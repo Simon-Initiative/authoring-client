@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  couch:
+    container_name: couch
+    image: klaemo/couchdb:latest
+    volumes:
+      - ./couch.conf:/etc/couchdb/local.d
+    ports:
+      - "5984:5984"
+  dev:
+    container_name: experiment
+    build: .
+    depends_on: 
+      - couch
+    ports:
+      - "9000:9000"
+    links:
+      - couch
+    volumes:
+      - .:/app
+      - ./dist:/app/dist
+      - /app/node_modules
+    command: gulp dev
+    

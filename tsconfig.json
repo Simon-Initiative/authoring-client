@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "target": "es6",
+        "jsx": "preserve",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "noImplicitAny": false,
+        "removeComments": false,
+        "sourceMap": true,
+        "inlineSourceMap": false,
+        "noEmitHelpers": true,
+        "outDir": "./dev"
+    },
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
