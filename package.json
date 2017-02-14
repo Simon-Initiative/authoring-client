@@ -1,6 +1,6 @@
 {
-  "name": "authoring-experiments",
-  "version": "1.0.0",
+  "name": "course-editor",
+  "version": "0.0.1",
   "description": "",
   "main": "./src/app.tsx",
   "scripts": {},

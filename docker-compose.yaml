@@ -9,7 +9,7 @@ services:
     ports:
       - "5984:5984"
   dev:
-    container_name: experiment
+    container_name: editor
     build: .
     depends_on: 
       - couch
