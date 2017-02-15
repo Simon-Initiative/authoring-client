@@ -12,7 +12,7 @@ var WebpackDevServer = require("webpack-dev-server");
 var $ = require('gulp-load-plugins')({lazy: true});
 var webpackDistConfig = require('./webpack.dist.js');
 var webpackDevConfig = require('./webpack.dev.js');
-
+var fs = require('fs');
 var runDataInit = require('./src/data/couch.js');
 
 var exec = require('child_process').exec;
@@ -131,8 +131,44 @@ gulp.task('dist', function(cb) {
   runSequence('prelude', 'clean', 'setupDist', 'build', 'postdist', cb);
 });
 
+
+
 gulp.task('test', function(cb) {
-  return run('jest').exec();
+  runSequence('clean:test', 'setup:test', 'exec:test', cb);
+});
+
+gulp.task('test-dist', function(cb) {
+  runSequence('test', 'dist', cb);
+});
+
+
+
+gulp.task('clean:test', function(cb) {
+  fs.unlink('test-out/results.txt', () => {
+    return fs.rmdir('test-out', () => cb());
+  });
+  
+});
+
+gulp.task('setup:test', function(cb) {
+  return fs.mkdir('test-out', () => cb());
+});
+
+
+gulp.task('exec:test', function(cb) {
+  return exec('jest',(error, stdout, stderr) => {
+    
+    fs.writeFile('test-out/results.txt', stderr, (err) => {
+      if (err) {
+        cb(err);
+        return;
+      }
+      cb(error);
+    });
+    
+    console.log(stderr);
+  });
+
 });
 
 gulp.task('prelude', function() {
@@ -217,8 +253,9 @@ gulp.task('serve', function(callback) {
 gulp.task('default', function() {
     gutil.log("[default]", "Available tasks are:");
     gutil.log("[default]", "------------------------------------------------------");
-    gutil.log("[default]", "dev      - runs project in webpack dev server");
-    gutil.log("[default]", "dist     - builds the webpack dist version of project");
-    gutil.log("[default]", "test     - runs all unit tests");
+    gutil.log("[default]", "dev        - runs project in webpack dev server");
+    gutil.log("[default]", "dist       - builds the webpack dist version of project");
+    gutil.log("[default]", "test       - runs all unit tests");
+    gutil.log("[default]", "test-dist  - runs tests then builds dist");
     gutil.log("[default]", "------------------------------------------------------");
 });
