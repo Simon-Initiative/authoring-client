@@ -23,8 +23,8 @@ interface ToolbarOwnProps {
 }
 
 const stateGeneric = returnType(mapStateToProps);  
-type ToolbarStateProps = typeof stateGeneric;  
-type ToolbarProps = ToolbarStateProps & ToolbarOwnProps;
+type ToolbarReduxProps = typeof stateGeneric;  
+type ToolbarProps = ToolbarReduxProps & ToolbarOwnProps;
 
 
 interface Toolbar {
@@ -128,6 +128,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
 }
 
-export default connect<ToolbarStateProps, {}, ToolbarOwnProps>(mapStateToProps)(Toolbar);;
+export default connect<ToolbarReduxProps, {}, ToolbarOwnProps>(mapStateToProps)(Toolbar);;
 
 

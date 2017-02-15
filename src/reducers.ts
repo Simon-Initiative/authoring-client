@@ -1,12 +1,21 @@
 
 import { combineReducers } from 'redux';
 
-import { authoring } from './actions/authoring';
+export type OtherAction = { type: '' };
+export const OtherAction : OtherAction = { type: '' };
+    
+import { authoringActions } from './actions/authoring';
 import { dataActions } from './actions/data';
 import { modalActions } from './actions/modal';
 import { viewActions } from './actions/view';
 
-function content(state = { rev: null, content: null}, action): Object {
+
+type ContentAction = 
+  dataActions.publishPageAction |
+  dataActions.publishRevAction |
+  OtherAction
+
+function content(state = { rev: null, content: null}, action: ContentAction): Object {
   switch(action.type) {
   case dataActions.PUBLISH_PAGE:
     return { rev: action.content._rev, content: action.content};
@@ -17,8 +26,12 @@ function content(state = { rev: null, content: null}, action): Object {
   }
 }
 
+type PagesAction = 
+  dataActions.publishPagesAction |
+  dataActions.pageCreatedAction |
+  OtherAction
 
-function pages(state = [], action): Object[] {
+function pages(state = [], action: PagesAction): Object[] {
   switch(action.type) {
   case dataActions.PUBLISH_PAGES:
     return action.pages;
@@ -30,7 +43,12 @@ function pages(state = [], action): Object[] {
   }
 }
 
-function questions(state = [], action): Object[] {
+type QuestionsActions =
+  dataActions.publishQuestionsAction |
+  dataActions.questionCreatedAction |
+  OtherAction
+
+function questions(state = [], action: QuestionsActions): Object[] {
   switch(action.type) {
   case dataActions.PUBLISH_QUESTIONS:
     return action.questions;
@@ -42,10 +60,15 @@ function questions(state = [], action): Object[] {
   }
 }
 
-function editHistory(state = [], action): Object[] {
+type EditAction =
+    authoringActions.insertActivityAction |
+    authoringActions.toggleInlineStyleAction |
+    OtherAction
+
+function editHistory(state = [], action: EditAction = OtherAction): Object[] {
   switch(action.type) {
-  case authoring.TOGGLE_INLINE_STYLE:
-  case authoring.INSERT_ACTIVITY:
+  case authoringActions.INSERT_ACTIVITY:
+  case authoringActions.TOGGLE_INLINE_STYLE:
     return [action, ...state];
   default:
     return state;
@@ -53,7 +76,12 @@ function editHistory(state = [], action): Object[] {
   
 }
 
-function modal(state = null, action): Object[] {
+type ModalActions = 
+  modalActions.dismissAction |
+  modalActions.displayAction |
+  OtherAction
+
+function modal(state = null, action: ModalActions): Object[] {
   switch(action.type) {
   case modalActions.DISMISS_MODAL:
     return null;
@@ -64,7 +92,11 @@ function modal(state = null, action): Object[] {
   }
 }
 
-function view(state : viewActions.View = "allPages", action): viewActions.View {
+type ViewActions =
+  viewActions.changeViewAction |
+  OtherAction
+
+function view(state : viewActions.View = "allPages", action: ViewActions): viewActions.View {
   switch(action.type) {
   case viewActions.CHANGE_VIEW:
     return action.view;

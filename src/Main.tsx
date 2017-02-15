@@ -4,7 +4,7 @@ import * as React from 'react';
 import { connect }  from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { authoring } from './actions/authoring';
+import { authoringActions } from './actions/authoring';
 import { modalActions } from './actions/modal';
 import { viewActions } from './actions/view';
 import { dataActions } from './actions/data';
@@ -34,7 +34,7 @@ class Main extends React.Component<MainProps, {}> {
   constructor(props) {
     super(props);
 
-    this.authoringActions = bindActionCreators((authoring as any), this.props.dispatch);
+    this.authoringActions = bindActionCreators((authoringActions as any), this.props.dispatch);
     this.modalActions = bindActionCreators((modalActions as any), this.props.dispatch);
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
     this.dataActions = bindActionCreators((dataActions as any), this.props.dispatch);
