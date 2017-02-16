@@ -128,6 +128,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
 }
 
-export default connect<ToolbarReduxProps, {}, ToolbarOwnProps>(mapStateToProps)(Toolbar);;
+export default connect<ToolbarReduxProps, {}, ToolbarOwnProps>(mapStateToProps)(Toolbar);
 
 

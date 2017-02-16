@@ -16,6 +16,8 @@ coverage
 test-out
 junitresults.xml
 
+couch/data
+
 # nyc test coverage
 .nyc_output
 

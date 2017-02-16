@@ -2,6 +2,24 @@
 var http = require('http');
 var proc = require('child_process');
 
+var protocol = 'http://';
+var hostname = 'couch';
+var port = 5986;
+var user = 'su';
+var password = 'su';
+
+const NO_AUTH_NEEDED = false;
+
+
+
+var authHeader = function() {
+  return 'Basic ' + new Buffer(user + ':' + password).toString('base64');
+}
+
+var url = function(user, password) {
+  return protocol + user + ':' + password + '@' + hostname + ':' + port;
+}
+
 var questions = [
   { type: 'tf', stem: 'Blue is a color.', answer: true},
   { type: 'tf', stem: 'Dog is an animal.', answer: true},
@@ -11,14 +29,17 @@ var questions = [
 
 var request = function(method, resourcePath, data) {
   return new Promise(function(resolve, reject) {
+
+    var headers = {
+      'Content-Type': 'application/json',
+    };
+    
     var options = {
-      hostname: 'couch',
-      port: 5984,
+      hostname,
+      port,
       path: resourcePath,
       method: method,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers
     };
 
     var req = http.request(options, (res) => {
@@ -80,7 +101,7 @@ var waitUntilReady = function(initialResolve) {
   console.log("Attempting connection to couch");
 
   return new Promise(function(resolve, reject) {
-    fetch('http://couch:5984')
+    fetch(url())
       .then(v => resolve(true))
       .catch(e => {
         console.log("...error connecting: " + e);
@@ -90,11 +111,20 @@ var waitUntilReady = function(initialResolve) {
   });
 }
 
+var createAdmin = function() {
+  console.log('About to create admin user');
+  return request('PUT', '/_config/admins/su', 'superuser')
+}
+
+var createUser = function(name, password) {
+
+}
+
 var run = function() {
   return waitUntilReady()
-    .then(r => request('PUT', '/db'))
-    .then(r => insertData())
-    .then(r => console.log("data loaded"));
+ //   .then(r => request('PUT', '/db', undefined, NO_AUTH_NEEDED))
+ //   .then(r => insertData())
+    .then(r => console.log("database ready"));
 }
 
 module.exports = run; 

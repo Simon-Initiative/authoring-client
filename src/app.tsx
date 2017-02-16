@@ -2,6 +2,7 @@ import 'babel-polyfill';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { getUserName } from './utils/params';
 
 declare var require: {
     <T>(path: string): T;
@@ -45,6 +46,6 @@ initRegistry();
 
 ReactDOM.render(
     <Provider store={store}>
-      <Main/>
+      <Main user={getUserName()}/>
     </Provider>,
   document.getElementById('app')); // jshint ignore:line

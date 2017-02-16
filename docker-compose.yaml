@@ -3,9 +3,10 @@ version: '2'
 services:
   couch:
     container_name: couch
-    image: klaemo/couchdb:latest
+    build: couch
     volumes:
-      - ./couch.conf:/etc/couchdb/local.d
+      - ./couch/data:/opt/couchdb/data
+      - ./couch/local.d:/opt/couchdb/etc/local.d
     ports:
       - "5984:5984"
   dev:

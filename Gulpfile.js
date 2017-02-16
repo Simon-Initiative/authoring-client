@@ -124,7 +124,7 @@ gulp.task('enableCors', function(cb) {
 
 
 gulp.task('dev', function(cb) {
-  runSequence('prelude', 'clean:dev', 'setupDev', 'initData', 'enableCors','serve', cb);
+  runSequence('prelude', 'clean:dev', 'setupDev', 'serve', cb);
 });
 
 gulp.task('dist', function(cb) {

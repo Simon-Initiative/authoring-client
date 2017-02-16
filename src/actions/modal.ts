@@ -1,6 +1,7 @@
 import {makeActionCreator} from './utils';
 
 export module modalActions {
+  
   export type DISPLAY_MODAL = 'DISPLAY_MODAL';
   export const DISPLAY_MODAL : DISPLAY_MODAL = 'DISPLAY_MODAL';
   

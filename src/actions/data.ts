@@ -9,10 +9,28 @@ import { EditorState } from 'draft-js';
 
 const defaultContent = translateDraftToContent(EditorState.createEmpty().getCurrentContent());
 
-const baseUrl = 'http://localhost:5984';
+const protocol = 'http://';
+const hostname = 'localhost';
+const port = '5984';
+
+// Cached from login action
+var username;
+var pass;
+
+const baseUrl = protocol + hostname + ':' + port;
+
+function getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Basic ' + btoa(username + ':' + pass)
+  }
+}
+
+const database = 'editor';
+
 
 export module dataActions {
-
 
   export type PUBLISH_PAGES = 'PUBLISH_PAGES';
   export const PUBLISH_PAGES : PUBLISH_PAGES = 'PUBLISH_PAGES';
@@ -124,6 +142,17 @@ export module dataActions {
     }
   }
 
+  export function login(name: string, password: string) {
+    return function(dispatch) {
+
+      // Store these for all subsequent calls
+      username = name;
+      pass = password;
+      
+      dispatch(fetchPages());
+      dispatch(fetchQuestions());
+    }
+  }
 
   export const fetchPages = function() {
     return function(dispatch) {
@@ -133,13 +162,11 @@ export module dataActions {
           type: {'$eq': 'page'}
         },
         fields: ["_id", "title"]
-      }
+      };
 
-      fetch(baseUrl + '/db/_find', {
+      fetch(`${baseUrl}/${database}/_find`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getHeaders(),
         body: JSON.stringify(query)
       })
       .then(response => {
@@ -162,11 +189,9 @@ export module dataActions {
         fields: ["_id", "stem"]
       }
 
-      fetch(baseUrl + '/db/_find', {
+      fetch(`${baseUrl}/${database}/_find`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getHeaders(),
         body: JSON.stringify(query)
       })
       .then(response => {
@@ -182,7 +207,10 @@ export module dataActions {
   }
 
   export const fetchDocument = function(id: string) {
-    return fetch(baseUrl + '/db/' + id)
+    return fetch(`${baseUrl}/${database}/${id}`, {
+        method: 'GET',
+        headers: getHeaders()
+      })
       .then(r => r.json());
   }
 
@@ -193,11 +221,9 @@ export module dataActions {
 
     return function(dispatch) {
 
-      fetch(baseUrl + '/db', {
+      fetch(`${baseUrl}/${database}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getHeaders(),
         body: JSON.stringify(content)
       })
       .then(response => response.json())
@@ -212,11 +238,9 @@ export module dataActions {
 
     return function(dispatch) {
 
-      fetch(baseUrl + '/db', {
+      fetch(`${baseUrl}/${database}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getHeaders(),
         body: JSON.stringify(content)
       })
       .then(response => response.json())
@@ -237,11 +261,9 @@ export module dataActions {
 
   export const savePage = function(content) {
     return function(dispatch) {
-      fetch(baseUrl + '/db/' + content._id, {
+      fetch(`${baseUrl}/${database}/${content._id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getHeaders(),
         body: JSON.stringify(content)
       })
       .then(result => result.json())
@@ -257,11 +279,9 @@ export module dataActions {
   }
   export const saveQuestion = function(content: QuestionContent) {
     
-    return fetch(baseUrl + '/db/' + content._id, {
+    return fetch(`${baseUrl}/${database}/${content._id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getHeaders(),
       body: JSON.stringify(content)
     })
     .then(result => result.json())

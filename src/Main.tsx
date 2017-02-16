@@ -1,6 +1,7 @@
 'use strict'
 
 import * as React from 'react';
+import { returnType } from './utils/types';
 import { connect }  from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -14,6 +15,23 @@ import PageEditor from './components/PageEditor';
 import AllPages from './components/AllPages';
 import AllQuestions from './components/AllQuestions';
 
+function mapStateToProps(state: any) {
+
+  const {
+    content, 
+    editHistory,
+    modal,
+    view
+  } = state;
+
+  return {
+    content, 
+    editHistory,
+    modal,
+    view
+  }
+}
+
 interface Main {
   authoringActions: Object;
   modalActions: Object;
@@ -21,13 +39,13 @@ interface Main {
   dataActions: Object;
 }
 
-export interface MainProps {
-  dispatch: any;
-  content: any;
-  editHistory: Object[];
-  view: viewActions.View;
-  modal: any;
+interface MainOwnProps {
+  user: string
 }
+
+const stateGeneric = returnType(mapStateToProps);  
+type MainReduxProps = typeof stateGeneric; 
+type MainProps = MainReduxProps & MainOwnProps & { dispatch };
 
 class Main extends React.Component<MainProps, {}> {
 
@@ -41,8 +59,8 @@ class Main extends React.Component<MainProps, {}> {
   }
 
   componentDidMount() {
-    this.props.dispatch(dataActions.fetchPages());
-    this.props.dispatch(dataActions.fetchQuestions());
+    let user = this.props.user;
+    this.props.dispatch(dataActions.login(user, user));
   }
 
   getView(view: viewActions.View): JSX.Element {
@@ -80,22 +98,4 @@ class Main extends React.Component<MainProps, {}> {
 
 };
 
-function subscribedState(state: any): Object {
-
-  const {
-    content, 
-    editHistory,
-    modal,
-    view
-  } = state;
-
-  return {
-    content, 
-    editHistory,
-    modal,
-    view
-  }
-}
-
-
-export default connect(subscribedState)(Main);
+export default connect<MainReduxProps, {}, MainOwnProps>(mapStateToProps)(Main);
