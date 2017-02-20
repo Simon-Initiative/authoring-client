@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { persistence } from '../actions/persistence';
+import * as persistence from '../data/persistence';
 import { document as documentActions } from '../actions/document';
 
 import { getEditorByName } from './registry';
@@ -28,13 +28,9 @@ class EditorFactory extends React.Component<EditorFactoryProps, { document: pers
   }
 
   fetchDocument(documentId: string) {
-    this.props.dispatch(persistence.retrieveDocument(documentId, 'Retrieving Document',
-      (document) => {
-        this.setState({document});
-      },
-      (err) => {
-
-      }));
+    persistence.retrieveDocument(documentId)
+      .then(document => this.setState({document}))
+      .catch(err => console.log(err));
   }
 
   componentWillReceiveProps(nextProps) {

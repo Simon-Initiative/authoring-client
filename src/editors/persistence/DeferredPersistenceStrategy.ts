@@ -1,5 +1,5 @@
 
-import { persistence } from '../../actions/persistence';
+import * as persistence from '../../data/persistence';
 import { PersistenceStrategy, onSaveCompletedCallback, onFailureCallback } from './PersistenceStrategy';
 
 export interface DeferredPersistenceStrategy {
@@ -66,23 +66,23 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     this.inFlight = this.pending; 
     this.pending = null;
 
-    persistence.persistDocument(this.pending._id, this.inFlight, this.taskDescription,
-      (success) => {
+    persistence.persistDocument(this.pending._id, this.inFlight)
+      .then(result => {
         this.inFlight = null;
         if (this.successCallback !== null) {
-          this.successCallback(success);
+          this.successCallback(result);
         }
 
         if (this.pending !== null) {
-          this.pending._rev = success.rev;
+          this.pending._rev = result.rev;
           this.queueSave();
         }
 
-      },
-      (failure) => {
+      })
+      .catch(err => {
         this.inFlight = null;
         if (this.failureCallback !== null) {
-          this.failureCallback(failure);
+          this.failureCallback(err);
         }
 
         // TODO: revisit this logic.  We are at a state where we may

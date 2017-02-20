@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { ContentState } from 'draft-js';
 
-import { persistence } from '../../actions/persistence';
 import Toolbar from './Toolbar';
 import DraftWrapper from '../DraftWrapper';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../AbstractEditor';

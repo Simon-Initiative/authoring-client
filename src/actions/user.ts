@@ -1,6 +1,6 @@
 var fetch = (window as any).fetch;
 
-import { persistence } from './persistence';
+import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
@@ -53,17 +53,9 @@ export module user {
       let userId = null;
       let username = null;
 
-      let query = {
-        selector: {
-          'doc.name': {'$eq': user},
-          'doc.type': {'$eq': 'user'}
-        }
-      };
-
-      fetch(`${configuration.baseUrl}/_users/_find`, {
-        method: 'POST',
-        headers: getHeaders({ user, password}),
-        body: JSON.stringify(query)
+      fetch(`${configuration.baseUrl}/_users/org.couchdb.user:${user}`, {
+        method: 'GET',
+        headers: getHeaders({ user, password})
       })
       .then(response => {
 
@@ -75,29 +67,30 @@ export module user {
         return response.json();
       })
       .then(json => {
-        if (json.docs.length === 1) {
-          userId = json.docs[0]._id;
-          username = json.docs[0].doc.name;
+        
+        userId = json._id;
+        username = json.name;
 
-          // fetch the courses that the user has access to
-          let coursesQuery = {
-            selector: {
-              'content.userId': {'$eq': userId},
-              'metadata.type': {'$eq': 'coursePermission'}
-            }
+        credentials.user = user;
+        credentials.password = password;
+
+        // fetch the courses that the user has access to
+        let coursesQuery = {
+          selector: {
+            'content.userId': {'$eq': userId},
+            'metadata.type': {'$eq': 'coursePermission'}
           }
-          persistence.queryDocuments(coursesQuery, 'Retrieving courses',
-            (docs) => {
-              let courses = docs.map(result => (result.content as any).courseId);
-              dispatch(loginSuccess(username,userId, {}, courses));
-            },
-            (failure) => {
-              dispatch(loginFailure());
+        }
+
+        persistence.queryDocuments(coursesQuery)
+          .then(docs => {
+            let courses = docs.map(result => (result.content as any).courseId);
+            dispatch(loginSuccess(username, userId, {}, courses));
+          })
+          .catch(err => {
+            dispatch(loginFailure());
           });
 
-        } else {
-          dispatch(loginFailure());
-        }
       })
       .catch(err => {
         dispatch(requestActions.endRequest(requestId));

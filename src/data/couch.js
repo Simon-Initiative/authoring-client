@@ -3,12 +3,12 @@ var http = require('http');
 var proc = require('child_process');
 
 var protocol = 'http://';
-var hostname = 'couch';
+var hostname = 'localhost';
 var port = 5984;
 var user = 'su';
 var password = 'su';
 
-var url = function(user, password) {
+var url = function() {
   return protocol + user + ':' + password + '@' + hostname + ':' + port;
 }
 
@@ -107,7 +107,7 @@ var createUser = function(user, password) {
     roles: [], 
     type: "user"
   };
-  return request('POST', '/_users', data);
+  return request('PUT', `/_users/org.couchdb.user:${user}`, data);
 }
 
 var createPermission = function(user, course) {
@@ -160,7 +160,7 @@ var createCourse = function(users) {
           }
         };
         request('POST', '/editor', data)
-          .then(result => resolve(result));
+          .then(result => resolve({course: result.id, users}));
       });
   });
 }
@@ -172,11 +172,15 @@ var createPermissions = function(data) {
 
 var run = function() {
   return waitUntilReady()
-    .then(r => request('PUT', '/editor', undefined))
+//.then(r => request('PUT', '/editor', undefined))
+    //.then(r => request('PUT', '/_global_changes', undefined))
+    //.then(r => request('PUT', '/_metadata', undefined))
+    //.then(r => request('PUT', '/_replicator', undefined))
+    //.then(r => request('PUT', '/_users', undefined))
     .then(r => createUsers())
     .then(r => createCourse(r))
     .then(r => createPermissions(r))
     .then(r => console.log("database ready"));
 }
 
-module.exports = run; 
+run(); 

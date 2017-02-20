@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { persistence } from '../actions/persistence';
+import * as persistence from '../data/persistence';
 
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
@@ -48,7 +48,7 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
       this.currentRevision = result.rev;
     };
 
-    this.onSaveFailure = (failure: persistence.PersistFailure) => {
+    this.onSaveFailure = (failure: any) => {
 
     };
   }

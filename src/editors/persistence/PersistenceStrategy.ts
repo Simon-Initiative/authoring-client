@@ -1,9 +1,9 @@
 
-import { persistence } from '../../actions/persistence';
+import * as persistence from '../../data/persistence';
 
 export type onSaveCompletedCallback = (result: persistence.PersistSuccess) => void;
 
-export type onFailureCallback = (result: persistence.PersistFailure) => void;
+export type onFailureCallback = (result: any) => void;
 
 
 export interface PersistenceStrategy {

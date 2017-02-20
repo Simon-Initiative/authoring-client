@@ -9,7 +9,7 @@ import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
 import { document as documentActions } from './actions/document';
 
-import { persistence } from './actions/persistence';
+import * as persistence from './data/persistence';
 
 import NavigationBar from './components/NavigationBar';
 import Courses from './components/Courses';
@@ -63,8 +63,10 @@ class Main extends React.Component<MainProps, {}> {
     if (documentId === documentActions.VIEW_ALL_COURSES) {
       return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
-    else {
+    else if (documentId !== null) {
       return <EditorFactory dispatch={this.props.dispatch} documentId={this.props.document}/>;
+    } else {
+      return null;  // TODO replace with welcome / logon screen
     }
   }
 

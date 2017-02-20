@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { persistence } from '../actions/persistence';
+import * as persistence from '../data/persistence';
 import { document as documentActions } from '../actions/document';
 
 interface Courses {
@@ -39,14 +39,14 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
       },
       fields: ['_id', 'content.title']
     }
-    this.props.dispatch(persistence.queryDocuments(coursesQuery, 'Retrieving Courses',
-      (docs) => {
+    persistence.queryDocuments(coursesQuery)
+      .then(docs => {
         let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d.content as any).title}));
         this.setState({ courses });
-      },
-      (err) => {
+      })
+      .catch(err => {
 
-      }));
+      });
   }  
 
   render() {

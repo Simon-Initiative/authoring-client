@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { persistence } from '../actions/persistence'
+import * as persistence from '../data/persistence'
 
 interface InlineQuestion {
   currentAnswer: boolean;
@@ -20,14 +20,11 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
   }
 
   componentDidMount() {
-    this.props.blockProps.dispatch(persistence.retrieveDocument(this.props.questionId,
-      '', 
-      (doc) => {
-        this.setState({ question: doc.content, editStem: (doc.content as any).stem})
-      },
-      (err) => {
-
-    }));
+    persistence.retrieveDocument(this.props.questionId)
+      .then(doc => this.setState({ question: doc.content, editStem: (doc.content as any).stem}))
+      .catch(err => {
+        // TODO: unified error handling 
+      });
   }
 
   onSubmit() {
@@ -55,16 +52,14 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
   issueSave() {
     var updated = Object.assign({}, this.state.question, { stem: this.state.editStem, answer: this.currentAnswer });
     
-    this.props.blockProps.dispatch(persistence.persistDocument(this.props.questionId,
-      this.state.question,
-      '', 
-      (update) => {
+    persistence.persistDocument(this.props.questionId, this.state.question)
+      .then(update => {
         this.setState({editMode: false, question: { _rev: update.rev, stem: updated.stem, answer: updated.answer}, answer: null});
         this.props.blockProps.onEditMode(false);
-      },
-      (err) => {
-
-    }));
+      })
+      .catch(err => {
+        // TODO unified err handling
+      });
     
   }
 

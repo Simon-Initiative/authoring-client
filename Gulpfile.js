@@ -13,7 +13,7 @@ var $ = require('gulp-load-plugins')({lazy: true});
 var webpackDistConfig = require('./webpack.dist.js');
 var webpackDevConfig = require('./webpack.dev.js');
 var fs = require('fs');
-var runDataInit = require('./src/data/couch.js');
+//var runDataInit = require('./src/data/couch.js');
 
 var exec = require('child_process').exec;
  
