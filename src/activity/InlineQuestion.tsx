@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { dataActions } from '../actions/data'
+import { persistence } from '../actions/persistence'
 
 interface InlineQuestion {
   currentAnswer: boolean;
@@ -20,11 +20,14 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
   }
 
   componentDidMount() {
-    dataActions.fetchDocument(this.props.questionId)
-      .then(doc => {
-        
-        this.setState({ question: doc, editStem: doc.stem})
-      });
+    this.props.blockProps.dispatch(persistence.retrieveDocument(this.props.questionId,
+      '', 
+      (doc) => {
+        this.setState({ question: doc.content, editStem: (doc.content as any).stem})
+      },
+      (err) => {
+
+    }));
   }
 
   onSubmit() {
@@ -51,11 +54,17 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
 
   issueSave() {
     var updated = Object.assign({}, this.state.question, { stem: this.state.editStem, answer: this.currentAnswer });
-    dataActions.saveQuestion(updated)
-      .then(update => {
+    
+    this.props.blockProps.dispatch(persistence.persistDocument(this.props.questionId,
+      this.state.question,
+      '', 
+      (update) => {
         this.setState({editMode: false, question: { _rev: update.rev, stem: updated.stem, answer: updated.answer}, answer: null});
         this.props.blockProps.onEditMode(false);
-    });
+      },
+      (err) => {
+
+    }));
     
   }
 

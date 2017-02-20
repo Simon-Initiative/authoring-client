@@ -1,4 +1,4 @@
-import {makeActionCreator} from '../src/actions/utils'
+import {makeActionCreator} from '../src/actions/utils/utils'
 
 it('creates an action creator', () => {
   let actionCreator = makeActionCreator('TEST', 'guid');

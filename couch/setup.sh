@@ -1,13 +1,11 @@
 # enable CORS
 
-# curl -sX PUT http://su:su@localhost:5986/_config/httpd/enable_cors -d '"true"' 1>/dev/null
-# curl -sX PUT http://su:su@localhost:5986/_config/cors/origins -d '"*"' 1>/dev/null
-# curl -sX PUT http://su:su@localhost:5986/_config/cors/credentials -d '"true"' 1>/dev/null
-# curl -sX PUT http://su:su@localhost:5986/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"' 1>/dev/null
-# curl -sX PUT http://su:su@localhost:5986/_config/cors/headers -d '"accept, authorization, content-type, origin, referer, x-csrf-token"' 1>/dev/null
+curl -sX PUT http://su:su@localhost:5984/_config/httpd/enable_cors -d '"true"' 1>/dev/null
+curl -sX PUT http://su:su@localhost:5984/_config/cors/origins -d '"*"' 1>/dev/null
+curl -sX PUT http://su:su@localhost:5984/_config/cors/credentials -d '"true"' 1>/dev/null
+curl -sX PUT http://su:su@localhost:5984/_config/cors/methods -d '"GET, PUT, POST, HEAD, DELETE"' 1>/dev/null
+curl -sX PUT http://su:su@localhost:5984/_config/cors/headers -d '"accept, authorization, content-type, origin, referer, x-csrf-token"' 1>/dev/null
   
-
-
 # create two test users
 curl -X PUT http://su:su@localhost:5984/_users/org.couchdb.user:user1 \
     -H "Accept: application/json" \

@@ -43,9 +43,12 @@ import Main from './Main';
 import initRegistry from './activity/registrar';
 initRegistry();
 
+import initEditorRegistry from './editors/registrar';
+initEditorRegistry();
+
 
 ReactDOM.render(
     <Provider store={store}>
-      <Main user={getUserName()}/>
+      <Main username={getUserName()}/>
     </Provider>,
   document.getElementById('app')); // jshint ignore:line

@@ -17,6 +17,7 @@ export interface DraftWrapperProps {
   editHistory: Object[];
   notifyOnChange: (ContentState) => void;
   content: ContentState;
+  locked: boolean;
 }
 
 interface DraftWrapperState {
@@ -214,7 +215,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
-          readOnly={this.state.inEdit}
+          readOnly={this.state.inEdit || this.props.locked}
           onChange={this.onChange} />
       </div>;
   }

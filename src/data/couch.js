@@ -4,34 +4,21 @@ var proc = require('child_process');
 
 var protocol = 'http://';
 var hostname = 'couch';
-var port = 5986;
+var port = 5984;
 var user = 'su';
 var password = 'su';
-
-const NO_AUTH_NEEDED = false;
-
-
-
-var authHeader = function() {
-  return 'Basic ' + new Buffer(user + ':' + password).toString('base64');
-}
 
 var url = function(user, password) {
   return protocol + user + ':' + password + '@' + hostname + ':' + port;
 }
-
-var questions = [
-  { type: 'tf', stem: 'Blue is a color.', answer: true},
-  { type: 'tf', stem: 'Dog is an animal.', answer: true},
-  { type: 'tf', stem: 'Parrot is a color.', answer: true},
-];
-
 
 var request = function(method, resourcePath, data) {
   return new Promise(function(resolve, reject) {
 
     var headers = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Basic ' + new Buffer(user + ':' + password).toString('base64')
     };
     
     var options = {
@@ -44,11 +31,13 @@ var request = function(method, resourcePath, data) {
 
     var req = http.request(options, (res) => {
       res.setEncoding('utf8');
+      var body = '';
       res.on('data', (chunk) => {
+        body += chunk;
         console.log(`BODY: ${chunk}`);
       });
       res.on('end', () => {
-        resolve(true);
+        resolve(JSON.parse(body));
       });
     });
 
@@ -111,25 +100,83 @@ var waitUntilReady = function(initialResolve) {
   });
 }
 
-var createAdmin = function() {
-  console.log('About to create admin user');
-  return request('PUT', '/_config/admins/su', 'superuser')
+var createUser = function(user, password) {
+  let data = { 
+    name: user, 
+    password: password, 
+    roles: [], 
+    type: "user"
+  };
+  return request('POST', '/_users', data);
 }
 
-var createUser = function(name, password) {
+var createPermission = function(user, course) {
+  let data = { 
+    metadata: {
+      type: 'coursePermission'
+    }, 
+    content: {
+      userId: user,
+      courseId: course
+    }
+  };
+  return request('POST', '/editor', data);
+}
 
+var createUsers = function() {
+  return Promise.all([
+    createUser('user1', 'user1'),
+    createUser('user2', 'user2')
+  ]);
+}
+
+var createOrganization = function() {
+  let data = { 
+    metadata: {
+      type: 'organization',
+      lockedBy: ''
+    }, 
+    content: {
+      title: 'Sample Organization',
+      nodes: []
+    }
+  };
+  return request('POST', '/editor', data);
+}
+
+var createCourse = function(users) {
+  return new Promise(function(resolve, reject) {
+    createOrganization()
+      .then(result => {
+        let data = { 
+          metadata: {
+            type: 'course',
+            lockedBy: ''
+          }, 
+          content: {
+            title: 'Sample Course',
+            organizations: [result.id],
+            resources: []
+          }
+        };
+        request('POST', '/editor', data)
+          .then(result => resolve(result));
+      });
+  });
+}
+
+var createPermissions = function(data) {
+  let course = data.course;
+  return Promise.all(data.users.map(u => createPermission(u.id, course)));
 }
 
 var run = function() {
   return waitUntilReady()
- //   .then(r => request('PUT', '/db', undefined, NO_AUTH_NEEDED))
- //   .then(r => insertData())
+    .then(r => request('PUT', '/editor', undefined))
+    .then(r => createUsers())
+    .then(r => createCourse(r))
+    .then(r => createPermissions(r))
     .then(r => console.log("database ready"));
 }
 
 module.exports = run; 
-
-
-
-
-

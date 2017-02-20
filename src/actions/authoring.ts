@@ -1,4 +1,3 @@
-import {makeActionCreator} from './utils';
 
 export module authoringActions {
 

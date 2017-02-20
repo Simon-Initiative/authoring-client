@@ -2,10 +2,9 @@
 
 import * as React from 'react';
 import { connect }  from 'react-redux';
-import { returnType } from '../utils/types';
+import { returnType } from '../../utils/types';
 
-import MediaSelection from './MediaSelection';
-import QuestionSelection from './QuestionSelection';
+import MediaSelection from '../../components/selection/MediaSelection';
 
 function mapStateToProps(state) {  
   const {
@@ -91,14 +90,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
         )
     };
 
-    this.onActivity = () => {
-        this.props.modalActions.display(
-            <QuestionSelection questions={this.props.questions} onInsert={(type, data) => {
-                this.props.authoringActions.insertActivity(type, data);
-                this.props.modalActions.dismiss();
-                }} onCancel={this.props.modalActions.dismiss}/>
-        )
-    };
   }
 
   render() {

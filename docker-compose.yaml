@@ -6,7 +6,6 @@ services:
     build: couch
     volumes:
       - ./couch/data:/opt/couchdb/data
-      - ./couch/local.d:/opt/couchdb/etc/local.d
     ports:
       - "5984:5984"
   dev:
