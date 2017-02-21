@@ -172,11 +172,7 @@ var createPermissions = function(data) {
 
 var run = function() {
   return waitUntilReady()
-//.then(r => request('PUT', '/editor', undefined))
-    //.then(r => request('PUT', '/_global_changes', undefined))
-    //.then(r => request('PUT', '/_metadata', undefined))
-    //.then(r => request('PUT', '/_replicator', undefined))
-    //.then(r => request('PUT', '/_users', undefined))
+    .then(r => request('PUT', '/editor', undefined))
     .then(r => createUsers())
     .then(r => createCourse(r))
     .then(r => createPermissions(r))

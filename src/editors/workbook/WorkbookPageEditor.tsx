@@ -30,8 +30,9 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
     this.setState({ content: this.props.document.content });
   }
 
-  translateContent(content: Object) : Object {
-    return translateDraftToContent(content);
+  saveContent(content: Object) {
+    let inContentModel : Object = translateDraftToContent(content);
+    this.onContentChange(inContentModel);
   } 
 
   render() {
@@ -47,8 +48,8 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
                         <DraftWrapper 
                             editHistory={this.props.editHistory} 
                             content={this.state.content} 
-                            locked={this.state.lockedOut}
-                            notifyOnChange={this.onContentChange.bind(this)} />
+                            locked={!this.state.editingAllowed}
+                            notifyOnChange={this.saveContent.bind(this)} />
                     </div>
                 </div>
                 

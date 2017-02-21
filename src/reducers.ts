@@ -7,9 +7,9 @@ import { modal } from './reducers/modal';
 import { requests } from './reducers/requests';
 
 const reducers = combineReducers({
-  user,           // Information about current user, null if not logged insertActivityAction
-  courses,        // Available courses
-  document,       // The currently viewed document, null if none
+  user,           // Information about current user, null if not logged in
+  courses,        // Array of available course ids for current user
+  document,       // The currently viewed document id, null if none
   modal,          // modal display state
   requests        // the current pending async requests
 });

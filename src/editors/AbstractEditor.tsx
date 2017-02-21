@@ -24,14 +24,14 @@ export interface AbstractEditor<T extends PersistenceStrategy, P extends Abstrac
 }
 
 export interface AbstractEditorProps {
+  dispatch: any;
   document: persistence.Document; 
   userId: string;
   debug: boolean;
 }
 
 export interface AbstractEditorState {
-  document: persistence.Document;
-  lockedOut: boolean;
+  editingAllowed: boolean;
 }
 
 export abstract class AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState>
@@ -40,6 +40,7 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
   constructor(props, ctor: NoParamConstructor<T>) {
     super(props);
 
+    this.state = ({ editingAllowed: false } as any);
     this.persistenceStrategy = new ctor();
     this.currentRevision = null;
     this.documentMetadata = null;
@@ -62,26 +63,25 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
     };
   }
 
+  /**
+   * Called to trigger a save of the document. 
+   */
   onContentChange(content: Object) {
     const doc: persistence.Document = this.toFullDocument(content);
-    this.persistenceStrategy.triggerChange(doc, 'Saving ' + doc.metadata.type);
+    this.persistenceStrategy.save(doc, () => doc);
   }
 
-  abstract translateContent(content: Object) : Object;
-
   componentDidMount() {
-
     this.documentMetadata = this.props.document.metadata;
     this.currentRevision = this.props.document._rev;
 
-    if (this.documentMetadata.lockedBy !== (this.props.userId as string)
-      && this.documentMetadata.lockedBy !== '') {
-      this.setState({lockedOut: true});
-    }
+    this.persistenceStrategy.initialize(this.props.document, this.props.userId)
+      .then(result => this.setState({ editingAllowed: result }))
+      .catch(err => console.log(err));
   }
 
   componentWillUnmount() {
-    this.persistenceStrategy.flushPendingChanges();
+    this.persistenceStrategy.destroy();
   }
 
 }

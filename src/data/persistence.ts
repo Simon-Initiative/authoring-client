@@ -27,6 +27,12 @@ export type Document = {
   content: Object  
 };
 
+export type PendingDocument = { 
+  metadata: DocumentMetadata,
+  content: Object  
+};
+
+
 export function queryDocuments(query: Object) : Promise<Document[]> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/_find`, {
@@ -77,7 +83,51 @@ export type PersistSuccess = {
   ok: boolean
 }
 
-export const persistDocument = function(documentId: string, doc: Document) : Promise<PersistSuccess> {
+export function createDocument(doc: PendingDocument) : Promise<PersistSuccess> {
+  return new Promise(function(resolve, reject) {
+    fetch(`${configuration.baseUrl}/${configuration.database}`, {
+        method: 'POST',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(doc)
+      })
+    .then(response => {
+      if (!response.ok) {
+          throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      resolve(json as PersistSuccess);
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
+}
+
+export function createDocumentWithId(id: string, doc: PendingDocument) : Promise<PersistSuccess> {
+  return new Promise(function(resolve, reject) {
+    fetch(`${configuration.baseUrl}/${configuration.database}/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(doc)
+      })
+    .then(response => {
+      if (!response.ok) {
+          throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      resolve(json as PersistSuccess);
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });
+}
+
+export function persistDocument(documentId: string, doc: Document) : Promise<PersistSuccess> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${doc._id}`, {
         method: 'PUT',

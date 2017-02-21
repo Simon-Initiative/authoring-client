@@ -64,7 +64,8 @@ class Main extends React.Component<MainProps, {}> {
       return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
     else if (documentId !== null) {
-      return <EditorFactory dispatch={this.props.dispatch} documentId={this.props.document}/>;
+      return <EditorFactory dispatch={this.props.dispatch} 
+        userId={this.props.user.userId} documentId={this.props.document}/>;
     } else {
       return null;  // TODO replace with welcome / logon screen
     }

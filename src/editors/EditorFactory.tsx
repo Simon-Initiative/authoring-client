@@ -3,16 +3,16 @@
 import * as React from 'react';
 
 import * as persistence from '../data/persistence';
-import { document as documentActions } from '../actions/document';
 
 import { getEditorByName } from './registry';
 
 interface EditorFactory {
-  onSelect: (id) => void;
+  
 }
 
 export interface EditorFactoryProps {
   documentId: string;
+  userId: string;
   dispatch: any;
 }
 
@@ -22,9 +22,6 @@ class EditorFactory extends React.Component<EditorFactoryProps, { document: pers
     super(props);
 
     this.state = { document: null};
-    this.onSelect = (id) => {
-      this.props.dispatch(documentActions.viewDocument(id));
-    }
   }
 
   fetchDocument(documentId: string) {
