@@ -136,7 +136,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     this.onChange = (editorState) => {
       let content = editorState.getCurrentContent();
-      this.props.notifyOnChange(content);
+      console.log(editorState.getLastChangeType());
+      console.log(editorState.getUndoStack());
+      this.props.notifyOnChange(editorState);
 
       return this.setState({editorState})
     };

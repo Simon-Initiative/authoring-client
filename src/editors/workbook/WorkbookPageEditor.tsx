@@ -1,7 +1,7 @@
 'use strict'
 
 import * as React from 'react';
-import { ContentState } from 'draft-js';
+import { ContentState, EditorState } from 'draft-js';
 import { bindActionCreators } from 'redux';
 
 import Toolbar from './Toolbar';
@@ -15,6 +15,7 @@ interface WorkbookPageEditor {
   authoringActions: any;
   modalActions: any;
   editDispatch: any;
+  lastUndoStackSize: number;
 }
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps {
@@ -32,6 +33,7 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
     super(props, DeferredPersistenceStrategy);
     
     this.editDispatch = this._editDispatch.bind(this);
+    this.lastUndoStackSize = 0;
     
     this.state = { 
       content: this.props.document.content,
@@ -39,12 +41,19 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
     };
   }
 
-  saveContent(content: Object) {
-    let inContentModel : Object = translateDraftToContent(content);
-    let newDoc = persistence.copy(this.currentDocument);
-    newDoc.content = inContentModel;
+  saveContent(editorState: EditorState) {
+
+    if (editorState.getUndoStack().count() !== this.lastUndoStackSize) {
+
+      this.lastUndoStackSize = editorState.getUndoStack().count();
+
+      let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
+      let newDoc = persistence.copy(this.currentDocument);
+      newDoc.content = inContentModel;
+      
+      this.persistenceStrategy.save(newDoc, () => newDoc);
+    }
     
-    this.persistenceStrategy.save(newDoc, () => newDoc);
   } 
 
   _editDispatch(action: Object) {

@@ -11,6 +11,8 @@ export interface DeferredPersistenceStrategy {
   pending: persistence.Document;   // A document that is pending save 
   inFlight: persistence.Document;  // Document that is in flight
   writeLockedDocumentId: string;
+  destroyed: boolean;
+  flushResolve: any;               // Function to call to resolve inflight requests after destroy
 }
 
 /**
@@ -25,6 +27,9 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     this.timer = null;
     this.timerStart = 0;
     this.writeLockedDocumentId = null;
+
+    this.destroyed = false;
+    this.flushResolve = null;
   }
 
   now() {
@@ -32,7 +37,6 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
   }
 
   save(doc: persistence.Document, documentGenerator: DocumentGenerator) {
-
     this.pending = documentGenerator(doc);
 
     if (!this.inFlight) {
@@ -71,6 +75,11 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
       persistence.persistDocument(this.inFlight._id, this.inFlight)
         .then(result => {
 
+          if (this.flushResolve !== null) {
+            this.flushResolve();
+            return;
+          }
+
           if (this.successCallback !== null) {
             let savedDoc = persistence.copy(this.inFlight);
             savedDoc._rev = result.rev;
@@ -104,6 +113,9 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
   }
 
   destroy() {
+
+    this.destroyed = true;
+
     let initiatedLockRelease = false;
     this.flushPendingChanges()
       .then(result => {
@@ -134,9 +146,25 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
         clearTimeout(this.timer);
       }
       
-      if (this.pending !== null) {
+      // Handle the case where we have a pending change, but
+      // there isn't anything in flight. We simply persist 
+      // the pending change. 
+      if (this.inFlight === null && this.pending !== null) {
+        console.log('case 1')
         return this.persist()
+      }
+
+      // Handle the case where we have a persistence request
+      // in flight.  In this case we have to wait for that 
+      // in flight request to complete. 
+      else if (this.inFlight !== null) {
+        console.log('case 2')
+        this.flushResolve = resolve;
+      
+      // Neither in flight or pending save, so there is nothing
+      // to do. 
       } else {
+        console.log('case 3')
         return Promise.resolve();
       }
     });    
