@@ -4,6 +4,7 @@ import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
+import { coursesQuery } from '../data/domain';
 import guid from '../utils/guid';
 
 
@@ -74,15 +75,7 @@ export module user {
         credentials.user = user;
         credentials.password = password;
 
-        // fetch the courses that the user has access to
-        let coursesQuery = {
-          selector: {
-            'content.userId': {'$eq': userId},
-            'metadata.type': {'$eq': 'coursePermission'}
-          }
-        }
-
-        persistence.queryDocuments(coursesQuery)
+        persistence.queryDocuments(coursesQuery(userId))
           .then(docs => {
             let courses = docs.map(result => (result.content as any).courseId);
             dispatch(loginSuccess(username, userId, {}, courses));

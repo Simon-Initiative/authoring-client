@@ -23,6 +23,29 @@ export function initWorkbook(title: string) : PendingDocument {
   }
 }
 
+export function titlesForCoursesQuery(courseIds: string[]) : Object {
+  return {
+    selector: {
+      '_id': {'$in': courseIds},
+      'metadata.type': {'$eq': 'course'}
+    },
+    fields: ['_id', 'content.title']
+  }
+}
+
+/**
+ * A query to determine which courses a user has permission
+ * to acess. 
+ */
+export function coursesQuery(userId: string) : Object {
+  return {
+    selector: {
+      'content.userId': {'$eq': userId},
+      'metadata.type': {'$eq': 'coursePermission'}
+    }
+  }
+}
+
 export function resourceQuery(resources: string[]) : Object {
   return {
     selector: {

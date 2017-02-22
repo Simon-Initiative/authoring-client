@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import * as persistence from '../data/persistence';
 import { document as documentActions } from '../actions/document';
+import { titlesForCoursesQuery } from '../data/domain';
 
 interface Courses {
   onSelect: (id) => void;
@@ -32,14 +33,7 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
 
   componentDidMount() {
 
-    let coursesQuery = {
-      selector: {
-        '_id': {'$in': this.props.courseIds},
-        'metadata.type': {'$eq': 'course'}
-      },
-      fields: ['_id', 'content.title']
-    }
-    persistence.queryDocuments(coursesQuery)
+    persistence.queryDocuments(titlesForCoursesQuery(this.props.courseIds))
       .then(docs => {
         let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d.content as any).title}));
         this.setState({ courses });
