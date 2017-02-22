@@ -43,6 +43,7 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
     let inContentModel : Object = translateDraftToContent(content);
     let newDoc = persistence.copy(this.currentDocument);
     newDoc.content = inContentModel;
+    
     this.persistenceStrategy.save(newDoc, () => newDoc);
   } 
 

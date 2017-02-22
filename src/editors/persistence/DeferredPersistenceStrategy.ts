@@ -128,7 +128,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
   }
 
   flushPendingChanges() {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       // Flush pending changes:
       if (this.timer !== null) {
         clearTimeout(this.timer);
