@@ -4,27 +4,15 @@ import * as React from 'react';
 import { connect }  from 'react-redux';
 import { returnType } from '../../utils/types';
 
+import { authoringActions } from '../../actions/authoring';
+import { modalActions } from '../../actions/modal';
+
 import MediaSelection from '../../components/selection/MediaSelection';
 
-function mapStateToProps(state) {  
-  const {
-    questions, 
-  } = state;
-
-  return {
-    questions
-  }
+interface ToolbarProps {  
+  dispatch: any;
+  editDispatch: any;
 }
-
-interface ToolbarOwnProps {  
-  authoringActions: any;
-  modalActions: any;
-}
-
-const stateGeneric = returnType(mapStateToProps);  
-type ToolbarReduxProps = typeof stateGeneric;  
-type ToolbarProps = ToolbarReduxProps & ToolbarOwnProps;
-
 
 interface Toolbar {
   onImage: () => void;
@@ -55,53 +43,55 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
     super(props);
 
     this.onImage = () => {
-        this.props.modalActions.display(
+        this.props.dispatch(modalActions.display(
             <MediaSelection type='image' onInsert={(type, data) => {
-                this.props.authoringActions.insertActivity(type, data);
-                this.props.modalActions.dismiss();
-                }} onCancel={this.props.modalActions.dismiss}/>
-        )
+                authoringActions.insertActivity(type, data);
+                this.props.dispatch(modalActions.dismiss());
+                }} onCancel={modalActions.dismiss}/>
+        ));
     };
 
     this.onVideo = () => {
-        this.props.modalActions.display(
+        this.props.dispatch(modalActions.display(
             <MediaSelection type='video'  onInsert={(type, data) => {
-                this.props.authoringActions.insertActivity(type, data);
-                this.props.modalActions.dismiss();
-                }} onCancel={this.props.modalActions.dismiss}/>
-        )
+                this.props.editDispatch(authoringActions.insertActivity(type, data));
+                this.props.dispatch(modalActions.dismiss());
+                }} onCancel={modalActions.dismiss}/>
+        ));
     };
 
     this.onAudio = () => {
-        this.props.modalActions.display(
+        this.props.dispatch(modalActions.display(
             <MediaSelection type='audio' onInsert={(type, data) => {
-                this.props.authoringActions.insertActivity(type, data);
-                this.props.modalActions.dismiss();
-                }} onCancel={this.props.modalActions.dismiss}/>
-        )
+                this.props.editDispatch(authoringActions.insertActivity(type, data));
+                this.props.dispatch(modalActions.dismiss());
+                }} onCancel={modalActions.dismiss}/>
+        ));
     };
 
     this.onYouTube = () => {
-        this.props.modalActions.display(
+        this.props.dispatch(modalActions.display(
             <MediaSelection type='youtube' onInsert={(type, data) => {
-                this.props.authoringActions.insertActivity(type, data);
-                this.props.modalActions.dismiss();
-                }} onCancel={this.props.modalActions.dismiss}/>
-        )
+                this.props.editDispatch(authoringActions.insertActivity(type, data));
+                this.props.dispatch(modalActions.dismiss());
+                }} onCancel={modalActions.dismiss}/>
+        ));
     };
 
   }
 
   render() {
 
-    const { authoringActions, modalActions } = this.props;
-
     return (
 
       <div className="btn-group">
-        <Button action={authoringActions.toggleInlineStyle.bind(this, 'BOLD')} icon="bold"/>
-        <Button action={authoringActions.toggleInlineStyle.bind(this, 'ITALIC')} icon="italic"/>
-        <Button action={authoringActions.toggleInlineStyle.bind(this, 'UNDERLINE')} icon="underline"/>
+
+        <Button action={() => this.props.editDispatch(
+          authoringActions.toggleInlineStyle.bind(this, 'BOLD'))} icon="bold"/>
+        <Button action={() => this.props.editDispatch(
+          authoringActions.toggleInlineStyle.bind(this, 'ITALIC'))} icon="italic"/>
+        <Button action={() => this.props.editDispatch(
+          authoringActions.toggleInlineStyle.bind(this, 'UNDERLINE'))} icon="underline"/>
         
         <Separator/>
 
@@ -119,6 +109,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
 }
 
-export default connect<ToolbarReduxProps, {}, ToolbarOwnProps>(mapStateToProps)(Toolbar);
+export default Toolbar;
 
 

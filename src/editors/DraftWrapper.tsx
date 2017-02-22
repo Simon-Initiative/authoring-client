@@ -129,8 +129,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     const state = convertFromRaw(this.props.content);
 
-    this.state = {editorState: EditorState.createWithContent(state, decorator),
-      inEdit: false};
+    this.state = {
+      editorState: EditorState.createWithContent(state, decorator),
+      inEdit: false
+    };
     
     this.onChange = (editorState) => {
       let content = editorState.getCurrentContent();

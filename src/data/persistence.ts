@@ -24,14 +24,27 @@ export type Document = {
   _id: string,
   _rev: string,
   metadata: DocumentMetadata,
+  title: string,
   content: Object  
 };
 
 export type PendingDocument = { 
   metadata: DocumentMetadata,
+  title: string,
   content: Object  
 };
 
+export function copy(document: Document) : Document {
+  
+  let doc : Document = Object.assign({}, document);
+  let meta : DocumentMetadata = Object.assign({}, document.metadata);
+  let content = Object.assign({}, document.content);
+  
+  doc.metadata = meta;
+  doc.content = content;
+
+  return doc;
+}
 
 export function queryDocuments(query: Object) : Promise<Document[]> {
   return new Promise(function(resolve, reject) {

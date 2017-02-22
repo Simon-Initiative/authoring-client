@@ -68,13 +68,17 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
       this.inFlight = this.pending; 
       this.pending = null;
 
-      persistence.persistDocument(this.pending._id, this.inFlight)
+      persistence.persistDocument(this.inFlight._id, this.inFlight)
         .then(result => {
-          this.inFlight = null;
+
           if (this.successCallback !== null) {
-            this.successCallback(result);
+            let savedDoc = persistence.copy(this.inFlight);
+            savedDoc._rev = result.rev;
+            this.successCallback(savedDoc);
           }
 
+          this.inFlight = null;
+          
           if (this.pending !== null) {
             this.pending._rev = result.rev;
             this.queueSave();
@@ -138,40 +142,50 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     });    
   }
 
-  setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.PersistSuccess> {
+  setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.Document> {
     let currentMetadata = Object.assign({}, doc.metadata);
     let lockedBy = Object.assign({}, currentMetadata, { lockedBy: userId});
     let lockedDocument = Object.assign({}, doc, { metadata: lockedBy});
-    return persistence.persistDocument(doc._id, lockedDocument);
+    return new Promise((resolve, reject) => {
+      persistence.persistDocument(doc._id, lockedDocument)
+        .then(success => {
+          lockedDocument._rev = success.rev;
+          resolve(lockedDocument);
+        })
+        .catch(err => reject(err));
+    });
   }
 
   /**
    * This strategy requires the user to acquire the write lock before
    * editing.
    */
-  initialize(doc: persistence.Document, userId: string) : Promise<boolean> {
+  initialize(doc: persistence.Document, userId: string,
+    onSuccess: onSaveCompletedCallback, 
+    onFailure: onFailureCallback) : Promise<boolean> {
+
+    this.successCallback = onSuccess;
+    this.failureCallback = onFailure;
+
     let alreadyLocked = doc.metadata.lockedBy !== userId
-      && doc.metadata.lockedBy === ''; 
+      && doc.metadata.lockedBy !== ''; 
+
     if (alreadyLocked) {
       return Promise.resolve(false);
     } else {
       // Attempt to acquire the lock
       return new Promise((resolve, reject) => {
         this.setWriteLock(doc, userId)
-          .then(success => {
-            this.writeLockedDocumentId = doc._id;
+          .then(lockedDocument => {
+            this.writeLockedDocumentId = lockedDocument._id;
+            onSuccess(lockedDocument);
             resolve(true)
           })
-          .catch(err => reject(err));
+          .catch(err => {
+            console.log(err);
+            reject(err)
+          });
       });
     }
-  }
-
-  onSaveCompleted(callback: onSaveCompletedCallback) {
-    this.successCallback = callback;
-  }
-
-  onSaveFailed(callback: onFailureCallback) {
-    this.failureCallback = callback;
   }
 }

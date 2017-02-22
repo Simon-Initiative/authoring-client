@@ -2,24 +2,28 @@
 
 import * as React from 'react';
 import { ContentState } from 'draft-js';
+import { bindActionCreators } from 'redux';
 
 import Toolbar from './Toolbar';
 import DraftWrapper from '../DraftWrapper';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../AbstractEditor';
 import {DeferredPersistenceStrategy} from '../persistence/DeferredPersistenceStrategy';
 import { translateDraftToContent } from '../translate';
+import * as persistence from '../../data/persistence';
 
 interface WorkbookPageEditor {
+  authoringActions: any;
+  modalActions: any;
+  editDispatch: any;
 }
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps {
-  editHistory: Object[];
-  authoringActions: any;
-  modalActions: any;
+  
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   content: Object;
+  editHistory: Object[];
 }
 
 class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, WorkbookPageEditorProps, WorkbookPageEditorState>  {
@@ -27,13 +31,24 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
   constructor(props) {
     super(props, DeferredPersistenceStrategy);
     
-    this.setState({ content: this.props.document.content });
+    this.editDispatch = this._editDispatch.bind(this);
+    
+    this.state = { 
+      content: this.props.document.content,
+      editHistory: []
+    };
   }
 
   saveContent(content: Object) {
     let inContentModel : Object = translateDraftToContent(content);
-    this.onContentChange(inContentModel);
+    let newDoc = persistence.copy(this.currentDocument);
+    newDoc.content = inContentModel;
+    this.persistenceStrategy.save(newDoc, () => newDoc);
   } 
+
+  _editDispatch(action: Object) {
+    this.setState({ editHistory: [action, ...this.state.editHistory]});
+  }
 
   render() {
     return (
@@ -43,10 +58,10 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
                 <div className="column col-10">
                     <div>
                         <Toolbar
-                            authoringActions={this.props.authoringActions} 
-                            modalActions={this.props.modalActions} />
+                            dispatch={this.props.dispatch}
+                            editDispatch={this.editDispatch} />
                         <DraftWrapper 
-                            editHistory={this.props.editHistory} 
+                            editHistory={this.state.editHistory} 
                             content={this.state.content} 
                             locked={!this.state.editingAllowed}
                             notifyOnChange={this.saveContent.bind(this)} />
@@ -62,5 +77,3 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
 }
 
 export default WorkbookPageEditor;
-
-

@@ -16,8 +16,7 @@ export interface AbstractEditor<T extends PersistenceStrategy, P extends Abstrac
   lastContent: any;
   timer: any;
   timerStart: number;
-  currentRevision: string;
-  documentMetadata: persistence.DocumentMetadata;
+  currentDocument: persistence.Document;
   persistenceStrategy: T;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
@@ -25,13 +24,13 @@ export interface AbstractEditor<T extends PersistenceStrategy, P extends Abstrac
 
 export interface AbstractEditorProps {
   dispatch: any;
-  document: persistence.Document; 
   userId: string;
   debug: boolean;
+  document: persistence.Document;
 }
 
 export interface AbstractEditorState {
-  editingAllowed: boolean;
+  editingAllowed? : boolean;
 }
 
 export abstract class AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState>
@@ -42,40 +41,18 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
 
     this.state = ({ editingAllowed: false } as any);
     this.persistenceStrategy = new ctor();
-    this.currentRevision = null;
-    this.documentMetadata = null;
-
-    this.onSaveCompleted = (result: persistence.PersistSuccess) => {
-      this.currentRevision = result.rev;
+    this.currentDocument = this.props.document;
+    
+    this.onSaveCompleted = (doc: persistence.Document) => {
+      this.currentDocument = doc;
     };
 
     this.onSaveFailure = (failure: any) => {
 
     };
-  }
 
-  toFullDocument(content: Object) : persistence.Document {
-    return { 
-      _rev: this.currentRevision, 
-      _id: this.props.document._id, 
-      content,
-      metadata: this.documentMetadata
-    };
-  }
-
-  /**
-   * Called to trigger a save of the document. 
-   */
-  onContentChange(content: Object) {
-    const doc: persistence.Document = this.toFullDocument(content);
-    this.persistenceStrategy.save(doc, () => doc);
-  }
-
-  componentDidMount() {
-    this.documentMetadata = this.props.document.metadata;
-    this.currentRevision = this.props.document._rev;
-
-    this.persistenceStrategy.initialize(this.props.document, this.props.userId)
+    this.persistenceStrategy.initialize(this.props.document, this.props.userId,
+      this.onSaveCompleted, this.onSaveFailure)
       .then(result => this.setState({ editingAllowed: result }))
       .catch(err => console.log(err));
   }

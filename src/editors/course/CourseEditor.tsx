@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import * as persistence from '../../data/persistence';
+import { initWorkbook, resourceQuery } from '../../data/domain';
 import { document as documentActions } from '../../actions/document';
 
 import { AbstractEditor, AbstractEditorProps, 
@@ -11,9 +12,10 @@ import { AbstractEditor, AbstractEditorProps,
 import { ImmediatePersistenceStrategy } from '../persistence/ImmediatePersistenceStrategy';
 
 interface CourseEditor {
+  document: persistence.Document;
 }
 
-export interface WorkbookPageEditorProps extends AbstractEditorProps {
+export interface CourseEditorProps extends AbstractEditorProps {
   editHistory: Object[];
   authoringActions: any;
   modalActions: any;
@@ -25,29 +27,25 @@ type CourseResource = {
   type: string
 }
 
-interface WorkbookPageEditorState extends AbstractEditorState {
+interface CourseEditorState extends AbstractEditorState {
   resources: CourseResource[];
 }
 
-class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, WorkbookPageEditorProps, WorkbookPageEditorState>  {
+class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEditorProps, CourseEditorState>  {
 
   constructor(props) {
     super(props, ImmediatePersistenceStrategy);
+
+    this.document = this.props.document;
+
+    this.state = { resources: [], editingAllowed: true};
   }
 
   componentDidMount() {
-    super.componentDidMount();
-
     // Fetch the titles of all current course resources
-    let query = {
-      selector: {
-        '_id': {'$in': (this.props.document.content as any).resources},
-      },
-      fields: ['_id', 'content.title', 'metadata']
-    }
-    persistence.queryDocuments(query)
+    persistence.queryDocuments(resourceQuery((this.props.document.content as any).resources))
       .then(docs => this.setState({resources: 
-        docs.map(d => ({ _id: d._id, title: (d.content as any).title, type: d.metadata.type}))}));
+        docs.map(d => ({ _id: d._id, title: d.title, type: d.metadata.type}))}));
   }
 
   clickResource(id) {
@@ -55,20 +53,18 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, Workbook
   }
 
   createResource() {
-    let resource = {
-      metadata: {
-        type: 'workbook',
-        lockedBy: ''
-      },
-      content: {
-        title: (this.refs['title'] as any).value
-      }
-    }
+
+    let resource = initWorkbook((this.refs['title'] as any).value);
+      
     persistence.createDocument(resource)
       .then(result => {
 
-        // let addNewResource = (doc) => 
-        // this.persistenceStrategy.save(addNewResource)
+        let addNewResource = (doc) => {
+          let copy = persistence.copy(doc);
+          (copy.content as any).resources.push(result.id);
+          return copy;
+        };
+        this.persistenceStrategy.save(this.document, addNewResource)
       });
   }
 
@@ -76,11 +72,9 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, Workbook
 
     let link = (id, title) => <button onClick={this.clickResource.bind(this, id)} className="btn btn-link">{title}</button>;
 
-    let rows = this.state.resources.map(r => <tr>
+    let rows = this.state.resources.map(r => <tr key={r._id}>
                     <td>{r.type}</td>
                     <td>{link(r._id, r.title)}</td>
-                    <td>Crime, Drama</td>
-                    <td>14 October 1994</td>
                 </tr>)
 
     return <table className="table table-striped table-hover">
@@ -91,7 +85,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, Workbook
                 </tr>
             </thead>
             <tbody>
-                
+                {rows}
             </tbody>
         </table>
 

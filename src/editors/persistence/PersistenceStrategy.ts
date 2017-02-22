@@ -1,7 +1,7 @@
 
 import * as persistence from '../../data/persistence';
 
-export type onSaveCompletedCallback = (result: persistence.PersistSuccess) => void;
+export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 
 export type onFailureCallback = (result: any) => void;
 
@@ -13,7 +13,10 @@ export interface PersistenceStrategy {
    * Enables the persistence strategy, can asynchronously return false to indicate
    * that editing is not allowed.
    */
-  initialize: (doc: persistence.Document, userId: string) => Promise<boolean>; 
+  initialize: (doc: persistence.Document, 
+    userId: string,
+    onSuccess: onSaveCompletedCallback, 
+    onFailure: onFailureCallback ) => Promise<boolean>; 
 
   /**
    * Method called to request that the persistence strategy saves the document. 
@@ -30,14 +33,4 @@ export interface PersistenceStrategy {
    */
   destroy: () => void;
   
-  /**
-   * Callback to execute when an actual save is completed. 
-   */
-  onSaveCompleted: (callback: onSaveCompletedCallback) => void;  
-
-  /**
-   * Callback to execute when an attempted save fails.
-   */
-  onSaveFailed: (callback: onFailureCallback) => void;  
-
 }
