@@ -16,6 +16,8 @@ interface WorkbookPageEditor {
   modalActions: any;
   editDispatch: any;
   lastUndoStackSize: number;
+  editorState: EditorState;
+  lastSavedDocument: persistence.Document;
 }
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps {
@@ -23,36 +25,58 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps {
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
-  content: Object;
   editHistory: Object[];
 }
 
-class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, WorkbookPageEditorProps, WorkbookPageEditorState>  {
+class WorkbookPageEditor extends AbstractEditor<
+
+  DeferredPersistenceStrategy, 
+  WorkbookPageEditorProps, 
+  WorkbookPageEditorState>  {
 
   constructor(props) {
     super(props, DeferredPersistenceStrategy);
     
     this.editDispatch = this._editDispatch.bind(this);
     this.lastUndoStackSize = 0;
+    this.editorState = null;
     
+    this.lastSavedDocument = this.props.document;
+
     this.state = { 
-      content: this.props.document.content,
-      editHistory: []
+      currentDocument: this.props.document,
+      editHistory: [],
     };
+  }
+
+  documentChanged(currentDocument: persistence.Document) {
+    console.log('documentChange: ' + (currentDocument.content as any).blocks[0].text);
+    this.setState({currentDocument});
+  }
+
+  editingAllowed(allowed: boolean) {
+    if (!allowed) {
+      this.listenForChanges();
+    }
+  }
+
+  saveCompleted(doc: persistence.Document) {
+    this.lastSavedDocument = doc;
+    console.log('save completed');
+
   }
 
   saveContent(editorState: EditorState) {
 
-    if (editorState.getUndoStack().count() !== this.lastUndoStackSize) {
+    this.editorState = editorState;
 
-      this.lastUndoStackSize = editorState.getUndoStack().count();
+    this.lastUndoStackSize = editorState.getUndoStack().count();
 
-      let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
-      let newDoc = persistence.copy(this.currentDocument);
-      newDoc.content = inContentModel;
-      
-      this.persistenceStrategy.save(newDoc, () => newDoc);
-    }
+    let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
+    let newDoc = persistence.copy(this.lastSavedDocument);
+    newDoc.content = inContentModel;
+    console.log('save initiated');
+    this.persistenceStrategy.save(newDoc, () => newDoc);
     
   } 
 
@@ -61,6 +85,9 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
   }
 
   render() {
+
+    const locked = this.state.editingAllowed === null || this.state.editingAllowed === false;
+ 
     return (
         <div className="container">
             <div className="columns">
@@ -72,8 +99,8 @@ class WorkbookPageEditor extends AbstractEditor<DeferredPersistenceStrategy, Wor
                             editDispatch={this.editDispatch} />
                         <DraftWrapper 
                             editHistory={this.state.editHistory} 
-                            content={this.state.content} 
-                            locked={!this.state.editingAllowed}
+                            content={this.state.currentDocument.content} 
+                            locked={locked}
                             notifyOnChange={this.saveContent.bind(this)} />
                     </div>
                 </div>

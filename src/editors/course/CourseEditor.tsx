@@ -12,7 +12,7 @@ import { AbstractEditor, AbstractEditorProps,
 import { ImmediatePersistenceStrategy } from '../persistence/ImmediatePersistenceStrategy';
 
 interface CourseEditor {
-  document: persistence.Document;
+  
 }
 
 export interface CourseEditorProps extends AbstractEditorProps {
@@ -36,16 +36,40 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   constructor(props) {
     super(props, ImmediatePersistenceStrategy);
 
-    this.document = this.props.document;
+    this.state = { 
+      resources: [], 
+      editingAllowed: true,
+      currentDocument: this.props.document
+    };
+  }
 
-    this.state = { resources: [], editingAllowed: true};
+  documentChanged(doc: persistence.Document) {
+    this.fetchTitles(doc);
+  }
+
+  editingAllowed(allowed: boolean) {
+    if (allowed) {
+      this.listenForChanges();
+    }
+  }
+
+  saveCompleted(doc: persistence.Document) {
+    this.setState({
+      currentDocument: doc
+    });
   }
 
   componentDidMount() {
     // Fetch the titles of all current course resources
+    this.fetchTitles(this.state.currentDocument);
+  }
+
+  fetchTitles(doc: persistence.Document) {
     persistence.queryDocuments(resourceQuery((this.props.document.content as any).resources))
-      .then(docs => this.setState({resources: 
-        docs.map(d => ({ _id: d._id, title: d.title, type: d.metadata.type}))}));
+      .then(docs => this.setState({
+          resources: docs.map(d => ({ _id: d._id, title: d.title, type: d.metadata.type})),
+          currentDocument: doc
+        }));
   }
 
   clickResource(id) {
@@ -64,7 +88,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
           (copy.content as any).resources.push(result.id);
           return copy;
         };
-        this.persistenceStrategy.save(this.document, addNewResource)
+        this.persistenceStrategy.save(this.state.currentDocument, addNewResource)
       });
   }
 

@@ -108,6 +108,17 @@ const Image = (props) => {
   );
 };
 
+const decorator = new CompositeDecorator([
+  {
+    strategy: findLinkEntities,
+    component: Link,
+  },
+  {
+    strategy: findImageEntities,
+    component: Image,
+  },
+]);
+
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
@@ -116,16 +127,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.focus = () => (this.refs as any).editor.focus();
 
-    const decorator = new CompositeDecorator([
-      {
-        strategy: findLinkEntities,
-        component: Link,
-      },
-      {
-        strategy: findImageEntities,
-        component: Image,
-      },
-    ]);
+    
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     const state = convertFromRaw(this.props.content);
 
@@ -135,12 +137,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
     
     this.onChange = (editorState) => {
-      let content = editorState.getCurrentContent();
-      console.log(editorState.getLastChangeType());
-      console.log(editorState.getUndoStack());
-      this.props.notifyOnChange(editorState);
+      if (!this.props.locked) {
+        let content = editorState.getCurrentContent();
+        this.props.notifyOnChange(editorState);
 
-      return this.setState({editorState})
+        return this.setState({editorState})
+      }
     };
   }
 
@@ -181,6 +183,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
+    const state = convertFromRaw(nextProps.content);
+    this.setState({
+      editorState: EditorState.createWithContent(state, decorator)
+    });
+
     // Determine if we have received a new edit action
     if (this.props.editHistory.length !== nextProps.editHistory.length) {
       let action : any = nextProps.editHistory[0];
@@ -189,7 +196,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       } else if (action.type === 'INSERT_ACTIVITY') {
         this.insertActivity(action.activityType, action.data);
       }
-    }
+    } 
   }
 
   insertActivity(type, data) {

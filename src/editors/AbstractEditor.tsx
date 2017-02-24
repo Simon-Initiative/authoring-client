@@ -16,10 +16,10 @@ export interface AbstractEditor<T extends PersistenceStrategy, P extends Abstrac
   lastContent: any;
   timer: any;
   timerStart: number;
-  currentDocument: persistence.Document;
   persistenceStrategy: T;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
+  stopListening: boolean;
 }
 
 export interface AbstractEditorProps {
@@ -31,6 +31,7 @@ export interface AbstractEditorProps {
 
 export interface AbstractEditorState {
   editingAllowed? : boolean;
+  currentDocument: persistence.Document;
 }
 
 export abstract class AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState>
@@ -39,12 +40,16 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
   constructor(props, ctor: NoParamConstructor<T>) {
     super(props);
 
-    this.state = ({ editingAllowed: false } as any);
+    this.state = ({ 
+      editingAllowed: null,
+      currentDocument: this.props.document
+    } as any);
+
+    this.stopListening = false;
     this.persistenceStrategy = new ctor();
-    this.currentDocument = this.props.document;
     
     this.onSaveCompleted = (doc: persistence.Document) => {
-      this.currentDocument = doc;
+      this.saveCompleted(doc);
     };
 
     this.onSaveFailure = (failure: any) => {
@@ -53,11 +58,41 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
 
     this.persistenceStrategy.initialize(this.props.document, this.props.userId,
       this.onSaveCompleted, this.onSaveFailure)
-      .then(result => this.setState({ editingAllowed: result }))
+      .then(result => {
+        this.editingAllowed(result);
+        this.setState({ editingAllowed: result })
+      })
       .catch(err => console.log(err));
   }
 
+  listenForChanges() {
+    persistence.listenToDocument(this.props.document._id)
+      .then(doc => {
+        if (!this.stopListening) {
+          this.documentChanged(doc);
+          this.listenForChanges();
+        }
+
+      })
+      .catch(err => {
+        if (!this.stopListening) {
+          this.listenForChanges();
+        }
+      })
+  }
+
+  abstract saveCompleted(doc: persistence.Document);
+
+  abstract documentChanged(doc: persistence.Document);
+
+  abstract editingAllowed(allowed: boolean);
+
+  stopListeningToChanges() {
+    this.stopListening = true;
+  }
+
   componentWillUnmount() {
+    this.stopListeningToChanges();    
     this.persistenceStrategy.destroy();
   }
 

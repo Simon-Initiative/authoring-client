@@ -69,6 +69,37 @@ export function queryDocuments(query: Object) : Promise<Document[]> {
   });      
 }
 
+let since = 'now'
+export function listenToDocument(documentId: string) : Promise<Document> {
+  return new Promise(function(resolve, reject) {
+    fetch(`${configuration.baseUrl}/${configuration.database}/_changes?timeout=30000&include_docs=true&feed=longpoll&since=${since}&doc_ids=${documentId}`, {
+        method: 'GET',
+        headers: getHeaders(credentials)
+      })
+      .then(response => {
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then(json => {
+        since = json.last_seq;
+        if (json.results[0] !== undefined) {
+          console.log('listened and got doc with text:')
+          let doc : Document = json.results[0].doc as Document;
+          console.log((doc.content as any).blocks[0].text)
+          resolve(json.results[0].doc as Document);
+        } else {
+          reject('empty');
+        }
+        
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });     
+}
+
 export function retrieveDocument(documentId: string) : Promise<Document> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${documentId}`, {
