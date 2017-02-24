@@ -44,6 +44,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   }
 
   documentChanged(doc: persistence.Document) {
+    console.log("doc changed: " + (doc.content as any).resources.length);
     this.fetchTitles(doc);
   }
 
@@ -54,9 +55,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   }
 
   saveCompleted(doc: persistence.Document) {
-    this.setState({
-      currentDocument: doc
-    });
+    this.fetchTitles(doc);
   }
 
   componentDidMount() {
@@ -65,7 +64,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   }
 
   fetchTitles(doc: persistence.Document) {
-    persistence.queryDocuments(resourceQuery((this.props.document.content as any).resources))
+    persistence.queryDocuments(resourceQuery((doc.content as any).resources))
       .then(docs => this.setState({
           resources: docs.map(d => ({ _id: d._id, title: d.title, type: d.metadata.type})),
           currentDocument: doc

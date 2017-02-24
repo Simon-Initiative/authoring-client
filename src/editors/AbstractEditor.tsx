@@ -66,19 +66,24 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
   }
 
   listenForChanges() {
-    // persistence.listenToDocument(this.props.document._id)
-    //   .then(doc => {
-    //     if (!this.stopListening) {
-    //       this.documentChanged(doc);
-    //       this.listenForChanges();
-    //     }
 
-    //   })
-    //   .catch(err => {
-    //     if (!this.stopListening) {
-    //       this.listenForChanges();
-    //     }
-    //   })
+    console.log('invoke listening');
+
+    persistence.listenToDocument(this.props.document._id)
+      .then(doc => {
+        console.log('listen complete');
+        if (!this.stopListening) {
+          console.log('still listening');
+          this.documentChanged(doc);
+          this.listenForChanges();
+        }
+
+      })
+      .catch(err => {
+        if (!this.stopListening) {
+          this.listenForChanges();
+        }
+      })
   }
 
   abstract saveCompleted(doc: persistence.Document);

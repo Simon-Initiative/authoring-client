@@ -72,9 +72,15 @@ export function queryDocuments(query: Object) : Promise<Document[]> {
 let since = 'now'
 export function listenToDocument(documentId: string) : Promise<Document> {
   return new Promise(function(resolve, reject) {
-    fetch(`${configuration.baseUrl}/${configuration.database}/_changes?timeout=30000&include_docs=true&feed=longpoll&since=${since}&doc_ids=${documentId}`, {
-        method: 'GET',
-        headers: getHeaders(credentials)
+
+    const params = {
+      doc_ids: [documentId]
+    }
+    
+    fetch(`${configuration.baseUrl}/${configuration.database}/_changes?timeout=30000&include_docs=true&feed=longpoll&since=${since}&filter=_doc_ids`, {
+        method: 'POST',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(params)
       })
       .then(response => {
         if (!response.ok) {
@@ -85,9 +91,6 @@ export function listenToDocument(documentId: string) : Promise<Document> {
       .then(json => {
         since = json.last_seq;
         if (json.results[0] !== undefined) {
-          console.log('listened and got doc with text:')
-          let doc : Document = json.results[0].doc as Document;
-          console.log((doc.content as any).blocks[0].text)
           resolve(json.results[0].doc as Document);
         } else {
           reject('empty');

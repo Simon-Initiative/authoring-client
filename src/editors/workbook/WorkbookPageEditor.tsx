@@ -55,6 +55,7 @@ class WorkbookPageEditor extends AbstractEditor<
   }
 
   editingAllowed(allowed: boolean) {
+    console.log('editing allowed: ' + allowed);
     if (!allowed) {
       this.listenForChanges();
     }
