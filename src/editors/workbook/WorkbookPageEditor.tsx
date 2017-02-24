@@ -62,8 +62,6 @@ class WorkbookPageEditor extends AbstractEditor<
 
   saveCompleted(doc: persistence.Document) {
     this.lastSavedDocument = doc;
-    console.log('save completed');
-
   }
 
   saveContent(editorState: EditorState) {
@@ -75,7 +73,7 @@ class WorkbookPageEditor extends AbstractEditor<
     let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
     let newDoc = persistence.copy(this.lastSavedDocument);
     newDoc.content = inContentModel;
-    console.log('save initiated');
+    
     this.persistenceStrategy.save(newDoc, () => newDoc);
     
   } 

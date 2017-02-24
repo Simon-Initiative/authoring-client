@@ -30,6 +30,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
 
     this.destroyed = false;
     this.flushResolve = null;
+    this.inFlight = null;
   }
 
   now() {
@@ -39,7 +40,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
   save(doc: persistence.Document, documentGenerator: DocumentGenerator) {
     this.pending = documentGenerator(doc);
 
-    if (!this.inFlight) {
+    if (this.inFlight === null) {
       this.queueSave();
     }
   }
@@ -66,16 +67,28 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     }
   }
 
-  persist() {
+  wait() {
+    return new Promise((resolve, reject) => {
+      setTimeout((r) => resolve(r), 5000);
+    });
+  }
+
+  persist() : Promise<{}> {
 
     return new Promise((resolve, reject) => {
       this.inFlight = this.pending; 
       this.pending = null;
 
+      console.log('making call to persist');
+
       persistence.persistDocument(this.inFlight._id, this.inFlight)
+        .then(result => this.wait())
         .then(result => {
 
+          console.log('persist finished');
+
           if (this.flushResolve !== null) {
+            console.log('resolving flush promise');
             this.flushResolve();
             return;
           }
@@ -95,6 +108,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
           resolve(result);
         })
         .catch(err => {
+          console.log('persist err: ' + err);
           this.inFlight = null;
           if (this.failureCallback !== null) {
             this.failureCallback(err);
@@ -120,6 +134,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     this.flushPendingChanges()
       .then(result => {
         initiatedLockRelease = true;
+        console.log('initiating lock release');
         this.releaseLock();
       })
       .catch(err => {
@@ -139,38 +154,42 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     }
   }
 
-  flushPendingChanges() {
-    return new Promise((resolve, reject) => {
-      // Flush pending changes:
-      if (this.timer !== null) {
-        clearTimeout(this.timer);
-      }
-      
-      // Handle the case where we have a pending change, but
-      // there isn't anything in flight. We simply persist 
-      // the pending change. 
-      if (this.inFlight === null && this.pending !== null) {
-        console.log('case 1')
-        return this.persist()
-      }
+  flushPendingChanges() : Promise<{}> {
 
-      // Handle the case where we have a persistence request
-      // in flight.  In this case we have to wait for that 
-      // in flight request to complete. 
-      else if (this.inFlight !== null) {
-        console.log('case 2')
-        this.flushResolve = resolve;
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+    }
+    
+    // Handle the case where we have a pending change, but
+    // there isn't anything in flight. We simply persist 
+    // the pending change. 
+    if (this.inFlight === null && this.pending !== null) {
+      console.log('flush pending changes case 1')
+      return this.persist()
+    }
+
+    // Handle the case where we have a persistence request
+    // in flight.  In this case we have to wait for that 
+    // in flight request to complete. 
+    else if (this.inFlight !== null) {
+
+      return new Promise((resolve, reject) => {
+        // Flush pending changes:
+        console.log('flush pending changes case 2')
+          this.flushResolve = resolve;
+      });    
       
-      // Neither in flight or pending save, so there is nothing
-      // to do. 
-      } else {
-        console.log('case 3')
-        return Promise.resolve();
-      }
-    });    
+    // Neither in flight or pending save, so there is nothing
+    // to do. 
+    } else {
+      console.log('flush pending changes case 2')
+      return Promise.resolve({});
+    }
+    
   }
 
   setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.Document> {
+    console.log('setting write lock to: ' + userId);
     let currentMetadata = Object.assign({}, doc.metadata);
     let lockedBy = Object.assign({}, currentMetadata, { lockedBy: userId});
     let lockedDocument = Object.assign({}, doc, { metadata: lockedBy});
@@ -178,9 +197,13 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
       persistence.persistDocument(doc._id, lockedDocument)
         .then(success => {
           lockedDocument._rev = success.rev;
+          console.log('set write lock');
           resolve(lockedDocument);
         })
-        .catch(err => reject(err));
+        .catch(err => {
+          console.log('error setting write lock: ' + err);
+          reject(err)
+        });
     });
   }
 
