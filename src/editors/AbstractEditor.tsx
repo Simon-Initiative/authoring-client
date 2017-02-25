@@ -34,6 +34,10 @@ export interface AbstractEditorState {
   currentDocument: persistence.Document;
 }
 
+/**
+ * An abstract editor that provides the basis for reusable 
+ * persistence and undo/redo. 
+ */
 export abstract class AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState>
   extends React.Component<P, S> {
 
@@ -67,13 +71,9 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
 
   listenForChanges() {
 
-    console.log('invoke listening');
-
     persistence.listenToDocument(this.props.document._id)
       .then(doc => {
-        console.log('listen complete');
         if (!this.stopListening) {
-          console.log('still listening');
           this.documentChanged(doc);
           this.listenForChanges();
         }
@@ -86,10 +86,26 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
       })
   }
 
+  /**
+   * Lifecycle method that fires when a save is successfully completed 
+   * by the persistence strategy. The document here will contain 
+   * the revision that was persisted.  This document should be used
+   * as the basis for future save requests. 
+   */
   abstract saveCompleted(doc: persistence.Document);
 
+  /**
+   * Lifecycle method that fires when a document that is not being
+   * edited by the user changes based on edits being made by another
+   * user. 
+   */
   abstract documentChanged(doc: persistence.Document);
 
+  /**
+   * Lifecycle method that fires after the persistence strategy
+   * finishes initialization and determines whether or not editing 
+   * is allowed by the current user. 
+   */
   abstract editingAllowed(allowed: boolean);
 
   stopListeningToChanges() {
