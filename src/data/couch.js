@@ -112,13 +112,9 @@ var createUser = function(user, password) {
 
 var createPermission = function(user, course) {
   let data = { 
-    metadata: {
-      type: 'coursePermission'
-    }, 
-    content: {
-      userId: user,
-      courseId: course
-    }
+    modelType: 'CoursePermissionModel',
+    userId: user,
+    courseId: course
   };
   return request('POST', '/editor', data);
 }
@@ -132,11 +128,10 @@ var createUsers = function() {
 
 var createOrganization = function() {
   let data = { 
-      _modelType: 'OrganizationModel',
-      title: 'Sample Organization',
-      nodes: []
-    }
-  };
+    modelType: 'OrganizationModel',
+    title: 'Sample Organization',
+    nodes: []
+  }
   return request('POST', '/editor', data);
 }
 
@@ -145,7 +140,7 @@ var createCourse = function(users) {
     createOrganization()
       .then(result => {
         let data = { 
-          _modelType: 'CourseModel',
+          modelType: 'CourseModel',
           title: 'Sample Course',
           organizations: [result.id],
           resources: []
@@ -154,6 +149,24 @@ var createCourse = function(users) {
           .then(result => resolve({course: result.id, users}));
       });
   });
+}
+
+var createSecurityDocument = function(input) {
+  return new Promise(function(resolve, reject) {
+    let data = { 
+        admins: {
+          names: [],
+          roles: []
+        },
+        members: {
+          names: ['user1', 'user2'],
+          roles: []
+        }
+      }
+      request('PUT', '/editor/_security', data)
+        .then(result => resolve(input));
+  });
+  
 }
 
 var createPermissions = function(data) {
@@ -165,6 +178,7 @@ var run = function() {
   return waitUntilReady()
     .then(r => request('PUT', '/editor', undefined))
     .then(r => createUsers())
+    .then(r => createSecurityDocument(r))
     .then(r => createCourse(r))
     .then(r => createPermissions(r))
     .then(r => console.log("database ready"));

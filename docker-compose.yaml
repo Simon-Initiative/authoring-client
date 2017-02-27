@@ -22,4 +22,3 @@ services:
       - ./dist:/app/dist
       - /app/node_modules
     command: gulp dev
-    
