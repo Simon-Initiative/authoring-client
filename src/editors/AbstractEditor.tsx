@@ -3,19 +3,13 @@
 import * as React from 'react';
 
 import * as persistence from '../data/persistence';
+import * as content from '../data/content';
 
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
   onFailureCallback } from './persistence/PersistenceStrategy';
 
-interface NoParamConstructor<T> {
-    new (): T;
-}
-
 export interface AbstractEditor<P extends AbstractEditorProps, S extends AbstractEditorState> {
-  lastContent: any;
-  timer: any;
-  timerStart: number;
   persistenceStrategy: PersistenceStrategy;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
@@ -23,15 +17,35 @@ export interface AbstractEditor<P extends AbstractEditorProps, S extends Abstrac
 }
 
 export interface AbstractEditorProps {
+
+  // The dispatch function 
   dispatch: any;
+
+  // Id of the current user
   userId: string;
+
+  // Debug mode 
   debug: boolean;
+
+  // The initial document passed into the editor.
   document: persistence.Document;
 }
 
 export interface AbstractEditorState {
+
+  // Whether or not editing is allowed for this user for this document
+  // Will be null initally, and will then be set to true or false after
+  // the persistence strategy initializes. 
   editingAllowed? : boolean;
-  currentDocument: persistence.Document;
+
+  // The current document that the editor should be rendering. This can
+  // be different that the lastSavedDocument, depdending on the implementation
+  // of the persistence strategy being used. 
+  currentDocument?: persistence.Document;
+
+  // The most recently saved document during the use of this editor. This
+  // must be the document that is used as the bases for future changes. 
+  lastSavedDocument?: persistence.Document;
 }
 
 /**
@@ -44,14 +58,8 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
   constructor(props, persistenceStrategy : PersistenceStrategy) {
     super(props);
 
-    this.state = ({ 
-      editingAllowed: null,
-      currentDocument: this.props.document
-    } as any);
-
-    this.stopListening = false;
     this.persistenceStrategy = persistenceStrategy;
-    
+
     this.onSaveCompleted = (doc: persistence.Document) => {
       this.saveCompleted(doc);
     };
@@ -60,17 +68,33 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
 
     };
 
+    this.init();
+  }
+
+  init() {
+    this.setState({ 
+      editingAllowed: null,
+      currentDocument: this.props.document,
+      lastSavedDocument: this.props.document
+    } as any);
+
+    this.stopListening = false;
+    
     this.persistenceStrategy.initialize(this.props.document, this.props.userId,
       this.onSaveCompleted, this.onSaveFailure)
       .then(result => {
         this.editingAllowed(result);
-        this.setState({ editingAllowed: result })
       })
       .catch(err => console.log(err));
   }
 
-  listenForChanges() {
+  componentWillReceiveProps(nextProps: AbstractEditorProps) {
+    if (nextProps.document._rev !== this.props.document._rev) {
+      this.init();
+    }
+  }
 
+  listenForChanges() {
     persistence.listenToDocument(this.props.document._id)
       .then(doc => {
         if (!this.stopListening) {
@@ -90,23 +114,33 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
    * Lifecycle method that fires when a save is successfully completed 
    * by the persistence strategy. The document here will contain 
    * the revision that was persisted.  This document should be used
-   * as the basis for future save requests. 
+   * as the basis for future save requests. That document will also
+   * be present in the state as lastSavedDocument. 
    */
-  abstract saveCompleted(doc: persistence.Document);
+  saveCompleted(doc: persistence.Document) {
+    this.setState({lastSavedDocument: doc} as any);
+  }
 
   /**
    * Lifecycle method that fires when a document that is not being
    * edited by the user changes based on edits being made by another
    * user. 
    */
-  abstract documentChanged(doc: persistence.Document);
+  documentChanged(doc: persistence.Document) {
+    this.setState({ 
+      currentDocument: doc,
+      lastSavedDocument: doc
+    } as any);
+  }
 
   /**
    * Lifecycle method that fires after the persistence strategy
    * finishes initialization and determines whether or not editing 
    * is allowed by the current user. 
    */
-  abstract editingAllowed(allowed: boolean);
+  editingAllowed(editingAllowed: boolean) {
+    this.setState({ editingAllowed });
+  }
 
   stopListeningToChanges() {
     this.stopListening = true;

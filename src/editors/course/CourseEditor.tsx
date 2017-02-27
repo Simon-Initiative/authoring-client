@@ -45,16 +45,19 @@ class CourseEditor extends AbstractEditor<CourseEditorProps, CourseEditorState> 
   }
 
   documentChanged(doc: persistence.Document) {
+    super.documentChanged(doc);
     this.fetchTitles(doc);
   }
 
   editingAllowed(allowed: boolean) {
+    super.editingAllowed(allowed);
     if (allowed) {
       this.listenForChanges();
     }
   }
 
   saveCompleted(doc: persistence.Document) {
+    super.saveCompleted(doc);
     this.fetchTitles(doc);
   }
 
@@ -89,7 +92,7 @@ class CourseEditor extends AbstractEditor<CourseEditorProps, CourseEditorState> 
           (copy as any).resources.push(result._id);
           return copy;
         };
-        this.persistenceStrategy.save(this.state.currentDocument, addNewResource)
+        this.persistenceStrategy.save(this.state.lastSavedDocument, addNewResource)
       });
   }
 

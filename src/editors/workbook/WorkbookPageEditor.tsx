@@ -17,7 +17,6 @@ interface WorkbookPageEditor {
   editDispatch: any;
   lastUndoStackSize: number;
   editorState: EditorState;
-  lastSavedDocument: persistence.Document;
 }
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps {
@@ -39,28 +38,17 @@ class WorkbookPageEditor extends AbstractEditor<
     this.lastUndoStackSize = 0;
     this.editorState = null;
     
-    this.lastSavedDocument = this.props.document;
-
     this.state = { 
       currentDocument: this.props.document,
-      editHistory: [],
+      editHistory: []
     };
   }
 
-  documentChanged(currentDocument: persistence.Document) {
-    console.log('documentChange: ' + (currentDocument as any).blocks[0].text);
-    this.setState({currentDocument});
-  }
-
   editingAllowed(allowed: boolean) {
-    console.log('editing allowed: ' + allowed);
+    super.editingAllowed(allowed);
     if (!allowed) {
       this.listenForChanges();
     }
-  }
-
-  saveCompleted(doc: persistence.Document) {
-    this.lastSavedDocument = doc;
   }
 
   saveContent(editorState: EditorState) {
@@ -70,7 +58,7 @@ class WorkbookPageEditor extends AbstractEditor<
     this.lastUndoStackSize = editorState.getUndoStack().count();
 
     let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
-    let newDoc = persistence.copy(this.lastSavedDocument);
+    let newDoc = persistence.copy(this.state.lastSavedDocument);
     Object.assign(newDoc, inContentModel);
     
     this.persistenceStrategy.save(newDoc, () => newDoc);
