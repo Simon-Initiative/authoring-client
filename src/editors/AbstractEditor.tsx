@@ -14,6 +14,10 @@ export interface AbstractEditor<P extends AbstractEditorProps, S extends Abstrac
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
+
+  // The most recently saved document during the use of this editor. This
+  // must be the document that is used as the bases for future changes. 
+  lastSavedDocument: persistence.Document;
 }
 
 export interface AbstractEditorProps {
@@ -29,6 +33,8 @@ export interface AbstractEditorProps {
 
   // The initial document passed into the editor.
   document: persistence.Document;
+
+  
 }
 
 export interface AbstractEditorState {
@@ -43,9 +49,7 @@ export interface AbstractEditorState {
   // of the persistence strategy being used. 
   currentDocument?: persistence.Document;
 
-  // The most recently saved document during the use of this editor. This
-  // must be the document that is used as the bases for future changes. 
-  lastSavedDocument?: persistence.Document;
+  
 }
 
 /**
@@ -68,15 +72,12 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
 
     };
 
-    this.init();
-  }
+    this.lastSavedDocument = this.props.document;
 
-  init() {
-    this.setState({ 
+    this.state = { 
       editingAllowed: null,
-      currentDocument: this.props.document,
-      lastSavedDocument: this.props.document
-    } as any);
+      currentDocument: this.props.document
+    } as any;
 
     this.stopListening = false;
     
@@ -90,7 +91,20 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
 
   componentWillReceiveProps(nextProps: AbstractEditorProps) {
     if (nextProps.document._rev !== this.props.document._rev) {
-      this.init();
+      this.setState({ 
+        editingAllowed: null,
+        currentDocument: this.props.document,
+        lastSavedDocument: this.props.document
+      } as any);
+
+      this.stopListening = false;
+      
+      this.persistenceStrategy.initialize(this.props.document, this.props.userId,
+        this.onSaveCompleted, this.onSaveFailure)
+        .then(result => {
+          this.editingAllowed(result);
+        })
+        .catch(err => console.log(err));
     }
   }
 
@@ -118,7 +132,7 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
    * be present in the state as lastSavedDocument. 
    */
   saveCompleted(doc: persistence.Document) {
-    this.setState({lastSavedDocument: doc} as any);
+    this.lastSavedDocument = doc;
   }
 
   /**
@@ -127,9 +141,9 @@ export abstract class AbstractEditor<P extends AbstractEditorProps, S extends Ab
    * user. 
    */
   documentChanged(doc: persistence.Document) {
+    this.lastSavedDocument = doc;
     this.setState({ 
-      currentDocument: doc,
-      lastSavedDocument: doc
+      currentDocument: doc
     } as any);
   }
 

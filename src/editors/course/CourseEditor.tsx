@@ -92,7 +92,7 @@ class CourseEditor extends AbstractEditor<CourseEditorProps, CourseEditorState> 
           (copy as any).resources.push(result._id);
           return copy;
         };
-        this.persistenceStrategy.save(this.state.lastSavedDocument, addNewResource)
+        this.persistenceStrategy.save(this.lastSavedDocument, addNewResource)
       });
   }
 

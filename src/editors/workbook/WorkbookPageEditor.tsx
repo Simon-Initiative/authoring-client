@@ -58,9 +58,9 @@ class WorkbookPageEditor extends AbstractEditor<
     this.lastUndoStackSize = editorState.getUndoStack().count();
 
     let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
-    let newDoc = persistence.copy(this.state.lastSavedDocument);
+    let newDoc = persistence.copy(this.lastSavedDocument);
     Object.assign(newDoc, inContentModel);
-    
+
     this.persistenceStrategy.save(newDoc, () => newDoc);
   } 
 
