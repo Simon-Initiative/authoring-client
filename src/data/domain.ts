@@ -1,25 +1,20 @@
 
-import { PendingDocument } from './persistence';
+import { WorkbookPageModel, ModelTypes } from './content';
 
-export function initWorkbook(title: string) : PendingDocument {
+export function initWorkbook(title: string) : WorkbookPageModel {
   return {
-    metadata: {
-      type: 'workbook',
-      lockedBy: ''
-    },
+    modelType: ModelTypes.WorkbookPageModel,
+    lockedBy: '',
+    lockedAt: 0,
     title,
-    content: {
-      blocks: [
-        {
-          text: (
-            'Sample text'
-          ),
-          type: 'unstyled',
-          entityRanges: [],
-      }],
-      entityMap: {
-      }
-    }
+    blocks: [{
+      text: (
+        'Sample text'
+      ),
+      type: 'unstyled',
+      entityRanges: [],
+    }],
+    entityMap: {}
   }
 }
 
@@ -27,9 +22,9 @@ export function titlesForCoursesQuery(courseIds: string[]) : Object {
   return {
     selector: {
       '_id': {'$in': courseIds},
-      'metadata.type': {'$eq': 'course'}
+      'modelType': {'$eq': 'CourseModel'}
     },
-    fields: ['_id', 'content.title']
+    fields: ['_id', 'title']
   }
 }
 
@@ -40,8 +35,8 @@ export function titlesForCoursesQuery(courseIds: string[]) : Object {
 export function coursesQuery(userId: string) : Object {
   return {
     selector: {
-      'content.userId': {'$eq': userId},
-      'metadata.type': {'$eq': 'coursePermission'}
+      'userId': {'$eq': userId},
+      'modelType': {'$eq': 'CoursePermissionModel'}
     }
   }
 }
@@ -51,6 +46,6 @@ export function resourceQuery(resources: string[]) : Object {
     selector: {
       '_id': {'$in': resources},
     },
-    fields: ['_id', 'title', 'metadata']
+    fields: ['_id', 'title', 'modelType']
   };
 }

@@ -2,33 +2,31 @@
 import * as persistence from '../../data/persistence';
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback, DocumentGenerator } from './PersistenceStrategy';
+import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 
 export interface DeferredPersistenceStrategy {
-  successCallback: onSaveCompletedCallback;
-  failureCallback: onFailureCallback;
   timer: any;
   timerStart: number;
+  quietPeriodInMs: number;
+  maxDeferredTimeInMs: number;
   pending: persistence.Document;   // A document that is pending save 
   inFlight: persistence.Document;  // Document that is in flight
-  writeLockedDocumentId: string;
-  destroyed: boolean;
   flushResolve: any;               // Function to call to resolve inflight requests after destroy
 }
 
 /**
- * A persistence strategy 
+ * A persistence strategy that waits until user edits have ceased
+ * for a specific amount of time but will auto save when a maximum
+ * wait period has exceeded. 
  */
-export class DeferredPersistenceStrategy implements PersistenceStrategy {
+export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
-  constructor() {
-    this.successCallback = null;
-    this.failureCallback = null;
-
+  constructor(quietPeriodInMs : number = 2000, maxDeferredTimeInMs = 5000) {
+    super();
+    this.quietPeriodInMs = quietPeriodInMs;
+    this.maxDeferredTimeInMs = maxDeferredTimeInMs;
     this.timer = null;
     this.timerStart = 0;
-    this.writeLockedDocumentId = null;
-
-    this.destroyed = false;
     this.flushResolve = null;
     this.inFlight = null;
   }
@@ -49,14 +47,14 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     let startTimer = () => setTimeout(() => {
           this.timer = null;
           this.persist();
-        }, 2000);
+        }, this.quietPeriodInMs);
 
     if (this.timer !== null) {
       
       clearTimeout(this.timer);
       this.timer = null;
 
-      if (this.now() - this.timerStart > 5000) {
+      if (this.now() - this.timerStart > this.maxDeferredTimeInMs) {
         this.persist();
       } else {
         this.timer = startTimer(); 
@@ -73,7 +71,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
       this.inFlight = this.pending; 
       this.pending = null;
 
-      persistence.persistDocument(this.inFlight._id, this.inFlight)
+      persistence.persistDocument(this.inFlight)
         .then(result => {
 
           if (this.flushResolve !== null) {
@@ -82,15 +80,13 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
           }
 
           if (this.successCallback !== null) {
-            let savedDoc = persistence.copy(this.inFlight);
-            savedDoc._rev = result.rev;
-            this.successCallback(savedDoc);
+            this.successCallback(result);
           }
 
           this.inFlight = null;
           
           if (this.pending !== null) {
-            this.pending._rev = result.rev;
+            this.pending._rev = result._rev;
             this.queueSave();
           }
           resolve(result);
@@ -103,7 +99,7 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
 
           // TODO: revisit this logic.  We are at a state where we may
           // have encountered an error due to a conflict, so scheduling
-          // another save without properly rebasing the revsition could be
+          // another save without properly rebasing the revsion could be
           // futile. 
           if (this.pending !== null) {
             this.queueSave();
@@ -113,31 +109,10 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
       });
   }
 
-  destroy() {
-
-    this.destroyed = true;
-
-    let initiatedLockRelease = false;
-    this.flushPendingChanges()
-      .then(result => {
-        initiatedLockRelease = true;
-        this.releaseLock();
-      })
-      .catch(err => {
-        if (!initiatedLockRelease) {
-          this.releaseLock();
-        }
-      })
+  doDestroy() {
+    return this.flushPendingChanges();
   }
 
-  releaseLock() {
-    // Release the write lock if it was acquired, but fetch
-    // the document first to get the most up to date version
-    if (this.writeLockedDocumentId !== null) {
-      persistence.retrieveDocument(this.writeLockedDocumentId)
-        .then(document => this.setWriteLock(document, ''));
-    }
-  }
 
   flushPendingChanges() : Promise<{}> {
 
@@ -170,52 +145,4 @@ export class DeferredPersistenceStrategy implements PersistenceStrategy {
     
   }
 
-  setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.Document> {
-    let currentMetadata = Object.assign({}, doc.metadata);
-    let lockedBy = Object.assign({}, currentMetadata, { lockedBy: userId});
-    let lockedDocument = Object.assign({}, doc, { metadata: lockedBy});
-    return new Promise((resolve, reject) => {
-      persistence.persistDocument(doc._id, lockedDocument)
-        .then(success => {
-          lockedDocument._rev = success.rev;
-          resolve(lockedDocument);
-        })
-        .catch(err => {
-          reject(err)
-        });
-    });
-  }
-
-  /**
-   * This strategy requires the user to acquire the write lock before
-   * editing.
-   */
-  initialize(doc: persistence.Document, userId: string,
-    onSuccess: onSaveCompletedCallback, 
-    onFailure: onFailureCallback) : Promise<boolean> {
-
-    this.successCallback = onSuccess;
-    this.failureCallback = onFailure;
-
-    let alreadyLocked = doc.metadata.lockedBy !== userId
-      && doc.metadata.lockedBy !== ''; 
-
-    if (alreadyLocked) {
-      return Promise.resolve(false);
-    } else {
-      // Attempt to acquire the lock
-      return new Promise((resolve, reject) => {
-        this.setWriteLock(doc, userId)
-          .then(lockedDocument => {
-            this.writeLockedDocumentId = lockedDocument._id;
-            onSuccess(lockedDocument);
-            resolve(true)
-          })
-          .catch(err => {
-            console.log(err);
-            reject(err)
-          });
-      });
-    }
-  }
 }

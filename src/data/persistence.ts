@@ -1,6 +1,7 @@
 
 var fetch = (window as any).fetch;
 
+import * as content from './content';
 import { credentials, getHeaders } from '../actions/utils/credentials';
 import { configuration } from '../actions/utils/config';
 import guid from '../utils/guid';
@@ -15,35 +16,21 @@ export type InternalServerError = '500';
 
 export type StatusCode = Ok | Accepted | BadRequest | Unauthorized | NotFound | Conflict | InternalServerError;
 
+export type RevisionId = string;
+
 export type DocumentMetadata = {
-  lockedBy: string,
-  type: string
+  _id: content.DocumentId,
+  _rev: RevisionId,
 }
 
-export type Document = { 
-  _id: string,
-  _rev: string,
-  metadata: DocumentMetadata,
-  title: string,
-  content: Object  
-};
-
-export type PendingDocument = { 
-  metadata: DocumentMetadata,
-  title: string,
-  content: Object  
-};
+export type Document = DocumentMetadata & content.ContentModel
 
 export function copy(document: Document) : Document {
   
   let doc : Document = Object.assign({}, document);
-  let meta : DocumentMetadata = Object.assign({}, document.metadata);
-  let content = Object.assign({}, document.content);
+  let copy = Object.assign({}, document);
   
-  doc.metadata = meta;
-  doc.content = content;
-
-  return doc;
+  return copy;
 }
 
 export function queryDocuments(query: Object) : Promise<Document[]> {
@@ -70,7 +57,7 @@ export function queryDocuments(query: Object) : Promise<Document[]> {
 }
 
 let since = 'now'
-export function listenToDocument(documentId: string) : Promise<Document> {
+export function listenToDocument(documentId: content.DocumentId) : Promise<Document> {
   return new Promise(function(resolve, reject) {
 
     const params = {
@@ -98,12 +85,13 @@ export function listenToDocument(documentId: string) : Promise<Document> {
         
       })
       .catch(err => {
+        console.log('listen err: ');
         reject(err);
       });
   });     
 }
 
-export function retrieveDocument(documentId: string) : Promise<Document> {
+export function retrieveDocument(documentId: content.DocumentId) : Promise<Document> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${documentId}`, {
         method: 'GET',
@@ -124,18 +112,12 @@ export function retrieveDocument(documentId: string) : Promise<Document> {
   });      
 }
 
-export type PersistSuccess = {
-  id: string,
-  rev: string,
-  ok: boolean
-}
-
-export function createDocument(doc: PendingDocument) : Promise<PersistSuccess> {
+export function createDocument(content: content.ContentModel) : Promise<Document> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}`, {
         method: 'POST',
         headers: getHeaders(credentials),
-        body: JSON.stringify(doc)
+        body: JSON.stringify(content)
       })
     .then(response => {
       if (!response.ok) {
@@ -144,7 +126,12 @@ export function createDocument(doc: PendingDocument) : Promise<PersistSuccess> {
       return response.json();
     })
     .then(json => {
-      resolve(json as PersistSuccess);
+      const newDocument : Document = Object.assign({}, {
+        _id: (json as any).id,
+        _rev: (json as any).rev
+      }, content);
+
+      resolve(newDocument);
     })
     .catch(err => {
       reject(err);
@@ -152,29 +139,8 @@ export function createDocument(doc: PendingDocument) : Promise<PersistSuccess> {
   });
 }
 
-export function createDocumentWithId(id: string, doc: PendingDocument) : Promise<PersistSuccess> {
-  return new Promise(function(resolve, reject) {
-    fetch(`${configuration.baseUrl}/${configuration.database}/${id}`, {
-        method: 'PUT',
-        headers: getHeaders(credentials),
-        body: JSON.stringify(doc)
-      })
-    .then(response => {
-      if (!response.ok) {
-          throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then(json => {
-      resolve(json as PersistSuccess);
-    })
-    .catch(err => {
-      reject(err);
-    });
-  });
-}
 
-export function persistDocument(documentId: string, doc: Document) : Promise<PersistSuccess> {
+export function persistDocument(doc: Document) : Promise<Document> {
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${doc._id}`, {
         method: 'PUT',
@@ -188,7 +154,12 @@ export function persistDocument(documentId: string, doc: Document) : Promise<Per
       return response.json();
     })
     .then(json => {
-      resolve(json as PersistSuccess);
+      const savedDocument : Document = Object.assign({}, doc, {
+        _id: (json as any).id,
+        _rev: (json as any).rev
+      });
+
+      resolve(savedDocument);
     })
     .catch(err => {
       reject(err);

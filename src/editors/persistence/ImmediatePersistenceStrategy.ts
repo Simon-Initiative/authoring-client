@@ -2,32 +2,19 @@
 import * as persistence from '../../data/persistence';
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback, DocumentGenerator } from './PersistenceStrategy';
-
-export interface ImmediatePersistenceStrategy {
-  saveCallback: onSaveCompletedCallback;
-  failureCallback: onFailureCallback
-}
+import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 
 /**
- * A lock-free, optimistic persistence strategy.  
+ * A persistence strategy that applies changes immediately, and will auto
+ * retry if a conflict is detected. 
  */
-export class ImmediatePersistenceStrategy implements PersistenceStrategy {
-
-  initialize(doc: persistence.Document, userId: string,
-    onSuccess: onSaveCompletedCallback, 
-    onFailure: onFailureCallback) : Promise<boolean> {
-
-    this.saveCallback = onSuccess;
-    this.failureCallback = onFailure;
-
-    return Promise.resolve(true);
-  }
+export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
 
   save(initialDoc: persistence.Document, documentGenerator: DocumentGenerator) {
     this.saveDocument(initialDoc, documentGenerator, 3, undefined, undefined)
       .then(doc => {
-        if (this.saveCallback !== null) {
-          this.saveCallback(doc);
+        if (this.successCallback !== null) {
+          this.successCallback(doc);
         }
       })
       .catch(err => {
@@ -48,11 +35,10 @@ export class ImmediatePersistenceStrategy implements PersistenceStrategy {
 
       return new Promise((resolve, reject) => {
         let toSave = documentGenerator(initialDoc);
-        persistence.persistDocument(initialDoc._id, toSave)
+
+        persistence.persistDocument(toSave)
           .then(result => {
-            let copy = persistence.copy(toSave);
-            copy._rev = result.rev;
-            initialResolve !== undefined ? initialResolve(copy) : resolve(copy);
+            initialResolve !== undefined ? initialResolve(result) : resolve(result);
           })
           .catch(err => {
             if (remainingRetries === 0) {
@@ -73,8 +59,8 @@ export class ImmediatePersistenceStrategy implements PersistenceStrategy {
       });
   }
   
-  destroy() {
-    // No op
+  doDestroy() {
+    return Promise.resolve({});
   }
   
 }

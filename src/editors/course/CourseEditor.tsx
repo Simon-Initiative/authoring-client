@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import * as persistence from '../../data/persistence';
+import * as content from '../../data/content';
 import { initWorkbook, resourceQuery } from '../../data/domain';
 import { document as documentActions } from '../../actions/document';
 
@@ -31,10 +32,10 @@ interface CourseEditorState extends AbstractEditorState {
   resources: CourseResource[];
 }
 
-class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEditorProps, CourseEditorState>  {
+class CourseEditor extends AbstractEditor<CourseEditorProps, CourseEditorState>  {
 
   constructor(props) {
-    super(props, ImmediatePersistenceStrategy);
+    super(props, new ImmediatePersistenceStrategy());
 
     this.state = { 
       resources: [], 
@@ -44,7 +45,6 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   }
 
   documentChanged(doc: persistence.Document) {
-    console.log("doc changed: " + (doc.content as any).resources.length);
     this.fetchTitles(doc);
   }
 
@@ -64,11 +64,13 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
   }
 
   fetchTitles(doc: persistence.Document) {
-    persistence.queryDocuments(resourceQuery((doc.content as any).resources))
-      .then(docs => this.setState({
-          resources: docs.map(d => ({ _id: d._id, title: d.title, type: d.metadata.type})),
+    persistence.queryDocuments(resourceQuery((doc as any).resources))
+      .then(docs => {
+        this.setState({
+          resources: docs.map(d => ({ _id: d._id, title: (d as content.HasTitle).title, type: d.modelType})),
           currentDocument: doc
-        }));
+        })
+      });
   }
 
   clickResource(id) {
@@ -84,7 +86,7 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
 
         let addNewResource = (doc) => {
           let copy = persistence.copy(doc);
-          (copy.content as any).resources.push(result.id);
+          (copy as any).resources.push(result._id);
           return copy;
         };
         this.persistenceStrategy.save(this.state.currentDocument, addNewResource)
@@ -136,8 +138,6 @@ class CourseEditor extends AbstractEditor<ImmediatePersistenceStrategy, CourseEd
                 
                 <div className="column col-1"></div>
             </div>
-
-
         </div>
     )
   }

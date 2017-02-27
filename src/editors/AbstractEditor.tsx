@@ -12,11 +12,11 @@ interface NoParamConstructor<T> {
     new (): T;
 }
 
-export interface AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState> {
+export interface AbstractEditor<P extends AbstractEditorProps, S extends AbstractEditorState> {
   lastContent: any;
   timer: any;
   timerStart: number;
-  persistenceStrategy: T;
+  persistenceStrategy: PersistenceStrategy;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
@@ -38,10 +38,10 @@ export interface AbstractEditorState {
  * An abstract editor that provides the basis for reusable 
  * persistence and undo/redo. 
  */
-export abstract class AbstractEditor<T extends PersistenceStrategy, P extends AbstractEditorProps, S extends AbstractEditorState>
+export abstract class AbstractEditor<P extends AbstractEditorProps, S extends AbstractEditorState>
   extends React.Component<P, S> {
 
-  constructor(props, ctor: NoParamConstructor<T>) {
+  constructor(props, persistenceStrategy : PersistenceStrategy) {
     super(props);
 
     this.state = ({ 
@@ -50,7 +50,7 @@ export abstract class AbstractEditor<T extends PersistenceStrategy, P extends Ab
     } as any);
 
     this.stopListening = false;
-    this.persistenceStrategy = new ctor();
+    this.persistenceStrategy = persistenceStrategy;
     
     this.onSaveCompleted = (doc: persistence.Document) => {
       this.saveCompleted(doc);

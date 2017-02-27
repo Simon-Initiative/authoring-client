@@ -77,7 +77,7 @@ export module user {
 
         persistence.queryDocuments(coursesQuery(userId))
           .then(docs => {
-            let courses = docs.map(result => (result.content as any).courseId);
+            let courses = docs.map(result => (result as any).courseId);
             dispatch(loginSuccess(username, userId, {}, courses));
           })
           .catch(err => {

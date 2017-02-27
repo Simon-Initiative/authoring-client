@@ -132,11 +132,7 @@ var createUsers = function() {
 
 var createOrganization = function() {
   let data = { 
-    metadata: {
-      type: 'organization',
-      lockedBy: ''
-    }, 
-    content: {
+      _modelType: 'OrganizationModel',
       title: 'Sample Organization',
       nodes: []
     }
@@ -149,15 +145,10 @@ var createCourse = function(users) {
     createOrganization()
       .then(result => {
         let data = { 
-          metadata: {
-            type: 'course',
-            lockedBy: ''
-          }, 
-          content: {
-            title: 'Sample Course',
-            organizations: [result.id],
-            resources: []
-          }
+          _modelType: 'CourseModel',
+          title: 'Sample Course',
+          organizations: [result.id],
+          resources: []
         };
         request('POST', '/editor', data)
           .then(result => resolve({course: result.id, users}));

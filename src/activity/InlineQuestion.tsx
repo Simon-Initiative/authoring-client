@@ -21,7 +21,7 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
 
   componentDidMount() {
     persistence.retrieveDocument(this.props.questionId)
-      .then(doc => this.setState({ question: doc.content, editStem: (doc.content as any).stem}))
+      .then(doc => this.setState({ question: doc, editStem: (doc as any).stem}))
       .catch(err => {
         // TODO: unified error handling 
       });
@@ -52,9 +52,9 @@ class InlineQuestion extends React.PureComponent<InlineQuestionProps, { editMode
   issueSave() {
     var updated = Object.assign({}, this.state.question, { stem: this.state.editStem, answer: this.currentAnswer });
     
-    persistence.persistDocument(this.props.questionId, this.state.question)
+    persistence.persistDocument(this.state.question)
       .then(update => {
-        this.setState({editMode: false, question: { _rev: update.rev, stem: updated.stem, answer: updated.answer}, answer: null});
+        this.setState({editMode: false, question: { _rev: update._rev, stem: updated.stem, answer: updated.answer}, answer: null});
         this.props.blockProps.onEditMode(false);
       })
       .catch(err => {

@@ -44,7 +44,7 @@ class EditorFactory extends React.Component<EditorFactoryProps, { document: pers
     if (this.state.document === null) {
       return null;
     } else {
-      let component = getEditorByName(this.state.document.metadata.type);
+      let component = getEditorByName(this.state.document.modelType);
       let childProps = Object.assign({}, this.props, {document: this.state.document});
       return React.createElement( (component as any), childProps);
     }

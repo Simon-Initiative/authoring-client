@@ -29,13 +29,11 @@ interface WorkbookPageEditorState extends AbstractEditorState {
 }
 
 class WorkbookPageEditor extends AbstractEditor<
-
-  DeferredPersistenceStrategy, 
   WorkbookPageEditorProps, 
   WorkbookPageEditorState>  {
 
   constructor(props) {
-    super(props, DeferredPersistenceStrategy);
+    super(props, new DeferredPersistenceStrategy());
     
     this.editDispatch = this._editDispatch.bind(this);
     this.lastUndoStackSize = 0;
@@ -50,7 +48,7 @@ class WorkbookPageEditor extends AbstractEditor<
   }
 
   documentChanged(currentDocument: persistence.Document) {
-    console.log('documentChange: ' + (currentDocument.content as any).blocks[0].text);
+    console.log('documentChange: ' + (currentDocument as any).blocks[0].text);
     this.setState({currentDocument});
   }
 
@@ -73,10 +71,9 @@ class WorkbookPageEditor extends AbstractEditor<
 
     let inContentModel : Object = translateDraftToContent(editorState.getCurrentContent());
     let newDoc = persistence.copy(this.lastSavedDocument);
-    newDoc.content = inContentModel;
+    Object.assign(newDoc, inContentModel);
     
     this.persistenceStrategy.save(newDoc, () => newDoc);
-    
   } 
 
   _editDispatch(action: Object) {
@@ -98,7 +95,7 @@ class WorkbookPageEditor extends AbstractEditor<
                             editDispatch={this.editDispatch} />
                         <DraftWrapper 
                             editHistory={this.state.editHistory} 
-                            content={this.state.currentDocument.content} 
+                            content={this.state.currentDocument} 
                             locked={locked}
                             notifyOnChange={this.saveContent.bind(this)} />
                     </div>
