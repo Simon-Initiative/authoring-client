@@ -1,5 +1,4 @@
 FROM haproxytech/haproxy-ubuntu:latest
-MAINTAINER Baptiste Assmann <bassmann@haproxy.com>
 
 # install third party tools
 RUN export DEBIAN_FRONTEND=noninteractive && \
