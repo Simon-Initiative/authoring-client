@@ -23,6 +23,8 @@ export interface AbstractEditor<P extends AbstractEditorProps, S extends Abstrac
 export interface AbstractEditorProps {
 
   // The dispatch function 
+  // TODO remove direct dependency on dispatch - instead have pre-bound
+  // action handlers as properties
   dispatch: any;
 
   // Id of the current user
