@@ -12,7 +12,8 @@ function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
 export const ModelTypes = strEnum([
   'CourseModel',
   'CoursePermissionModel',
-  'WorkbookPageModel'
+  'WorkbookPageModel',
+  'AssessmentModel'
 ])
 
 // Create an actual type
@@ -52,7 +53,27 @@ export interface WorkbookPageModel extends Lockable, HasTitle {
   entityMap: Object;
 }
 
-export type ContentModel = CourseModel | CoursePermissionModel | WorkbookPageModel;
+export interface HtmlContent {
+  blocks: Object[];
+  entityMap: Object;
+}
+
+export interface InlineAssessmentContent {
+  timeLimit: number,
+  questions: DocumentId[]
+}
+
+export interface AssessmentModel extends Lockable, HasTitle {
+  modelType: 'AssessmentModel',
+  context: HtmlContent,
+  assessment: InlineAssessmentContent
+}
+
+export type ContentModel = 
+  AssessmentModel |
+  CourseModel | 
+  CoursePermissionModel | 
+  WorkbookPageModel;
 
 // Example of how to write a switch statement that
 // forces you to cover all possible types of ContentModel
@@ -66,6 +87,9 @@ function example1(model: ContentModel) {
         return;
       case ModelTypes.CoursePermissionModel: 
         console.log('permission');
+        return;
+      case ModelTypes.AssessmentModel:
+        console.log('assessment');
         return;
       default: const _exhaustiveCheck: never = model;
   }
