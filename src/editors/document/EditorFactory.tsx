@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import * as persistence from '../data/persistence';
+import * as persistence from '../../data/persistence';
 
 import { getEditorByName } from './registry';
 

@@ -43,7 +43,7 @@ import Main from './Main';
 import initRegistry from './activity/registrar';
 initRegistry();
 
-import initEditorRegistry from './editors/registrar';
+import initEditorRegistry from './editors/document/registrar';
 initEditorRegistry();
 
 

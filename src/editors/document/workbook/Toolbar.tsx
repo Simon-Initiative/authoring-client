@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 import { connect }  from 'react-redux';
-import { returnType } from '../../utils/types';
+import { returnType } from '../../../utils/types';
 
-import { authoringActions } from '../../actions/authoring';
-import { modalActions } from '../../actions/modal';
+import { authoringActions } from '../../../actions/authoring';
+import { modalActions } from '../../../actions/modal';
 
-import MediaSelection from '../../components/selection/MediaSelection';
+import MediaSelection from '../../../components/selection/MediaSelection';
 
 interface ToolbarProps {  
   dispatch: any;

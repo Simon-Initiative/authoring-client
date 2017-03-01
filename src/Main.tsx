@@ -13,7 +13,7 @@ import * as persistence from './data/persistence';
 
 import NavigationBar from './components/NavigationBar';
 import Courses from './components/Courses';
-import EditorFactory from './editors/EditorFactory';
+import EditorFactory from './editors/document/EditorFactory';
 
 function mapStateToProps(state: any) {
 

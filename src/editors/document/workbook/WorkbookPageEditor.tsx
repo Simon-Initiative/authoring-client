@@ -5,11 +5,11 @@ import { ContentState, EditorState } from 'draft-js';
 import { bindActionCreators } from 'redux';
 
 import Toolbar from './Toolbar';
-import DraftWrapper from '../DraftWrapper';
-import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../AbstractEditor';
-import {DeferredPersistenceStrategy} from '../persistence/DeferredPersistenceStrategy';
-import { translateDraftToContent } from '../translate';
-import * as persistence from '../../data/persistence';
+import DraftWrapper from '../../content/common/draft/DraftWrapper';
+import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
+import {DeferredPersistenceStrategy} from '../common/persistence/DeferredPersistenceStrategy';
+import { translateDraftToContent } from '../../content/common/draft/translate';
+import * as persistence from '../../../data/persistence';
 
 interface WorkbookPageEditor {
   authoringActions: any;

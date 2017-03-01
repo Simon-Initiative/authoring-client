@@ -4,7 +4,7 @@ import * as React from 'react';
 import {Editor, EditorState, CompositeDecorator, ContentState, 
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 
-import { getActivityByName, Activity } from '../activity/registry';
+import { getActivityByName, Activity } from '../../../../activity/registry';
 
 interface DraftWrapper {
   onChange: any;

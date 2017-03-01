@@ -1,6 +1,6 @@
 
-import * as content from '../../data/content';
-import * as persistence from '../../data/persistence';
+import * as content from '../../../../data/content';
+import * as persistence from '../../../../data/persistence';
 
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback, DocumentGenerator} from './PersistenceStrategy';

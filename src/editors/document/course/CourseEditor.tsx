@@ -2,15 +2,15 @@
 
 import * as React from 'react';
 
-import * as persistence from '../../data/persistence';
-import * as content from '../../data/content';
-import { initWorkbook, resourceQuery } from '../../data/domain';
-import { document as documentActions } from '../../actions/document';
+import * as persistence from '../../../data/persistence';
+import * as content from '../../../data/content';
+import { initWorkbook, resourceQuery } from '../../../data/domain';
+import { document as documentActions } from '../../../actions/document';
 
 import { AbstractEditor, AbstractEditorProps, 
-  AbstractEditorState } from '../AbstractEditor';
+  AbstractEditorState } from '../common/AbstractEditor';
 
-import { ImmediatePersistenceStrategy } from '../persistence/ImmediatePersistenceStrategy';
+import { ImmediatePersistenceStrategy } from '../common/persistence/ImmediatePersistenceStrategy';
 
 interface CourseEditor {
   

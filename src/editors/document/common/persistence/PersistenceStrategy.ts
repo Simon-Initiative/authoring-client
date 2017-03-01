@@ -1,5 +1,5 @@
 
-import * as persistence from '../../data/persistence';
+import * as persistence from '../../../../data/persistence';
 
 export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 

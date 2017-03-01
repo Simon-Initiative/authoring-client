@@ -1,5 +1,5 @@
 
-import * as persistence from '../../data/persistence';
+import * as persistence from '../../../../data/persistence';
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback, DocumentGenerator } from './PersistenceStrategy';
 import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';

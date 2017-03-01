@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 
-import * as persistence from '../data/persistence';
-import * as content from '../data/content';
+import * as persistence from '../../../data/persistence';
+import * as content from '../../../data/content';
 
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
