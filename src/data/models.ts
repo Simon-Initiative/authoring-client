@@ -160,35 +160,3 @@ export type ContentModel =
 // A pure function that takes a content model as 
 // input and returns a changed content model
 export type ChangeRequest = (input: ContentModel) => ContentModel;
-
-// Example of how to write a switch statement that
-// forces you to cover all possible types of ContentModel
-function example1(model: ContentModel) {
-  switch (model.modelType) {
-      case ModelTypes.CourseModel: 
-        console.log('course');
-        return;
-      case ModelTypes.WorkbookPageModel: 
-        console.log('workbook');
-        return;
-      case ModelTypes.CoursePermissionModel: 
-        console.log('permission');
-        return;
-      case ModelTypes.AssessmentModel:
-        console.log('assessment');
-        return;
-      default: const _exhaustiveCheck: never = model;
-  }
-}
-
-// Example of how to write a switch statement that
-// doesn't cover all possible types of ContentModel
-function example2(model: ContentModel) {
-  switch (model.modelType) {
-      case ModelTypes.CourseModel: 
-        console.log('course');
-        return;
-      default: 
-        console.log('something else')
-  }
-}
