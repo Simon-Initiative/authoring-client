@@ -1,7 +1,9 @@
 
-import * as persistence from '../../../../data/persistence';
+import * as persistence from '../../../data/persistence';
+import * as models from '../../../data/models';
+
 import { PersistenceStrategy, onSaveCompletedCallback, 
-  onFailureCallback, DocumentGenerator } from './PersistenceStrategy';
+  onFailureCallback } from './PersistenceStrategy';
 import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 
 /**
@@ -10,8 +12,8 @@ import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
  */
 export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
 
-  save(initialDoc: persistence.Document, documentGenerator: DocumentGenerator) {
-    this.saveDocument(initialDoc, documentGenerator, 3, undefined, undefined)
+  save(initialDoc: persistence.Document, changeRequest: models.ChangeRequest) {
+    this.saveDocument(initialDoc, changeRequest, 3, undefined, undefined)
       .then(doc => {
         if (this.successCallback !== null) {
           this.successCallback(doc);
@@ -28,13 +30,14 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
    * Attempts to save the document.  Will auto retry a maximum number of times
    * to seamlessly handle conflicts. 
    */
-  saveDocument(initialDoc: persistence.Document, documentGenerator: DocumentGenerator,
+  saveDocument(initialDoc: persistence.Document, changeRequest: models.ChangeRequest,
     remainingRetries: number,
     initialResolve: any, initialReject: any)
     : Promise<persistence.Document> {
 
       return new Promise((resolve, reject) => {
-        let toSave = documentGenerator(initialDoc);
+
+        let toSave = initialDoc.with({ model: changeRequest(initialDoc.model)});
 
         persistence.persistDocument(toSave)
           .then(result => {
@@ -46,7 +49,7 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
             } else {
               persistence.retrieveDocument(initialDoc._id)
                 .then(doc => {
-                  this.saveDocument(doc, documentGenerator, --remainingRetries,
+                  this.saveDocument(doc, changeRequest, --remainingRetries,
                     initialResolve === undefined ? resolve : initialResolve,
                     initialReject === undefined ? reject : initialReject);
                 })

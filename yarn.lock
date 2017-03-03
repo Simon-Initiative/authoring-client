@@ -4361,9 +4361,9 @@ reduce-function-call@^1.0.1:
   dependencies:
     balanced-match "^0.4.2"
 
-redux-logger@^2.7.4:
-  version "2.7.4"
-  resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-2.7.4.tgz#891e5d29e7f111d08b5781a237b9965b5858c7f8"
+redux-logger@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/redux-logger/-/redux-logger-2.8.2.tgz#52140a89afa1c1d25312cc17649c116650bf7fca"
   dependencies:
     deep-diff "0.3.4"
 

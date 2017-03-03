@@ -4,6 +4,10 @@ import * as React from 'react';
 import {Editor, EditorState, CompositeDecorator, ContentState, 
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 
+import * as translate from './translate';
+
+import { HtmlContent } from '../../../../data/contentTypes';
+
 import { getActivityByName, Activity } from '../../../../activity/registry';
 
 interface DraftWrapper {
@@ -15,13 +19,13 @@ interface DraftWrapper {
 
 export interface DraftWrapperProps {
   editHistory: Object[];
-  notifyOnChange: (ContentState) => void;
-  content: ContentState;
+  onEdit: (HtmlContent) => void;
+  content: HtmlContent;
   locked: boolean;
 }
 
 interface DraftWrapperState {
-  editorState: any;
+  editorState: EditorState;
   inEdit: boolean;
 }
 
@@ -126,20 +130,24 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     super(props);
 
     this.focus = () => (this.refs as any).editor.focus();
-
-    
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
-    const state = convertFromRaw(this.props.content);
+    
+    const contentState : ContentState = translate.htmlContentToDraft(this.props.content);
 
     this.state = {
-      editorState: EditorState.createWithContent(state, decorator),
+      editorState: EditorState.createWithContent(contentState, decorator),
       inEdit: false
     };
     
     this.onChange = (editorState) => {
+
+      // You wouldn't think that this check would be necessary, but I was seeing
+      // change notifications fired from Draft even when it was not in edit mode.
       if (!this.props.locked) {
-        let content = editorState.getCurrentContent();
-        this.props.notifyOnChange(editorState);
+
+        const content = editorState.getCurrentContent();
+        const htmlContent : HtmlContent = translate.draftToHtmlContent(editorState.getCurrentContent());
+        this.props.onEdit(htmlContent);
 
         return this.setState({editorState})
       }
@@ -183,9 +191,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    const state = convertFromRaw(nextProps.content);
+    const contentState : ContentState = translate.htmlContentToDraft(nextProps.content);
+
     this.setState({
-      editorState: EditorState.createWithContent(state, decorator)
+      editorState: EditorState.createWithContent(contentState, decorator)
     });
 
     // Determine if we have received a new edit action

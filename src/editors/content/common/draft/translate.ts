@@ -1,20 +1,21 @@
 
 import { ContentState, convertToRaw, convertFromRaw} from 'draft-js';
+import { HtmlContent } from '../../../../data/contentTypes';
 
 // Translation routines between the models:
 
-// 1. The nextgen course content model.  This is the model persisted
-//    in the backend. Referred to here as the 'content' model
+// 1. The nextgen course content model for HTML text. 
+
 // 2. The Draft.js content model. This is the model that powers the 
 //    Draft editor. Referred to here as the 'draft' model.
 
 
-export function translateContentToDraft(content: Object) : ContentState {
+export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
   // Current support is a simple identity transform 
-  return convertFromRaw(content);
+  return convertFromRaw(htmlContent);
 }
 
-export function translateDraftToContent(state: ContentState) : Object {
+export function draftToHtmlContent(state: ContentState) : HtmlContent {
   // Current support is a simple identity transform
   return convertToRaw(state);
 }

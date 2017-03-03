@@ -2,53 +2,53 @@ import 'babel-polyfill';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { getUserName } from './utils/params';
-
-declare var require: {
-    <T>(path: string): T;
-    (paths: string[], callback: (...modules: any[]) => void): void;
-    ensure: (paths: string[], callback: (require: <T>(path: string) => T) => void) => void;
-};
-
 import thunkMiddleware from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+import 'whatwg-fetch';
 
+var Provider = (require('react-redux') as RR).Provider;
 var createLogger = require('redux-logger');
 
-import { createStore, applyMiddleware } from 'redux';
-
+import { getUserName } from './utils/params';
 import rootReducer from './reducers';
-import 'whatwg-fetch';
+import Main from './Main';
+import initRegistry from './activity/registrar';
+import initEditorRegistry from './editors/manager/registrar';
 
 interface RR {
     Provider: any;
 }
 
-var Provider = (require('react-redux') as RR).Provider;
+function initStore() {
+  
+  const loggerMiddleware = (createLogger as any)();
 
+  const createStoreWithMiddleware = applyMiddleware(
+    thunkMiddleware, // lets us dispatch async actions
+    loggerMiddleware // middleware that logs actions
+  )(createStore);
 
-const loggerMiddleware = (createLogger as any)();
+  return createStoreWithMiddleware(rootReducer);
+}
 
-const createStoreWithMiddleware = applyMiddleware(
-  thunkMiddleware, // lets us dispatch async actions
-  loggerMiddleware // middleware that logs actions
-)(createStore);
+function main() {
 
-//const store = createStoreWithMiddleware((rootReducer as <A extends Action>(state: any, action: A) => any));
+  // Application specific initialization
+  initRegistry();
+  initEditorRegistry();
 
-const store = createStoreWithMiddleware(rootReducer);
+  // Extract the user name from the query parameters
+  const userName = getUserName();
 
+  // Create the redux store
+  const store = initStore();
 
-import Main from './Main';
+  // Now do the initial rendering
+  ReactDOM.render(
+      <Provider store={store}>
+        <Main username={userName}/>
+      </Provider>, document.getElementById('app')); 
+}
 
-import initRegistry from './activity/registrar';
-initRegistry();
+main();
 
-import initEditorRegistry from './editors/document/registrar';
-initEditorRegistry();
-
-
-ReactDOM.render(
-    <Provider store={store}>
-      <Main username={getUserName()}/>
-    </Provider>,
-  document.getElementById('app')); // jshint ignore:line

@@ -129,7 +129,7 @@ var createUsers = function() {
 var createOrganization = function() {
   let data = { 
     modelType: 'OrganizationModel',
-    title: 'Sample Organization',
+    title: {text: 'Sample Organization'},
     nodes: []
   }
   return request('POST', '/editor', data);
@@ -141,7 +141,7 @@ var createCourse = function(users) {
       .then(result => {
         let data = { 
           modelType: 'CourseModel',
-          title: 'Sample Course',
+          title: {text: 'Sample Course'},
           organizations: [result.id],
           resources: []
         };

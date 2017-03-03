@@ -1,9 +1,10 @@
 
-import * as content from '../../../../data/content';
-import * as persistence from '../../../../data/persistence';
+import * as models from '../../../data/models';
+import * as contentTypes from '../../../data/contentTypes';
+import * as persistence from '../../../data/persistence';
 
 import { PersistenceStrategy, onSaveCompletedCallback, 
-  onFailureCallback, DocumentGenerator} from './PersistenceStrategy';
+  onFailureCallback } from './PersistenceStrategy';
 
 
 export interface AbstractPersistenceStrategy {
@@ -24,9 +25,13 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
 
   setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.Document> {
     
-    let lockedDocument = persistence.copy(doc);
-    (lockedDocument as content.Lockable).lockedBy = userId;
-    (lockedDocument as content.Lockable).lockedAt = (new Date()).getTime();
+    let lock : contentTypes.LockContent = (doc.model as any).lock;
+    let updatedLock = lock.with({
+      lockedBy: userId,
+      lockedAt: (new Date()).getTime()
+    });
+    
+    let lockedDocument = doc.with({ model: (doc.model as any).with({ lock: updatedLock})});
     
     return new Promise((resolve, reject) => {
       persistence.persistDocument(lockedDocument)
@@ -45,6 +50,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     if (this.writeLockedDocumentId !== null) {
       persistence.retrieveDocument(this.writeLockedDocumentId)
         .then(document => this.setWriteLock(document, ''));
+    } else {
+      return Promise.resolve(true);
     }
   }
 
@@ -59,11 +66,11 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.successCallback = onSuccess;
     this.failureCallback = onFailure;
 
-    if (content.isLockable(doc)) {
-      let lockable : content.Lockable = (doc as content.Lockable);
+    if (models.isLockable(doc.model)) {
+      let lock : contentTypes.LockContent = (doc.model as any).lock;
       
-      let alreadyLocked = lockable.lockedBy !== userId
-        && lockable.lockedBy !== ''; 
+      let alreadyLocked = lock.lockedBy !== userId
+        && lock.lockedBy !== ''; 
 
       if (alreadyLocked) {
         return Promise.resolve(false);
@@ -87,7 +94,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     }
   }
 
-  abstract save(initialDoc: persistence.Document, documentGenerator: DocumentGenerator) : void;
+  abstract save(initialDoc: persistence.Document, changeRequest: models.ChangeRequest) : void;
   
   /**
    * Method to that child classes must implement to allow an async
@@ -99,8 +106,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * Indicate to the persistence strategy that it is being shutdown and that it
    * should clean up any resources and flush any pending changes immediately.
    */
-  destroy() {
-    this.doDestroy()
-      .then(r => this.releaseLock());
+  destroy() : Promise<{}> {
+    return this.doDestroy()
+      .then(r => this.releaseLock())
+
   };
 }
