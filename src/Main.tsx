@@ -13,7 +13,7 @@ import * as persistence from './data/persistence';
 
 import NavigationBar from './components/NavigationBar';
 import Courses from './components/Courses';
-import EditorFactory from './editors/document/EditorFactory';
+import EditorManager from './editors/document/EditorManager';
 
 function mapStateToProps(state: any) {
 
@@ -64,7 +64,7 @@ class Main extends React.Component<MainProps, {}> {
       return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
     else if (documentId !== null) {
-      return <EditorFactory dispatch={this.props.dispatch} 
+      return <EditorManager dispatch={this.props.dispatch} 
         userId={this.props.user.userId} documentId={this.props.document}/>;
     } else {
       return null;  // TODO replace with welcome / logon screen

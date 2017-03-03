@@ -35,7 +35,7 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
 
     persistence.queryDocuments(titlesForCoursesQuery(this.props.courseIds))
       .then(docs => {
-        let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title}));
+        let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title.text}));
         this.setState({ courses });
       })
       .catch(err => {

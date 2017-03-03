@@ -1,21 +1,11 @@
 
-import { WorkbookPageModel, ModelTypes } from './content';
+import { WorkbookPageModel, ModelTypes } from './models';
+import * as contentTypes from './contentTypes';
 
 export function initWorkbook(title: string) : WorkbookPageModel {
-  return {
-    modelType: ModelTypes.WorkbookPageModel,
-    lockedBy: '',
-    lockedAt: 0,
-    title,
-    blocks: [{
-      text: (
-        'Sample text'
-      ),
-      type: 'unstyled',
-      entityRanges: [],
-    }],
-    entityMap: {}
-  }
+  return new WorkbookPageModel({
+    title: new contentTypes.TitleContent({ text: title})
+  });
 }
 
 export function titlesForCoursesQuery(courseIds: string[]) : Object {

@@ -1,18 +1,25 @@
 
+import { PersistenceStrategy } from './common/persistence/PersistenceStrategy';
+import { ListeningApproach } from './ListeningApproach';
+
 export const EditorRegistry = {};
 
 export type RegisteredEditor = {
   name: string;
-  editor: Object;
+  component: Object;
+  persistenceStrategy: PersistenceStrategy;
+  listeningApproach: ListeningApproach;
 }
 
-export function register(editor: RegisteredEditor) {
-  EditorRegistry[editor.name] = editor
+export function register(registration: RegisteredEditor) {
+  EditorRegistry[registration.name] = registration
 }
 
-export function getEditorByName(name: string) : Object {
-  return EditorRegistry[name].editor;
+export function lookUpByName(name: string) : RegisteredEditor {
+  return EditorRegistry[name];
 }
+
+
 
 
 

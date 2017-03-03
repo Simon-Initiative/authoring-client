@@ -1,7 +1,9 @@
 
 import * as persistence from '../../../../data/persistence';
+import * as models from '../../../../data/models';
+
 import { PersistenceStrategy, onSaveCompletedCallback, 
-  onFailureCallback, DocumentGenerator } from './PersistenceStrategy';
+  onFailureCallback } from './PersistenceStrategy';
 import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 
 export interface DeferredPersistenceStrategy {
@@ -29,15 +31,17 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
     this.timerStart = 0;
     this.flushResolve = null;
     this.inFlight = null;
+    this.pending = null;
   }
 
   now() {
     return new Date().getTime();
   }
 
-  save(doc: persistence.Document, documentGenerator: DocumentGenerator) {
-    this.pending = documentGenerator(doc);
-
+  save(doc: persistence.Document, changeRequest: models.ChangeRequest) {
+    
+    this.pending = doc.with({ model: changeRequest(doc.model)});
+    
     if (this.inFlight === null) {
       this.queueSave();
     }
@@ -86,7 +90,7 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           this.inFlight = null;
           
           if (this.pending !== null) {
-            this.pending._rev = result._rev;
+            this.pending = this.pending.with({_rev: result._rev});
             this.queueSave();
           }
           resolve(result);
