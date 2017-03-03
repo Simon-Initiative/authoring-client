@@ -1,5 +1,5 @@
 
-import { PersistenceStrategy } from './common/persistence/PersistenceStrategy';
+import { PersistenceStrategy } from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 
 export const EditorRegistry = {};

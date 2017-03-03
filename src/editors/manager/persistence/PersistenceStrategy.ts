@@ -1,7 +1,7 @@
 
-import * as persistence from '../../../../data/persistence';
+import * as persistence from '../../../data/persistence';
 
-import { ChangeRequest } from '../../../../data/models';
+import { ChangeRequest } from '../../../data/models';
 
 export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 

@@ -13,7 +13,7 @@ import { getUserName } from './utils/params';
 import rootReducer from './reducers';
 import Main from './Main';
 import initRegistry from './activity/registrar';
-import initEditorRegistry from './editors/document/registrar';
+import initEditorRegistry from './editors/manager/registrar';
 
 interface RR {
     Provider: any;

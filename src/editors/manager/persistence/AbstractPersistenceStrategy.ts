@@ -1,7 +1,7 @@
 
-import * as models from '../../../../data/models';
-import * as contentTypes from '../../../../data/contentTypes';
-import * as persistence from '../../../../data/persistence';
+import * as models from '../../../data/models';
+import * as contentTypes from '../../../data/contentTypes';
+import * as persistence from '../../../data/persistence';
 
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback } from './PersistenceStrategy';

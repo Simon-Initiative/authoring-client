@@ -2,12 +2,7 @@
 
 import * as React from 'react';
 
-import { bindActionCreators } from 'redux';
-
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
-import {DeferredPersistenceStrategy} from '../common/persistence/DeferredPersistenceStrategy';
-import * as persistence from '../../../data/persistence';
-
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 

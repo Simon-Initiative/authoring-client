@@ -1,6 +1,6 @@
 
-import * as persistence from '../../../../data/persistence';
-import * as models from '../../../../data/models';
+import * as persistence from '../../../data/persistence';
+import * as models from '../../../data/models';
 
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback } from './PersistenceStrategy';

@@ -6,10 +6,10 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import { document as documentActions } from '../../actions/document';
-import { AbstractEditorProps, EditorServices } from './common/AbstractEditor';
+import { AbstractEditorProps, EditorServices } from '../document/common/AbstractEditor';
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
-  onFailureCallback } from './common/persistence/PersistenceStrategy';
+  onFailureCallback } from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 

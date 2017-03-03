@@ -1,9 +1,9 @@
 
-import WorkbookPageEditor from './workbook/WorkbookPageEditor';
-import CourseEditor from './course/CourseEditor';
+import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor';
+import CourseEditor from '../document/course/CourseEditor';
 
-import { DeferredPersistenceStrategy } from './common/persistence/DeferredPersistenceStrategy';
-import { ImmediatePersistenceStrategy } from './common/persistence/ImmediatePersistenceStrategy';
+import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
+import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 
 import { ModelTypes } from '../../data/models';
