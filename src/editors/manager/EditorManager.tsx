@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 
@@ -15,8 +13,6 @@ import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 
 interface EditorManager {
-
-  serviceProvider: EditorServices;
 
   persistenceStrategy: PersistenceStrategy;
 
@@ -89,7 +85,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         listeningApproach === ListeningApproach.Always) {
 
         this.stopListening = false;
-        console.log('start listening');
         this.listenForChanges();
       }
 
@@ -99,7 +94,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   fetchDocument(documentId: string) {
     persistence.retrieveDocument(documentId)
       .then(document => {
-        console.log('retrieved document');
         this.lastSavedDocument = document;
 
         // Tear down previous persistence strategy
@@ -118,7 +112,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   componentWillReceiveProps(nextProps) {
     if (this.props.documentId !== nextProps.documentId) {
-      console.log('received new document id');
       this.stopListening = true;
       this.fetchDocument(nextProps.documentId);
     }
@@ -157,13 +150,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     if (this.state.document === null) {
       return null;
     } else {
-      console.log("rendered EditorManager");
       const childProps : AbstractEditorProps<any> = {
         model : this.state.document.model,
         onEdit: this._onEdit,
         userId: this.props.userId,
         editingAllowed: this.state.editingAllowed,
-        services: this.serviceProvider
+        services: this.props.services
       }
       
       let component = lookUpByName(this.state.document.model.modelType).component;

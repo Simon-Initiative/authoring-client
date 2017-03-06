@@ -78,8 +78,7 @@ class Main extends React.Component<MainProps, {}> {
     }
   }
 
-  render(): JSX.Element 
-  {
+  render(): JSX.Element {
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
@@ -93,7 +92,7 @@ class Main extends React.Component<MainProps, {}> {
 			</div>				
 			
 			<div style={{"display": "flex", flexGrow: 1, order: 1, margin: "0 0 4px 0", flex: 1}}>
-				<div style={{"border-right" : "1px solid grey"}}>
+				<div style={{"borderRight" : "1px solid grey"}}>
     				<NavigationBar documentActions={this.documentActions}/>
 				</div>
 				<div style={{background: "#f1f1f1", border: "1px solid #c4c0c0", padding: "2px", margin: "2px 2px 2px 2px", flex: 1}}>

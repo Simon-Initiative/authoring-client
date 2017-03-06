@@ -17,5 +17,7 @@ export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
 
 export function draftToHtmlContent(state: ContentState) : HtmlContent {
   // Current support is a simple identity transform
-  return convertToRaw(state);
+  const rawContent = convertToRaw(state);
+  const mixinContentTag = Object.assign({}, rawContent, { contentType: 'HtmlContent'});
+  return new HtmlContent(mixinContentTag);
 }

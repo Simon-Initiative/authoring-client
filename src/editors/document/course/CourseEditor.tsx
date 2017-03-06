@@ -117,7 +117,6 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
   }
 
   render() {
-    console.log('rendered CourseEditor');
     return (
       <div className="container">
           <div className="columns">
