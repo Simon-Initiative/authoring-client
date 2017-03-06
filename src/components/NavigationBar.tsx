@@ -1,32 +1,23 @@
-
-'use strict'
-
 import * as React from 'react';
-import { document } from '../actions/document';
 
 /**
 *
 */
-interface NavigationBar 
-{
-  
+interface NavigationBar {
 }
 
 /**
 *
 */
-export interface NavigationBarProps 
-{
+export interface NavigationBarProps {
   documentActions: any;
 }
 
 /**
 *
 */
-class NavigationBar extends React.PureComponent<NavigationBarProps, {}> 
-{
-  render() 
-  {
+class NavigationBar extends React.PureComponent<NavigationBarProps, {}> {
+  render() {
     return (
     		<ul className="unstyled">
     			<li><a onClick={this.props.documentActions.viewAllCourses} className="btn btn-link">My Courses</a></li>

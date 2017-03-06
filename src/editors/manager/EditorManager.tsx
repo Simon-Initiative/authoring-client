@@ -6,7 +6,8 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import { document as documentActions } from '../../actions/document';
-import { AbstractEditorProps, EditorServices } from '../document/common/AbstractEditor';
+import { AbstractEditorProps } from '../document/common/AbstractEditor';
+import { EditorServices } from './EditorServices';
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
   onFailureCallback } from './persistence/PersistenceStrategy';
@@ -33,9 +34,12 @@ interface EditorManager {
 }
 
 export interface EditorManagerProps {
+
   documentId: string;
+
   userId: string;
-  dispatch: any;
+
+  services: EditorServices;
 }
 
 export interface EditorManagerState {
@@ -50,9 +54,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
     this.state = { document: null, editingAllowed: null};
 
-    this.serviceProvider = {
-      viewDocument: (id) => this.props.dispatch(documentActions.viewDocument(id))
-    };
+    
 
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);

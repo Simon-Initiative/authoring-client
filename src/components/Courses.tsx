@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 
 import * as persistence from '../data/persistence';
@@ -45,25 +43,25 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
 
   render() {
 
-      let rows = this.state.courses.map((c, i) => {
-        const { id, title} = c;
-        return <tr key={id}><td>
-            <button key={id} onClick={this.onSelect.bind(this, id)} 
-              className="btn btn-link">{title}</button>
-          </td></tr>
-      });
+    let rows = this.state.courses.map((c, i) => {
+      const { id, title} = c;
+      return <tr key={id}><td>
+          <button key={id} onClick={this.onSelect.bind(this, id)} 
+            className="btn btn-link">{title}</button>
+        </td></tr>
+    });
 
-      return (
-        <table className="table table-striped table-hover"> 
-          <thead>
-              <tr>
-                  <th>Courses</th>
-              </tr>
-          </thead>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>);
+    return (
+      <table className="table table-striped table-hover"> 
+        <thead>
+            <tr>
+                <th>Courses</th>
+            </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>);
   }
   
 

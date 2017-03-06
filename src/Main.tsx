@@ -14,6 +14,7 @@ import * as persistence from './data/persistence';
 import NavigationBar from './components/NavigationBar';
 import Courses from './components/Courses';
 import EditorManager from './editors/manager/EditorManager';
+import { EditorServices, DispatchBasedServices } from './editors/manager/EditorServices';
 
 function mapStateToProps(state: any) {
 
@@ -35,6 +36,7 @@ function mapStateToProps(state: any) {
 interface Main {
   modalActions: Object;
   documentActions: Object;
+  services: EditorServices;
 }
 
 interface MainOwnProps {
@@ -45,10 +47,13 @@ const stateGeneric = returnType(mapStateToProps);
 type MainReduxProps = typeof stateGeneric; 
 type MainProps = MainReduxProps & MainOwnProps & { dispatch };
 
+
 class Main extends React.Component<MainProps, {}> {
 
   constructor(props) {
     super(props);
+
+    this.services = new DispatchBasedServices(this.props.dispatch);
 
     this.modalActions = bindActionCreators((modalActions as any), this.props.dispatch);
     this.documentActions = bindActionCreators((documentActions as any), this.props.dispatch);
@@ -64,8 +69,10 @@ class Main extends React.Component<MainProps, {}> {
       return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
     else if (documentId !== null) {
-      return <EditorManager dispatch={this.props.dispatch} 
-        userId={this.props.user.userId} documentId={this.props.document}/>;
+      return <EditorManager 
+        services={this.services} 
+        userId={this.props.user.userId} 
+        documentId={this.props.document}/>;
     } else {
       return null;  // TODO replace with welcome / logon screen
     }

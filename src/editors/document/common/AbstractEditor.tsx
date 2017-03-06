@@ -5,15 +5,10 @@ import * as React from 'react';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as types from '../../../data/types';
+import { EditorServices } from '../../manager/EditorServices';
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
-}
-
-export interface EditorServices {
-
-  viewDocument: (documentId: types.DocumentId) => void;
-
 }
 
 export interface AbstractEditorProps<ModelType> {
@@ -42,9 +37,6 @@ export interface AbstractEditorState {
 export abstract class AbstractEditor<ModelType, 
   P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState>
   extends React.Component<P, S> {
-
-
-
 
 }
 
