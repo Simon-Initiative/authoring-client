@@ -11,7 +11,7 @@ import {document as documentActions} from '../../actions/document';
  * of the Redux dispatcher.  The service implementation (see below)
  * can effectively hide the presence and invocation of dispatch.  
  */
-export interface EditorServices {
+export interface AppServices {
 
   // Request to view a document with the specified document id.
   viewDocument: (documentId: types.DocumentId) => void;
@@ -28,7 +28,7 @@ export interface DispatchBasedServices {
   dispatch;
 }
 
-export class DispatchBasedServices implements EditorServices {
+export class DispatchBasedServices implements AppServices {
   
   constructor(dispatch) {
     this.dispatch = dispatch;
