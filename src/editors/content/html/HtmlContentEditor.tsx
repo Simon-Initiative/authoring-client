@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { ContentState, EditorState, ContentBlock, convertToRaw } from 'draft-js';
-
+import { stateToHTML } from 'draft-js-export-html';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
@@ -10,13 +10,29 @@ import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import EditorManager from '../../manager/EditorManager';
 import ToolbarManager from '../common/ToolbarManager';
+import { htmlContentToDraft } from '../common/draft/translate';
 
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
 }
 
 var toHtml = function(block: ContentBlock, onEditModeChange) {
-  return <div key={block.key} onClick={() => onEditModeChange(block.key, false)}><p>{block.text}</p></div>;
+
+  const content = {
+    blocks: [block],
+    entityMap: {}
+  };
+
+  const converted = stateToHTML(htmlContentToDraft(content as any));
+
+  const html = {
+    __html: converted
+  };
+
+  return <div 
+    key={block.key} 
+    dangerouslySetInnerHTML={html} 
+    onClick={() => onEditModeChange(block.key, false)}/>;
 };
 
 var toEditor = function(services, userId, editMode, id) {
@@ -31,6 +47,8 @@ var toEditor = function(services, userId, editMode, id) {
 
 var convert = function(services, userId, activeEditId: string, content, onEditModeChange) {
   
+  
+  
   return content.blocks.map(block => {
     if (block.type === 'atomic') {
       return toEditor(services, userId, activeEditId === block.key,
@@ -39,6 +57,7 @@ var convert = function(services, userId, activeEditId: string, content, onEditMo
       return toHtml(block, onEditModeChange);
     }
   })
+  
 };
 
 export interface HtmlContentEditorProps extends AbstractContentEditorProps {

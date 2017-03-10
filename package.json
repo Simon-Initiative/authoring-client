@@ -26,6 +26,7 @@
     "css-loader": "^0.26.1",
     "del": "^2.2.2",
     "draft-js": "^0.10.0",
+    "draft-js-export-html": "^0.5.2",
     "file-loader": "^0.10.0",
     "gulp": "^3.9.1",
     "gulp-if": "^2.0.2",
