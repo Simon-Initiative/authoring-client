@@ -14,7 +14,7 @@ import * as persistence from './data/persistence';
 import NavigationBar from './components/NavigationBar';
 import Courses from './components/Courses';
 import EditorManager from './editors/manager/EditorManager';
-import { EditorServices, DispatchBasedServices } from './editors/manager/EditorServices';
+import { AppServices, DispatchBasedServices } from './editors/common/AppServices';
 
 function mapStateToProps(state: any) {
 
@@ -36,7 +36,7 @@ function mapStateToProps(state: any) {
 interface Main {
   modalActions: Object;
   documentActions: Object;
-  services: EditorServices;
+  services: AppServices;
 }
 
 interface MainOwnProps {

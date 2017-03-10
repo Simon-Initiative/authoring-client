@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as types from '../../../data/types';
-import { EditorServices } from '../../manager/EditorServices';
+import { AppServices } from '../../common/AppServices';
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
@@ -23,7 +23,7 @@ export interface AbstractEditorProps<ModelType> {
 
   editingAllowed : boolean;
 
-  services: EditorServices;
+  services: AppServices;
 }
 
 export interface AbstractEditorState {

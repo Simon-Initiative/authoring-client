@@ -5,7 +5,7 @@ import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import { document as documentActions } from '../../actions/document';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
-import { EditorServices } from './EditorServices';
+import { AppServices } from '../common/AppServices';
 import { PersistenceStrategy, 
   onSaveCompletedCallback, 
   onFailureCallback } from './persistence/PersistenceStrategy';
@@ -35,7 +35,7 @@ export interface EditorManagerProps {
 
   userId: string;
 
-  services: EditorServices;
+  services: AppServices;
 }
 
 export interface EditorManagerState {
