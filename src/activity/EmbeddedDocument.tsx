@@ -4,7 +4,7 @@ import EditorManager from '../editors/manager/EditorManager';
 
 export const EmbeddedDocument = (props) => {
   return (
-    <div onClick={() => props.blockProps.onEditMode(true)}>
+    <div>
       <EditorManager 
           editMode={false}
           services={props.blockProps.services} 
