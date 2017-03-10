@@ -36,7 +36,7 @@
     "gulp-shell": "^0.5.2",
     "gulp-util": "^3.0.8",
     "immutable": "^3.8.1",
-    "jasmine-reporters": "^2.2.0",
+    "jasmine-reporters": "^2.2.0",    
     "json-loader": "^0.5.4",
     "jsx-loader": "^0.13.2",
     "lodash-amd": "^4.17.4",
