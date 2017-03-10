@@ -5,8 +5,9 @@ import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
+import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
-import { initWorkbook, resourceQuery } from '../../../data/domain';
+import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import { document as documentActions } from '../../../actions/document';
 
 import { AbstractEditor, AbstractEditorProps, 
@@ -42,11 +43,11 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
   componentDidMount() {
     // Fetch the titles of all current course resources
-    this.fetchTitles(this.props.model.resources);
+    this.fetchTitles(this.props.documentId);
   }
 
-  fetchTitles(resources: Immutable.List<types.DocumentId>) {
-    persistence.queryDocuments(resourceQuery(resources.toArray()))
+  fetchTitles(documentId: types.DocumentId) {
+    persistence.queryDocuments(titlesForCoursesResources(documentId))
       .then(docs => {
         this.setState({
           resources: docs.map(d => ({ _id: d._id, title: (d as any).title.text, type: (d as any).modelType}))
@@ -55,8 +56,8 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.model.resources !== nextProps.model.resources) {
-      this.fetchTitles(nextProps.model.resources);
+    if (this.props.documentId !== nextProps.documentId) {
+      this.fetchTitles(nextProps.documentId);
     }
   }
 
@@ -66,19 +67,24 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
   createResource() {
 
-    let resource = initWorkbook((this.refs['title'] as any).value);
-      
-    persistence.createDocument(resource)
-      .then(result => {
+    const type = (this.refs['type'] as any).value;
+    const title = (this.refs['title'] as any).value;
 
-        let addNewResource : models.ChangeRequest = (model: models.CourseModel) => {
-          return model.with({
-            resources: model.resources.push(result._id)
-          })
-        };
-        
-        this.props.onEdit(addNewResource);
-      });
+    let resource = null;
+    if (type === 'workbook') {
+      resource = new models.WorkbookPageModel({
+          courseId: this.props.documentId,
+          title: new contentTypes.TitleContent({ text: title})
+        });
+    } else {
+      resource = new models.AssessmentModel({
+          courseId: this.props.documentId,
+          title: new contentTypes.TitleContent({ text: title})
+        });
+    }
+
+    persistence.createDocument(resource)
+      .then(result => this.fetchTitles(this.props.documentId));
   }
 
   renderResources() {
@@ -110,8 +116,11 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
   renderCreation() {
     return (
       <div className="input-group">
-        <span className="input-group-addon">New workbook</span>
-        <input ref='title' type="text" className="form-input" placeholder="Workbook page title" />
+        <select ref="type" className="form-select input-group-addon">
+          <option value="workbook">Workbook</option>
+          <option value="assessment">Assessment</option>
+        </select>
+        <input ref='title' type="text" className="form-input" placeholder="Title" />
         <button onClick={this.createResource.bind(this)} className="btn btn-primary input-group-btn">Create</button>
       </div>);
   }

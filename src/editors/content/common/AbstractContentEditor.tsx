@@ -13,7 +13,10 @@ export interface AbstractContentEditorProps {
 
   // Whether or not editing is allowed for this user for this content
   editingAllowed : boolean;
-  
+
+  editMode: boolean;
+
+  onEditModeChange: (blockKey: string, mode: boolean) => void;
 }
 
 export interface AbstractContentEditorState {

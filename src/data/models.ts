@@ -35,13 +35,11 @@ export function createModel(object: any) : ContentModel {
 
 export type CourseModelParams = {
   title?: contentTypes.TitleContent,
-  resources?: Immutable.List<types.DocumentId>,
   organizations?: Immutable.List<types.DocumentId>
 };
 const defaultCourseModel = {
   modelType: 'CourseModel',
   title: new contentTypes.TitleContent(),
-  resources: Immutable.List<types.DocumentId>(),
   organizations: Immutable.List<types.DocumentId>()
 }
 
@@ -50,7 +48,6 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   modelType: 'CourseModel';
 
   title: contentTypes.TitleContent;
-  resources: Immutable.List<types.DocumentId>;
   organizations: Immutable.List<types.DocumentId>;
 
   constructor(params?: CourseModelParams) {
@@ -90,12 +87,14 @@ export class CoursePermissionModel extends Immutable.Record(defaultCoursePermiss
 }
 
 export type WorkbookPageModelParams = {
+  courseId?: types.DocumentId,
   title?: contentTypes.TitleContent,
   body?: contentTypes.HtmlContent,
   lock?: contentTypes.LockContent
 };
 const defaultWorkbookPageModelParams = {
   modelType: 'WorkbookPageModel',
+  courseId: '',
   title: new contentTypes.TitleContent(),
   body: new contentTypes.HtmlContent(),
   lock: new contentTypes.LockContent()
@@ -105,6 +104,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     
   modelType: 'WorkbookPageModel';
 
+  courseId: types.DocumentId;
   title: contentTypes.TitleContent;
   body: contentTypes.HtmlContent;
   lock: contentTypes.LockContent;
@@ -119,6 +119,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 }
 
 export type AssessmentModelParams = {
+  courseId?: types.DocumentId,
   lock?: contentTypes.LockContent,
   title?: contentTypes.TitleContent,
   context?: contentTypes.HtmlContent,
@@ -126,6 +127,7 @@ export type AssessmentModelParams = {
 };
 const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
+  courseId: '',
   lock: new contentTypes.LockContent(),
   title: new contentTypes.TitleContent(),
   context: new contentTypes.HtmlContent(),
@@ -136,6 +138,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     
   modelType: 'AssessmentModel';
 
+  courseId: types.DocumentId;
   lock: contentTypes.LockContent;
   title: contentTypes.TitleContent;
   context: contentTypes.HtmlContent;

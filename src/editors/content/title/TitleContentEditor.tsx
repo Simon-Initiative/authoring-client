@@ -3,23 +3,20 @@
 import * as React from 'react';
 
 import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 
 export interface TitleContentEditor {
   _onChange: (e: any) => void;
 }
 
-export interface TitleContentEditorProps {
-
-  // Whether or not editing is allowed for this user for this content
-  editingAllowed : boolean;
+export interface TitleContentEditorProps extends AbstractContentEditorProps {
 
   // Initial content to display
   content: contentTypes.TitleContent;
 
   onEdit: (newContent: contentTypes.TitleContent) => void;
-  
+
 }
 
 export interface TitleContentEditorState {
@@ -58,13 +55,25 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
     }
   }
 
-  render() : JSX.Element {
+  renderView(): JSX.Element {
+    return <p>{this.state.activeContent.text}</p>;
+  }
+
+  renderEdit(): JSX.Element {
     return ( 
       <div className="input-group">
           <input onChange={this._onChange} ref='title' type="text" 
             value={this.state.activeContent.text}
             className="form-input" placeholder="Enter title..." />
       </div>);
+  }
+
+  render() : JSX.Element {
+    if (this.props.editMode) {
+      return this.renderEdit();
+    } else {
+      return this.renderView();
+    }
   }
 
 }

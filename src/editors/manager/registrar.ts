@@ -1,5 +1,6 @@
 
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor';
+import AssessmentEditor from '../document/assessment/AssessmentEditor';
 import CourseEditor from '../document/course/CourseEditor';
 
 import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
@@ -14,12 +15,21 @@ export default function initEditorRegistry() {
     name: ModelTypes.WorkbookPageModel, 
     component: WorkbookPageEditor, 
     persistenceStrategy: new DeferredPersistenceStrategy(),
-    listeningApproach: ListeningApproach.WhenReadOnly
+    listeningApproach: ListeningApproach.WhenReadOnly,
+    protected: true
   });
   register({
     name: ModelTypes.CourseModel, 
     component: CourseEditor,
     persistenceStrategy: new ImmediatePersistenceStrategy(),
-    listeningApproach: ListeningApproach.Never
+    listeningApproach: ListeningApproach.Never,
+    protected: false
+  });
+  register({
+    name: ModelTypes.AssessmentModel, 
+    component: AssessmentEditor,
+    persistenceStrategy: new DeferredPersistenceStrategy(),
+    listeningApproach: ListeningApproach.WhenReadOnly,
+    protected: true
   });
 }

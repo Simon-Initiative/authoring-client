@@ -70,6 +70,7 @@ class Main extends React.Component<MainProps, {}> {
     }
     else if (documentId !== null) {
       return <EditorManager 
+        editMode={false}
         services={this.services} 
         userId={this.props.user.userId} 
         documentId={this.props.document}/>;

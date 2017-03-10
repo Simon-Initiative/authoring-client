@@ -5,6 +5,8 @@ import {Editor, EditorState, CompositeDecorator, ContentState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 
 import * as translate from './translate';
+import { AuthoringActions } from '../../../../actions/authoring';
+import { AppServices } from '../../../common/AppServices';
 
 import { HtmlContent } from '../../../../data/contentTypes';
 
@@ -18,11 +20,17 @@ interface DraftWrapper {
 }
 
 export interface DraftWrapperProps {
-  editHistory: Object[];
+  editHistory: AuthoringActions[];
   onEdit: (HtmlContent) => void;
+  onEditModeChange: (key: string, mode: boolean) => void;
   content: HtmlContent;
   locked: boolean;
+  userId: string;
+  services: AppServices;
+  subEditKey: string;
 }
+
+
 
 interface DraftWrapperState {
   editorState: EditorState;
@@ -49,6 +57,7 @@ const styles = {
 
   }
 };
+
 
 const ActivityFactory = (props) => {
   const entity = props.contentState.getEntity(
@@ -161,8 +170,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         editable: false,
         props: {
           onEditMode: (editMode) => {
-            this.setState({inEdit: editMode})
-          }
+            this.setState({inEdit: editMode});
+            this.props.onEditModeChange(block.getKey(), editMode);
+          },
+          services: this.props.services,
+          userId: this.props.userId
         }
       };
     }
@@ -229,14 +241,22 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         ));
     }
 
+
   render() {
-    return <div style={styles.editor} onClick={this.focus}>
+    const toolbar = null;
+    return <div 
+      style={styles.editor} 
+      onClick={this.focus}>
+
         <Editor ref="editor"
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.inEdit || this.props.locked}
           onChange={this.onChange} />
+
+        {toolbar}
+
       </div>;
   }
 

@@ -14,6 +14,8 @@ import { lookUpByName } from './registry';
 
 interface EditorManager {
 
+  componentDidUnmount: boolean;
+
   persistenceStrategy: PersistenceStrategy;
 
   onSaveCompleted: onSaveCompletedCallback;
@@ -27,6 +29,9 @@ interface EditorManager {
   lastSavedDocument: persistence.Document;
 
   _onEdit: (c : models.ChangeRequest) => void;
+
+  _onEditModeChange: (blockKey: string, mode: boolean) => void;
+
 }
 
 export interface EditorManagerProps {
@@ -36,11 +41,17 @@ export interface EditorManagerProps {
   userId: string;
 
   services: AppServices;
+
+  editMode: boolean;
+
+  blockKey?: string;
 }
 
 export interface EditorManagerState {
   editingAllowed: boolean;
   document: persistence.Document;
+  editMode: boolean;
+  blockKey: string;
 }
 
 class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
@@ -48,16 +59,23 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   constructor(props) {
     super(props);
 
-    this.state = { document: null, editingAllowed: null};
-
-    
-
+    this.state = { 
+      document: null, 
+      editingAllowed: null, 
+      editMode: this.props.editMode,
+      blockKey: null
+    };
+    this.componentDidUnmount = false;
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);
+    this._onEditModeChange = this.onEditModeChange.bind(this);
 
     this.onSaveCompleted = (doc: persistence.Document) => {
       this.lastSavedDocument = doc;
-      this.setState({ document: doc});
+      if (!this.componentDidUnmount) {
+        this.setState({ document: doc});
+      }
+      
     };
 
     this.onSaveFailure = (reason : any) => {
@@ -67,6 +85,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   onEdit(changeRequest : models.ChangeRequest) {
     this.persistenceStrategy.save(this.lastSavedDocument, changeRequest);
+  }
+
+  onEditModeChange(blockKey: string, editMode: boolean) {
+    this.setState({blockKey, editMode});
   }
 
   initPersistence(document: persistence.Document) {
@@ -99,9 +121,15 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         // Tear down previous persistence strategy
         if (this.persistenceStrategy !== null) {
           this.persistenceStrategy.destroy()
-            .then(nothing => this.initPersistence(document));
+            .then(nothing => {
+              if (this.state.editMode) { 
+                this.initPersistence(document)
+              } 
+            });
         } else {
-          this.initPersistence(document);
+          if (this.state.editMode) { 
+            this.initPersistence(document);
+          }
         }
         
         this.setState({document})
@@ -113,6 +141,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   componentWillReceiveProps(nextProps) {
     if (this.props.documentId !== nextProps.documentId) {
       this.stopListening = true;
+      this.setState({document: null, editingAllowed: null});
       this.fetchDocument(nextProps.documentId);
     }
   }
@@ -123,6 +152,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   componentWillUnmount() {
     this.stopListening = true;
+    this.componentDidUnmount = true;
     if (this.persistenceStrategy !== null) {
       this.persistenceStrategy.destroy();
     }
@@ -152,14 +182,31 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     } else {
       const childProps : AbstractEditorProps<any> = {
         model : this.state.document.model,
+        documentId: this.props.documentId,
         onEdit: this._onEdit,
         userId: this.props.userId,
         editingAllowed: this.state.editingAllowed,
-        services: this.props.services
+        services: this.props.services,
+        editMode: this.state.editMode,
+        onEditModeChange: this._onEditModeChange
       }
       
-      let component = lookUpByName(this.state.document.model.modelType).component;
-      return React.createElement( (component as any), childProps);
+      const registeredEditor = lookUpByName(this.state.document.model.modelType);
+      const editor = React.createElement( (registeredEditor.component as any), childProps);
+
+      const editModeText = this.state.editMode ? 'Done' : 'Edit';
+
+      if (registeredEditor.protected) {
+        return <div>
+          <button onClick={() => this.onEditModeChange(this.props.blockKey, !this.state.editMode)} className="btn btn-sm">{editModeText}</button>
+          {editor}
+        </div>
+      } else {
+        return <div>
+          {editor}
+        </div>
+      }
+
     }
   }
   
