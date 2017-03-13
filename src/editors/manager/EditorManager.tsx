@@ -122,14 +122,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         if (this.persistenceStrategy !== null) {
           this.persistenceStrategy.destroy()
             .then(nothing => {
-              if (this.state.editMode) { 
-                this.initPersistence(document)
-              } 
+              this.initPersistence(document) 
             });
         } else {
-          if (this.state.editMode) { 
-            this.initPersistence(document);
-          }
+          this.initPersistence(document);
         }
         
         this.setState({document})
@@ -177,7 +173,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   render() : JSX.Element {
-    if (this.state.document === null) {
+    if (this.state.document === null || this.state.editingAllowed === null) {
       return null;
     } else {
       const childProps : AbstractEditorProps<any> = {
@@ -196,7 +192,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
       const editModeText = this.state.editMode ? 'Done' : 'Edit';
 
-      if (registeredEditor.protected) {
+      if (registeredEditor.protected && this.state.editingAllowed) {
         return <div>
           <button onClick={() => this.onEditModeChange(this.props.blockKey, !this.state.editMode)} className="btn btn-sm">{editModeText}</button>
           {editor}
