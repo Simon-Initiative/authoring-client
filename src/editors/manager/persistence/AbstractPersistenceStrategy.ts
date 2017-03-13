@@ -13,8 +13,6 @@ export interface AbstractPersistenceStrategy {
   destroyed: boolean;
 }
 
-const documentLocks = {};
-
 export abstract class AbstractPersistenceStrategy implements PersistenceStrategy {
 
   constructor() {
@@ -77,13 +75,13 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     // Release the write lock if it was acquired, but fetch
     // the document first to get the most up to date version
 
-    if (documentLocks[this.writeLockedDocumentId] === false) {
-      persistence.retrieveDocument(this.writeLockedDocumentId)
+    if (this.writeLockedDocumentId !== null) {
+      return persistence.retrieveDocument(this.writeLockedDocumentId)
         .then(document => this.setWriteLock(document, when, ''));
-    
     } else {
-      return Promise.resolve(true);
+      return Promise.resolve({});
     }
+
   }
 
 
@@ -114,7 +112,6 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
           this.setWriteLock(doc, new Date().getTime(), userId)
             .then(lockedDocument => {
               this.writeLockedDocumentId = lockedDocument._id;
-              documentLocks[this.writeLockedDocumentId] = true;
               onSuccess(lockedDocument);
               resolve(true)
             })

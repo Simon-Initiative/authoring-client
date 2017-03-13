@@ -100,15 +100,18 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       this.onSaveCompleted, this.onSaveFailure)
     .then(editingAllowed => {
 
-      this.setState({editingAllowed});
+      if (!this.componentDidUnmount) {
+        this.setState({editingAllowed});
 
-      const listeningApproach: ListeningApproach = lookUpByName(document.model.modelType).listeningApproach;
-      if ((!editingAllowed && listeningApproach === ListeningApproach.WhenReadOnly) ||
-        listeningApproach === ListeningApproach.Always) {
+        const listeningApproach: ListeningApproach = lookUpByName(document.model.modelType).listeningApproach;
+        if ((!editingAllowed && listeningApproach === ListeningApproach.WhenReadOnly) ||
+          listeningApproach === ListeningApproach.Always) {
 
-        this.stopListening = false;
-        this.listenForChanges();
+          this.stopListening = false;
+          this.listenForChanges();
+        }
       }
+      
 
     });
   }
