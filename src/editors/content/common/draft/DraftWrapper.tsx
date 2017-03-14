@@ -1,6 +1,8 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
+
 import {Editor, EditorState, CompositeDecorator, ContentState, 
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 
@@ -57,6 +59,22 @@ const styles = {
 
   }
 };
+
+
+const blockRenderMap = Immutable.Map({
+  'header-one': { element: 'h1' },
+  'header-two': { element: 'h2' },
+  'header-three': { element: 'h3' },
+  'header-four': { element: 'h4' },
+  'header-five': { element: 'h5' },
+  'header-six': { element: 'h6' },
+  'blockquote': { element: 'blockquote' },
+  'code-block': { element: 'pre' },
+  'atomic': { element: 'figure' },
+  'unordered-list-item': { element: 'li' },
+  'ordered-list-item': { element: 'li' },
+  'unstyled': { element: 'div' }
+});
 
 
 const ActivityFactory = (props) => {
@@ -250,6 +268,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         <Editor ref="editor"
           handleKeyCommand={this.handleKeyCommand}
+          blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.inEdit || this.props.locked}

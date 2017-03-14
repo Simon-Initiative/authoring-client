@@ -23,7 +23,23 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
     entityMap: {}
   };
 
-  const converted = stateToHTML(htmlContentToDraft(content as any));
+  let options = {
+    blockRenderers: {
+      unstyled: (block) => {
+          let text = block.getText().trim();
+          let textToDisplay;
+          if (text === '') {
+            textToDisplay = '<br/>';  
+          } else {
+            textToDisplay = text;
+          }
+          return '<div class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr">' + textToDisplay + '</div>';
+        
+      },
+    },
+  };
+
+  const converted = stateToHTML(htmlContentToDraft(content as any), options);
 
   const html = {
     __html: converted
@@ -136,9 +152,30 @@ export abstract class HtmlContentEditor
               onEdit={this._onChange} />
         </ToolbarManager>);
     } else {
+      
+      // Do not display an actual Draft editor, but instead convert draft 
+      // content into pure HTML.  Continue to style the HTML and enclosing
+      // divs exactly the same way that a draft editor would style them 
+      // to guarantee that the rendered HTML looks the same as Draft editor 
+      // rendered content
       const pureHtml = convert(this.props.services, this.props.userId, 
-        this.state.subEditKey, this.state.activeContent,this.props.onEditModeChange);
-      return (<div>{pureHtml}</div>);
+        this.state.subEditKey, this.state.activeContent, this.props.onEditModeChange);
+
+      const draftStyle = {
+        outline: 'none',
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word'
+      };
+      return <div className="DraftEditor-root">
+                <div className="DraftEditor-editorContainer">
+                  <div className="public-DraftEditor-content" style={draftStyle}>
+                    <div>
+                      {pureHtml}
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
     }
     
   }
