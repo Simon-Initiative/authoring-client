@@ -141,8 +141,7 @@ var createCourse = function(users) {
         let data = { 
           modelType: 'CourseModel',
           title: {text: 'Sample Course'},
-          organizations: [result.id],
-          resources: []
+          organizations: [result.id]
         };
         request('POST', '/editor', data)
           .then(result => resolve({course: result.id, users}));

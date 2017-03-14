@@ -105,8 +105,8 @@ export class HtmlContent extends Immutable.Record(defaultHtmlContentParams) {
 }
 
 export type InlineAssessmentContentParams = {
-  timeLimit: number,
-  questions: Immutable.List<types.DocumentId>
+  timeLimit?: number,
+  questions?: Immutable.List<types.DocumentId>
 };
 
 export class InlineAssessmentContent extends Immutable.Record({contentType: 'InlineAssessmentContent', timeLimit: 0, questions: Immutable.List<types.DocumentId>()}) {

@@ -5,8 +5,14 @@ import * as React from 'react';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import Toolbar from './Toolbar';
+
+import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
 import * as models from '../../../data/models';
+
+
+
 
 interface WorkbookPageEditor {
   
@@ -18,15 +24,29 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   
+  editHistory: AuthoringActions[];
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, 
-  WorkbookPageEditorState>  {
-
+  WorkbookPageEditorState> 
+  implements AuthoringActionsHandler {
+    
   constructor(props) {
     super(props);
+
+    this.state = {
+      editHistory: []
+    };
   }
+
+  
+  handleAction(action: AuthoringActions) {
+    this.setState({
+      editHistory: [action, ...this.state.editHistory]
+    });
+  }
+
 
   onEdit(property : string, content : any) {
 
@@ -39,22 +59,42 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.props.onEdit(changeRequest);
   }
 
+
+
   render() {
 
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
- 
+    
     return (
         <div className="container">
             <div className="columns">
                 <div className="column col-1"></div>
                 <div className="column col-10">
                     <div>
-                        <TitleContentEditor content={this.props.model.title}
+                        <TitleContentEditor 
+                          onEditModeChange={this.props.onEditModeChange}
+                          editMode={this.props.editMode}
+                          content={this.props.model.title}
                           onEdit={(c) => this.onEdit('title', c)} 
                           editingAllowed={this.props.editingAllowed}/>
-                        <HtmlContentEditor content={this.props.model.body}
-                          onEdit={(c) => this.onEdit('body', c)} 
-                          editingAllowed={this.props.editingAllowed}/>
+                        
+                        <HtmlContentEditor 
+                            onEditModeChange={this.props.onEditModeChange}
+                            editMode={this.props.editMode}
+                            services={this.props.services}
+                            userId={this.props.userId}
+                            editHistory={this.state.editHistory}
+                            content={this.props.model.body}
+                            onEdit={(c) => this.onEdit('body', c)} 
+                            editingAllowed={this.props.editingAllowed}>
+
+                            <Toolbar 
+                              courseId={this.props.model.courseId} 
+                              services={this.props.services} 
+                              actionHandler={this} />
+                        
+                        </HtmlContentEditor>
+                        
                     </div>
                 </div>
                 

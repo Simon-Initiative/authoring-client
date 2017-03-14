@@ -6,7 +6,6 @@ import * as persistence from '../../../data/persistence';
 import { PersistenceStrategy, onSaveCompletedCallback, 
   onFailureCallback } from './PersistenceStrategy';
 
-
 export interface AbstractPersistenceStrategy {
   successCallback: onSaveCompletedCallback;
   failureCallback: onFailureCallback;
@@ -23,37 +22,69 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.destroyed = false;
   }
 
-  setWriteLock(doc: persistence.Document, userId: string) : Promise<persistence.Document> {
-    
-    let lock : contentTypes.LockContent = (doc.model as any).lock;
-    let updatedLock = lock.with({
-      lockedBy: userId,
-      lockedAt: (new Date()).getTime()
-    });
-    
-    let lockedDocument = doc.with({ model: (doc.model as any).with({ lock: updatedLock})});
-    
-    return new Promise((resolve, reject) => {
-      persistence.persistDocument(lockedDocument)
-        .then(success => {
-          resolve(success);
-        })
-        .catch(err => {
-          reject(err)
-        });
-    });
+  setWriteLock(doc: persistence.Document, requestTime: number, userId: string) : Promise<persistence.Document> {
+
+    return this.setWriteLockHelper(doc, userId, requestTime, 3, undefined, undefined);
   }
 
-  releaseLock() {
+  setWriteLockHelper(doc: persistence.Document, userId: string,
+    requestTime: number, 
+    remainingRetries: number, initialResolve, initialReject) : Promise<persistence.Document> {
+
+    let lock : contentTypes.LockContent = (doc.model as any).lock;
+    if (lock.lockedAt > requestTime) {
+      // Do nothing, since another, async operation that was initiated after
+      // this lock mutation has completed. 
+      return Promise.resolve(doc);
+    }
+
+    return new Promise((resolve, reject) => {
+
+        
+        let updatedLock = lock.with({
+          lockedBy: userId,
+          lockedAt: (new Date()).getTime()
+        });
+        
+        let lockedDocument = doc.with({ model: (doc.model as any).with({ lock: updatedLock})});
+        
+        persistence.persistDocument(lockedDocument)
+          .then(result => {
+            initialResolve !== undefined ? initialResolve(result) : resolve(result);
+          })
+          .catch(err => {
+            if (remainingRetries === 0) {
+              initialReject !== undefined ? initialReject(err) : reject(err);
+            } else {
+              persistence.retrieveDocument(doc._id)
+                .then(doc => {
+                  this.setWriteLockHelper(doc, userId, requestTime, --remainingRetries,
+                    initialResolve === undefined ? resolve : initialResolve,
+                    initialReject === undefined ? reject : initialReject);
+                })
+                .catch(err => {
+                  initialReject !== undefined ? initialReject(err) : reject(err);
+                })
+            }
+            
+          });
+      });
+  }
+
+  releaseLock(when: number) {
     // Release the write lock if it was acquired, but fetch
     // the document first to get the most up to date version
+
     if (this.writeLockedDocumentId !== null) {
-      persistence.retrieveDocument(this.writeLockedDocumentId)
-        .then(document => this.setWriteLock(document, ''));
+      return persistence.retrieveDocument(this.writeLockedDocumentId)
+        .then(document => this.setWriteLock(document, when, ''));
     } else {
-      return Promise.resolve(true);
+      return Promise.resolve({});
     }
+
   }
+
+
 
   /**
    * This strategy requires the user to acquire the write lock before
@@ -77,7 +108,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
       } else {
         // Attempt to acquire the lock
         return new Promise((resolve, reject) => {
-          this.setWriteLock(doc, userId)
+          
+          this.setWriteLock(doc, new Date().getTime(), userId)
             .then(lockedDocument => {
               this.writeLockedDocumentId = lockedDocument._id;
               onSuccess(lockedDocument);
@@ -107,8 +139,9 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    * should clean up any resources and flush any pending changes immediately.
    */
   destroy() : Promise<{}> {
+    const now = new Date().getTime();
     return this.doDestroy()
-      .then(r => this.releaseLock())
+      .then(r => this.releaseLock(now))
 
   };
 }

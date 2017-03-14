@@ -9,6 +9,7 @@ export type RegisteredEditor = {
   component: Object;
   persistenceStrategy: PersistenceStrategy;
   listeningApproach: ListeningApproach;
+  protected: boolean;
 }
 
 export function register(registration: RegisteredEditor) {

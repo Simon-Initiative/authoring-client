@@ -1,6 +1,7 @@
 
 import { WorkbookPageModel, ModelTypes } from './models';
 import * as contentTypes from './contentTypes';
+import * as models from './models';
 
 export function initWorkbook(title: string) : WorkbookPageModel {
   return new WorkbookPageModel({
@@ -15,6 +16,26 @@ export function titlesForCoursesQuery(courseIds: string[]) : Object {
       'modelType': {'$eq': 'CourseModel'}
     },
     fields: ['_id', 'title']
+  }
+}
+
+export function titlesForCoursesResources(courseId: string) : Object {
+  return {
+    selector: {
+      'courseId': {'$eq': courseId},
+      'modelType': {'$in': ['WorkbookPageModel', 'AssessmentModel']}
+    },
+    fields: ['_id', 'title', 'modelType']
+  }
+}
+
+export function titlesForEmbeddedResources(courseId: string) : Object {
+  return {
+    selector: {
+      'courseId': {'$eq': courseId},
+      'modelType': {'$in': ['AssessmentModel']}
+    },
+    fields: ['_id', 'title', 'modelType']
   }
 }
 

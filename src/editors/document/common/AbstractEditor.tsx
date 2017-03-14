@@ -19,11 +19,20 @@ export interface AbstractEditorProps<ModelType> {
   // The initial document model passed into the editor.
   model: ModelType;
 
+  // The document id that the model pertains to. 
+  documentId: types.DocumentId;
+
   onEdit: (changeRequest: models.ChangeRequest) => void;  
 
   editingAllowed : boolean;
 
   services: AppServices;
+
+  onEditModeChange: (blockKey: string, mode: boolean) => void;
+
+  editMode: boolean;
+
+  blockKey?: string;
 }
 
 export interface AbstractEditorState {

@@ -43,7 +43,7 @@ export class DispatchBasedServices implements AppServices {
   }
   
   dismissModal() {
-  this.dispatch(modalActions.dismiss());
+    this.dispatch(modalActions.dismiss());
   }
 
 

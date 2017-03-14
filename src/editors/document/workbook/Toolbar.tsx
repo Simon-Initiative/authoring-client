@@ -1,17 +1,17 @@
 'use strict'
 
 import * as React from 'react';
-import { connect }  from 'react-redux';
-import { returnType } from '../../../utils/types';
 
-import { authoringActions } from '../../../actions/authoring';
-import { modalActions } from '../../../actions/modal';
-
-import MediaSelection from '../../../components/selection/MediaSelection';
+import { AppServices } from '../../common/AppServices';
+import { insertActivity, toggleInlineStyle, AuthoringActionsHandler } from '../../../actions/authoring';
+import { titlesForEmbeddedResources } from '../../../data/domain';
+import ResourceSelection from '../../../components/selection/ResourceSelection';
 
 interface ToolbarProps {  
-  dispatch: any;
-  editDispatch: any;
+  courseId: string; 
+  services: AppServices;
+  actionHandler: AuthoringActionsHandler;
+  dismissToolbar?: () => void;  
 }
 
 interface Toolbar {
@@ -35,49 +35,40 @@ const Button = (props) => {
   );
 }
 
-import { bindActionCreators } from "redux";
 
 class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
   constructor(props) {
     super(props);
 
-    this.onImage = () => {
-        this.props.dispatch(modalActions.display(
-            <MediaSelection type='image' onInsert={(type, data) => {
-                authoringActions.insertActivity(type, data);
-                this.props.dispatch(modalActions.dismiss());
-                }} onCancel={modalActions.dismiss}/>
-        ));
+    this.onActivity = () => {
+        this.props.services.displayModal(
+            <ResourceSelection
+              query={titlesForEmbeddedResources(this.props.courseId)}
+              onInsert={(resource) => {
+                const data = {
+                  id: resource.id
+                };
+                this.props.actionHandler.handleAction(insertActivity('document', data));
+                this.props.services.dismissModal();
+                this.props.dismissToolbar();
+              }} 
+              onCancel={() => {
+                this.props.services.dismissModal();
+                this.props.dismissToolbar();
+              }}/>
+        );
     };
 
-    this.onVideo = () => {
-        this.props.dispatch(modalActions.display(
-            <MediaSelection type='video'  onInsert={(type, data) => {
-                this.props.editDispatch(authoringActions.insertActivity(type, data));
-                this.props.dispatch(modalActions.dismiss());
-                }} onCancel={modalActions.dismiss}/>
-        ));
-    };
+  }
 
-    this.onAudio = () => {
-        this.props.dispatch(modalActions.display(
-            <MediaSelection type='audio' onInsert={(type, data) => {
-                this.props.editDispatch(authoringActions.insertActivity(type, data));
-                this.props.dispatch(modalActions.dismiss());
-                }} onCancel={modalActions.dismiss}/>
-        ));
-    };
+  shouldComponentUpdate(nextProps, nextState) {
+    return false; 
+  }
 
-    this.onYouTube = () => {
-        this.props.dispatch(modalActions.display(
-            <MediaSelection type='youtube' onInsert={(type, data) => {
-                this.props.editDispatch(authoringActions.insertActivity(type, data));
-                this.props.dispatch(modalActions.dismiss());
-                }} onCancel={modalActions.dismiss}/>
-        ));
-    };
-
+  toggleInlineStyle(style) {
+    this.props.actionHandler.handleAction(toggleInlineStyle(style));
+    this.props.dismissToolbar();
   }
 
   render() {
@@ -86,19 +77,16 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
       <div className="btn-group">
 
-        <Button action={() => this.props.editDispatch(
-          authoringActions.toggleInlineStyle.bind(this, 'BOLD'))} icon="bold"/>
-        <Button action={() => this.props.editDispatch(
-          authoringActions.toggleInlineStyle.bind(this, 'ITALIC'))} icon="italic"/>
-        <Button action={() => this.props.editDispatch(
-          authoringActions.toggleInlineStyle.bind(this, 'UNDERLINE'))} icon="underline"/>
+        <Button action={() => this.toggleInlineStyle('BOLD')} icon="bold"/>
+        <Button action={() => this.toggleInlineStyle('ITALIC')} icon="italic"/>
+        <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
         
         <Separator/>
 
-        <Button action={this.onImage} icon="image"/>
-        <Button action={this.onAudio} icon="music"/>
-        <Button action={this.onVideo} icon="play"/>
-        <Button action={this.onYouTube} icon="youtube2"/>
+        <Button icon="image"/>
+        <Button icon="music"/>
+        <Button icon="play"/>
+        <Button icon="youtube2"/>
         
         <Separator/>
 
