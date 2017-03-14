@@ -41,7 +41,7 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
   }
 
   onChange() {
-    const text = (this.refs.text as any).innerHTML;
+    const text = ((this.refs as any).text as any).innerHTML;
     const updatedContent : contentTypes.TitleContent = this.state.activeContent.with({ text });
     this.setState({activeContent: updatedContent});
     this.props.onEdit(updatedContent);
