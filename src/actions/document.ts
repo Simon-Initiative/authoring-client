@@ -1,11 +1,14 @@
 
-export module document {
-  
+export module document 
+{  
   export type VIEW_DOCUMENT = 'VIEW_DOCUMENT';
   export const VIEW_DOCUMENT : VIEW_DOCUMENT = 'VIEW_DOCUMENT';
 
   export type VIEW_ALL_COURSES = 'VIEW_ALL_COURSES';
   export const VIEW_ALL_COURSES : VIEW_ALL_COURSES = 'VIEW_ALL_COURSES';
+  
+  var menuCollapsed:Boolean=false;
+  var menuWidth:Number=-1;
   
   export type viewDocumentAction = {
     type: VIEW_DOCUMENT,
@@ -28,5 +31,12 @@ export module document {
       type: VIEW_ALL_COURSES
     }
   }
-
+  	
+  	/**
+  	*
+  	*/
+  	export function viewOutlineEditor ()
+  	{
+  	
+  	}  	
 }

@@ -1,3 +1,7 @@
+/**
+*
+*/
+
 'use strict'
 
 import * as React from 'react';
@@ -79,7 +83,9 @@ class Main extends React.Component<MainProps, {}> {
     }
   }
 
-  render(): JSX.Element {
+  render(): JSX.Element {      
+      console.log ("render ()");
+      
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
@@ -92,18 +98,16 @@ class Main extends React.Component<MainProps, {}> {
 				<div style={{float: "left", margin: "0px", marginTop: "8px", fontSize: "12pt", fontWeight: "bold"}}>Welcome to OLI</div>
 			</div>				
 			
-			<div style={{"display": "flex", flexGrow: 1, order: 1, margin: "0 0 4px 0", flex: 1}}>
-				<div style={{"borderRight" : "1px solid grey"}}>
-    				<NavigationBar documentActions={this.documentActions}/>
-				</div>
+			<div style={{"display": "flex", flexGrow: 1, order: 1, margin: "0 0 4px 0", flex: 1}}>				
+    			<NavigationBar documentActions={this.documentActions} />				
 				<div style={{background: "#f1f1f1", border: "1px solid #c4c0c0", padding: "2px", margin: "2px 2px 2px 2px", flex: 1}}>
 				{this.getView(this.props.document)}
 				</div>
 			</div>
 			
-			<div style={{"display": "flex", flexGrow: 0, order: 2, background: "#f1f1f1", border: "0px solid #c4c0c0", width: "100%", height: "30px", margin: "0 0 4px 0"}}>
+			<div style={{"display": "flex", flexGrow: 0, order: 2, background: "#f1f1f1", border: "0px solid #c4c0c0", width: "100%", height: "24px", margin: "2px"}}>
 			Statusbar goes here if we want one
-			</div>						
+			</div>
 		</div>
       </div>
     )
