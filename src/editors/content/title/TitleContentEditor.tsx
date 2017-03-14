@@ -40,8 +40,8 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
     this._onChange = this.onChange.bind(this);
   }
 
-  onChange(e) {
-    const text = e.target.value;
+  onChange() {
+    const text = (this.refs.text as any).innerHTML;
     const updatedContent : contentTypes.TitleContent = this.state.activeContent.with({ text });
     this.setState({activeContent: updatedContent});
     this.props.onEdit(updatedContent);
@@ -60,12 +60,7 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
   }
 
   renderEdit(): JSX.Element {
-    return ( 
-      <div className="input-group">
-          <input onChange={this._onChange} ref='title' type="text" 
-            value={this.state.activeContent.text}
-            className="form-input" placeholder="Enter title..." />
-      </div>);
+    return <p ref='text' onInput={this._onChange} contentEditable>{this.state.activeContent.text}</p>;
   }
 
   render() : JSX.Element {

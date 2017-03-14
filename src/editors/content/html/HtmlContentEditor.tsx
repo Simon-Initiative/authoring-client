@@ -23,26 +23,12 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
     entityMap: {}
   };
 
-  let options = {
-    blockRenderers: {
-      unstyled: (block) => {
-          let text = block.getText().trim();
-          let textToDisplay;
-          if (text === '') {
-            textToDisplay = '<br/>';  
-          } else {
-            textToDisplay = text;
-          }
-          return '<div class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr">' + textToDisplay + '</div>';
-        
-      },
-    },
-  };
+  const converted : string = stateToHTML(htmlContentToDraft(content as any));
 
-  const converted = stateToHTML(htmlContentToDraft(content as any), options);
+  const replaced = '<div>' + converted.substring(3, converted.length - 4) +  '</div>';
 
   const html = {
-    __html: converted
+    __html: replaced
   };
 
   return <div 
@@ -62,8 +48,6 @@ var toEditor = function(services, userId, editMode, id) {
 };
 
 var convert = function(services, userId, activeEditId: string, content, onEditModeChange) {
-  
-  
   
   return content.blocks.map(block => {
     if (block.type === 'atomic') {
@@ -160,13 +144,17 @@ export abstract class HtmlContentEditor
       // rendered content
       const pureHtml = convert(this.props.services, this.props.userId, 
         this.state.subEditKey, this.state.activeContent, this.props.onEditModeChange);
-
+      const outerStyle = {
+        minHeight: '300px',
+        padding: '10px'
+      }
       const draftStyle = {
         outline: 'none',
         whiteSpace: 'pre-wrap',
         wordWrap: 'break-word'
       };
-      return <div className="DraftEditor-root">
+      return <div style={outerStyle}>
+              <div className="DraftEditor-root">
                 <div className="DraftEditor-editorContainer">
                   <div className="public-DraftEditor-content" style={draftStyle}>
                     <div>
@@ -175,6 +163,7 @@ export abstract class HtmlContentEditor
                   </div>
                 </div>
               </div>
+            </div>
       
     }
     

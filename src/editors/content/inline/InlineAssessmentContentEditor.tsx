@@ -55,32 +55,28 @@ export abstract class InlineAssessmentContentEditor extends AbstractContentEdito
     }
   }
 
-  renderView(): JSX.Element {
-    return <div>Timelimit: {this.state.activeContent.timeLimit}</div>;
-  }
-
-  renderEdit(): JSX.Element {
-    return ( 
-      <form className="form-horizontal">
-        <div className="form-group">
-          <div className="col-3">
-            <label className="form-label">Time Limit</label>
-          </div>
-          <div className="col-9">
-            <input className="form-input" onChange={this._onChange} ref='timeLimit' 
-              type="text" value={this.state.activeContent.timeLimit} placeholder="Name" />
-          </div>
-        </div>
-      </form>
-    );
-  }
-
   render() : JSX.Element {
+    
+    let input;
     if (this.props.editMode) {
-      return this.renderEdit();
+      input = <input className="form-input" onChange={this._onChange} ref='timeLimit' 
+            type="text" value={this.state.activeContent.timeLimit} placeholder="Name" />
     } else {
-      return this.renderView();
+      input = <input disabled className="form-input" onChange={this._onChange} ref='timeLimit' 
+            type="text" value={this.state.activeContent.timeLimit} placeholder="Name" />
     }
+    
+    return <form className="form-horizontal">
+      <div className="form-group">
+        <div className="col-3">
+          <label className="form-label">Time Limit</label>
+        </div>
+        <div className="col-9">
+          {input}
+        </div>
+      </div>
+    </form>
+  
   }
 
 }
