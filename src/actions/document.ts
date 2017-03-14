@@ -31,30 +31,6 @@ export module document
       type: VIEW_ALL_COURSES
     }
   }
-
-	/**
-	*
-	*/  
-  	export function collapseMenu ()
-  	{
-  		if (menuWidth==-1)
-  		{
-  			//menuWidth=document.getElementById("sidebarmenu").offsetWidth;
-  		}
-  	
-  		if (menuCollapsed==false)
-  		{
-  			menuCollapsed=true;
-  			//document.getElementById("sidebarmenucontent").style.visibility='hidden';
-  			//document.getElementById("sidebarmenu").offsetWidth='75px';
-  		}
-  		else
-  		{
-  			menuCollapsed=false;
-  			//document.getElementById("sidebarmenucontent").style.visibility='visible';
-  			//document.getElementById("sidebarmenu").offsetWidth=menuWidth;
-  		}	
-  	}
   	
   	/**
   	*
