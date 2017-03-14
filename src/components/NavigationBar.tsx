@@ -34,7 +34,7 @@ function FoldOutButton(props)
 }
 
 // Nick, do whatever you feel you have to here
-const styles=
+const navbarStyles=
 {
     openMenu:
     {
@@ -119,9 +119,9 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         if (this.state.closed==false)
         {        
         return (
-                <div style={styles.openMenu as any}>
-                    <div style={styles.mainMenu}>
-                        <ul style={styles.verticalMenu}>
+                <div style={navbarStyles.openMenu as any}>
+                    <div style={navbarStyles.mainMenu}>
+                        <ul style={navbarStyles.verticalMenu}>
                             <li><a onClick={this.props.documentActions.viewAllCourses}>My Courses</a></li>
                             <li><a onClick={this.props.documentActions.viewOutlineEditor}>Outline Editor</a></li>
                             <li><a>Learning Objectives</a></li>
@@ -130,7 +130,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
                             <li><a>Analytics</a></li>
                         </ul>
                     </div>
-                    <div style={styles.bottomMenu}>                    
+                    <div style={navbarStyles.bottomMenu}>                    
                         {menuControl}
                     </div>
                 </div>
@@ -138,9 +138,9 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         }        
         
         return (
-    		<div style={styles.closedMenu as any}>
-				<div style={styles.mainMenu}>
-		    		 <ul style={styles.verticalMenu}>
+    		<div style={navbarStyles.closedMenu as any}>
+				<div style={navbarStyles.mainMenu}>
+		    		 <ul style={navbarStyles.verticalMenu}>
 		    			<li><a onClick={this.props.documentActions.viewAllCourses}>C</a></li>
 		    			<li><a onClick={this.props.documentActions.viewOutlineEditor}>E</a></li>
 		    			<li><a>O</a></li>
@@ -149,7 +149,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
 		    			<li><a>L</a></li>
 					</ul>
 				</div>
-				<div style={styles.bottomMenu}>
+				<div style={navbarStyles.bottomMenu}>
                     {menuControl}
 				</div>
 			</div>

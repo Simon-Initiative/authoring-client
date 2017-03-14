@@ -51,6 +51,80 @@ const stateGeneric = returnType(mapStateToProps);
 type MainReduxProps = typeof stateGeneric; 
 type MainProps = MainReduxProps & MainOwnProps & { dispatch };
 
+// Nick, do whatever you feel you have to here
+const mainStyle=
+{
+    container:
+    {
+        width: "inherit", 
+        height: "inherit"        
+    },
+    holder:
+    {
+        display: "flex", 
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'stretch',
+        alignContent: 'stretch',
+        height: "inherit"        
+    },
+    topMenu:
+    {
+        flex: "none",
+        flexGrow: 0,
+        order: 0,
+        background: "#f1f1f1",
+        border: "0px solid #c4c0c0",
+        width: "100%",
+        height: "32px",
+        padding: "0px",
+        margin: "0 0 0 0"        
+    },
+    logo:
+    {
+        float: "left",
+        border: "0px solid #c4c0c0",
+        width: "32px",
+        height: "32px",
+        padding: "0px",
+        margin: "0px"        
+    },
+    title:
+    {
+        float: "left",
+        margin: "0px",
+        marginTop: "8px",
+        fontSize: "12pt",
+        fontWeight: "bold"        
+    },
+    centerPanel:
+    {
+        display: "flex",
+        flexGrow: 1,
+        order: 1,
+        margin: "0 0 4px 0",
+        flex: 1
+    },
+    contentPanel:
+    {
+        background: "#f1f1f1",
+        border: "1px solid #c4c0c0",
+        padding: "2px",
+        margin: "2px 2px 2px 2px",
+        flex: 1        
+    },
+    statusBar:
+    {
+        display: "flex",
+        flexGrow: 0,
+        order: 2,
+        background: "#f1f1f1",
+        border: "0px solid #c4c0c0",
+        width: "100%",
+        height: "24px",
+        margin: "2px"        
+    }
+};
 
 class Main extends React.Component<MainProps, {}> {
 
@@ -89,23 +163,20 @@ class Main extends React.Component<MainProps, {}> {
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
-      <div style={{width: "inherit", height: "inherit"}}>
+      <div style={mainStyle.container as any}>
         {modalDisplay}        
-		<div style={{"display": "flex", flexDirection: 'column', justifyContent: 'space-between', alignItems: 'stretch',  alignContent: 'stretch', height: "inherit"}}>
-		
-			<div style={{flex: "none", flexGrow: 0, order: 0, background: "#f1f1f1", border: "0px solid #c4c0c0", width: "100%", height: "32px", padding: "0px", margin: "0 0 0 0"}}>
-				<img src="assets/oli-icon.png" style={{float: "left", border: "0px solid #c4c0c0", width: "32px", height: "32px", padding: "0px", margin: "0px"}} />
-				<div style={{float: "left", margin: "0px", marginTop: "8px", fontSize: "12pt", fontWeight: "bold"}}>Welcome to OLI</div>
-			</div>				
-			
-			<div style={{"display": "flex", flexGrow: 1, order: 1, margin: "0 0 4px 0", flex: 1}}>				
+		<div style={mainStyle.holder as any}>		
+			<div style={mainStyle.topMenu}>
+				<img src="assets/oli-icon.png" style={mainStyle.logo} />
+				<div style={mainStyle.title as any}>Welcome to OLI</div>
+			</div>							
+			<div style={mainStyle.centerPanel as any}>				
     			<NavigationBar documentActions={this.documentActions} />				
-				<div style={{background: "#f1f1f1", border: "1px solid #c4c0c0", padding: "2px", margin: "2px 2px 2px 2px", flex: 1}}>
+				<div style={mainStyle.contentPanel as any}>
 				{this.getView(this.props.document)}
 				</div>
-			</div>
-			
-			<div style={{"display": "flex", flexGrow: 0, order: 2, background: "#f1f1f1", border: "0px solid #c4c0c0", width: "100%", height: "24px", margin: "2px"}}>
+			</div>			
+			<div style={mainStyle.statusBar as any}>
 			Statusbar goes here if we want one
 			</div>
 		</div>
