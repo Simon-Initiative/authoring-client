@@ -59,47 +59,39 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
  
     return (
-        <div className="container">
-            <div className="columns">
-                <div className="column col-1"></div>
-                <div className="column col-10">
-                    <div>
-                        <TitleContentEditor 
-                          onEditModeChange={this.props.onEditModeChange}
-                          editMode={this.props.editMode}
-                          content={this.props.model.title}
-                          onEdit={(c) => this.onEdit('title', c)} 
-                          editingAllowed={this.props.editingAllowed}/>
-                        
-                        <HtmlContentEditor 
-                          onEditModeChange={this.props.onEditModeChange}
-                          editMode={this.props.editMode}
-                          services={this.props.services}
-                          userId={this.props.userId}
-                          editHistory={this.state.editHistory}
-                          content={this.props.model.context}
-                          onEdit={(c) => this.onEdit('context', c)} 
-                          editingAllowed={this.props.editingAllowed}>
+      <div>
+          <TitleContentEditor 
+            onEditModeChange={this.props.onEditModeChange}
+            editMode={this.props.editMode}
+            content={this.props.model.title}
+            onEdit={(c) => this.onEdit('title', c)} 
+            editingAllowed={this.props.editingAllowed}/>
+          
+          <HtmlContentEditor 
+            onEditModeChange={this.props.onEditModeChange}
+            editMode={this.props.editMode}
+            services={this.props.services}
+            userId={this.props.userId}
+            editHistory={this.state.editHistory}
+            content={this.props.model.context}
+            onEdit={(c) => this.onEdit('context', c)} 
+            editingAllowed={this.props.editingAllowed}>
 
-                          <Toolbar 
-                            courseId={this.props.model.courseId}
-                            services={this.props.services} 
-                            actionHandler={this} />
+            <Toolbar 
+              courseId={this.props.model.courseId}
+              services={this.props.services} 
+              actionHandler={this} />
 
-                        </HtmlContentEditor>
+          </HtmlContentEditor>
 
-                        <InlineAssessmentContentEditor 
-                          onEditModeChange={this.props.onEditModeChange}
-                          editMode={this.props.editMode}
-                          content={this.props.model.assessment}
-                          onEdit={(c) => this.onEdit('assessment', c)} 
-                          editingAllowed={this.props.editingAllowed}/>
-                    </div>
-                </div>
+          <InlineAssessmentContentEditor 
+            onEditModeChange={this.props.onEditModeChange}
+            editMode={this.props.editMode}
+            content={this.props.model.assessment}
+            onEdit={(c) => this.onEdit('assessment', c)} 
+            editingAllowed={this.props.editingAllowed}/>
+      </div>
                 
-                <div className="column col-1"></div>
-            </div>
-        </div>
     )
   }
 

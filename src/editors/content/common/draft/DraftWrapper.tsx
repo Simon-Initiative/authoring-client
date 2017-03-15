@@ -11,7 +11,6 @@ import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 
 import { HtmlContent } from '../../../../data/contentTypes';
-
 import { getActivityByName, Activity } from '../../../../activity/registry';
 
 interface DraftWrapper {
@@ -70,7 +69,7 @@ const blockRenderMap = Immutable.Map({
   'header-six': { element: 'h6' },
   'blockquote': { element: 'blockquote' },
   'code-block': { element: 'pre' },
-  'atomic': { element: 'figure' },
+  'atomic': { element: 'div' },
   'unordered-list-item': { element: 'li' },
   'ordered-list-item': { element: 'li' },
   'unstyled': { element: 'div' }
