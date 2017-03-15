@@ -47,9 +47,8 @@ gulp.task('setupDist', function() {
   setupLog("Setup for dist: Copying files to " + config.distDir);
 
   var patterns = ["./index.html",
-                  "./spectre.min.css",
-                  "/../assets/*",
-                   config.srcDir + '/vendor/**/*.*'];
+                  "/../assets/*",                   
+                  config.srcDir + '/vendor/**/*.*'];
 
   setupLog("Patterns: " + patterns);
 
@@ -63,7 +62,6 @@ gulp.task('setupDev', function() {
 
   var patterns = [config.srcDir + "/../index.html",
                   config.srcDir + "/../assets/*",
-                  config.srcDir + "/../spectre.min.css",
                    config.srcDir + '/vendor/**/*.*'];
 
   setupLog("Patterns: " + patterns);
