@@ -33,6 +33,44 @@ function FoldOutButton(props)
   );
 }
 
+function placeholderMenuHandler (props)
+{
+    console.log ("placeHolderMenuHanlder ()");
+}
+
+let options = [
+                {
+                    label: "My Courses",
+                    icon: "C",
+                    onclick: placeholderMenuHandler
+                },
+                {
+                    label: "Outline Editor",
+                    icon: "O",                            
+                    onclick: placeholderMenuHandler                        
+                },
+                { 
+                    label: "Learning Objectives",
+                    icon: "O",                            
+                    onclick: placeholderMenuHandler                        
+                },
+                {
+                    label: "Activity Editor",
+                    icon: "A",                            
+                    onclick: placeholderMenuHandler                        
+                },
+                {
+                    label: "Asset Manager",
+                    icon: "M",                            
+                    onclick: placeholderMenuHandler
+                },
+                {
+                    label: "Analytics",
+                    icon: "L",                            
+                    onclick: placeholderMenuHandler                        
+                }
+              ]; 
+
 // Nick, do whatever you feel you have to here
 const navbarStyles=
 {
@@ -82,7 +120,7 @@ const navbarStyles=
 *
 */
 export default class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> 
-{
+{    
     constructor(props) 
     {     
         super(props);
@@ -100,11 +138,33 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         console.log ("handleFoldOut()");
         this.setState({closed: false});
     }    
+    
+    /**
+     * We included this dedicated menu generator to ensure we could insert main menu options
+     * dynamically from external data and even from a marktplace
+     */
+    generateMenu (closed:Boolean)
+    {
+        console.log ("generateMenu ("+closed+")");
+        
+        if (closed==true)
+        {
+           return ( options.map(item => <li key={item.label}><a onClick={item.onclick}>{item.icon}</a></li>));
+        } 
+
+        return (options.map(item => <li key={item.label}><a onClick={item.onclick}>{item.label}</a></li>));                
+    }
          
+    /**
+     * Main render function
+     */
     render() 
     {
         let menuControl = null;        
         let mStyle = null;
+        
+        options [0].onclick=this.props.documentActions.viewAllCourses;
+        options [1].onclick=this.props.documentActions.viewOutlineEditor;
         
         if (this.state.closed==true) 
         {
@@ -117,18 +177,12 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
             mStyle = navbarStyles.openMenu as any;
         }
         
-        console.log ("chosen style: " + mStyle);
-                
+        let menuData=this.generateMenu(this.state.closed);
+        
         return (
                 <div style={mStyle as any}>
                     <div style={navbarStyles.mainMenu}>
-                        <ul style={navbarStyles.verticalMenu}>
-                            <li><a onClick={this.props.documentActions.viewAllCourses}>My Courses</a></li>
-                            <li><a onClick={this.props.documentActions.viewOutlineEditor}>Outline Editor</a></li>
-                            <li><a>Learning Objectives</a></li>
-                            <li><a>Activity Editor</a></li>
-                            <li><a>Asset Manager</a></li>
-                            <li><a>Analytics</a></li>
+                        <ul style={navbarStyles.verticalMenu}>{menuData}
                         </ul>
                     </div>
                     <div style={navbarStyles.bottomMenu}>                    

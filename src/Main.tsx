@@ -157,9 +157,8 @@ class Main extends React.Component<MainProps, {}> {
     }
   }
 
-  render(): JSX.Element {      
-      console.log ("render ()");
-      
+  render(): JSX.Element 
+  {      
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
