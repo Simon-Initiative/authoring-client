@@ -69,7 +69,7 @@ const navbarStyles=
     },
     verticalMenu:
     {
-        'list-style-type': 'none'
+        listStyleType : 'none'
     },
     bottomMenu:
     {
@@ -103,23 +103,24 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
          
     render() 
     {
-        let menuControl = null;
-        
-        console.log (this.state.closed);
+        let menuControl = null;        
+        let mStyle = null;
         
         if (this.state.closed==true) 
         {
             menuControl = <FoldOutButton onClick={ e => this.handleFoldOut(e) } />;
+            mStyle = navbarStyles.closedMenu as any;
         }
         else 
         {
             menuControl = <FoldInButton onClick={ e => this.handleFoldIn(e) } />;
+            mStyle = navbarStyles.openMenu as any;
         }
         
-        if (this.state.closed==false)
-        {        
+        console.log ("chosen style: " + mStyle);
+                
         return (
-                <div style={navbarStyles.openMenu as any}>
+                <div style={mStyle as any}>
                     <div style={navbarStyles.mainMenu}>
                         <ul style={navbarStyles.verticalMenu}>
                             <li><a onClick={this.props.documentActions.viewAllCourses}>My Courses</a></li>
@@ -135,24 +136,5 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
                     </div>
                 </div>
             );
-        }        
-        
-        return (
-    		<div style={navbarStyles.closedMenu as any}>
-				<div style={navbarStyles.mainMenu}>
-		    		 <ul style={navbarStyles.verticalMenu}>
-		    			<li><a onClick={this.props.documentActions.viewAllCourses}>C</a></li>
-		    			<li><a onClick={this.props.documentActions.viewOutlineEditor}>E</a></li>
-		    			<li><a>O</a></li>
-		    			<li><a>A</a></li>
-		    			<li><a>M</a></li>
-		    			<li><a>L</a></li>
-					</ul>
-				</div>
-				<div style={navbarStyles.bottomMenu}>
-                    {menuControl}
-				</div>
-			</div>
-        );
     }
 }
