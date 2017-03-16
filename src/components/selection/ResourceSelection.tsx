@@ -61,7 +61,7 @@ class ResourceSelection extends React.PureComponent<ResourceSelectionProps, Reso
         className="btn btn-link">{r.title}</button>;
 
     return this.state.resources.map(r => {
-        const active = r.id === this.state.selected.id ? 'active' : '';
+        const active = r.id === this.state.selected.id ? 'table-active' : '';
         return <tr key={r.id} className={active}>
           <td>{r.type}</td>
           <td>{link(r)}</td>
@@ -72,7 +72,7 @@ class ResourceSelection extends React.PureComponent<ResourceSelectionProps, Reso
   render() {
     return (
       <ModalSelection title="Select Resource" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.selected)}>
-        <table className="table table-striped table-hover">
+        <table className="table table-hover table-sm">
           <thead>
               <tr>
                   <th>Type</th>
