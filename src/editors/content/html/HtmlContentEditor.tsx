@@ -24,7 +24,6 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
   };
 
   const converted : string = stateToHTML(htmlContentToDraft(content as any));
-
   const replaced = '<div>' + converted.substring(3, converted.length - 4) +  '</div>';
 
   const html = {
@@ -33,8 +32,7 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
 
   return <div 
     key={block.key} 
-    dangerouslySetInnerHTML={html} 
-    onClick={() => onEditModeChange(block.key, false)}/>;
+    dangerouslySetInnerHTML={html} />;
 };
 
 var toEditor = function(services, userId: string, editMode: boolean, id: string, blockKey: string, onEditModeChange) {
