@@ -107,7 +107,7 @@ const mainStyle=
     },
     contentPanel:
     {
-        background: "#f1f1f1",
+        background: "#FFFFFF",
         border: "1px solid #c4c0c0",
         padding: "2px",
         margin: "2px 2px 2px 2px",
@@ -148,7 +148,6 @@ class Main extends React.Component<MainProps, {}> {
     }
     else if (documentId !== null) {
       return <EditorManager 
-        editMode={false}
         services={this.services} 
         userId={this.props.user.userId} 
         documentId={this.props.document}/>;

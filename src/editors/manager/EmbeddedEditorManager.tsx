@@ -12,7 +12,7 @@ import { PersistenceStrategy,
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 
-interface EditorManager {
+interface EmbeddedEditorManager {
 
   componentDidUnmount: boolean;
 
@@ -32,9 +32,13 @@ interface EditorManager {
 
   _onEditModeChange: (blockKey: string, mode: boolean) => void;
 
+  _onMouseEnter: () => void;
+
+  _onMouseLeave: () => void;
+
 }
 
-export interface EditorManagerProps {
+export interface EmbeddedEditorManagerProps {
 
   documentId: string;
 
@@ -42,16 +46,21 @@ export interface EditorManagerProps {
 
   services: AppServices;
 
+  editMode: boolean;
+
+  blockKey?: string;
+
+  onEditModeChange: (blockKey: string, editMode: boolean) => void;
+
 }
 
-export interface EditorManagerState {
+export interface EmbeddedEditorManagerState {
   editingAllowed: boolean;
   document: persistence.Document;
-  editMode: boolean;
-  activeSubEditorKey: string;
+  hovering: boolean;
 }
 
-class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
+class EmbeddedEditorManager extends React.Component<EmbeddedEditorManagerProps, EmbeddedEditorManagerState> {
 
   constructor(props) {
     super(props);
@@ -59,13 +68,15 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this.state = { 
       document: null, 
       editingAllowed: null, 
-      editMode: true,
-      activeSubEditorKey: null
+      hovering: false
     };
     this.componentDidUnmount = false;
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);
     this._onEditModeChange = this.onEditModeChange.bind(this);
+
+    this._onMouseEnter = this.onMouseEnter.bind(this);
+    this._onMouseLeave = this.onMouseLeave.bind(this);
 
     this.onSaveCompleted = (doc: persistence.Document) => {
       this.lastSavedDocument = doc;
@@ -85,11 +96,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   onEditModeChange(blockKey: string, editMode: boolean) {
-    if (editMode) {
-      this.setState({activeSubEditorKey: blockKey, editMode: false});
-    } else {
-      this.setState({activeSubEditorKey: null, editMode: true});
-    }
+    this.props.onEditModeChange(this.props.blockKey, editMode);
   }
 
   initPersistence(document: persistence.Document) {
@@ -122,17 +129,21 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       .then(document => {
         this.lastSavedDocument = document;
 
-        // Tear down previous persistence strategy
-        if (this.persistenceStrategy !== null) {
-          this.persistenceStrategy.destroy()
-            .then(nothing => {
-              this.initPersistence(document) 
-            });
-        } else {
-          this.initPersistence(document);
+        if (!this.componentDidUnmount) {
+
+          // Tear down previous persistence strategy
+          if (this.persistenceStrategy !== null) {
+            this.persistenceStrategy.destroy()
+              .then(nothing => {
+                this.initPersistence(document);
+              });
+          } else {
+            this.initPersistence(document);
+          }
+          
+          this.setState({document});
+
         }
-        
-        this.setState({document})
 
       })
       .catch(err => console.log(err));
@@ -176,6 +187,14 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       })
   }
 
+  onMouseEnter() {
+    this.setState({hovering: true});
+  }
+
+  onMouseLeave() {
+    this.setState({hovering: false});
+  }
+
   render() : JSX.Element {
     if (this.state.document === null || this.state.editingAllowed === null) {
       return null;
@@ -187,18 +206,35 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         userId: this.props.userId,
         editingAllowed: this.state.editingAllowed,
         services: this.props.services,
-        editMode: this.state.editMode,
-        onEditModeChange: this._onEditModeChange,
-        activeSubEditorKey: this.state.activeSubEditorKey
+        editMode: this.props.editMode,
+        onEditModeChange: this._onEditModeChange
       }
       
       const registeredEditor = lookUpByName(this.state.document.model.modelType);
       const editor = React.createElement( (registeredEditor.component as any), childProps);
 
-      return <div>{editor}</div>;
+      const editModeText = this.props.editMode ? 'Done' : 'Edit';
+
+      const highlightStyle = {
+        border: this.state.hovering ? "5px solid gray" : "5px solid white"
+      };
+
+      if (this.state.editingAllowed) {
+        return <div onMouseEnter={this._onMouseEnter} onMouseLeave={this._onMouseLeave} 
+            style={highlightStyle}>
+          <button onClick={() => this.onEditModeChange(this.props.blockKey, !this.props.editMode)} className="btn btn-sm">{editModeText}</button>
+          {editor}
+        </div>
+      } else {
+        return <div onMouseEnter={this._onMouseEnter} onMouseLeave={this._onMouseLeave} 
+            style={highlightStyle}>
+          {editor}
+        </div>
+      }
+
     }
   }
   
 }
 
-export default EditorManager;
+export default EmbeddedEditorManager;

@@ -75,6 +75,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

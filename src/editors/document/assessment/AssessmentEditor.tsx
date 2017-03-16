@@ -68,6 +68,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+            activeSubEditorKey={this.props.activeSubEditorKey}
             onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
             services={this.props.services}
