@@ -29,7 +29,7 @@ const Button = (props) => {
   const { action, icon } = props;
   const iconClasses = 'icon icon-' + icon;
   return (
-    <button onClick={() => action()} className="btn btn-sm">
+    <button onClick={() => action()} type="button" className="btn btn-secondary">
       <i className={iconClasses}></i>
     </button>
   );
@@ -72,26 +72,22 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
   }
 
   render() {
-
     return (
-
-      <div className="btn-group">
-
-        <Button action={() => this.toggleInlineStyle('BOLD')} icon="bold"/>
-        <Button action={() => this.toggleInlineStyle('ITALIC')} icon="italic"/>
-        <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
-        
-        <Separator/>
-
-        <Button icon="image"/>
-        <Button icon="music"/>
-        <Button icon="play"/>
-        <Button icon="youtube2"/>
-        
-        <Separator/>
-
-        <Button action={this.onActivity} icon="cog"/>
-
+      <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div className="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+          <Button action={() => this.toggleInlineStyle('BOLD')} icon="bold"/>
+          <Button action={() => this.toggleInlineStyle('ITALIC')} icon="italic"/>
+          <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
+        </div>
+        <div className="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
+          <Button icon="image"/>
+          <Button icon="music"/>
+          <Button icon="play"/>
+          <Button icon="youtube2"/>
+        </div>
+        <div className="btn-group btn-group-sm" role="group" aria-label="Third group">
+          <Button action={this.onActivity} icon="cog"/>
+        </div>
       </div>);
   }
 
