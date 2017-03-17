@@ -170,10 +170,10 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         
         if (closed==true)
         {
-           return (this.opts.map(item => <li key={item.label}><a onClick={item.onclick}>{item.icon}</a></li>));
+           return (this.opts.map(item => <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a></li>));
         } 
 
-        return (this.opts.map(item => <li key={item.label}><a onClick={item.onclick}>{item.label}</a></li>));        
+        return (this.opts.map(item => <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>));        
     }
          
     /**
