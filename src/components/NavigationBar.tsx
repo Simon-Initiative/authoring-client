@@ -19,6 +19,9 @@ export interface NavigationBarProps
   documentActions: any;
 }
 
+/**
+ * 
+ */
 function FoldInButton(props) 
 {
   return (
@@ -26,13 +29,18 @@ function FoldInButton(props)
   );
 }
 
+/**
+ * 
+ */
 function FoldOutButton(props) 
 {
   return (
     <a href="#" onClick={props.onClick}>Open</a>
   );
 }
-
+/**
+ * 
+ */
 function placeholderMenuHandler (props)
 {
     console.log ("placeHolderMenuHanlder ()");
@@ -141,7 +149,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
     
     /**
      * We included this dedicated menu generator to ensure we could insert main menu options
-     * dynamically from external data and even from a marktplace
+     * dynamically from external data and even from a marktplace (yes we can)
      */
     generateMenu (closed:Boolean)
     {
@@ -163,6 +171,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let menuControl = null;        
         let mStyle = null;
         
+        // Bad way of doing this, will be changed soon!
         options [0].onclick=this.props.documentActions.viewAllCourses;
         options [1].onclick=this.props.documentActions.viewOutlineEditor;
         
