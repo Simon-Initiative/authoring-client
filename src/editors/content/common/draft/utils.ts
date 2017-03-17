@@ -12,7 +12,7 @@ const log = (ss) => {
   console.log(ss.getAnchorKey() + '(' + ss.getAnchorOffset() + ') - ' + ss.getFocusKey() + '(' + ss.getFocusOffset() + ')');
 }
 
-const hasSelection = (ss) => {
+export function hasSelection(ss: SelectionState) {
   if (ss.getAnchorKey() !== ss.getFocusKey()) {
     return true;
   } else if (ss.getAnchorOffset() !== ss.getFocusOffset()) {

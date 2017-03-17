@@ -1,12 +1,17 @@
 import * as React from 'react';
 import { SelectionState } from 'draft-js';
-import { determineChangeType, SelectionChangeType } from './draft/utils';
+import { determineChangeType, SelectionChangeType, hasSelection } from './draft/utils';
+
+const SHIFT = 16;
 
 interface ToolbarManager {
   container: any;
   _onMouseUp: () => void;
   _onMouseDown: () => void; 
+  _onKeyDown: () => void;
+  _onKeyUp: () => void;
   mouseDown: boolean; 
+  shiftPressed: boolean;
   _dismissToolbar: () => void;
 }
 
@@ -29,6 +34,12 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
 
     this._dismissToolbar = this.dismissToolbar.bind(this);
     this.mouseDown = false;
+    this.shiftPressed = false;
+
+    this._onMouseDown = this.onMouseDown.bind(this);
+    this._onMouseUp = this.onMouseUp.bind(this);
+    this._onKeyDown = this.onKeyDown.bind(this);
+    this._onKeyUp = this.onKeyUp.bind(this);
 
     this.state = {
       show: false,
@@ -63,19 +74,25 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   componentWillReceiveProps(nextProps: ToolbarManagerProps) {
 
     const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
-    console.log('change: ' + changeType);
-    if (changeType === SelectionChangeType.Selection) {
-      const selection = document.getSelection();
-      if (selection.rangeCount !== 0) {
-        let topRect = this.getPosition();
-        if (topRect !== null) {
-          console.log('props: ' + this.mouseDown);
-          this.setState({show: !this.mouseDown, x: topRect.left, y: topRect.top - 20});
-        } else {
-          this.setState({ show: false, x: null, y: null});
+    
+    if (changeType === SelectionChangeType.Selection) {  
+      if (hasSelection(nextProps.selectionState)) {
+        const selection = document.getSelection();
+        if (selection.rangeCount !== 0) {
+          let topRect = this.getPosition();
+          if (topRect !== null) {
+
+            const show = !this.mouseDown && !this.shiftPressed;
+            this.setState({show, x: topRect.left, y: topRect.top - 20});
+          } else {
+            this.setState({ show: false, x: null, y: null});
+          }
         }
-        
+      } else {
+        this.setState({ show: false, x: null, y: null});
       }
+      
+      
     } else if (changeType === SelectionChangeType.CursorPosition) {
       this.setState({ show: false, x: null, y: null});
     } 
@@ -84,17 +101,30 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
 
   onMouseDown() {
     this.mouseDown = true;
-    console.log('mouse down');
-
     this.setState({show: false});
   }
 
   onMouseUp() {
     this.mouseDown = false; 
-    console.log('mouse up');
     
     if (this.state.x !== null) {
       this.setState({show: true});
+    }
+  }
+
+  onKeyDown(e) {
+    if (e.keyCode === SHIFT) {
+      this.shiftPressed = true;
+    }
+  }
+
+  onKeyUp(e) {
+    if (e.keyCode === SHIFT) {
+      this.shiftPressed = false;
+
+      if (this.state.x !== null) {
+        this.setState({show: true});
+      }
     }
   }
 
@@ -121,7 +151,9 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
         </div>;
     } 
 
-    return <div ref={(container => this.container = container)}
+    return <div ref={(container => this.container = container)} 
+            onKeyUp={this._onKeyUp}
+            onKeyDown={this._onKeyDown}
             onMouseDown={this._onMouseDown}
             onMouseUp={this._onMouseUp}
             >
