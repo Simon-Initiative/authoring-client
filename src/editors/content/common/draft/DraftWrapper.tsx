@@ -3,26 +3,28 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import {Editor, EditorState, CompositeDecorator, ContentState, 
+import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
-
+import { determineChangeType, SelectionChangeType } from './utils';
 import * as translate from './translate';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 
 import { HtmlContent } from '../../../../data/contentTypes';
+
 import { getActivityByName, Activity } from '../../../../activity/registry';
 
 interface DraftWrapper {
   onChange: any;
   focus: () => any; 
   handleKeyCommand: any;
-  
+  lastSelectionState: SelectionState;
 }
 
 export interface DraftWrapperProps {
   editHistory: AuthoringActions[];
   onEdit: (HtmlContent) => void;
+  onSelectionChange: (state: SelectionState) => void;
   onEditModeChange: (key: string, mode: boolean) => void;
   content: HtmlContent;
   locked: boolean;
@@ -137,16 +139,13 @@ const Image = (props) => {
   );
 };
 
-const decorator = new CompositeDecorator([
-  {
+const decorator = new CompositeDecorator([{
     strategy: findLinkEntities,
     component: Link,
-  },
-  {
+  }, {
     strategy: findImageEntities,
     component: Image,
-  },
-]);
+  }]);
 
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
@@ -156,6 +155,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.focus = () => (this.refs as any).editor.focus();
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
+    this.lastSelectionState = null;
     
     const contentState : ContentState = translate.htmlContentToDraft(this.props.content);
 
@@ -165,10 +165,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
     
     this.onChange = (editorState) => {
-
+      
+      
       // You wouldn't think that this check would be necessary, but I was seeing
       // change notifications fired from Draft even when it was not in edit mode.
       if (!this.props.locked) {
+
+        const ss = editorState.getSelection();
+        const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
+        this.lastSelectionState = ss; 
+        
+        // Report any change, including initial change 
+        if (changeType !== SelectionChangeType.None) {
+          this.props.onSelectionChange(ss);
+        }
 
         const content = editorState.getCurrentContent();
         const htmlContent : HtmlContent = translate.draftToHtmlContent(editorState.getCurrentContent());
