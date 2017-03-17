@@ -128,16 +128,16 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
   render() {
     return (
       <div className="container">
-          <div className="columns">
-              <div className="column col-1"></div>
-              <div className="column col-10">
+          <div className="row">
+              <div className="col-1"></div>
+              <div className="col-10">
                   <div>
                       {this.renderResources()}
                       {this.renderCreation()}
                   </div>
               </div>
               
-              <div className="column col-1"></div>
+              <div className="col-1"></div>
           </div>
       </div>
     )

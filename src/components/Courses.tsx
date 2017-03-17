@@ -57,10 +57,7 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Example #1</th>
-              <th>Example #2</th>
-              <th>Example #3</th>
+              <th>Course</th>
             </tr>
           </thead>
           <tbody>

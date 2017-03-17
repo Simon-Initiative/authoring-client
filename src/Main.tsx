@@ -142,7 +142,10 @@ class Main extends React.Component<MainProps, {}> {
     this.props.dispatch(userActions.login(user, user));
   }
 
-  getView(documentId: string): JSX.Element {
+  getView(documentId: string): JSX.Element 
+  {
+      console.log ("getView ()");
+      
     if (documentId === documentActions.VIEW_ALL_COURSES) {
       return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
@@ -156,9 +159,8 @@ class Main extends React.Component<MainProps, {}> {
     }
   }
 
-  render(): JSX.Element {      
-      console.log ("render ()");
-      
+  render(): JSX.Element 
+  {      
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
