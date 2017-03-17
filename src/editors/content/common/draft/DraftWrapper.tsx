@@ -228,12 +228,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    const contentState : ContentState = translate.htmlContentToDraft(nextProps.content);
-
-    this.setState({
-      editorState: EditorState.createWithContent(contentState, decorator)
-    });
-
     // Determine if we have received a new edit action
     if (this.props.editHistory.length !== nextProps.editHistory.length) {
       let action : any = nextProps.editHistory[0];

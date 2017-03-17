@@ -15,6 +15,7 @@ import { htmlContentToDraft } from '../common/draft/translate';
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
   _onBlur: () => void; 
+  container: any;
 }
 
 var toHtml = function(block: ContentBlock, onEditModeChange) {
@@ -83,8 +84,6 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps {
 
 export interface HtmlContentEditorState {
 
-  activeContent: contentTypes.HtmlContent;
-
   selectionState: SelectionState;
 }
 
@@ -98,27 +97,18 @@ export abstract class HtmlContentEditor
     super(props);
 
     this.state = {
-      activeContent: this.props.content,
       selectionState: null
     }
 
     this._onChange = this.onChange.bind(this);
     this._onBlur = this.onBlur.bind(this);
+    this.container = null; 
   }
 
 
   onChange(content: contentTypes.HtmlContent) {
     this.props.onEdit(content);
   } 
-
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.content !== nextProps.content) {
-      this.setState({
-        activeContent: nextProps.content
-      })
-    }
-  }
 
   onBlur() {
     this.setState({
@@ -138,7 +128,7 @@ export abstract class HtmlContentEditor
               services={this.props.services}
               userId={this.props.userId}
               editHistory={this.props.editHistory} 
-              content={this.state.activeContent} 
+              content={this.props.content} 
               locked={!this.props.editingAllowed}
               onEdit={this._onChange} />
           </ToolbarManager>
@@ -151,7 +141,7 @@ export abstract class HtmlContentEditor
       // to guarantee that the rendered HTML looks the same as Draft editor 
       // rendered content
       const pureHtml = convert(this.props.services, this.props.userId, 
-        this.props.activeSubEditorKey, this.state.activeContent, this.props.onEditModeChange);
+        this.props.activeSubEditorKey, this.props.content, this.props.onEditModeChange);
       
       const outerStyle = {
         minHeight: '300px',

@@ -2,26 +2,24 @@ import * as React from 'react';
 import { SelectionState } from 'draft-js';
 import { determineChangeType, SelectionChangeType } from './draft/utils';
 
-type ToolbarState = {
-  show: boolean,
-  x: number,
-  y: number
-};
-
 interface ToolbarManager {
-  toolbarTimer: any;
-  componentDidUnmount: boolean;
+  container: any;
+  _onMouseUp: () => void;
+  _onMouseDown: () => void; 
+  mouseDown: boolean; 
   _dismissToolbar: () => void;
 }
 
 export interface ToolbarManagerProps {
   toolbar: any;
   selectionState: SelectionState;
-  
+
 }
 
 export interface ToolbarManagerState {
-  toolbar: ToolbarState
+  show: boolean;
+  x: number;
+  y: number;
 }
 
 class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManagerState> {
@@ -29,17 +27,15 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   constructor(props) {
     super(props);
 
-    this.toolbarTimer = null;
-    this.componentDidUnmount = false;
     this._dismissToolbar = this.dismissToolbar.bind(this);
+    this.mouseDown = false;
 
     this.state = {
-      toolbar: {
-        show: false,
-        x: null,
-        y: null
-      }
+      show: false,
+      x: null,
+      y: null
     }
+  
   }
 
   getPosition() {
@@ -60,80 +56,64 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
     return top;
   }
 
+  dismissToolbar() {
+    this.setState({show: false, x: null, y: null});
+  }
+
   componentWillReceiveProps(nextProps: ToolbarManagerProps) {
 
     const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
-    
+    console.log('change: ' + changeType);
     if (changeType === SelectionChangeType.Selection) {
       const selection = document.getSelection();
       if (selection.rangeCount !== 0) {
         let topRect = this.getPosition();
-        this.setState({ toolbar: {show: true, x: topRect.left, y: topRect.top - 20}});
+        if (topRect !== null) {
+          console.log('props: ' + this.mouseDown);
+          this.setState({show: !this.mouseDown, x: topRect.left, y: topRect.top - 20});
+        } else {
+          this.setState({ show: false, x: null, y: null});
+        }
+        
       }
     } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ toolbar: { show: false, x: null, y: null}});
+      this.setState({ show: false, x: null, y: null});
     } 
 
   }
 
-  dismissToolbar() {
-    this.setState({ 
-      toolbar: {
-        show: false,
-        x: 0,
-        y: 0
-      }
-    });
-  }
+  onMouseDown() {
+    this.mouseDown = true;
+    console.log('mouse down');
 
-  showToolbar(coords) {
-    if (!this.componentDidUnmount) {
-      this.setState({ 
-        toolbar: {
-          show: true,
-          x: coords.x,
-          y: coords.y
-        }
-      });
-    }
-    
-  }
-
-  onMouseDown(e) {
-    // const coords = {
-    //   x: e.clientX,
-    //   y: e.clientY
-    // }
-    // if (this.toolbarTimer === null) {
-    //   this.toolbarTimer = setTimeout(() => {
-    //     this.toolbarTimer = null;
-    //     this.showToolbar(coords);
-    //   }, 500);
-    // }
+    this.setState({show: false});
   }
 
   onMouseUp() {
-    if (this.toolbarTimer !== null) {
-      clearTimeout(this.toolbarTimer);
-      this.toolbarTimer = null;
+    this.mouseDown = false; 
+    console.log('mouse up');
+    
+    if (this.state.x !== null) {
+      this.setState({show: true});
     }
   }
 
-  componentWillUnmount() {
-    this.componentDidUnmount = true;
+  getXOffset() {
+    const position = this.container.getBoundingClientRect();  
+    return position.left;
   }
 
   render() : JSX.Element {
 
     let toolbarAndContainer = null;
-    if (this.state.toolbar.show) {
+    if (this.state.show) {
       
       const clonedToolbar = React.cloneElement(this.props.toolbar, { dismissToolbar: this._dismissToolbar});
       
       const positionStyle = {
         position: 'absolute',
-        top: this.state.toolbar.y,
-        left: this.state.toolbar.x
+        top: this.state.y,
+        left: this.state.x - this.getXOffset()
       };
 
       toolbarAndContainer = <div style={positionStyle}>
@@ -141,9 +121,10 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
         </div>;
     } 
 
-    return <div 
-            onMouseDown={this.onMouseDown.bind(this)}
-            onMouseUp={this.onMouseUp.bind(this)}>
+    return <div ref={(container => this.container = container)}
+            onMouseDown={this._onMouseDown}
+            onMouseUp={this._onMouseUp}
+            >
             {this.props.children}
             {toolbarAndContainer}
           </div>
