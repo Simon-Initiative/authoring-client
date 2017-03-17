@@ -1,7 +1,7 @@
 'use strict'
 
 import * as React from 'react';
-import { ContentState, EditorState, ContentBlock, convertToRaw } from 'draft-js';
+import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -14,6 +14,7 @@ import { htmlContentToDraft } from '../common/draft/translate';
 
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
+  _onBlur: () => void; 
 }
 
 var toHtml = function(block: ContentBlock, onEditModeChange) {
@@ -76,12 +77,15 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps {
   blockKey?: string;
 
   activeSubEditorKey?: string; 
+
   
 }
 
 export interface HtmlContentEditorState {
 
   activeContent: contentTypes.HtmlContent;
+
+  selectionState: SelectionState;
 }
 
 /**
@@ -94,10 +98,12 @@ export abstract class HtmlContentEditor
     super(props);
 
     this.state = {
-      activeContent: this.props.content
+      activeContent: this.props.content,
+      selectionState: null
     }
 
     this._onChange = this.onChange.bind(this);
+    this._onBlur = this.onBlur.bind(this);
   }
 
 
@@ -114,12 +120,20 @@ export abstract class HtmlContentEditor
     }
   }
 
+  onBlur() {
+    this.setState({
+      selectionState: SelectionState.createEmpty('fakeKey')
+    })
+  }
+
   render() : JSX.Element {
 
     if (this.props.editMode) {
-      return ( 
-        <ToolbarManager toolbar={this.props.children}>
-          <DraftWrapper 
+      return (
+        <div onBlur={this._onBlur}>
+          <ToolbarManager selectionState={this.state.selectionState} toolbar={this.props.children}>
+            <DraftWrapper 
+              onSelectionChange={(selectionState) => this.setState({selectionState})}
               onEditModeChange={this.props.onEditModeChange}
               services={this.props.services}
               userId={this.props.userId}
@@ -127,7 +141,8 @@ export abstract class HtmlContentEditor
               content={this.state.activeContent} 
               locked={!this.props.editingAllowed}
               onEdit={this._onChange} />
-        </ToolbarManager>);
+          </ToolbarManager>
+        </div>);
     } else {
       
       // Do not display an actual Draft editor, but instead convert draft 

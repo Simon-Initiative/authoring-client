@@ -1,5 +1,6 @@
 import * as React from 'react';
-
+import { SelectionState } from 'draft-js';
+import { determineChangeType, SelectionChangeType } from './draft/utils';
 
 type ToolbarState = {
   show: boolean,
@@ -15,6 +16,8 @@ interface ToolbarManager {
 
 export interface ToolbarManagerProps {
   toolbar: any;
+  selectionState: SelectionState;
+  
 }
 
 export interface ToolbarManagerState {
@@ -37,6 +40,40 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
         y: null
       }
     }
+  }
+
+  getPosition() {
+    const selection = document.getSelection();
+    if (selection.rangeCount === 0) return null;
+
+    const range = selection.getRangeAt(0);
+    const clientRects = range.getClientRects();
+
+    let top = clientRects.item(0);
+    for (let i = 0; i < clientRects.length; i++) {
+      let c = clientRects.item(i);
+      if (c.top < top.top) {
+        top = c;
+      }
+    }
+
+    return top;
+  }
+
+  componentWillReceiveProps(nextProps: ToolbarManagerProps) {
+
+    const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
+    
+    if (changeType === SelectionChangeType.Selection) {
+      const selection = document.getSelection();
+      if (selection.rangeCount !== 0) {
+        let topRect = this.getPosition();
+        this.setState({ toolbar: {show: true, x: topRect.left, y: topRect.top - 20}});
+      }
+    } else if (changeType === SelectionChangeType.CursorPosition) {
+      this.setState({ toolbar: { show: false, x: null, y: null}});
+    } 
+
   }
 
   dismissToolbar() {
@@ -63,16 +100,16 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   }
 
   onMouseDown(e) {
-    const coords = {
-      x: e.clientX,
-      y: e.clientY
-    }
-    if (this.toolbarTimer === null) {
-      this.toolbarTimer = setTimeout(() => {
-        this.toolbarTimer = null;
-        this.showToolbar(coords);
-      }, 500);
-    }
+    // const coords = {
+    //   x: e.clientX,
+    //   y: e.clientY
+    // }
+    // if (this.toolbarTimer === null) {
+    //   this.toolbarTimer = setTimeout(() => {
+    //     this.toolbarTimer = null;
+    //     this.showToolbar(coords);
+    //   }, 500);
+    // }
   }
 
   onMouseUp() {
