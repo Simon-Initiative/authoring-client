@@ -77,16 +77,16 @@ const navbarStyles=
         height: "24px"
     },
     sidebar: {
-        'padding-left': 0,
-        'padding-right': 0,
+        paddingLeft: 0,
+        paddingRight: 0,
         'position': 'fixed',
         top: '51px',
         bottom: 0,
         left: 0,
-        'z-index': 1000,
-        'overflow-x': 'hidden',
-        'overflow-y': 'auto',
-        'border-right': '1px solid #eee'
+        zIndex: 1000,
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        borderRight: '1px solid #eee'
     }
 };
 
