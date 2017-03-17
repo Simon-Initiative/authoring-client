@@ -75,6 +75,18 @@ const navbarStyles=
     {
         margin: "0 0 0 14px",
         height: "24px"
+    },
+    sidebar: {
+        'padding-left': 0,
+        'padding-right': 0,
+        'position': 'fixed',
+        top: '51px',
+        bottom: 0,
+        left: 0,
+        'z-index': 1000,
+        'overflow-x': 'hidden',
+        'overflow-y': 'auto',
+        'border-right': '1px solid #eee'
     }
 };
 
@@ -120,21 +132,23 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         console.log ("chosen style: " + mStyle);
                 
         return (
-                <div style={mStyle as any}>
-                    <div style={navbarStyles.mainMenu}>
-                        <ul style={navbarStyles.verticalMenu}>
-                            <li><a onClick={this.props.documentActions.viewAllCourses}>My Courses</a></li>
-                            <li><a onClick={this.props.documentActions.viewOutlineEditor}>Outline Editor</a></li>
-                            <li><a>Learning Objectives</a></li>
-                            <li><a>Activity Editor</a></li>
-                            <li><a>Asset Manager</a></li>
-                            <li><a>Analytics</a></li>
-                        </ul>
-                    </div>
-                    <div style={navbarStyles.bottomMenu}>                    
-                        {menuControl}
-                    </div>
-                </div>
+                <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+                    <ul className="nav nav-pills flex-column">
+                        <li className="nav-item"><a className="nav-link active" onClick={this.props.documentActions.viewAllCourses}>My Courses</a></li>
+                        <li className="nav-item"><a className="nav-link" onClick={this.props.documentActions.viewOutlineEditor}>Outline Editor</a></li>
+                        <li className="nav-item"><a className="nav-link">Learning Objectives</a></li>
+                        <li className="nav-item"><a className="nav-link">Activity Editor</a></li>
+                        <li className="nav-item"><a className="nav-link">Asset Manager</a></li>
+                        <li className="nav-item"><a className="nav-link">Analytics</a></li>
+                    </ul>
+                    {/*  
+                    <ul className="nav nav-pills flex-column">
+                        <li className="nav-item">                    
+                            {menuControl}
+                        </li>
+                    </ul>
+                    */}
+                </nav>
             );
     }
 }

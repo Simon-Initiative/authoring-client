@@ -27,6 +27,10 @@ module.exports = {
         unknownContextCritical: false,
         loaders: [
             { test: /\.css$/, loader: "style-loader!css-loader" },
+            {
+              test: /\.scss$/,
+              loaders: ["style-loader", "css-loader", "sass-loader"]
+            },
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, loader: 'file-loader' },
             { test: /\.ts$/, loaders: [ 'babel', 'ts-loader'], exclude: /node_modules/ },

@@ -52,16 +52,23 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
     });
 
     return (
-      <table className="table table-striped table-hover"> 
-        <thead>
+      <div>
+      <h1>Courses</h1>
+        <table className="table table-striped">
+          <thead>
             <tr>
-                <th>Courses</th>
+              <th>#</th>
+              <th>Example #1</th>
+              <th>Example #2</th>
+              <th>Example #3</th>
             </tr>
-        </thead>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>);
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+      </div>
+    );
   }
   
 
