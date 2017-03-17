@@ -16,13 +16,14 @@ interface ToolbarManager {
 }
 
 export interface ToolbarManagerProps {
-  toolbar: any;
+  inlineToolbar: any;
+  blockToolbar: any;
   selectionState: SelectionState;
-
 }
 
 export interface ToolbarManagerState {
   show: boolean;
+  component: any;
   x: number;
   y: number;
 }
@@ -44,7 +45,8 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
     this.state = {
       show: false,
       x: null,
-      y: null
+      y: null,
+      component: null
     }
   
   }
@@ -83,7 +85,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
           if (topRect !== null) {
 
             const show = !this.mouseDown && !this.shiftPressed;
-            this.setState({show, x: topRect.left, y: topRect.top - 20});
+            this.setState({show, x: topRect.left, y: topRect.top - 20, component: this.props.inlineToolbar});
           } else {
             this.setState({ show: false, x: null, y: null});
           }
@@ -138,7 +140,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
     let toolbarAndContainer = null;
     if (this.state.show) {
       
-      const clonedToolbar = React.cloneElement(this.props.toolbar, { dismissToolbar: this._dismissToolbar});
+      const clonedToolbar = React.cloneElement(this.state.component, { dismissToolbar: this._dismissToolbar});
       
       const positionStyle = {
         position: 'absolute',

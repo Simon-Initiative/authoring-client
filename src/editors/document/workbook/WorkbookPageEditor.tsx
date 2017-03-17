@@ -65,6 +65,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
     
+    const inlineToolbar = <Toolbar 
+                courseId={this.props.model.courseId} 
+                services={this.props.services} 
+                actionHandler={this} />;
+    const blockToolbar = <Toolbar 
+                courseId={this.props.model.courseId} 
+                services={this.props.services} 
+                actionHandler={this} />;
+
     return (
       <div>
           <TitleContentEditor 
@@ -75,6 +84,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+              inlineToolbar={inlineToolbar}
+              blockToolbar={blockToolbar}
               activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
@@ -85,10 +96,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               onEdit={(c) => this.onEdit('body', c)} 
               editingAllowed={this.props.editingAllowed}>
 
-              <Toolbar 
-                courseId={this.props.model.courseId} 
-                services={this.props.services} 
-                actionHandler={this} />
+              
           </HtmlContentEditor>
           
       </div>

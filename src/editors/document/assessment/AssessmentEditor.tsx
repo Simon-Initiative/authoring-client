@@ -57,7 +57,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
- 
+    const inlineToolbar = <Toolbar 
+              courseId={this.props.model.courseId}
+              services={this.props.services} 
+              actionHandler={this} />;
+    const blockToolbar = <Toolbar 
+              courseId={this.props.model.courseId}
+              services={this.props.services} 
+              actionHandler={this} />;
+
     return (
       <div>
           <TitleContentEditor 
@@ -68,6 +76,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+            inlineToolbar={inlineToolbar}
+            blockToolbar={blockToolbar}
             activeSubEditorKey={this.props.activeSubEditorKey}
             onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
@@ -77,12 +87,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             content={this.props.model.context}
             onEdit={(c) => this.onEdit('context', c)} 
             editingAllowed={this.props.editingAllowed}>
-
-            <Toolbar 
-              courseId={this.props.model.courseId}
-              services={this.props.services} 
-              actionHandler={this} />
-
           </HtmlContentEditor>
 
           <InlineAssessmentContentEditor 

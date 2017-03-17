@@ -79,7 +79,9 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps {
 
   activeSubEditorKey?: string; 
 
-  
+  inlineToolbar: any;
+
+  blockToolbar: any;
 }
 
 export interface HtmlContentEditorState {
@@ -121,7 +123,10 @@ export abstract class HtmlContentEditor
     if (this.props.editMode) {
       return (
         <div onBlur={this._onBlur}>
-          <ToolbarManager selectionState={this.state.selectionState} toolbar={this.props.children}>
+          <ToolbarManager selectionState={this.state.selectionState} 
+            inlineToolbar={this.props.inlineToolbar}
+            blockToolbar={this.props.blockToolbar}
+            >
             <DraftWrapper 
               onSelectionChange={(selectionState) => this.setState({selectionState})}
               onEditModeChange={this.props.onEditModeChange}
