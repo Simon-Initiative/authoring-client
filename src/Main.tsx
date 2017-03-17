@@ -162,23 +162,48 @@ class Main extends React.Component<MainProps, {}> {
     let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
-      <div style={mainStyle.container as any}>
-        {modalDisplay}        
-		<div style={mainStyle.holder as any}>		
-			<div style={mainStyle.topMenu}>
+      <div>
+            
+            {/* {modalDisplay} */}
+		
+            {/* Navigation Bar START */}		
+			<div className="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
 				<img src="assets/oli-icon.png" style={mainStyle.logo} />
-				<div style={mainStyle.title as any}>Welcome to OLI</div>
-			</div>							
-			<div style={mainStyle.centerPanel as any}>				
-    			<NavigationBar documentActions={this.documentActions} />				
-				<div style={mainStyle.contentPanel as any}>
-				{this.getView(this.props.document)}
-				</div>
-			</div>			
-			<div style={mainStyle.statusBar as any}>
-			Statusbar goes here if we want one
-			</div>
-		</div>
+                <a className="navbar-brand" href="#">OLI Dashboard</a>
+				<div className="collapse navbar-collapse" id="navbarsExampleDefault">
+                {/* Top level navigation if needed
+                    <ul className="navbar-nav mr-auto">
+                      <li className="nav-item active">
+                        <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
+                      </li>
+                      <li className="nav-item">
+                        <a className="nav-link" href="#">Settings</a>
+                      </li>
+                      <li className="nav-item">
+                        <a className="nav-link" href="#">Profile</a>
+                      </li>
+                      <li className="nav-item">
+                        <a className="nav-link" href="#">Help</a>
+                      </li>
+                    </ul>
+                */}
+                </div>
+			</div>	
+            {/* Navigation Bar END */}	
+
+            {/* Main Container START */}
+            <div className="container-fluid">
+                <div className="row">
+                    {/* Sidebar START */}
+                    <NavigationBar documentActions={this.documentActions} />
+                    {/* Sidebar END */}
+                    <main className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+                      {this.getView(this.props.document)}
+                    </main>
+                </div>
+            </div>
+        {/* Main Container END */}
+		
       </div>
     )
   }
