@@ -8,7 +8,7 @@ import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/auth
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import EditorManager from '../../manager/EditorManager';
+import EmbeddedEditorManager from '../../manager/EmbeddedEditorManager';
 import ToolbarManager from '../common/ToolbarManager';
 import { htmlContentToDraft } from '../common/draft/translate';
 
@@ -24,7 +24,6 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
   };
 
   const converted : string = stateToHTML(htmlContentToDraft(content as any));
-
   const replaced = '<div>' + converted.substring(3, converted.length - 4) +  '</div>';
 
   const html = {
@@ -33,15 +32,16 @@ var toHtml = function(block: ContentBlock, onEditModeChange) {
 
   return <div 
     key={block.key} 
-    dangerouslySetInnerHTML={html} 
-    onClick={() => onEditModeChange(block.key, false)}/>;
+    dangerouslySetInnerHTML={html} />;
 };
 
-var toEditor = function(services, userId, editMode, id) {
+var toEditor = function(services, userId: string, editMode: boolean, id: string, blockKey: string, onEditModeChange) {
 
-  return <EditorManager 
+  return <EmbeddedEditorManager 
+          onEditModeChange={onEditModeChange}
           key={id}
           editMode={editMode}
+          blockKey={blockKey}
           services={services} 
           userId={userId} 
           documentId={id}/>
@@ -52,7 +52,7 @@ var convert = function(services, userId, activeEditId: string, content, onEditMo
   return content.blocks.map(block => {
     if (block.type === 'atomic') {
       return toEditor(services, userId, activeEditId === block.key,
-        content.entityMap[block.entityRanges[0].key].data.id);
+        content.entityMap[block.entityRanges[0].key].data.id, block.key, onEditModeChange);
     } else {
       return toHtml(block, onEditModeChange);
     }
@@ -74,14 +74,14 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps {
   services: AppServices;
 
   blockKey?: string;
+
+  activeSubEditorKey?: string; 
   
 }
 
 export interface HtmlContentEditorState {
 
   activeContent: contentTypes.HtmlContent;
-
-  subEditKey: string;
 }
 
 /**
@@ -94,8 +94,7 @@ export abstract class HtmlContentEditor
     super(props);
 
     this.state = {
-      activeContent: this.props.content,
-      subEditKey: null
+      activeContent: this.props.content
     }
 
     this._onChange = this.onChange.bind(this);
@@ -115,24 +114,18 @@ export abstract class HtmlContentEditor
     }
   }
 
-  onSubEdit(key: string, mode: boolean) {
-    this.props.onEditModeChange(key, !mode);
-    this.setState({ subEditKey: key});
-  }
-
   render() : JSX.Element {
 
     if (this.props.editMode) {
       return ( 
         <ToolbarManager toolbar={this.props.children}>
           <DraftWrapper 
-              onEditModeChange={this.onSubEdit.bind(this)}
+              onEditModeChange={this.props.onEditModeChange}
               services={this.props.services}
               userId={this.props.userId}
               editHistory={this.props.editHistory} 
               content={this.state.activeContent} 
               locked={!this.props.editingAllowed}
-              subEditKey={this.state.subEditKey}
               onEdit={this._onChange} />
         </ToolbarManager>);
     } else {
@@ -143,7 +136,8 @@ export abstract class HtmlContentEditor
       // to guarantee that the rendered HTML looks the same as Draft editor 
       // rendered content
       const pureHtml = convert(this.props.services, this.props.userId, 
-        this.state.subEditKey, this.state.activeContent, this.props.onEditModeChange);
+        this.props.activeSubEditorKey, this.state.activeContent, this.props.onEditModeChange);
+      
       const outerStyle = {
         minHeight: '300px',
         padding: '10px'

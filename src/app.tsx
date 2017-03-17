@@ -15,6 +15,9 @@ import Main from './Main';
 import initRegistry from './activity/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 
+// Stylesheets
+import './stylesheets/main.scss';
+
 interface RR {
     Provider: any;
 }

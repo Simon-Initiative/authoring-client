@@ -96,7 +96,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
       const positionStyle = {
         position: 'absolute',
         top: this.state.toolbar.y,
-        left: this.state.toolbar.y
+        left: this.state.toolbar.x
       };
 
       toolbarAndContainer = <div style={positionStyle}>

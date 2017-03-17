@@ -38,46 +38,6 @@ function FoldOutButton(props)
     <a href="#" onClick={props.onClick}>Open</a>
   );
 }
-/**
- * 
- */
-function placeholderMenuHandler (props)
-{
-    console.log ("placeHolderMenuHanlder ()");
-}
-
-let options = [
-                {
-                    label: "My Courses",
-                    icon: "C",
-                    onclick: placeholderMenuHandler
-                },
-                {
-                    label: "Outline Editor",
-                    icon: "O",                            
-                    onclick: placeholderMenuHandler                        
-                },
-                { 
-                    label: "Learning Objectives",
-                    icon: "O",                            
-                    onclick: placeholderMenuHandler                        
-                },
-                {
-                    label: "Activity Editor",
-                    icon: "A",                            
-                    onclick: placeholderMenuHandler                        
-                },
-                {
-                    label: "Asset Manager",
-                    icon: "M",                            
-                    onclick: placeholderMenuHandler
-                },
-                {
-                    label: "Analytics",
-                    icon: "L",                            
-                    onclick: placeholderMenuHandler                        
-                }
-              ]; 
 
 // Nick, do whatever you feel you have to here
 const navbarStyles=
@@ -121,6 +81,18 @@ const navbarStyles=
     {
         margin: "0 0 0 14px",
         height: "24px"
+    },
+    sidebar: {
+        'padding-left': 0,
+        'padding-right': 0,
+        'position': 'fixed',
+        top: '51px',
+        bottom: 0,
+        left: 0,
+        'z-index': 1000,
+        'overflow-x': 'hidden',
+        'overflow-y': 'auto',
+        'border-right': '1px solid #eee'
     }
 };
 
@@ -129,6 +101,39 @@ const navbarStyles=
 */
 export default class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> 
 {    
+     opts = [
+                {
+                    label: "My Courses",
+                    icon: "C",
+                    onclick: this.placeholderMenuHandler
+                },
+                {
+                    label: "Outline Editor",
+                    icon: "O",                            
+                    onclick: this.placeholderMenuHandler                        
+                },
+                { 
+                    label: "Learning Objectives",
+                    icon: "O",                            
+                    onclick: this.placeholderMenuHandler                        
+                },
+                {
+                    label: "Activity Editor",
+                    icon: "A",                            
+                    onclick: this.placeholderMenuHandler                        
+                },
+                {
+                    label: "Asset Manager",
+                    icon: "M",                            
+                    onclick: this.placeholderMenuHandler
+                },
+                {
+                    label: "Analytics",
+                    icon: "L",                            
+                    onclick: this.placeholderMenuHandler                        
+                }
+              ];
+    
     constructor(props) 
     {     
         super(props);
@@ -148,6 +153,14 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
     }    
     
     /**
+     * 
+     */
+    placeholderMenuHandler (props)
+    {
+        console.log ("placeHolderMenuHanlder ()");
+    }    
+    
+    /**
      * We included this dedicated menu generator to ensure we could insert main menu options
      * dynamically from external data and even from a marktplace (yes we can)
      */
@@ -157,10 +170,10 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         
         if (closed==true)
         {
-           return ( options.map(item => <li key={item.label}><a onClick={item.onclick}>{item.icon}</a></li>));
+           return (this.opts.map(item => <li key={item.label}><a onClick={item.onclick}>{item.icon}</a></li>));
         } 
 
-        return (options.map(item => <li key={item.label}><a onClick={item.onclick}>{item.label}</a></li>));                
+        return (this.opts.map(item => <li key={item.label}><a onClick={item.onclick}>{item.label}</a></li>));        
     }
          
     /**
@@ -172,8 +185,8 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let mStyle = null;
         
         // Bad way of doing this, will be changed soon!
-        options [0].onclick=this.props.documentActions.viewAllCourses;
-        options [1].onclick=this.props.documentActions.viewOutlineEditor;
+        this.opts [0].onclick=this.props.documentActions.viewAllCourses;
+        this.opts [1].onclick=this.props.documentActions.viewOutlineEditor;
         
         if (this.state.closed==true) 
         {
@@ -189,15 +202,18 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let menuData=this.generateMenu(this.state.closed);
         
         return (
-                <div style={mStyle as any}>
-                    <div style={navbarStyles.mainMenu}>
-                        <ul style={navbarStyles.verticalMenu}>{menuData}
-                        </ul>
-                    </div>
-                    <div style={navbarStyles.bottomMenu}>                    
-                        {menuControl}
-                    </div>
-                </div>
+                <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+                    <ul className="nav nav-pills flex-column">
+                    {menuData}
+                    </ul>
+                    {/*  
+                    <ul className="nav nav-pills flex-column">
+                        <li className="nav-item">                    
+                            {menuControl}
+                        </li>
+                    </ul>
+                    */}
+                </nav>
             );
     }
 }

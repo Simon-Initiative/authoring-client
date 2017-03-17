@@ -60,7 +60,9 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
   }
 
   renderEdit(): JSX.Element {
-    return <p ref='text' onInput={this._onChange} contentEditable>{this.state.activeContent.text}</p>;
+    const html = { __html: this.state.activeContent.text };
+    return <div ref='text' onInput={this._onChange} 
+      contentEditable dangerouslySetInnerHTML={html}></div>;
   }
 
   render() : JSX.Element {

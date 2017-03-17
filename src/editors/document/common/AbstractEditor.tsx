@@ -33,6 +33,8 @@ export interface AbstractEditorProps<ModelType> {
   editMode: boolean;
 
   blockKey?: string;
+
+  activeSubEditorKey?: string; 
 }
 
 export interface AbstractEditorState {

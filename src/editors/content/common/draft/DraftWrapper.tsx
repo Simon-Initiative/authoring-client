@@ -28,7 +28,6 @@ export interface DraftWrapperProps {
   locked: boolean;
   userId: string;
   services: AppServices;
-  subEditKey: string;
 }
 
 
@@ -186,8 +185,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         component: ActivityFactory,
         editable: false,
         props: {
-          onEditMode: (editMode) => {
-            this.setState({inEdit: editMode});
+          onEditModeChange: (editMode) => {
             this.props.onEditModeChange(block.getKey(), editMode);
           },
           services: this.props.services,

@@ -1,0 +1,6 @@
+@import 'abstracts/variables';
+
+// Examples
+body { background: $primary; width: 100%; height: 100%; padding-top: 50px;}
+#app { margin: 0px; padding: 0px; width: 100%; height: 100%;}
+.sidebar .nav-link { border-radius: 0px; }
