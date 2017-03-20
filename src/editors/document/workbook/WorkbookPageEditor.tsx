@@ -5,7 +5,7 @@ import * as React from 'react';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import Toolbar from './Toolbar';
+import InlineToolbar from './InlineToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
@@ -65,11 +65,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
     
-    const inlineToolbar = <Toolbar 
+    const inlineToolbar = <InlineToolbar 
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
-    const blockToolbar = <Toolbar 
+    const blockToolbar = <InlineToolbar 
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;

@@ -7,14 +7,14 @@ import { insertActivity, toggleInlineStyle, AuthoringActionsHandler } from '../.
 import { titlesForEmbeddedResources } from '../../../data/domain';
 import ResourceSelection from '../../../components/selection/ResourceSelection';
 
-interface ToolbarProps {  
+interface InlineToolbarProps {  
   courseId: string; 
   services: AppServices;
   actionHandler: AuthoringActionsHandler;
   dismissToolbar?: () => void;  
 }
 
-interface Toolbar {
+interface InlineToolbar {
   onImage: () => void;
   onVideo: () => void;
   onAudio: () => void;
@@ -44,7 +44,7 @@ const Button = (props) => {
 }
 
 
-class Toolbar extends React.PureComponent<ToolbarProps, {}> {
+class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
   constructor(props) {
     super(props);
@@ -111,6 +111,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
 }
 
-export default Toolbar;
+export default InlineToolbar;
 
 

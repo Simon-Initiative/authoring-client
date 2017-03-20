@@ -8,7 +8,7 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { InlineAssessmentContentEditor } from '../../content/inline/InlineAssessmentContentEditor';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import Toolbar from '../workbook/Toolbar';
+import InlineToolbar from '../workbook/InlineToolbar';
 
 import * as models from '../../../data/models';
 
@@ -57,11 +57,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
-    const inlineToolbar = <Toolbar 
+    const inlineToolbar = <InlineToolbar 
               courseId={this.props.model.courseId}
               services={this.props.services} 
               actionHandler={this} />;
-    const blockToolbar = <Toolbar 
+    const blockToolbar = <InlineToolbar 
               courseId={this.props.model.courseId}
               services={this.props.services} 
               actionHandler={this} />;
