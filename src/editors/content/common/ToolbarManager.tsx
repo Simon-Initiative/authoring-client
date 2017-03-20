@@ -2,7 +2,9 @@ import * as React from 'react';
 import { SelectionState } from 'draft-js';
 import { determineChangeType, SelectionChangeType, hasSelection } from './draft/utils';
 
-const SHIFT = 16;
+const SHIFT_KEY = 16;
+const ENTER_KEY = 13; 
+const PADDING = 30;
 
 interface ToolbarManager {
   container: any;
@@ -47,6 +49,17 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   
   }
 
+  getCursorPosition() {
+    const selection = document.getSelection();
+    const range = document.createRange();
+    range.selectNode(selection.anchorNode);
+    const rect = range.getBoundingClientRect();
+    return {
+      x: rect.left,
+      y: rect.top
+    };
+  }
+
   getPosition() {
     const selection = document.getSelection();
     if (selection.rangeCount === 0) return null;
@@ -71,6 +84,9 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
 
   componentWillReceiveProps(nextProps: ToolbarManagerProps) {
 
+    // When the selection state changes, we either show or hide the
+    // inline style toolbar: 
+    
     const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
     if (changeType === SelectionChangeType.Selection) {  
       if (hasSelection(nextProps.selectionState)) {
@@ -97,18 +113,30 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   }
 
   onKeyDown(e) {
-    if (e.keyCode === SHIFT) {
+    if (e.keyCode === SHIFT_KEY) {
       this.shiftPressed = true;
-    }
+    } 
   }
 
   onKeyUp(e) {
-    if (e.keyCode === SHIFT) {
+    
+    if (e.keyCode === SHIFT_KEY) {
       this.shiftPressed = false;
 
       if (this.state.x !== null) {
         this.setState({show: true});
       }
+
+    } else if (e.keyCode === ENTER_KEY) {
+      // Every time the user presses 'Enter', we display
+      // the block toolbar just below their cursor
+      const point = this.getCursorPosition();
+      this.setState({
+        show: true, 
+        x: point.x, 
+        y: point.y + PADDING, 
+        component: this.props.blockToolbar
+      });        
     }
   }
 
