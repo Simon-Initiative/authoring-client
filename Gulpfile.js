@@ -46,6 +46,12 @@ var port = 9000;
 gulp.task('setupDist', function() {
   setupLog("Setup for dist: Copying files to " + config.distDir);
 
+  gulp.src('./icons/style.css')
+        .pipe(gulp.dest(config.distDir + '/assets'));
+
+  gulp.src('./icons/fonts/icomoon*')
+        .pipe(gulp.dest(config.distDir + '/assets'));
+
   var patterns = ["./index.html",
                   "/../assets/*",                   
                   config.srcDir + '/vendor/**/*.*'];
@@ -59,6 +65,12 @@ gulp.task('setupDist', function() {
 
 gulp.task('setupDev', function() {
   setupLog("Setup for dev: Copying files to " + config.devDir);
+
+   gulp.src('./icons/style.css')
+        .pipe(gulp.dest(config.devDir + '/assets'));
+
+  gulp.src('./icons/fonts/icomoon*')
+        .pipe(gulp.dest(config.devDir + '/assets'));
 
   var patterns = [config.srcDir + "/../index.html",
                   config.srcDir + "/../assets/*",
