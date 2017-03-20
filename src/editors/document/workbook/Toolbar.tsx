@@ -30,9 +30,15 @@ const Separator = (props) => <span>&nbsp;</span>;
 const Button = (props) => {
   const { action, icon } = props;
   const iconClasses = 'icon icon-' + icon;
+  const style = {
+    color: 'white'
+  }
+  const buttonStyle = {
+    backgroundColor: 'black'
+  }
   return (
-    <button onClick={() => action()} type="button" className="btn btn-secondary">
-      <i className={iconClasses}></i>
+    <button onClick={() => action()} type="button" className="btn" style={buttonStyle}>
+      <i style={style} className={iconClasses}></i>
     </button>
   );
 }
@@ -75,7 +81,6 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
   }
 
   toggleInlineStyle(style) {
-    console.log('toggle');
     this.props.actionHandler.handleAction(toggleInlineStyle(style));
     this.props.dismissToolbar();
   }
@@ -85,18 +90,17 @@ class Toolbar extends React.PureComponent<ToolbarProps, {}> {
   }
 
   render() {
+    const style = {
+      boxShadow: "5px 5px 5px #888888"
+    }
     return (
-      <div ref={(c) => this.component = c} onBlur={this._onBlur} className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-        <div className="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+      <div style={style} ref={(c) => this.component = c} onBlur={this._onBlur} className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div className="btn-group btn-group-sm" role="group" aria-label="First group">
           <Button action={() => this.toggleInlineStyle('BOLD')} icon="bold"/>
           <Button action={() => this.toggleInlineStyle('ITALIC')} icon="italic"/>
           <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
-        </div>
-        <div className="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
           <Button action={() => this.toggleInlineStyle('KBD')} icon="terminal"/>
           <Button action={() => this.toggleInlineStyle('CODE')} icon="code"/>
-        </div>
-        <div className="btn-group btn-group-sm mr-2" role="group" aria-label="Third group">
           <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="list-ol"/>
           <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="list-ul"/>
           <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="link"/>

@@ -86,7 +86,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
 
     // When the selection state changes, we either show or hide the
     // inline style toolbar: 
-    
+
     const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
     if (changeType === SelectionChangeType.Selection) {  
       if (hasSelection(nextProps.selectionState)) {
@@ -96,7 +96,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
           if (topRect !== null) {
 
             const show = !this.shiftPressed;
-            this.setState({show, x: topRect.left, y: topRect.top - 20, component: this.props.inlineToolbar});
+            this.setState({show, x: topRect.left, y: topRect.top - PADDING, component: this.props.inlineToolbar});
           } else {
             this.setState({ show: false, x: null, y: null});
           }
