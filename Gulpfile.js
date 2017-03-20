@@ -50,7 +50,7 @@ gulp.task('setupDist', function() {
         .pipe(gulp.dest(config.distDir + '/assets'));
 
   gulp.src('./icons/fonts/icomoon*')
-        .pipe(gulp.dest(config.distDir + '/assets'));
+        .pipe(gulp.dest(config.distDir + '/assets/fonts'));
 
   var patterns = ["./index.html",
                   "/../assets/*",                   
@@ -70,7 +70,7 @@ gulp.task('setupDev', function() {
         .pipe(gulp.dest(config.devDir + '/assets'));
 
   gulp.src('./icons/fonts/icomoon*')
-        .pipe(gulp.dest(config.devDir + '/assets'));
+        .pipe(gulp.dest(config.devDir + '/assets/fonts'));
 
   var patterns = [config.srcDir + "/../index.html",
                   config.srcDir + "/../assets/*",
