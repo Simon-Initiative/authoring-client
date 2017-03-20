@@ -60,6 +60,14 @@ const styles = {
   }
 };
 
+const styleMap = {
+  CODE: {
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
+    fontSize: 16,
+    padding: 2,
+  },
+};
 
 const blockRenderMap = Immutable.Map({
   'header-one': { element: 'h1' },
@@ -218,12 +226,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   toggleInlineStyle(inlineStyle) {
-    this.onChange(
-      RichUtils.toggleInlineStyle(
-        this.state.editorState,
-        inlineStyle
-      )
-    );
+
+    const updateStyle = RichUtils.toggleInlineStyle(this.state.editorState, inlineStyle);
+
+    const key : string = this.state.editorState.getSelection().getAnchorKey();
+    const clearedSelection = EditorState.acceptSelection(updateStyle, SelectionState.createEmpty(key))
+
+    this.onChange(clearedSelection);
   }
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
@@ -262,20 +271,18 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
 
   render() {
-    const toolbar = null;
     return <div 
-      style={styles.editor} 
-      onClick={this.focus}>
+        style={styles.editor} 
+        onClick={this.focus}>
 
         <Editor ref="editor"
+          
           handleKeyCommand={this.handleKeyCommand}
           blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.inEdit || this.props.locked}
           onChange={this.onChange} />
-
-        {toolbar}
 
       </div>;
   }

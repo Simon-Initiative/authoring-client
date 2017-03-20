@@ -14,7 +14,6 @@ import { htmlContentToDraft } from '../common/draft/translate';
 
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
-  _onBlur: () => void; 
   container: any;
 }
 
@@ -103,7 +102,6 @@ export abstract class HtmlContentEditor
     }
 
     this._onChange = this.onChange.bind(this);
-    this._onBlur = this.onBlur.bind(this);
     this.container = null; 
   }
 
@@ -112,17 +110,13 @@ export abstract class HtmlContentEditor
     this.props.onEdit(content);
   } 
 
-  onBlur() {
-    this.setState({
-      selectionState: SelectionState.createEmpty('fakeKey')
-    })
-  }
+  
 
   render() : JSX.Element {
 
     if (this.props.editMode) {
       return (
-        <div onBlur={this._onBlur}>
+        <div>
           <ToolbarManager selectionState={this.state.selectionState} 
             inlineToolbar={this.props.inlineToolbar}
             blockToolbar={this.props.blockToolbar}

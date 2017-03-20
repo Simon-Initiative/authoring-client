@@ -6,8 +6,6 @@ const SHIFT = 16;
 
 interface ToolbarManager {
   container: any;
-  _onMouseUp: () => void;
-  _onMouseDown: () => void; 
   _onKeyDown: () => void;
   _onKeyUp: () => void;
   mouseDown: boolean; 
@@ -37,8 +35,6 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
     this.mouseDown = false;
     this.shiftPressed = false;
 
-    this._onMouseDown = this.onMouseDown.bind(this);
-    this._onMouseUp = this.onMouseUp.bind(this);
     this._onKeyDown = this.onKeyDown.bind(this);
     this._onKeyUp = this.onKeyUp.bind(this);
 
@@ -76,7 +72,6 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   componentWillReceiveProps(nextProps: ToolbarManagerProps) {
 
     const changeType : SelectionChangeType = determineChangeType(this.props.selectionState, nextProps.selectionState);
-    
     if (changeType === SelectionChangeType.Selection) {  
       if (hasSelection(nextProps.selectionState)) {
         const selection = document.getSelection();
@@ -84,13 +79,13 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
           let topRect = this.getPosition();
           if (topRect !== null) {
 
-            const show = !this.mouseDown && !this.shiftPressed;
+            const show = !this.shiftPressed;
             this.setState({show, x: topRect.left, y: topRect.top - 20, component: this.props.inlineToolbar});
           } else {
             this.setState({ show: false, x: null, y: null});
           }
         }
-      } else {
+      } else {   
         this.setState({ show: false, x: null, y: null});
       }
       
@@ -99,19 +94,6 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
       this.setState({ show: false, x: null, y: null});
     } 
 
-  }
-
-  onMouseDown() {
-    this.mouseDown = true;
-    this.setState({show: false});
-  }
-
-  onMouseUp() {
-    this.mouseDown = false; 
-    
-    if (this.state.x !== null) {
-      this.setState({show: true});
-    }
   }
 
   onKeyDown(e) {
@@ -156,8 +138,6 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
     return <div ref={(container => this.container = container)} 
             onKeyUp={this._onKeyUp}
             onKeyDown={this._onKeyDown}
-            onMouseDown={this._onMouseDown}
-            onMouseUp={this._onMouseUp}
             >
             {this.props.children}
             {toolbarAndContainer}
