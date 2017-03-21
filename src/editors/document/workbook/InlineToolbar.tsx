@@ -3,9 +3,7 @@
 import * as React from 'react';
 
 import { AppServices } from '../../common/AppServices';
-import { insertActivity, toggleInlineStyle, AuthoringActionsHandler } from '../../../actions/authoring';
-import { titlesForEmbeddedResources } from '../../../data/domain';
-import ResourceSelection from '../../../components/selection/ResourceSelection';
+import { toggleInlineStyle, AuthoringActionsHandler } from '../../../actions/authoring';
 
 interface InlineToolbarProps {  
   courseId: string; 
@@ -15,11 +13,6 @@ interface InlineToolbarProps {
 }
 
 interface InlineToolbar {
-  onImage: () => void;
-  onVideo: () => void;
-  onAudio: () => void;
-  onYouTube: () => void;
-  onActivity: () => void;
   _onBlur: () => void;
   component: any;
 }
@@ -50,26 +43,6 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
     super(props);
 
     this._onBlur = this.onBlur.bind(this);
-
-    this.onActivity = () => {
-        this.props.services.displayModal(
-            <ResourceSelection
-              query={titlesForEmbeddedResources(this.props.courseId)}
-              onInsert={(resource) => {
-                const data = {
-                  id: resource.id
-                };
-                this.props.actionHandler.handleAction(insertActivity('document', data));
-                this.props.services.dismissModal();
-                this.props.dismissToolbar();
-              }} 
-              onCancel={() => {
-                this.props.services.dismissModal();
-                this.props.dismissToolbar();
-              }}/>
-        );
-    };
-
   }
 
   onBlur() {

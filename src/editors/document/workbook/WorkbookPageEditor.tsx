@@ -6,6 +6,7 @@ import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../commo
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar from './InlineToolbar';
+import BlockToolbar from './BlockToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
@@ -69,7 +70,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
-    const blockToolbar = <InlineToolbar 
+    const blockToolbar = <BlockToolbar 
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;

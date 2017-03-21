@@ -4,6 +4,7 @@ import { determineChangeType, SelectionChangeType, hasSelection } from './draft/
 
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
+const ALT_KEY = 18; 
 const PADDING = 30;
 
 interface ToolbarManager {
@@ -115,7 +116,15 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
   onKeyDown(e) {
     if (e.keyCode === SHIFT_KEY) {
       this.shiftPressed = true;
-    } 
+    } else if (e.keyCode === ALT_KEY) {
+      const point = this.getCursorPosition();
+      this.setState({
+        show: true, 
+        x: point.x, 
+        y: point.y + PADDING, 
+        component: this.props.blockToolbar
+      });        
+    }
   }
 
   onKeyUp(e) {
@@ -137,6 +146,8 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
         y: point.y + PADDING, 
         component: this.props.blockToolbar
       });        
+    } else if (e.keyCode === ALT_KEY) {
+      this.setState({show: false, x: null, y: null});
     }
   }
 

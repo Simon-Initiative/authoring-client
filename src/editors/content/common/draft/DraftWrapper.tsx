@@ -244,6 +244,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.toggleInlineStyle(action.style);
       } else if (action.type === 'INSERT_ACTIVITY') {
         this.insertActivity(action.activityType, action.data);
+      } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
+        this.toggleBlockType(action.blockType);
       }
     } 
   }
@@ -268,6 +270,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           ' '
         ));
     }
+
+  toggleBlockType(type) {
+    const updateStyle = RichUtils.toggleBlockType(this.state.editorState, type);
+    this.onChange(updateStyle);
+  }
 
 
   render() {
