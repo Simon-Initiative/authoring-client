@@ -99,6 +99,12 @@ const ActivityFactory = (props) => {
   return React.createElement((viewer as any), childProps);
 };
 
+function myBlockStyleFn(contentBlock) {
+  const type = contentBlock.getType();
+  if (type === 'code-block') {
+    return 'customCodeBlock';
+  }
+}
 
 function findLinkEntities(contentBlock, callback, contentState) {
   contentBlock.findEntityRanges(
@@ -283,7 +289,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         onClick={this.focus}>
 
         <Editor ref="editor"
-          
+          blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
           blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
