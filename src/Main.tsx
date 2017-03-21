@@ -13,8 +13,9 @@ import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
 import * as viewActions from './actions/view';
 import { CurrentView } from './reducers/view';
-import * as persistence from './data/persistence';
 
+import Header from './components/Header';
+import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
@@ -162,35 +163,14 @@ class Main extends React.Component<MainProps, {}> {
   render(): JSX.Element {      
 
     const modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
-    
+    const mainView = this.getView(this.props.view);
+
     return (
       <div>
-      {modalDisplay}
-		
-      {/* Navigation Bar START */}		
-			<div className="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-				<img src="assets/oli-icon.png" style={mainStyle.logo} />
-        <a className="navbar-brand" href="#">OLI Dashboard</a>
-				<div className="collapse navbar-collapse" id="navbarsExampleDefault">
-                {/* Top level navigation if needed
-                    <ul className="navbar-nav mr-auto">
-                      <li className="nav-item active">
-                        <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">Settings</a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">Profile</a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link" href="#">Help</a>
-                      </li>
-                    </ul>
-                */}
-        </div>
-			</div>	
-      {this.getView(this.props.view)}
+        {modalDisplay}
+        <Header dispatch={this.props.dispatch}/>
+        {mainView}
+        <Footer dispatch={this.props.dispatch}/>
       </div>
     )
   }

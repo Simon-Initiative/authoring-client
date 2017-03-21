@@ -52,19 +52,16 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     });
 
     return (
-      <div>
-      <h1>Courses</h1>
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>Course</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>
-      </div>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Course</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
     );
   }
   
