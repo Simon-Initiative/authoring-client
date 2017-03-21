@@ -20,8 +20,7 @@ export module user {
     type: LOGIN_SUCCESS,
     username: string,
     userId: string,
-    profile: Object,
-    availableCourses: Object[]
+    profile: Object
   }
 
   export type loginFailureAction = {
@@ -29,13 +28,12 @@ export module user {
   }
 
   export function loginSuccess(username: string, userId: string,
-    profile: Object, availableCourses: Object[]) : loginSuccessAction {
+    profile: Object) : loginSuccessAction {
     return {
       type: LOGIN_SUCCESS,
       username,
       userId,
-      profile,
-      availableCourses
+      profile
     }
   }
 
@@ -75,14 +73,7 @@ export module user {
         credentials.user = user;
         credentials.password = password;
 
-        persistence.queryDocuments(coursesQuery(userId))
-          .then(docs => {
-            let courses = docs.map(result => (result as any).courseId);
-            dispatch(loginSuccess(username, userId, {}, courses));
-          })
-          .catch(err => {
-            dispatch(loginFailure());
-          });
+        dispatch(loginSuccess(username, userId, {}));
 
       })
       .catch(err => {

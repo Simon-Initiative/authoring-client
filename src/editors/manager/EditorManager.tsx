@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as viewActions from '../../actions/view';
+import * as courseActions from '../../actions/course';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices } from '../common/AppServices';
 import { PersistenceStrategy, 
@@ -35,6 +36,8 @@ interface EditorManager {
 }
 
 export interface EditorManagerProps {
+
+  dispatch: any;
 
   documentId: string;
 
@@ -121,6 +124,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     persistence.retrieveDocument(documentId)
       .then(document => {
         this.lastSavedDocument = document;
+
+        // Notify that the course may have changed
+        this.props.dispatch(courseActions.changeCourse((document.model as any).courseId));
 
         // Tear down previous persistence strategy
         if (this.persistenceStrategy !== null) {

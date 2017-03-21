@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as persistence from '../data/persistence';
 import * as viewActions from '../actions/view';
-import { titlesForCoursesQuery } from '../data/domain';
+import { titlesForCoursesQuery, coursesQuery } from '../data/domain';
 
 interface CoursesView {
   onSelect: (id) => void;
@@ -14,7 +14,7 @@ type CourseDescription = {
 }
 
 export interface CoursesViewProps {
-  courseIds: string[];
+  userId: string; 
   dispatch: any;
 }
 
@@ -31,13 +31,17 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
   componentDidMount() {
 
-    persistence.queryDocuments(titlesForCoursesQuery(this.props.courseIds))
+    persistence.queryDocuments(coursesQuery(this.props.userId))
+      .then(docs => {
+        const courseIds = docs.map(result => (result as any).courseId);
+        return persistence.queryDocuments(titlesForCoursesQuery(courseIds))
+      })
       .then(docs => {
         let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title.text}));
         this.setState({ courses });
       })
       .catch(err => {
-
+        console.log(err);
       });
   }  
 

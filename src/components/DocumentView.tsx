@@ -32,6 +32,7 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
             <NavigationBar viewActions={this.viewActions} />
             <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
               <EditorManager 
+                dispatch={this.props.dispatch}
                 services={this.services} 
                 userId={this.props.userId} 
                 documentId={this.props.documentId}/>;

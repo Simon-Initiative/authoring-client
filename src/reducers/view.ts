@@ -37,6 +37,7 @@ type ViewAction =
   userActions.loginSuccessAction | 
   OtherAction
 
+
 export function view(state : CurrentView = defaultView, action: ViewAction): CurrentView {
   switch(action.type) {
   case viewActions.VIEW_DOCUMENT:
