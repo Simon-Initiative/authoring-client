@@ -26,15 +26,13 @@ function mapStateToProps(state: any) {
   const {
     user,
     modal,
-    view,
-    courses
+    view
   } = state;
 
   return {
     user, 
     modal,
-    view,
-    courses
+    view
   }
 }
 
