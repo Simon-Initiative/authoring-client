@@ -125,9 +125,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       .then(document => {
         this.lastSavedDocument = document;
 
-        // Notify that the course may have changed
-        this.props.dispatch(courseActions.changeCourse((document.model as any).courseId));
-
+        // Notify that the course has changed when a user views a course
+        if (document.model.modelType === models.ModelTypes.CourseModel) {
+          this.props.dispatch(courseActions.courseChanged(documentId, 
+            document.model.organizations.get(0)));
+        }
+        
         // Tear down previous persistence strategy
         if (this.persistenceStrategy !== null) {
           this.persistenceStrategy.destroy()

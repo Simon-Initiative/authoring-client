@@ -9,9 +9,9 @@ import { OtherAction } from './utils';
 
 export type CurrentView = 
   LoginView |
-  DocumentView |
   CreateCourseView |
-  AllCoursesView;
+  AllCoursesView |
+  DocumentView;
 
 export type LoginView = {
   type: 'LoginView'

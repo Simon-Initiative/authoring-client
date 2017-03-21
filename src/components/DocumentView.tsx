@@ -35,11 +35,11 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
                 dispatch={this.props.dispatch}
                 services={this.services} 
                 userId={this.props.userId} 
-                documentId={this.props.documentId}/>;
+                documentId={this.props.documentId}/>
             </div>
         </div>
       </div>
-    );
+    )
   }
   
 }
