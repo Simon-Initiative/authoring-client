@@ -1,7 +1,7 @@
 import * as types from '../../data/types';
 
 import {modalActions} from '../../actions/modal';
-import {document as documentActions} from '../../actions/document';
+import * as viewActions from '../../actions/view';
 
 /**
  * An interface that defines the  'services' that are available to 
@@ -35,7 +35,7 @@ export class DispatchBasedServices implements AppServices {
   }
 
   viewDocument(documentId: string) {
-    this.dispatch(documentActions.viewDocument(documentId));
+    this.dispatch(viewActions.viewDocument(documentId));
   }
 
   displayModal(component: any) {

@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import * as persistence from '../data/persistence';
-import { document as documentActions } from '../actions/document';
+import * as viewActions from '../actions/view';
 import { titlesForCoursesQuery } from '../data/domain';
 
-interface Courses {
+interface CoursesView {
   onSelect: (id) => void;
 }
 
@@ -13,19 +13,19 @@ type CourseDescription = {
   title: string
 }
 
-export interface CoursesProps {
+export interface CoursesViewProps {
   courseIds: string[];
   dispatch: any;
 }
 
-class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescription[]}> {
+class CoursesView extends React.PureComponent<CoursesViewProps, { courses: CourseDescription[]}> {
 
   constructor(props) {
     super(props);
 
     this.state = { courses: []};
     this.onSelect = (id) => {
-      this.props.dispatch(documentActions.viewDocument(id));
+      this.props.dispatch(viewActions.viewDocument(id));
     }
   }
 
@@ -71,6 +71,6 @@ class Courses extends React.PureComponent<CoursesProps, { courses: CourseDescrip
 
 }
 
-export default Courses;
+export default CoursesView;
 
 

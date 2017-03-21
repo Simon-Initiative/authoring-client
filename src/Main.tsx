@@ -11,36 +11,36 @@ import { bindActionCreators } from 'redux';
 
 import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
-import { document as documentActions } from './actions/document';
-
+import * as viewActions from './actions/view';
+import { CurrentView } from './reducers/view';
 import * as persistence from './data/persistence';
 
-import NavigationBar from './components/NavigationBar';
-import Courses from './components/Courses';
-import EditorManager from './editors/manager/EditorManager';
-import { AppServices, DispatchBasedServices } from './editors/common/AppServices';
+import CoursesView from './components/CoursesView';
+import DocumentView from './components/DocumentView';
+import LoginView from './components/LoginView';
+import CreateCourseView from './components/CreateCourseView';
 
 function mapStateToProps(state: any) {
 
   const {
     user,
     modal,
-    document,
+    view,
     courses
   } = state;
 
   return {
     user, 
     modal,
-    document,
+    view,
     courses
   }
 }
 
 interface Main {
   modalActions: Object;
-  documentActions: Object;
-  services: AppServices;
+  viewActions: Object;
+  
 }
 
 interface MainOwnProps {
@@ -130,11 +130,9 @@ class Main extends React.Component<MainProps, {}> {
 
   constructor(props) {
     super(props);
-
-    this.services = new DispatchBasedServices(this.props.dispatch);
-
+    
     this.modalActions = bindActionCreators((modalActions as any), this.props.dispatch);
-    this.documentActions = bindActionCreators((documentActions as any), this.props.dispatch);
+    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
   componentDidMount() {
@@ -142,36 +140,37 @@ class Main extends React.Component<MainProps, {}> {
     this.props.dispatch(userActions.login(user, user));
   }
 
-  getView(documentId: string): JSX.Element 
-  {
-      console.log ("getView ()");
+  getView(view: CurrentView): JSX.Element {
+    console.log ("getView ()");
       
-    if (documentId === documentActions.VIEW_ALL_COURSES) {
-      return <Courses dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
+    switch (view.type) {
+      case 'LoginView':
+        return <LoginView dispatch={this.props.dispatch} />
+      case 'DocumentView':
+        return <DocumentView 
+            dispatch={this.props.dispatch}
+            userId={this.props.user.userId} 
+            documentId={view.documentId}/>;
+      case 'CreateCourseView':
+        return <CreateCourseView dispatch={this.props.dispatch} />
+      case 'AllCoursesView':
+        return <CoursesView dispatch={this.props.dispatch} courseIds={this.props.courses}/>;
     }
-    else if (documentId !== null) {
-      return <EditorManager 
-        services={this.services} 
-        userId={this.props.user.userId} 
-        documentId={this.props.document}/>;
-    } else {
-      return null;  // TODO replace with welcome / logon screen
-    }
+    
   }
 
-  render(): JSX.Element 
-  {      
-    let modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
+  render(): JSX.Element {      
+
+    const modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     
     return (
       <div>
-            
-            {/* {modalDisplay} */}
+      {modalDisplay}
 		
-            {/* Navigation Bar START */}		
+      {/* Navigation Bar START */}		
 			<div className="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
 				<img src="assets/oli-icon.png" style={mainStyle.logo} />
-                <a className="navbar-brand" href="#">OLI Dashboard</a>
+        <a className="navbar-brand" href="#">OLI Dashboard</a>
 				<div className="collapse navbar-collapse" id="navbarsExampleDefault">
                 {/* Top level navigation if needed
                     <ul className="navbar-nav mr-auto">
@@ -189,23 +188,9 @@ class Main extends React.Component<MainProps, {}> {
                       </li>
                     </ul>
                 */}
-                </div>
+        </div>
 			</div>	
-            {/* Navigation Bar END */}	
-
-            {/* Main Container START */}
-            <div className="container-fluid">
-                <div className="row">
-                    {/* Sidebar START */}
-                    <NavigationBar documentActions={this.documentActions} />
-                    {/* Sidebar END */}
-                    <main className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
-                      {this.getView(this.props.document)}
-                    </main>
-                </div>
-            </div>
-        {/* Main Container END */}
-		
+      {this.getView(this.props.view)}
       </div>
     )
   }

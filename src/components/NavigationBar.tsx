@@ -14,9 +14,8 @@ interface NavigationBarState
 /**
 *
 */
-export interface NavigationBarProps 
-{
-  documentActions: any;
+export interface NavigationBarProps {
+  viewActions: any;
 }
 
 /**
@@ -185,8 +184,8 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let mStyle = null;
         
         // Bad way of doing this, will be changed soon!
-        this.opts [0].onclick=this.props.documentActions.viewAllCourses;
-        this.opts [1].onclick=this.props.documentActions.viewOutlineEditor;
+        this.opts [0].onclick=this.props.viewActions.viewAllCourses;
+        this.opts [1].onclick=this.props.viewActions.viewOutlineEditor;
         
         if (this.state.closed==true) 
         {
