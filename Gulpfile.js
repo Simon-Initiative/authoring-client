@@ -111,11 +111,14 @@ gulp.task('clean:dev', function() {
 gulp.task('build', function(callback) {
   // run webpack
   webpack(webpackDistConfig, function(err, stats) {
-      if(err) callback(err);
-      gutil.log("[build]", stats.toString({
-          // output options
-      }));
-      callback();
+      if(stats.hasErrors()) {
+        var json = stats.toJson();
+
+        console.log(json.errors.reduce((p, c) => p + '\n' + c, ''));
+        callback(json.errors.reduce((p, c) => p + '\n' + c, ''));
+      } else {
+        callback();
+      }
   });
 });
 
