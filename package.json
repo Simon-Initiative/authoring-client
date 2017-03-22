@@ -57,7 +57,9 @@
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2",
     "whatwg-fetch": "^2.0.2",
-    "yargs": "^6.6.0"
+    "yargs": "^6.6.0",
+    "react-addons-shallow-compare": "^15.3.0",
+    "react-sortable-tree": "^0.1.12"
   },
   "devDependencies": {
     "jasmine": "^2.5.3",
