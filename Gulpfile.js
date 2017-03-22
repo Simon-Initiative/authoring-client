@@ -111,7 +111,7 @@ gulp.task('clean:dev', function() {
 gulp.task('build', function(callback) {
   // run webpack
   webpack(webpackDistConfig, function(err, stats) {
-      if(err) throw new gutil.PluginError("build", err);
+      if(err) callback(err);
       gutil.log("[build]", stats.toString({
           // output options
       }));
