@@ -22,6 +22,13 @@ export function hasSelection(ss: SelectionState) {
   }
 }
 
+export function removeHTML(text : string) : string {
+  return text
+    .replace(/<\/div>/i, '')
+    .replace(/<div>/i, '\n');
+}
+
+
 export function determineChangeType(previous: SelectionState, current: SelectionState) : SelectionChangeType {
 
   if (previous === null) {

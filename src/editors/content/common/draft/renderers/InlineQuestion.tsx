@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import * as persistence from '../data/persistence'
+import * as persistence from '../../../../../data/persistence'
 
 interface InlineQuestion {
   currentAnswer: boolean;

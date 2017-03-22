@@ -6,13 +6,14 @@ import * as Immutable from 'immutable';
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 import { determineChangeType, SelectionChangeType } from './utils';
+import { BlockProps } from './renderers/properties';
 import * as translate from './translate';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 
 import { HtmlContent } from '../../../../data/contentTypes';
 
-import { getActivityByName, Activity } from '../../../../activity/registry';
+import { getActivityByName, BlockRenderer } from './renderers/registry';
 
 interface DraftWrapper {
   onChange: any;
@@ -36,7 +37,7 @@ export interface DraftWrapperProps {
 
 interface DraftWrapperState {
   editorState: EditorState;
-  inEdit: boolean;
+  lockedByBlockRenderer: boolean;
 }
 
 const styles = {
@@ -85,7 +86,7 @@ const blockRenderMap = Immutable.Map({
 });
 
 
-const ActivityFactory = (props) => {
+const BlockRendererFactory = (props) => {
   const entity = props.contentState.getEntity(
     props.block.getEntityAt(0)
   );
@@ -175,7 +176,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, decorator),
-      inEdit: false
+      lockedByBlockRenderer: false
     };
     
     this.onChange = (editorState) => {
@@ -206,9 +207,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   blockRenderer(block) {
     if (block.getType() === 'atomic') {
       return {
-        component: ActivityFactory,
+        component: BlockRendererFactory,
         editable: false,
         props: {
+          onLockChange: (locked) => {
+            this.setState({ lockedByBlockRenderer: locked });
+          },
           onEditModeChange: (editMode) => {
             this.props.onEditModeChange(block.getKey(), editMode);
           },
@@ -294,7 +298,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
-          readOnly={this.state.inEdit || this.props.locked}
+          readOnly={this.state.lockedByBlockRenderer || this.props.locked}
           onChange={this.onChange} />
 
       </div>;

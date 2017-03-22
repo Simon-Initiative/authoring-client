@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import EmbeddedEditorManager from '../editors/manager/EmbeddedEditorManager';
+import EmbeddedEditorManager from '../../../../../editors/manager/EmbeddedEditorManager';
 
 export const EmbeddedDocument = (props) => {
   return (

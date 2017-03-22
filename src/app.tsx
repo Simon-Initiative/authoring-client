@@ -12,7 +12,7 @@ var createLogger = require('redux-logger');
 import { getUserName } from './utils/params';
 import rootReducer from './reducers';
 import Main from './Main';
-import initRegistry from './activity/registrar';
+import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 
 // Stylesheets
