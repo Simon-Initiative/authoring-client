@@ -113,9 +113,8 @@ gulp.task('build', function(callback) {
   webpack(webpackDistConfig, function(err, stats) {
       if(stats.hasErrors()) {
         var json = stats.toJson();
-
         console.log(json.errors.reduce((p, c) => p + '\n' + c, ''));
-        callback(json.errors.reduce((p, c) => p + '\n' + c, ''));
+        callback('Errors');
       } else {
         callback();
       }
