@@ -42,7 +42,7 @@ const defaultView : LoginView = {
 type ViewAction = 
   viewActions.viewDocumentAction |
   viewActions.viewAllCoursesAction |
-  viewActions.viewOrganization |
+  viewActions.viewOrganizationAction |
   userActions.loginSuccessAction | 
   OtherAction
 
