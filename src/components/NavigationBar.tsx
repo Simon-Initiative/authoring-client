@@ -185,7 +185,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         
         // Bad way of doing this, will be changed soon!
         this.opts [0].onclick=this.props.viewActions.viewAllCourses;
-        this.opts [1].onclick=this.props.viewActions.viewOutlineEditor;
+        this.opts [1].onclick=this.props.viewActions.viewOrganization;
         
         if (this.state.closed==true) 
         {

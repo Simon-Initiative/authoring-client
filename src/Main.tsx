@@ -20,6 +20,7 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
 import CreateCourseView from './components/CreateCourseView';
+import CreateOrganizationView from './components/CreateOrganizationView';
 
 function mapStateToProps(state: any) {
 
@@ -63,8 +64,8 @@ class Main extends React.Component<MainProps, {}> {
     this.props.dispatch(userActions.login(user, user));
   }
 
-  getView(view: CurrentView): JSX.Element {
-      
+  getView(view: CurrentView): JSX.Element { 
+    console.log ("getView ("+view.type+")");
     switch (view.type) {
       case 'LoginView':
         return <LoginView dispatch={this.props.dispatch} />
@@ -77,6 +78,10 @@ class Main extends React.Component<MainProps, {}> {
         return <CreateCourseView dispatch={this.props.dispatch} />
       case 'AllCoursesView':
         return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;
+      case 'OrganizationView':
+        return <CreateOrganizationView dispatch={this.props.dispatch}
+                                       userId={this.props.user.userId} 
+                                       documentId={view.documentId} />            
     }
     
   }
