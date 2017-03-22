@@ -204,6 +204,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
+  processBlockEdit(block, data) {
+
+    const content = this.state.editorState.getCurrentContent();
+
+    var entityKey = block.getEntityAt(0);
+    var newContentState = content.mergeEntityData(entityKey, data);
+
+    const htmlContent : HtmlContent = translate.draftToHtmlContent(newContentState);
+    this.props.onEdit(htmlContent);
+  }
+
   blockRenderer(block) {
     if (block.getType() === 'atomic') {
       return {
@@ -215,6 +226,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           onEditModeChange: (editMode) => {
             this.props.onEditModeChange(block.getKey(), editMode);
+          },
+          onEdit: (data) => {
+            this.processBlockEdit(block, data);
           },
           services: this.props.services,
           userId: this.props.userId

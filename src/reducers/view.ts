@@ -11,8 +11,7 @@ export type CurrentView =
   LoginView |
   CreateCourseView |
   AllCoursesView |
-  DocumentView |
-  OrganizationView;
+  DocumentView;
 
 export type LoginView = {
   type: 'LoginView'
@@ -29,12 +28,6 @@ export type AllCoursesView = {
   type: 'AllCoursesView'
 }
 
-export type OrganizationView = 
-{
-  type: 'OrganizationView',
-  documentId: string
-}
-
 const defaultView : LoginView = {
   type: 'LoginView'
 }
@@ -42,25 +35,18 @@ const defaultView : LoginView = {
 type ViewAction = 
   viewActions.viewDocumentAction |
   viewActions.viewAllCoursesAction |
-  viewActions.viewOrganizationAction |
   userActions.loginSuccessAction | 
   OtherAction
 
-
-export function view(state : CurrentView = defaultView, action: ViewAction): CurrentView 
-{
-    switch(action.type) 
-    {
-        case viewActions.VIEW_DOCUMENT:
-                                            const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
-                                            return nextView;
-        case viewActions.VIEW_ALL_COURSES:
-        case userActions.LOGIN_SUCCESS:
-                                            return {type: 'AllCoursesView'};
-        case viewActions.VIEW_ORGANIZATION:
-                                            const nView : OrganizationView = { type: 'OrganizationView', documentId: action.documentId }      
-                                            return nView;
-        default:
-                                            return state;
+export function view(state : CurrentView = defaultView, action: ViewAction): CurrentView {
+  switch (action.type) {
+    case viewActions.VIEW_DOCUMENT:
+      const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
+      return nextView;
+    case viewActions.VIEW_ALL_COURSES:
+    case userActions.LOGIN_SUCCESS:
+      return {type: 'AllCoursesView'}; 
+    default:
+      return state;
   }
 }

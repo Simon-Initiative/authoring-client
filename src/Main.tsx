@@ -77,11 +77,7 @@ class Main extends React.Component<MainProps, {}> {
       case 'CreateCourseView':
         return <CreateCourseView dispatch={this.props.dispatch} />
       case 'AllCoursesView':
-        return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;
-      case 'OrganizationView':
-        return <CreateOrganizationView dispatch={this.props.dispatch}
-                                       userId={this.props.user.userId} 
-                                       documentId={view.documentId} />            
+        return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;         
     }
     
   }
