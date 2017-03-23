@@ -1,13 +1,20 @@
 @import 'abstracts/variables';
 @import '../editors/content/common/draft/DraftWrapper';
-// Examples
+
 body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale; font-family: $sans-font;}
 #app { margin: 0px; padding: 0px; width: 100%; height: 100%;}
 .sidebar .nav-link { border-radius: 0px; }
-.btn-primary {
-	background-color: $color-blue;
+
+//Button Global
+.btn {
+	border-radius: 0px;
+
+	&.btn-primary {
+		background-color: $color-blue;
+	}
 }
+
 // Header
 .navbar{ 
 	background-color: $color-offwhite!important;
@@ -62,7 +69,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	}
 }
 
-//Overall Editor
+// Editor Global
 .editor {
 	margin: 3em auto;
 
@@ -126,4 +133,29 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
     	}
 	}
 
+}
+
+// Tables Global
+.table {
+
+	background-color: $color-white;
+
+	thead {
+		text-transform: uppercase;
+		background-color: $color-white;
+
+		th {
+			font-weight: 100;
+			font-size: 13px;
+			color: $color-grey;
+		}
+	}
+
+	td {
+		vertical-align: middle;
+	}
+
+	th {
+		vertical-align: middle;
+	}
 }
