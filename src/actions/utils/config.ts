@@ -22,3 +22,7 @@ export const configuration : Configuration = {
   database,
   prefix
 };
+
+export function relativeToAbsolute(relativeURL: string) : string {
+  return configuration.baseUrl + '/' + configuration.database + '/' + relativeURL;
+}

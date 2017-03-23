@@ -1,4 +1,5 @@
 import { createDocument, Document } from '../../data/persistence';
+import { relativeToAbsolute } from '../../actions/utils/config';
 import * as models from '../../data/models';
 import { DocumentId } from '../../data/types';
 import * as Immutable from 'immutable';
@@ -21,7 +22,7 @@ export function createAttachment(name: string, data: any, content_type: string,
     
     createDocument(mediaModel)
       .then((doc: Document) => {
-        resolve(`${doc._id}/${name}`);
+        resolve(relativeToAbsolute(`${doc._id}/${name}`));
       })
       .catch(err => reject(err));
   });

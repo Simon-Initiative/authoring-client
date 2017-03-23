@@ -7,9 +7,11 @@ import { insertActivity, toggleBlockType, AuthoringActionsHandler } from '../../
 import { titlesForEmbeddedResources } from '../../../data/domain';
 import ResourceSelection from '../../../components/selection/ResourceSelection';
 import MediaSelection from '../../../components/selection/MediaSelection';
+import { createAttachment } from '../../../components/selection/upload';
 
 interface BlockToolbarProps {  
   courseId: string; 
+  documentId: string; 
   services: AppServices;
   actionHandler: AuthoringActionsHandler;
   dismissToolbar?: () => void;  
@@ -84,13 +86,41 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
         this.props.services.displayModal(
             <MediaSelection
               type='image'
-              onInsert={(resource) => {
-                const data = {
-                  id: resource.src
-                };
-                this.props.actionHandler.handleAction(insertActivity('image', data));
-                this.props.services.dismissModal();
-                this.props.dismissToolbar();
+              onInsert={(type, file) => {
+                
+                var reader  = new FileReader();
+
+                reader.addEventListener('load', () => {
+
+                  const base64data = reader.result.substring(reader.result.indexOf(',') + 1);
+                  
+                  createAttachment(file.name, base64data, file.type, this.props.documentId)
+                    .then(src => {
+
+                      const data = {src};
+                  
+                      this.props.actionHandler.handleAction(
+                        insertActivity('image', data));
+
+                      this.props.services.dismissModal();
+                      this.props.dismissToolbar();
+                    })
+                    .catch(err => {
+                      this.props.services.dismissModal();
+                      this.props.dismissToolbar();
+                    });
+
+
+                }, false);
+
+                if (file) {
+                  reader.readAsDataURL(file);
+                }
+
+                
+
+                  
+                
               }} 
               onCancel={() => {
                 this.props.services.dismissModal();

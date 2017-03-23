@@ -71,6 +71,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
+                documentId={this.props.documentId}
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;

@@ -8,8 +8,9 @@ type GeneratedIds = {
 }
 
 interface MediaSelection {
-  data: Object;
+  file: Object;
   ids: GeneratedIds; 
+  _onChange: any;
 }
 
 export interface MediaSelectionProps {
@@ -26,16 +27,21 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
       input: guid(),
       help: guid()
     }
-    this.data = { src: '' };
+    this.file = null;
+    this._onChange = this.onChange.bind(this);
+  }
+
+  onChange(e) {
+    this.file = e.target.files[0];
   }
 
   render() {
     return (
-      <ModalSelection title="Select File" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.props.type, this.data)}>
+      <ModalSelection title="Select File" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.props.type, this.file)}>
         <form>
           <div className="form-group">
             <label htmlFor={this.ids.input}>Choose a file</label>
-            <input type="file" className="form-control" id={this.ids.input} aria-describedby={this.ids.help} />
+            <input onChange={this._onChange} type="file" className="form-control" id={this.ids.input} aria-describedby={this.ids.help} />
             <small id={this.ids.help} className="form-text text-muted">Select a file to upload</small>
           </div>
         </form>
