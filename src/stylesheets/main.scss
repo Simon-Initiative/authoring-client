@@ -62,13 +62,20 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	}
 }
 
-// My Courses
-.courseView {
-
+//Overall Editor
+.editor {
 	margin: 3em auto;
 
 	h2 {
 		font-family: $serif-font;
+		margin: 0em auto 1em auto;
+	}
+}
+
+// My Courses
+.courseView {
+
+	h2 {
 		margin: 1em auto;
 	}
 

@@ -100,44 +100,46 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
       </tr>)
 
     return (
-      <table className="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Type</th>
-                <th>Title</th>
-            </tr>
-        </thead>
-        <tbody>
-            {rows}
-        </tbody>
-      </table>);
+      <div className="col-12">
+        <h2>Pages</h2>
+        <table className="table table-striped table-hover">
+          <thead>
+              <tr>
+                  <th>Type</th>
+                  <th>Title</th>
+              </tr>
+          </thead>
+          <tbody>
+              {rows}
+          </tbody>
+        </table>
+      </div>);
   }
 
   renderCreation() {
     return (
-      <div className="input-group">
-        <select ref="type" className="form-select input-group-addon">
-          <option value="workbook">Workbook</option>
-          <option value="assessment">Assessment</option>
-        </select>
-        <input ref='title' type="text" className="form-input" placeholder="Title" />
-        <button onClick={this.createResource.bind(this)} className="btn btn-primary input-group-btn">Create</button>
+      <div className="input-group col-12">
+        <form className="form-inline">
+          <select ref="type" className="custom-select mb-2 mr-sm-2 mb-sm-0" id="inlineFormCustomSelect">
+            <option value="workbook">Workbook</option>
+            <option value="assessment">Assessment</option>
+          </select>
+          <input type="text" ref='title' className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Title"></input>
+          <button onClick={this.createResource.bind(this)} className="btn btn-primary">Create</button>
+        </form>
       </div>);
   }
 
   render() {
     return (
-      <div className="container">
+      <div className="container-fluid editor">
           <div className="row">
-              <div className="col-1"></div>
-              <div className="col-10">
-                  <div>
-                      {this.renderResources()}
-                      {this.renderCreation()}
-                  </div>
-              </div>
+              { /* <div className="col-1"></div> */}
               
-              <div className="col-1"></div>
+              {this.renderResources()}
+              {this.renderCreation()}
+              
+              { /* <div className="col-1"></div> */}
           </div>
       </div>
     )

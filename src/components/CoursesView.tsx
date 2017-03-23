@@ -71,7 +71,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     });
 
     return (
-      <div className="container courseView">
+      <div className="container courseView editor">
         <h2>Example Courses</h2>
         {rows}  
       </div>

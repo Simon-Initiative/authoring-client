@@ -65,7 +65,7 @@ class CreateOrganizationView extends React.PureComponent<CreateOrganizationViewP
       <div className="container-fluid">
         <div className="row">
             <NavigationBar viewActions={this.viewActions} />
-            <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+            <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                 <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                     <p className="h2" style={tempnavstyle.h2}>Course Content</p>
                     <button type="button" className="btn btn-secondary">Add Item</button>
