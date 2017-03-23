@@ -10,7 +10,8 @@ export const ModelTypes = types.strEnum([
   'CourseModel',
   'CoursePermissionModel',
   'WorkbookPageModel',
-  'AssessmentModel'
+  'AssessmentModel',
+  'MediaModel'
 ])
 
 // Create an actual type
@@ -30,6 +31,8 @@ export function createModel(object: any) : ContentModel {
       return new CoursePermissionModel(object);
     case ModelTypes.AssessmentModel:
       return new AssessmentModel(object);
+    case ModelTypes.MediaModel:
+      return new MediaModel(object);
   }
 }
 
@@ -55,6 +58,35 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   }
 
   with(values: CourseModelParams) {
+      return this.merge(values) as this;
+  }
+}
+
+export type MediaModelParams = {
+  name: string,
+  _attachments: any,
+  referencingDocuments: Immutable.List<types.DocumentId>
+};
+const defaultMediaModelParams = {
+  modelType: 'MediaModel',
+  name: '',
+  _attachments: {},
+  referencingDocuments: Immutable.List<types.DocumentId>()
+}
+
+export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
+    
+  modelType: 'MediaModel';
+
+  name: string;
+  _attachments: any;
+  referencingDocuments: Immutable.List<types.DocumentId>
+
+  constructor(params?: MediaModelParams) {
+      params ? super(contentTypes.deserialize(params)) : super();
+  }
+
+  with(values: MediaModelParams) {
       return this.merge(values) as this;
   }
 }
@@ -153,11 +185,11 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 }
 
-
 export type ContentModel = 
   AssessmentModel |
   CourseModel | 
   CoursePermissionModel | 
+  MediaModel |
   WorkbookPageModel;
 
 // A pure function that takes a content model as 

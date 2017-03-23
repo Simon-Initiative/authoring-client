@@ -6,6 +6,7 @@ import { AppServices } from '../../common/AppServices';
 import { insertActivity, toggleBlockType, AuthoringActionsHandler } from '../../../actions/authoring';
 import { titlesForEmbeddedResources } from '../../../data/domain';
 import ResourceSelection from '../../../components/selection/ResourceSelection';
+import MediaSelection from '../../../components/selection/MediaSelection';
 
 interface BlockToolbarProps {  
   courseId: string; 
@@ -79,6 +80,25 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
         );
     };
 
+    this.onImage = () => {
+        this.props.services.displayModal(
+            <MediaSelection
+              type='image'
+              onInsert={(resource) => {
+                const data = {
+                  id: resource.src
+                };
+                this.props.actionHandler.handleAction(insertActivity('image', data));
+                this.props.services.dismissModal();
+                this.props.dismissToolbar();
+              }} 
+              onCancel={() => {
+                this.props.services.dismissModal();
+                this.props.dismissToolbar();
+              }}/>
+        );
+    };
+
   }
 
   onBlur() {
@@ -102,6 +122,9 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
         action={() => this.props.actionHandler.handleAction(
           insertActivity('codeblock', {src: 'Your code here...'}))} 
         icon="code"/>,
+      <Button hidden={this.state.collapsed} key="image" 
+        action={this.onImage} 
+        icon="image"/>,
     ];
   }
 

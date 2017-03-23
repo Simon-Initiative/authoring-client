@@ -31,12 +31,12 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
 
   render() {
     return (
-      <ModalSelection title="Select URL" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.props.type, this.data)}>
+      <ModalSelection title="Select File" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.props.type, this.data)}>
         <form>
           <div className="form-group">
-            <label htmlFor={this.ids.input}>Email address</label>
-            <input type="email" className="form-control" id={this.ids.input} aria-describedby={this.ids.help} placeholder="Enter URL"/>
-            <small id={this.ids.help} className="form-text text-muted">You can use any publicly accessible URL here</small>
+            <label htmlFor={this.ids.input}>Choose a file</label>
+            <input type="file" className="form-control" id={this.ids.input} aria-describedby={this.ids.help} />
+            <small id={this.ids.help} className="form-text text-muted">Select a file to upload</small>
           </div>
         </form>
       </ModalSelection>    
