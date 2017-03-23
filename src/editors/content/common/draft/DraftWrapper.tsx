@@ -309,7 +309,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         <Editor ref="editor"
           blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
-          blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.lockedByBlockRenderer || this.props.locked}

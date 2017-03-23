@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { AppServices } from '../../common/AppServices';
-import { toggleInlineStyle, AuthoringActionsHandler } from '../../../actions/authoring';
+import { toggleInlineStyle, toggleBlockType, AuthoringActionsHandler } from '../../../actions/authoring';
 
 interface InlineToolbarProps {  
   courseId: string; 
@@ -58,6 +58,11 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
     this.props.dismissToolbar();
   }
 
+  toggleBlockType(type) {
+    this.props.actionHandler.handleAction(toggleBlockType(type));
+    this.props.dismissToolbar();
+  }
+
   componentDidMount() {
     this.component.focus();
   }
@@ -74,9 +79,8 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
           <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
           <Button action={() => this.toggleInlineStyle('KBD')} icon="terminal"/>
           <Button action={() => this.toggleInlineStyle('CODE')} icon="code"/>
-          <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="list-ol"/>
-          <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="list-ul"/>
-          <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="link"/>
+          <Button action={() => this.toggleBlockType('ordered-list-item')} icon="list-ol"/>
+          <Button action={() => this.toggleBlockType('unordered-list-item')} icon="list-ul"/>
         </div>
         
       </div>);

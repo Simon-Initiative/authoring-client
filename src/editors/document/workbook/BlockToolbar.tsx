@@ -102,8 +102,6 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
         action={() => this.props.actionHandler.handleAction(
           insertActivity('codeblock', {src: 'Your code here...'}))} 
         icon="code"/>,
-      <Button hidden={this.state.collapsed} key="list-ul" action={() => this.toggleBlockType('unordered-list-item')} icon="list-ul"/>,
-      <Button hidden={this.state.collapsed} key="list-ol" action={() => this.toggleBlockType('ordered-list-item')} icon="list-ol"/>
     ];
   }
 
