@@ -85,13 +85,12 @@ const navbarStyles=
         paddingLeft: 0,
         paddingRight: 0,
         'position': 'fixed',
-        top: '51px',
+        top: '58px',
         bottom: 0,
         left: 0,
         zIndex: 1000,
         overflowX: 'hidden',
         overflowY: 'auto',
-        borderRight: '1px solid #eee'
     }
 };
 
@@ -201,17 +200,12 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let menuData=this.generateMenu(this.state.closed);
         
         return (
-                <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down bg-faded sidebar">
+                <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
+                    <h1>Title of Course</h1>
+                    <h2>Example Label</h2>
                     <ul className="nav nav-pills flex-column">
-                    {menuData}
+                        {menuData}
                     </ul>
-                    {/*  
-                    <ul className="nav nav-pills flex-column">
-                        <li className="nav-item">                    
-                            {menuControl}
-                        </li>
-                    </ul>
-                    */}
                 </nav>
             );
     }
