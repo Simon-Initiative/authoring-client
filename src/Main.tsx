@@ -91,7 +91,9 @@ class Main extends React.Component<MainProps, {}> {
       <div>
         {modalDisplay}
         <Header dispatch={this.props.dispatch}/>
-        {currentView}
+        <div className="container-fluid">
+          {currentView}
+        </div>
         <Footer dispatch={this.props.dispatch}/>
       </div>
     )

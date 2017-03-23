@@ -49,23 +49,32 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
     let rows = this.state.courses.map((c, i) => {
       const { id, title} = c;
-      return <tr key={id}><td>
-          <button key={id} onClick={this.onSelect.bind(this, id)} 
-            className="btn btn-link">{title}</button>
-        </td></tr>
+      return  <div className="course" key={id}>
+          <img src="assets/ph-courseView.png" className="img-fluid" alt=""/>
+          <div className="content container">
+            <div className="row">
+              <div className="information col-3">
+                <span className="title">{title}</span>
+                <span className="name">Instructor Name</span>
+              </div>
+              <div className="description col-7">
+                C@CM is a three-unit, pass/fail half-semester mini course that will help you develop the foundational computing and information literacy skills that you will need to succeed in your other courses. It is a graduation requirement for...
+              </div>
+              <div className="enter col-2">
+                <button type="button" className="btn btn-primary" key={id} onClick={this.onSelect.bind(this, id)}>
+                  Enter Course
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
     });
 
     return (
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>Course</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
+      <div className="container courseView editor">
+        <h2>Example Courses</h2>
+        {rows}  
+      </div>
     );
   }
   

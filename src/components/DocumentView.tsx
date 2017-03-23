@@ -30,7 +30,7 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
       <div className="container-fluid">
         <div className="row">
             <NavigationBar viewActions={this.viewActions} />
-            <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+            <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
               <EditorManager 
                 dispatch={this.props.dispatch}
                 services={this.services} 
