@@ -6,12 +6,13 @@ import { removeHTML, getCaretPosition, setCaretPosition } from '../utils';
 require('./CodeBlock.scss');
  
 interface CodeBlock {
-  _onToggleLock: any;
   _onChange: any;
   _onBlur: any;
   _onKeyPress: any;
   _onKeyUp: any;
+  _onClick: any;
   caretPosition: any;
+  pre: any;
 }
 
 export interface CodeBlockProps {
@@ -33,12 +34,11 @@ class CodeBlock extends React.PureComponent<CodeBlockProps, CodeBlockState> {
       src: this.props.src
     };
 
-    this._onToggleLock = this.onToggleLock.bind(this);
     this._onChange = this.onChange.bind(this);
     this._onBlur = this.onBlur.bind(this);
     this._onKeyPress = this.onKeyPress.bind(this);
     this._onKeyUp = this.onKeyUp.bind(this);
-    
+    this._onClick = this.onClick.bind(this);
     this.caretPosition = null;
   }
 
@@ -93,52 +93,38 @@ class CodeBlock extends React.PureComponent<CodeBlockProps, CodeBlockState> {
 
   onBlur() {
     if (this.state.editMode) {
-      this.onToggleLock();
+      this.setState({editMode: false});
+      this.props.blockProps.onLockChange(false);
     }
   }
 
-  onToggleLock() {
-    const editMode = !this.state.editMode;
-    this.setState({editMode});
-    this.props.blockProps.onLockChange(editMode);
+  onClick() {
+    if (!this.state.editMode) {
+      this.setState({editMode: true}, () => this.pre.focus());
+      this.props.blockProps.onLockChange(true);
+    }
   }
 
-  renderViewMode() : JSX.Element {
-    
-    return (
-      <pre onClick={this._onToggleLock} 
-        className="CodeBlock-code">
-        {this.state.src}
-      </pre>
-    );
-  }
-
-  renderEditMode() : JSX.Element {
+  render() : JSX.Element {
     
     // We cannot use JSX here to render this div because
     // the TypeScript type definitions do not seem to
     // recognize 'suppressContentEditableWarning' as a valid
     // property. 
-    const element = React.createElement('pre', {
-      contentEditable: true,
+    
+    return React.createElement('pre', {
+      ref: (component) => this.pre = component,
+      contentEditable: this.state.editMode,
       suppressContentEditableWarning: true,
       children: this.state.src,
       className: "CodeBlock-code",
       onInput: this._onChange,
       onKeyPress: this._onKeyPress,
       onBlur: this._onBlur,
-      onKeyUp: this._onKeyUp
+      onKeyUp: this._onKeyUp,
+      onClick: this._onClick
     });
-    
-    return element;
-  }
 
-  render() : JSX.Element {
-    if (this.state.editMode) {
-      return this.renderEditMode();
-    } else {
-      return this.renderViewMode();
-    }
   }
 };
 
