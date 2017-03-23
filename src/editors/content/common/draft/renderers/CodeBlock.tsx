@@ -10,6 +10,7 @@ interface CodeBlock {
   _onChange: any;
   _onBlur: any;
   _onKeyPress: any;
+  _onKeyUp: any;
   caretPosition: any;
 }
 
@@ -36,6 +37,7 @@ class CodeBlock extends React.PureComponent<CodeBlockProps, CodeBlockState> {
     this._onChange = this.onChange.bind(this);
     this._onBlur = this.onBlur.bind(this);
     this._onKeyPress = this.onKeyPress.bind(this);
+    this._onKeyUp = this.onKeyUp.bind(this);
     
     this.caretPosition = null;
   }
@@ -82,6 +84,11 @@ class CodeBlock extends React.PureComponent<CodeBlockProps, CodeBlockState> {
   onKeyPress(e) {
     // Keep track of the position of caret 
     this.caretPosition = getCaretPosition(e.target);
+    
+  }
+
+  onKeyUp(e) {
+    e.stopPropagation();
   }
 
   onBlur() {
@@ -119,7 +126,8 @@ class CodeBlock extends React.PureComponent<CodeBlockProps, CodeBlockState> {
       className: "CodeBlock-code",
       onInput: this._onChange,
       onKeyPress: this._onKeyPress,
-      onBlur: this._onBlur
+      onBlur: this._onBlur,
+      onKeyUp: this._onKeyUp
     });
     
     return element;
