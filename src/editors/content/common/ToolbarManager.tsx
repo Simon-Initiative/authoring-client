@@ -121,7 +121,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
       this.setState({
         show: true, 
         x: point.x, 
-        y: point.y + PADDING, 
+        y: point.y, 
         component: this.props.blockToolbar
       });        
     }
@@ -143,7 +143,7 @@ class ToolbarManager extends React.Component<ToolbarManagerProps, ToolbarManager
       this.setState({
         show: true, 
         x: point.x, 
-        y: point.y + PADDING, 
+        y: point.y, 
         component: this.props.blockToolbar
       });        
     } else if (e.keyCode === ALT_KEY) {
