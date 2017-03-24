@@ -35,6 +35,7 @@ const defaultView : LoginView = {
 type ViewAction = 
   viewActions.viewDocumentAction |
   viewActions.viewAllCoursesAction |
+  viewActions.viewCreateCourseAction |
   userActions.loginSuccessAction | 
   OtherAction
 
@@ -43,9 +44,11 @@ export function view(state : CurrentView = defaultView, action: ViewAction): Cur
     case viewActions.VIEW_DOCUMENT:
       const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
       return nextView;
-    case viewActions.VIEW_ALL_COURSES:
+    case viewActions.VIEW_CREATE_COURSE:
+      return { type: 'CreateCourseView'};
+    case viewActions.VIEW_ALL_COURSES: // Deliberate fall through
     case userActions.LOGIN_SUCCESS:
-      return {type: 'AllCoursesView'}; 
+      return { type: 'AllCoursesView'}; 
     default:
       return state;
   }

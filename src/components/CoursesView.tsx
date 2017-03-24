@@ -6,6 +6,7 @@ import { titlesForCoursesQuery, coursesQuery } from '../data/domain';
 
 interface CoursesView {
   onSelect: (id) => void;
+  _createCourse: () => void;
 }
 
 type CourseDescription = {
@@ -24,9 +25,14 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     super(props);
 
     this.state = { courses: []};
+    this._createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
       this.props.dispatch(viewActions.viewDocument(id));
     }
+  }
+
+  createCourse() {
+    this.props.dispatch(viewActions.viewCreateCourse());
   }
 
   componentDidMount() {
@@ -82,7 +88,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
                 </p>
               </div>
               <div className="col-4">
-                <button className="btn btn-secondary btn-lg btn-block outline serif">
+                <button onClick={this._createCourse} className="btn btn-secondary btn-lg btn-block outline serif">
                   <img src="assets/icon-book.png" width="42" height="42" className="d-inline-block align-middle" alt=""/>
                   Create a Course
                 </button>
