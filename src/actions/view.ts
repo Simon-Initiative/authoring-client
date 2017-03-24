@@ -1,8 +1,3 @@
-/**
- * MvV: I've moved some pieces around and clustered
- * them because I have otherwise no fucking clue what
- * the contents of this file is supposed to do.
- */
 
 export type VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
 export const VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
