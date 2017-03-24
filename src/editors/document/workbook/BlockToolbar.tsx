@@ -83,37 +83,41 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
         );
     };
 
-    this.onImage = () => {
-        this.props.services.displayModal(
-            <MediaSelection
-              accept='image/*'
-              type='image'
-              onInsert={(type, file) => {
+    this.onImage = this.insertMedia.bind(this, 'image', 'image/*');
+    this.onVideo = this.insertMedia.bind(this, 'video', 'video/*');
+    this.onAudio = this.insertMedia.bind(this, 'audio', 'audio/*');
 
-                fileToBase64(file)
-                .then(base64data => createAttachment(file.name, base64data, file.type, this.props.documentId))
-                .then(src =>  {
+  }
 
-                  const data = {src};     
-                  this.props.actionHandler.handleAction(
-                    insertActivity('image', data));
+  insertMedia(mediaType : string, accept : string) {
+    this.props.services.displayModal(
+        <MediaSelection
+          accept={accept}
+          type={mediaType}
+          onInsert={(type, file) => {
 
-                  this.props.services.dismissModal();
-                  this.props.dismissToolbar();
-                })
-                .catch(err => {
-                  this.props.services.dismissModal();
-                  this.props.dismissToolbar();
-                });
-                
-              }} 
-              onCancel={() => {
-                this.props.services.dismissModal();
-                this.props.dismissToolbar();
-              }}/>
-        );
-    };
+            fileToBase64(file)
+            .then(base64data => createAttachment(file.name, base64data, file.type, this.props.documentId))
+            .then(src =>  {
 
+              const data = {src};     
+              this.props.actionHandler.handleAction(
+                insertActivity(mediaType, data));
+
+              this.props.services.dismissModal();
+              this.props.dismissToolbar();
+            })
+            .catch(err => {
+              this.props.services.dismissModal();
+              this.props.dismissToolbar();
+            });
+            
+          }} 
+          onCancel={() => {
+            this.props.services.dismissModal();
+            this.props.dismissToolbar();
+          }}/>
+    );
   }
 
   onBlur() {
@@ -124,8 +128,6 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
     this.props.actionHandler.handleAction(toggleBlockType(type));
     this.props.dismissToolbar();
   }
-
-  
 
   componentDidMount() {
     this.component.focus();

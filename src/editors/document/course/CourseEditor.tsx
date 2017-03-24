@@ -65,7 +65,9 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     this.props.services.viewDocument(id);
   }
 
-  createResource() {
+  createResource(e) {
+
+    e.preventDefault();
 
     const type = (this.refs['type'] as any).value;
     const title = (this.refs['title'] as any).value;
