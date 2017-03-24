@@ -14,7 +14,8 @@ interface MediaSelection {
 }
 
 export interface MediaSelectionProps {
-  type: string
+  type: string;
+  accept: string;  // Media type to allow selection of 
   onInsert: (type, data) => void;
   onCancel: () => void;
 }
@@ -41,7 +42,13 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
         <form>
           <div className="form-group">
             <label htmlFor={this.ids.input}>Choose a file</label>
-            <input onChange={this._onChange} type="file" className="form-control" id={this.ids.input} aria-describedby={this.ids.help} />
+            <input 
+              accept={this.props.accept}
+              onChange={this._onChange} 
+              type="file" 
+              className="form-control" 
+              id={this.ids.input} 
+              aria-describedby={this.ids.help} />
             <small id={this.ids.help} className="form-text text-muted">Select a file to upload</small>
           </div>
         </form>

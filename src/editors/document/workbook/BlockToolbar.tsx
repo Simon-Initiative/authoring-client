@@ -86,6 +86,7 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
     this.onImage = () => {
         this.props.services.displayModal(
             <MediaSelection
+              accept='image/*'
               type='image'
               onInsert={(type, file) => {
 
