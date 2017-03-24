@@ -71,9 +71,29 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     });
 
     return (
-      <div className="container courseView editor">
-        <h2>Example Courses</h2>
-        {rows}  
+      <div>
+        <div className="createCourse">
+          <div className="container">
+            <div className="row">
+              <div className="col-6 offset-1">
+                <p className="lead">
+                  OLI’s aim is to combine free, high-quality courses, continuous feedback, and research to improve learning and transform higher education. If you’re 
+    ready to check out OLI for yourself, let’s get started.
+                </p>
+              </div>
+              <div className="col-4">
+                <button className="btn btn-secondary btn-lg btn-block outline serif">
+                  <img src="assets/icon-book.png" width="42" height="42" className="d-inline-block align-middle" alt=""/>
+                  Create a Course
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container courseView editor">
+          <h2>Example Courses</h2>
+          {rows}  
+        </div>
       </div>
     );
   }
