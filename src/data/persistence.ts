@@ -133,9 +133,11 @@ export function retrieveDocument(documentId: types.DocumentId) : Promise<Documen
   });      
 }
 
-export function createDocument(content: models.ContentModel) : Promise<Document> {
+export function createDocument(content: models.ContentModel, 
+  database : string = configuration.database) : Promise<Document> {
+    
   return new Promise(function(resolve, reject) {
-    fetch(`${configuration.baseUrl}/${configuration.database}`, {
+    fetch(`${configuration.baseUrl}/${database}`, {
         method: 'POST',
         headers: getHeaders(credentials),
         body: JSON.stringify(content.toJS())
@@ -195,37 +197,3 @@ export function persistDocument(doc: Document) : Promise<Document> {
   });
 }
 
-export function persistAttachment(doc: Document, 
-  attachmentName: string, attachment: any) : Promise<Document> {
-  return new Promise(function(resolve, reject) {
-
-    const rev = doc._rev;
-    
-    fetch(`${configuration.baseUrl}/${configuration.database}/${doc._id}/${attachmentName}?rev=${rev}`, {
-        method: 'PUT',
-        headers: getHeaders(credentials),
-        body: JSON.stringify(attachment)
-      })
-    .then(response => {
-      if (!response.ok) {
-          throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then(json => {
-      
-      // Adding an attachment revs the parent document, so we need to
-      // return an updated Document object reflecting that change 
-      const updatedDocument = new Document({
-        _id: (json as any).id,
-        _rev: (json as any).rev,
-        model: doc.model
-      });
-
-      resolve(updatedDocument);
-    })
-    .catch(err => {
-      reject(err);
-    });
-  });
-}

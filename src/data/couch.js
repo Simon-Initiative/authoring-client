@@ -175,11 +175,12 @@ var createPermissions = function(data) {
 var run = function() {
   return waitUntilReady()
     .then(r => request('PUT', '/editor', undefined))
+    .then(r => request('PUT', '/attachments', undefined))
     .then(r => createUsers())
     .then(r => createSecurityDocument(r))
     .then(r => createCourse(r))
     .then(r => createPermissions(r))
-    .then(r => console.log("database ready"));
+    .then(r => console.log("databases ready"));
 }
 
 run(); 

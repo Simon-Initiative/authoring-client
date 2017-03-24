@@ -1,5 +1,5 @@
 import { createDocument, Document } from '../../data/persistence';
-import { relativeToAbsolute } from '../../actions/utils/config';
+import { configuration, relativeToAbsolute } from '../../actions/utils/config';
 import * as models from '../../data/models';
 import { DocumentId } from '../../data/types';
 import * as Immutable from 'immutable';
@@ -17,12 +17,12 @@ export function createAttachment(name: string, data: any, content_type: string,
       content_type,
       data
     };
-    const referencingDocuments = Immutable.List<string>(referencingDocumentId);
+    const referencingDocuments = Immutable.List.of<string>(referencingDocumentId);
     const mediaModel = new models.MediaModel({ name, _attachments, referencingDocuments });
     
-    createDocument(mediaModel)
+    createDocument(mediaModel, configuration.attachmentDatabase)
       .then((doc: Document) => {
-        resolve(relativeToAbsolute(`${doc._id}/${name}`));
+        resolve(relativeToAbsolute(`${doc._id}/${name}`, configuration.attachmentDatabase));
       })
       .catch(err => reject(err));
   });

@@ -8,6 +8,7 @@ import { titlesForEmbeddedResources } from '../../../data/domain';
 import ResourceSelection from '../../../components/selection/ResourceSelection';
 import MediaSelection from '../../../components/selection/MediaSelection';
 import { createAttachment } from '../../../components/selection/upload';
+import { fileToBase64 } from '../../../utils/file';
 
 interface BlockToolbarProps {  
   courseId: string; 
@@ -87,39 +88,22 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, BlockToolbarSt
             <MediaSelection
               type='image'
               onInsert={(type, file) => {
-                
-                var reader  = new FileReader();
 
-                reader.addEventListener('load', () => {
+                fileToBase64(file)
+                .then(base64data => createAttachment(file.name, base64data, file.type, this.props.documentId))
+                .then(src =>  {
 
-                  const base64data = reader.result.substring(reader.result.indexOf(',') + 1);
-                  
-                  createAttachment(file.name, base64data, file.type, this.props.documentId)
-                    .then(src => {
+                  const data = {src};     
+                  this.props.actionHandler.handleAction(
+                    insertActivity('image', data));
 
-                      const data = {src};
-                  
-                      this.props.actionHandler.handleAction(
-                        insertActivity('image', data));
-
-                      this.props.services.dismissModal();
-                      this.props.dismissToolbar();
-                    })
-                    .catch(err => {
-                      this.props.services.dismissModal();
-                      this.props.dismissToolbar();
-                    });
-
-
-                }, false);
-
-                if (file) {
-                  reader.readAsDataURL(file);
-                }
-
-                
-
-                  
+                  this.props.services.dismissModal();
+                  this.props.dismissToolbar();
+                })
+                .catch(err => {
+                  this.props.services.dismissModal();
+                  this.props.dismissToolbar();
+                });
                 
               }} 
               onCancel={() => {
