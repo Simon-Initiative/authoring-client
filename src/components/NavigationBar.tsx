@@ -2,6 +2,8 @@
 *
 */
 import * as React from 'react';
+import { returnType } from '../utils/types';
+import { connect }  from 'react-redux';
 
 /**
 *
@@ -14,7 +16,7 @@ interface NavigationBarState
 /**
 *
 */
-export interface NavigationBarProps {
+export interface NavigationBarOwnProps {
   viewActions: any;
 }
 
@@ -94,10 +96,28 @@ const navbarStyles=
     }
 };
 
+
+function mapStateToProps(state: any) {
+
+  const {
+    course
+  } = state;
+
+  return {
+    course
+  }
+}
+
+
+const stateGeneric = returnType(mapStateToProps);  
+type NavigationBarReduxProps = typeof stateGeneric; 
+type NavigationBarProps = NavigationBarReduxProps & NavigationBarOwnProps & { dispatch };
+
+
 /**
 *
 */
-export default class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> 
+class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> 
 {    
      opts = [
                 {
@@ -214,7 +234,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let mStyle = null;
         
         // Bad way of doing this, will be changed soon!
-        this.opts [0].onclick=this.props.viewActions.editOrganization;        
+        this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);        
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
         
         if (this.state.closed==true) 
@@ -240,3 +260,6 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
             );
     }
 }
+
+
+export default connect<NavigationBarReduxProps, {}, NavigationBarOwnProps>(mapStateToProps)(NavigationBar);
