@@ -39,8 +39,6 @@ export function createModel(object: any) : ContentModel {
   }
 }
 
-//>---------------------------------------------------------------
-
 export type CourseModelParams = {
   title?: contentTypes.TitleContent,
   organizations?: Immutable.List<types.DocumentId>
@@ -68,25 +66,20 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   }
 }
 
-//>---------------------------------------------------------------
-
 export type OrganizationModelParams = {
   title?: contentTypes.TitleContent
 };
 
-const defaultOrganizationModel = 
-{
+const defaultOrganizationModel = {
   modelType: 'OrganizationModel',
   title: new contentTypes.TitleContent(),
 }
 
-export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) 
-{    
+export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {    
   modelType: 'OrganizationModel';
   title: contentTypes.TitleContent;
   
-  constructor(params?: OrganizationModelParams) 
-  {
+  constructor(params?: OrganizationModelParams) {
       params ? super(contentTypes.deserialize(params)) : super();
   }
 
@@ -94,8 +87,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       return this.merge(values) as this;
   }
 }
-
-//>---------------------------------------------------------------
 
 export type MediaModelParams = {
   name: string,

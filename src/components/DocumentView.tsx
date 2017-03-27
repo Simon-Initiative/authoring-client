@@ -45,5 +45,3 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
 }
 
 export default DocumentView;
-
-

@@ -13,11 +13,11 @@ export type RegisteredEditor = {
 }
 
 export function register(registration: RegisteredEditor) {
-  EditorRegistry[registration.name] = registration
+    EditorRegistry[registration.name] = registration
 }
 
-export function lookUpByName(name: string) : RegisteredEditor {
-  return EditorRegistry[name];
+export function lookUpByName(name: string) : RegisteredEditor {  
+    return EditorRegistry[name];
 }
 
 

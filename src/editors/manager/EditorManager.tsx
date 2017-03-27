@@ -122,6 +122,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   fetchDocument(documentId: string) {
+      console.log ("fetchDocument ("+documentId+")");
     persistence.retrieveDocument(documentId)
       .then(document => {
         this.lastSavedDocument = document;
@@ -189,11 +190,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   render() : JSX.Element {
     if (this.state.document === null || this.state.editingAllowed === null) {
       return null;
-    }
-    else 
-    {
-      const childProps : AbstractEditorProps<any> = 
-      {
+    } else {
+      const childProps : AbstractEditorProps<any> = {
         model : this.state.document.model,
         documentId: this.props.documentId,
         onEdit: this._onEdit,
