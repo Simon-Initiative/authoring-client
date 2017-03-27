@@ -47,13 +47,3 @@ export function viewAllCourses() : viewAllCoursesAction {
 }
 
 //--------------------------------------------------
-
-export type VIEW_ORGANIZATION = 'VIEW_ORGANIZATION';
-export const VIEW_ORGANIZATION : VIEW_ORGANIZATION = 'VIEW_ORGANIZATION';
-
-export function editOrganization(documentId: string) : viewDocumentAction {
-    return {
-        type: VIEW_DOCUMENT,
-        documentId
-    }
-}
