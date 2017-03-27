@@ -2,7 +2,7 @@
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor';
 import AssessmentEditor from '../document/assessment/AssessmentEditor';
 import CourseEditor from '../document/course/CourseEditor';
-//import OrganizaitonEditor from '../organization/OrganizationEditor';
+import OrganizationEditor from '../document/organization/OrganizationEditor';
 
 import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
 import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';
@@ -32,14 +32,12 @@ export default function initEditorRegistry() {
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true
-  });
-  /*  
+  });  
   register({
     name: ModelTypes.OrganizationModel, 
     component: OrganizationEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true
-  });
-  */    
+  });   
 }

@@ -101,33 +101,54 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
 {    
      opts = [
                 {
-                    label: "My Courses",
+                    label: "Course Content",
                     icon: "C",
+                    staticContent: false,
                     onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Outline Editor",
-                    icon: "O",                            
+                    label: "Content",          
+                    staticContent: true,
+                    onclick: this.placeholderMenuHandler     
+                },     
+                {
+                    label: "Pages",
+                    icon: "O",           
+                    staticContent: false,
                     onclick: this.placeholderMenuHandler                        
                 },
                 { 
+                    label: "Activities",
+                    icon: "O",
+                    staticContent: false,
+                    onclick: this.placeholderMenuHandler                        
+                },
+                {
+                    label: "Learning",          
+                    staticContent: true,
+                    onclick: this.placeholderMenuHandler                       
+                },                
+                {
                     label: "Learning Objectives",
-                    icon: "O",                            
+                    icon: "A",           
+                    staticContent: false,
                     onclick: this.placeholderMenuHandler                        
                 },
                 {
-                    label: "Activity Editor",
-                    icon: "A",                            
-                    onclick: this.placeholderMenuHandler                        
-                },
+                    label: "Assets",          
+                    staticContent: true,
+                    onclick: this.placeholderMenuHandler
+                },                
                 {
-                    label: "Asset Manager",
-                    icon: "M",                            
+                    label: "Media",
+                    icon: "M",
+                    staticContent: false,
                     onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Analytics",
-                    icon: "L",                            
+                    label: "Add-Ons",
+                    icon: "L",
+                    staticContent: false,
                     onclick: this.placeholderMenuHandler                        
                 }
               ];
@@ -158,20 +179,30 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         console.log ("placeHolderMenuHanlder ()");
     }    
     
+    generateMenuItem (closed:boolean, item: any)
+    {
+        if (item.staticContent==true)
+        {
+            return (<h2 key={item.label}>{item.label}</h2>);
+        }
+                
+        if (closed==true)
+        {
+           return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a></li>);
+        } 
+
+        return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>);   
+    }
+    
     /**
      * We included this dedicated menu generator to ensure we could insert main menu options
      * dynamically from external data and even from a marktplace (yes we can)
      */
-    generateMenu (closed:Boolean)
+    generateMenu (closed:boolean)
     {
         console.log ("generateMenu ("+closed+")");
         
-        if (closed==true)
-        {
-           return (this.opts.map(item => <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a></li>));
-        } 
-
-        return (this.opts.map(item => <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>));        
+        return (this.opts.map(item => this.generateMenuItem (closed,item)));                
     }
          
     /**
@@ -183,8 +214,8 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         let mStyle = null;
         
         // Bad way of doing this, will be changed soon!
-        this.opts [0].onclick=this.props.viewActions.viewAllCourses;
-        this.opts [1].onclick=this.props.viewActions.viewOrganization;
+        this.opts [0].onclick=this.props.viewActions.editOrganization;        
+        this.opts [1].onclick=this.props.viewActions.viewAllCourses;
         
         if (this.state.closed==true) 
         {
@@ -201,8 +232,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
         
         return (
                 <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-                    <h1>Title of Course</h1>
-                    <h2>Example Label</h2>
+                    <h1>Title of Course</h1>                    
                     <ul className="nav nav-pills flex-column">
                         {menuData}
                     </ul>

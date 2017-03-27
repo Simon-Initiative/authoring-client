@@ -20,7 +20,6 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
 import CreateCourseView from './components/CreateCourseView';
-import CreateOrganizationView from './components/CreateOrganizationView';
 
 function mapStateToProps(state: any) {
 

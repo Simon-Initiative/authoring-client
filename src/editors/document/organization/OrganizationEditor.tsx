@@ -1,0 +1,107 @@
+import * as React from 'react';
+import * as Immutable from 'immutable';
+
+import * as persistence from '../../../data/persistence';
+import * as models from '../../../data/models';
+import * as contentTypes from '../../../data/contentTypes';
+import * as types from '../../../data/types';
+import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
+import * as viewActions from '../../../actions/view';
+
+import { AbstractEditor, AbstractEditorProps, 
+  AbstractEditorState } from '../common/AbstractEditor';
+
+import SortableTree from 'react-sortable-tree';
+
+const tempnavstyle=
+{
+    h2:
+    {
+        marginRight: '10px'
+    }
+};
+
+interface OrganizationEditor 
+{
+
+}
+
+export interface OrganizationEditorState extends AbstractEditorState 
+{
+    treeData : any;  
+}
+
+export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>
+{
+  dispatch: any;
+  documentId: string;
+  userId: string;    
+}
+
+/**
+*
+*/
+class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationEditorProps, OrganizationEditorState> 
+{
+    /**
+     * 
+     */
+    constructor(props) 
+    {
+        super(props);
+        this.state = {
+                        treeData: [
+                                    {
+                                        title: 'Logic',
+                                        children: [ 
+                                                    { title: 'Pre Test' } 
+                                                  ] 
+                                    },
+                                    {
+                                        title: 'Sets',
+                                        children: [ 
+                                                    { title: 'Methods for Prevention' } 
+                                                  ] 
+                                    }    
+                                ]
+                    };            
+    }
+    
+    componentDidMount() 
+    {
+    
+    }    
+    
+    /**
+     * 
+     */
+    processDataChange (treeData:any)
+    {
+        this.setState({ treeData })
+        
+        console.log (JSON.stringify(treeData));
+    }
+
+    /**
+     * 
+     */
+    render() 
+    {
+        return (
+                <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
+                    <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+                        <p className="h2" style={tempnavstyle.h2}>Course Content</p>
+                        <button type="button" className="btn btn-secondary">Add Item</button>
+                        <a className="nav-link" href="#">+ Expand All</a>
+                        <a className="nav-link" href="#">- Collapse All</a>
+                    </nav>
+                    <SortableTree
+                        treeData={this.state.treeData}
+                        onChange={ treeData => this.processDataChange({treeData}) }
+                    />
+                </div>
+        );
+    }
+}
+
+export default OrganizationEditor;

@@ -11,7 +11,8 @@ export const ModelTypes = types.strEnum([
   'CoursePermissionModel',
   'WorkbookPageModel',
   'AssessmentModel',
-  'MediaModel'
+  'MediaModel',
+  'OrganizationModel'
 ])
 
 // Create an actual type
@@ -33,13 +34,18 @@ export function createModel(object: any) : ContentModel {
       return new AssessmentModel(object);
     case ModelTypes.MediaModel:
       return new MediaModel(object);
+    case ModelTypes.OrganizationModel:
+      return new OrganizationModel(object);          
   }
 }
+
+//>---------------------------------------------------------------
 
 export type CourseModelParams = {
   title?: contentTypes.TitleContent,
   organizations?: Immutable.List<types.DocumentId>
 };
+
 const defaultCourseModel = {
   modelType: 'CourseModel',
   title: new contentTypes.TitleContent(),
@@ -61,6 +67,35 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       return this.merge(values) as this;
   }
 }
+
+//>---------------------------------------------------------------
+
+export type OrganizationModelParams = {
+  title?: contentTypes.TitleContent
+};
+
+const defaultOrganizationModel = 
+{
+  modelType: 'OrganizationModel',
+  title: new contentTypes.TitleContent(),
+}
+
+export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) 
+{    
+  modelType: 'OrganizationModel';
+  title: contentTypes.TitleContent;
+  
+  constructor(params?: OrganizationModelParams) 
+  {
+      params ? super(contentTypes.deserialize(params)) : super();
+  }
+
+  with(values: OrganizationModelParams) {
+      return this.merge(values) as this;
+  }
+}
+
+//>---------------------------------------------------------------
 
 export type MediaModelParams = {
   name: string,
@@ -190,7 +225,8 @@ export type ContentModel =
   CourseModel | 
   CoursePermissionModel | 
   MediaModel |
-  WorkbookPageModel;
+  WorkbookPageModel |
+  OrganizationModel;
 
 // A pure function that takes a content model as 
 // input and returns a changed content model

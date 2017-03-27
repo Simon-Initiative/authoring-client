@@ -51,12 +51,9 @@ export function viewAllCourses() : viewAllCoursesAction {
 export type VIEW_ORGANIZATION = 'VIEW_ORGANIZATION';
 export const VIEW_ORGANIZATION : VIEW_ORGANIZATION = 'VIEW_ORGANIZATION';
 
-export type viewOrganizationAction = {
-    type: VIEW_ORGANIZATION
-}
-
-export function viewOrganization() : viewOrganizationAction {
+export function editOrganization(documentId: string) : viewDocumentAction {
     return {
-        type: VIEW_ORGANIZATION
+        type: VIEW_DOCUMENT,
+        documentId
     }
 }
