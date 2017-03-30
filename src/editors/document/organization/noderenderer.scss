@@ -1,7 +1,6 @@
-$row-padding: 10px;
 
 .rowWrapper {
-    padding: $row-padding $row-padding $row-padding 0;
+    padding: 10px 10px 10px 0;
     height: 100%;
     box-sizing: border-box;
 }
@@ -278,6 +277,6 @@ $row-padding: 10px;
         width: 1px;
         left: 50%;
         bottom: 0;
-        height: $row-padding;
+        height: 10px;
     }
 }
