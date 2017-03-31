@@ -110,8 +110,6 @@ export abstract class HtmlContentEditor
     this.props.onEdit(content);
   } 
 
-  
-
   render() : JSX.Element {
 
     if (this.props.editMode) {

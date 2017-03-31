@@ -5,7 +5,7 @@ import * as models from './models';
 
 export function initWorkbook(title: string) : WorkbookPageModel {
   return new WorkbookPageModel({
-    title: new contentTypes.TitleContent({ text: title})
+    head: new contentTypes.TitleContent({ title: {text: title}})
   });
 }
 
@@ -25,7 +25,7 @@ export function titlesForCoursesResources(courseId: string) : Object {
       'courseId': {'$eq': courseId},
       'modelType': {'$in': ['WorkbookPageModel', 'AssessmentModel']}
     },
-    fields: ['_id', 'title', 'modelType']
+    fields: ['_id', 'head', 'modelType']
   }
 }
 
@@ -35,7 +35,7 @@ export function titlesForEmbeddedResources(courseId: string) : Object {
       'courseId': {'$eq': courseId},
       'modelType': {'$in': ['AssessmentModel']}
     },
-    fields: ['_id', 'title', 'modelType']
+    fields: ['_id', 'head', 'modelType']
   }
 }
 
@@ -57,6 +57,6 @@ export function resourceQuery(resources: string[]) : Object {
     selector: {
       '_id': {'$in': resources},
     },
-    fields: ['_id', 'title', 'modelType']
+    fields: ['_id', 'head', 'modelType']
   };
 }

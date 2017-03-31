@@ -1,0 +1,120 @@
+import * as contentTypes from '../../../../../src/data/contentTypes';
+import * as models from '../../../../../src/data/models';
+
+import * as translate from '../../../../../src/editors/content/common/draft/translate';
+
+const body = [{
+  "section": [
+    {
+      "title": {
+        "text": "First section title"
+      }
+    },
+    {
+      "body": [
+        {
+          "p": {
+            "text": "Amino acids are the building blocks of proteins. The sequence of amino acids in individual proteins is encoded in the DNA of the cell. The physical and chemical properties of the 20 different, naturally occurring amino acids dictate the shape of the protein and its interactions with its environment. Certain short sequences of amino acids in the protein also dictate where the protein resides in the cell. Proteins are composed of hundreds to thousands of amino acids. As you can imagine, protein folding is a complicated process and there are many potential shapes due to the large number of combinations of amino acids. By understanding the properties of the amino acids you will get an appreciation for the limits of protein folding and how to predict the potential higher order structure of the protein."
+          }
+        },
+        {
+          "p": [
+            {
+              "text": "All amino acids all have the same backbone structure with an amino group (the "
+            },
+            {
+              "em": {
+                "text": "mainchain"
+              }
+            },
+            {
+              "text": "atoms)."
+            }
+          ]
+        },
+        {
+          "p": [
+            {
+              "em": {
+                "text": "Chirality:"
+              }
+            },
+            {
+              "text": "Because there are four different groups attached to the central carbon, the alpha carbon is an asymmetric or chiral center."
+            }
+          ]
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Sub section 1 title"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": {
+                    "text": "Because there are four different groups attached to the central carbon, the alpha carbon is an asymmetric or chiral center. Use the Jmol to answer the questions."
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "p": {
+            "text": "The chiral center gives rise to D and L enantiomers for each amino acid. Although enantiomers have identical physical properties, bioselectivity gives rise to the dominance of the use of L amino acids in nature. Most of these L forms are also S, but some amino acids in the L form are actually R."
+          }
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Sub section 2 title"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": {
+                    "text": "Because there are four different groups attached to the central carbon, the alpha carbon is an asymmetric or chiral center. Use the Jmol to answer the questions."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+},
+{
+  "section": [
+    {
+      "title": {
+        "text": "Second section title"
+      }
+    },
+    {
+      "body": [
+        {
+          "p": {
+            "text": "The sidechains of a number of amino acids have pKa values in the range of 2-12 and thus can potentially ionize in biochemical systems. The structures of the ionizable sidechains, along with their pKa values are shown in the figure below."
+          }
+        }
+      ]
+    }
+  ]
+}];
+
+
+it('conversion of HTMLContent to Draft model', () => {
+
+  const html = new contentTypes.HtmlContent({body});
+
+  const draft = translate.htmlContentToDraft(html);
+
+  //expect(wb.lock.lockedBy).toBe('alice');
+  
+});

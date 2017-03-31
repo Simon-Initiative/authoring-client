@@ -7,7 +7,8 @@ import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
 import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
-import * as translate from './translate';
+import { htmlContentToDraft } from './translation/todraft';
+import { draftToHtmlContent } from './translation/topersistence';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 
@@ -172,7 +173,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.lastSelectionState = null;
     
-    const contentState : ContentState = translate.htmlContentToDraft(this.props.content);
+    const contentState : ContentState = htmlContentToDraft(this.props.content);
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, decorator),
@@ -196,7 +197,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         }
 
         const content = editorState.getCurrentContent();
-        const htmlContent : HtmlContent = translate.draftToHtmlContent(editorState.getCurrentContent());
+        const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
         this.props.onEdit(htmlContent);
 
         return this.setState({editorState})
@@ -211,7 +212,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     var entityKey = block.getEntityAt(0);
     var newContentState = content.mergeEntityData(entityKey, data);
 
-    const htmlContent : HtmlContent = translate.draftToHtmlContent(newContentState);
+    const htmlContent : HtmlContent = draftToHtmlContent(newContentState);
     this.props.onEdit(htmlContent);
   }
 

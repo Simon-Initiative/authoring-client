@@ -51,14 +51,18 @@ export class LockContent extends Immutable.Record({contentType: 'LockContent', l
 }
 
 
-export type TitleContentParams = {
-  text?: string
+export type TextContent = {
+  text: string
 };
 
-export class TitleContent extends Immutable.Record({contentType: 'TitleContent', text: ''}) {
+export type TitleContentParams = {
+  title?: TextContent
+};
+
+export class TitleContent extends Immutable.Record({contentType: 'TitleContent', title: { text: ''}}) {
   
   contentType: 'TitleContent';
-  text: string;
+  title: TextContent;
   
   constructor(params?: TitleContentParams) {
     params ? super(deserialize(params)) : super();
@@ -70,28 +74,22 @@ export class TitleContent extends Immutable.Record({contentType: 'TitleContent',
 }
 
 export type HtmlContentParams = {
-  blocks: Object[],
-  entityMap: Object
+  body: any
 };
 
 const defaultHtmlContentParams = {
-  blocks: [{
-    text: (
-      'Sample text'
-    ),
-    type: 'unstyled',
-    entityRanges: [],
-  }], 
-  entityMap: {},
-  contentType: 'HtmlContent'
+  body: [{
+    "p": {
+      "text": "Sample text"
+    }
+  }]
 };
 
 export class HtmlContent extends Immutable.Record(defaultHtmlContentParams) {
 
   contentType: 'HtmlContent';
 
-  blocks: Object[];
-  entityMap: Object;
+  body: any;
   
   constructor(params?: HtmlContentParams) {
     // We do not use the deserielize here only because HtmlContent is still just
