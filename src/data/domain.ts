@@ -5,7 +5,7 @@ import * as models from './models';
 
 export function initWorkbook(title: string) : WorkbookPageModel {
   return new WorkbookPageModel({
-    head: new contentTypes.TitleContent({ title: {text: title}})
+    head: new contentTypes.TitleContent({ title: {'#text': title}})
   });
 }
 

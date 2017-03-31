@@ -28,6 +28,21 @@ export type RawDraft = {
   blocks: RawContentBlock[]
 };
 
+export const ARRAY = '#array';
+export const TITLE = '@title';
+export const STYLE = '@style';
+export const TEXT = '#text';
+export const CDATA = '#cdata';
+
+export const styleMap = {};
+const addStyle = (oliStyle, draftStyle) => {
+  styleMap[oliStyle] = draftStyle;
+  styleMap[draftStyle] = oliStyle;
+}
+
+addStyle('bold', 'BOLD');
+addStyle('italic', 'ITALIC');
+
 export const sectionBlockStyles = {
   1: 'header-one',
   2: 'header-two',

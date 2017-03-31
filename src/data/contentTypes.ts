@@ -52,14 +52,14 @@ export class LockContent extends Immutable.Record({contentType: 'LockContent', l
 
 
 export type TextContent = {
-  text: string
+  '#text': string
 };
 
 export type TitleContentParams = {
   title?: TextContent
 };
 
-export class TitleContent extends Immutable.Record({contentType: 'TitleContent', title: { text: ''}}) {
+export class TitleContent extends Immutable.Record({contentType: 'TitleContent', title: { '#text': ''}}) {
   
   contentType: 'TitleContent';
   title: TextContent;
@@ -78,11 +78,13 @@ export type HtmlContentParams = {
 };
 
 const defaultHtmlContentParams = {
-  body: [{
-    "p": {
-      "text": "Sample text"
-    }
-  }]
+  body: {
+    "#array": [{
+      "p": {
+        "#text": "Sample text"
+      }
+    }]
+  }
 };
 
 export class HtmlContent extends Immutable.Record(defaultHtmlContentParams) {

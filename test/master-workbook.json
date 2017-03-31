@@ -1,0 +1,86 @@
+ // To use this file, open the couchdb web console and find a workbook page document
+
+ // Then replace the top level 'body' attribute with the top level 'body'
+ // attribute here:
+ {
+  "body": {
+    "section": {
+      "#array": [
+        {
+          "title": {
+            "#text": "Prose Style Lightside Activity"
+          }
+        },
+        {
+          "body": {
+            "#array": [
+              {
+                "p": {
+                  "#array": [
+                  {
+                    "#text": "As we "
+                  },
+                  {
+                    "em": {
+                      "@style": "bold",
+                      "#text": "have seen"
+                    }
+                  },
+                  {
+                    "em": {
+                      "@style": "italic",
+                      "#text": "translation"
+                    }
+                  },
+                  {
+                    "#text": ", for example a pair of equal and ."
+                  }
+                ]
+                }
+              },
+              {
+                "p": {
+                  "#text": "Within this Character Data block"
+                }
+              },
+              {
+                "ul": {
+                  "#array": [{
+                    "li": {
+                      "#text": "Unordered List item 1"
+                    }},
+                    {
+                      "li": {
+                      "#text": "Unordered List item 2"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "ol": {
+                  "#array": [{
+                    "li": {
+                      "#text": "Ordered List item 1"
+                    }},
+                    {
+                      "li": {
+                      "#text": "Ordered List item 2"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "wb:inline": {
+                  "@idref": "prose_light_side",
+                  "@purpose": "learnbydoing"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+ }

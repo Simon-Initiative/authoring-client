@@ -2,29 +2,29 @@ import * as Immutable from 'immutable';
 
 import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import { HtmlContent } from '../../../../../data/contentTypes';
-import * as types from './common';
+import * as common from './common';
 import { BlockTypes } from '../blocktypes';
 
 // Translation routines to convert from persistence model to draft model 
 
-export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
-  // Current support is a simple identity transform 
 
+export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
+  
   const keyHandlers = {
     section: sectionHandler,
-    body: genericContainerHandler,
+    body: bodyHandler,
     p: paragraphHandler,
     ol: listHandler.bind(undefined, 'ordered-list-item'),
     ul: listHandler.bind(undefined, 'unordered-list-item')
   }
 
-  const params : types.RawDraft = {
+  const params : common.RawDraft = {
     entityMap : {},
     blocks : []
   };
-    
-  genericContainerHandler(htmlContent.body, keyHandlers, params, 0);
-
+  
+  parse(htmlContent, keyHandlers, params, 0);
+  
   console.log(params.blocks);
 
   return convertFromRaw(params);
@@ -33,10 +33,10 @@ export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
 
 
 function getBlockStyleForDepth(depth: number) : string {
-  if (types.sectionBlockStyles[depth] === undefined) {
+  if (common.sectionBlockStyles[depth] === undefined) {
     return 'header-six';
   } else {
-    return types.sectionBlockStyles[depth];
+    return common.sectionBlockStyles[depth];
   }
 }
 
@@ -59,8 +59,8 @@ function getKey(item) {
   return Object.keys(item)[0];
 }
 
-function addNewBlock(params : types.RawDraft, values : Object) {
-  const defaultBlock : types.RawContentBlock = {
+function addNewBlock(params : common.RawDraft, values : Object) {
+  const defaultBlock : common.RawContentBlock = {
     key: generateRandomKey(),
     text: ' ',
     type: 'unstyled',
@@ -74,29 +74,36 @@ function addNewBlock(params : types.RawDraft, values : Object) {
 }
 
 
-function listHandler(listBlockType, item, keyRegistry, params : types.RawDraft, depth: number) {
-  item.forEach(listItem => {
+function listHandler(listBlockType, item, keyRegistry, params : common.RawDraft, depth: number) {
+  const key = getKey(item);
+  item[key][common.ARRAY].forEach(listItem => {
     addNewBlock(params, { 
-      text: listItem.li.text,
+      text: listItem.li[common.TEXT],
       type: listBlockType,
       data: { oliDepth: depth}
     });
   });
 }
 
-function paragraphHandler(item, keyRegistry, params : types.RawDraft, depth: number) {
-  if (item instanceof Array) {
+function paragraphHandler(item, keyRegistry, params : common.RawDraft, depth: number) {
+  
+  const key = getKey(item);
+  if (item[key][common.ARRAY] !== undefined) {
 
     let fullText = '';
-    let markups : types.RawInlineStyle[] = [];
-    item.forEach(subItem => {
+    let markups : common.RawInlineStyle[] = [];
+    item[key][common.ARRAY].forEach(subItem => {
       switch (getKey(subItem)) {
         case 'em': 
-          markups.push({ offset: fullText.length, length: subItem.em.text.length, style: 'ITALIC'});
-          fullText += subItem.em.text;
+          const style = common.styleMap[subItem.em[common.STYLE]];
+          markups.push({ offset: fullText.length, length: subItem.em[common.TEXT].length, style});
+          fullText += subItem.em[common.TEXT];
           break;
-        case 'text':
-          fullText += subItem.text; 
+        case common.TEXT:
+          fullText += subItem[common.TEXT]; 
+          break;
+        case common.CDATA:
+          fullText += subItem[common.CDATA]; 
           break;
       }
     });
@@ -110,34 +117,36 @@ function paragraphHandler(item, keyRegistry, params : types.RawDraft, depth: num
   } else {
     // It is just one text element, go ahead and create a block for it
     addNewBlock(params, { 
-      text: item.text,
+      text: item[key][common.TEXT],
       data: { oliDepth: depth }
     });
   }
 }
 
 
-function sectionHandler(item, keyRegistry, params : types.RawDraft, depth: number) {
+function sectionHandler(item, keyRegistry, params : common.RawDraft, depth: number) {
+
+  const key = getKey(item);
 
    // Create a content block displaying the title text
   const values = { 
     type: getBlockStyleForDepth(depth + 1), 
-    text: item[0].title.text,
+    text: item[key][common.ARRAY][0].title[common.TEXT],
     data: { oliType: 'section.title', oliDepth: depth + 1}
   };
   addNewBlock(params, values);
 
   // parse the body 
-  keyRegistry.body(item[1].body, keyRegistry, params, depth + 1);
+  parse(item[key][common.ARRAY][1], keyRegistry, params, depth + 1);
 }
 
-function genericContainerHandler(container, keyHandlers, params: types.RawDraft, depth: number) {
-  container.forEach(item => {
-    parse(item, keyHandlers, params, depth);
-  });
+function bodyHandler(item, keyRegistry, params : common.RawDraft, depth: number) {
+
+  const key = getKey(item);
+  item[key][common.ARRAY].forEach(subItem => parse(subItem, keyRegistry, params, depth));
 }
 
-function handleUnsupported(item, keyRegistry, params : types.RawDraft, depth: number) {
+function handleUnsupported(item, keyRegistry, params : common.RawDraft, depth: number) {
   // Add a new block with an immutable entity containing the raw data 
   const entityKey = generateRandomKey();
   const values = { 
@@ -153,18 +162,19 @@ function handleUnsupported(item, keyRegistry, params : types.RawDraft, depth: nu
   };
 }
 
-function parse(item, keyHandlers, params : types.RawDraft, depth: number) {
+function parse(item : Object, keyHandlers, params : common.RawDraft, depth: number) {
 
   // item is an object with one key.  That key will be either 'section' or 'title'
   // or 'body' or 'p' or ...  
 
+  // Get the key and then get the registered key handler
   const key = getKey(item);
   const handler = keyHandlers[key];
 
   if (handler === undefined) {
     handleUnsupported(item, keyHandlers, params, depth);
   } else {
-    handler(item[key], keyHandlers, params, depth);
+    handler(item, keyHandlers, params, depth);
   }
 
 }
