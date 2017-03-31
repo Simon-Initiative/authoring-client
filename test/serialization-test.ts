@@ -6,7 +6,7 @@ import * as models from '../src/data/models';
 
 it('deserialization of WorkbookPageModel', () => {
 
-  let wb = new models.WorkbookPageModel({ lock: {contentType: 'LockContent', lockedBy: 'alice', lockedAt: 123}, head: {contentType: 'TitleContent', title: {text: 'testing'}}} as any);
+  let wb = new models.WorkbookPageModel({ lock: {contentType: 'LockContent', lockedBy: 'alice', lockedAt: 123}, head: {contentType: 'TitleContent', title: {'#text': 'testing'}}} as any);
   
   expect(wb.head.title['#text']).toBe('testing');
   expect(wb.head instanceof contentTypes.TitleContent).toEqual(true);
@@ -30,7 +30,7 @@ it('roundtrip of TitleContent', () => {
   expect(titleContent.title['#text']).toBe('testing');
 
   let json = titleContent.toJS();
-  expect(json).toEqual({ title: {text: 'testing'}, contentType: 'TitleContent'});
+  expect(json).toEqual({ title: {'#text': 'testing'}, contentType: 'TitleContent'});
 
   let obj = new contentTypes.TitleContent(json);
   expect(obj.title['#text']).toBe('testing');
@@ -40,26 +40,27 @@ it('roundtrip of TitleContent', () => {
 it('roundtrip of HtmlContent', () => {
 
   let html = new contentTypes.HtmlContent();
-  expect(html.body).toEqual([
-      {
+  expect(html.body).toEqual({
+      "#array": [{
         "p": {
             "#text": "Sample text"
           }
-        
-      }
-    ]);
+        }
+      ]
+  });
   
 
   let json = html.toJS();
   expect(json).toEqual({
-    "body": [
-      {
-        "p": {
+    "body": {
+      "#array": [
+        {
+          "p": {
             "#text": "Sample text"
           }
-        
-      }
-    ]
+        }
+      ]
+    }
   });
 
 });
