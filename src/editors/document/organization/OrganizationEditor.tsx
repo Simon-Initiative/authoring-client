@@ -61,7 +61,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         super(props);
 
         this.state = {
-                        treeData:[{"title":"Available Tests","children":[{"title":"Server Tests","children":[]},{"title":"Activity Tests","children":[]},{"title":"Workbook Page Items","children":[]}]}]
+                        treeData: this.processData(orgData)
                      };
     }
         
@@ -107,8 +107,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    getTextFromNode (aNode: any) : string
-    {
+    getTextFromNode (aNode: any) : string {
         var testString:string=aNode ['text'];
         
         console.log ("getTextFromNode ("+testString+")");
@@ -123,6 +122,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     extractData (treeData: any) {
         console.log ("extractData ()");
         
+        console.log ("New data: " + JSON.stringify (treeData));
     }
     
     resolveItem (anItem:any):string {
@@ -151,6 +151,65 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         return ("");
     }
+
+    /**
+     * Parses a structure that looks like this:
+     * {
+     *   "item": {
+     *            "@scoring_mode": "default",
+     *            "resourceref": {
+     *              "@idref": "test03_sections_workbook"
+     *            }
+     *   }
+     * },
+     */
+    parseItem (anItem: any): OrgTreeNode {
+        console.log ("parseItem ()");
+        
+        var newNode: OrgTreeNode=new OrgTreeNode ();
+        
+        for (var i in anItem) {
+            
+            console.log ("item: " + i);
+            
+            if (i=="@scoring_mode") {
+                newNode.scoringMode=anItem [i];
+            }
+            
+            if (i=="resourceref") {
+                newNode.title=anItem [i]["@idref"];
+                newNode.resourceRef.idRef=anItem [i]["@idref"];
+            }            
+        }
+        
+        return (newNode);
+    }
+    
+    /**
+     * 
+     */
+    parseSection (aSection: any): OrgTreeNode {
+        console.log ("parseSection ()");
+        
+        var newNode: OrgTreeNode=new OrgTreeNode ();
+        
+        for (var i=0;i<aSection.length;i++)
+        {
+            var potentialSection=aSection [i];
+            
+            for (var j in potentialSection) {
+                if (j=="title") {
+                  newNode.title=this.getTextFromNode (potentialSection [j]);  
+                }
+                
+                if (j=="item") {
+                  newNode.addNode (this.parseItem (potentialSection [j]));
+                }                
+            }
+        }
+        
+        return (newNode);
+    }
     
     /**
      * 
@@ -166,33 +225,23 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         for (var s in mContents) {
           
           var mdl=mContents [s];
-          
+          //var newNode:OrgTreeNode=new OrgTreeNode ();
+            
           if (s=="title") {            
             //console.log ("Found title: " + this.getTextFromNode (mdl));                                  
             moduleNode.title=this.getTextFromNode (mdl); 
           }                                 
           
+          if (s=="item") {
+              console.log ("Found item");
+              
+              moduleNode.addNode (this.parseItem (mdl));
+          }                
+            
           if (s=="section") {
-            console.log ("Found section");
+              console.log ("Found section");
               
-              for (var i=0;i<mdl.length;i++) {
-              
-                var sect=mdl [i];
-
-                var nodeType:string = this.getNodeType (sect);
-                  
-                if (nodeType=="item") {
-                    console.log ("Adding item ...");
-                    let itemNode=new OrgTreeNode ();
-                    itemNode.title=mdl ["resourceref"]["@idref"];
-                    itemNode.resourceRef=mdl ["resourceref"]["@idref"];
-                    moduleNode.addNode (itemNode);
-                    
-                    // Find out if there is real content backing this
-                    // reference
-                    this.resolveItem (itemNode.resourceRef);
-                }
-              }
+               moduleNode.addNode (this.parseSection (mdl));
             }
         }
       }
@@ -276,7 +325,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             }
         }
 
-        console.log ("Created tree: " + JSON.stringify (newData));
+        //console.log ("Created tree: " + JSON.stringify (newData));
         
         return (newData);
     }

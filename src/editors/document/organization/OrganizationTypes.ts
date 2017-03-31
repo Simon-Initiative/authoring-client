@@ -5,7 +5,7 @@ export class IDRef {
 
 export default class OrgTreeNode {
   title:string="Something";
-  scoring_mode : string ="default";
+  scoringMode : string ="default";
   resourceRef : IDRef;
   children:Array<OrgTreeNode>;
     
