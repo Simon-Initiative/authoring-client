@@ -1,16 +1,27 @@
 import * as React from 'react';
 import { Component, PropTypes } from 'react';
 
-//import baseStyles from './OrganizationNodeRenderer.scss';
-import baseStyles from 'react-sortable-tree';
 import { isDescendant } from 'react-sortable-tree';
+//import baseStyles from './noderenderer.scss';
+//import './noderenderer.scss';
+var baseStyles = ersatzimport ('!style!scss!./noderender.scss') as any;
 
 let styles = baseStyles;
+//let styles = {};
 
 class OrganizationNodeRenderer extends Component <any, any> 
 {
-    render() {
-        const {
+    render() 
+    {
+        //console.log ("render ()");
+        
+        console.log ("Props: " + JSON.stringify (this.props));
+        console.log ("Styles: " + JSON.stringify (styles));
+        
+        let handle;
+        
+        const 
+        {
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -31,14 +42,16 @@ class OrganizationNodeRenderer extends Component <any, any>
             isOver:     _isOver,     // Not needed, but preserved for other renderers
             parentNode: _parentNode, // Needed for drag-and-drop utils
             endDrag:    _endDrag,    // Needed for drag-and-drop utils
-            startDrag:  _startDrag,  // Needed for drag-and-drop utils
+            startDrag:  _startDrag,   // Needed for drag-and-drop utils
             ...otherProps,
         } = this.props;
 
-        let handle;
+        //console.log ("render () A");
 
-        if (canDrag) {
-            if (typeof node.children === 'function' && node.expanded) {
+        if (canDrag) 
+        {
+            if (typeof node.children === 'function' && node.expanded) 
+            {
                 // Show a loading symbol on the handle when the children are expanded
                 //  and yet still defined by a function (a callback to fetch the children)
                 handle = (
@@ -67,11 +80,15 @@ class OrganizationNodeRenderer extends Component <any, any>
             }
         }
 
+        //console.log ("render () B");
+
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;
 
+        //console.log ("render () C");
+
         return (
-            <div style={{ height: '100%' }} {...otherProps}>
+            <div style={{ height: '100%' }} {...otherProps} >
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
                     <div>
                         <button

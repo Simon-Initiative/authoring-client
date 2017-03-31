@@ -1,0 +1,336 @@
+{
+  "organization": [
+    {
+      "title": {
+        "text": "OLI Website QA Content"
+      }
+    },
+    {
+      "description": {
+        "text": "Use this course to either test the various aspects of the OLI server or use in conjunction with a tool like Selenium."
+      }
+    },
+    {
+      "audience": {
+        "text": "This organization is specifically intended for OLI technical staff."
+      }
+    },
+    {
+      "sequences": {
+        "sequence": [
+          {
+            "title": {
+              "text": "Available Tests"
+            }
+          },
+          {
+            "module": [
+              {
+                "title": {
+                  "text": "Server Tests"
+                }
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "Server Stress Tests"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test00_stress_test_workbook"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "Native OLI Logging"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test1e_logging_native_workbook"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "CTAT/Datashop Logging"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test01_logging_class"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test1d_logging_embed_workbook"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "XAPI Logging through OLI logger"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test01b_loggingxapi_class"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test01c_loggingxapi_interactive_class"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "module": [
+              {
+                "title": {
+                  "text": "Activity Tests"
+                }
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "Tests of API and Internal Capabilities"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02a_embedded_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02b_embeddedapi_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02b_embeddedapi_interactive_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02c_ctat_tutor_embed_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02d_ctat_tutor_embed_seq_workbook"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "Tests of External Tools and Package Integration"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02e_external_embed_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02f_adaptive_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02g_basic_angular_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02h_diagrammer_angular_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02i_layout_easyui_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02j_widgets_jqueryui_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02k_adobe_captivate_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02l_ctat_widget_test_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02m_tinymce_activity_workbook"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "section": [
+                  {
+                    "title": {
+                      "text": "Test of Documentation Examples"
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02h_diagrammer_angular_activity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02o_peeractivity_workbook"
+                      }
+                    }
+                  },
+                  {
+                    "item": {
+                      "@scoring_mode": "default",
+                      "resourceref": {
+                        "@idref": "test02p_peeredit_workbook"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "module": [
+              {
+                "title": {
+                  "text": "Workbook Page Items"
+                }
+              },
+              {
+                "item": {
+                  "@scoring_mode": "default",
+                  "resourceref": {
+                    "@idref": "test03_sections_workbook"
+                  }
+                }
+              },
+              {
+                "item": {
+                  "@scoring_mode": "default",
+                  "resourceref": {
+                    "@idref": "test03b_sections_workbook"
+                  }
+                }
+              },
+              {
+                "item": {
+                  "@scoring_mode": "default",
+                  "resourceref": {
+                    "@idref": "test03c_links_workbook"
+                  }
+                }
+              },
+              {
+                "item": {
+                  "@scoring_mode": "default",
+                  "resourceref": {
+                    "@idref": "test03.1_workbook_page_structure"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
