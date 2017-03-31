@@ -50,7 +50,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     persistence.queryDocuments(titlesForCoursesResources(documentId))
       .then(docs => {
         this.setState({
-          resources: docs.map(d => ({ _id: d._id, title: (d as any).title.text, type: (d as any).modelType}))
+          resources: docs.map(d => ({ _id: d._id, title: (d as any).head.title.text, type: (d as any).modelType}))
         })
       });
   }
@@ -76,12 +76,12 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     if (type === 'workbook') {
       resource = new models.WorkbookPageModel({
           courseId: this.props.documentId,
-          title: new contentTypes.TitleContent({ text: title})
+          head: new contentTypes.TitleContent({ title: {text: title}})
         });
     } else {
       resource = new models.AssessmentModel({
           courseId: this.props.documentId,
-          title: new contentTypes.TitleContent({ text: title})
+          head: new contentTypes.TitleContent({ title: {text: title}})
         });
     }
 

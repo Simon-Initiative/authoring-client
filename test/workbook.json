@@ -1,0 +1,846 @@
+{
+  "workbook_page": [
+    {
+      "head": {
+        "title": {
+          "text": "5. Amino Acids"
+        }
+      }
+    },
+    {
+      "body": [
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Amino Acids"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": {
+                    "text": "Amino acids are the building blocks of proteins. The sequence of amino acids in individual proteins is encoded in the DNA of the cell. The physical and chemical properties of the 20 different, naturally occurring amino acids dictate the shape of the protein and its interactions with its environment. Certain short sequences of amino acids in the protein also dictate where the protein resides in the cell. Proteins are composed of hundreds to thousands of amino acids. As you can imagine, protein folding is a complicated process and there are many potential shapes due to the large number of combinations of amino acids. By understanding the properties of the amino acids you will get an appreciation for the limits of protein folding and how to predict the potential higher order structure of the protein."
+                  }
+                },
+                {
+                  "p": [
+                    {
+                      "text": "All amino acids all have the same backbone structure with an amino group (the"
+                    },
+                    {
+                      "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eα\u003c/m:mi\u003e \u003c/m:math\u003e"
+                    },
+                    {
+                      "text": "-amino group), a carboxyl group, an"
+                    },
+                    {
+                      "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eα\u003c/m:mi\u003e \u003c/m:math\u003e"
+                    },
+                    {
+                      "text": "-hydrogen, and a variety of functional groups (R) all attached to the"
+                    },
+                    {
+                      "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eα\u003c/m:mi\u003e \u003c/m:math\u003e"
+                    },
+                    {
+                      "text": "-carbon. The atoms that are common to all amino acids are called the"
+                    },
+                    {
+                      "em": {
+                        "text": "mainchain"
+                      }
+                    },
+                    {
+                      "text": "atoms."
+                    }
+                  ]
+                },
+                {
+                  "image": {
+                    "@src": "../webcontent/single_amino_acid.gif",
+                    "@width": "500",
+                    "@height": "115",
+                    "caption": [
+                      {
+                        "text": "The general structure of an α-amino acid is shown on the left. The amino group (blue) has a pK"
+                      },
+                      {
+                        "sub": {
+                          "text": "a"
+                        }
+                      },
+                      {
+                        "text": "value of ~9, thus it is protonated at pH 7.0. The carboxylic acid group (red) has a pK"
+                      },
+                      {
+                        "sub": {
+                          "text": "a"
+                        }
+                      },
+                      {
+                        "text": "of 2.0, and thus it is deprotonated at pH 7.0. The amino group and the carboxylic acid are joined by the α-carbon. The α-carbon, α-proton, the amino group and the carboxyl-group are found in all amino acids. The R group varies from amino acid to amino acid. The right structure shows the amino acid leucine. The R-group is 2-methyl-propane. The name of the carbons on the sidechain follow the greek alphabet, i.e. the β-carbon is next to the α-carbon, the γ-carbon next to the β-carbon, etc."
+                      }
+                    ]
+                  }
+                },
+                {
+                  "p": [
+                    {
+                      "em": {
+                        "text": "Chirality:"
+                      }
+                    },
+                    {
+                      "text": "Because there are four different groups attached to the central carbon, the alpha carbon is an asymmetric or chiral center."
+                    }
+                  ]
+                },
+                {
+                  "p": {
+                    "text": "In order to determine chirality follow these steps:"
+                  }
+                },
+                {
+                  "ol": [
+                    {
+                      "li": {
+                        "text": "Label the four groups attached to the chiral center with nubmers 1-4. 1 has the highest atomic number and 4 has the lowest."
+                      }
+                    },
+                    {
+                      "li": {
+                        "text": "Point the group labeled 4 away from you."
+                      }
+                    },
+                    {
+                      "li": [
+                        {
+                          "text": "If 1,2,3 is"
+                        },
+                        {
+                          "em": {
+                            "text": "counter-clockwise"
+                          }
+                        },
+                        {
+                          "text": "the compound is"
+                        },
+                        {
+                          "em": {
+                            "text": "L"
+                          }
+                        },
+                        {
+                          "text": ", or S123."
+                        }
+                      ]
+                    },
+                    {
+                      "li": [
+                        {
+                          "text": "If 1,2,3 is"
+                        },
+                        {
+                          "em": {
+                            "text": "clockwise"
+                          }
+                        },
+                        {
+                          "text": "the compound is"
+                        },
+                        {
+                          "em": {
+                            "text": "D"
+                          }
+                        },
+                        {
+                          "text": ", or R. Most common amino acids are"
+                        },
+                        {
+                          "em": {
+                            "text": "L"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "section": [
+                    {
+                      "title": {
+                        "text": "Chirality"
+                      }
+                    },
+                    {
+                      "body": [
+                        {
+                          "p": {
+                            "text": "Because there are four different groups attached to the central carbon, the alpha carbon is an asymmetric or chiral center. Use the Jmol to answer the questions."
+                          }
+                        },
+                        {
+                          "materials": [
+                            {
+                              "material": {
+                                "@orient": "vertical",
+                                "applet": [
+                                  {},
+                                  {
+                                    "param": {
+                                      "text": "true"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "blue"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "Downloading JmolApplet ..."
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "white"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "black"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "_jmolReadyCallback"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "@name": "load",
+                                      "wb:path": {
+                                        "@href": "../webcontent/jmol/jmol/pdbs/F_I_amino_methane.pdb"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "reset;rotate z 75;rotate x 40;rotate y -20;zoom 150;"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "material": {
+                                "@orient": "vertical",
+                                "wb:inline": {
+                                  "@idref": "inline_l5_chirality"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "p": {
+                    "text": "The chiral center gives rise to D and L enantiomers for each amino acid. Although enantiomers have identical physical properties, bioselectivity gives rise to the dominance of the use of L amino acids in nature. Most of these L forms are also S, but some amino acids in the L form are actually R."
+                  }
+                },
+                {
+                  "section": [
+                    {
+                      "title": {
+                        "text": "Amino Acid Chirality"
+                      }
+                    },
+                    {
+                      "body": [
+                        {
+                          "materials": [
+                            {
+                              "material": {
+                                "@orient": "horizontal",
+                                "image": {
+                                  "@src": "../webcontent/l-ala.jpg",
+                                  "@width": "160",
+                                  "title": {
+                                    "text": "L-Alanine"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "material": {
+                                "@orient": "horizontal",
+                                "applet": [
+                                  {
+                                    "title": {
+                                      "text": "Valine"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "true"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "blue"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "Downloading JmolApplet ..."
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "white"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "white"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "_jmolReadyCallback"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "@name": "load",
+                                      "wb:path": {
+                                        "@href": "../webcontent/jmol/jmol/pdbs/valine.pdb"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "set specular 60; set specpower 100; set ambient 20; set diffuse 80; rotate x 90; zoom 135; wireframe 0.2;spacefill 0.3"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "material": {
+                                "@orient": "horizontal",
+                                "applet": [
+                                  {
+                                    "title": {
+                                      "text": "Glycine"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "true"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "blue"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "Downloading JmolApplet ..."
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "white"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "white"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "_jmolReadyCallback"
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "@name": "load",
+                                      "wb:path": {
+                                        "@href": "../webcontent/jmol/jmol/pdbs/glycine.pdb"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "param": {
+                                      "text": "set specular 60; set specpower 100; set ambient 20; set diffuse 80; rotate x 90; zoom 135; wireframe 0.2;spacefill 0.3"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "wb:inline": {
+                            "@idref": "inline_aa_chiral"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "p": [
+                    {
+                      "em": {
+                        "text": "Sidechain properties:"
+                      }
+                    },
+                    {
+                      "text": "If all of the amino acids have the same basic structure with an amino, a carboxyl and a hydrogen fixed to the alpha carbon, then the large variation in the properties and structure of the amino acids must come from the fourth group attached to the alpha carbon. This group is referred to as the"
+                    },
+                    {
+                      "em": {
+                        "text": "sidechain"
+                      }
+                    },
+                    {
+                      "text": "of the amino acid or the"
+                    },
+                    {
+                      "em": {
+                        "text": "R group"
+                      }
+                    },
+                    {
+                      "text": ". These structures of the 20 common amino acids are shown below."
+                    }
+                  ]
+                },
+                {
+                  "image": [
+                    {
+                      "title": {
+                        "text": "Common Amino Acids"
+                      }
+                    },
+                    {
+                      "caption": [
+                        {
+                          "text": "The structure of the 20 common amino acids is shown. The simplest amino acid, glycine, is shown in the upper left. The mainchain atoms of glycine are highlighted in yellow and its sidechain (H) is highlighted in green. All amino acids have the same mainchain atoms, but differ in the sidechains. For clarity, the"
+                        },
+                        {
+                          "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eα\u003c/m:mi\u003e \u003c/m:math\u003e"
+                        },
+                        {
+                          "text": "-proton is omitted in the remaining drawings. Non-polar amino acids are highlighted in grey, aromatic amino acids are highlighted in cyan, polar are highlighted by purple, amino acids with acidic sidechains are highlighted in red, and amino acids with basic sidechains are highlighted in blue. The amino acids cysteine and proline, which are shown at the bottom of the page have unique properties. Cysteine can form covalent S-S disulfide bond, stabilizing the protein structure. In the case of proline, the sidechain attaches to its own nitrogen, making proline an imino acid."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "p": {
+                    "text": "The sidechain groups of these amino acids contain many of the same functional groups that were discussed in the first lecture. You can click on the image below to view and compare the jmol structures of the amino acids."
+                  }
+                },
+                {
+                  "table": {
+                    "@rowstyle": "plain",
+                    "tr": {
+                      "td": {
+                        "link": {
+                          "@href": "../webcontent/jmol/aa.html",
+                          "@target": "new",
+                          "image": {
+                            "@src": "../webcontent/aminoacidsjmol.jpg",
+                            "@alt": "amino acids",
+                            "@height": "200",
+                            "@width": "276",
+                            "caption": {
+                              "text": "Jmol OVERVIEW OF THE AMINO ACIDS"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Acid-Base Properties of Amino Acid Side-Chains"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": {
+                    "text": "The sidechains of a number of amino acids have pKa values in the range of 2-12 and thus can potentially ionize in biochemical systems. The structures of the ionizable sidechains, along with their pKa values are shown in the figure below."
+                  }
+                },
+                {
+                  "image": [
+                    {
+                      "title": {
+                        "text": "Ionizable Amino acids"
+                      }
+                    },
+                    {
+                      "caption": {
+                        "text": "The protonated (left) and deprotonated (right) forms of ionizable amino acids are shown. Note that the acidic residues become negatively charged when ionized, while the basic residues become neutral. Clicking on the image will enlarge it."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "UV Absorption of Amino Acids"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": [
+                    {
+                      "text": "Tryptophan (Trp), tyrosine (Tyr), and phenylalanine (Phe) contain conjugated aromatic rings. Consequently, they absorb light in the ultraviolet range (UV). Light absorbance is quantified by the"
+                    },
+                    {
+                      "em": {
+                        "text": "absorbance"
+                      }
+                    },
+                    {
+                      "text": ", which is equal to log(I"
+                    },
+                    {
+                      "sub": {
+                        "text": "o"
+                      }
+                    },
+                    {
+                      "text": "/I), where I"
+                    },
+                    {
+                      "sub": {
+                        "text": "o"
+                      }
+                    },
+                    {
+                      "text": "is the intensity of the incident light and I is the intensity of the light that leaves the sample. If no light is absorbed, then I\u003dI"
+                    },
+                    {
+                      "sub": {
+                        "text": "o"
+                      }
+                    },
+                    {
+                      "text": "and A\u003d0. As the intensity of the transmitted light decreases, A increases."
+                    }
+                  ]
+                },
+                {
+                  "p": {
+                    "text": "The amount of light that is absorbed by a solution of chromophores is characterized by the molar extinction coefficient. This is the absorbance that would be measured for a 1 molar solution. The extinction coefficients for Trp, Tyr, and Phe are listed below."
+                  }
+                },
+                {
+                  "table": [
+                    {
+                      "tr": [
+                        {
+                          "th": {
+                            "text": "Amino Acid"
+                          }
+                        },
+                        {
+                          "th": [
+                            {
+                              "text": "Extinction Coefficient"
+                            },
+                            {
+                              "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003c/m:math\u003e"
+                            },
+                            {
+                              "text": "("
+                            },
+                            {
+                              "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eλ\u003c/m:mi\u003e \u003c/m:math\u003e"
+                            },
+                            {
+                              "sub": {
+                                "text": "MAX"
+                              }
+                            },
+                            {
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tr": [
+                        {
+                          "td": {
+                            "text": "Trp"
+                          }
+                        },
+                        {
+                          "td": [
+                            {
+                              "text": "5,050 M"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "cm"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "(280 nm)"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tr": [
+                        {
+                          "td": {
+                            "text": "Tyr"
+                          }
+                        },
+                        {
+                          "td": [
+                            {
+                              "text": "1,440 M"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "cm"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "(274 nm)"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tr": [
+                        {
+                          "td": {
+                            "text": "Phe"
+                          }
+                        },
+                        {
+                          "td": [
+                            {
+                              "text": "220 M"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "cm"
+                            },
+                            {
+                              "sup": {
+                                "text": "-1"
+                              }
+                            },
+                            {
+                              "text": "(257 nm)"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "p": {
+                    "text": "Due to the dominance of the absorption by Trp residues, most proteins show a maximum light absorbance at a wavelength of 280 nm."
+                  }
+                },
+                {
+                  "p": [
+                    {
+                      "text": "The amount of light absorbed by a solution of concentration [X] is given by the Beer-Lambert Law: A\u003d"
+                    },
+                    {
+                      "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003c/m:math\u003e"
+                    },
+                    {
+                      "text": "l [X], where [X] is the concentration of the absorbing species, in moles/L, and l is the pathlength of the light (usually 1 cm). Given a known extinction coefficient it is possible to measure the concentration of a protein. Note that experimentally accurate absorption measurements seldom exceed ~3.0; at this value most of the light is absorbed by the sample and very little light reaches the detector in the instrument."
+                    }
+                  ]
+                },
+                {
+                  "p": [
+                    {
+                      "em": {
+                        "text": "Calculation of molar extinction coefficients"
+                      }
+                    },
+                    {
+                      "text": ": If a protein contains a mixture of N different chromophores, the absorbance can generally be assumed to be additive. Consequently the molar extinction coefficient for the entire protein is:"
+                    }
+                  ]
+                },
+                {
+                  "formula": {
+                    "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" display\u003d\"block\" overflow\u003d\"scroll\"\u003e \u003cm:mrow\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003cm:mo\u003e\u003d\u003c/m:mo\u003e \u003cm:mrow\u003e \u003cm:munder\u003e \u003cm:mo\u003e∑\u003c/m:mo\u003e \u003cm:mrow\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eAbsorbing\u003c/m:mi\u003e \u003cm:mtext\u003e \u003c/m:mtext\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eGroups\u003c/m:mi\u003e \u003c/m:mrow\u003e \u003c/m:munder\u003e \u003cm:mrow\u003e \u003cm:msub\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003cm:mi\u003ei\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:msub\u003e \u003cm:mi\u003en\u003c/m:mi\u003e \u003cm:mi\u003ei\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:mo\u003e\u003d\u003c/m:mo\u003e \u003cm:msub\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eTrp\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:msub\u003e \u003cm:mi\u003en\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eTrp\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:mo\u003e+\u003c/m:mo\u003e \u003cm:msub\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eTyr\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:msub\u003e \u003cm:mi\u003en\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003eTyr\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:mo\u003e+\u003c/m:mo\u003e \u003cm:msub\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eε\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003ePhe\u003c/m:mi\u003e \u003c/m:msub\u003e \u003cm:msub\u003e \u003cm:mi\u003en\u003c/m:mi\u003e \u003cm:mi mathvariant\u003d\"italic\"\u003ePhe\u003c/m:mi\u003e \u003c/m:msub\u003e \u003c/m:mrow\u003e \u003c/m:mrow\u003e \u003c/m:mrow\u003e \u003c/m:math\u003e"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Peptide Bond"
+              }
+            },
+            {
+              "body": [
+                {
+                  "p": {
+                    "text": "Proteins are polymers of amino acids. The amino acids are joined together by a condensation reaction similar to that described for the formation of the glycosidic bond in polysaccharides. Each amino acid in the polymer is referred to as a residue. Individual amino acids are joined together by the attack of the nitrogen of an amino group of one amino acid on the carbonyl carbon of the carboxyl group of another to create a covalent peptide bond and yield a molecule of water as shown below."
+                  }
+                },
+                {
+                  "image": {
+                    "@src": "../webcontent/peptide_bond.png",
+                    "@width": "345",
+                    "@height": "291",
+                    "caption": [
+                      {
+                        "text": "Peptide bond formation occurs by a dehydration reaction. The amino group of the second amino acid attacks the carbonyl carbon of the first, forming the peptide bond and releasing water. The resultant dipeptide has an amino terminus (left) and a carboxy-terminus (right). The mainchain atoms, which are the same for each residue in the peptide, include the nitrogen and its proton, the"
+                      },
+                      {
+                        "math": "\u003cm:math xmlns:m\u003d\"http://www.w3.org/1998/Math/MathML\" overflow\u003d\"scroll\"\u003e \u003cm:mi mathvariant\u003d\"normal\"\u003eα\u003c/m:mi\u003e \u003c/m:math\u003e"
+                      },
+                      {
+                        "text": "-carbon and its hydrogen, and the C\u003dO group. The R-groups form the sidechain atoms."
+                      }
+                    ]
+                  }
+                },
+                {
+                  "p": {
+                    "text": "The resulting peptide chain is linear, defined by the mechanism that builds the polymer, and has defined ends. Short polymers (\u003c 50 residues or amino acids) are usually refereed to as peptides, and longer polymers as proteins. Because the synthesis takes place from the alpha amino group of one amino acid to the carboxyl group of another amino acid, the result is that there will always be a free amino group on one end of the growing polymer (the N-terminus) and a free carboxyl group on the other end (the C-terminus). Note that the potential exists for the formation of amide (peptide) links involving the carboxyl and amino groups in the side chains, but bioselectivity directs the synthesis to be linear, involving only the alpha amino and alpha carboxyl groups."
+                  }
+                },
+                {
+                  "p": {
+                    "text": "Note that after the amino acid has been incorporated into the protein, the charges on the amino and carboxy terminus have disappeared. Thus the mainchain atoms have become polar functional groups. Since each residue in a protein has exactly the same mainchain atoms, the functional properties of a protein must arise from the different sidechain groups."
+                  }
+                },
+                {
+                  "p": [
+                    {
+                      "text": "By convention, the sequences of peptides and proteins are written with the N-terminus on the left and the C-terminus on the right. The name of the N-terminal residue is always the first amino acid. The name of each amino acid then follows. The"
+                    },
+                    {
+                      "em": {
+                        "text": "primary sequence"
+                      }
+                    },
+                    {
+                      "text": "of a protein refers to its amino acid sequence."
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section": [
+            {
+              "title": {
+                "text": "Review and Pre-Lecture BONUS QUIZ"
+              }
+            },
+            {
+              "body": [
+                {
+                  "wb:inline": {
+                    "@idref": "inline_aminoacids_peptides",
+                    "@purpose": "didigetthis"
+                  }
+                },
+                {
+                  "p": {
+                    "em": {
+                      "text": "Readings"
+                    }
+                  }
+                },
+                {
+                  "p": {
+                    "text": "After you have completed the activities on this page, and read the assigned sections in the take the bonus quiz below."
+                  }
+                },
+                {
+                  "ul": [
+                    {
+                      "li": {
+                        "text": "Horton: 3.1, 3.2, 3.4, 3.5 Amino acids and peptides"
+                      }
+                    },
+                    {
+                      "li": {
+                        "text": "Nelson: 3.1 amino acids, 3.2 peptides and proteins."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

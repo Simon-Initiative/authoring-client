@@ -71,7 +71,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           <TitleContentEditor 
             onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
-            content={this.props.model.title}
+            content={this.props.model.head}
             onEdit={(c) => this.onEdit('title', c)} 
             editingAllowed={this.props.editingAllowed}/>
           

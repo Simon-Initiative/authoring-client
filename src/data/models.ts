@@ -150,14 +150,14 @@ export class CoursePermissionModel extends Immutable.Record(defaultCoursePermiss
 
 export type WorkbookPageModelParams = {
   courseId?: types.DocumentId,
-  title?: contentTypes.TitleContent,
+  head?: contentTypes.TitleContent,
   body?: contentTypes.HtmlContent,
   lock?: contentTypes.LockContent
 };
 const defaultWorkbookPageModelParams = {
   modelType: 'WorkbookPageModel',
   courseId: '',
-  title: new contentTypes.TitleContent(),
+  head: new contentTypes.TitleContent(),
   body: new contentTypes.HtmlContent(),
   lock: new contentTypes.LockContent()
 }
@@ -167,7 +167,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   modelType: 'WorkbookPageModel';
 
   courseId: types.DocumentId;
-  title: contentTypes.TitleContent;
+  head: contentTypes.TitleContent;
   body: contentTypes.HtmlContent;
   lock: contentTypes.LockContent;
 
@@ -183,7 +183,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 export type AssessmentModelParams = {
   courseId?: types.DocumentId,
   lock?: contentTypes.LockContent,
-  title?: contentTypes.TitleContent,
+  head?: contentTypes.TitleContent,
   context?: contentTypes.HtmlContent,
   assessment?: contentTypes.InlineAssessmentContent
 };
@@ -191,7 +191,7 @@ const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
   courseId: '',
   lock: new contentTypes.LockContent(),
-  title: new contentTypes.TitleContent(),
+  head: new contentTypes.TitleContent(),
   context: new contentTypes.HtmlContent(),
   assessment: new contentTypes.InlineAssessmentContent()
 }
@@ -202,7 +202,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
   courseId: types.DocumentId;
   lock: contentTypes.LockContent;
-  title: contentTypes.TitleContent;
+  head: contentTypes.TitleContent;
   context: contentTypes.HtmlContent;
   assessment: contentTypes.InlineAssessmentContent;
 
