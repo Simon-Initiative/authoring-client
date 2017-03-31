@@ -15,6 +15,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
+import {IDRef} from './OrganizationTypes'
 import OrgTreeNode from './OrganizationTypes'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
@@ -58,24 +59,6 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         console.log ("OrganizationEditor ()");
         
         super(props);
-        /*
-        this.state = {
-                        treeData: [
-                                    {
-                                        title: 'Logic',
-                                        children: [ 
-                                                    { title: 'Pre Test' } 
-                                                  ] 
-                                    },
-                                    {
-                                        title: 'Sets',
-                                        children: [ 
-                                                    { title: 'Methods for Prevention' } 
-                                                  ] 
-                                    }    
-                                ]
-                    };
-        */
 
         this.state = {
                         treeData:[{"title":"Available Tests","children":[{"title":"Server Tests","children":[]},{"title":"Activity Tests","children":[]},{"title":"Workbook Page Items","children":[]}]}]
@@ -142,6 +125,33 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
     }
     
+    resolveItem (anItem:any):string {
+        
+        return ("");
+    }
+    
+    /**
+     * This method exists to handle the specific structure we find in serialized OLI
+     * organization content. For example:
+     * {
+     *      "item" : {
+     *          "@scoring_mode" : "default",
+     *          "resourceref" : {
+     *              "@idref" : "test02a_embedded_workbook"
+     *          }
+     *      }
+     *  }
+     */
+    getNodeType (aNode: any): string {
+        console.log ("getNodeType ()");
+        
+        for (var i in aNode) {            
+            return (i);
+        }
+        
+        return ("");
+    }
+    
     /**
      * 
      */
@@ -158,13 +168,32 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
           var mdl=mContents [s];
           
           if (s=="title") {            
-            console.log ("Found title: " + this.getTextFromNode (mdl));                                  
+            //console.log ("Found title: " + this.getTextFromNode (mdl));                                  
             moduleNode.title=this.getTextFromNode (mdl); 
           }                                 
           
-          if (s=="section") {           
+          if (s=="section") {
             console.log ("Found section");
-          }
+              
+              for (var i=0;i<mdl.length;i++) {
+              
+                var sect=mdl [i];
+
+                var nodeType:string = this.getNodeType (sect);
+                  
+                if (nodeType=="item") {
+                    console.log ("Adding item ...");
+                    let itemNode=new OrgTreeNode ();
+                    itemNode.title=mdl ["resourceref"]["@idref"];
+                    itemNode.resourceRef=mdl ["resourceref"]["@idref"];
+                    moduleNode.addNode (itemNode);
+                    
+                    // Find out if there is real content backing this
+                    // reference
+                    this.resolveItem (itemNode.resourceRef);
+                }
+              }
+            }
         }
       }
         
@@ -255,7 +284,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    processDataChange (treeData: any){
+    processDataChange (treeData: any) {
                 
         console.log ("processDataChange ()");
         
