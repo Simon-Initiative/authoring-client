@@ -8,7 +8,7 @@ import CodeBlock from './CodeBlock';
 import { EmbeddedDocument } from './EmbeddedDocument';
 import Unsupported from './Unsupported';
 
-import { BlockTypes } from '../blocktypes';
+import { BlockTypes } from '../custom';
 import { register } from './registry';
 
 

@@ -8,6 +8,7 @@ import * as common from './common';
 
 type Container = Object[];
 type Stack = Container[];
+type InlineOrEntity = common.RawInlineStyle | common.RawEntityRange;
 
 type Block = {
   rawBlock: common.RawContentBlock,
@@ -227,9 +228,16 @@ function translateParagraph(rawBlock : common.RawContentBlock,
 
 }
 
-function hasOverlappingIntervals(intervals : common.RawInlineStyle[]) : boolean {
+function combineIntervals(rawBlock: common.RawContentBlock) : InlineOrEntity[] {
   
-  intervals.sort((a,b) => a.offset - b.offset);
+  const intervals : InlineOrEntity[] = 
+    [...rawBlock.entityRanges, ...rawBlock.inlineStyleRanges]
+    .sort((a,b) => a.offset - b.offset);
+  
+  return intervals;
+}
+
+function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
   
   for (let i = 0; i < intervals.length - 2; i++) {
     let a = intervals[i];
@@ -312,35 +320,43 @@ function translateOverlapping(rawBlock : common.RawContentBlock,
   }
 }
 
-function translateInline(s : common.RawInlineStyle, text : string) {
+function translateInline(s : InlineOrEntity, text : string, entityMap : common.RawEntityMap) {
   
-  const { style, offset, length } = s;
-  const substr = text.substring(offset, offset + length);
-  const mappedStyle = common.styleMap[style];
-  
-  if (common.emStyles[mappedStyle] !== undefined) {
-    return { em: { '@style': mappedStyle, '#text': substr}};
+  if (isInlineStyle(s)) {
+    const { style, offset, length } = s;
+    const substr = text.substring(offset, offset + length);
+    const mappedStyle = common.styleMap[style];
+
+    if (common.emStyles[mappedStyle] !== undefined) {
+      return { em: { '@style': mappedStyle, '#text': substr}};
+    } else {
+      const value = {};
+      value[mappedStyle] = { '#text': substr};
+      return value;
+    }
   } else {
-    const value = {};
-    value[mappedStyle] = { '#text': substr};
-    return value;
+    return entityMap[s.key].data;
   }
 
 }
 
-function translateNonOverlapping(rawBlock : common.RawContentBlock, 
-  block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
+function isInlineStyle(range : InlineOrEntity) : range is common.RawInlineStyle {
+  return (<common.RawInlineStyle>range).style !== undefined;
+}
 
-  let styles = rawBlock.inlineStyleRanges;
-  if (styles[0].offset !== 0) {
-    container.push({ '#text': rawBlock.text.substring(0, styles[0].offset)});
+function translateNonOverlapping(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, intervals : InlineOrEntity[],
+  entityMap : common.RawEntityMap, container: Object[]) {
+
+  if (intervals[0].offset !== 0) {
+    container.push({ '#text': rawBlock.text.substring(0, intervals[0].offset)});
   }
 
-  styles
-    .map(s => translateInline(s, rawBlock.text))
+  intervals
+    .map(s => translateInline(s, rawBlock.text, entityMap))
     .forEach(s => container.push(s));
 
-  let lastStyleEnd = styles[styles.length - 1].offset + styles[styles.length - 1].length;
+  let lastStyleEnd = intervals[intervals.length - 1].offset + intervals[intervals.length - 1].length;
   if (lastStyleEnd < rawBlock.text.length) {
     container.push({ '#text': rawBlock.text.substring(lastStyleEnd)});
   }
@@ -350,10 +366,12 @@ function translateNonOverlapping(rawBlock : common.RawContentBlock,
 function translateTextBlock(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
   
-  if (hasOverlappingIntervals(rawBlock.inlineStyleRanges)) {
+  const intervals = combineIntervals(rawBlock);
+
+  if (hasOverlappingIntervals(intervals)) {
     translateOverlapping(rawBlock, block, entityMap, container);
   } else {
-    translateNonOverlapping(rawBlock, block, entityMap, container);
+    translateNonOverlapping(rawBlock, block, intervals, entityMap, container);
   }
 }
 

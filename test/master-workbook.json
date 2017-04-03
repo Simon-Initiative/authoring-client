@@ -36,6 +36,11 @@
                     }
                   },
                   {
+                    "bdo": {
+                      "#text": "this is bdo "
+                    }
+                  },
+                  {
                     "sup": {
                       "#text": "superscript "
                     }

@@ -21,6 +21,14 @@ export type RawContentBlock = {
   data: any
 };
 
+export type RawEntity = {
+  type: string,
+  mutability: string,
+  data: Object
+};
+
+
+
 export type RawEntityMap = Object;
 
 export type RawDraft = {

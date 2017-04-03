@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import { HtmlContent } from '../../../../../data/contentTypes';
 import * as common from './common';
-import { BlockTypes } from '../blocktypes';
+import { BlockTypes, EntityTypes } from '../custom';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -85,6 +85,24 @@ function listHandler(listBlockType, item, keyRegistry, params : common.RawDraft,
   });
 }
 
+
+function createEntity(params: common.RawDraft, offset : number, length : number, type: string, mutability: string, data: Object) : common.RawEntityRange {
+
+  const range : common.RawEntityRange = {
+    length,
+    offset,
+    key: generateRandomKey()
+  };
+
+  params.entityMap[range.key] = {
+    type,
+    mutability,
+    data
+  }
+
+  return range;
+}
+
 function paragraphHandler(item, keyRegistry, params : common.RawDraft, depth: number) {
   
   const key = getKey(item);
@@ -92,8 +110,16 @@ function paragraphHandler(item, keyRegistry, params : common.RawDraft, depth: nu
 
     let fullText = '';
     let markups : common.RawInlineStyle[] = [];
+    let entities : common.RawEntityRange[] = [];
+
     item[key][common.ARRAY].forEach(subItem => {
-      switch (getKey(subItem)) {
+
+      const offset = fullText.length;
+      const subKey = getKey(subItem);
+      
+      const data = {};
+      
+      switch (subKey) {
         case 'foreign': // intentional fall through
         case 'ipa':  // intentional fall through
         case 'sym':  // intentional fall through
@@ -101,29 +127,59 @@ function paragraphHandler(item, keyRegistry, params : common.RawDraft, depth: nu
         case 'term': // intentional fall through 
         case 'var':  // intentional fall through
         case 'sub':  // intentional fall through
-        case 'sup':
-          const key = getKey(subItem);
-          const subStyle = common.styleMap[key];
-          markups.push({ offset: fullText.length, length: subItem[key][common.TEXT].length, style: subStyle});
-          fullText += subItem[key][common.TEXT];
+        case 'sup': {
+            const text = subItem[subKey][common.TEXT];
+            const length = text.length;
+            const subStyle = common.styleMap[subKey];
+            markups.push({ offset, length, style: subStyle});
+            fullText += text;
+          }
           break;
-        case 'em': 
-          const style = common.styleMap[subItem.em[common.STYLE]];
-          markups.push({ offset: fullText.length, length: subItem.em[common.TEXT].length, style});
-          fullText += subItem.em[common.TEXT];
+        
+        case 'em': {
+            const style = common.styleMap[subItem.em[common.STYLE]];
+            markups.push({ offset: fullText.length, length: subItem.em[common.TEXT].length, style});
+            fullText += subItem.em[common.TEXT];
+          }
           break;
+        
         case common.TEXT:
           fullText += subItem[common.TEXT]; 
           break;
         case common.CDATA:
           fullText += subItem[common.CDATA]; 
           break;
+        default: {
+          
+          // Unsupported, but has a text property
+          if (subItem[subKey][common.TEXT] !== undefined) {
+
+            const text = subItem[subKey][common.TEXT];
+            const length = text.length;
+            fullText += text;
+            
+            entities.push(createEntity(params, offset, length, EntityTypes.UNSUPPORTED, 'IMMUTABLE', subItem));
+
+          } else {
+            
+            // Unsupported but no text property. 
+            const text = JSON.stringify(subItem);
+            const length = text.length;
+            fullText += text;
+            
+            entities.push(createEntity(params, offset, length, EntityTypes.UNSUPPORTED, 'IMMUTABLE', subItem));
+            
+          }
+
+        }
+          
       }
     });
 
     addNewBlock(params, { 
       text: fullText,
       inlineStyleRanges: markups,
+      entityRanges: entities,
       data: { oliDepth: depth }
     });
 
