@@ -1,6 +1,7 @@
 /**
 *
 */
+
 import * as React from 'react';
 import { returnType } from '../utils/types';
 import { connect }  from 'react-redux';
@@ -147,9 +148,15 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                     label: "Learning",          
                     staticContent: true,
                     onclick: this.placeholderMenuHandler                       
-                },                
+                },
                 {
                     label: "Learning Objectives",
+                    icon: "A",           
+                    staticContent: false,
+                    onclick: this.placeholderMenuHandler                        
+                },
+                {
+                    label: "Skills",
                     icon: "A",           
                     staticContent: false,
                     onclick: this.placeholderMenuHandler                        
@@ -236,7 +243,6 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         // Bad way of doing this, will be changed soon!
         this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);        
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
-        //this.opts [4].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);
         
         if (this.state.closed==true) 
         {
@@ -261,6 +267,5 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
             );
     }
 }
-
 
 export default connect<NavigationBarReduxProps, {}, NavigationBarOwnProps>(mapStateToProps)(NavigationBar);
