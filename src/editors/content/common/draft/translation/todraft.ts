@@ -94,6 +94,19 @@ function paragraphHandler(item, keyRegistry, params : common.RawDraft, depth: nu
     let markups : common.RawInlineStyle[] = [];
     item[key][common.ARRAY].forEach(subItem => {
       switch (getKey(subItem)) {
+        case 'foreign': // intentional fall through
+        case 'ipa':  // intentional fall through
+        case 'sym':  // intentional fall through
+        case 'cite': // intentional fall through
+        case 'term': // intentional fall through 
+        case 'var':  // intentional fall through
+        case 'sub':  // intentional fall through
+        case 'sup':
+          const key = getKey(subItem);
+          const subStyle = common.styleMap[key];
+          markups.push({ offset: fullText.length, length: subItem[key][common.TEXT].length, style: subStyle});
+          fullText += subItem[key][common.TEXT];
+          break;
         case 'em': 
           const style = common.styleMap[subItem.em[common.STYLE]];
           markups.push({ offset: fullText.length, length: subItem.em[common.TEXT].length, style});

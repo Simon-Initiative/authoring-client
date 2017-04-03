@@ -8,7 +8,7 @@
       "#array": [
         {
           "title": {
-            "#text": "Prose Style Lightside Activity"
+            "#text": "Section title"
           }
         },
         {
@@ -21,15 +21,40 @@
                     "#text": "As we "
                   },
                   {
+                    "cite": {
+                      "#text": "cite "
+                    }
+                  },
+                  {
+                    "term": {
+                      "#text": "term "
+                    }
+                  },
+                  {
+                    "sub": {
+                      "#text": "subscript "
+                    }
+                  },
+                  {
+                    "sup": {
+                      "#text": "superscript "
+                    }
+                  },
+                  {
+                    "var": {
+                      "#text": "and use code "
+                    }
+                  },
+                  {
                     "em": {
                       "@style": "bold",
-                      "#text": "have seen"
+                      "#text": "have seen bold "
                     }
                   },
                   {
                     "em": {
                       "@style": "italic",
-                      "#text": "translation"
+                      "#text": "italics"
                     }
                   },
                   {

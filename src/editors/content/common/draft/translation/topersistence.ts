@@ -312,6 +312,22 @@ function translateOverlapping(rawBlock : common.RawContentBlock,
   }
 }
 
+function translateInline(s : common.RawInlineStyle, text : string) {
+  
+  const { style, offset, length } = s;
+  const substr = text.substring(offset, offset + length);
+  const mappedStyle = common.styleMap[style];
+  
+  if (common.emStyles[mappedStyle] !== undefined) {
+    return { em: { '@style': mappedStyle, '#text': substr}};
+  } else {
+    const value = {};
+    value[mappedStyle] = { '#text': substr};
+    return value;
+  }
+
+}
+
 function translateNonOverlapping(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
 
@@ -321,7 +337,7 @@ function translateNonOverlapping(rawBlock : common.RawContentBlock,
   }
 
   styles
-    .map(s => ({ em: { '@style': common.styleMap[s.style], '#text': rawBlock.text.substring(s.offset, s.offset + s.length)}}))
+    .map(s => translateInline(s, rawBlock.text))
     .forEach(s => container.push(s));
 
   let lastStyleEnd = styles[styles.length - 1].offset + styles[styles.length - 1].length;

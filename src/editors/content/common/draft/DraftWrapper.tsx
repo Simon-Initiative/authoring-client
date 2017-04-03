@@ -63,12 +63,36 @@ const styles = {
 };
 
 const styleMap = {
-  CODE: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-    fontSize: 16,
-    padding: 2,
+  SUBSCRIPT: {
+    lineHeight: '0',
+    position: 'relative',
+    verticalAlign: 'baseline',
+    fontSize: '75%',
+    bottom: '-0.25em'
   },
+  SUPERSCRIPT: {
+    lineHeight: '0',
+    position: 'relative',
+    verticalAlign: 'baseline',
+    fontSize: '75%',
+    top: '-0.5em'
+  },
+  CITE: {
+    fontStyle: 'italic',
+    textDecoration: 'underline'
+  },
+  TERM: {
+    textDecoration: 'underline'
+  },
+  IPA: {
+    // TODO
+  },
+  FOREIGN: {
+    // TODO
+  },
+  SYM: {
+    // TODO
+  }
 };
 
 const blockRenderMap = Immutable.Map({
@@ -308,6 +332,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         onClick={this.focus}>
 
         <Editor ref="editor"
+          customStyleMap={styleMap}
           blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.blockRenderer.bind(this)}
