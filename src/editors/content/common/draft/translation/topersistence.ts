@@ -2,15 +2,16 @@ import * as Immutable from 'immutable';
 
 import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import { HtmlContent } from '../../../../../data/contentTypes';
-import * as types from './common';
+import * as common from './common';
 
 // Translation routine from draft model to persistence model 
 
 type Container = Object[];
 type Stack = Container[];
+type InlineOrEntity = common.RawInlineStyle | common.RawEntityRange;
 
 type Block = {
-  rawBlock: types.RawContentBlock,
+  rawBlock: common.RawContentBlock,
   block : ContentBlock
 }
 
@@ -21,14 +22,14 @@ interface BlockIterator {
 }
 
 interface BlockProvider {
-  blocks : types.RawContentBlock[];
+  blocks : common.RawContentBlock[];
   state : ContentState;
   index : number; 
 }
 
 class BlockProvider implements BlockIterator {
 
-  constructor(blocks : types.RawContentBlock[], state: ContentState) {
+  constructor(blocks : common.RawContentBlock[], state: ContentState) {
     this.blocks = blocks;
     this.state = state; 
     this.index = 0;
@@ -80,14 +81,14 @@ export function draftToHtmlContent(state: ContentState) : HtmlContent {
   return new HtmlContent(translated as any);
 }
 
-function translate(content: types.RawDraft, state: ContentState) : Object {
+function translate(content: common.RawDraft, state: ContentState) : Object {
 
-  const root = { body: [], contentType: 'HtmlContent'};
+  const root = { body: { '#array': []}, contentType: 'HtmlContent'};
 
   // The root section really isn't a section, it is just the top level
   // body element.  We consider this to be depth level 0 - so it matches
   // the index of the location in this 'stack'.  
-  const context = [root.body];  
+  const context = [root.body['#array']];  
 
   const iterator = new BlockProvider(content.blocks, state);
 
@@ -99,7 +100,7 @@ function translate(content: types.RawDraft, state: ContentState) : Object {
 }
 
 function translateBlock(iterator : BlockIterator,
-  entityMap : types.RawEntityMap, context: Stack) {
+  entityMap : common.RawEntityMap, context: Stack) {
   
   const block = iterator.next();
   const rawBlock = block.rawBlock;
@@ -119,33 +120,34 @@ function translateBlock(iterator : BlockIterator,
 }
 
 
-function isSectionTitleBlock(block : types.RawContentBlock) : boolean {
+function isSectionTitleBlock(block : common.RawContentBlock) : boolean {
   const { type } = block; 
-  return (types.blockStylesMap[type] !== undefined);
+  return (common.blockStylesMap[type] !== undefined);
 }
 
-function isParagraphBlock(block : types.RawContentBlock) : boolean {
+function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (data.oliType === undefined && type === 'unstyled');
 }
 
-function isUnorderedListBlock(block : types.RawContentBlock) : boolean {
+function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
   const { type } = block; 
   return (type === 'unordered-list-item');
 }
 
-function isOrderedListBlock(block : types.RawContentBlock) : boolean {
+function isOrderedListBlock(block : common.RawContentBlock) : boolean {
   const { type } = block; 
   return (type === 'ordered-list-item');
 }
 
 function translateList(listType : string, 
-  rawBlock : types.RawContentBlock, 
+  rawBlock : common.RawContentBlock, 
   block: ContentBlock, iterator : BlockIterator, 
-  entityMap : types.RawEntityMap, context: Stack) {
+  entityMap : common.RawEntityMap, context: Stack) {
 
   const list = {};
-  list[listType] = [];
+  list[listType] = { '#array': [] };
+  const container = list[listType]['#array'];
 
   const listBlockType = rawBlock.type;
 
@@ -154,11 +156,11 @@ function translateList(listType : string,
   while (true) {
 
     if (rawBlock.inlineStyleRanges.length === 0) {
-      list[listType].push({ li: { text: rawBlock.text}});
+      container.push({ li: { '#text': rawBlock.text}});
     } else {
-      const li = { li: []};
-      list[listType].push(li);
-      translateTextBlock(rawBlock, block, entityMap, li.li);
+      const li = { li: { '#array': []}};
+      container.push(li);
+      translateTextBlock(rawBlock, block, entityMap, li.li['#array']);
     }
 
     let nextBlock = iterator.peek();
@@ -173,23 +175,27 @@ function translateList(listType : string,
 
 }
 
-function translateUnsupported(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, context: Stack) {
+function translateUnsupported(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   top(context).push(JSON.parse(entityMap[rawBlock.entityRanges[0].key].data.src));
 }
 
-function translateSection(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, context: Stack) {
+function translateSection(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const s = { 
-    section: [{ 
-      title: {
-        text: rawBlock.text
-      }
-    }, {
-      body: []
-    }]
+    section: {
+      '#array': [{
+        title: {
+          '#text': rawBlock.text
+        }
+      }, {
+        body: {
+          '#array': []
+        }
+      }]
+    }
   };
 
   // Everytime we encounter a section title we have to consider
@@ -198,33 +204,40 @@ function translateSection(rawBlock : types.RawContentBlock,
   // get the section depth from the block header type and then
   // adjust the section stack accordingly.
 
-  const sectionDepth = types.blockStylesMap[rawBlock.type];
+  const sectionDepth = common.blockStylesMap[rawBlock.type];
 
   while (context.length > sectionDepth) {
     context.pop();
   }
 
   top(context).push(s);
-  context.push((s.section[1] as any).body);
+  context.push((s.section['#array'][1] as any).body['#array']);
 
 }
 
-function translateParagraph(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, context: Stack) {
+function translateParagraph(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   if (rawBlock.inlineStyleRanges.length === 0) {
-    top(context).push({ p: { text: rawBlock.text}});
+    top(context).push({ p: { '#text': rawBlock.text}});
   } else {
-    const p = { p: []};
+    const p = { p: { '#array': []}};
     top(context).push(p);
-    translateTextBlock(rawBlock, block, entityMap, p.p);
+    translateTextBlock(rawBlock, block, entityMap, p.p['#array']);
   }
 
 }
 
-function hasOverlappingIntervals(intervals : types.RawInlineStyle[]) : boolean {
+function combineIntervals(rawBlock: common.RawContentBlock) : InlineOrEntity[] {
   
-  intervals.sort((a,b) => a.offset - b.offset);
+  const intervals : InlineOrEntity[] = 
+    [...rawBlock.entityRanges, ...rawBlock.inlineStyleRanges]
+    .sort((a,b) => a.offset - b.offset);
+  
+  return intervals;
+}
+
+function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
   
   for (let i = 0; i < intervals.length - 2; i++) {
     let a = intervals[i];
@@ -237,13 +250,14 @@ function hasOverlappingIntervals(intervals : types.RawInlineStyle[]) : boolean {
   return false;
 }
 
-function translateOverlapping(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, container: Object[]) {
+function translateOverlapping(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
 
   // Create a bare text tag for the first unstyled part, if one exists
   let styles = rawBlock.inlineStyleRanges;
   if (styles[0].offset !== 0) {
-    container.push({ text: rawBlock.text.substring(0, styles[0].offset - 1)});
+    let text = { '#text': rawBlock.text.substring(0, styles[0].offset - 1)};
+    container.push(text);
   }
 
   // Find all overlapping styles and group them
@@ -262,31 +276,37 @@ function translateOverlapping(rawBlock : types.RawContentBlock,
   }
 
   
-  // Walk through each group of overlapping styles (which could just be one style)
+  // Walk through each group of overlapping styles 
   // and create the necessary objects, using the Draft per-character style support
   let chars : Immutable.List<CharacterMetadata> = block.getCharacterList();
+
   for (let j = 0; j < groups.length; j++) {
 
     let g = groups[j];
 
     let current = chars.get(g.offset).getStyle();
     let begin = g.offset;
+
     for (let i = g.offset; i < (g.offset + g.length); i++) {
       let c : CharacterMetadata = chars.get(i);
       let allStyles : Immutable.OrderedSet<string> = c.getStyle();
 
       if (!allStyles.equals(current)) {
+        
         // TODO handle multiple styles 
-        container.push({ em: {text: rawBlock.text.substring(begin, i - 1)}});
+
+        container.push({ em: {'#text': rawBlock.text.substring(begin, i - 1)}});
         current = chars.get(i).getStyle();
         begin = i;
       }
     }
-    container.push({ em: {text: rawBlock.text.substring(begin, (g.offset + g.length) - 1)}});
+    // Handle the last interval in the group
+    container.push({ em: {'#text': rawBlock.text.substring(begin, (g.offset + g.length) - 1)}});
     
+    // Handle the gap between groups (which is just a bare text tag)
     if (j !== groups.length - 1) {
       if (g.offset + g.length < (groups[j + 1].offset)) {
-        container.push({ text: rawBlock.text.substring(g.offset + g.length + 1, groups[j + 1].offset - 1)});
+        container.push({ '#text': rawBlock.text.substring(g.offset + g.length + 1, groups[j + 1].offset - 1)});
       }
     }
 
@@ -295,36 +315,63 @@ function translateOverlapping(rawBlock : types.RawContentBlock,
   // Create a bare text tag for the last unstyled part, if one exists
   let lastStyleEnd = styles[styles.length - 1].offset + styles[styles.length - 1].length;
   if (lastStyleEnd < rawBlock.text.length) {
-    container.push({ text: rawBlock.text.substring(lastStyleEnd + 1)});
+    container.push({ '#text': rawBlock.text.substring(lastStyleEnd + 1)});
+    
   }
 }
 
-function translateNonOverlapping(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, container: Object[]) {
+function translateInline(s : InlineOrEntity, text : string, entityMap : common.RawEntityMap) {
+  
+  if (isInlineStyle(s)) {
+    const { style, offset, length } = s;
+    const substr = text.substring(offset, offset + length);
+    const mappedStyle = common.styleMap[style];
 
-  let styles = rawBlock.inlineStyleRanges;
-  if (styles[0].offset !== 0) {
-    container.push({ text: rawBlock.text.substring(0, styles[0].offset)});
+    if (common.emStyles[mappedStyle] !== undefined) {
+      return { em: { '@style': mappedStyle, '#text': substr}};
+    } else {
+      const value = {};
+      value[mappedStyle] = { '#text': substr};
+      return value;
+    }
+  } else {
+    return entityMap[s.key].data;
   }
 
-  styles
-    .map(s => ({ em: {text: rawBlock.text.substring(s.offset, s.offset + s.length)}}))
+}
+
+function isInlineStyle(range : InlineOrEntity) : range is common.RawInlineStyle {
+  return (<common.RawInlineStyle>range).style !== undefined;
+}
+
+function translateNonOverlapping(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, intervals : InlineOrEntity[],
+  entityMap : common.RawEntityMap, container: Object[]) {
+
+  if (intervals[0].offset !== 0) {
+    container.push({ '#text': rawBlock.text.substring(0, intervals[0].offset)});
+  }
+
+  intervals
+    .map(s => translateInline(s, rawBlock.text, entityMap))
     .forEach(s => container.push(s));
 
-  let lastStyleEnd = styles[styles.length - 1].offset + styles[styles.length - 1].length;
+  let lastStyleEnd = intervals[intervals.length - 1].offset + intervals[intervals.length - 1].length;
   if (lastStyleEnd < rawBlock.text.length) {
-    container.push({ text: rawBlock.text.substring(lastStyleEnd)});
+    container.push({ '#text': rawBlock.text.substring(lastStyleEnd)});
   }
 }
 
 
-function translateTextBlock(rawBlock : types.RawContentBlock, 
-  block: ContentBlock, entityMap : types.RawEntityMap, container: Object[]) {
+function translateTextBlock(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
   
-  if (hasOverlappingIntervals(rawBlock.inlineStyleRanges)) {
+  const intervals = combineIntervals(rawBlock);
+
+  if (hasOverlappingIntervals(intervals)) {
     translateOverlapping(rawBlock, block, entityMap, container);
   } else {
-    translateNonOverlapping(rawBlock, block, entityMap, container);
+    translateNonOverlapping(rawBlock, block, intervals, entityMap, container);
   }
 }
 

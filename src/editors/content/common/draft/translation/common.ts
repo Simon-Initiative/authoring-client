@@ -21,12 +21,50 @@ export type RawContentBlock = {
   data: any
 };
 
+export type RawEntity = {
+  type: string,
+  mutability: string,
+  data: Object
+};
+
+
+
 export type RawEntityMap = Object;
 
 export type RawDraft = {
   entityMap : RawEntityMap,
   blocks: RawContentBlock[]
 };
+
+export const ARRAY = '#array';
+export const TITLE = '@title';
+export const STYLE = '@style';
+export const TEXT = '#text';
+export const CDATA = '#cdata';
+
+export const styleMap = {};
+const addStyle = (oliStyle, draftStyle) => {
+  styleMap[oliStyle] = draftStyle;
+  styleMap[draftStyle] = oliStyle;
+}
+
+
+addStyle('bold', 'BOLD');
+addStyle('italic', 'ITALIC');
+addStyle('var', 'CODE');
+addStyle('cite', 'CITE');
+addStyle('term', 'TERM');
+addStyle('ipa', 'IPA');
+addStyle('foreign', 'FOREIGN');
+addStyle('var', 'CODE');
+addStyle('sub', 'SUBSCRIPT');
+addStyle('sup', 'SUPERSCRIPT');
+
+export const emStyles = {
+  bold: true,
+  italic: true
+}
+
 
 export const sectionBlockStyles = {
   1: 'header-one',

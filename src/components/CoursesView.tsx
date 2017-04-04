@@ -43,7 +43,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
         return persistence.queryDocuments(titlesForCoursesQuery(courseIds))
       })
       .then(docs => {
-        let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title.text}));
+        let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title['#text']}));
         this.setState({ courses });
       })
       .catch(err => {

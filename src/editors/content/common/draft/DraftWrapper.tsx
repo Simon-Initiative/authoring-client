@@ -15,6 +15,7 @@ import { AppServices } from '../../../common/AppServices';
 import { HtmlContent } from '../../../../data/contentTypes';
 
 import { getActivityByName, BlockRenderer } from './renderers/registry';
+import compositeDecorator from './decorators/composite';
 
 interface DraftWrapper {
   onChange: any;
@@ -63,12 +64,36 @@ const styles = {
 };
 
 const styleMap = {
-  CODE: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-    fontSize: 16,
-    padding: 2,
+  SUBSCRIPT: {
+    lineHeight: '0',
+    position: 'relative',
+    verticalAlign: 'baseline',
+    fontSize: '75%',
+    bottom: '-0.25em'
   },
+  SUPERSCRIPT: {
+    lineHeight: '0',
+    position: 'relative',
+    verticalAlign: 'baseline',
+    fontSize: '75%',
+    top: '-0.5em'
+  },
+  CITE: {
+    fontStyle: 'italic',
+    textDecoration: 'underline'
+  },
+  TERM: {
+    textDecoration: 'underline'
+  },
+  IPA: {
+    // TODO
+  },
+  FOREIGN: {
+    // TODO
+  },
+  SYM: {
+    // TODO
+  }
 };
 
 const blockRenderMap = Immutable.Map({
@@ -108,62 +133,6 @@ function myBlockStyleFn(contentBlock) {
   }
 }
 
-function findLinkEntities(contentBlock, callback, contentState) {
-  contentBlock.findEntityRanges(
-    (character) => {
-      const entityKey = character.getEntity();
-      return (
-        entityKey !== null &&
-        contentState.getEntity(entityKey).getType() === 'LINK'
-      );
-    },
-    callback
-  );
-}
-
-const Link = (props) => {
-  const {url} = props.contentState.getEntity(props.entityKey).getData();
-  return (
-    <a href={url} target='_blank' style={styles.link}>
-      {props.children}
-    </a>
-  );
-};
-
-function findImageEntities(contentBlock, callback, contentState) {
-  contentBlock.findEntityRanges(
-    (character) => {
-      const entityKey = character.getEntity();
-      return (
-        entityKey !== null &&
-        contentState.getEntity(entityKey).getType() === 'IMAGE'
-      );
-    },
-    callback
-  );
-}
-
-const Image = (props) => {
-  const {
-    height,
-    src,
-    width,
-  } = props.contentState.getEntity(props.entityKey).getData();
-
-  return (
-    <img src={src} height={height} width={width} />
-  );
-};
-
-const decorator = new CompositeDecorator([{
-    strategy: findLinkEntities,
-    component: Link,
-  }, {
-    strategy: findImageEntities,
-    component: Image,
-  }]);
-
-
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
   constructor(props) {
@@ -176,7 +145,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const contentState : ContentState = htmlContentToDraft(this.props.content);
 
     this.state = {
-      editorState: EditorState.createWithContent(contentState, decorator),
+      editorState: EditorState.createWithContent(contentState, compositeDecorator),
       lockedByBlockRenderer: false
     };
     
@@ -308,6 +277,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         onClick={this.focus}>
 
         <Editor ref="editor"
+          customStyleMap={styleMap}
           blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.blockRenderer.bind(this)}

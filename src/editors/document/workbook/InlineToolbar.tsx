@@ -76,8 +76,8 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
         <div className="btn-group btn-group-sm" role="group" aria-label="First group">
           <Button action={() => this.toggleInlineStyle('BOLD')} icon="bold"/>
           <Button action={() => this.toggleInlineStyle('ITALIC')} icon="italic"/>
-          <Button action={() => this.toggleInlineStyle('UNDERLINE')} icon="underline"/>
-          <Button action={() => this.toggleInlineStyle('KBD')} icon="terminal"/>
+          <Button action={() => this.toggleInlineStyle('SUPERSCRIPT')} icon="superscript"/>
+          <Button action={() => this.toggleInlineStyle('SUBSCRIPT')} icon="subscript"/>
           <Button action={() => this.toggleInlineStyle('CODE')} icon="code"/>
           <Button action={() => this.toggleBlockType('ordered-list-item')} icon="list-ol"/>
           <Button action={() => this.toggleBlockType('unordered-list-item')} icon="list-ul"/>

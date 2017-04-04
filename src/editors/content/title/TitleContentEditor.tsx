@@ -42,7 +42,7 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
 
   onChange() {
     const text = ((this.refs as any).text as any).innerHTML;
-    const updatedContent : contentTypes.TitleContent = this.state.activeContent.with({ title: { text } });
+    const updatedContent : contentTypes.TitleContent = this.state.activeContent.with({ title: { '#text': text } });
     this.setState({activeContent: updatedContent});
     this.props.onEdit(updatedContent);
   }
@@ -56,11 +56,11 @@ export abstract class TitleContentEditor extends AbstractContentEditor<TitleCont
   }
 
   renderView(): JSX.Element {
-    return <p>{this.state.activeContent.title.text}</p>;
+    return <p>{this.state.activeContent.title['#text']}</p>;
   }
 
   renderEdit(): JSX.Element {
-    const html = { __html: this.state.activeContent.title.text };
+    const html = { __html: this.state.activeContent.title['#text'] };
     return <div ref='text' onInput={this._onChange} 
       contentEditable dangerouslySetInnerHTML={html}></div>;
   }
