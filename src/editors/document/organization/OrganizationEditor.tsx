@@ -15,7 +15,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import {IDRef,OrgTreeNode,SimonOrganization} from './OrganizationTypes'
+import {IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from './OrganizationTypes'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
 //import orgData from './organization.json'; // does not work
@@ -109,8 +109,15 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * 
      */
     getTextFromNode (aNode: any) : string {
-      var testString:string=aNode ['text'];        
-      return (testString);
+        
+      console.log ("getTextFromNode: " + JSON.stringify (aNode));
+          
+      // Check for old style text nodes  
+      if (aNode ['#text']) { 
+        return (aNode ['#text']);
+      } 
+
+      return ("");
     }
     
     /**
@@ -128,7 +135,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * Here we go from visual data to database-ready data. We walk the tree
      * and build a db JSON ready representation. We could have done this
      * recursively but since we have to tag every level with a certain type
-     * in output tree it was easier to do this in one function.
+     * in output tree it was easier to do this in one function for now.
      */
     extractData (dummy: any) {
         console.log ("extractData ()");
@@ -152,7 +159,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
            // this object always exists             
            for (let j=0;j<orgObject.children.length;j++)
            {
-             let seqObject:OrgTreeNode=orgObject.children [j];
+             let seqObject:OrgItem=orgObject.children [j];
              let sequence:Array<Object>=new Array ();
              sequences["sequence"]=sequence;   
 
@@ -169,7 +176,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                
                sequence.push (moduleContainer);
          
-               let mObj:OrgTreeNode=seqObject.children [k];
+               let mObj:OrgItem=seqObject.children [k];
                moduleObj.push (this.addTextObject ("title",mObj.title));
                  
                for (let l=0;l<mObj.children.length;l++)
@@ -182,20 +189,22 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                
                  moduleObj.push (sectionContainer);
                    
-                 let sObj:OrgTreeNode=mObj.children [l];
+                 let sObj:OrgItem=mObj.children [l];
                  sectionObj.push (this.addTextObject ("title",sObj.title));                   
 
                  for (let m=0;m<sObj.children.length;m++)
                  {
                    let iObj=sObj.children [m];
                      
+                   /*  
                    if (iObj.isLeaf ()==true) {
                      sectionObj.push (iObj.toExternalObject ());
                    }
                    else {
                      // If we're here that means an author has gone beyond the nesting level we find in
                      // traditional OLI organizations    
-                   }  
+                   }
+                   */ 
                  }
                }  
              }
@@ -204,7 +213,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         var formattedOrganization=JSON.stringify (root);
         
-        console.log ("To: " + formattedOrganization);
+        //console.log ("To: " + formattedOrganization);
         
         return (formattedOrganization);
     }
@@ -238,6 +247,40 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         return ("");
     }
+    
+    /**
+     * 
+     */
+    getNodeContentType (aNode:any):string {
+        
+        //console.log ("getNodeContentType: " + JSON.stringify (aNode));
+        
+        if (aNode==null) {
+            return "";
+        }
+        
+        if (aNode ["title"]) {
+          return ("title");
+        }
+        
+        if (aNode ["section"]) {
+          return ("section");
+        }        
+        
+        if (aNode ["sequence"]) {
+          return ("section");
+        }        
+        
+        if (aNode ["module"]) {
+          return ("module");
+        }
+        
+        if (aNode ["item"]) {
+          return ("item");
+        }        
+        
+        return ("");
+    }    
 
     /**
      * Parses a structure that looks like this:
@@ -250,10 +293,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      *   }
      * },
      */
-    parseItem (anItem: any): OrgTreeNode {
+    parseItem (anItem: any): OrgItem {
         //console.log ("parseItem ()");
         
-        var newNode: OrgTreeNode=new OrgTreeNode ();
+        var newNode: OrgItem=new OrgItem ();
         
         for (var i in anItem) {
             
@@ -275,14 +318,17 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    parseSection (aSection: any): OrgTreeNode {
-        //console.log ("parseSection ()");
+    parseSection (aSection: any): OrgSection {
+        console.log ("parseSection ()");
         
-        var newNode: OrgTreeNode=new OrgTreeNode ();
+        console.log ("parseSection: " + JSON.stringify (aSection));
         
-        for (var i=0;i<aSection.length;i++)
+        var newNode: OrgSection=new OrgSection ();
+        newNode.id=aSection ["@id"];
+        
+        for (var i=0;i<aSection ["#array"].length;i++)
         {
-            var potentialSection=aSection [i];
+            var potentialSection=aSection ["#array"] [i];
             
             for (var j in potentialSection) {
                 if (j=="title") {
@@ -297,41 +343,38 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         return (newNode);
     }
-    
+        
     /**
      * 
      */
-    parseModule (aModule: any) : OrgTreeNode {
-      //console.log ("parseModule ()");
+    parseModule (aModule: any) : OrgItem {
+      console.log ("parseModule ()");
+                
+      //console.log ("Parsing " + aModule ["#array"].length + " module sub items ...");  
         
-      let moduleNode=new OrgTreeNode (); 
-        
-      for (var t=0; t<aModule.length;t++) {
-        var mContents=aModule [t];
-           
-        for (var s in mContents) {
+      let moduleNode:OrgModule=new OrgModule (); 
+      moduleNode.id=aModule ["@id"]; 
+      for (var t=0; t<aModule ["#array"].length;t++) {
+
+        var mdl=aModule ["#array"] [t];
           
-          var mdl=mContents [s];
-          //var newNode:OrgTreeNode=new OrgTreeNode ();
-            
-          if (s=="title") {            
-            //console.log ("Found title: " + this.getTextFromNode (mdl));                                  
-            moduleNode.title=this.getTextFromNode (mdl); 
-          }                                 
+        var typeSwitch:string=this.getNodeContentType (mdl);
+                                   
+        if (typeSwitch=="title") {
+          //console.log ("Found module title: " + this.getTextFromNode (mdl ["title"]));                                  
+          moduleNode.title=this.getTextFromNode (mdl ["title"]); 
+        }                                 
           
-          if (s=="item") {
-              //console.log ("Found item");
-              
-              moduleNode.addNode (this.parseItem (mdl));
-          }                
+        if (typeSwitch=="item") {              
+          moduleNode.addNode (this.parseItem (mdl ["item"]));
+        }                
             
-          if (s=="section") {
-              //console.log ("Found section");
-              
-               moduleNode.addNode (this.parseSection (mdl));
-            }
+        if (typeSwitch=="section") {              
+          moduleNode.addNode (this.parseSection (mdl ["section"]));
         }
       }
+        
+      //console.log ("Result " + JSON.stringify (moduleNode));  
         
       return (moduleNode);
     }
@@ -342,15 +385,15 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
     processData (treeData: any) {
-        
-       // console.log ("processData ()");
-        
-        var newData:Array<SimonOrganization>=new Array ();
+
+        var newData:Array<OrgOrganization>=new Array ();
         
         for (var i in treeData) {
-          var orgNode=new SimonOrganization (); 
+          var orgNode=new OrgOrganization (); 
           newData.push (orgNode);
-          var oList=treeData [i]
+          orgNode.id=treeData [i]["@id"];
+          orgNode.version=treeData [i]["@version"];
+          var oList=treeData [i]["#array"];
                         
             if (i=='organization') {
                for (var k=0;k<oList.length;k++) {                   
@@ -381,36 +424,39 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                      {                          
                        if (sequenceObject=="sequence") // checking to make absolutely sure we're in the right place
                        {
-                         let newSequence:OrgTreeNode=new OrgTreeNode ();
-                         orgNode.addNode (newSequence);
-                         var sequenceList: Array<any>= destNode [sequenceObject];   
+                         let newSequence:OrgSequence=new OrgSequence ();
+                         orgNode.addNode (newSequence);                          
+                         newSequence.id = destNode [sequenceObject]["@id"];
+                         newSequence.category = destNode [sequenceObject]["@category"];
+                         newSequence.audience = destNode [sequenceObject]["@audience"];                           
+                         var sequenceList: Array<any> = destNode [sequenceObject]["#array"];   
                                                                 
                          for (var t=0; t<sequenceList.length;t++) {
                            var seq=sequenceList [t];
         
                            for (var s in seq) {
+                             var mdl=seq [s];
+                                                                    
+                             if (s=="title") {
+                               console.log ("Found sequence title: " + this.getTextFromNode (mdl));                                  
+                               newSequence.title=this.getTextFromNode (mdl); 
+                             }                                 
                                       
-                           var mdl=seq [s];
-                                     
-                           if (s=="title") {
-                             console.log ("Found title: " + this.getTextFromNode (mdl));                                  
-                             newSequence.title=this.getTextFromNode (mdl); 
-                           }                                 
-                                      
-                           if (s=="module") {    
-                             //console.log ("Parsing module ... " + JSON.stringify (seq [s]));
-                             let newModule=this.parseModule (mdl);
-                             newSequence.children.push (newModule);
-                           }                              
-                         }                          
+                             if (s=="module") {
+                               let newModule=this.parseModule (mdl);
+                               newSequence.children.push (newModule);
+                             }                              
+                           }                          
+                         }
                        }
-                     }
-                   }  
-                 }   
+                     }  
+                   }   
+                 }
                }
-             }
+            }
           }
-        }
+        
+        //console.log ("Transformed data: " + JSON.stringify (newData));
         
         return (newData);
     }
@@ -458,57 +504,45 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * onChange event. That's why we call extractData manually as the very
      * last function call.
      */
-    addNode () {
+    addNode (anEvent) {
         //console.log ("addNode ()");
+        
+        var immutableHelper = this.state.treeData.slice()
         
         var aData=this.state.treeData;
 
-        if (aData==null)
+        if (immutableHelper==null)
         {
             console.log ("Bump");
             return;
         }
         
-        var newNode=new OrgTreeNode ();
-        newNode.title="New Module";
-        aData.push (newNode);
+        var newNode=new OrgItem ();
+        newNode.title="New Item";
+        immutableHelper.push (newNode);
+
+        this.extractData (immutableHelper);
         
-        this.setState(aData);
-        
-        /*
-        var expanded:boolean=true;
-        
-        //this.setState(aData);
-        this.setState({
-            treeData: toggleExpandedForAll({
-                treeData: this.state.treeData,
-                expanded,
-            }),
-        });
-        */
-        
-        this.extractData (this.state.treeData);
+        this.setState({treeData: immutableHelper});
     }    
 
     /**
      * 
      */
     render() 
-    {        
-      this.newData=this.state.treeData;
-      
-      //const FakeNode = (({ node }) => (<div>FakeNode</div>));
-      //FakeNode.propTypes = { node: PropTypes.object.isRequired };
-    
+    { 
+      console.log ("render()");       
+          
       return (
               <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                   <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                       <p className="h2" style={tempnavstyle.h2}>Course Content</p>
-                      <button type="button" className="btn btn-secondary" onClick={e => this.addNode ()}>Add Item</button>
+                      <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                       <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                   </nav>
                   <SortableTree
+                      maxDepth={5}
                       treeData={this.state.treeData}
                       generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
