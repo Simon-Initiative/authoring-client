@@ -132,50 +132,74 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     extractData (dummy: any) {
         console.log ("extractData ()");
-        //console.log ("From: " + JSON.stringify (this.newData));
         
-        var root:Object=new Object ();
+        let root:Object=new Object ();
         root ["organization"]=new Array ();
-        //console.log (JSON.stringify (treeData));
                 
-        for (var i=0;i<this.newData.length;i++)
+        for (let i=0;i<this.newData.length;i++)
         {            
            let orgObject=this.newData [i];
-            
-           //console.log ("orgObject: " + JSON.stringify (orgObject));
-                        
+                                    
            root ["organization"].push (this.addTextObject ("title",orgObject.title));
            root ["organization"].push (this.addTextObject ("description",orgObject.description));
            root ["organization"].push (this.addTextObject ("audience",orgObject.audience));
-           var seqRoot=new Object ();                       
+           let seqRoot=new Object ();
            root ["organization"].push (seqRoot);
-           var sequences:Object=new Object ();
+           let sequences:Object=new Object ();
            seqRoot ["sequences"]=sequences;    
 
            // We can point directly to .children because we ensure in the constructor that 
            // this object always exists             
-           for (var j=0;j<orgObject.children.length;j++)
+           for (let j=0;j<orgObject.children.length;j++)
            {
-             var seqObject:OrgTreeNode=orgObject.children [j];
-             var sequence:Array<Object>=new Array ();
+             let seqObject:OrgTreeNode=orgObject.children [j];
+             let sequence:Array<Object>=new Array ();
              sequences["sequence"]=sequence;   
 
-             console.log ("Adding module with title: " + seqObject.title);  
+             console.log ("Adding sequence with title: " + seqObject.title);  
              sequence.push (this.addTextObject ("title",seqObject.title));
-                          
-             var moduleContainer:Object=new Object ();
-             var moduleObj:Array<Object>=new Array();               
-             moduleContainer ["module"]=moduleObj;  
-               
-             sequence.push (moduleContainer);
-
-             for (var k=0;k<seqObject.children.length;k++)
+                            
+             for (let k=0;k<seqObject.children.length;k++)
              {
-               var mObj:OrgTreeNode=seqObject.children [k];  
-
+               console.log ("Module: " + seqObject.children [k].title);
+                 
+               let moduleObj:Array<Object>=new Array();               
+               let moduleContainer:Object=new Object ();
+               moduleContainer ["module"]=moduleObj;  
+               
+               sequence.push (moduleContainer);
+         
+               let mObj:OrgTreeNode=seqObject.children [k];
                moduleObj.push (this.addTextObject ("title",mObj.title));
+                 
+               for (let l=0;l<mObj.children.length;l++)
+               {
+                 console.log ("Section: " + mObj.children [l].title);
+                   
+                 let sectionObj:Array<Object>=new Array();               
+                 let sectionContainer:Object=new Object ();
+                 sectionContainer ["section"]=sectionObj;  
+               
+                 moduleObj.push (sectionContainer);
+                   
+                 let sObj:OrgTreeNode=mObj.children [l];
+                 sectionObj.push (this.addTextObject ("title",sObj.title));                   
+
+                 for (let m=0;m<sObj.children.length;m++)
+                 {
+                   let iObj=sObj.children [m];
+                     
+                   if (iObj.isLeaf ()==true) {
+                     sectionObj.push (iObj.toExternalObject ());
+                   }
+                   else {
+                     // If we're here that means an author has gone beyond the nesting level we find in
+                     // traditional OLI organizations    
+                   }  
+                 }
+               }  
              }
-           } 
+           }
         }
         
         var formattedOrganization=JSON.stringify (root);
@@ -185,6 +209,9 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         return (formattedOrganization);
     }
     
+    /**
+     * 
+     */
     resolveItem (anItem:any):string {
         
         return ("");

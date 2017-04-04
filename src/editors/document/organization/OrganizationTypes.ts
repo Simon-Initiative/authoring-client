@@ -25,6 +25,17 @@ export class OrgTreeNode {
       
     return (false);
   }
+    
+  toExternalObject (): Object {
+      var nodeObj=new Object ();
+      
+      nodeObj ["item"]=new Object ();
+      nodeObj ["item"]["@scoring_mode"]=this.scoringMode;
+      nodeObj ["item"]["resourceref"]=new Object ();
+      nodeObj ["item"]["resourceref"]["@idref"]=this.resourceRef.idRef;
+      
+      return (nodeObj);
+  }  
 }
 
 
