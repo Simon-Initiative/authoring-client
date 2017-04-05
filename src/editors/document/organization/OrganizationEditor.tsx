@@ -61,7 +61,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
 
         this.state = {
                         treeData: this.processData(orgData),
-                        orgData: this.createEmtpyOrganization()
+                        orgData: this.createEmtpyOrganization(orgData)
                      };
     }
         
@@ -105,11 +105,56 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     }    
     
     /**
-     * 
+     * People might notice that this code is a bit odd because it will return
+     * the last organization object under the root. Right now that is by design.
+     * That might change as the specs change but at least we won't have to
+     * redo the code.
      */
-    createEmtpyOrganization () : OrgOrganization {
-        return (new OrgOrganization ());
-    }
+    createEmtpyOrganization (aData:any) : OrgOrganization {
+        
+      var orgNode=new OrgOrganization ();// throw away for now
+                       
+      if (aData)
+      {  
+          for (var i in aData) { 
+            orgNode=new OrgOrganization ();// throw away for now
+            orgNode.id=aData [i]["@id"];
+            orgNode.version=aData [i]["@version"];
+            var oList=aData [i]["#array"];
+                            
+            if (i=='organization') {
+              for (var k=0;k<oList.length;k++) {                   
+                var obj=oList [k];                 
+                                          
+                for (var j in obj) {
+                  var destNode = obj [j];
+                                         
+                  if (j=='title') {
+                    //console.log ("title: " + this.getTextFromNode (destNode));
+                    orgNode.title=this.getTextFromNode (destNode);
+                      
+                    return (orgNode);  
+                  }
+                    
+                  if (j=='description') {
+                    //console.log ("title: " + this.getTextFromNode (destNode));
+                    orgNode.description=this.getTextFromNode (destNode);
+                      
+                    return (orgNode);  
+                  }
+                    
+                  if (j=='audience') {
+                    //console.log ("title: " + this.getTextFromNode (destNode));
+                    orgNode.audience=this.getTextFromNode (destNode);
+                  }                
+                }
+              }
+            }                   
+          }
+      }   
+        
+      return (orgNode);
+    }           
     
     /**
      * 
@@ -343,13 +388,13 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                 
                 if (j=="item") {
                   newNode.addNode (this.parseItem (potentialSection [j]));
-                }                
+                }
             }
         }
-        
+
         return (newNode);
     }
-        
+
     /**
      * 
      */
@@ -392,13 +437,9 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     processData (treeData: any) {
 
-        var newData:Array<OrgOrganization>=new Array ();
-        
+        var newData:Array<OrgSequence>=new Array ();
+                        
         for (var i in treeData) {
-          var orgNode=new OrgOrganization (); 
-          newData.push (orgNode);
-          orgNode.id=treeData [i]["@id"];
-          orgNode.version=treeData [i]["@version"];
           var oList=treeData [i]["#array"];
                         
             if (i=='organization') {
@@ -407,31 +448,16 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                                       
                  for (var j in obj) {
                    var destNode = obj [j];
-                                      
-                   if (j=='title') {
-                     console.log ("title: " + this.getTextFromNode (destNode));
-                     orgNode.title=this.getTextFromNode (destNode);
-                   }
-                   
-                   if (j=='description') {
-                     console.log ("desc: " + this.getTextFromNode (destNode));
-                     orgNode.description=this.getTextFromNode (destNode);
-                   }
-                       
-                   if (j=='audience') {
-                     console.log ("aud: " + this.getTextFromNode (destNode));
-                     orgNode.audience=this.getTextFromNode (destNode);
-                   }
 
                    if (j=='sequences') {
-                     console.log ("org node: " + JSON.stringify (orgNode));
+                     //console.log ("org node: " + JSON.stringify (orgNode));
   
                      for (var sequenceObject in destNode)
                      {                          
                        if (sequenceObject=="sequence") // checking to make absolutely sure we're in the right place
                        {
                          let newSequence:OrgSequence=new OrgSequence ();
-                         orgNode.addNode (newSequence);                          
+                         newData.push (newSequence);                          
                          newSequence.id = destNode [sequenceObject]["@id"];
                          newSequence.category = destNode [sequenceObject]["@category"];
                          newSequence.audience = destNode [sequenceObject]["@audience"];                           
@@ -451,8 +477,8 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                              if (s=="module") {
                                let newModule=this.parseModule (mdl);
                                newSequence.children.push (newModule);
-                             }                              
-                           }                          
+                             }
+                           }
                          }
                        }
                      }  

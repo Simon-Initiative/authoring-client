@@ -344,6 +344,7 @@ class OrganizationNodeRenderer extends Component <any, any>
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;
 
+        //>--------------------------------------------------------------------
         let handleStyle:any=styles.orgcollapseButton;
         styles.orgcollapseButton ["left"]= -0.5 * scaffoldBlockPxWidth;
         styles.orgexpandButton ["left"]= -0.5 * scaffoldBlockPxWidth;
@@ -353,7 +354,32 @@ class OrganizationNodeRenderer extends Component <any, any>
         }    
         else {
             handleStyle=styles.orgexpandButton;
-        }    
+        }
+
+        //>--------------------------------------------------------------------
+
+        let nStyle:any=styles.orglineChildren;
+        nStyle ["width"]=scaffoldBlockPxWidth;
+
+        //>--------------------------------------------------------------------
+
+        /*
+        className={styles.row +
+            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
+            (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
+            (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
+            (className ? ` ${className}` : '')
+        }
+        style={{
+            opacity: isDraggedDescendant ? 0.5 : 1,
+            ...style,
+        }}
+        */
+        let gStyle:any=styles.orgrow;
+        gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
+
+        //>--------------------------------------------------------------------
 
         return (
             <div
@@ -371,7 +397,7 @@ class OrganizationNodeRenderer extends Component <any, any>
 
                         {node.expanded && !isDragging &&
                             <div
-                                style={styles.orglineChildren}
+                                style={nStyle}
                             />
                         }
                     </div>
@@ -380,7 +406,7 @@ class OrganizationNodeRenderer extends Component <any, any>
                 <div style={styles.orgrowWrapper as any}>
                     {/* Set the row preview to be used during drag and drop */}
                     {connectDragPreview(
-                        <div style={styles.orgrow as any}>
+                        <div style={gStyle}>
                             {handle}
                             <div style={styles.orgrowContents as any}>
                                 <div style={styles.orgrowLabel as any}>
