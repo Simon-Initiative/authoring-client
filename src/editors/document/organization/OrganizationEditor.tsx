@@ -36,7 +36,8 @@ interface OrganizationEditor
 
 export interface OrganizationEditorState extends AbstractEditorState 
 {
-    treeData : any;  
+    treeData : any;
+    orgData: OrgOrganization;  
 }
 
 export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -51,18 +52,16 @@ export interface OrganizationEditorProps extends AbstractEditorProps<models.Cour
 */
 class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationEditorProps, OrganizationEditorState> 
 {
-    newData:Array<any>=[];
-
     /**
      * 
      */
     constructor(props) {
-        //console.log ("OrganizationEditor ()");
-        
+       
         super(props);
 
         this.state = {
-                        treeData: this.processData(orgData)
+                        treeData: this.processData(orgData),
+                        orgData: this.createEmtpyOrganization()
                      };
     }
         
@@ -108,6 +107,13 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
+    createEmtpyOrganization () : OrgOrganization {
+        return (new OrgOrganization ());
+    }
+    
+    /**
+     * 
+     */
     getTextFromNode (aNode: any) : string {
         
       console.log ("getTextFromNode: " + JSON.stringify (aNode));
@@ -137,15 +143,15 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * recursively but since we have to tag every level with a certain type
      * in output tree it was easier to do this in one function for now.
      */
-    extractData (dummy: any) {
+    extractData (newData: any) {
         console.log ("extractData ()");
         
         let root:Object=new Object ();
         root ["organization"]=new Array ();
                 
-        for (let i=0;i<this.newData.length;i++)
+        for (let i=0;i<newData.length;i++)
         {            
-           let orgObject=this.newData [i];
+           let orgObject=newData [i];
                                     
            root ["organization"].push (this.addTextObject ("title",orgObject.title));
            root ["organization"].push (this.addTextObject ("description",orgObject.description));
@@ -321,7 +327,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     parseSection (aSection: any): OrgSection {
         console.log ("parseSection ()");
         
-        console.log ("parseSection: " + JSON.stringify (aSection));
+        //console.log ("parseSection: " + JSON.stringify (aSection));
         
         var newNode: OrgSection=new OrgSection ();
         newNode.id=aSection ["@id"];
@@ -462,15 +468,17 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     }
 
     /**
-     * 
+     * This method is called by the tree component and even though we could access
+     * the state directly we're going to assume that the tree component made some
+     * changes that haven't been reflected in the global component state yet.
      */
-    processDataChange (treeData: any) {
+    processDataChange (newData: any) {
                 
         console.log ("processDataChange ()");
         
-        this.extractData (treeData);        
+        this.extractData (newData);        
         
-        this.setState (treeData);                
+        this.setState (newData);                
     }
 
     /**
@@ -546,7 +554,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                       treeData={this.state.treeData}
                       generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
-                      //nodeContentRenderer={OrganizationNodeRenderer}
+                      nodeContentRenderer={OrganizationNodeRenderer}
                       //nodeContentRenderer={FakeNode}
                   />
               </div>
