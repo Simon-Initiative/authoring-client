@@ -15,14 +15,42 @@
           "body": {
             "#array": [
               {
+                "pullout": {
+                  "@type": "note",
+                  "p": {
+                    "#text": " A simple paragraph in the note pullout. "
+                  }
+                }
+              },
+              {
                 "p": {
                   "#array": [
                   {
                     "#text": "As we "
                   },
                   {
+                    "link": {
+                      "#text": "text hyperlink ",
+                      "@target": "new",
+                      "@href": "http://www.google.com"
+                    }
+                  },
+                  {
+                    "link": {
+                      "#array": [{
+                        "em": {
+                          "@style": "bold",
+                          "#text": "a bold link "
+                        }
+                      }],
+                      "@target": "new",
+                      "@href": "http://www.google.com"
+                    }
+                  },
+                  {
                     "cite": {
-                      "#text": "cite "
+                      "#text": "cite ",
+                      "@entry": "A citation"
                     }
                   },
                   {
@@ -54,6 +82,15 @@
                     "em": {
                       "@style": "bold",
                       "#text": "have seen bold "
+                    }
+                  },
+                  {
+                    "em": {
+                      "@style": "bold",
+                      "em": {
+                        "@style": "italic",
+                        "#text": "both bold and italic "
+                      }
                     }
                   },
                   {

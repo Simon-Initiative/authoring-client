@@ -7,19 +7,25 @@ import { YouTube } from './YouTube';
 import CodeBlock from './CodeBlock';
 import { EmbeddedDocument } from './EmbeddedDocument';
 import Unsupported from './Unsupported';
+import { PulloutBegin } from './PulloutBegin';
+import { PulloutEnd } from './PulloutEnd';
 
-import { BlockTypes } from '../custom';
+
+import { EntityTypes } from '../custom';
 import { register } from './registry';
 
 
 export default function init() {
-  register(BlockTypes.audio, Audio, undefined);
-  register(BlockTypes.image, Image, undefined);
-  register(BlockTypes.video, Video, undefined);
-  register(BlockTypes.youtube, YouTube, undefined);
-  register(BlockTypes.codeblock, CodeBlock, undefined);
-  register(BlockTypes.document, EmbeddedDocument, undefined);
-  register(BlockTypes.unsupported, Unsupported, undefined);
+  register(EntityTypes.audio, Audio, undefined);
+  register(EntityTypes.image, Image, undefined);
+  register(EntityTypes.video, Video, undefined);
+  register(EntityTypes.youtube, YouTube, undefined);
+  register(EntityTypes.codeblock, CodeBlock, undefined);
+  register(EntityTypes.document, EmbeddedDocument, undefined);
+  register(EntityTypes.unsupported, Unsupported, undefined);
+  
+  register(EntityTypes.pullout_begin, PulloutBegin, undefined);
+  register(EntityTypes.pullout_end, PulloutEnd, undefined);
   
   
 }

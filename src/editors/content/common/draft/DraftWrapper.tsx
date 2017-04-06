@@ -4,14 +4,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
-  ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils} from 'draft-js';
+  ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
 import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
 import { htmlContentToDraft } from './translation/todraft';
 import { draftToHtmlContent } from './translation/topersistence';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
-
+import * as common from './translation/common';
 import { HtmlContent } from '../../../../data/contentTypes';
 
 import { getActivityByName, BlockRenderer } from './renderers/registry';
@@ -126,11 +126,75 @@ const BlockRendererFactory = (props) => {
   return React.createElement((viewer as any), childProps);
 };
 
+
+function splitBlockInContentState(
+  contentState: ContentState,
+  selectionState: SelectionState,
+): ContentState {
+  
+  var key = selectionState.getAnchorKey();
+  var offset = selectionState.getAnchorOffset();
+  var blockMap = contentState.getBlockMap();
+  var blockToSplit = blockMap.get(key);
+
+  var text = blockToSplit.getText();
+  var chars = blockToSplit.getCharacterList();
+
+  var blockAbove = blockToSplit.merge({
+    text: text.slice(0, offset),
+    characterList: chars.slice(0, offset),
+  });
+
+  const dataAbove = blockAbove.data.toJSON();
+  console.log(dataAbove);
+  const toPreserve = Object.keys(dataAbove)
+    .filter(key => key.startsWith('oli'))
+    .reduce((o, key) => {
+      o[key] = dataAbove[key]
+      return o;
+    }, {});
+  
+
+  var keyBelow = common.generateRandomKey();
+  var blockBelow = blockAbove.merge({
+    key: keyBelow,
+    text: text.slice(offset),
+    characterList: chars.slice(offset),
+    data: Immutable.Map(toPreserve),
+  });
+
+  var blocksBefore = blockMap.toSeq().takeUntil(v => v === blockToSplit);
+  var blocksAfter = blockMap.toSeq().skipUntil(v => v === blockToSplit).rest();
+  var newBlocks = blocksBefore.concat(
+    [[blockAbove.getKey(), blockAbove], [blockBelow.getKey(), blockBelow]],
+    blocksAfter,
+  ).toOrderedMap();
+
+  return contentState.merge({
+    blockMap: newBlocks,
+    selectionBefore: selectionState,
+    selectionAfter: selectionState.merge({
+      anchorKey: keyBelow,
+      anchorOffset: 0,
+      focusKey: keyBelow,
+      focusOffset: 0,
+      isBackward: false,
+    }),
+  });
+}
+
 function myBlockStyleFn(contentBlock) {
-  const type = contentBlock.getType();
-  if (type === 'code-block') {
-    return 'customCodeBlock';
+  const data = contentBlock.getData().toJSON();
+  
+  const semantic = data.semanticContext;
+  if (semantic !== undefined && semantic !== null) {
+    if (semantic.oliType === 'example') {
+      return 'exampleBlock';
+    } else if (semantic.oliType === 'pullout') {
+      return 'pulloutBlock';
+    }
   }
+  
 }
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
@@ -166,8 +230,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         }
 
         const content = editorState.getCurrentContent();
-        const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
-        this.props.onEdit(htmlContent);
+        
+        //const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
+
+        //this.props.onEdit(htmlContent);
 
         return this.setState({editorState})
       }
@@ -210,13 +276,110 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   _handleKeyCommand(command) {
+
+    console.log('handle key command: ');
+    console.log(command);
+
+    if (command === 'split-block') {
+
+      const editorState = this.state.editorState;
+      const selectionState = editorState.getSelection();
+      const currentContent = editorState.getCurrentContent();
+      
+      const updatedContent = splitBlockInContentState(currentContent, selectionState)
+
+      this.onChange(EditorState.push(editorState, updatedContent, 'split-block'));
+
+      return 'handled';
+
+    } else if (command === 'backspace') {
+
+      const ss = this.state.editorState.getSelection();
+      
+      const anchorKey = ss.getAnchorKey();
+      const currentContent =  this.state.editorState.getCurrentContent();
+      const currentContentBlock = currentContent.getBlockForKey(anchorKey);
+      const start = ss.getStartOffset();
+
+      if (start === 0) {
+        const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
+        if (blockBefore !== null && blockBefore.getType() === 'atomic') {
+          const key = blockBefore.getEntityAt(0);
+          const entity = currentContent.getEntity(key);
+          const oliType = entity.getData().oliType;
+          const beginBlock = entity.getData().beginBlock;
+
+          if (entity.getData().oliType === 'pullout') {
+            let beginBlockKey;
+            if (beginBlock !== null) {
+              beginBlockKey = beginBlock;
+            } else {
+              beginBlockKey = blockBefore.getKey();
+            }
+
+            const operation = (block : ContentBlock) => {
+              
+              const data = block.getData();
+              if (data.get('semanticContext') !== undefined && data.get('semanticContext') !== null 
+                && data.get('semanticContext').beginBlock === beginBlockKey) {
+                return block.merge({ data: data.delete('semanticContext') });
+              } else {
+                return block;
+              }
+              
+            }
+
+            // Remove sentinel blocks and 
+            // Update blocks within to strip out the pullout semantic type
+            
+            var blockMap = currentContent.getBlockMap();
+            var newBlocks = blockMap
+              .toSeq()
+              .map(operation)
+              .filter((block, k) => {
+                if (block.getKey() === beginBlockKey) {
+                  return false;
+                }
+                if (block.getType() === 'atomic') {
+                  const key = block.getEntityAt(0);
+                  const entity = currentContent.getEntity(key);
+                  const oliType = entity.getData().oliType;
+                  const beginBlock = entity.getData().beginBlock;
+
+                  if (beginBlock !== undefined && beginBlock === beginBlockKey) {
+                    return false;
+                  }
+                }
+                
+                return true;
+              })
+
+            const updatedContent = currentContent.merge({
+              blockMap: newBlocks,
+              selectionBefore: ss,
+              selectionAfter: ss,
+            });
+
+            this.onChange(EditorState.push(this.state.editorState, updatedContent, 'backspace'));
+
+            return 'handled';
+
+          }
+        } 
+      } 
+      return 'not-handled';
+      
+    }
+
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.onChange(newState);
-      return true;
+      return 'handled';
+    } else {
+      return 'not-handled';
     }
-    return false;
+    
   }
 
   toggleInlineStyle(inlineStyle) {

@@ -127,7 +127,7 @@ function isSectionTitleBlock(block : common.RawContentBlock) : boolean {
 
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
-  return (data.oliType === undefined && type === 'unstyled');
+  return (type === 'unstyled');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
