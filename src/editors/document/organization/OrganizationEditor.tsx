@@ -15,7 +15,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import {IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from './OrganizationTypes'
+import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from './OrganizationTypes'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
 //import orgData from './organization.json'; // does not work
@@ -130,21 +130,14 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                   var destNode = obj [j];
                                          
                   if (j=='title') {
-                    //console.log ("title: " + this.getTextFromNode (destNode));
                     orgNode.title=this.getTextFromNode (destNode);
-                      
-                    return (orgNode);  
                   }
                     
                   if (j=='description') {
-                    //console.log ("title: " + this.getTextFromNode (destNode));
                     orgNode.description=this.getTextFromNode (destNode);
-                      
-                    return (orgNode);  
                   }
                     
                   if (j=='audience') {
-                    //console.log ("title: " + this.getTextFromNode (destNode));
                     orgNode.audience=this.getTextFromNode (destNode);
                   }                
                 }
@@ -170,103 +163,99 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
 
       return ("");
     }
-    
-    /**
-     * 
-     */
-    addTextObject (aText,aValue)
-    {
-      let newTextObject:Object=new Object ();
-      newTextObject [aText]=new Object ();
-      newTextObject [aText]["text"]=aValue;
-      return (newTextObject);
-    }
-    
+        
     /**
      * Here we go from visual data to database-ready data. We walk the tree
      * and build a db JSON ready representation. We could have done this
      * recursively but since we have to tag every level with a certain type
      * in output tree it was easier to do this in one function for now.
      */
-    extractData (newData: any) {
+    extractData (aData: any): Object {
         console.log ("extractData ()");
-        
-        let root:Object=new Object ();
-        root ["organization"]=new Array ();
                 
-        for (let i=0;i<newData.length;i++)
+        var newData=aData.treeData;
+                
+        // First process our organization object and add it to the tree we're building
+        
+        let orgObject:OrgOrganization=this.state.orgData as OrgOrganization;
+               
+        let orgRoot:Object=orgObject.toJSONObject ();
+        let seqRoot=new Object ();
+        orgRoot ["organization"]["#array"].push (seqRoot);
+        
+        let sequences:Object=new Object ();
+        seqRoot ["sequences"]=sequences;
+                        
+        // We can point directly to .children because we ensure in the constructor that 
+        // this object always exists             
+        for (let j=0;j<newData.length;j++)
         {            
-           let orgObject=newData [i];
-                                    
-           root ["organization"].push (this.addTextObject ("title",orgObject.title));
-           root ["organization"].push (this.addTextObject ("description",orgObject.description));
-           root ["organization"].push (this.addTextObject ("audience",orgObject.audience));
-           let seqRoot=new Object ();
-           root ["organization"].push (seqRoot);
-           let sequences:Object=new Object ();
-           seqRoot ["sequences"]=sequences;    
-
-           // We can point directly to .children because we ensure in the constructor that 
-           // this object always exists             
-           for (let j=0;j<orgObject.children.length;j++)
-           {
-             let seqObject:OrgItem=orgObject.children [j];
-             let sequence:Array<Object>=new Array ();
-             sequences["sequence"]=sequence;   
-
-             console.log ("Adding sequence with title: " + seqObject.title);  
-             sequence.push (this.addTextObject ("title",seqObject.title));
+          let seqObject:OrgSequence=newData [j] as OrgSequence;
+                        
+          //let sequence:Object=seqObject.toJSONObject (); // This doesn't work for some reason 
+          let sequence:Object=new Object ();          
+          sequence ["@id"]=seqObject.id;
+          sequence ["@category"]=seqObject.category;
+          sequence ["@audience"]=seqObject.audience;
+          sequence ["#array"]=new Array ();
+          sequence ["#array"].push (OrgItem.addTextObject ("title",seqObject.title));
+              
+          sequences["sequence"]=sequence;   
+                        
+          for (let k=0;k<seqObject.children.length;k++)
+          {
+            let mObj:OrgItem=seqObject.children [k];
                             
-             for (let k=0;k<seqObject.children.length;k++)
-             {
-               console.log ("Module: " + seqObject.children [k].title);
-                 
-               let moduleObj:Array<Object>=new Array();               
-               let moduleContainer:Object=new Object ();
-               moduleContainer ["module"]=moduleObj;  
-               
-               sequence.push (moduleContainer);
-         
-               let mObj:OrgItem=seqObject.children [k];
-               moduleObj.push (this.addTextObject ("title",mObj.title));
-                 
-               for (let l=0;l<mObj.children.length;l++)
-               {
-                 console.log ("Section: " + mObj.children [l].title);
-                   
-                 let sectionObj:Array<Object>=new Array();               
-                 let sectionContainer:Object=new Object ();
-                 sectionContainer ["section"]=sectionObj;  
-               
-                 moduleObj.push (sectionContainer);
-                   
-                 let sObj:OrgItem=mObj.children [l];
-                 sectionObj.push (this.addTextObject ("title",sObj.title));                   
+            // Check the type here. We can expect Module, Section and Item  
+            console.log ("Object: " + mObj.orgType);
+             
+            let moduleContainer:Object=new Object ();
+            let moduleObj:Object=new Object ();
+            moduleContainer ["module"]=moduleObj;
 
-                 for (let m=0;m<sObj.children.length;m++)
-                 {
-                   let iObj=sObj.children [m];
-                     
-                   /*  
-                   if (iObj.isLeaf ()==true) {
-                     sectionObj.push (iObj.toExternalObject ());
-                   }
-                   else {
-                     // If we're here that means an author has gone beyond the nesting level we find in
-                     // traditional OLI organizations    
-                   }
-                   */ 
-                 }
-               }  
-             }
-           }
+            sequence ["#array"].push (moduleContainer);
+             
+            moduleObj["@id"]=mObj.id;
+            moduleObj["#array"]=new Array ();
+            moduleObj["#array"].push (OrgItem.addTextObject ("title",mObj.title));
+  
+            for (let l=0;l<mObj.children.length;l++)
+            {
+              console.log ("Section: " + mObj.children [l].title);
+                
+              let sObj:OrgItem=mObj.children [l];                
+               
+              let sectionObj:Object=new Object();               
+              let sectionContainer:Object=new Object ();
+              sectionContainer ["section"]=sectionObj;  
+           
+              moduleObj["#array"].push (sectionContainer);
+               
+              sectionObj ["#id"]=sObj.id; 
+              sectionObj ["#array"]=new Array ();
+              sectionObj ["#array"].push (OrgItem.addTextObject ("title",sObj.title));                   
+
+              for (let m=0;m<sObj.children.length;m++)
+              {
+                let iObj=sObj.children [m];
+
+                if (iObj.orgType==OrgContentTypes.Item)
+                {
+                   var itemObj:OrgItem=iObj as OrgItem; 
+                   sectionObj ["#array"].push (iObj.toJSONObject ());   
+                }
+                else {
+                    console.log ("Error: undefined type found at this level: " + iObj.orgType);
+                }    
+              }
+            }
+          }
         }
         
-        var formattedOrganization=JSON.stringify (root);
+        var formattedOrganization=JSON.stringify (orgRoot);        
+        console.log ("To: " + formattedOrganization);
         
-        //console.log ("To: " + formattedOrganization);
-        
-        return (formattedOrganization);
+        return (orgRoot);
     }
     
     /**
@@ -457,7 +446,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                        if (sequenceObject=="sequence") // checking to make absolutely sure we're in the right place
                        {
                          let newSequence:OrgSequence=new OrgSequence ();
-                         newData.push (newSequence);                          
+                         newData.push (newSequence);
                          newSequence.id = destNode [sequenceObject]["@id"];
                          newSequence.category = destNode [sequenceObject]["@category"];
                          newSequence.audience = destNode [sequenceObject]["@audience"];                           
@@ -551,8 +540,8 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             return;
         }
         
-        var newNode=new OrgItem ();
-        newNode.title="New Item";
+        var newNode:OrgSequence=new OrgSequence ();
+        newNode.title="New Sequence";
         immutableHelper.push (newNode);
 
         this.extractData (immutableHelper);
@@ -565,7 +554,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     render() 
     { 
-      console.log ("render()");       
+      //console.log ("render()");
           
       return (
               <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
@@ -581,7 +570,6 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                       generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
-                      //nodeContentRenderer={FakeNode}
                   />
               </div>
       );

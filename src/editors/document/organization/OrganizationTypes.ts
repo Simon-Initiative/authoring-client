@@ -7,7 +7,7 @@ export const OrgContentTypes = types.strEnum([
   'Sequence',
   'Module',
   'Organization'
-])
+]);
 
 export type OrgContentTypes = keyof typeof OrgContentTypes;
 
@@ -28,6 +28,14 @@ export class OrgItem {
     this.resourceRef=new IDRef ();
   }
     
+  static addTextObject (aText,aValue)
+  {
+    let newTextObject:Object=new Object ();
+    newTextObject [aText]=new Object ();
+    newTextObject [aText]["#text"]=aValue;
+    return (newTextObject);
+  }    
+    
   addNode (aNode: OrgItem) {
       this.children.push (aNode);
   }
@@ -44,15 +52,15 @@ export class OrgItem {
   * You can only call this if the node is a leaf node, or in other words
   * an OLI item
   */  
-  toExternalObject (): Object {
-      var nodeObj=new Object ();
+  toJSONObject (): Object {
+      var ephemeral:Object=new Object ();
       
-      nodeObj ["item"]=new Object ();
-      nodeObj ["item"]["@scoring_mode"]=this.scoringMode;
-      nodeObj ["item"]["resourceref"]=new Object ();
-      nodeObj ["item"]["resourceref"]["@idref"]=this.resourceRef.idRef;
+      ephemeral ["item"]=new Object ();
+      ephemeral ["item"]["@scoring_mode"]=this.scoringMode;
+      ephemeral ["item"]["resourceref"]=new Object ();
+      ephemeral ["item"]["resourceref"]["@idref"]=this.resourceRef.idRef;
       
-      return (nodeObj);
+      return (ephemeral);
   }  
 }
 
@@ -61,31 +69,69 @@ export class OrgSection extends OrgItem {
       super ();
       this.orgType=OrgContentTypes.Section;
   }
+    
+  toJSONObject (): Object {
+    let ephemeral:Object=new Object ();
+    ephemeral ["@id"]=this.id;
+    ephemeral ["#array"]=new Array ();      
+    return (ephemeral);
+  }     
 }
 
 export class OrgModule extends OrgItem {
+
   constructor() {
     super ();
     this.orgType=OrgContentTypes.Module;
   } 
+    
+  toJSONObject (): Object {
+    let ephemeral:Object=new Object ();
+    ephemeral ["@id"]=this.id;
+    ephemeral ["#array"]=new Array ();      
+    return (ephemeral);
+  }     
 }
 
 export class OrgSequence extends OrgItem{    
+
   category:string="unassigned";
   audience:string="unassigned";
     
   constructor() {
    super ();      
    this.orgType=OrgContentTypes.Sequence;
+  } 
+    
+  toJSONObject (): Object {
+    let ephemeral:Object=new Object ();
+    ephemeral ["@id"]=this.id;
+    ephemeral ["@category"]=this.category;
+    ephemeral ["@audience"]=this.audience;
+    ephemeral ["#array"]=new Array ();      
+    return (ephemeral);
   }    
 }
 
 export class OrgOrganization extends OrgSequence {
+    
+  version:string="unassigned";
+  description:string="unassgined";
+        
   constructor() {
     super ();      
     this.orgType=OrgContentTypes.Organization;
   }
-        
-  version:string="unassigned";
-  description:string="unassgined";
+    
+  toJSONObject (): Object {
+    let ephemeral:Object=new Object ();
+    ephemeral ["organization"]=new Object ();  
+    ephemeral ["organization"]["@id"]=this.id;
+    ephemeral ["organization"]["@version"]=this.version;
+    ephemeral ["organization"]["#array"]=new Array ();
+    ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("title",this.title));
+    ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("description",this.description));
+    ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("audience",this.audience));      
+    return (ephemeral);
+  }  
 }
