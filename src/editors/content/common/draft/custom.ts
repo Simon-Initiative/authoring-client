@@ -1,32 +1,35 @@
 import * as types from '../../../../data/types';
 
 export const EntityTypes = types.strEnum([
+
+  // Sentinals
   'pullout_begin',
   'pullout_end',
   'example_begin',
   'example_end',
-  'figure-begin',
-  'figure-end',
+  'figure_begin',
+  'figure_end',
+  'section_begin',
+  'section_end',
+
+  // Inline entities
+  'activity_link',
   'code',
   'formula',
   'quote',
-  'codeblock',
   'bdo',
   'link',
+  'xref',
+  'wb_manual',
   'cite',
   'image',
+  
+  // Block entities
+  'codeblock',
+  'objref',
+  'wb_inline',
   'table',
-  'activity_link',
-  'command',
-  'test_and_configure',
-  'iframe',
-  'applet',
   'audio',
-  'director',
-  'flash',
-  'mathematica',
-  'panopto',
-  'unity',
   'video',
   'youtube',
   'unsupported',

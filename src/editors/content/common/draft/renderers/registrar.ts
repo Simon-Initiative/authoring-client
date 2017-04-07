@@ -9,6 +9,8 @@ import { EmbeddedDocument } from './EmbeddedDocument';
 import Unsupported from './Unsupported';
 import { PulloutBegin } from './PulloutBegin';
 import { PulloutEnd } from './PulloutEnd';
+import { SectionBegin } from './SectionBegin';
+import { SectionEnd } from './SectionEnd';
 
 
 import { EntityTypes } from '../custom';
@@ -26,6 +28,8 @@ export default function init() {
   
   register(EntityTypes.pullout_begin, PulloutBegin, undefined);
   register(EntityTypes.pullout_end, PulloutEnd, undefined);
+  register(EntityTypes.section_begin, SectionBegin, undefined);
+  register(EntityTypes.section_end, SectionEnd, undefined);
   
   
 }

@@ -4,7 +4,7 @@ import './markers.scss';
 
 export const PulloutEnd = (props) => {
   return (
-    <span className='Marker'>
+    <span className='PulloutSentinel'>
       pullout end ({props.subType}) 
     </span>);
 };
