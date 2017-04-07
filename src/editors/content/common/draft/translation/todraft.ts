@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import { HtmlContent } from '../../../../../data/contentTypes';
 import * as common from './common';
+import { getKey } from './common';
 import { EntityTypes } from '../custom';
 
 // Translation routines to convert from persistence model to draft model 
@@ -161,9 +162,7 @@ function getBlockStyleForDepth(depth: number) : string {
 // This is the same code that Draft.js uses to determine
 // random block keys:
 
-function getKey(item) {
-  return Object.keys(item).filter(k => !k.startsWith('@'))[0];
-}
+
 
 function addNewBlock(params : common.RawDraft, values : Object) : common.RawContentBlock {
   const defaultBlock : common.RawContentBlock = {

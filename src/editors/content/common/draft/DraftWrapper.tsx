@@ -148,7 +148,7 @@ function splitBlockInContentState(
   const dataAbove = blockAbove.data.toJSON();
   console.log(dataAbove);
   const toPreserve = Object.keys(dataAbove)
-    .filter(key => key.startsWith('oli'))
+    .filter(key => key.startsWith('oli') || key === 'semanticContext')
     .reduce((o, key) => {
       o[key] = dataAbove[key]
       return o;
