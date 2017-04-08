@@ -2,6 +2,20 @@
   background-color: #999;
 }
 
+.exampleBlock {
+  border-left-color: #0000DD;
+  border-left-style: solid;
+  border-left-width: 2;
+  padding-left: 20;
+}
+
+.pulloutBlock {
+  border-left-color: #0000DD;
+  border-left-style: solid;
+  border-left-width: 2;
+  padding-left: 20;
+}
+
 .public-DraftStyleDefault-unorderedListItem {
   .public-DraftStyleDefault-block {
     display: inline;

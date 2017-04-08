@@ -107,7 +107,7 @@ export abstract class HtmlContentEditor
 
 
   onChange(content: contentTypes.HtmlContent) {
-    this.props.onEdit(content);
+    //this.props.onEdit(content);
   } 
 
   render() : JSX.Element {

@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import { HtmlContent } from '../../../../../data/contentTypes';
 import * as common from './common';
+import { EntityTypes } from '../custom';
 
 // Translation routine from draft model to persistence model 
 
@@ -106,8 +107,11 @@ function translateBlock(iterator : BlockIterator,
   const rawBlock = block.rawBlock;
   const draftBlock = block.block;
 
-  if (isSectionTitleBlock(rawBlock)) {
-    translateSection(rawBlock, draftBlock, entityMap, context);
+  const sentinelType = getSentinelType(rawBlock, entityMap);
+
+  if (sentinelType !== null) {
+    handleSentinelTransition(sentinelType, iterator, rawBlock, entityMap, context);
+
   } else if (isParagraphBlock(rawBlock)) {
     translateParagraph(rawBlock, draftBlock, entityMap, context);
   } else if (isOrderedListBlock(rawBlock)) {
@@ -117,17 +121,45 @@ function translateBlock(iterator : BlockIterator,
   } else {
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
+  
 }
 
+function handleSentinelTransition(type: EntityTypes, iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap, context: Stack) {
 
-function isSectionTitleBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block; 
-  return (common.blockStylesMap[type] !== undefined);
+    if (type.endsWith('_end')) {
+      // Simply pop the context stack
+      context.pop();
+
+    } else if (type === EntityTypes.section_begin) {
+      translateSection(iterator, entityMap, context);
+
+    } else if (type === EntityTypes.pullout_begin) {
+      translatePullout(iterator, entityMap, context);
+
+    } else if (type === EntityTypes.example_begin) {
+      translateExample(iterator, entityMap, context);
+
+    } else if (type === EntityTypes.figure_begin) {
+      //translateFigure(iterator, entityMap, context);
+
+    } 
+
+}
+
+function getSentinelType(rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap) : EntityTypes {
+  if (rawBlock.type === 'atomic') {
+    const entity : common.RawEntity = entityMap[rawBlock.entityRanges[0].key];
+    if (entity.type.endsWith('_begin') || entity.type.endsWith('_end')) {
+      return (entity.type as EntityTypes);
+    } 
+  } 
+  return null; 
 }
 
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
-  return (data.oliType === undefined && type === 'unstyled');
+  return (type === 'unstyled');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
@@ -178,19 +210,27 @@ function translateList(listType : string,
 function translateUnsupported(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
-  top(context).push(JSON.parse(entityMap[rawBlock.entityRanges[0].key].data.src));
+  top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
 }
 
-function translateSection(rawBlock : common.RawContentBlock, 
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+function translateSection(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+
+  let block = iterator.peek();
+  let title;
+  if (block !== null && isTitleBlock(block.rawBlock)) {
+    block = iterator.next();
+    title = processTitle(block.rawBlock, block.block, entityMap);
+  } else {
+    title = {
+      title: {
+        '#text': ''
+      }
+    };
+  }
 
   const s = { 
     section: {
-      '#array': [{
-        title: {
-          '#text': rawBlock.text
-        }
-      }, {
+      '#array': [title, {
         body: {
           '#array': []
         }
@@ -198,27 +238,73 @@ function translateSection(rawBlock : common.RawContentBlock,
     }
   };
 
-  // Everytime we encounter a section title we have to consider
-  // whether the new section is a sub-section of the current section,
-  // a sibling section, or a parent section. To account for this we
-  // get the section depth from the block header type and then
-  // adjust the section stack accordingly.
-
-  const sectionDepth = common.blockStylesMap[rawBlock.type];
-
-  while (context.length > sectionDepth) {
-    context.pop();
-  }
-
   top(context).push(s);
   context.push((s.section['#array'][1] as any).body['#array']);
 
 }
 
+
+function translatePullout(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+
+  let block = iterator.peek();
+  let arr = [];
+  if (block !== null && isTitleBlock(block.rawBlock)) {
+    block = iterator.next();
+    arr.push(processTitle(block.rawBlock, block.block, entityMap));
+  }
+
+  const p = {
+    "pullout": {
+      "@type": "note",
+      "#array": arr
+    }
+  };
+
+  top(context).push(p);
+  context.push(p.pullout['#array']);
+
+}
+
+function processTitle(rawBlock: common.RawContentBlock, block: ContentBlock, entityMap: common.RawEntityMap) {
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    return { title: { '#text': rawBlock.text}};
+  } else {
+    const title = { title: { '#array': []}};
+    translateTextBlock(rawBlock, block, entityMap, title.title['#array']);
+    return title;
+  }
+}
+
+function translateExample(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+
+  let block = iterator.peek();
+  let arr = [];
+  if (block !== null && isTitleBlock(block.rawBlock)) {
+    block = iterator.next();
+    arr.push(processTitle(block.rawBlock, block.block, entityMap));
+  }
+
+  const e = {
+    "example": {
+      "@type": "note",
+      "#array": arr
+    }
+  };
+
+  top(context).push(e);
+  context.push(e.example['#array']);
+
+}
+
+function isTitleBlock(block: common.RawContentBlock) {
+  const data = block.data;
+  return data.oliType !== undefined && data.oliType !== null && data.oliType === 'title';
+}
+
 function translateParagraph(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
-  if (rawBlock.inlineStyleRanges.length === 0) {
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
     top(context).push({ p: { '#text': rawBlock.text}});
   } else {
     const p = { p: { '#array': []}};
@@ -352,14 +438,22 @@ function translateNonOverlapping(rawBlock : common.RawContentBlock,
     container.push({ '#text': rawBlock.text.substring(0, intervals[0].offset)});
   }
 
-  intervals
-    .map(s => translateInline(s, rawBlock.text, entityMap))
-    .forEach(s => container.push(s));
+  for (let i = 0; i < intervals.length; i++) {
+    const s = intervals[i];
 
-  let lastStyleEnd = intervals[intervals.length - 1].offset + intervals[intervals.length - 1].length;
-  if (lastStyleEnd < rawBlock.text.length) {
-    container.push({ '#text': rawBlock.text.substring(lastStyleEnd)});
+    // Translate the style to a style object
+    const translated = translateInline(s, rawBlock.text, entityMap)
+    container.push(translated);
+
+    // Insert another plain text style if there is a gap between
+    // this style and the next one
+    let endOrNext = (i == intervals.length - 1) ? rawBlock.text.length : intervals[i + 1].offset;
+    if (endOrNext > (s.offset + s.length)) {
+      container.push({ '#text': rawBlock.text.substring((s.offset + s.length), endOrNext)});
+    }
+    
   }
+    
 }
 
 
