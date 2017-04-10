@@ -5,10 +5,14 @@ import { HtmlContent } from '../../../../../data/contentTypes';
 import * as common from './common';
 import { EntityTypes } from '../custom';
 import { getKey } from './common';
+import { Block, BlockIterator, BlockProvider } from './provider'
 
 // Translation routine from draft model to persistence model 
 
 
+// A mapping of inline sytles to the persistence
+// object trees needed to represent them.  Functions
+// are present here to provide a poor-man's immutability. 
 const styleContainers = {
   BOLD: () => ({ em: { '@style': 'bold'} }),
   ITALIC: () => ({ em: { '@style': 'italic'} }),
@@ -22,6 +26,7 @@ const styleContainers = {
 
 type Container = Object[];
 type Stack = Container[];
+
 type InlineOrEntity = common.RawInlineStyle | common.RawEntityRange;
 
 type OverlappingRanges = {
@@ -30,89 +35,28 @@ type OverlappingRanges = {
   ranges: InlineOrEntity[]
 };
 
-type Block = {
-  rawBlock: common.RawContentBlock,
-  block : ContentBlock
-}
-
-interface BlockIterator {
-  next() : Block;
-  hasNext() : boolean;
-  peek() : Block;
-}
-
-interface BlockProvider {
-  blocks : common.RawContentBlock[];
-  state : ContentState;
-  index : number; 
-}
-
-class BlockProvider implements BlockIterator {
-
-  constructor(blocks : common.RawContentBlock[], state: ContentState) {
-    this.blocks = blocks;
-    this.state = state; 
-    this.index = 0;
-  }
-
-  next() : Block {
-
-    if (this.index === this.blocks.length) {
-      return null;
-    }
-
-    const block = { 
-      rawBlock: this.blocks[this.index], 
-      block: this.state.getBlockForKey(this.blocks[this.index].key)
-    };
-    this.index++;
-    return block;
-  }
-
-  peek() : Block {
-    
-    if (this.index === this.blocks.length) {
-      return null;
-    }
-    
-    const block = { 
-      rawBlock: this.blocks[this.index], 
-      block: this.state.getBlockForKey(this.blocks[this.index].key)
-    };
-    return block;
-  }
-
-  hasNext() : boolean {
-    return this.index < this.blocks.length
-  }
-}
-
-
-const top = (stack : Stack) => stack[stack.length - 1];
-
+// Converts the draft ContentState object to the HtmlContent format
+// (which ultimately is serialized and stored in persistence)
 export function draftToHtmlContent(state: ContentState) : HtmlContent {
 
   const rawContent = convertToRaw(state);
   const translated = translate(rawContent, state);
-
-  console.log('translated back:');
-  console.log(rawContent);
-  console.log(translated);
 
   return new HtmlContent(translated as any);
 }
 
 function translate(content: common.RawDraft, state: ContentState) : Object {
 
+  // Create a top-level container for the object tree to root itself into
   const root = { body: { '#array': []}, contentType: 'HtmlContent'};
-
-  // The root section really isn't a section, it is just the top level
-  // body element.  We consider this to be depth level 0 - so it matches
-  // the index of the location in this 'stack'.  
   const context = [root.body['#array']];  
 
+  // Start iterating through the blocks, converting them as we go.
+  // The iterator pattern is used here instead of a for-loop since some
+  // blocks are processed as groups - so we need to be able to provide
+  // the iterator to the block processing function so that it can 
+  // access additional blocks if needed. 
   const iterator = new BlockProvider(content.blocks, state);
-
   while (iterator.hasNext()) {
     translateBlock(iterator, content.entityMap, context);
   }
@@ -143,6 +87,8 @@ function translateBlock(iterator : BlockIterator,
   }
   
 }
+
+const top = (stack : Stack) => stack[stack.length - 1];
 
 function handleSentinelTransition(type: EntityTypes, iterator: BlockIterator, 
   rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap, context: Stack) {
@@ -197,6 +143,7 @@ function translateList(listType : string,
   block: ContentBlock, iterator : BlockIterator, 
   entityMap : common.RawEntityMap, context: Stack) {
 
+  // Create the object representing the list type (ol, ul)
   const list = {};
   list[listType] = { '#array': [] };
   const container = list[listType]['#array'];
@@ -205,6 +152,8 @@ function translateList(listType : string,
 
   top(context).push(list);
 
+  // To translate a list we have iterate through the blocks
+  // to find the transition out of blocks of this list type.
   while (true) {
 
     if (rawBlock.inlineStyleRanges.length === 0) {
@@ -378,39 +327,61 @@ function translateOverlappingGroup(
   let current = chars.get(offset).getStyle();
   let begin = offset;
 
-  const createStyle = (set, start, end) => {
+  // createStyleTree is a helper function to create the object tree of 
+  // potentially nested styles for a specific range.  
+
+  // set is an Immutable OrderedSet of style strings ('BOLD', 'ITALIC')
+  // that represent the styles applied to the range of start-end. An example
+  // of what it would create 
+
+  // { sub: { var: "#text": "some text"}}
+  const createStyleTree = (set, start, end) => {
+    
+    // A placeholder for the first style object
     const root = { root: {} };
     let last = root;
+
     set.toArray().forEach(s => {
+      
+      // For each style, create the object representation for that style
       const style = Object.assign({}, styleContainers[s]());
+
+      // Now root this style object into the parent style
       last[getKey(last)] = style;
       last = style; 
     });
+
+    // The '#text' parameter should only exist at the leaf node
     last[getKey(last)]['#text'] = rawBlock.text.substring(start, end);
 
+    // Add the root of the object tree to the container
     container.push(root.root);
   }
 
+  // Walk through each character at a time, finding when the
+  // style set that applies to the character differ from the previous
+  // character.  For these transitions we create a style tree and
+  // push it into the container. 
   for (let i = offset; i < (offset + length); i++) {
     let c : CharacterMetadata = chars.get(i);
     let allStyles : Immutable.OrderedSet<string> = c.getStyle();
 
     if (!allStyles.equals(current)) {
       
-      createStyle(current, begin, i);
+      createStyleTree(current, begin, i);
       current = allStyles;
       begin = i;
     }
   }
 
-  createStyle(current, begin, (offset + length));
+  createStyleTree(current, begin, (offset + length));
     
   return container;
 }
 
-function getOverlappingRanges(ranges: InlineOrEntity[]) : OverlappingRanges[] {
+// Group all overlapping ranges 
+function groupOverlappingRanges(ranges: InlineOrEntity[]) : OverlappingRanges[] {
 
-  // Find all overlapping styles and group them
   let groups : OverlappingRanges[] = [{ offset: ranges[0].offset, length: ranges[0].length, ranges: [ranges[0]]}];
   let offset, length;
   
@@ -462,7 +433,16 @@ function overlaps(a: InlineOrEntity, b: InlineOrEntity) : boolean {
 }
 
 
+// Splits styles that overlap the specified linkRange. For example, in the following
+// The text "This is some" is bold and the text "some text" is the text for a link.
+// This function would split the bold interval so that there would be two intervals,
+// one for "This is " and another for "some".  This is necessary because the 
+// persistence representation of links requires nesting of their text content, and
+// so to do that property we need to make sure no other styles overlap the link
 
+//          --link---
+//  ----bold----
+//  This is some text
 function splitOverlappingStyles(linkRange: common.RawEntityRange, rawBlock: common.RawContentBlock) {
 
   const updatedInlines : common.RawInlineStyle[] = [];
@@ -558,8 +538,6 @@ function processOverlappingStyles(group: OverlappingRanges, rawBlock : common.Ra
 function translateOverlapping(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
 
-  console.log('translateOverlapping');
-
   // Find all entityRanges that are links - we are going to have to 
   // nest containing styles underneath the object that we create for the link 
   const linkRanges : common.RawEntityRange[] = getLinkRanges(rawBlock, entityMap);
@@ -572,7 +550,7 @@ function translateOverlapping(rawBlock : common.RawContentBlock,
   // Chunk the entity ranges and inline styles into separate groups - where
   // only intervals that overlap each other belong to the same group. A group
   // could very likely contain just one interval. 
-  const groups = getOverlappingRanges(combineIntervals(rawBlock));
+  const groups = groupOverlappingRanges(combineIntervals(rawBlock));
 
   // Create a bare text tag for the first unstyled part, if one exists
   let styles = rawBlock.inlineStyleRanges;
