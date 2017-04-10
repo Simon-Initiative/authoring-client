@@ -232,7 +232,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const content = editorState.getCurrentContent();
         
         const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
-        console.log(htmlContent);
         this.props.onEdit(htmlContent);
 
         return this.setState({editorState})
