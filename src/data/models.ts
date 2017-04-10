@@ -13,7 +13,8 @@ export const ModelTypes = types.strEnum([
   'AssessmentModel',
   'MediaModel',
   'OrganizationModel',
-  'LearningObjectiveModel'
+  'LearningObjectiveModel',
+  'SkillModel'  
 ])
 
 // Create an actual type
@@ -38,19 +39,25 @@ export function createModel(object: any) : ContentModel {
     case ModelTypes.OrganizationModel:
       return new OrganizationModel(object);
     case ModelTypes.LearningObjectiveModel:
-      return new LearningObjectiveModel(object);          
+      return new LearningObjectiveModel(object);
+    case ModelTypes.SkillModel:
+      return new SkillModel(object);                    
   }
 }
 
 export type CourseModelParams = {
   title?: contentTypes.TitleContent,
-  organizations?: Immutable.List<types.DocumentId>
+  organizations?: Immutable.List<types.DocumentId>,
+  learningobjectives?: Immutable.List<types.DocumentId>,
+  skills?: Immutable.List<types.DocumentId>
 };
 
 const defaultCourseModel = {
   modelType: 'CourseModel',
   title: new contentTypes.TitleContent(),
-  organizations: Immutable.List<types.DocumentId>()
+  organizations: Immutable.List<types.DocumentId>(),
+  learningobjectives: Immutable.List<types.DocumentId>(),
+  skills: Immutable.List<types.DocumentId>()
 }
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
@@ -59,7 +66,8 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
 
   title: contentTypes.TitleContent;
   organizations: Immutable.List<types.DocumentId>;
-  learningObjectives: Immutable.List<types.DocumentId>;
+  learningobjectives: Immutable.List<types.DocumentId>;
+  skills: Immutable.List<types.DocumentId>;
 
   constructor(params?: CourseModelParams) {
       params ? super(contentTypes.deserialize(params)) : super();
@@ -222,11 +230,14 @@ export type ContentModel =
   MediaModel |
   WorkbookPageModel |
   OrganizationModel |
-  LearningObjectiveModel;
+  LearningObjectiveModel |
+  SkillModel;
 
 // A pure function that takes a content model as 
 // input and returns a changed content model
 export type ChangeRequest = (input: ContentModel) => ContentModel;
+
+//>------------------------------------------------------------------
 
 export type LearningObjectiveModelParams = {
   title?: contentTypes.TitleContent
@@ -246,6 +257,30 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   }
 
   with(values: LearningObjectiveModelParams) {
+      return this.merge(values) as this;
+  }
+}
+
+//>------------------------------------------------------------------
+
+export type SkillModelParams = {
+  title?: contentTypes.TitleContent
+};
+
+const defaultSkillModel = {
+  modelType: 'SkillModel',
+  title: new contentTypes.TitleContent(),
+}
+
+export class SkillModel extends Immutable.Record(defaultSkillModel) {    
+  modelType: 'SkillModel';
+  title: contentTypes.TitleContent;
+  
+  constructor(params?: SkillModelParams) {
+      params ? super(contentTypes.deserialize(params)) : super();
+  }
+
+  with(values: SkillModelParams) {
       return this.merge(values) as this;
   }
 }

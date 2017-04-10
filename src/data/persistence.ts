@@ -47,6 +47,7 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 }
 
 export function queryDocuments(query: Object) : Promise<Document[]> {
+  console.log ("queryDocuments ("+JSON.stringify (query)+")");
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/_find`, {
         method: 'POST',
@@ -71,6 +72,7 @@ export function queryDocuments(query: Object) : Promise<Document[]> {
 
 let since = 'now'
 export function listenToDocument(documentId: types.DocumentId) : Promise<Document> {
+  console.log ("listenToDocument ("+documentId+")");  
   return new Promise(function(resolve, reject) {
 
     const params = {
@@ -109,6 +111,7 @@ export function listenToDocument(documentId: types.DocumentId) : Promise<Documen
 }
 
 export function retrieveDocument(documentId: types.DocumentId) : Promise<Document> {
+  console.log ("retrieveDocument ("+documentId+")");  
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${documentId}`, {
         method: 'GET',
@@ -135,7 +138,7 @@ export function retrieveDocument(documentId: types.DocumentId) : Promise<Documen
 
 export function createDocument(content: models.ContentModel, 
   database : string = configuration.database) : Promise<Document> {
-    
+  console.log ("createDocument ()");  
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${database}`, {
         method: 'POST',
@@ -163,6 +166,7 @@ export function createDocument(content: models.ContentModel,
 
 
 export function persistDocument(doc: Document) : Promise<Document> {
+  console.log ("persistDocument ()");  
   return new Promise(function(resolve, reject) {
 
     // We flatten the model during persistence so that the properties of 

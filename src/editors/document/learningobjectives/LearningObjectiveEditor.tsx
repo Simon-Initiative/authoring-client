@@ -14,7 +14,9 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-//import OrganizationNodeRenderer from './OrganizationNodeRenderer';
+import { LOTypes, LearningObjective } from './LOTypes.ts';
+
+var loData=require ('./LO.json');
 
 const tempnavstyle=
 {
@@ -32,6 +34,7 @@ interface LearningObjectiveEditor
 export interface LearningObjectiveEditorState extends AbstractEditorState 
 {
     treeData : any;  
+    rootLO: any;
 }
 
 export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -54,61 +57,71 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         
         super(props);
         this.state = {
-                        treeData: [
-                                    {
-                                        title: 'Logic',
-                                        children: [ 
-                                                    { title: 'Pre Test' } 
-                                                  ] 
-                                    },
-                                    {
-                                        title: 'Sets',
-                                        children: [ 
-                                                    { title: 'Methods for Prevention' } 
-                                                  ] 
-                                    }    
-                                ]
-                    };            
+                        treeData: this.processData (loData),
+                        rootLO: this.createRootLO (loData)                        
+                     };        
     }
     
     componentDidMount() {
         console.log ("componentDidMount ()");
-        this.fetchTitles(this.props.documentId);
     }    
     
-    fetchTitles(documentId: types.DocumentId) {
-        console.log ("fetchTitles ();");
-        
-        persistence.queryDocuments(titlesForCoursesResources(documentId)).then(docs => {
-            /*
-            this.setState(
-            {
-                resources: docs.map(d => ({ _id: d._id, title: (d as any).title.text, type: (d as any).modelType}))
-            })
-            */
-        });
-    }
-
     componentWillReceiveProps(nextProps) {
-        console.log ("componentWillReceiveProps ();");
-        
-        if (this.props.documentId !== nextProps.documentId) 
-        {
-          this.fetchTitles(nextProps.documentId);
-        }
+        console.log ("componentWillReceiveProps ();");    
     }    
+    
+    createRootLO (aData: any):Object {
+        
+        var newRootLO:LearningObjective=new LearningObjective ();
+        
+        for (var i in aData) {
+            
+            if (i=="objectives") {                
+                var loRoot=aData [i];
+                newRootLO.id=loRoot ["@id"];
+                
+                for (var j=0;j<loRoot ["#array"].length;j++) {
+                    var lObjectiveTest=loRoot ["#array"][j];
+                    
+                    for (var k in lObjectiveTest) {
+                        if (k=="title") {
+                            newRootLO.title=this.getTextFromNode (lObjectiveTest [k]);                            
+                        }
+                    }
+                }
+            }
+        }  
+        
+        return (newRootLO as Object);
+    }
     
     /**
      * 
      */
-    processDataChange (treeData: any) {
+    extractData (aData: any): Object {
+        console.log ("extractData ()");
+                
+        var changedData=aData.treeData;
+        
+        var newData:Object=new Object ();
+        
+        return (newData);
+    }
+    
+    /**
+     * 
+     */
+    processDataChange (newData: any) {
         console.log ("processDataChange ()");
         
-        this.setState(treeData)
+        this.extractData (newData);        
         
-        console.log (JSON.stringify(treeData));
+        this.setState (newData);
     }
 
+    /**
+     * 
+     */
     expand(expanded) {
         this.setState({
             treeData: toggleExpandedForAll({
@@ -118,14 +131,104 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         });
     }
 
+    /**
+     * 
+     */
     expandAll() {
         this.expand(true);
     }
 
+    /**
+     * 
+     */
     collapseAll() {
         this.expand(false);
     }
+    
+    /**
+     * 
+     */
+    getTextFromNode (aNode: any) : string {
+        
+      console.log ("getTextFromNode: " + JSON.stringify (aNode));
+          
+      // Check for old style text nodes  
+      if (aNode ['#text']) { 
+        return (aNode ['#text']);
+      } 
+
+      return ("");
+    }
+
+    parseLearningObjective (anObjective:Object): LearningObjective {
+
+        var newLO:LearningObjective=new LearningObjective ();
+        
+        newLO.id=anObjective ["@id"];
+        newLO.category=anObjective ["@category"];
+        newLO.title=anObjective ["#text"];
+        
+        return (newLO);
+    }
+    
+    /**
+     * This method goes from external format to the format used by the tree renderer
+     * Note that the tree widget needs to maintain any attributes we add to a node
+     * object. Otherwise we can't annotate and enrich the structuer. 
+     */
+    processData (treeData: any) {
+        
+        var newData:Array<Object>=new Array ();
                 
+        for (var i in treeData) {
+            
+            if (i=="objectives") {                
+                var loRoot=treeData [i];
+                
+                for (var j=0;j<loRoot ["#array"].length;j++) {
+                    var lObjectiveTest=loRoot ["#array"][j];
+                    
+                    for (var k in lObjectiveTest) {
+                        
+                        if (k=="objective") {
+                            newData.push (this.parseLearningObjective (lObjectiveTest [k]));                            
+                        }                        
+                    }
+                }
+            }
+        }
+
+        return (newData);
+    }
+
+    /**
+     * Note that this manual method of adding a new node does not generate an
+     * onChange event. That's why we call extractData manually as the very
+     * last function call.
+     */
+    addNode (anEvent) {
+        
+        console.log ("addNode ()");
+                
+        var immutableHelper = this.state.treeData.slice()
+        
+        var aData=this.state.treeData;
+
+        if (immutableHelper==null)
+        {
+            console.log ("Bump");
+            return;
+        }
+        
+        var newNode:LearningObjective=new LearningObjective ();
+        newNode.title="New Learning Objective";
+        immutableHelper.push (newNode);
+
+        this.extractData (immutableHelper);
+        
+        this.setState({treeData: immutableHelper});
+    }   
+
     /**
      * 
      */
@@ -133,7 +236,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                        <p className="h2" style={tempnavstyle.h2}>Course Content</p>
+                        <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
                         <button type="button" className="btn btn-secondary">Add Item</button>
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>

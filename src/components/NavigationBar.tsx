@@ -188,13 +188,11 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
 
     handleFoldIn(event: any) 
     {
-        console.log ("handleFoldIn()");
         this.setState({closed: true});
     }
 
     handleFoldOut(event: any) 
-    {
-        console.log ("handleFoldOut()");
+    {       
         this.setState({closed: false});
     }    
     
@@ -206,6 +204,9 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         console.log ("placeHolderMenuHanlder ()");
     }    
     
+    /**
+     * 
+     */
     generateMenuItem (closed:boolean, item: any)
     {
         if (item.staticContent==true)
@@ -226,9 +227,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
      * dynamically from external data and even from a marktplace (yes we can)
      */
     generateMenu (closed:boolean)
-    {
-        console.log ("generateMenu ("+closed+")");
-        
+    {        
         return (this.opts.map(item => this.generateMenuItem (closed,item)));                
     }
          
@@ -239,10 +238,12 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     {
         let menuControl = null;        
         let mStyle = null;
-        
+
         // Bad way of doing this, will be changed soon!
         this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);        
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
+        this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
+        this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);        
         
         if (this.state.closed==true) 
         {

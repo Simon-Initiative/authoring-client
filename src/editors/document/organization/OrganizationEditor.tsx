@@ -18,7 +18,6 @@ import NodeRendererDefault from 'react-sortable-tree';
 import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from './OrganizationTypes'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
-//import orgData from './organization.json'; // does not work
 var orgData=require ('./organization.json');
 
 const tempnavstyle=
