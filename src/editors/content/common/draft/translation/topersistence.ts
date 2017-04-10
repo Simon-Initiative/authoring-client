@@ -10,14 +10,14 @@ import { getKey } from './common';
 
 
 const styleContainers = {
-  BOLD: { em: { '@style': 'bold'} },
-  ITALIC: { em: { '@style': 'italic'} },
-  CODE: { var: { } },
-  TERM: { term: { } },
-  IPA: { ipa: { } },
-  FOREIGN: { foreign: { } },
-  SUBSCRIPT: { sub: { } },
-  SUPERSCRIPT: { sup: { } }
+  BOLD: () => ({ em: { '@style': 'bold'} }),
+  ITALIC: () => ({ em: { '@style': 'italic'} }),
+  CODE: () => ({ var: { } }),
+  TERM: () => ({ term: { } }),
+  IPA: () => ({ ipa: { } }),
+  FOREIGN: () => ({ foreign: { } }),
+  SUBSCRIPT: () => ({ sub: { } }),
+  SUPERSCRIPT: () => ({ sup: { } })
 }
 
 type Container = Object[];
@@ -96,6 +96,7 @@ export function draftToHtmlContent(state: ContentState) : HtmlContent {
   const translated = translate(rawContent, state);
 
   console.log('translated back:');
+  console.log(rawContent);
   console.log(translated);
 
   return new HtmlContent(translated as any);
@@ -337,14 +338,20 @@ function combineIntervals(rawBlock: common.RawContentBlock) : InlineOrEntity[] {
   
   const intervals : InlineOrEntity[] = 
     [...rawBlock.entityRanges, ...rawBlock.inlineStyleRanges]
-    .sort((a,b) => a.offset - b.offset);
+    .sort((a,b) => {
+      if (a.offset - b.offset === 0) {
+        return a.length - b.length;
+      } else {
+        return a.offset - b.offset;
+      }
+    });
   
   return intervals;
 }
 
 function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
   
-  for (let i = 0; i < intervals.length - 2; i++) {
+  for (let i = 0; i < intervals.length - 1; i++) {
     let a = intervals[i];
     let b = intervals[i + 1];
 
@@ -355,7 +362,7 @@ function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
   return false;
 }
 
-function translateOverlapping(
+function translateOverlappingGroup(
   offset: number,
   length: number, 
   ranges: InlineOrEntity[],
@@ -372,16 +379,16 @@ function translateOverlapping(
   let begin = offset;
 
   const createStyle = (set, start, end) => {
-    const root = {};
-    let last = root
+    const root = { root: {} };
+    let last = root;
     set.toArray().forEach(s => {
-      const style = Object.assign({}, styleContainers[s]);
+      const style = Object.assign({}, styleContainers[s]());
       last[getKey(last)] = style;
       last = style; 
     });
-    last['#text'] = rawBlock.text.substring(start, end);
+    last[getKey(last)]['#text'] = rawBlock.text.substring(start, end);
 
-    container.push(root[getKey(root)]);
+    container.push(root.root);
   }
 
   for (let i = offset; i < (offset + length); i++) {
@@ -390,7 +397,7 @@ function translateOverlapping(
 
     if (!allStyles.equals(current)) {
       
-      createStyle(current, begin, i - 1);
+      createStyle(current, begin, i);
       current = allStyles;
       begin = i;
     }
@@ -448,9 +455,9 @@ function subsumes(a: InlineOrEntity, b: InlineOrEntity) : boolean {
 // Do a and b overlap in any way?
 function overlaps(a: InlineOrEntity, b: InlineOrEntity) : boolean {
   if (a.offset < b.offset) {
-    return a.offset + a.length < b.offset;
+    return a.offset + a.length > b.offset;
   } else {
-    return b.offset + b.length < a.offset;
+    return b.offset + b.length > a.offset;
   }
 }
 
@@ -531,7 +538,7 @@ function processOverlappingStyles(group: OverlappingRanges, rawBlock : common.Ra
           }
         });
 
-        entity[getKey(entity)][common.ARRAY] = translateOverlapping(group.offset, group.length, minusLink, rawBlock, block, entityMap);
+        entity[getKey(entity)][common.ARRAY] = translateOverlappingGroup(group.offset, group.length, minusLink, rawBlock, block, entityMap);
       
         return [entity];
       }
@@ -539,18 +546,19 @@ function processOverlappingStyles(group: OverlappingRanges, rawBlock : common.Ra
     } else if (group.ranges.length === 1) {
       
       const item : InlineOrEntity = group.ranges[0];
-      const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);    
-      return [translateInline(item, text, entityMap)];
+      return [translateInline(item, rawBlock.text, entityMap)];
       
     } else {
 
-      return translateOverlapping(group.offset, group.length, group.ranges, rawBlock, block, entityMap);
+      return translateOverlappingGroup(group.offset, group.length, group.ranges, rawBlock, block, entityMap);
     }
 
 }
 
-function translateOverlapping2(rawBlock : common.RawContentBlock, 
+function translateOverlapping(rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
+
+  console.log('translateOverlapping');
 
   // Find all entityRanges that are links - we are going to have to 
   // nest containing styles underneath the object that we create for the link 
@@ -569,7 +577,7 @@ function translateOverlapping2(rawBlock : common.RawContentBlock,
   // Create a bare text tag for the first unstyled part, if one exists
   let styles = rawBlock.inlineStyleRanges;
   if (styles[0].offset !== 0) {
-    let text = { '#text': rawBlock.text.substring(0, styles[0].offset - 1)};
+    let text = { '#text': rawBlock.text.substring(0, styles[0].offset)};
     container.push(text);
   }
 
@@ -607,7 +615,7 @@ function translateInline(s : InlineOrEntity, text : string, entityMap : common.R
 
 function translateInlineStyle(s : common.RawInlineStyle, text : string, entityMap : common.RawEntityMap) {
   const { style, offset, length } = s;
-  const substr = text.substring(offset, offset + length);
+  const substr = text.substr(offset, length);
   const mappedStyle = common.styleMap[style];
 
   if (common.emStyles[mappedStyle] !== undefined) {
@@ -623,7 +631,7 @@ function translateInlineStyle(s : common.RawInlineStyle, text : string, entityMa
 function translateInlineEntity(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap,
   childrenProcessor: () => Object[]) {
 
-  const { data, type } = entityMap[s.key].data;
+  const { data, type } = entityMap[s.key];
 
   const { offset, length } = s;
   data['#array'] = [];
@@ -677,7 +685,7 @@ function translateTextBlock(rawBlock : common.RawContentBlock,
   const intervals = combineIntervals(rawBlock);
 
   if (hasOverlappingIntervals(intervals)) {
-    translateOverlapping2(rawBlock, block, entityMap, container);
+    translateOverlapping(rawBlock, block, entityMap, container);
   } else {
     translateNonOverlapping(rawBlock, block, intervals, entityMap, container);
   }
