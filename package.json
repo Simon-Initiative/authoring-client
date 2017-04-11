@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "",
   "main": "./src/app.tsx",
-  "scripts": {},
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -25,7 +24,7 @@
     "babel-preset-stage-0": "^6.22.0",
     "css-loader": "^0.26.1",
     "del": "^2.2.2",
-    "draft-js": "^0.10.0",
+    "draft-js": "Simon-Initiative/draft-js",
     "draft-js-export-html": "^0.5.2",
     "file-loader": "^0.10.0",
     "gulp": "^3.9.1",
