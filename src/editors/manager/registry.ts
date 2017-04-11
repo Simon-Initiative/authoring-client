@@ -16,7 +16,8 @@ export function register(registration: RegisteredEditor) {
     EditorRegistry[registration.name] = registration
 }
 
-export function lookUpByName(name: string) : RegisteredEditor {  
+export function lookUpByName(name: string) : RegisteredEditor {
+    console.log ("lookUpByName ("+name+")");  
     return EditorRegistry[name];
 }
 

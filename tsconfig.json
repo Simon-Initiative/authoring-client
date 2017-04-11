@@ -10,7 +10,7 @@
         "removeComments": false,
         "sourceMap": true,
         "inlineSourceMap": false,
-        "noEmitHelpers": true,
+        "noEmitHelpers": false,
         "outDir": "./dev"
     },
 

@@ -7,6 +7,9 @@ var port = 5984;
 var user = 'su';
 var password = 'su';
 
+var skillDocID="-1";
+var LODocID="-1";
+
 var url = function() {
   return protocol + user + ':' + password + '@' + hostname + ':' + port;
 }
@@ -56,17 +59,17 @@ var fetch = function(resource) {
     http.get(resource, (res) => {
       const statusCode = res.statusCode;
       
-      let error;
+      var error;
       if (statusCode !== 200) {
         reject(statusCode);
       } 
       
       res.setEncoding('utf8');
-      let rawData = '';
+      var rawData = '';
       res.on('data', (chunk) => rawData += chunk);
       res.on('end', () => {
         try {
-          let parsedData = JSON.parse(rawData);
+          var parsedData = JSON.parse(rawData);
           resolve(parsedData);
         } catch (e) {
           reject(e.message);
@@ -100,7 +103,7 @@ var waitUntilReady = function(initialResolve) {
 }
 
 var createUser = function(user, password) {
-  let data = { 
+  var data = { 
     name: user, 
     password: password, 
     roles: [], 
@@ -110,7 +113,7 @@ var createUser = function(user, password) {
 }
 
 var createPermission = function(user, course) {
-  let data = { 
+  var data = { 
     modelType: 'CoursePermissionModel',
     userId: user,
     courseId: course
@@ -125,8 +128,32 @@ var createUsers = function() {
   ]);
 }
 
+var createSkills = function(input) {
+  return new Promise(function(resolve, reject) {  
+    var data = { 
+      modelType: 'SkillModel',
+      title: {text: 'Sample Skill Model'},
+      nodes: []
+    }
+    request('POST', '/editor', data)
+      .then(result => { skillDocID=result.id; resolve(input)});
+  });  
+}
+
+var createLearningObjectives = function(input) {
+  return new Promise(function(resolve, reject) {  
+    var data = { 
+      modelType: 'LearningObjectiveModel',
+      title: {text: 'Sample Learning Objective Model'},
+      nodes: []
+    }
+    request('POST', '/editor', data)
+    .then(result => { LODocID=result.id; resolve(input)});
+  });  
+}
+
 var createOrganization = function() {
-  let data = { 
+  var data = { 
     modelType: 'OrganizationModel',
     title: {text: 'Sample Organization'},
     nodes: []
@@ -134,15 +161,22 @@ var createOrganization = function() {
   return request('POST', '/editor', data);
 }
 
-var createCourse = function(users) {
-  return new Promise(function(resolve, reject) {
+var createCourse = function(users) 
+{
+  return new Promise(function(resolve, reject) 
+  {
     createOrganization()
-      .then(result => {
-        let data = { 
+      .then(result => 
+      {
+        var data = 
+        { 
           modelType: 'CourseModel',
           title: {text: 'Sample Course'},
-          organizations: [result.id]
+          organizations: [result.id],
+          learningobjectives: [LODocID],
+          skills: [skillDocID]
         };
+        
         request('POST', '/editor', data)
           .then(result => resolve({course: result.id, users}));
       });
@@ -151,7 +185,7 @@ var createCourse = function(users) {
 
 var createSecurityDocument = function(input) {
   return new Promise(function(resolve, reject) {
-    let data = { 
+    var data = { 
         admins: {
           names: [],
           roles: []
@@ -164,11 +198,10 @@ var createSecurityDocument = function(input) {
       request('PUT', '/editor/_security', data)
         .then(result => resolve(input));
   });
-  
 }
 
 var createPermissions = function(data) {
-  let course = data.course;
+  var course = data.course;
   return Promise.all(data.users.map(u => createPermission(u.id, course)));
 }
 
@@ -176,8 +209,10 @@ var run = function() {
   return waitUntilReady()
     .then(r => request('PUT', '/editor', undefined))
     .then(r => request('PUT', '/attachments', undefined))
-    .then(r => createUsers())
+    .then(r => createUsers())    
     .then(r => createSecurityDocument(r))
+    .then(r => createLearningObjectives(r))
+    .then(r => createSkills(r))    
     .then(r => createCourse(r))
     .then(r => createPermissions(r))
     .then(r => console.log("databases ready"));

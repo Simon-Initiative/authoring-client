@@ -41,7 +41,7 @@ export function titlesForEmbeddedResources(courseId: string) : Object {
 
 /**
  * A query to determine which courses a user has permission
- * to acess. 
+ * to access. 
  */
 export function coursesQuery(userId: string) : Object {
   return {

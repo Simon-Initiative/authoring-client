@@ -4,6 +4,7 @@ import AssessmentEditor from '../document/assessment/AssessmentEditor';
 import CourseEditor from '../document/course/CourseEditor';
 import OrganizationEditor from '../document/organization/OrganizationEditor';
 import LearningObjectiveEditor from '../document/learningobjectives/LearningObjectiveEditor';
+import SkillEditor from '../document/skills/SkillEditor';
 
 import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
 import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';
@@ -47,5 +48,12 @@ export default function initEditorRegistry() {
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true
-  });       
+  });
+  register({
+    name: ModelTypes.SkillModel, 
+    component: SkillEditor,
+    persistenceStrategy: new DeferredPersistenceStrategy(),
+    listeningApproach: ListeningApproach.WhenReadOnly,
+    protected: true
+  });
 }
