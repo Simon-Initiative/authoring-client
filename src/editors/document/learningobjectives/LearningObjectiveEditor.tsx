@@ -14,6 +14,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
+import { OrgItem } from '../organization/OrganizationTypes.ts';
 import { LOTypes, LearningObjective } from './LOTypes.ts';
 
 var loData=require ('./LO.json');
@@ -100,10 +101,25 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     extractData (aData: any): Object {
         console.log ("extractData ()");
-                
-        var changedData=aData.treeData;
+                                
+        console.log ("From: " + JSON.stringify (aData));         
         
         var newData:Object=new Object ();
+        newData ["objectives"]=new Object();
+        newData ["objectives"]["@id"]=this.state.rootLO.id;
+        newData ["objectives"]["#array"]=new Array ();
+        newData ["objectives"]["#array"].push (OrgItem.addTextObject ("title",this.state.rootLO.title));
+        
+        for (var i=0;i<aData.length;i++)               
+        {
+            var testLOContainer:Object=new Object();
+            var testLO=aData [i] as LearningObjective;
+            testLOContainer ["objective"]=testLO.toJSONObject ();
+            
+            newData ["objectives"]["#array"].push (testLOContainer);
+        }
+       
+        console.log ("To: " + JSON.stringify (newData));
         
         return (newData);
     }
@@ -212,7 +228,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                 
         var immutableHelper = this.state.treeData.slice()
         
-        var aData=this.state.treeData;
+        //var aData=this.state.treeData;
 
         if (immutableHelper==null)
         {
@@ -237,15 +253,14 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
-                        <button type="button" className="btn btn-secondary">Add Item</button>
+                        <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                     </nav>
                     <SortableTree
+                        maxDepth={3}
                         treeData={this.state.treeData}
-                        generateNodeProps={rowInfo => ({
-                          onClick: () => console.log(1),
-                        })}
+                        generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         /*nodeContentRenderer={NodeRendererDefault}*/
                     />

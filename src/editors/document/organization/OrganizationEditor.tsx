@@ -531,7 +531,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         var immutableHelper = this.state.treeData.slice()
         
-        var aData=this.state.treeData;
+        //var aData=this.state.treeData;
 
         if (immutableHelper==null)
         {
