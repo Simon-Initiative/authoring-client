@@ -148,7 +148,7 @@ var createLearningObjectives = function(input) {
       nodes: []
     }
     request('POST', '/editor', data)
-    .then(result => { LODocID=result.id; resolve(input)});
+      .then(result => { LODocID=result.id; resolve(input)});
   });  
 }
 
@@ -161,15 +161,11 @@ var createOrganization = function() {
   return request('POST', '/editor', data);
 }
 
-var createCourse = function(users) 
-{
-  return new Promise(function(resolve, reject) 
-  {
+var createCourse = function(users) {
+  return new Promise(function(resolve, reject) {
     createOrganization()
-      .then(result => 
-      {
-        var data = 
-        { 
+      .then(result => {
+        var data = { 
           modelType: 'CourseModel',
           title: {text: 'Sample Course'},
           organizations: [result.id],
