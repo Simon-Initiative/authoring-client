@@ -18,7 +18,16 @@
                 "pullout": {
                   "@type": "note",
                   "p": {
-                    "#text": " A simple paragraph in the note pullout. "
+                    "#array": [
+                      {
+                        "#text": "This is an inline formula using MathML, click to edit it: "
+                      },
+                      {
+                      "math": {
+                        "#cdata": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\">\n<munderover><mo>&sum;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>&infin;</mi></munderover><mfrac><mn>1</mn><mi>n</mi></mfrac></math>"
+                      }
+                    }
+                    ]
                   }
                 }
               },
