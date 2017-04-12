@@ -49,8 +49,8 @@ export function draftToHtmlContent(state: ContentState) : HtmlContent {
   const rawContent = convertToRaw(state);
   const translated = translate(rawContent, state);
 
-  console.log('Translated to persistence:');
-  console.log(translated);
+  //console.log('Translated to persistence:');
+  //console.log(translated);
 
   return new HtmlContent(translated as any);
 }
@@ -276,8 +276,8 @@ function translateExample(iterator: BlockIterator, entityMap : common.RawEntityM
 }
 
 function isTitleBlock(block: common.RawContentBlock) {
-  const data = block.data;
-  return data.oliType !== undefined && data.oliType !== null && data.oliType === 'title';
+  const data : common.BlockData = block.data;
+  return data.type === 'title';
 }
 
 function translateParagraph(rawBlock : common.RawContentBlock, 

@@ -8,16 +8,11 @@ import { EntityTypes } from '../custom';
 
 // Translation routines to convert from persistence model to draft model 
 
-type SemanticContext = {
-  beginBlock: string, 
-  oliType: string,
-  subType: string
-}
+
 
 type ParsingContext = {
   draft : common.RawDraft, 
-  depth: number,
-  semantic: SemanticContext
+  depth: number
 };
 
 type WorkingBlock = {
@@ -113,10 +108,6 @@ function insertEntity(mutability: string, type: string, offset: number, length: 
 
   const key = common.generateRandomKey();
 
-  if (type === 'formula') {
-    //(window as any).MathJax.OutputJax()
-  }
-
   workingBlock.entities.push({ offset, length, key});
   
   const data = extractAttrs(item);
@@ -150,12 +141,11 @@ export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
     blocks : []
   };
   
-  parse(htmlContent, { draft, depth: 0, semantic: null});
+  parse(htmlContent, { draft, depth: 0 });
   
   // Add a final empty block that will ensure that we have content past
   // any last positioned atomic blocks
   addNewBlock(draft, {});
-
 
   console.log(draft);
 
@@ -185,7 +175,7 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
     depth: 0,
     inlineStyleRanges: [],
     entityRanges: [],
-    data: {}
+    data: { type: ''}
   }
   const block : common.RawContentBlock = Object.assign({}, defaultBlock, values);
   params.blocks.push(block);
@@ -199,8 +189,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
   item[key][common.ARRAY].forEach(listItem => {
     addNewBlock(context.draft, { 
       text: listItem.li[common.TEXT],
-      type: listBlockType,
-      data: { semanticContext: context.semantic}
+      type: listBlockType
     });
   });
 }
@@ -271,13 +260,12 @@ function p(item: Object, context: ParsingContext) {
   addNewBlock(context.draft, { 
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    data: { semanticContext: context.semantic }
+    entityRanges: blockContext.entities
   });
 
 }
 
-function createRichTitle(item: Object, context: ParsingContext, blockType: string) {
+function createRichTitle(item: Object, context: ParsingContext, blockType: string, beginBlockKey: string) {
   
   const children = getChildren(item);
   
@@ -294,19 +282,19 @@ function createRichTitle(item: Object, context: ParsingContext, blockType: strin
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
-    data: { oliType: 'title', semanticContext: context.semantic }
+    data: { type: 'title', beginBlockKey }
   });
 
 }
 
 
 
-function createSimpleTitle(title: string, context: ParsingContext, type: string) {
-  
+function createSimpleTitle(title: string, context: ParsingContext, type: string, beginBlockKey: string) {
+
   const values = { 
     type, 
     text: title,
-    data: { oliType: 'title', semanticContext: context.semantic }
+    data: { type: 'title', beginBlockKey }
   };
   addNewBlock(context.draft, values);
 }
@@ -315,13 +303,15 @@ function createSimpleTitle(title: string, context: ParsingContext, type: string)
 function section(item: Object, context: ParsingContext) {
 
   const key = getKey(item);
-  const beginData : any = extractAttrs(item);
-  beginData.oliType = 'section';
+  const beginData : common.SectionBegin = {
+    type: 'section_begin',
+    '@purpose': extractAttrs(item)['@purpose']
+  };
   
   const beginBlock = addAtomicBlock(EntityTypes.section_begin, beginData, context);
 
    // Create a content block displaying the title text
-  processTitle(item, context, getBlockStyleForDepth(context.depth + 1))
+  processTitle(item, context, getBlockStyleForDepth(context.depth + 1), beginBlock.key);
 
   // parse the body 
   context.depth++;
@@ -329,9 +319,10 @@ function section(item: Object, context: ParsingContext) {
   context.depth--; 
 
   // Create then ending block 
-  const endData = {
-    oliType: 'section',
-    beginBlock: beginBlock.key
+  const endData : common.SectionEnd = {
+    type: 'section_end',
+    '@purpose': extractAttrs(item)['@purpose'],
+    beginBlockKey: beginBlock.key
   };
   addAtomicBlock(EntityTypes.section_end, endData, context);
 }
@@ -341,40 +332,30 @@ function pullout(item: Object, context: ParsingContext) {
   const key = getKey(item);
 
   // Create the beginning block
-  const beginData = {
-    oliType: 'pullout',
+  const beginData : common.PulloutBegin = {
+    type: 'pullout_begin',
     subType: item[key]['@type']
   };
   const beginBlock = addAtomicBlock(EntityTypes.pullout_begin, beginData, context);
 
   // Process the title
-  processTitle(item, context, 'header-three');
+  processTitle(item, context, 'header-three', beginBlock.key);
   
   // Handle the children, excluding 'title'
   const children = getChildren(item, 'title');
-  
-  const semanticContext = {
-    beginBlock: beginBlock.key,
-    oliType: 'pullout',
-    subType: item[key]['@type']
-  };
-  context.semantic = semanticContext;
-
   children.forEach(subItem => parse(subItem, context));
 
-  context.semantic = null;
-
   // Create then ending block 
-  const endData = {
-    oliType: 'pullout',
+  const endData : common.PulloutEnd = {
+    type: 'pullout_end',
     subType: item[key]['@type'],
-    beginBlock: beginBlock.key
+    beginBlockKey: beginBlock.key
   };
   addAtomicBlock(EntityTypes.pullout_end, endData, context);
 
 }
 
-function processTitle(item: Object, context: ParsingContext, titleStyle: string) {
+function processTitle(item: Object, context: ParsingContext, titleStyle: string, beginBlockKey: string) {
 
   const key = getKey(item);
 
@@ -386,9 +367,9 @@ function processTitle(item: Object, context: ParsingContext, titleStyle: string)
   const titleElements = getChildren(item).filter(c => getKey(c) === 'title');
 
   if (titleElements.length === 1) {
-    createRichTitle(titleElements[0], context, titleStyle);
+    createRichTitle(titleElements[0], context, titleStyle, beginBlockKey);
   } else if (titleAttribute !== undefined && titleAttribute !== '') {
-    createSimpleTitle(titleAttribute, context, titleStyle);
+    createSimpleTitle(titleAttribute, context, titleStyle, beginBlockKey);
   } 
 }
 
@@ -397,33 +378,22 @@ function example(item: Object, context: ParsingContext) {
   const key = getKey(item);
 
   // Create the beginning block
-  const beginData = {
-    oliType: 'example'
+  const beginData : common.ExampleBegin = {
+    type: 'example_begin'
   };
   const beginBlock = addAtomicBlock(EntityTypes.pullout_begin, beginData, context);
 
   // Process the title
-  processTitle(item, context, 'header-three');
+  processTitle(item, context, 'header-three', beginBlock.key);
 
   // Handle the children, ignoring 'title'
   const children = getChildren(item, 'title');
-  
-  const semanticContext = {
-    beginBlock: beginBlock.key,
-    oliType: 'example',
-    subType: null
-  };
-  context.semantic = semanticContext;
-
   children.forEach(subItem => parse(subItem, context));
 
-  context.semantic = null;
-
   // Create the ending block 
-  const endData = {
-    oliType: 'example',
-    subType: null,
-    beginBlock: beginBlock.key
+  const endData : common.ExampleEnd = {
+    type: 'example_end',
+    beginBlockKey: beginBlock.key
   };
   addAtomicBlock(EntityTypes.pullout_end, endData, context);
 
