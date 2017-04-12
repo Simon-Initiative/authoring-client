@@ -3,7 +3,8 @@
 export type AuthoringActions = 
   toggleInlineStyleAction |
   insertActivityAction |
-  toggleBlockTypeAction
+  toggleBlockTypeAction | 
+  insertInlineEntityAction
 
 export interface AuthoringActionsHandler {
   handleAction(action: AuthoringActions);
@@ -18,6 +19,9 @@ export const TOGGLE_INLINE_STYLE : TOGGLE_INLINE_STYLE = 'TOGGLE_INLINE_STYLE';
 
 export type INSERT_ACTIVITY = 'INSERT_ACTIVITY';
 export const INSERT_ACTIVITY : INSERT_ACTIVITY = 'INSERT_ACTIVITY';
+
+export type INSERT_INLINE_ENTITY = 'INSERT_INLINE_ENTITY';
+export const INSERT_INLINE_ENTITY : INSERT_INLINE_ENTITY = 'INSERT_INLINE_ENTITY';
 
 export type toggleBlockTypeAction = {
   type: TOGGLE_BLOCK_TYPE,
@@ -35,10 +39,26 @@ export type insertActivityAction = {
   data: Object
 };
 
+export type insertInlineEntityAction = {
+  type: INSERT_INLINE_ENTITY,
+  entityType: string,
+  mutability: string,
+  data: Object
+}
+
 export function insertActivity(activityType: string, data: Object) : insertActivityAction {
   return {
     type: INSERT_ACTIVITY,
     activityType,
+    data
+  }
+}
+
+export function insertInlineEntity(entityType: string, mutability: string, data: Object) : insertInlineEntityAction {
+  return {
+    type: INSERT_INLINE_ENTITY,
+    entityType,
+    mutability,
     data
   }
 }

@@ -418,8 +418,28 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.insertActivity(action.activityType, action.data);
       } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
         this.toggleBlockType(action.blockType);
+      } else if (action.type === 'INSERT_INLINE_ENTITY') {
+        this.insertInlineEntity(action.entityType, action.mutability, action.data);
       }
     } 
+  }
+
+  insertInlineEntity(type: string, mutability: string, data: Object) {
+    const contentState = this.state.editorState.getCurrentContent();
+    const selectionState = this.state.editorState.getSelection();
+    const contentStateWithEntity = contentState.createEntity(type, mutability, data);
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+    const contentStateWithLink = Modifier.applyEntity(
+      contentState,
+      selectionState,
+      entityKey
+    );
+
+    const newEditorState = EditorState.set(
+        this.state.editorState,
+        { currentContent: contentStateWithLink });
+
+    this.onChange(newEditorState);
   }
 
   insertActivity(type, data) {

@@ -355,6 +355,7 @@ function translateOverlappingGroup(
       
       // For each style, create the object representation for that style
       if (s !== undefined) {
+
         const style = Object.assign({}, styleContainers[s]());
 
         // Now root this style object into the parent style
