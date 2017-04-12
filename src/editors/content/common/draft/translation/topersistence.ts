@@ -354,11 +354,13 @@ function translateOverlappingGroup(
     set.toArray().forEach(s => {
       
       // For each style, create the object representation for that style
-      const style = Object.assign({}, styleContainers[s]());
+      if (s !== undefined) {
+        const style = Object.assign({}, styleContainers[s]());
 
-      // Now root this style object into the parent style
-      last[getKey(last)] = style;
-      last = style; 
+        // Now root this style object into the parent style
+        last[getKey(last)] = style;
+        last = style; 
+      }
     });
 
     // The '#text' parameter should only exist at the leaf node
@@ -512,7 +514,7 @@ function processOverlappingStyles(group: OverlappingRanges, rawBlock : common.Ra
         // There is only one style, this one, so use the basic entity translator
         const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);
         const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
-        entity[getKey(entity)][common.ARRAY] = { '#text': text};
+        entity[getKey(entity)][common.ARRAY] = [{ '#text': text}];
         return [entity];
       
       } else {
