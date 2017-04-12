@@ -3,6 +3,9 @@ import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
 
+import * as contentTypes from '../../../data/contentTypes';
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+
 const styles = {
     
   orgrowWrapper : {
@@ -291,6 +294,10 @@ class SkillNodeRenderer extends Component <any, any>
         console.log ("deleteSkill ()");
     }
     
+    onEdit (property : string, content : any) : void {
+        console.log ("onEdit ("+property+","+content+")");        
+    }
+    
     render() {
        //console.log ("Props: " + JSON.stringify (this.props));
                 
@@ -390,6 +397,8 @@ class SkillNodeRenderer extends Component <any, any>
 
         //>--------------------------------------------------------------------
 
+        var titleObj=new contentTypes.TitleContent({ title: {'#text': node.title}})
+
         return (
             <div style={{ height: '100%' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
@@ -415,10 +424,12 @@ class SkillNodeRenderer extends Component <any, any>
             
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
-                                  {typeof node.title === 'function' ?
-                                   node.title({node, path, treeIndex }) :
-                                   node.title
-                                  }
+                                 <TitleContentEditor 
+                                   onEditModeChange={this.props.onEditModeChange}
+                                   editMode={true}
+                                   content={titleObj}
+                                   onEdit={(c) => this.onEdit('title', c)} 
+                                   editingAllowed={true} />
                                </div>
                                <a style={bStyle} href="#" onClick={e => this.deleteSkill (node)}>X</a>
                             </div>
