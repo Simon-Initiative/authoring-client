@@ -1,11 +1,11 @@
 
-.orgrowWrapper {
+.rowWrapper {
     padding: 10px 10px 10px 0;
     height: 100%;
     box-sizing: border-box;
 }
 
-.orgrow {
+.row {
     height: 100%;
     white-space: nowrap;
     display: flex;
@@ -18,7 +18,7 @@
 /**
  * The outline of where the element will go if dropped, displayed while dragging
  */
-.orgrowLandingPad {
+.rowLandingPad {
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
@@ -43,8 +43,8 @@
 /**
  * Alternate appearance of the landing pad when the dragged location is invalid
  */
-.orgrowCancelPad {
-    @extend .orgrowLandingPad;
+.rowCancelPad {
+    @extend .rowLandingPad;
 
     &::before {
         background-color: #E6A8AD;
@@ -54,24 +54,24 @@
 /**
  * Nodes matching the search conditions are highlighted
  */
-.orgrowSearchMatch {
+.rowSearchMatch {
     outline: solid 3px #0080FF;
 }
 
 /**
  * The node that matches the search conditions and is currently focused
  */
-.orgrowSearchFocus {
+.rowSearchFocus {
     outline: solid 3px #FC6421;
 }
 
-%orgrowItem {
+%rowItem {
     display: inline-block;
     vertical-align: middle;
 }
 
-.orgrowContents {
-    @extend %orgrowItem;
+.rowContents {
+    @extend %rowItem;
     position: relative;
     height: 100%;
     border: solid #BBB 1px;
@@ -87,24 +87,24 @@
     background-color: white;
 }
 
-.orgrowContentsDragDisabled {
+.rowContentsDragDisabled {
     border-left: solid #BBB 1px;
 }
 
-.orgrowLabel {
-    @extend %orgrowItem;
+.rowLabel {
+    @extend %rowItem;
     flex: 0 1 auto;
     padding-right: 20px;
 }
 
-.orgrowToolbar {
-    @extend %orgrowItem;
+.rowToolbar {
+    @extend %rowItem;
     flex: 0 1 auto;
     display: flex;
 }
 
-.orgmoveHandle {
-    @extend %orgrowItem;
+.moveHandle {
+    @extend %rowItem;
 
     height: 100%;
     width: 44px;
@@ -116,8 +116,8 @@
     z-index: 1;
 }
 
-.orgloadingHandle {
-    @extend .orgmoveHandle;
+.loadingHandle {
+    @extend .moveHandle;
 
     cursor: default;
     background: #D9D9D9;
@@ -128,14 +128,14 @@
     20% { opacity: 1; }
 }
 
-.orgloadingCircle {
+.loadingCircle {
     width: 80%;
     height: 80%;
     margin: 10%;
     position: relative;
 }
 
-.orgloadingCirclePoint {
+.loadingCirclePoint {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -173,26 +173,26 @@
     }
 }
 
-.orgtoolbarButton {
-    @extend %orgrowItem;
+.toolbarButton {
+    @extend %rowItem;
 }
 
-.orgrowTitle {
+.rowTitle {
     font-weight: bold;
 }
 
-.orgrowTitleWithSubtitle {
+.rowTitleWithSubtitle {
     font-size: 85%;
     display: block;
     height: 0.8rem;
 }
 
-.orgrowSubtitle {
+.rowSubtitle {
     font-size: 70%;
     line-height: 1;
 }
 
-.orgcollapseButton, .orgexpandButton {
+.collapseButton, .expandButton {
     appearance: none;
     border: none;
     position: absolute;
@@ -216,18 +216,18 @@
     }
 }
 
-.orgcollapseButton {
+.collapseButton {
     background: #FFF url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==') no-repeat center;
 }
 
-.orgexpandButton {
+.expandButton {
     background: #FFF url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+') no-repeat center;
 }
 
 /**
   * Classes for IE9 and below
   */
-%orgfixVertAlign {
+%fixVertAlign {
     &::before {
         content: '';
         display: inline-block;
@@ -236,12 +236,12 @@
     }
 }
 
-.orgrow_NoFlex {
-    @extend %orgfixVertAlign;
+.row_NoFlex {
+    @extend %fixVertAlign;
 }
 
-.orgrowContents_NoFlex {
-    @extend %orgfixVertAlign;
+.rowContents_NoFlex {
+    @extend %fixVertAlign;
 
     display: inline-block;
     &::after {
@@ -251,13 +251,13 @@
     }
 }
 
-.orgrowLabel_NoFlex {
-    @extend %orgrowItem;
+.rowLabel_NoFlex {
+    @extend %rowItem;
     width: 50%;
 }
 
-.orgrowToolbar_NoFlex {
-    @extend %orgrowItem;
+.rowToolbar_NoFlex {
+    @extend %rowItem;
     text-align: right;
     width: 50%;
 }
@@ -265,7 +265,7 @@
 /**
  * Line for under a node with children
  */
-.orglineChildren {
+.lineChildren {
     height: 100%;
     display: inline-block;
     position: absolute;

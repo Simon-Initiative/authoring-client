@@ -5,6 +5,8 @@ import * as Immutable from 'immutable';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
+import { wrappers } from './wrappers/wrappers';
+import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
 import { htmlContentToDraft } from './translation/todraft';
@@ -13,9 +15,10 @@ import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 import * as common from './translation/common';
 import { HtmlContent } from '../../../../data/contentTypes';
-
+import { EntityTypes } from './custom';
 import { getActivityByName, BlockRenderer } from './renderers/registry';
-import compositeDecorator from './decorators/composite';
+import { buildCompositeDecorator } from './decorators/composite';
+
 
 interface DraftWrapper {
   onChange: any;
@@ -148,7 +151,7 @@ function splitBlockInContentState(
   const dataAbove = blockAbove.data.toJSON();
   console.log(dataAbove);
   const toPreserve = Object.keys(dataAbove)
-    .filter(key => key.startsWith('oli'))
+    .filter(key => key.startsWith('oli') || key === 'semanticContext')
     .reduce((o, key) => {
       o[key] = dataAbove[key]
       return o;
@@ -205,8 +208,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.focus = () => (this.refs as any).editor.focus();
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.lastSelectionState = null;
+
     
     const contentState : ContentState = htmlContentToDraft(this.props.content);
+
+    const onDecoratorEdit = () => this.onChange(this.state.editorState);
+    const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),
@@ -223,6 +230,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss; 
+
+        console.log('selection state');
+        console.log(ss);
         
         // Report any change, including initial change 
         if (changeType !== SelectionChangeType.None) {
@@ -231,9 +241,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         const content = editorState.getCurrentContent();
         
-        //const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
-
-        //this.props.onEdit(htmlContent);
+        const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
+        this.props.onEdit(htmlContent);
 
         return this.setState({editorState})
       }
@@ -297,9 +306,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const ss = this.state.editorState.getSelection();
       
       const anchorKey = ss.getAnchorKey();
+
       const currentContent =  this.state.editorState.getCurrentContent();
       const currentContentBlock = currentContent.getBlockForKey(anchorKey);
       const start = ss.getStartOffset();
+
+      console.log('offset: ' + anchorKey);
+      console.log(ss);
+      
 
       if (start === 0) {
         const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
@@ -367,6 +381,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           }
         } 
       } 
+      console.log('unhandled backspace');
       return 'not-handled';
       
     }
@@ -434,12 +449,73 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
 
+
+  renderPostProcess(components, blocks) {
+    
+    const updated = [];
+    let children = []; 
+    let current = updated;
+
+    const content =  this.state.editorState.getCurrentContent();
+
+    let currentWrapper : ContentWrapper = null;
+    
+    for (let i = 0; i < components.length; i++) {
+      
+      let comp = components[i];
+      let block = content.getBlockForKey(comp.key);
+
+      // Block will be undefined when what we have encountered is a Draft
+      // block level wrapper such as a ol or a ul that is wrapping a series
+      // of li blocks.  
+      if (block === undefined) {
+        updated.push(comp);
+        continue;
+      }
+
+      if (currentWrapper === null) {
+
+        wrappers.forEach(w => console.log(w));
+
+        let foundWrapperBegin = wrappers.find((w) => w.isBeginBlock(block, content));
+        if (foundWrapperBegin !== undefined) {
+          
+          currentWrapper = foundWrapperBegin;
+
+          children = [];
+          current = children;
+          
+          children.push(components[i]);
+
+        } else {
+          current.push(components[i]);
+        }
+
+      } else if (currentWrapper.isEndBlock(block, content)) {
+
+        children.push(components[i]);
+        updated.push(React.createElement(currentWrapper.component, {key: 'block-' + block.key}, children));
+
+        current = updated;
+
+      } else {
+        current.push(components[i]);
+      }
+      
+    }
+
+    return updated;
+  }
+
   render() {
     return <div 
         style={styles.editor} 
         onClick={this.focus}>
 
+
+
         <Editor ref="editor"
+          renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}

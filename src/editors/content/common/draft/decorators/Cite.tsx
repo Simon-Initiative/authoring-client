@@ -15,20 +15,17 @@ class Cite extends React.PureComponent<any, any> {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const entry = data['@entry'];
     return (
-      <u ref={(a) => this.a = a} data-toggle="tooltip" data-placement="top" title={entry} >
+      <u data-offset-key={this.props.offsetKey} ref={(a) => this.a = a} data-toggle="tooltip" data-placement="top" title={entry} >
         {this.props.children}
       </u>
     );
   }
 }
 
-
-const decorator : Decorator = {
-  
-  strategy: byType.bind(undefined, EntityTypes.cite),
-  
-  component: Cite
-
+export default function(props: Object) : Decorator {
+  return {
+    strategy: byType.bind(undefined, EntityTypes.cite),
+    component: Cite,
+    props
+  };
 };
-
-export default decorator;

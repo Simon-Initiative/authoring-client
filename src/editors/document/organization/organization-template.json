@@ -1,0 +1,59 @@
+{
+  "organization": {
+    "@id": "project_template-5.7_default",
+    "@version": "1.0",
+    "#array": [
+      {
+        "title": {
+          "#text": "Default Organization"
+        }
+      },
+      {
+        "description": {
+          "#text": "Sample organization included with the OLI project template."
+        }
+      },
+      {
+        "audience": {
+          "#text": "This organization is intended as an example for OLI content authors."
+        }
+      },
+      {
+        "sequences": {
+          "sequence": {
+            "@id": "part1",
+            "@category": "content",
+            "@audience": "all",
+            "#array": [
+              {
+                "title": {
+                  "#text": "Project Template"
+                }
+              },
+              {
+                "module": {
+                  "@id": "introduction",
+                  "#array": [
+                    {
+                      "title": {
+                        "#text": "Introduction"
+                      }
+                    },
+                    {
+                      "item": {
+                        "@scoring_mode": "default",
+                        "resourceref": {
+                          "@idref": "welcome"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

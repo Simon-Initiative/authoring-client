@@ -98,6 +98,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   initPersistence(document: persistence.Document) {
 
+    console.log ("initPersistence ("+document.model.modelType+")");  
+      
     this.persistenceStrategy = lookUpByName(document.model.modelType).persistenceStrategy;
         
     this.persistenceStrategy.initialize(
@@ -109,6 +111,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         this.setState({editingAllowed});
 
         const listeningApproach: ListeningApproach = lookUpByName(document.model.modelType).listeningApproach;
+          
         if ((!editingAllowed && listeningApproach === ListeningApproach.WhenReadOnly) ||
           listeningApproach === ListeningApproach.Always) {
 
@@ -127,10 +130,14 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       .then(document => {
         this.lastSavedDocument = document;
 
+        console.log ("fetched document: " + JSON.stringify (document));  
+
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(courseActions.courseChanged(documentId, 
-            document.model.organizations.get(0)));
+            document.model.organizations.get(0),
+            document.model.learningobjectives.get(0),
+            document.model.skills.get(0)));
         }
         
         // Tear down previous persistence strategy
@@ -150,6 +157,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log ("componentWillReceiveProps ("+nextProps.documentId+")");
     if (this.props.documentId !== nextProps.documentId) {
       this.stopListening = true;
       this.setState({document: null, editingAllowed: null});

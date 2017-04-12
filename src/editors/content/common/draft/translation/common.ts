@@ -27,6 +27,10 @@ export type RawEntity = {
   data: Object
 };
 
+export function getKey(item) {
+  return Object.keys(item).filter(k => !k.startsWith('@'))[0];
+}
+
 const seenKeys = {};
 const MULTIPLIER = Math.pow(2, 24);
 
