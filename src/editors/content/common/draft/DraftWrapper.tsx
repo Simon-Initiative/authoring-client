@@ -17,7 +17,7 @@ import * as common from './translation/common';
 import { HtmlContent } from '../../../../data/contentTypes';
 import { EntityTypes } from './custom';
 import { getActivityByName, BlockRenderer } from './renderers/registry';
-import compositeDecorator from './decorators/composite';
+import { buildCompositeDecorator } from './decorators/composite';
 
 
 interface DraftWrapper {
@@ -210,6 +210,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.lastSelectionState = null;
     
     const contentState : ContentState = htmlContentToDraft(this.props.content);
+    const compositeDecorator = buildCompositeDecorator({ services: this.props.services });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),
@@ -226,6 +227,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss; 
+
+        console.log('selection state');
+        console.log(ss);
         
         // Report any change, including initial change 
         if (changeType !== SelectionChangeType.None) {
@@ -299,9 +303,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const ss = this.state.editorState.getSelection();
       
       const anchorKey = ss.getAnchorKey();
+
       const currentContent =  this.state.editorState.getCurrentContent();
       const currentContentBlock = currentContent.getBlockForKey(anchorKey);
       const start = ss.getStartOffset();
+
+      console.log('offset: ' + anchorKey);
+      console.log(ss);
+      
 
       if (start === 0) {
         const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
@@ -369,6 +378,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           }
         } 
       } 
+      console.log('unhandled backspace');
       return 'not-handled';
       
     }
@@ -498,6 +508,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return <div 
         style={styles.editor} 
         onClick={this.focus}>
+
+
 
         <Editor ref="editor"
           renderPostProcess={this.renderPostProcess.bind(this)}

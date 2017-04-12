@@ -56,11 +56,11 @@ const blockHandlers = {
 };
 
 const inlineHandlers = {
-  activity_link: insertEntity.bind(undefined, 'mutable', EntityTypes.activity_link),
-  xref: insertEntity.bind(undefined, 'mutable', EntityTypes.xref),
-  wb_manual: insertEntity.bind(undefined, 'mutable', EntityTypes.wb_manual),
-  link: insertEntity.bind(undefined, 'mutable', EntityTypes.link),
-  cite: insertEntity.bind(undefined, 'mutable', EntityTypes.cite),
+  activity_link: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.activity_link),
+  xref: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.xref),
+  wb_manual: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.wb_manual),
+  link: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.link),
+  cite: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.cite),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -68,10 +68,10 @@ const inlineHandlers = {
   sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
-  image: insertEntity.bind(undefined, 'immutable', EntityTypes.image),
-  formula: insertEntity.bind(undefined, 'immutable', EntityTypes.formula),
-  quote: insertEntity.bind(undefined, 'mutable', EntityTypes.quote),
-  code: insertEntity.bind(undefined, 'mutable', EntityTypes.code)
+  image: insertEntity.bind(undefined, 'IMMUTABLE', EntityTypes.image),
+  math: insertEntity.bind(undefined, 'IMMUTABLE', EntityTypes.formula),
+  quote: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.quote),
+  code: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.code)
 };
 
 function applyStyle(style: string, offset: number, length: number, item: Object, 
@@ -106,13 +106,23 @@ function extractAttrs(item: Object) : Object {
     }, {});
 }
 
+
+
 function insertEntity(mutability: string, type: string, offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
+
+  if (type === 'formula') {
+    //(window as any).MathJax.OutputJax()
+  }
+
   workingBlock.entities.push({ offset, length, key});
   
   const data = extractAttrs(item);
+  data[common.CDATA] = item[getKey(item)][common.CDATA];
+  data[common.TEXT] = item[getKey(item)][common.TEXT];
+  
   context.draft.entityMap[key] = {
     type,
     mutability,
@@ -145,6 +155,9 @@ export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
   // Add a final empty block that will ensure that we have content past
   // any last positioned atomic blocks
   addNewBlock(draft, {});
+
+
+  console.log(draft);
 
   return convertFromRaw(draft);
 }
@@ -192,24 +205,6 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
   });
 }
 
-
-function createEntity(params: common.RawDraft, offset : number, length : number, type: string, mutability: string, data: Object) : common.RawEntityRange {
-
-  const range : common.RawEntityRange = {
-    length,
-    offset,
-    key: common.generateRandomKey()
-  };
-
-  params.entityMap[range.key] = {
-    type,
-    mutability,
-    data
-  }
-
-  return range;
-}
-
 function getChildren(item: Object, ignore = null) : Object[] {
   const key = getKey(item);
   if (item[key][common.ARRAY] !== undefined) {
@@ -236,16 +231,24 @@ function processInline(item: Object,
 
     const children = getChildren(item);
     const offset = blockContext.fullText.length;
-    
-    children.forEach(subItem => {
-      const subKey = getKey(subItem);
-      if (subKey === common.CDATA || subKey === common.TEXT) {
-        blockContext.fullText += subItem[subKey];
-      } else {
-        processInline(subItem, context, blockContext);
-      }
-    });
 
+    if (key === 'math') {
+
+      blockContext.fullText += ' ';
+
+    } else {
+
+      children.forEach(subItem => {
+        const subKey = getKey(subItem);
+        if (subKey === common.CDATA || subKey === common.TEXT) {
+          blockContext.fullText += subItem[subKey];
+        } else {
+          processInline(subItem, context, blockContext);
+        }
+      });
+
+    }
+    
     const text = blockContext.fullText.substring(offset);
     const handler = getInlineHandler(key);
     handler(offset, text.length, item, context, blockContext);
