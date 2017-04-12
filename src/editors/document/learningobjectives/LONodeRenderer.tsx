@@ -2,15 +2,9 @@ import * as React from 'react';
 import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
-//import baseStyles from './noderenderer.scss';
-//import './noderenderer.scss';
-//var baseStyles = import ('!style!scss!./noderenderer.scss') as any;
-
-//var nodeStyles = require('./treerenderer.scss');
-//var baseStyles = require('./noderenderer.scss');
-//var styles = baseStyles;
 
 const styles = {
+    
   orgrowWrapper : {
     "padding": "10px 10px 10px 0",
     "height": "100%",
@@ -18,7 +12,6 @@ const styles = {
   },
   orgrow : {
     "height": "100%",
-    "whiteSpace": "nowrap",
     "display": "flex",
     "& > *": {
         "boxSizing": "border-box"
@@ -76,37 +69,19 @@ const styles = {
   orgrowContents : {          
     "position": "relative",
     "height": "100%",
-    "border": "solid #bbb 1px",
+    "border": "solid #bbb 0px",
     "borderLeft": "none",
     "boxShadow": "0 2px 2px -2px",
     "padding": "0 5px 0 10px",
     "borderRadius": "2px",
     "minWidth": "230px",
-    "flex": "1 0 auto",
-    "display": "flex",
-    "alignItems": "center",
+    //"maxWidth": "500px",
+    "alignItems": "left",
     "verticalAlign": "middle",
-    "backgroundColor": "white",
-    "justifyContent": "space-between"    
+    "backgroundColor": "white"
   },
   orgrowContentsDragDisabled : {
     "borderLeft": "solid #bbb 1px"
-  },
-  orgrowLabel : {  
-     //@extend %orgrowItem;
-    "display": "inline-block",
-    "verticalAlign": "middle",
-    
-    "flex": "0 1 auto",
-    "paddingRight": "20px"
-  },
-  orgrowToolbar : { 
-     //@extend %orgrowItem;
-     //"display": "inline-block",
-    "verticalAlign": "middle",
-    
-    "flex": "0 1 auto",
-    "display": "flex"
   },
   orgmoveHandle : {
     //@extend %orgrowItem;
@@ -122,27 +97,33 @@ const styles = {
     "borderRadius": "1px",
     "zIndex": 1,
   },
+  backupHamburger : {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAA4klEQVR4nGP8//8/AymAiSTVDAwMLJt37i+rqvn7n4GRkRGPuv///zMyMvS0tTDqWLuIioqzs7MTNPvnzx8f379jiggLZ2VnZWJhIohYOFiDgoIZ/5Pia0YGBhYIRTxg2bL7YFl17f//BDX+Z2Jg6GxrZjSw95SQlGLj5CRo9q9v39+9ecUUHhrKysHOysRMELGxs/sHBzL+IzGmWUjyMQMDA8uW3YcqGpqIVN3RUMdo5hYgLS/PzsnNhDeU/jH8//nt26tnTxi7Ziw6f/EaMyc7/mT4j4Hh7/efhvrajKQmbwBQa0jTnL7HxQAAAABJRU5ErkJggg==') no-repeat center",
+  },  
   orgloadingHandle : {
-    //@extend %orgrowItem;
-    "display": "inline-block",
-    "verticalAlign": "middle",
-    
-    //@extend %orgmoveHandle;      
-    "height": "100%",
-    "width": "44px",
-    "border": "solid #aaa 1px",
+    "height": "42px",
+    "width": "45px",
+    "border": "0px solid green",
     "boxShadow": "0 2px 2px -2px",
     "borderRadius": "1px",
-    "zIndex": 1,      
-            
-    "cursor": "default",
-    "background": "#d9d9d9",
+    "zIndex": 1,                  
+    "cursor": "pointer",
+    "background": "#ffffff",
+    "verticalAlign" : "middle",
+    "textAlign": "center",  
+    "display": "flex",
+    "alignItems": "center" 
   },
   orgloadingCircle : {
     "width": "80%",
     "height": "80%",
     "margin": "10%",
-    "position": "relative"
+    "position": "relative",
+    "border" : "1px solid green"
   },
   orgloadingCirclePoint : {
     "width": "100%",
@@ -150,6 +131,8 @@ const styles = {
     "position": "absolute",
     "left": "0",
     "top": "0",
+    
+    "border" : "1px solid blue",
     
     "pointcount": "12",
     "spinAnimationTime": "800ms",
@@ -186,8 +169,17 @@ const styles = {
     "display": "inline-block",
     "verticalAlign": "middle",          
   },
-  orgrowTitle : {
-    "fontWeight": "bold"
+  orgrowTitle : {    
+    "border": "0px solid red",
+    "display": "inline-block",
+    "width": "inherited",
+    "height": "100%",    
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "marginRight": "auto", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
   },
   orgrowTitleWithSubtitle : {
     "fontSize": "85%",
@@ -246,19 +238,6 @@ const styles = {
         "width": "20px"
     }    
   },
-  orgrow_NoFlex : {
-    
-  },
-  orgrowContents_NoFlex : {
-    "display": "inline-block"
-  },
-  orgrowLabel_NoFlex : {    
-    "width": "50%"
-  },
-  orgrowToolbar_NoFlex : {  
-    "textAlign": "right",
-    "width": "50%"
-  },
   orglineChildren : {
     "height": "100%",
     "display": "inline-block",
@@ -279,9 +258,9 @@ const styles = {
 /**
  * 
  */
-class OrganizationNodeRenderer extends Component <any, any> 
-{
-    /*    
+class LONodeRenderer extends Component <any, any> 
+{       
+    /* 
     static propTypes = {
       node: PropTypes.object.isRequired,
       path: PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])).isRequired,
@@ -306,17 +285,20 @@ class OrganizationNodeRenderer extends Component <any, any>
       isOver:  PropTypes.bool.isRequired,
       canDrop: PropTypes.bool,
     };
-    */
-            
-    deleteNode (anEvent) : void {
+    */    
+    
+    deleteNode (aNode) : void {
         console.log ("deleteNode ()");
     }
     
+    linkSkill (aNode) : void {
+        console.log ("linkSkill ()");
+    }    
+    
     render() {
-        
-        //console.log ("Styles: " + JSON.stringify (styles));
-        
-        var {
+       //console.log ("Props: " + JSON.stringify (this.props));
+                
+       var {
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -339,44 +321,19 @@ class OrganizationNodeRenderer extends Component <any, any>
             endDrag:    _endDrag,    // Needed for drag-and-drop utils
             startDrag:  _startDrag,  // Needed for drag-and-drop utils
             ...otherProps,
-        } = this.props;
+       } = this.props;
 
-        let handle;
+       let handle;
 
-        canDrag=true;
+       canDrag=true;
         
-        if (canDrag) {
-            console.log ("canDrag: " + canDrag);
-            
-            if (typeof node.children === 'function' && node.expanded) {
-                console.log ("create handle ...");
-                // Show a loading symbol on the handle when the children are expanded
-                // and yet still defined by a function (a callback to fetch the children)
-                handle = (
-                    <div style={styles.orgloadingHandle}>
-                        <div style={styles.orgloadingCircle}>
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                        </div>
-                    </div>
-                );
-            } else {
-                // Show the handle used to initiate a drag-and-drop
-                handle = connectDragSource((
-                    <div style={styles.orgmoveHandle as any} />
-                ), { dropEffect: 'copy' });
-            }
-        }
+       let hStyle:any=styles.backupHamburger;
+
+       handle = connectDragSource((
+            <div style={styles.orgloadingHandle}>
+               <div id="handle" style={hStyle}></div>
+            </div>
+        ), { dropEffect: 'copy' });
 
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;
@@ -428,34 +385,27 @@ class OrganizationNodeRenderer extends Component <any, any>
 
         //>--------------------------------------------------------------------
 
-        let iStyle:any=styles.orgrowTitle;
+        // If we assign the style directly then React freaks out (or TypeScript it's hard to tell)
+        // and claims that 'bold' isn't a valid option for fontWeight
+        let tStyle:any=styles.orgrowTitle;
 
-        if (node.subtitle) {
-            iStyle ["fontSize"]="85%";
-            iStyle ["display"]="block";
-            iStyle ["height"]="0.8rem";
-        }
+        let bStyle:any=styles.orgrowTitle;
+        bStyle ["marginLeft"]="10px";
 
         //>--------------------------------------------------------------------
 
         return (
-            <div
-                style={{ height: '100%' }}
-                {...otherProps}
-            >
+            <div style={{ height: '100%' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
                     <div>
                         <button
-                            type="button"
-                            aria-label={node.expanded ? 'Collapse' : 'Expand'}
+                            type="button"                            
                             style={handleStyle}
                             onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
                         />
 
                         {node.expanded && !isDragging &&
-                            <div
-                                style={nStyle}
-                            />
+                            <div style={nStyle} />
                         }
                     </div>
                 )}
@@ -467,35 +417,15 @@ class OrganizationNodeRenderer extends Component <any, any>
 
                             {handle}
             
-                            <div style={dStyle as any}>
-                                <div style={styles.orgrowLabel as any}>
-                                    <span
-                                        style={iStyle}>
-                                        {typeof node.title === 'function' ?
-                                            node.title({node, path, treeIndex }) :
-                                            node.title
-                                        }
-                                    </span>
-
-                                    {node.subtitle &&
-                                        <span style={styles.orgrowSubtitle as any}>
-                                            {typeof node.subtitle === 'function' ?
-                                                node.subtitle({node, path, treeIndex }) :
-                                                node.subtitle
-                                            }
-                                        </span>
-                                    }
-
-                                   <span className="glyphicon glyphicon-remove" style={{marginLeft: "10px"}}><a href="#" onClick={e => this.deleteNode (e)}>Delete</a></span>
-                                </div>
-
-                                <div style={styles.orgrowToolbar as any}>
-                                    {buttons && buttons.map((btn, index) => (
-                                        <div key={index} style={styles.orgtoolbarButton as any}>
-                                            {btn}
-                                        </div>
-                                    ))}
-                                </div>
+                            <div id="outter" style={dStyle as any}>
+                               <div id="inner" style={tStyle}>
+                                  {typeof node.title === 'function' ?
+                                   node.title({node, path, treeIndex }) :
+                                   node.title
+                                  }
+                               </div>
+                               <a style={bStyle} href="#" onClick={e => this.deleteNode (node)}>X</a>
+                               <a style={bStyle} href="#" onClick={e => this.linkSkill (node)}>+</a>
                             </div>
                         </div>
                     )}
@@ -505,4 +435,4 @@ class OrganizationNodeRenderer extends Component <any, any>
     }
 }
 
-export default OrganizationNodeRenderer;
+export default LONodeRenderer;

@@ -17,6 +17,7 @@ import initEditorRegistry from './editors/manager/registrar';
 
 // Stylesheets
 import './stylesheets/main.scss';
+import './stylesheets/sortabletree.scss';
 
 interface RR {
     Provider: any;

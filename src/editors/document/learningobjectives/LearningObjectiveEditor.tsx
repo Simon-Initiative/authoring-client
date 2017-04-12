@@ -16,6 +16,7 @@ import NodeRendererDefault from 'react-sortable-tree';
 
 import { OrgItem } from '../organization/OrganizationTypes.ts';
 import { LOTypes, LearningObjective } from './LOTypes.ts';
+import LONodeRenderer from './LONodeRenderer';
 
 var loData=require ('./LO.json');
 
@@ -262,7 +263,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         treeData={this.state.treeData}
                         generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
-                        /*nodeContentRenderer={NodeRendererDefault}*/
+                        nodeContentRenderer={LONodeRenderer}
                     />
                 </div>
         );

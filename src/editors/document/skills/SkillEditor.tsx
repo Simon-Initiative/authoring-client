@@ -14,6 +14,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
+import SkillNodeRenderer from './SkillNodeRenderer';
 import {Skill} from './SkillTypes';
 
 var skillData=require ('./Skills.json');
@@ -97,23 +98,6 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         
         this.setState (newData);
     }
-
-    expand(expanded) {
-        this.setState({
-            treeData: toggleExpandedForAll({
-                treeData: this.state.treeData,
-                expanded,
-            }),
-        });
-    }
-
-    expandAll(e) {
-        this.expand(true);
-    }
-
-    collapseAll(e) {
-        this.expand(false);
-    }
     
     /**
      * Here we go from visual data to database-ready data. We walk the tree
@@ -188,14 +172,13 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <a className="nav-link" href="#" onClick={e => this.expandAll (e)}>+ Expand All</a>
-                        <a className="nav-link" href="#" onClick={e => this.collapseAll (e)}>- Collapse All</a>
                     </nav>
                     <SortableTree
-                        maxDepth={3}
+                        maxDepth={1}
                         treeData={this.state.treeData}
                         generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
+                        nodeContentRenderer={SkillNodeRenderer}
                     />
                 </div>
         );

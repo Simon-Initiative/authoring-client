@@ -1,0 +1,23 @@
+/**
+* Global overrides to the react sortable tree. This is not the cleanest override but
+* it does work well. Use this to access styles that can't be changed by styling the
+* node renderer
+*/
+
+@import 'abstracts/variables';
+@import '../editors/content/common/draft/DraftWrapper';
+
+.rst__node {
+    min-width: 100%;
+    white-space: nowrap;
+    position: relative;
+}
+
+.rst__nodeContent {
+    /*width: 95%;*/
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    /*border: 1px solid red;*/
+}
+
