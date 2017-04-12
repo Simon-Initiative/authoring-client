@@ -208,9 +208,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.focus = () => (this.refs as any).editor.focus();
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.lastSelectionState = null;
+
     
     const contentState : ContentState = htmlContentToDraft(this.props.content);
-    const compositeDecorator = buildCompositeDecorator({ services: this.props.services });
+
+    const onDecoratorEdit = () => this.onChange(this.state.editorState);
+    const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),

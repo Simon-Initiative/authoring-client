@@ -5,9 +5,9 @@ import * as React from 'react';
 import { AppServices } from '../../common/AppServices';
 import { insertActivity, toggleBlockType, AuthoringActionsHandler } from '../../../actions/authoring';
 import { titlesForEmbeddedResources } from '../../../data/domain';
-import ResourceSelection from '../../../components/selection/ResourceSelection';
-import MediaSelection from '../../../components/selection/MediaSelection';
-import { createAttachment } from '../../../components/selection/upload';
+import ResourceSelection from '../../../utils/selection/ResourceSelection';
+import MediaSelection from '../../../utils/selection/MediaSelection';
+import { createAttachment } from '../../../utils/selection/upload';
 import { fileToBase64 } from '../../../utils/file';
 
 interface BlockToolbarProps {  
