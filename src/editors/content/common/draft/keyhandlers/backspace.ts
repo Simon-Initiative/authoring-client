@@ -1,4 +1,4 @@
-import { EditorState, ContentState, SelectionState, ContentBlock } from 'draft-js';
+import { EditorState, Modifier, ContentState, SelectionState, ContentBlock } from 'draft-js';
 
 import * as common from '../translation/common';
 
@@ -7,11 +7,81 @@ export default function handle(editorState: EditorState, onChange: (e: EditorSta
   const ss = editorState.getSelection();
   const start = ss.getStartOffset();
 
+  // Handle backspacing at the beginning of a block to 
+  // account for removing sentinel blocks
   if (start === 0) {
     return handleBackspaceAtBeginning(editorState, onChange);
-  } else {
-    return 'not-handled';
+  } 
+
+  // Handle backspacing to delete an immutable entity
+  const entityBefore = getEntityBefore(start - 1, editorState);
+  if (entityBefore !== null) {
+    return handleBackspaceAtEntity(editorState, onChange);
   }
+  
+  return 'not-handled';
+  
+}
+
+function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorState) => void) {
+
+  const currentContent = editorState.getCurrentContent();
+  const ss = editorState.getSelection();
+  const start = ss.getStartOffset();
+  const currentContentBlock = currentContent.getBlockForKey(ss.getAnchorKey());
+
+  const key = currentContentBlock.getKey();
+  const rangeToRemove = new SelectionState({
+    anchorKey: key,
+    anchorOffset: start - 2,
+    focusKey: key,
+    focusOffset: start - 1,
+    isBackwards: false,
+    hasFocus: false
+  });
+
+  console.log('range to remove');
+  console.log(rangeToRemove);
+
+  const updatedContent = Modifier.removeRange(
+    editorState.getCurrentContent(),
+    rangeToRemove,
+    'forward'
+  );
+
+  const newSelection = new SelectionState({
+    anchorKey: key,
+    anchorOffset: start - 2,
+    focusKey: key,
+    focusOffset: start - 2,
+    isBackwards: false,
+    hasFocus: false
+  });
+
+  onChange(
+    EditorState.forceSelection(
+      EditorState.push(editorState, updatedContent, 'backspace-character'), newSelection));
+  
+  return 'handled';
+
+}
+
+function getEntityBefore(position: number, editorState: EditorState) {
+
+  const anchorKey = editorState.getSelection().getAnchorKey();
+  const currentContent = editorState.getCurrentContent();
+  const currentContentBlock = currentContent.getBlockForKey(anchorKey);
+
+  const key = currentContentBlock.getEntityAt(position - 1);
+
+  if (key !== null) {
+    const entity = currentContent.getEntity(key);
+    if (entity.getMutability() === 'IMMUTABLE') {
+      return entity;
+    }
+  }
+
+  return null;
 }
 
 function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: EditorState) => void) {
@@ -79,7 +149,7 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
       selectionAfter: ss,
     });
 
-    onChange(EditorState.push(editorState, updatedContent, 'backspace'));
+    onChange(EditorState.push(editorState, updatedContent, 'backspace-character'));
     
     return 'handled';
         
