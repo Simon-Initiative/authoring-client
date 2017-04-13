@@ -58,36 +58,11 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         super(props);
         this.state = {
                         treeData: this.processData(skillData)
-                    };            
-    }
-    
-    componentDidMount() {
-        console.log ("componentDidMount ()");
-        this.fetchTitles(this.props.documentId);
-    }    
-    
-    fetchTitles(documentId: types.DocumentId) {
-        console.log ("fetchTitles ();");
+                    };
         
-        persistence.queryDocuments(titlesForCoursesResources(documentId)).then(docs => {
-            /*
-            this.setState(
-            {
-                resources: docs.map(d => ({ _id: d._id, title: (d as any).title.text, type: (d as any).modelType}))
-            })
-            */
-        });
+        this.deleteNode = this.deleteNode.bind(new Object());
     }
-
-    componentWillReceiveProps(nextProps) {
-        console.log ("componentWillReceiveProps ();");
-        
-        if (this.props.documentId !== nextProps.documentId) 
-        {
-          this.fetchTitles(nextProps.documentId);
-        }
-    }    
-    
+       
     /**
      * 
      */
@@ -118,8 +93,8 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
             dbReady ["skills"].push (targetSkillObject.toJSONObject ());
         }
 
-        console.log ("From: " + JSON.stringify (aData));
-        console.log ("To: " + JSON.stringify (dbReady));
+        //console.log ("From: " + JSON.stringify (aData));
+        //console.log ("To: " + JSON.stringify (dbReady));
         
         return (dbReady);
     }
@@ -162,7 +137,26 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         
         this.setState({treeData: immutableHelper});
     }     
-                
+
+    deleteNode (anObject:any): void {
+        console.log ("SkillEditor:deleteNode ()");
+    }
+    
+    editTitle ():void {
+        console.log ("editTitle ()");
+    }
+    
+    genProps (aTreeData:any,aDeleteFunction:any):Object {
+        console.log ("genProps ()");
+        
+        var optionalProps:Object=new Object ();
+        
+        optionalProps ["deleteNode"]=aDeleteFunction;
+        optionalProps ["treeData"]=aTreeData;
+        
+        return (optionalProps);
+    }
+    
     /**
      * 
      */
@@ -176,9 +170,11 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
                     <SortableTree
                         maxDepth={1}
                         treeData={this.state.treeData}
-                        generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
+                        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         nodeContentRenderer={SkillNodeRenderer}
+                        //generateNodeProps={({ node }) => ({ deleteFunc: this.deleteNode, editFunc: this.editTitle })}
+                        generateNodeProps={this.genProps.bind (this.state.treeData,this.deleteNode)}
                     />
                 </div>
         );

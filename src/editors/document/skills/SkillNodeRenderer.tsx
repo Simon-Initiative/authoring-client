@@ -263,6 +263,9 @@ const styles = {
  */
 class SkillNodeRenderer extends Component <any, any> 
 {       
+    deleteNodeFunction:any=null;
+    parentTreeData:any=null;
+    
     /* 
     static propTypes = {
       node: PropTypes.object.isRequired,
@@ -292,16 +295,27 @@ class SkillNodeRenderer extends Component <any, any>
     
     deleteSkill (aNode) : void {
         console.log ("deleteSkill ()");
+
+        /*
+        if (this.deleteNodeFunction) {
+            this.deleteNodeFunction ();
+        }
+        */
+        
+        console.log ("TreeData: " + JSON.stringify (this.parentTreeData));
     }
     
     onEdit (property : string, content : any) : void {
-        console.log ("onEdit ("+property+","+content+")");        
+                
+        console.log ("New title: " + content.title.get ("#text"));
     }
     
     render() {
-       //console.log ("Props: " + JSON.stringify (this.props));
-                
+       console.log ("Props: " + JSON.stringify (this.props));
+                         
        var {
+            deleteNode,
+            treeData,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -326,10 +340,14 @@ class SkillNodeRenderer extends Component <any, any>
             ...otherProps,
        } = this.props;
 
-       let handle;
+       console.log ("TreeData: " + JSON.stringify (treeData));
+
+       this.parentTreeData=treeData;
+       this.deleteNodeFunction=deleteNode;
 
        canDrag=true;
-        
+
+       let handle;        
        let hStyle:any=styles.backupHamburger;
 
        handle = connectDragSource((

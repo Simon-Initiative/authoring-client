@@ -548,6 +548,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         this.setState({treeData: immutableHelper});
     }    
 
+    deleteFunc (aNode):void {
+        console.log ("deleteFunc ()");
+    }
+    
     /**
      * 
      */

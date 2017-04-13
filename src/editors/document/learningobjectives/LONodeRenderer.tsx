@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
+import Modal from 'react-modal';
 
 const styles = {
     

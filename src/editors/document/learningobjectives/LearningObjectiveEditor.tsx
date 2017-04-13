@@ -17,6 +17,7 @@ import NodeRendererDefault from 'react-sortable-tree';
 import { OrgItem } from '../organization/OrganizationTypes.ts';
 import { LOTypes, LearningObjective } from './LOTypes.ts';
 import LONodeRenderer from './LONodeRenderer';
+import LearningObjectiveLinker from './LearningObjectiveLinker';
 
 var loData=require ('./LO.json');
 
@@ -37,6 +38,7 @@ export interface LearningObjectiveEditorState extends AbstractEditorState
 {
     treeData : any;  
     rootLO: any;
+    modalIsOpen : boolean;
 }
 
 export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -60,7 +62,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         super(props);
         this.state = {
                         treeData: this.processData (loData),
-                        rootLO: this.createRootLO (loData)                        
+                        rootLO: this.createRootLO (loData),
+                        modalIsOpen : false                    
                      };        
     }
     
@@ -219,6 +222,15 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     }
 
     /**
+     * 
+     */
+    linkSkill(anEvent) {        
+        console.log ("linkSkill ()");
+        
+        this.setState ({modalIsOpen: true});
+    }    
+    
+    /**
      * Note that this manual method of adding a new node does not generate an
      * onChange event. That's why we call extractData manually as the very
      * last function call.
@@ -249,7 +261,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */
-    render() {            
+    render() {
+        console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");  
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
@@ -257,7 +270,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                        <a className="nav-link" href="#" onClick={e => this.linkSkill (e)}>+ Link</a>
                     </nav>
+                    <LearningObjectiveLinker treeData={this.state.treeData} modalIsOpen={this.state.modalIsOpen} />
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}

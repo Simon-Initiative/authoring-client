@@ -2,13 +2,7 @@ import * as React from 'react';
 import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
-//import baseStyles from './noderenderer.scss';
-//import './noderenderer.scss';
-//var baseStyles = import ('!style!scss!./noderenderer.scss') as any;
-
-//var nodeStyles = require('./treerenderer.scss');
-//var baseStyles = require('./noderenderer.scss');
-//var styles = baseStyles;
+import { removeNodeAtPath } from 'react-sortable-tree';
 
 const styles = {
   orgrowWrapper : {
@@ -276,11 +270,37 @@ const styles = {
   }     
 };
 
+/*
+export interface NRendererState extends AbstractEditorState 
+{
+  treeData : any;
+}
+
+export interface NRendererProps extends AbstractEditorProps<models.CourseModel>
+{
+  deleteFun:function ();    
+}
+*/
+
 /**
  * 
  */
-class OrganizationNodeRenderer extends Component <any, any> 
+//class OrganizationNodeRenderer extends Component <NRendererState, NRendererProps> 
+class OrganizationNodeRenderer extends Component <any,any>
 {
+    /*    
+    constructor (props:any) {
+        console.log ("OrganizationNodeRenderer:constructor ()");
+        console.log ("Props: " + props);
+        
+        super(props);
+
+        this.state = {
+                        deleteFunc: props.deleteFunc
+                     };
+    }
+    */
+    
     /*    
     static propTypes = {
       node: PropTypes.object.isRequired,
@@ -308,8 +328,10 @@ class OrganizationNodeRenderer extends Component <any, any>
     };
     */
             
-    deleteNode (anEvent) : void {
+    deleteNode (aNode) : void {
         console.log ("deleteNode ()");
+        
+        this.state.deleteFunc (aNode);
     }
     
     render() {
@@ -317,6 +339,7 @@ class OrganizationNodeRenderer extends Component <any, any>
         //console.log ("Styles: " + JSON.stringify (styles));
         
         var {
+            deleteFunc,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
