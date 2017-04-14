@@ -438,8 +438,8 @@ class LONodeRenderer extends Component <any, any>
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
                                    editingAllowed={true} />
                                </div>
-                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>x</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-window-close"></i>+</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>
                             </div>
                         </div>
                     )}
