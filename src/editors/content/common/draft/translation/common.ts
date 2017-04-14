@@ -1,4 +1,49 @@
 
+import { EntityTypes } from '../custom';
+
+export type BlockData = PulloutBegin | PulloutEnd | SectionBegin | SectionEnd | ExampleBegin | ExampleEnd | Title | Empty;
+
+export interface PulloutBegin {
+  type: 'pullout_begin';
+  subType: string;
+}
+
+export interface PulloutEnd {
+  type: 'pullout_end';
+  beginBlockKey: string;
+  subType: string;
+}
+
+export interface SectionBegin {
+  type: 'section_begin';
+  '@purpose': string;
+}
+
+export interface SectionEnd {
+  type: 'section_end';
+  beginBlockKey: string;
+  '@purpose': string;
+}
+
+export interface ExampleBegin {
+  type: 'example_begin';
+}
+
+export interface ExampleEnd {
+  type: 'example_end';
+  beginBlockKey: string;
+}
+
+export interface Title {
+  type: 'title';
+  beginBlockKey: string;
+}
+
+export interface Empty {
+  type: ''
+}
+
+
 export type RawInlineStyle = {
   offset: number,
   length: number,

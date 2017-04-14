@@ -1,0 +1,23 @@
+import { EntityTypes } from '../custom';
+import { ContentState, ContentBlock} from 'draft-js';
+
+export type BlockIdentifier = (block: ContentBlock, content: ContentState) => boolean;
+
+export type ContentWrapper = {
+  component : any,
+  isBeginBlock: BlockIdentifier,
+  isEndBlock: BlockIdentifier
+};
+
+export function isEntityType(type: EntityTypes, block: ContentBlock, content: ContentState) {
+
+  if (block.type === 'atomic') {
+    const key = block.getEntityAt(0);
+    const entity = content.getEntity(key);
+    return entity.type === type;
+
+  } else {
+    return false;
+  }
+  
+}

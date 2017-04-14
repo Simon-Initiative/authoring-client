@@ -35,12 +35,22 @@ type OverlappingRanges = {
   ranges: InlineOrEntity[]
 };
 
+type EntityHandler = (s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) => Object;
+
+const entityHandlers = {
+  link,
+  formula
+}
+
 // Converts the draft ContentState object to the HtmlContent format
 // (which ultimately is serialized and stored in persistence)
 export function draftToHtmlContent(state: ContentState) : HtmlContent {
 
   const rawContent = convertToRaw(state);
   const translated = translate(rawContent, state);
+
+  //console.log('Translated to persistence:');
+  //console.log(translated);
 
   return new HtmlContent(translated as any);
 }
@@ -266,8 +276,8 @@ function translateExample(iterator: BlockIterator, entityMap : common.RawEntityM
 }
 
 function isTitleBlock(block: common.RawContentBlock) {
-  const data = block.data;
-  return data.oliType !== undefined && data.oliType !== null && data.oliType === 'title';
+  const data : common.BlockData = block.data;
+  return data.type === 'title';
 }
 
 function translateParagraph(rawBlock : common.RawContentBlock, 
@@ -344,11 +354,14 @@ function translateOverlappingGroup(
     set.toArray().forEach(s => {
       
       // For each style, create the object representation for that style
-      const style = Object.assign({}, styleContainers[s]());
+      if (s !== undefined) {
 
-      // Now root this style object into the parent style
-      last[getKey(last)] = style;
-      last = style; 
+        const style = Object.assign({}, styleContainers[s]());
+
+        // Now root this style object into the parent style
+        last[getKey(last)] = style;
+        last = style; 
+      }
     });
 
     // The '#text' parameter should only exist at the leaf node
@@ -501,14 +514,14 @@ function processOverlappingStyles(group: OverlappingRanges, rawBlock : common.Ra
 
         // There is only one style, this one, so use the basic entity translator
         const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);
-        return [translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap, 
-          () => [{ '#text': text }])];
+        const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
+        entity[getKey(entity)][common.ARRAY] = [{ '#text': text}];
+        return [entity];
       
       } else {
 
         const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);
-        const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap, 
-          () => []);
+        const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
 
         const minusLink = group.ranges.filter(range => {
           if (isEntityRange(range)) {
@@ -586,7 +599,7 @@ function translateInline(s : InlineOrEntity, text : string, entityMap : common.R
     return translateInlineStyle(s, text, entityMap);
   } else {
     const { offset, length } = s;
-    return translateInlineEntity(s, text, entityMap, () => [{ '#text': text.substring(offset, offset + length) }]);
+    return translateInlineEntity(s, text, entityMap);
   }
 
 }
@@ -606,20 +619,32 @@ function translateInlineStyle(s : common.RawInlineStyle, text : string, entityMa
 }
 
 
-function translateInlineEntity(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap,
-  childrenProcessor: () => Object[]) {
+function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data, type } = entityMap[s.key];
 
-  const { offset, length } = s;
   data['#array'] = [];
-
-  childrenProcessor().forEach(processed => data['#array'].push(processed));
   
   const item = {};
   item[type] = data;
   
   return item;
+}
+
+function formula(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return { math: { "#cdata": data["#cdata"] } };
+}
+
+function translateInlineEntity(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+  if (entityHandlers[type] !== undefined) {
+    return entityHandlers[type](s, text, entityMap);
+  } else {
+    return data;
+  }
 }
 
 function isInlineStyle(range : InlineOrEntity) : range is common.RawInlineStyle {

@@ -5,6 +5,8 @@ import * as Immutable from 'immutable';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
+import { wrappers } from './wrappers/wrappers';
+import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
 import { htmlContentToDraft } from './translation/todraft';
@@ -13,9 +15,10 @@ import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 import * as common from './translation/common';
 import { HtmlContent } from '../../../../data/contentTypes';
-
+import { EntityTypes } from './custom';
 import { getActivityByName, BlockRenderer } from './renderers/registry';
-import compositeDecorator from './decorators/composite';
+import { buildCompositeDecorator } from './decorators/composite';
+import handleBackspace from './keyhandlers/backspace';
 
 interface DraftWrapper {
   onChange: any;
@@ -146,7 +149,7 @@ function splitBlockInContentState(
   });
 
   const dataAbove = blockAbove.data.toJSON();
-  console.log(dataAbove);
+  
   const toPreserve = Object.keys(dataAbove)
     .filter(key => key.startsWith('oli') || key === 'semanticContext')
     .reduce((o, key) => {
@@ -183,19 +186,6 @@ function splitBlockInContentState(
   });
 }
 
-function myBlockStyleFn(contentBlock) {
-  const data = contentBlock.getData().toJSON();
-  
-  const semantic = data.semanticContext;
-  if (semantic !== undefined && semantic !== null) {
-    if (semantic.oliType === 'example') {
-      return 'exampleBlock';
-    } else if (semantic.oliType === 'pullout') {
-      return 'pulloutBlock';
-    }
-  }
-  
-}
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
@@ -205,8 +195,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.focus = () => (this.refs as any).editor.focus();
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.lastSelectionState = null;
+
     
     const contentState : ContentState = htmlContentToDraft(this.props.content);
+
+    const onDecoratorEdit = () => this.onChange(this.state.editorState);
+    const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),
@@ -223,6 +217,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss; 
+
+        console.log('selection state');
+        console.log(ss.toJSON());
         
         // Report any change, including initial change 
         if (changeType !== SelectionChangeType.None) {
@@ -276,110 +273,27 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   _handleKeyCommand(command) {
 
-    console.log('handle key command: ');
-    console.log(command);
-
-    if (command === 'split-block') {
-
-      const editorState = this.state.editorState;
-      const selectionState = editorState.getSelection();
-      const currentContent = editorState.getCurrentContent();
-      
-      const updatedContent = splitBlockInContentState(currentContent, selectionState)
-
-      this.onChange(EditorState.push(editorState, updatedContent, 'split-block'));
-
-      return 'handled';
-
-    } else if (command === 'backspace') {
-
-      const ss = this.state.editorState.getSelection();
-      
-      const anchorKey = ss.getAnchorKey();
-      const currentContent =  this.state.editorState.getCurrentContent();
-      const currentContentBlock = currentContent.getBlockForKey(anchorKey);
-      const start = ss.getStartOffset();
-
-      if (start === 0) {
-        const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
-        if (blockBefore !== null && blockBefore.getType() === 'atomic') {
-          const key = blockBefore.getEntityAt(0);
-          const entity = currentContent.getEntity(key);
-          const oliType = entity.getData().oliType;
-          const beginBlock = entity.getData().beginBlock;
-
-          if (entity.getData().oliType === 'pullout') {
-            let beginBlockKey;
-            if (beginBlock !== null) {
-              beginBlockKey = beginBlock;
-            } else {
-              beginBlockKey = blockBefore.getKey();
-            }
-
-            const operation = (block : ContentBlock) => {
-              
-              const data = block.getData();
-              if (data.get('semanticContext') !== undefined && data.get('semanticContext') !== null 
-                && data.get('semanticContext').beginBlock === beginBlockKey) {
-                return block.merge({ data: data.delete('semanticContext') });
-              } else {
-                return block;
-              }
-              
-            }
-
-            // Remove sentinel blocks and 
-            // Update blocks within to strip out the pullout semantic type
-            
-            var blockMap = currentContent.getBlockMap();
-            var newBlocks = blockMap
-              .toSeq()
-              .map(operation)
-              .filter((block, k) => {
-                if (block.getKey() === beginBlockKey) {
-                  return false;
-                }
-                if (block.getType() === 'atomic') {
-                  const key = block.getEntityAt(0);
-                  const entity = currentContent.getEntity(key);
-                  const oliType = entity.getData().oliType;
-                  const beginBlock = entity.getData().beginBlock;
-
-                  if (beginBlock !== undefined && beginBlock === beginBlockKey) {
-                    return false;
-                  }
-                }
-                
-                return true;
-              })
-
-            const updatedContent = currentContent.merge({
-              blockMap: newBlocks,
-              selectionBefore: ss,
-              selectionAfter: ss,
-            });
-
-            this.onChange(EditorState.push(this.state.editorState, updatedContent, 'backspace'));
-
-            return 'handled';
-
-          }
-        } 
-      } 
-      return 'not-handled';
-      
+    const editorState = this.state.editorState;
+    
+    if (command === 'backspace') {
+      if (handleBackspace(editorState, this.onChange) === 'handled') {
+        console.log('handled by custom backspace');
+        return 'handled';
+      }
     }
 
-    const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
+      console.log('handled by richutils');
       this.onChange(newState);
       return 'handled';
     } else {
+      console.log('not handled at all');
       return 'not-handled';
     }
     
   }
+  
 
   toggleInlineStyle(inlineStyle) {
 
@@ -402,8 +316,28 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.insertActivity(action.activityType, action.data);
       } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
         this.toggleBlockType(action.blockType);
+      } else if (action.type === 'INSERT_INLINE_ENTITY') {
+        this.insertInlineEntity(action.entityType, action.mutability, action.data);
       }
     } 
+  }
+
+  insertInlineEntity(type: string, mutability: string, data: Object) {
+    const contentState = this.state.editorState.getCurrentContent();
+    const selectionState = this.state.editorState.getSelection();
+    const contentStateWithEntity = contentState.createEntity(type, mutability, data);
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+    const contentStateWithLink = Modifier.applyEntity(
+      contentState,
+      selectionState,
+      entityKey
+    );
+
+    const newEditorState = EditorState.set(
+        this.state.editorState,
+        { currentContent: contentStateWithLink });
+
+    this.onChange(newEditorState);
   }
 
   insertActivity(type, data) {
@@ -433,14 +367,70 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
 
+
+  renderPostProcess(components, blocks) {
+    
+    const updated = [];
+    let children = []; 
+    let current = updated;
+
+    const content =  this.state.editorState.getCurrentContent();
+
+    let currentWrapper : ContentWrapper = null;
+    
+    for (let i = 0; i < components.length; i++) {
+      
+      let comp = components[i];
+      let block = content.getBlockForKey(comp.key);
+
+      // Block will be undefined when what we have encountered is a Draft
+      // block level wrapper such as a ol or a ul that is wrapping a series
+      // of li blocks.  
+      if (block === undefined) {
+        updated.push(comp);
+        continue;
+      }
+
+      if (currentWrapper === null) {
+
+        let foundWrapperBegin = wrappers.find((w) => w.isBeginBlock(block, content));
+        if (foundWrapperBegin !== undefined) {
+          
+          currentWrapper = foundWrapperBegin;
+
+          children = [];
+          current = children;
+          
+          children.push(components[i]);
+
+        } else {
+          current.push(components[i]);
+        }
+
+      } else if (currentWrapper.isEndBlock(block, content)) {
+
+        children.push(components[i]);
+        updated.push(React.createElement(currentWrapper.component, {key: 'block-' + block.key}, children));
+
+        current = updated;
+
+      } else {
+        current.push(components[i]);
+      }
+      
+    }
+
+    return updated;
+  }
+
   render() {
     return <div 
         style={styles.editor} 
         onClick={this.focus}>
 
         <Editor ref="editor"
+          renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
-          blockStyleFn={myBlockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
           blockRendererFn={this.blockRenderer.bind(this)}
           editorState={this.state.editorState} 

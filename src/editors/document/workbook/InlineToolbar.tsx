@@ -3,7 +3,8 @@
 import * as React from 'react';
 
 import { AppServices } from '../../common/AppServices';
-import { toggleInlineStyle, toggleBlockType, AuthoringActionsHandler } from '../../../actions/authoring';
+import { toggleInlineStyle, toggleBlockType, insertInlineEntity, AuthoringActionsHandler } from '../../../actions/authoring';
+import { EntityTypes } from '../../content/common/draft/custom';
 
 interface InlineToolbarProps {  
   courseId: string; 
@@ -36,6 +37,8 @@ const Button = (props) => {
   );
 }
 
+const formula = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo>&sum;</mo></math>"
+const defaultFormula = { '#cdata': formula};
 
 class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
@@ -55,6 +58,11 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
   toggleInlineStyle(style) {
     this.props.actionHandler.handleAction(toggleInlineStyle(style));
+    this.props.dismissToolbar();
+  }
+
+  insertInlineEntity(entityType, mutability, data) {
+    this.props.actionHandler.handleAction(insertInlineEntity(entityType, mutability, data));
     this.props.dismissToolbar();
   }
 
@@ -81,6 +89,7 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
           <Button action={() => this.toggleInlineStyle('CODE')} icon="code"/>
           <Button action={() => this.toggleBlockType('ordered-list-item')} icon="list-ol"/>
           <Button action={() => this.toggleBlockType('unordered-list-item')} icon="list-ul"/>
+          <Button action={() => this.insertInlineEntity(EntityTypes.formula, 'IMMUTABLE', defaultFormula)} icon="etsy"/>
         </div>
         
       </div>);
