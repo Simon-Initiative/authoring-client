@@ -34,15 +34,15 @@ const customStyles = {
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(255, 255, 255, 0.75)',
-    zIndex: 1000
+    zIndex: 1000 // otherwise we're behind the left most nav bar
   },
   content: {
     position: 'absolute',
-    top: '40px',
-    left: '40px',
-    right: '40px',
-    bottom: '40px',
-    border: '1px solid #ccc',
+    top: '140px',
+    left: '140px',
+    right: '140px',
+    bottom: '140px',
+    border: '1px solid #444444',
     background: '#fff',
     overflow: 'auto',
     WebkitOverflowScrolling: 'touch',
@@ -72,23 +72,18 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     this.closeModal = this.closeModal.bind(this);      
   }
     
-  componentWillReceiveProps (newProps:any) {
-      console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
-      
+  componentWillReceiveProps (newProps:any) {      
       this.setState({modalIsOpen: newProps ["modalIsOpen"]});
   }
     
-  openModal() {
-    console.log ("openModal ()");  
+  openModal() {  
     this.setState({modalIsOpen: true});
   }
 
   afterOpenModal() {
-    console.log ("afterOpenModal ()");
   }
 
   closeModal() {
-    console.log ("closeModal ()");
     this.setState({modalIsOpen: false});
   }
     

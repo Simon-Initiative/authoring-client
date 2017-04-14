@@ -288,16 +288,23 @@ class LONodeRenderer extends Component <any, any>
     };
     */    
     
+    /*
+    componentWillReceiveProps (newProps:any) {      
+      console.log ("componentWillReceiveProps ()");
+      console.log ("New props: " + JSON.stringify (newProps));
+    } 
+    */   
+
     deleteNode (aNode) : void {
         console.log ("deleteNode ()");
     }
-    
+
     linkSkill (aNode) : void {
         console.log ("linkSkill ()");
-    }    
-    
+    }
+
     render() {
-       //console.log ("Props: " + JSON.stringify (this.props));
+       console.log ("Props: " + JSON.stringify (this.props));
                 
        var {
             scaffoldBlockPxWidth,

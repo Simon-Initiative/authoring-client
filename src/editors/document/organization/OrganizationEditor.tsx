@@ -570,7 +570,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}
-                      generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
+                      //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
                   />

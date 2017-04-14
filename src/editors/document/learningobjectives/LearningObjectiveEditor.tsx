@@ -224,8 +224,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */
-    linkSkill(anEvent) {        
+    linkSkill(e) {        
         console.log ("linkSkill ()");
+        
+        e.preventDefault();
         
         this.setState ({modalIsOpen: true});
     }    
@@ -276,7 +278,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}
-                        generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
+                        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         nodeContentRenderer={LONodeRenderer}
                     />

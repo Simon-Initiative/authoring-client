@@ -138,25 +138,34 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         this.setState({treeData: immutableHelper});
     }     
 
-    deleteNode (anObject:any): void {
+    deleteNode (aNode:any): void {
         console.log ("SkillEditor:deleteNode ()");
+        //console.log ("Deleting: " + JSON.stringify (aNode));
     }
     
-    editTitle ():void {
+    editTitle (aNode:any, aTitle:any):void {
         console.log ("editTitle ()");
+        
+        let newTitle=aTitle.title.get ("#text");
+        
+        //console.log ("Changing title for: " + JSON.stringify (aNode));
+        console.log ("New title: " + newTitle);
+        
+        aNode.title=newTitle;
     }
     
-    genProps (aTreeData:any,aDeleteFunction:any):Object {
-        console.log ("genProps ()");
+    genProps () {
+        console.log ("SkillEditor:genProps ()");
         
         var optionalProps:Object=new Object ();
         
-        optionalProps ["deleteNode"]=aDeleteFunction;
-        optionalProps ["treeData"]=aTreeData;
+        optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
+        optionalProps ["deleteNode"]=this.deleteNode.bind (this);
+        optionalProps ["treeData"]=this.state.treeData;
         
         return (optionalProps);
     }
-    
+        
     /**
      * 
      */
@@ -170,11 +179,11 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
                     <SortableTree
                         maxDepth={1}
                         treeData={this.state.treeData}
-                        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         nodeContentRenderer={SkillNodeRenderer}
-                        //generateNodeProps={({ node }) => ({ deleteFunc: this.deleteNode, editFunc: this.editTitle })}
-                        generateNodeProps={this.genProps.bind (this.state.treeData,this.deleteNode)}
+                        //generateNodeProps={this.genProps.bind (this.state.treeData,this.deleteNode)}
+                        //generateNodeProps={this.handleClick.bind(this)}
+                        generateNodeProps={this.genProps.bind(this)}
                     />
                 </div>
         );

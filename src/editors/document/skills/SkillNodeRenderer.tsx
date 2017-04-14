@@ -265,6 +265,7 @@ class SkillNodeRenderer extends Component <any, any>
 {       
     deleteNodeFunction:any=null;
     parentTreeData:any=null;
+    editNodeTitle:any=null;
     
     /* 
     static propTypes = {
@@ -292,28 +293,12 @@ class SkillNodeRenderer extends Component <any, any>
       canDrop: PropTypes.bool,
     };
     */    
-    
-    deleteSkill (aNode) : void {
-        console.log ("deleteSkill ()");
 
-        /*
-        if (this.deleteNodeFunction) {
-            this.deleteNodeFunction ();
-        }
-        */
-        
-        console.log ("TreeData: " + JSON.stringify (this.parentTreeData));
-    }
-    
-    onEdit (property : string, content : any) : void {
-                
-        console.log ("New title: " + content.title.get ("#text"));
-    }
-    
     render() {
-       console.log ("Props: " + JSON.stringify (this.props));
+       //console.log ("Props: " + JSON.stringify (this.props));
                          
        var {
+            editNodeTitle,
             deleteNode,
             treeData,
             scaffoldBlockPxWidth,
@@ -340,8 +325,9 @@ class SkillNodeRenderer extends Component <any, any>
             ...otherProps,
        } = this.props;
 
-       console.log ("TreeData: " + JSON.stringify (treeData));
+       //console.log ("TreeData: " + JSON.stringify (treeData));
 
+       this.editNodeTitle=editNodeTitle;
        this.parentTreeData=treeData;
        this.deleteNodeFunction=deleteNode;
 
@@ -446,10 +432,10 @@ class SkillNodeRenderer extends Component <any, any>
                                    onEditModeChange={this.props.onEditModeChange}
                                    editMode={true}
                                    content={titleObj}
-                                   onEdit={(c) => this.onEdit('title', c)} 
+                                   onEdit={(content) => this.editNodeTitle(node,content)} 
                                    editingAllowed={true} />
                                </div>
-                               <a style={bStyle} href="#" onClick={e => this.deleteSkill (node)}>X</a>
+                               <a style={bStyle} href="#" onClick={this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>x</a>
                             </div>
                         </div>
                     )}
