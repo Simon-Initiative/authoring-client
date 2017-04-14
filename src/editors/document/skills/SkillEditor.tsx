@@ -163,13 +163,16 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
         
+        console.log ("SkillEditor:genProps () all done");
+        
         return (optionalProps);
     }
         
     /**
      * 
      */
-    render() {            
+    render() {  
+        //console.log ("SkillEditor:render ()");          
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
@@ -181,8 +184,6 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
                         treeData={this.state.treeData}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         nodeContentRenderer={SkillNodeRenderer}
-                        //generateNodeProps={this.genProps.bind (this.state.treeData,this.deleteNode)}
-                        //generateNodeProps={this.handleClick.bind(this)}
                         generateNodeProps={this.genProps.bind(this)}
                     />
                 </div>

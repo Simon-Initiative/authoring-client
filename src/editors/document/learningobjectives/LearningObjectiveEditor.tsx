@@ -220,17 +220,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
         return (newData);
     }
-
-    /**
-     * 
-     */
-    linkSkill(e) {        
-        console.log ("linkSkill ()");
-        
-        e.preventDefault();
-        
-        this.setState ({modalIsOpen: true});
-    }    
     
     /**
      * Note that this manual method of adding a new node does not generate an
@@ -258,13 +247,51 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         this.extractData (immutableHelper);
         
         this.setState({treeData: immutableHelper});
-    }   
+    }
+    
+    deleteNode (aNode:any): void {
+        console.log ("SkillEditor:deleteNode ()");
+        //console.log ("Deleting: " + JSON.stringify (aNode));
+    }
+    
+    editTitle (aNode:any, aTitle:any):void {
+        console.log ("editTitle ()");
+        
+        let newTitle=aTitle.title.get ("#text");
+        
+        console.log ("New title: " + newTitle);
+        
+        aNode.title=newTitle;
+    }
+    
+    /**
+     * 
+     */
+    linkSkill(aNode:any) {        
+        console.log ("linkSkill ()");
+                
+        this.setState ({modalIsOpen: true});
+    }    
+    
+    
+    genProps () {
+        console.log ("LearningObjectiveEditor:genProps ()");
+        
+        var optionalProps:Object=new Object ();
+        
+        optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
+        optionalProps ["deleteNode"]=this.deleteNode.bind (this);
+        optionalProps ["linkSkill"]=this.linkSkill.bind (this);
+        optionalProps ["treeData"]=this.state.treeData;
+
+        return (optionalProps);
+    }    
 
     /**
      * 
      */
     render() {
-        console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");  
+        //console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");  
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
@@ -272,15 +299,14 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
-                        <a className="nav-link" href="#" onClick={e => this.linkSkill (e)}>+ Link</a>
                     </nav>
                     <LearningObjectiveLinker treeData={this.state.treeData} modalIsOpen={this.state.modalIsOpen} />
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}
-                        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                         onChange={ treeData => this.processDataChange({treeData}) }
                         nodeContentRenderer={LONodeRenderer}
+                        generateNodeProps={this.genProps.bind(this)}    
                     />
                 </div>
         );

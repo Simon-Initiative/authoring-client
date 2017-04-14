@@ -435,7 +435,7 @@ class SkillNodeRenderer extends Component <any, any>
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
                                    editingAllowed={true} />
                                </div>
-                               <a style={bStyle} href="#" onClick={this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>x</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>x</a>
                             </div>
                         </div>
                     )}

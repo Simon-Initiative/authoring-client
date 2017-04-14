@@ -4,6 +4,9 @@ import { Component, PropTypes } from 'react';
 import { isDescendant } from 'react-sortable-tree';
 import Modal from 'react-modal';
 
+import * as contentTypes from '../../../data/contentTypes';
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+
 const styles = {
     
   orgrowWrapper : {
@@ -261,6 +264,11 @@ const styles = {
  */
 class LONodeRenderer extends Component <any, any> 
 {       
+    deleteNodeFunction:any=null;
+    parentTreeData:any=null;
+    editNodeTitle:any=null;
+    linkSkill:any=null;
+        
     /* 
     static propTypes = {
       node: PropTypes.object.isRequired,
@@ -288,25 +296,14 @@ class LONodeRenderer extends Component <any, any>
     };
     */    
     
-    /*
-    componentWillReceiveProps (newProps:any) {      
-      console.log ("componentWillReceiveProps ()");
-      console.log ("New props: " + JSON.stringify (newProps));
-    } 
-    */   
-
-    deleteNode (aNode) : void {
-        console.log ("deleteNode ()");
-    }
-
-    linkSkill (aNode) : void {
-        console.log ("linkSkill ()");
-    }
-
     render() {
-       console.log ("Props: " + JSON.stringify (this.props));
+       //console.log ("Props: " + JSON.stringify (this.props));
                 
        var {
+            editNodeTitle,
+            deleteNode,
+            treeData,
+            linkSkill,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -332,6 +329,11 @@ class LONodeRenderer extends Component <any, any>
        } = this.props;
 
        let handle;
+
+       this.linkSkill=linkSkill;
+       this.editNodeTitle=editNodeTitle;
+       this.parentTreeData=treeData;
+       this.deleteNodeFunction=deleteNode;
 
        canDrag=true;
         
@@ -402,6 +404,8 @@ class LONodeRenderer extends Component <any, any>
 
         //>--------------------------------------------------------------------
 
+        var titleObj=new contentTypes.TitleContent({ title: {'#text': node.title}})
+
         return (
             <div style={{ height: '100%' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
@@ -427,13 +431,15 @@ class LONodeRenderer extends Component <any, any>
             
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
-                                  {typeof node.title === 'function' ?
-                                   node.title({node, path, treeIndex }) :
-                                   node.title
-                                  }
+                                 <TitleContentEditor 
+                                   onEditModeChange={this.props.onEditModeChange}
+                                   editMode={true}
+                                   content={titleObj}
+                                   onEdit={(content) => this.editNodeTitle(node,content)} 
+                                   editingAllowed={true} />
                                </div>
-                               <a style={bStyle} href="#" onClick={e => this.deleteNode (node)}>X</a>
-                               <a style={bStyle} href="#" onClick={e => this.linkSkill (node)}>+</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>x</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-window-close"></i>+</a>
                             </div>
                         </div>
                     )}
