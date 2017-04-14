@@ -270,18 +270,6 @@ const styles = {
   }     
 };
 
-/*
-export interface NRendererState extends AbstractEditorState 
-{
-  treeData : any;
-}
-
-export interface NRendererProps extends AbstractEditorProps<models.CourseModel>
-{
-  deleteFun:function ();    
-}
-*/
-
 /**
  * 
  */

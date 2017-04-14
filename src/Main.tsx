@@ -22,7 +22,6 @@ import LoginView from './components/LoginView';
 import CreateCourseView from './components/CreateCourseView';
 
 function mapStateToProps(state: any) {
-  console.log ("mapStateToProps ()");
   const {
     user,
     modal,
@@ -58,19 +57,16 @@ class Main extends React.Component<MainProps, {}> {
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
-  componentDidMount() {
-    console.log ("componentDidMount()");  
+  componentDidMount() {  
     let user = this.props.username;
     this.props.dispatch(userActions.login(user, user));
   }
 
   getView(view: CurrentView): JSX.Element { 
-    console.log ("getView ("+view.type+")");
     switch (view.type) {
       case 'LoginView':
         return <LoginView dispatch={this.props.dispatch} />
       case 'DocumentView':
-        console.log ("DocumentView");
         return <DocumentView 
                 dispatch={this.props.dispatch}
                 userId={this.props.user.userId} 
@@ -84,8 +80,7 @@ class Main extends React.Component<MainProps, {}> {
   }
   
 
-  render(): JSX.Element {      
-    console.log ("render()");
+  render(): JSX.Element {
     const modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     const currentView = this.getView(this.props.view);
 

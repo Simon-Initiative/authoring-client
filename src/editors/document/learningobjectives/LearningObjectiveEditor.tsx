@@ -250,25 +250,56 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     }
     
     deleteNode (aNode:any): void {
-        console.log ("SkillEditor:deleteNode ()");
-        //console.log ("Deleting: " + JSON.stringify (aNode));
+        console.log ("LearningObjectiveEditor:deleteNode ()");
+            
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                immutableHelper.splice (i,1);
+                break;
+            }
+        }
+        
+        this.setState({treeData: immutableHelper});
     }
     
     editTitle (aNode:any, aTitle:any):void {
-        console.log ("editTitle ()");
+        console.log ("LearningObjectiveEditor:editTitle ()");
         
         let newTitle=aTitle.title.get ("#text");
+            
+        var immutableHelper = this.state.treeData.slice();
         
-        console.log ("New title: " + newTitle);
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                testNode.title=newTitle;
+                break;
+            }
+        }
         
-        aNode.title=newTitle;
+        this.setState({treeData: immutableHelper});    
     }
     
     /**
      * 
      */
     linkSkill(aNode:any) {        
-        console.log ("linkSkill ()");
+        console.log ("LearningObjectiveEditor:linkSkill ()");
                 
         this.setState ({modalIsOpen: true});
     }    
