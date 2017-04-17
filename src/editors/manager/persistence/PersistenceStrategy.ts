@@ -19,14 +19,9 @@ export interface PersistenceStrategy {
     onFailure: onFailureCallback ) => Promise<boolean>; 
 
   /**
-   * Method called to request that the persistence strategy saves the document. 
-   * This method takes as an argument a change request. This is a function 
-   * that when executed produces the content model  that is to be saved. 
-   * This function must be pure as the client code
-   * can make no assumption about how many times the underlying persistence 
-   * strategy may execute this method. 
+   * Method called to request that the persistence strategy saves the document.
    */
-  save: (initialDoc: persistence.Document, changeRequest: ChangeRequest) => void;
+  save: (doc: persistence.Document) => void;
   
   /**
    * Indicate to the persistence strategy that it is being shutdown and that it

@@ -14,8 +14,8 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import { OrgItem } from '../organization/OrganizationTypes.ts';
-import { LOTypes, LearningObjective } from './LOTypes.ts';
+import { OrgItem } from '../organization/OrganizationTypes';
+import { LOTypes, LearningObjective } from './LOTypes';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from './LearningObjectiveLinker';
 

@@ -2,12 +2,11 @@
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
+import { CourseResource, fetchCourseResources } from '../common/resources';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, 
@@ -21,11 +20,6 @@ export interface CourseEditorProps extends AbstractEditorProps<models.CourseMode
   
 }
 
-type CourseResource = {
-  _id: string,
-  title: string,
-  type: string
-}
 
 interface CourseEditorState extends AbstractEditorState {
   resources: CourseResource[];
@@ -46,13 +40,9 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     this.fetchTitles(this.props.documentId);
   }
 
-  fetchTitles(documentId: types.DocumentId) {
-    persistence.queryDocuments(titlesForCoursesResources(documentId))
-      .then(docs => {
-        this.setState({
-          resources: docs.map(d => ({ _id: d._id, title: (d as any).head.title['#text'], type: (d as any).modelType}))
-        })
-      });
+  fetchTitles(id: string) {
+    fetchCourseResources(id)
+      .then(resources => this.setState({resources}));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -76,12 +66,12 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     if (type === 'workbook') {
       resource = new models.WorkbookPageModel({
           courseId: this.props.documentId,
-          head: new contentTypes.TitleContent({ title: {'#text': title}})
+          head: new contentTypes.Head({ title: new contentTypes.Title({ text: title}) })
         });
     } else {
       resource = new models.AssessmentModel({
           courseId: this.props.documentId,
-          head: new contentTypes.TitleContent({ title: {'#text': title}})
+          title: new contentTypes.Title({ text: title})
         });
     }
 

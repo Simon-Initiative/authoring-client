@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { AppServices } from '../../common/AppServices';
 import { toggleInlineStyle, toggleBlockType, insertInlineEntity, AuthoringActionsHandler } from '../../../actions/authoring';
-import { EntityTypes } from '../../content/common/draft/custom';
+import { EntityTypes } from '../../../data/content/html/common';
 
 interface InlineToolbarProps {  
   courseId: string; 

@@ -26,11 +26,7 @@ interface EditorManager {
 
   stopListening: boolean;
 
-  // The most recently saved document during the display of the child editor. This
-  // must be the document that is used as the bases for future changes. 
-  lastSavedDocument: persistence.Document;
-
-  _onEdit: (c : models.ChangeRequest) => void;
+  _onEdit: (model : models.ContentModel) => void;
 
   _onEditModeChange: (blockKey: string, mode: boolean) => void;
 
@@ -72,7 +68,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this._onEditModeChange = this.onEditModeChange.bind(this);
 
     this.onSaveCompleted = (doc: persistence.Document) => {
-      this.lastSavedDocument = doc;
+  
       if (!this.componentDidUnmount) {
         this.setState({ document: doc});
       }
@@ -84,8 +80,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
   }
 
-  onEdit(changeRequest : models.ChangeRequest) {
-    this.persistenceStrategy.save(this.lastSavedDocument, changeRequest);
+  onEdit(model : models.ContentModel) {
+
+    const doc = this.state.document.with({model: model});
+    this.setState({ document: doc}, () => this.persistenceStrategy.save(doc));
   }
 
   onEditModeChange(blockKey: string, editMode: boolean) {
@@ -128,8 +126,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       console.log ("fetchDocument ("+documentId+")");
     persistence.retrieveDocument(documentId)
       .then(document => {
-        this.lastSavedDocument = document;
-
+        
         console.log ("fetched document: " + JSON.stringify (document));  
 
         // Notify that the course has changed when a user views a course

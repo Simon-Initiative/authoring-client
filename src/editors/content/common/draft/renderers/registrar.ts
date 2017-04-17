@@ -13,7 +13,7 @@ import { SectionBegin } from './SectionBegin';
 import { SectionEnd } from './SectionEnd';
 
 
-import { EntityTypes } from '../custom';
+import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
 
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ContentWrapper, isEntityType } from './common';
-import { EntityTypes } from '../custom';
+import { EntityTypes } from '../../../../../data/content/html/common';
 import { buildDivWrapper } from './builder';
 
 import './Pullout.scss';

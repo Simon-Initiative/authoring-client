@@ -5,14 +5,12 @@ import * as React from 'react';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import InlineToolbar from './InlineToolbar';
-import BlockToolbar from './BlockToolbar';
+import InlineToolbar from '../../content/html/InlineToolbar';
+import BlockToolbar from '../../content/html//BlockToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
 import * as models from '../../../data/models';
-
-
 
 
 interface WorkbookPageEditor {
@@ -51,16 +49,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   onEdit(property : string, content : any) {
 
-    let update = {};
-    update[property] = content;
+    let model; 
 
-    let changeRequest = (model: models.WorkbookPageModel) => 
-      model.with(update);
+    if (property === 'title') {
+      const head = model.head.with({ title: content});
+      model = this.props.model.with({ head });
+        
+    } else {
+      model = this.props.model.with({ body: content });
+    }
       
-    this.props.onEdit(changeRequest);
+    this.props.onEdit(model);
   }
-
-
 
   render() {
 
@@ -79,13 +79,19 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div>
           <TitleContentEditor 
+            services={this.props.services}
+            userId={this.props.userId}
+            documentId={this.props.documentId}
+            courseId={this.props.model.courseId}
             onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
-            content={this.props.model.head}
+            model={this.props.model.head.title}
             onEdit={(c) => this.onEdit('title', c)} 
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+              documentId={this.props.documentId}
+              courseId={this.props.model.courseId}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
               activeSubEditorKey={this.props.activeSubEditorKey}
@@ -94,7 +100,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               services={this.props.services}
               userId={this.props.userId}
               editHistory={this.state.editHistory}
-              content={this.props.model.body}
+              model={this.props.model.body}
               onEdit={(c) => this.onEdit('body', c)} 
               editingAllowed={this.props.editingAllowed}>
 

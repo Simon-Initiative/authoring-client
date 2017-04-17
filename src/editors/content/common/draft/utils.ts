@@ -12,6 +12,36 @@ const log = (ss) => {
   console.log(ss.getAnchorKey() + '(' + ss.getAnchorOffset() + ') - ' + ss.getFocusKey() + '(' + ss.getFocusOffset() + ')');
 }
 
+export function getCursorPosition() {
+    const selection = document.getSelection();
+    const range = document.createRange();
+    range.selectNode(selection.anchorNode);
+    const rect = range.getBoundingClientRect();
+    return {
+      x: rect.left,
+      y: rect.top
+    };
+  }
+
+export function getPosition() {
+    const selection = document.getSelection();
+    if (selection.rangeCount === 0) return null;
+
+    const range = selection.getRangeAt(0);
+    const clientRects = range.getClientRects();
+
+    let top = clientRects.item(0);
+    for (let i = 0; i < clientRects.length; i++) {
+      let c = clientRects.item(i);
+      if (c.top < top.top) {
+        top = c;
+      }
+    }
+
+    return top;
+  }
+
+
 export function hasSelection(ss: SelectionState) {
   if (ss.getAnchorKey() !== ss.getFocusKey()) {
     return true;

@@ -22,7 +22,7 @@ export interface AbstractEditorProps<ModelType> {
   // The document id that the model pertains to. 
   documentId: types.DocumentId;
 
-  onEdit: (changeRequest: models.ChangeRequest) => void;  
+  onEdit: (model: ModelType) => void;  
 
   editingAllowed : boolean;
 

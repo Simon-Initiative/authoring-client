@@ -38,9 +38,9 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
     return new Date().getTime();
   }
 
-  save(doc: persistence.Document, changeRequest: models.ChangeRequest) {
+  save(doc: persistence.Document) {
     
-    this.pending = doc.with({ model: changeRequest(doc.model)});
+    this.pending = doc;
     
     if (this.inFlight === null) {
       this.queueSave();

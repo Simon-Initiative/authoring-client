@@ -9,33 +9,46 @@ import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
-import { htmlContentToDraft } from './translation/todraft';
-import { draftToHtmlContent } from './translation/topersistence';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
-import * as common from './translation/common';
-import { HtmlContent } from '../../../../data/contentTypes';
-import { EntityTypes } from './custom';
+import * as common from '../../../../data/content/html/common';
+import { Html } from '../../../../data/contentTypes';
+import { EntityTypes } from '../../../../data/content/html/common';
 import { getActivityByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
 import handleBackspace from './keyhandlers/backspace';
+import { getCursorPosition, hasSelection, getPosition } from './utils';
+
+
+const SHIFT_KEY = 16;
+const ENTER_KEY = 13; 
+const ALT_KEY = 18; 
+const PADDING = 90;
 
 interface DraftWrapper {
   onChange: any;
   focus: () => any; 
   handleKeyCommand: any;
   lastSelectionState: SelectionState;
+  container: any;
+  _onKeyDown: () => void;
+  _onKeyUp: () => void;
+  mouseDown: boolean; 
+  shiftPressed: boolean;
+  _dismissToolbar: () => void;
 }
 
 export interface DraftWrapperProps {
   editHistory: AuthoringActions[];
-  onEdit: (HtmlContent) => void;
+  onEdit: (html : Html) => void;
   onSelectionChange: (state: SelectionState) => void;
   onEditModeChange: (key: string, mode: boolean) => void;
-  content: HtmlContent;
+  content: Html;
   locked: boolean;
   userId: string;
   services: AppServices;
+  inlineToolbar: any;
+  blockToolbar: any;
 }
 
 
@@ -43,6 +56,10 @@ export interface DraftWrapperProps {
 interface DraftWrapperState {
   editorState: EditorState;
   lockedByBlockRenderer: boolean;
+  show: boolean;
+  component: any;
+  x: number;
+  y: number;
 }
 
 const styles = {
@@ -196,20 +213,29 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.lastSelectionState = null;
 
-    
-    const contentState : ContentState = htmlContentToDraft(this.props.content);
+    this._dismissToolbar = this.dismissToolbar.bind(this);
+    this.mouseDown = false;
+    this.shiftPressed = false;
+
+    this._onKeyDown = this.onKeyDown.bind(this);
+    this._onKeyUp = this.onKeyUp.bind(this);
+
+    const contentState = props.content.contentState;
 
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
     const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),
-      lockedByBlockRenderer: false
+      lockedByBlockRenderer: false,
+      show: false,
+      x: null,
+      y: null,
+      component: null
     };
     
-    this.onChange = (editorState) => {
-      
-      
+    this.onChange = (editorState : EditorState) => {
+    
       // You wouldn't think that this check would be necessary, but I was seeing
       // change notifications fired from Draft even when it was not in edit mode.
       if (!this.props.locked) {
@@ -217,34 +243,103 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss; 
-
-        console.log('selection state');
-        console.log(ss.toJSON());
-        
-        // Report any change, including initial change 
-        if (changeType !== SelectionChangeType.None) {
-          this.props.onSelectionChange(ss);
-        }
+        this.handleSelectionChange(changeType, ss);
 
         const content = editorState.getCurrentContent();
         
-        const htmlContent : HtmlContent = draftToHtmlContent(editorState.getCurrentContent());
-        this.props.onEdit(htmlContent);
-
-        return this.setState({editorState})
+        const html = new Html({ contentState: editorState.getCurrentContent()});
+        this.props.onEdit(html);
+        
+        this.setState({editorState});
+        
       }
     };
+  }
+
+  handleSelectionChange(changeType, ss) {
+    
+    if (changeType === SelectionChangeType.Selection) {  
+      if (hasSelection(ss)) {
+        const selection = document.getSelection();
+        if (selection.rangeCount !== 0) {
+          let topRect = getPosition();
+          if (topRect !== null) {
+            const show = !this.shiftPressed;
+            this.setState({show, x: topRect.left, y: topRect.top - PADDING, component: this.props.inlineToolbar});
+            
+        } else {
+            this.setState({ show: false, x: null, y: null});
+          }
+        }
+      } else {   
+        this.setState({ show: false, x: null, y: null});
+      }
+      
+      
+    } else if (changeType === SelectionChangeType.CursorPosition) {
+      this.setState({ show: false, x: null, y: null});
+    } 
+  }
+  
+
+  dismissToolbar() {
+    this.setState({show: false, x: null, y: null});
+  }
+
+  onKeyDown(e) {
+    if (e.keyCode === SHIFT_KEY) {
+      this.shiftPressed = true;
+    } else if (e.keyCode === ALT_KEY) {
+      const point = getCursorPosition();
+      this.setState({
+        show: true, 
+        x: point.x, 
+        y: point.y, 
+        component: this.props.blockToolbar
+      });        
+    }
+  }
+
+  onKeyUp(e) {
+    
+    if (e.keyCode === SHIFT_KEY) {
+      this.shiftPressed = false;
+
+      if (this.state.x !== null) {
+        this.setState({show: true});
+      }
+
+    } else if (e.keyCode === ENTER_KEY) {
+      // Every time the user presses 'Enter', we display
+      // the block toolbar just below their cursor
+      const point = getCursorPosition();
+      this.setState({
+        show: true, 
+        x: point.x, 
+        y: point.y, 
+        component: this.props.blockToolbar
+      });        
+    } else if (e.keyCode === ALT_KEY) {
+      this.setState({show: false, x: null, y: null});
+    }
+  }
+
+  getXOffset() {
+    const position = this.container.getBoundingClientRect();  
+    return position.left;
   }
 
   processBlockEdit(block, data) {
 
     const content = this.state.editorState.getCurrentContent();
 
-    var entityKey = block.getEntityAt(0);
-    var newContentState = content.mergeEntityData(entityKey, data);
+    const entityKey = block.getEntityAt(0);
+    const newContentState = content.mergeEntityData(entityKey, data);
 
-    const htmlContent : HtmlContent = draftToHtmlContent(newContentState);
-    this.props.onEdit(htmlContent);
+    const editorState = EditorState.push(this.state.editorState, newContentState, '');
+    
+    this.onChange(editorState);
+
   }
 
   blockRenderer(block) {
@@ -423,10 +518,37 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return updated;
   }
 
+  renderToolbar() {
+    let toolbarAndContainer = null;
+    if (this.state.show) {
+      
+      const clonedToolbar = React.cloneElement(this.state.component, { dismissToolbar: this._dismissToolbar});
+      
+      const positionStyle = {
+        position: 'absolute',
+        top: this.state.y,
+        left: this.state.x - this.getXOffset()
+      };
+
+      return <div style={positionStyle}>
+          {clonedToolbar}
+        </div>;
+      
+    } else {
+      return null;
+    }
+
+  }
+
   render() {
-    return <div 
+    return (
+      <div ref={(container => this.container = container)} 
+        onKeyUp={this._onKeyUp}
+        onKeyDown={this._onKeyDown}
         style={styles.editor} 
         onClick={this.focus}>
+
+        {this.renderToolbar()}
 
         <Editor ref="editor"
           renderPostProcess={this.renderPostProcess.bind(this)}
@@ -437,7 +559,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           readOnly={this.state.lockedByBlockRenderer || this.props.locked}
           onChange={this.onChange} />
 
-      </div>;
+      </div>);
   }
 
 }

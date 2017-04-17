@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
 
 import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
-import { HtmlContent } from '../../../../../data/contentTypes';
+
 import * as common from './common';
-import { EntityTypes } from '../custom';
+import { EntityTypes } from './common';
 import { getKey } from './common';
 import { Block, BlockIterator, BlockProvider } from './provider'
 
@@ -44,21 +44,16 @@ const entityHandlers = {
 
 // Converts the draft ContentState object to the HtmlContent format
 // (which ultimately is serialized and stored in persistence)
-export function draftToHtmlContent(state: ContentState) : HtmlContent {
+export function toPersistence(state: ContentState) : Object {
 
   const rawContent = convertToRaw(state);
-  const translated = translate(rawContent, state);
-
-  //console.log('Translated to persistence:');
-  //console.log(translated);
-
-  return new HtmlContent(translated as any);
+  return translate(rawContent, state);
 }
 
 function translate(content: common.RawDraft, state: ContentState) : Object {
 
   // Create a top-level container for the object tree to root itself into
-  const root = { body: { '#array': []}, contentType: 'HtmlContent'};
+  const root = { body: { '#array': []}};
   const context = [root.body['#array']];  
 
   // Start iterating through the blocks, converting them as we go.
@@ -70,8 +65,7 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
   while (iterator.hasNext()) {
     translateBlock(iterator, content.entityMap, context);
   }
-
-  return root;
+  return root.body;
 }
 
 function translateBlock(iterator : BlockIterator,
@@ -87,7 +81,14 @@ function translateBlock(iterator : BlockIterator,
     handleSentinelTransition(sentinelType, iterator, rawBlock, entityMap, context);
 
   } else if (isParagraphBlock(rawBlock)) {
+
+    // If the last block is an empty paragraph, do not translate it
+    if (rawBlock.text === ' ' && iterator.peek() === null) {
+      return;
+    }
+
     translateParagraph(rawBlock, draftBlock, entityMap, context);
+
   } else if (isOrderedListBlock(rawBlock)) {
     translateList('ol', rawBlock, block, iterator, entityMap, context);
   } else if (isUnorderedListBlock(rawBlock)) {
