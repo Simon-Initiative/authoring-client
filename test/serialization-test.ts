@@ -14,7 +14,7 @@ it('WorkbookPageModel', () => {
   // persistence to object model and back:
   let model = models.WorkbookPageModel.fromPersistence(workbook_page);
   let persisted = model.toPersistence();
-  console.log(JSON.stringify(persisted));
+  
   model = models.WorkbookPageModel.fromPersistence(persisted);
   
   // Now verify that all the pieces and parts are present:
@@ -28,15 +28,15 @@ it('AssessmentModel', () => {
   // persistence to object model and back:
   let model = models.AssessmentModel.fromPersistence(assessment);
   let persisted = model.toPersistence();
-  console.log(JSON.stringify(persisted));
+  
   model = models.AssessmentModel.fromPersistence(persisted);
   
   // Now verify that all the pieces and parts are present:
 
   expect(model.title.text).toBe('Tutor');
-  expect(model.nodes.size).toBe(1);
+  expect(model.nodes.size).toBe(2);
 
-  const node : models.Node = model.nodes.toArray()[0];
+  const node : models.Node = model.nodes.toArray()[1];
   expect(node.contentType).toBe('Question');
 
   const question : contentTypes.Question = (node as contentTypes.Question);
