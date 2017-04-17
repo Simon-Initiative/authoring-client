@@ -49,6 +49,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
+  editorStyles?: Object;
 }
 
 
@@ -541,11 +542,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   render() {
+
+    const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
+
     return (
       <div ref={(container => this.container = container)} 
         onKeyUp={this._onKeyUp}
         onKeyDown={this._onKeyDown}
-        style={styles.editor} 
+        style={editorStyle} 
         onClick={this.focus}>
 
         {this.renderToolbar()}

@@ -7,20 +7,23 @@ import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/auth
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
-import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
-import { MultipleChoice } from '../items/MultipleChoice';
-
+import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
-export interface QuestionEditor {
-  
+import '../common/editor.scss';
+
+type IdTypes = {
+  value: string,
+  color: string
 }
 
-export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
+export interface Choice {
+  ids: IdTypes;
+}
+
+export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
 
   blockKey?: string;
 
@@ -28,25 +31,33 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
 
 }
 
-export interface QuestionEditorState {
+export interface ChoiceState {
 
   editHistory: AuthoringActions[];
+
+  value: string;
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export abstract class QuestionEditor 
-  extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
+export class Choice 
+  extends AbstractContentEditor<contentTypes.Choice, ChoiceProps, ChoiceState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
-      editHistory: []
+      editHistory: [],
+      value: this.props.model.value
     };
-
+    this.ids = {
+      color: guid(),
+      value: guid()
+    }
     this.onBodyEdit = this.onBodyEdit.bind(this);
+    this.onValueChange = this.onValueChange.bind(this);
+    this.onColorChange = this.onColorChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -56,44 +67,20 @@ export abstract class QuestionEditor
   }
 
   onBodyEdit(body) {
-    const question = this.props.model.with({body});
-    this.props.onEdit(question);
+    const concept = this.props.model.with({body});
+    this.props.onEdit(concept);
   }
 
-  onItemEdit(item) {
-    
-    this.props.onEdit(this.props.model.with({items: this.props.model.items.set(item.guid, item) }));
-    
+  componentWillReceiveProps(nextState) {
+    this.setState({ value: this.props.model.value});
   }
 
-  renderItems() {
-    return this.props.model.items.toArray().map(i => {
-      if (i.contentType === 'MultipleChoice') {
-            return <MultipleChoice
-              key={i.guid}
-              documentId={this.props.documentId}
-              courseId={this.props.courseId}
-              onEditModeChange={this.props.onEditModeChange}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              userId={this.props.userId}
-              model={i}
-              onEdit={(c) => this.onItemEdit(c)} 
-              editingAllowed={this.props.editingAllowed}/>
-      } else {
-        return <UnsupportedEditor
-              key={i.guid}
-              documentId={this.props.documentId}
-              courseId={this.props.courseId}
-              onEditModeChange={this.props.onEditModeChange}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              userId={this.props.userId}
-              model={i}
-              onEdit={(c) => {}} 
-              editingAllowed={this.props.editingAllowed}/>
-      }
-    })
+  onValueChange(e) {
+    this.props.onEdit(this.props.model.with({value: e.target.value}));
+  }
+
+  onColorChange(e) {
+    this.props.onEdit(this.props.model.with({color: e.target.value}));
   }
 
   render() : JSX.Element {
@@ -111,13 +98,21 @@ export abstract class QuestionEditor
     const bodyStyle = {
       minHeight: '75px',
       borderStyle: 'solid',
-      borderWith: '1px',
+      borderWith: 1,
       borderColor: '#AAAAAA'
     }
 
     return (
       <div>
-        <div>Question Body</div>
+
+        <form className="form-inline">
+           <label className="mr-sm-2" htmlFor={this.ids.value}>Value</label>
+           <input onChange={this.onValueChange} className="form-control" type="text" value={this.state.value} id={this.ids.value}/>
+          
+           <label htmlFor={this.ids.color} className="col-2 col-form-label">Color</label>
+           <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
+        </form>
+
         <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
@@ -132,11 +127,7 @@ export abstract class QuestionEditor
               editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
-              editingAllowed={this.props.editingAllowed}
-              
-              />
-
-        {this.renderItems()}
+              editingAllowed={this.props.editingAllowed}/>
 
       </div>);
   }

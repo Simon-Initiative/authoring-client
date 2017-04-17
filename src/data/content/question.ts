@@ -89,7 +89,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
           break;
         case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence(item, id) });
+          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         default:
           

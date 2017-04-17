@@ -26,6 +26,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   inlineToolbar: any;
 
   blockToolbar: any;
+
+  editorStyles?: Object;
 }
 
 export interface HtmlContentEditorState {
@@ -64,6 +66,7 @@ export abstract class HtmlContentEditor
       <div>
         
           <DraftWrapper 
+            editorStyles={this.props.editorStyles}
             inlineToolbar={this.props.inlineToolbar}
             blockToolbar={this.props.blockToolbar}
             onSelectionChange={this.onSelectionChange.bind(this)}

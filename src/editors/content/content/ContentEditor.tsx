@@ -8,14 +8,18 @@ import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
-
+import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
 import '../common/editor.scss';
 
+type IdTypes = {
+  availability: string
+}
+
 export interface ContentEditor {
-  
+  ids: IdTypes;
 }
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
@@ -43,8 +47,11 @@ export class ContentEditor
     this.state = {
       editHistory: []
     };
-
+    this.ids = {
+      availability: guid()
+    }
     this.onBodyEdit = this.onBodyEdit.bind(this);
+    this.onAvailability = this.onAvailability.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -56,6 +63,11 @@ export class ContentEditor
   onBodyEdit(body) {
     const concept = this.props.model.with({body});
     this.props.onEdit(concept);
+  }
+
+  onAvailability(e) {
+    console.log(e.target.value);
+    this.props.onEdit(this.props.model.with({availability: e.target.value}));
   }
 
   render() : JSX.Element {
@@ -70,10 +82,27 @@ export class ContentEditor
                 services={this.props.services} 
                 actionHandler={this} />;
 
+    const bodyStyle = {
+      minHeight: '75px',
+      borderStyle: 'solid',
+      borderWith: 1,
+      borderColor: '#AAAAAA'
+    }
+
     return (
-      <div className='editorWrapper'>
-        <h5>Content</h5>
+      <div>
+        <form className="form-inline">
+           <label className="mr-sm-2" htmlFor={this.ids.availability}>Content availability</label>
+            <select value={this.props.model.availability} onChange={this.onAvailability} className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={this.ids.availability}>
+              <option value="always">Always</option>
+              <option value="instructor_only">Instructor Only</option>
+              <option value="feedback_only">Feedback Only</option>
+              <option value="never">Never</option>
+            </select>
+        </form>
+
         <HtmlContentEditor 
+              editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
               activeSubEditorKey={this.props.activeSubEditorKey}
