@@ -83,16 +83,18 @@ export class ContentEditor
                 actionHandler={this} />;
 
     const bodyStyle = {
-      minHeight: '75px',
-      borderStyle: 'solid',
+      minHeight: '30px',
+      borderStyle: 'none',
       borderWith: 1,
       borderColor: '#AAAAAA'
     }
 
     return (
-      <div>
+      <div className='editorWrapper'>
+        <b>Content</b>&nbsp;&nbsp;&nbsp;
         <form className="form-inline">
-           <label className="mr-sm-2" htmlFor={this.ids.availability}>Content availability</label>
+
+           <label className="mr-sm-2" htmlFor={this.ids.availability}>Availability</label>
             <select value={this.props.model.availability} onChange={this.onAvailability} className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={this.ids.availability}>
               <option value="always">Always</option>
               <option value="instructor_only">Instructor Only</option>

@@ -15,15 +15,14 @@ import BlockToolbar from '../html/BlockToolbar';
 import '../common/editor.scss';
 
 type IdTypes = {
-  value: string,
-  color: string
+  targets: string
 }
 
-export interface Choice {
+export interface HintEditor {
   ids: IdTypes;
 }
 
-export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
+export interface HintEditorProps extends AbstractContentEditorProps<contentTypes.Hint> {
 
   blockKey?: string;
 
@@ -31,33 +30,31 @@ export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Cho
 
 }
 
-export interface ChoiceState {
+export interface HintEditorState {
 
   editHistory: AuthoringActions[];
 
-  value: string;
+  targets: string;
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export class Choice 
-  extends AbstractContentEditor<contentTypes.Choice, ChoiceProps, ChoiceState> {
+export class HintEditor 
+  extends AbstractContentEditor<contentTypes.Hint, HintEditorProps, HintEditorState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
       editHistory: [],
-      value: this.props.model.value
+      targets: this.props.model.targets
     };
     this.ids = {
-      color: guid(),
-      value: guid()
+      targets: guid()
     }
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onValueChange = this.onValueChange.bind(this);
-    this.onColorChange = this.onColorChange.bind(this);
+    this.onTargetChange = this.onTargetChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -72,15 +69,13 @@ export class Choice
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ value: nextProps.model.value});
+    this.setState({ targets: nextProps.model.targets});
   }
 
-  onValueChange(e) {
-    this.props.onEdit(this.props.model.with({value: e.target.value}));
-  }
-
-  onColorChange(e) {
-    this.props.onEdit(this.props.model.with({color: e.target.value}));
+  onTargetChange(e) {
+    const targets = e.target.value;
+    this.setState({ targets }, () => 
+      this.props.onEdit(this.props.model.with({targets })));
   }
 
   render() : JSX.Element {
@@ -102,15 +97,17 @@ export class Choice
       borderColor: '#AAAAAA'
     }
 
+    const style = {
+      width: '80px'
+    }
+
     return (
-      <div className='editorWrapper'>
+      <div className='itemWrapper'>
 
         <form className="form-inline">
-           <label className="mr-sm-2" htmlFor={this.ids.value}>Value</label>
-           <input onChange={this.onValueChange} className="form-control" type="text" value={this.state.value} id={this.ids.value}/>
-          
-           <label htmlFor={this.ids.color} className="col-2 col-form-label">Color</label>
-           <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
+           <div><b>Hint</b></div>
+           &nbsp;&nbsp;&nbsp;&nbsp;Targets&nbsp;&nbsp;
+           <input style={style} onChange={this.onTargetChange} className="form-control form-control-sm" type="text" value={this.state.targets} id={this.ids.targets}/>
         </form>
 
         <HtmlContentEditor 

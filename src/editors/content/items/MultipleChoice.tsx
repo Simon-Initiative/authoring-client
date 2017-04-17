@@ -68,8 +68,8 @@ export class MultipleChoice
     });
   }
 
-  componentWillReceiveProps(nextState) {
-    this.setState({ select: this.props.model.select});
+  componentWillReceiveProps(nextProps) {
+    this.setState({ select: nextProps.model.select});
   }
 
   onSelectChange(e) {
@@ -111,16 +111,6 @@ export class MultipleChoice
 
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                courseId={this.props.courseId} 
-                services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
-                courseId={this.props.courseId} 
-                services={this.props.services} 
-                actionHandler={this} />;
-
     const bodyStyle = {
       minHeight: '75px',
       borderStyle: 'solid',
@@ -129,7 +119,7 @@ export class MultipleChoice
     }
 
     return (
-      <div>
+      <div className='itemWrapper'>
 
         <form className="form-inline">
            <label className="form-check-label">
