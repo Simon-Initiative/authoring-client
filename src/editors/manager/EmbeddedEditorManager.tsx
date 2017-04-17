@@ -92,7 +92,7 @@ class EmbeddedEditorManager extends React.Component<EmbeddedEditorManagerProps, 
   }
 
   onEdit(changeRequest : models.ChangeRequest) {
-    this.persistenceStrategy.save(this.lastSavedDocument, changeRequest);
+    //this.persistenceStrategy.save(this.lastSavedDocument, changeRequest);
   }
 
   onEditModeChange(blockKey: string, editMode: boolean) {

@@ -31,7 +31,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     requestTime: number, 
     remainingRetries: number, initialResolve, initialReject) : Promise<persistence.Document> {
 
-    let lock : contentTypes.LockContent = (doc.model as any).lock;
+    let lock : contentTypes.Lock = (doc.model as any).lock;
     if (lock.lockedAt > requestTime) {
       // Do nothing, since another, async operation that was initiated after
       // this lock mutation has completed. 
@@ -98,7 +98,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.failureCallback = onFailure;
 
     if (models.isLockable(doc.model)) {
-      let lock : contentTypes.LockContent = (doc.model as any).lock;
+      let lock : contentTypes.Lock = (doc.model as any).lock;
       
       let alreadyLocked = lock.lockedBy !== userId
         && lock.lockedBy !== ''; 
@@ -126,7 +126,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     }
   }
 
-  abstract save(initialDoc: persistence.Document, changeRequest: models.ChangeRequest) : void;
+  abstract save(doc: persistence.Document) : void;
   
   /**
    * Method to that child classes must implement to allow an async

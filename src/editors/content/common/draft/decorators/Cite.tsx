@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Decorator, byType } from './common';
-import { EntityTypes } from '../custom';
+import { EntityTypes } from '../../../../../data/content/html/common';
 
 
 class Cite extends React.PureComponent<any, any> {

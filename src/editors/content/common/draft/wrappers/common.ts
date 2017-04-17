@@ -1,4 +1,4 @@
-import { EntityTypes } from '../custom';
+import { EntityTypes } from '../../../../../data/content/html/common';
 import { ContentState, ContentBlock} from 'draft-js';
 
 export type BlockIdentifier = (block: ContentBlock, content: ContentState) => boolean;

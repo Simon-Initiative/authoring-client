@@ -111,7 +111,7 @@ export function listenToDocument(documentId: types.DocumentId) : Promise<Documen
 }
 
 export function retrieveDocument(documentId: types.DocumentId) : Promise<Document> {
-  console.log ("retrieveDocument ("+documentId+")");  
+  
   return new Promise(function(resolve, reject) {
     fetch(`${configuration.baseUrl}/${configuration.database}/${documentId}`, {
         method: 'GET',
@@ -172,7 +172,7 @@ export function persistDocument(doc: Document) : Promise<Document> {
     // We flatten the model during persistence so that the properties of 
     // doc.model actually exist at the top level of the stored document, instead
     // of under 'model'.  This allows for more granular field selection during queries. 
-    const toPersist = Object.assign({}, {_id: doc._id, _rev: doc._rev}, doc.model.toJS());
+    const toPersist = Object.assign({}, {_id: doc._id, _rev: doc._rev}, doc.model.toPersistence());
 
     fetch(`${configuration.baseUrl}/${configuration.database}/${doc._id}`, {
         method: 'PUT',

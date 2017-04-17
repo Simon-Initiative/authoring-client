@@ -1,6 +1,6 @@
 import { EditorState, Modifier, ContentState, SelectionState, ContentBlock } from 'draft-js';
 
-import * as common from '../translation/common';
+import * as common from '../../../../../data/content/html/common';
 
 export default function handle(editorState: EditorState, onChange: (e: EditorState) => void) : string {
   

@@ -3,6 +3,8 @@ import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
+import { CourseResource, fetchCourseResources } from '../common/resources';
+
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
@@ -34,7 +36,7 @@ interface SkillEditor
 
 export interface SkillEditorState extends AbstractEditorState 
 {
-    treeData : any;  
+    treeData : any;
 }
 
 export interface SkillEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -70,6 +72,7 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         this.extractData (newData);        
         
         this.setState (newData);
+
     }
     
     /**
