@@ -549,24 +549,96 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         this.setState({treeData: immutableHelper});
     }    
 
+    findTreeParent (aTree:any,aNode:any) : Array<Object> {
+     
+        console.log ("findTreeParent ("+aNode.id+")");
+        
+        for (var i=0;i<aTree.length;i++) {
+            let testNode:OrgItem=aTree [i];
+            
+            if (testNode.id==aNode.id) {
+                return (aTree);
+            }
+            
+            // We can test length here because we always make sure this object exists
+            if (testNode.children.length>0) {
+                let result:Array<Object>=this.findTreeParent (testNode.children,aNode);
+                
+                if (result!=null) {
+                    return (result);
+                }
+            }
+        }
+        
+        return (null);
+    }    
+    
     /**
      * 
      */    
     deleteNode (aNode:any): void {
         console.log ("LearningObjectiveEditor:deleteNode ()");
-            
-        var immutableHelper = this.state.treeData.slice();
+          
+        let immutableHelper = this.state.treeData.slice();
+        
+        console.log ("Tree: " + JSON.stringify (immutableHelper));
+        
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
         if (immutableHelper==null) {
             console.log ("Bump");
             return;
         }
-                
-        for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:OrgItem=immutableHelper [i];
+        
+        if (parentArray!=null) {
+            console.log ("We have an object, performing edit ...");
+        }
+        else {
+           console.log ("Internal error: node not found in tree");
+        }        
+                        
+        for (var i=0;i<parentArray.length;i++) {
+            let testNode:OrgItem=parentArray [i] as OrgItem;
             
             if (testNode.id==aNode.id) {
-                immutableHelper.splice (i,1);
+                parentArray.splice (i,1);
+                break;
+            }
+        }
+        
+        this.setState({treeData: immutableHelper});        
+    }
+        
+    /**
+     * 
+     */    
+    editTitle (aNode:any, aTitle:any):void {
+        console.log ("OrganizationEditorr:editTitle ()");
+                
+        let newTitle=aTitle.text;
+        let immutableHelper = this.state.treeData.slice();
+        
+        console.log ("Tree: " + JSON.stringify (immutableHelper));
+        
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+        
+        if (parentArray!=null) {
+            console.log ("We have an object, performing edit ...");
+        }
+        else {
+           console.log ("Internal error: node not found in tree");
+        }
+                    
+        for (var i=0;i<parentArray.length;i++) {
+            let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+            if (testNode.id==aNode.id) {
+                testNode.title=newTitle;
                 break;
             }
         }
@@ -577,35 +649,8 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */    
-    editTitle (aNode:any, aTitle:any):void {
-        console.log ("LearningObjectiveEditor:editTitle ()");
-        
-        let newTitle=aTitle.title.get ("#text");
-            
-        var immutableHelper = this.state.treeData.slice();
-        
-        if (immutableHelper==null) {
-            console.log ("Bump");
-            return;
-        }
-                
-        for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:OrgItem=immutableHelper [i];
-            
-            if (testNode.id==aNode.id) {
-                testNode.title=newTitle;
-                break;
-            }
-        }
-        
-        this.setState({treeData: immutableHelper});    
-    }
-    
-    /**
-     * 
-     */    
     genProps () {
-        console.log ("LearningObjectiveEditor:genProps ()");
+        console.log ("OrganizationEditor:genProps ()");
         
         var optionalProps:Object=new Object ();
         
