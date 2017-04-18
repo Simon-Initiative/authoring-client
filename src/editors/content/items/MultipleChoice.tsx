@@ -6,7 +6,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { Choice } from './Choice';
 import guid from '../../../utils/guid';
@@ -24,7 +24,7 @@ export interface MultipleChoice {
   ids: IdTypes;
 }
 
-export interface MultipleChoiceProps extends AbstractContentEditorProps<contentTypes.MultipleChoice> {
+export interface MultipleChoiceProps extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
 
   blockKey?: string;
 
@@ -43,14 +43,14 @@ export interface MultipleChoiceState {
  * The content editor for HtmlContent.
  */
 export class MultipleChoice 
-  extends AbstractContentEditor<contentTypes.MultipleChoice, MultipleChoiceProps, MultipleChoiceState> {
+  extends AbstractItemPartEditor<contentTypes.MultipleChoice, MultipleChoiceProps, MultipleChoiceState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
       editHistory: [],
-      select: this.props.model.select
+      select: this.props.itemModel.select
     };
     this.ids = {
       select: guid(),
@@ -69,29 +69,29 @@ export class MultipleChoice
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ select: nextProps.model.select});
+    this.setState({ select: nextProps.itemModel.select});
   }
 
   onSelectChange(e) {
-    this.props.onEdit(this.props.model.with({select: e.target.value}));
+    this.props.onEdit(this.props.itemModel.with({select: e.target.value}), this.props.partModel);
   }
 
   onShuffleChange(e) {
-    this.props.onEdit(this.props.model.with({shuffle: e.target.value}));
+    this.props.onEdit(this.props.itemModel.with({shuffle: e.target.value}), this.props.partModel);
   }
 
   onAddChoice() {
     let content = new contentTypes.Choice();
     content = content.with({guid: guid()});
-    this.props.onEdit(this.props.model.with({choices: this.props.model.choices.set(content.guid, content) }));
+    this.props.onEdit(this.props.itemModel.with({choices: this.props.itemModel.choices.set(content.guid, content) }), this.props.partModel);
   }
 
   onChoiceEdit(c) {
-    this.props.onEdit(this.props.model.with({choices: this.props.model.choices.set(c.guid, c) }));
+    this.props.onEdit(this.props.itemModel.with({choices: this.props.itemModel.choices.set(c.guid, c) }), this.props.partModel);
   }
 
   renderChoices() {
-    return this.props.model.choices.toArray().map(c => {
+    return this.props.itemModel.choices.toArray().map(c => {
       return (
         <Choice 
               key={c.guid}
