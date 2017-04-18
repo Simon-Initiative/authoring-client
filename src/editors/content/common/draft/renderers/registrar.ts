@@ -1,7 +1,6 @@
 
 import { Audio } from './Audio';
 import { Image } from './Image';
-import InlineQuestion from './InlineQuestion';
 import { Video } from './Video';
 import { YouTube } from './YouTube';
 import CodeBlock from './CodeBlock';
