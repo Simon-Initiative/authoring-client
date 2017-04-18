@@ -99,35 +99,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         
         return (newRootLO as Object);
     }
-    
-    /**
-     * 
-     */
-    extractData (aData: any): Object {
-        console.log ("extractData ()");
-                                
-        console.log ("From: " + JSON.stringify (aData));         
         
-        var newData:Object=new Object ();
-        newData ["objectives"]=new Object();
-        newData ["objectives"]["@id"]=this.state.rootLO.id;
-        newData ["objectives"]["#array"]=new Array ();
-        newData ["objectives"]["#array"].push (OrgItem.addTextObject ("title",this.state.rootLO.title));
-        
-        for (var i=0;i<aData.length;i++)               
-        {
-            var testLOContainer:Object=new Object();
-            var testLO=aData [i] as LearningObjective;
-            testLOContainer ["objective"]=testLO.toJSONObject ();
-            
-            newData ["objectives"]["#array"].push (testLOContainer);
-        }
-       
-        console.log ("To: " + JSON.stringify (newData));
-        
-        return (newData);
-    }
-    
     /**
      * 
      */
@@ -144,8 +116,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     expand(expanded) {
         this.setState({
+            modalIsOpen : false,
             treeData: toggleExpandedForAll({
-                treeData: this.state.treeData,
+                treeData: this.state.treeData,                
                 expanded,
             }),
         });
@@ -179,7 +152,51 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
       return ("");
     }
+    
+    /**
+     * 
+     */
+    extractData (aData: Array<LearningObjective>): Object {
+        console.log ("extractData ()");
+                                
+        console.log ("From: " + JSON.stringify (aData));         
+        
+        var newData:Object=new Object ();
+        newData ["objectives"]=new Object();
+        newData ["objectives"]["@id"]=this.state.rootLO.id;
+        newData ["objectives"]["#array"]=new Array ();
+        newData ["objectives"]["#array"].push (OrgItem.addTextObject ("title",this.state.rootLO.title));
+        
+        for (var i=0;i<aData.length;i++)               
+        {
+            var testLOContainer:Object=new Object();
+            //var testLO=aData [i] as LearningObjective; // this does not work, why not?
+            //testLOContainer ["objective"]=aData [i].toJSONObject ();
+            
+            var ephemeral:Object=new Object ();
+              
+            ephemeral ["@id"]=aData [i].id;
+            ephemeral ["@category"]=aData [i].category;
+            ephemeral ["#text"]=aData [i].title;
+            ephemeral ["#skills"]=new Array<string>();
+              
+            for (var j=0;j<aData [i].skills.length;j++) {
+              
+              ephemeral ["#skills"].push (aData [i].skills [j]);
+            }            
+            
+            newData ["objectives"]["#array"].push (ephemeral);
+            //newData ["objectives"]["#array"].push (testLOContainer);
+        }
+       
+        console.log ("To: " + JSON.stringify (newData));
+        
+        return (newData);
+    }    
 
+    /**
+     * 
+     */    
     parseLearningObjective (anObjective:Object): LearningObjective {
 
         var newLO:LearningObjective=new LearningObjective ();
@@ -232,8 +249,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                 
         var immutableHelper = this.state.treeData.slice()
         
-        //var aData=this.state.treeData;
-
         if (immutableHelper==null)
         {
             console.log ("Bump");
@@ -246,9 +261,15 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
         this.extractData (immutableHelper);
         
-        this.setState({treeData: immutableHelper});
+        this.setState({
+          modalIsOpen : false, 
+          treeData: immutableHelper
+        });
     }
     
+    /**
+     * 
+     */    
     deleteNode (aNode:any): void {
         console.log ("LearningObjectiveEditor:deleteNode ()");
             
@@ -260,7 +281,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         }
                 
         for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:Skill=immutableHelper [i];
+            let testNode:LearningObjective=immutableHelper [i];
             
             if (testNode.id==aNode.id) {
                 immutableHelper.splice (i,1);
@@ -271,6 +292,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         this.setState({treeData: immutableHelper});
     }
     
+    /**
+     * 
+     */    
     editTitle (aNode:any, aTitle:any):void {
         console.log ("LearningObjectiveEditor:editTitle ()");
         
@@ -284,7 +308,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         }
                 
         for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:Skill=immutableHelper [i];
+            let testNode:LearningObjective=immutableHelper [i];
             
             if (testNode.id==aNode.id) {
                 testNode.title=newTitle;
@@ -304,7 +328,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         this.setState ({modalIsOpen: true});
     }    
     
-    
+    /**
+     * 
+     */    
     genProps () {
         console.log ("LearningObjectiveEditor:genProps ()");
         
@@ -321,8 +347,15 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */
-    render() {
-        //console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");  
+    render() {        
+        //console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");
+        
+        var data = [
+          {value: 'apple', label: 'Apple'},
+          {value: 'orange', label: 'Orange'},
+          {value: 'banana', label: 'Banana', checked: true} // check by default
+        ];        
+        
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
@@ -331,7 +364,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                     </nav>
-                    <LearningObjectiveLinker treeData={this.state.treeData} modalIsOpen={this.state.modalIsOpen} />
+                    <LearningObjectiveLinker defaultData={data} modalIsOpen={this.state.modalIsOpen} />
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}

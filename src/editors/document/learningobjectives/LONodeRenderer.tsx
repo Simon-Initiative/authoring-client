@@ -407,6 +407,7 @@ class LONodeRenderer extends Component <any, any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
+
         return (
             <div style={{ height: '100%' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (

@@ -1,6 +1,7 @@
 
 import * as Immutable from 'immutable';
 import * as types from '../../../data/types';
+import Linkable from '../../../data/linkable';
 import guid from '../../../utils/guid';
 
 export const SkillTypes = types.strEnum([
@@ -110,15 +111,14 @@ export class SkillModelOLI extends SkillModel {
   }    
 }    
 
-export class Skill {
+export class Skill extends Linkable {
   orgType:SkillTypes=SkillTypes.Skill;
       
-  title:string="unassigned";
-  id:string=guid();    
+  title:string="unassigned";    
   skillModel:SkillModel=new SkillModelBKT ();  
               
   constructor() {
-
+    super ();
   }
    
   /**

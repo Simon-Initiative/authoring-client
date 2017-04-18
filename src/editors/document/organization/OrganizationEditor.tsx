@@ -172,7 +172,8 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     extractData (aData: any): Object {
         console.log ("extractData ()");
                 
-        var newData=aData.treeData;
+        //var newData=aData.treeData;
+        var newData=aData;
                 
         // First process our organization object and add it to the tree we're building
         
@@ -548,9 +549,71 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         this.setState({treeData: immutableHelper});
     }    
 
-    deleteFunc (aNode):void {
-        console.log ("deleteFunc ()");
+    /**
+     * 
+     */    
+    deleteNode (aNode:any): void {
+        console.log ("LearningObjectiveEditor:deleteNode ()");
+            
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:OrgItem=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                immutableHelper.splice (i,1);
+                break;
+            }
+        }
+        
+        this.setState({treeData: immutableHelper});
     }
+    
+    /**
+     * 
+     */    
+    editTitle (aNode:any, aTitle:any):void {
+        console.log ("LearningObjectiveEditor:editTitle ()");
+        
+        let newTitle=aTitle.title.get ("#text");
+            
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:OrgItem=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                testNode.title=newTitle;
+                break;
+            }
+        }
+        
+        this.setState({treeData: immutableHelper});    
+    }
+    
+    /**
+     * 
+     */    
+    genProps () {
+        console.log ("LearningObjectiveEditor:genProps ()");
+        
+        var optionalProps:Object=new Object ();
+        
+        optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
+        optionalProps ["deleteNode"]=this.deleteNode.bind (this);
+
+        return (optionalProps);
+    }      
     
     /**
      * 
@@ -573,6 +636,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                       //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
+                      generateNodeProps={this.genProps.bind(this)} 
                   />
               </div>
       );
