@@ -92,7 +92,7 @@ export class Choice
                 actionHandler={this} />;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '20px',
       borderStyle: 'none',
       borderWith: 1,
       borderColor: '#AAAAAA'
@@ -109,7 +109,9 @@ export class Choice
            <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
         </form>
 
-        <HtmlContentEditor 
+        <div className="input-group">
+          <span className="input-group-addon" id="basic-addon3">Choice</span>
+          <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
@@ -123,6 +125,10 @@ export class Choice
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
               editingAllowed={this.props.editingAllowed}/>
+          
+        </div>
+
+        
 
       </div>);
   }

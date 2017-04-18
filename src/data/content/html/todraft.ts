@@ -145,9 +145,12 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   parse(persistenceFormat, { draft, depth: 0 });
   
   // Add a final empty block that will ensure that we have content past
-  // any last positioned atomic blocks
-  addNewBlock(draft, {});
-
+  // any last positioned atomic blocks. This allows the user to click
+  // past the last atomic block and begin inserting new text
+  if (draft.blocks[draft.blocks.length - 1].type === 'atomic') {
+    addNewBlock(draft, {});
+  }
+  
   return convertFromRaw(draft);
 }
 

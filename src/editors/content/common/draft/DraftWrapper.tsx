@@ -64,23 +64,10 @@ interface DraftWrapperState {
 }
 
 const styles = {
-  root: {
-    fontFamily: '\'Helvetica\', sans-serif',
-    padding: 20,
-    width: 600,
-  },
   editor: {
     border: 'none',
     cursor: 'text',
-    minHeight: 300,
-    padding: 10,
-  },
-  button: {
-    marginTop: 10,
-    textAlign: 'center',
-  },
-  link: {
-
+    minHeight: 300
   }
 };
 

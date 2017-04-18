@@ -35,7 +35,7 @@ export interface HtmlContentEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class HtmlContentEditor 
+export class HtmlContentEditor 
   extends AbstractContentEditor<contentTypes.Html, HtmlContentEditorProps, HtmlContentEditorState> {
     
   constructor(props) {
@@ -67,7 +67,7 @@ export abstract class HtmlContentEditor
 
   render() : JSX.Element {
     return (
-      <div>
+      <div className="form-control">
         
           <DraftWrapper 
             editorStyles={this.props.editorStyles}
