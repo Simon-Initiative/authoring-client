@@ -1,6 +1,7 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -17,20 +18,18 @@ export interface HtmlContentEditor {
 
 export interface HtmlContentEditorProps extends AbstractContentEditorProps<contentTypes.Html> {
   
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
   
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
   inlineToolbar: any;
 
   blockToolbar: any;
+
+  editorStyles?: Object;
 }
 
 export interface HtmlContentEditorState {
 
-  selectionState: SelectionState;
+  
 }
 
 /**
@@ -42,9 +41,6 @@ export abstract class HtmlContentEditor
   constructor(props) {
     super(props);
 
-    this.state = {
-      selectionState: null
-    }
 
     this._onChange = this.onChange.bind(this);
     this.container = null; 
@@ -59,11 +55,22 @@ export abstract class HtmlContentEditor
     this.setState({selectionState});
   }
 
+  shouldComponetUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextProps.editHistory !== this.props.editHistory) {
+      return true;
+    }
+    return false;
+  }
+
   render() : JSX.Element {
     return (
       <div>
         
           <DraftWrapper 
+            editorStyles={this.props.editorStyles}
             inlineToolbar={this.props.inlineToolbar}
             blockToolbar={this.props.blockToolbar}
             onSelectionChange={this.onSelectionChange.bind(this)}

@@ -23,7 +23,7 @@ import { getCursorPosition, hasSelection, getPosition } from './utils';
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
 const ALT_KEY = 18; 
-const PADDING = 90;
+const PADDING = 30;
 
 interface DraftWrapper {
   onChange: any;
@@ -39,7 +39,7 @@ interface DraftWrapper {
 }
 
 export interface DraftWrapperProps {
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
   onEdit: (html : Html) => void;
   onSelectionChange: (state: SelectionState) => void;
   onEditModeChange: (key: string, mode: boolean) => void;
@@ -49,6 +49,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
+  editorStyles?: Object;
 }
 
 
@@ -219,6 +220,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this._onKeyDown = this.onKeyDown.bind(this);
     this._onKeyUp = this.onKeyUp.bind(this);
+    this.onBlur = this.onBlur.bind(this);
 
     const contentState = props.content.contentState;
 
@@ -256,6 +258,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
+  onBlur() {
+    if (this.state.show) {
+      setTimeout(() => this.setState({ show: false, x: null, y: null}), 200);
+    }
+  }
+
   handleSelectionChange(changeType, ss) {
     
     if (changeType === SelectionChangeType.Selection) {  
@@ -263,9 +271,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const selection = document.getSelection();
         if (selection.rangeCount !== 0) {
           let topRect = getPosition();
+          
+          const divRect = this.container.getBoundingClientRect();
+
+          const y = topRect.top - PADDING;
+          
           if (topRect !== null) {
             const show = !this.shiftPressed;
-            this.setState({show, x: topRect.left, y: topRect.top - PADDING, component: this.props.inlineToolbar});
+
+            this.setState({show, x: topRect.left, y, component: this.props.inlineToolbar});
             
         } else {
             this.setState({ show: false, x: null, y: null});
@@ -316,7 +330,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       this.setState({
         show: true, 
         x: point.x, 
-        y: point.y, 
+        y: point.y + PADDING, 
         component: this.props.blockToolbar
       });        
     } else if (e.keyCode === ALT_KEY) {
@@ -403,8 +417,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
     // Determine if we have received a new edit action
-    if (this.props.editHistory.length !== nextProps.editHistory.length) {
-      let action : any = nextProps.editHistory[0];
+    if (this.props.editHistory !== nextProps.editHistory) {
+      let action : any = nextProps.editHistory.get(0);
       if (action.type === 'TOGGLE_INLINE_STYLE') {
         this.toggleInlineStyle(action.style);
       } else if (action.type === 'INSERT_ACTIVITY') {
@@ -525,9 +539,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const clonedToolbar = React.cloneElement(this.state.component, { dismissToolbar: this._dismissToolbar});
       
       const positionStyle = {
-        position: 'absolute',
+        position: 'fixed',
         top: this.state.y,
-        left: this.state.x - this.getXOffset()
+        left: this.state.x
       };
 
       return <div style={positionStyle}>
@@ -541,11 +555,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   render() {
+
+    const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
+
     return (
       <div ref={(container => this.container = container)} 
+        onBlur={this.onBlur}
         onKeyUp={this._onKeyUp}
         onKeyDown={this._onKeyDown}
-        style={styles.editor} 
+        style={editorStyle} 
         onClick={this.focus}>
 
         {this.renderToolbar()}

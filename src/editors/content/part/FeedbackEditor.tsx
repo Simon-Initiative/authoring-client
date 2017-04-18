@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
@@ -15,55 +14,49 @@ import BlockToolbar from '../html/BlockToolbar';
 import '../common/editor.scss';
 
 type IdTypes = {
-  availability: string
+  targets: string
 }
 
-export interface ContentEditor {
+export interface FeedbackEditor {
   ids: IdTypes;
 }
 
-export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
+export interface FeedbackEditorProps extends AbstractContentEditorProps<contentTypes.Feedback> {
+
 
 }
 
-export interface ContentEditorState {
+export interface FeedbackEditorState {
 
   editHistory: Immutable.List<AuthoringActions>;
+
+  targets: string;
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export class ContentEditor 
-  extends AbstractContentEditor<contentTypes.Content, ContentEditorProps, ContentEditorState> {
+export class FeedbackEditor 
+  extends AbstractContentEditor<contentTypes.Feedback, FeedbackEditorProps, FeedbackEditorState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
-      editHistory: Immutable.List<AuthoringActions>()
+      editHistory: Immutable.List<AuthoringActions>(),
+      targets: this.props.model.targets
     };
     this.ids = {
-      availability: guid()
+      targets: guid()
     }
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onAvailability = this.onAvailability.bind(this);
+    this.onTargetChange = this.onTargetChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
     this.setState({
       editHistory: this.state.editHistory.insert(0, action)
     });
-  }
-
-  onBodyEdit(body) {
-    const concept = this.props.model.with({body});
-    this.props.onEdit(concept);
-  }
-
-  onAvailability(e) {
-    console.log(e.target.value);
-    this.props.onEdit(this.props.model.with({availability: e.target.value}));
   }
 
   shouldComponetUpdate(nextProps, nextState) {
@@ -74,6 +67,21 @@ export class ContentEditor
       return true;
     }
     return false;
+  }
+
+  onBodyEdit(body) {
+    const concept = this.props.model.with({body});
+    this.props.onEdit(concept);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ targets: nextProps.model.targets});
+  }
+
+  onTargetChange(e) {
+    const targets = e.target.value;
+    this.setState({ targets }, () => 
+      this.props.onEdit(this.props.model.with({targets })));
   }
 
   render() : JSX.Element {
@@ -95,18 +103,17 @@ export class ContentEditor
       borderColor: '#AAAAAA'
     }
 
-    return (
-      <div className='editorWrapper'>
-        <b>Content</b>&nbsp;&nbsp;&nbsp;
-        <form className="form-inline">
+    const style = {
+      width: '80px'
+    }
 
-           <label className="mr-sm-2" htmlFor={this.ids.availability}>Availability</label>
-            <select value={this.props.model.availability} onChange={this.onAvailability} className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={this.ids.availability}>
-              <option value="always">Always</option>
-              <option value="instructor_only">Instructor Only</option>
-              <option value="feedback_only">Feedback Only</option>
-              <option value="never">Never</option>
-            </select>
+    return (
+      <div className='itemWrapper'>
+
+        <form className="form-inline">
+           <div><b>Feedback</b></div>
+           &nbsp;&nbsp;&nbsp;&nbsp;Targets&nbsp;&nbsp;
+           <input style={style} onChange={this.onTargetChange} className="form-control form-control-sm" type="text" value={this.state.targets} id={this.ids.targets}/>
         </form>
 
         <HtmlContentEditor 

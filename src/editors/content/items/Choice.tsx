@@ -15,39 +15,45 @@ import BlockToolbar from '../html/BlockToolbar';
 import '../common/editor.scss';
 
 type IdTypes = {
-  availability: string
+  value: string,
+  color: string
 }
 
-export interface ContentEditor {
+export interface Choice {
   ids: IdTypes;
 }
 
-export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
+export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
 
 }
 
-export interface ContentEditorState {
+export interface ChoiceState {
 
   editHistory: Immutable.List<AuthoringActions>;
+
+  value: string;
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export class ContentEditor 
-  extends AbstractContentEditor<contentTypes.Content, ContentEditorProps, ContentEditorState> {
+export class Choice 
+  extends AbstractContentEditor<contentTypes.Choice, ChoiceProps, ChoiceState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
-      editHistory: Immutable.List<AuthoringActions>()
+      editHistory: Immutable.List<AuthoringActions>(),
+      value: this.props.model.value
     };
     this.ids = {
-      availability: guid()
+      color: guid(),
+      value: guid()
     }
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onAvailability = this.onAvailability.bind(this);
+    this.onValueChange = this.onValueChange.bind(this);
+    this.onColorChange = this.onColorChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -61,19 +67,16 @@ export class ContentEditor
     this.props.onEdit(concept);
   }
 
-  onAvailability(e) {
-    console.log(e.target.value);
-    this.props.onEdit(this.props.model.with({availability: e.target.value}));
+  componentWillReceiveProps(nextProps) {
+    this.setState({ value: nextProps.model.value});
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextState.editHistory !== this.state.editHistory) {
-      return true;
-    }
-    return false;
+  onValueChange(e) {
+    this.props.onEdit(this.props.model.with({value: e.target.value}));
+  }
+
+  onColorChange(e) {
+    this.props.onEdit(this.props.model.with({color: e.target.value}));
   }
 
   render() : JSX.Element {
@@ -97,16 +100,13 @@ export class ContentEditor
 
     return (
       <div className='editorWrapper'>
-        <b>Content</b>&nbsp;&nbsp;&nbsp;
-        <form className="form-inline">
 
-           <label className="mr-sm-2" htmlFor={this.ids.availability}>Availability</label>
-            <select value={this.props.model.availability} onChange={this.onAvailability} className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={this.ids.availability}>
-              <option value="always">Always</option>
-              <option value="instructor_only">Instructor Only</option>
-              <option value="feedback_only">Feedback Only</option>
-              <option value="never">Never</option>
-            </select>
+        <form className="form-inline">
+           <label className="mr-sm-2" htmlFor={this.ids.value}>Value</label>
+           <input onChange={this.onValueChange} className="form-control" type="text" value={this.state.value} id={this.ids.value}/>
+          
+           <label htmlFor={this.ids.color} className="col-2 col-form-label">Color</label>
+           <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
         </form>
 
         <HtmlContentEditor 

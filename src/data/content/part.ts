@@ -96,7 +96,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
           break;
         case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence(item, id) });
+          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         default:
           
@@ -107,6 +107,8 @@ export class Part extends Immutable.Record(defaultPartParams) {
   }
 
   toPersistence() : Object {
+
+    const explanation = this.explanation.toPersistence();
 
     const children = [
       
@@ -124,7 +126,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(hint => hint.toPersistence()),
 
-      { explanation: this.explanation.toPersistence() }
+      { explanation }
     ];
 
     return {
