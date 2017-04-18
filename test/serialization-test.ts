@@ -43,9 +43,8 @@ it('AssessmentModel', () => {
   expect(question.id).toBe('multiple_choice');
 
   const blocks = question.body.contentState.getBlocksAsArray();
-  expect(blocks.length).toBe(2);
+  expect(blocks.length).toBe(1);
   expect(blocks[0].getText()).toBe('This is a multiple choice question');
-  expect(blocks[1].getText()).toBe(' ');
 
   const items = question.items.toArray();
   expect(items.length).toBe(1);
@@ -76,7 +75,7 @@ it('AssessmentModel', () => {
   const hints = part.hints.toArray();
   expect(hints.length).toBe(1);
   const hintBlocks = hints[0].body.contentState.getBlocksAsArray();
-  expect(hintBlocks.length).toBe(2);
+  expect(hintBlocks.length).toBe(1);
   expect(hintBlocks[0].getText()).toBe('This is a hint');
 
 });

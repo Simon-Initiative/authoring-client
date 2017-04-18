@@ -11,3 +11,8 @@ export { Feedback } from './content/feedback';
 export { MultipleChoice } from './content/multiple_choice';
 export { Choice } from './content/choice';
 export { Head } from './content/head';
+
+import { MultipleChoice } from './content/multiple_choice';
+import { Unsupported } from './content/unsupported';
+
+export type Item = MultipleChoice | Unsupported;

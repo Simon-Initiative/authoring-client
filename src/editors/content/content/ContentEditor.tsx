@@ -12,6 +12,9 @@ import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
+import { Collapse } from '../common/Collapse';
+import { getHtmlDetails } from '../common/details';
+
 import '../common/editor.scss';
 
 type IdTypes = {
@@ -96,8 +99,7 @@ export class ContentEditor
     }
 
     return (
-      <div className='editorWrapper'>
-        <b>Content</b>&nbsp;&nbsp;&nbsp;
+      <Collapse caption='Content' details={getHtmlDetails(this.props.model.body)}>
         <form className="form-inline">
 
            <label className="mr-sm-2" htmlFor={this.ids.availability}>Availability</label>
@@ -123,8 +125,7 @@ export class ContentEditor
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
               editingAllowed={this.props.editingAllowed}/>
-
-      </div>);
+      </Collapse>);
   }
 
 }
