@@ -14,7 +14,8 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { PartEditor } from '../part/PartEditor';
-
+import { Collapse } from '../common/Collapse';
+import { getHtmlDetails } from '../common/details';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
@@ -182,46 +183,41 @@ export abstract class QuestionEditor
     return (
     
 
-      <div className="container editorWrapper">
-        <div className="row">
-          <div className="col-12">
-            <b>Question</b>
-          </div>
-        </div>
-        <div className="row">
-          
-          <div className="col-12">
-            <form className="form-inline">
+      <div className="editorWrapper">
+
+        <Collapse caption='Question' details={getHtmlDetails(this.props.model.body)}>
+
+          <form className="form-inline">
            
-              <label htmlFor={this.ids.id} className="col-2 col-form-label">Id</label>
-              <input onChange={this.onIdEdit} className="form-control form-control-sm" type="text" value={this.state.id} id={this.ids.id}/>
+            <label htmlFor={this.ids.id} className="col-2 col-form-label">Id</label>
+            <input onChange={this.onIdEdit} className="form-control form-control-sm" type="text" value={this.state.id} id={this.ids.id}/>
 
-              <button onClick={this.onAddItemPart} type="button" className="btn btn-sm btn-primary">Add Item/Part</button>
-              
-            </form>
+            <button onClick={this.onAddItemPart} type="button" className="btn btn-sm btn-primary">Add Item/Part</button>
+            
+          </form>
 
-            <div><b>Body</b></div>
-            <HtmlContentEditor 
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  blockToolbar={blockToolbar}
-                  onEditModeChange={this.props.onEditModeChange}
-                  editMode={this.props.editMode}
-                  services={this.props.services}
-                  courseId={this.props.courseId}
-                  documentId={this.props.documentId}
-                  userId={this.props.userId}
-                  editHistory={this.state.editHistory}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit} 
-                  editingAllowed={this.props.editingAllowed}
-                  
-                  />
+          <div><b>Body</b></div>
+          <HtmlContentEditor 
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                blockToolbar={blockToolbar}
+                onEditModeChange={this.props.onEditModeChange}
+                editMode={this.props.editMode}
+                services={this.props.services}
+                courseId={this.props.courseId}
+                documentId={this.props.documentId}
+                userId={this.props.userId}
+                editHistory={this.state.editHistory}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit} 
+                editingAllowed={this.props.editingAllowed}
+                
+                />
 
-            {this.renderItemsAndParts()}
-          </div>
-          
-        </div>
+          {this.renderItemsAndParts()}
+
+        </Collapse>
+
       </div>);
   }
 

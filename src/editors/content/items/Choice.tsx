@@ -11,6 +11,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import { InputLabel } from '../common/InputLabel';
 
 import '../common/editor.scss';
 
@@ -109,8 +110,7 @@ export class Choice
            <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
         </form>
 
-        <div className="input-group">
-          <span className="input-group-addon" id="basic-addon3">Choice</span>
+        <InputLabel label="Choice">
           <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
@@ -125,8 +125,7 @@ export class Choice
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
               editingAllowed={this.props.editingAllowed}/>
-          
-        </div>
+        </InputLabel>
 
         
 
