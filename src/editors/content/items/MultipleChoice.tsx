@@ -95,7 +95,6 @@ export class MultipleChoice
       return (
         <Choice 
               key={c.guid}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

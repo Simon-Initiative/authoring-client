@@ -1,6 +1,7 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
@@ -23,7 +24,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -35,14 +36,14 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     super(props);
 
     this.state = {
-      editHistory: []
+      editHistory: Immutable.List<AuthoringActions>()
     };
   }
 
   
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
@@ -94,7 +95,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               courseId={this.props.model.courseId}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

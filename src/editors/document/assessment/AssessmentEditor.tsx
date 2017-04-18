@@ -52,7 +52,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               key={n.guid}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
@@ -66,7 +65,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               key={n.guid}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

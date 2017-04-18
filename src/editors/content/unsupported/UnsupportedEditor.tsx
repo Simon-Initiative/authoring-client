@@ -15,10 +15,18 @@ export interface UnsupportedEditorProps extends AbstractContentEditorProps<conte
 
 }
 
-export abstract class UnsupportedEditor extends AbstractContentEditor<contentTypes.Unsupported, UnsupportedEditorProps, {}> {
+export class UnsupportedEditor extends AbstractContentEditor<contentTypes.Unsupported, UnsupportedEditorProps, {}> {
 
   render() : JSX.Element {
     return <div className='editorWrapper'>{JSON.stringify(this.props.model.data)}</div>;
+  }
+
+  shouldComponetUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    
+    return false;
   }
 
 }

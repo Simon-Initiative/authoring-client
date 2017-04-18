@@ -1,6 +1,5 @@
-'use strict'
-
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -24,15 +23,11 @@ export interface HintEditor {
 
 export interface HintEditorProps extends AbstractContentEditorProps<contentTypes.Hint> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface HintEditorState {
 
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 
   targets: string;
 }
@@ -47,7 +42,7 @@ export class HintEditor
     super(props);
 
     this.state = {
-      editHistory: [],
+      editHistory: Immutable.List<AuthoringActions>(),
       targets: this.props.model.targets
     };
     this.ids = {
@@ -59,8 +54,18 @@ export class HintEditor
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
+  }
+
+  shouldComponetUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextState.editHistory !== this.state.editHistory) {
+      return true;
+    }
+    return false;
   }
 
   onBodyEdit(body) {
@@ -114,7 +119,6 @@ export class HintEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

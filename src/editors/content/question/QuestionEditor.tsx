@@ -1,6 +1,7 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -27,15 +28,11 @@ export interface QuestionEditor {
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface QuestionEditorState {
 
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 
   id: string;
 }
@@ -50,7 +47,7 @@ export abstract class QuestionEditor
     super(props);
 
     this.state = {
-      editHistory: [],
+      editHistory: Immutable.List<AuthoringActions>(),
       id: this.props.model.id
     };
 
@@ -68,7 +65,7 @@ export abstract class QuestionEditor
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
@@ -208,7 +205,6 @@ export abstract class QuestionEditor
                   editorStyles={bodyStyle}
                   inlineToolbar={inlineToolbar}
                   blockToolbar={blockToolbar}
-                  activeSubEditorKey={this.props.activeSubEditorKey}
                   onEditModeChange={this.props.onEditModeChange}
                   editMode={this.props.editMode}
                   services={this.props.services}

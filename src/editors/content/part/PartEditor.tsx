@@ -1,6 +1,5 @@
-'use strict'
-
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -30,15 +29,11 @@ export interface PartEditor {
 
 export interface PartEditorProps extends AbstractContentEditorProps<contentTypes.Part> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface PartEditorState {
   
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
   correct: string;
   scoreOutOf: string;
   targets: string;
@@ -54,7 +49,7 @@ export abstract class PartEditor
     super(props);
 
     this.state = {
-      editHistory: [],
+      editHistory: Immutable.List<AuthoringActions>(),
       correct: this.props.model.correct,
       scoreOutOf: this.props.model.scoreOutOf,
       targets: this.props.model.targets
@@ -76,7 +71,7 @@ export abstract class PartEditor
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
@@ -190,7 +185,6 @@ export abstract class PartEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

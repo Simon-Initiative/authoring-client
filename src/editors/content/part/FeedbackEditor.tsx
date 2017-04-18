@@ -1,6 +1,5 @@
-'use strict'
-
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -29,7 +28,7 @@ export interface FeedbackEditorProps extends AbstractContentEditorProps<contentT
 
 export interface FeedbackEditorState {
 
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 
   targets: string;
 }
@@ -44,7 +43,7 @@ export class FeedbackEditor
     super(props);
 
     this.state = {
-      editHistory: [],
+      editHistory: Immutable.List<AuthoringActions>(),
       targets: this.props.model.targets
     };
     this.ids = {
@@ -56,8 +55,18 @@ export class FeedbackEditor
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
+  }
+
+  shouldComponetUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextState.editHistory !== this.state.editHistory) {
+      return true;
+    }
+    return false;
   }
 
   onBodyEdit(body) {
@@ -111,7 +120,6 @@ export class FeedbackEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey=''
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

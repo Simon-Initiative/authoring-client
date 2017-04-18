@@ -1,6 +1,6 @@
-'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -24,15 +24,11 @@ export interface ContentEditor {
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface ContentEditorState {
 
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 }
 
 /**
@@ -45,7 +41,7 @@ export class ContentEditor
     super(props);
 
     this.state = {
-      editHistory: []
+      editHistory: Immutable.List<AuthoringActions>()
     };
     this.ids = {
       availability: guid()
@@ -56,7 +52,7 @@ export class ContentEditor
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
@@ -68,6 +64,16 @@ export class ContentEditor
   onAvailability(e) {
     console.log(e.target.value);
     this.props.onEdit(this.props.model.with({availability: e.target.value}));
+  }
+
+  shouldComponetUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextState.editHistory !== this.state.editHistory) {
+      return true;
+    }
+    return false;
   }
 
   render() : JSX.Element {
@@ -107,7 +113,6 @@ export class ContentEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

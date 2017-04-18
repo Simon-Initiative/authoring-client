@@ -1,6 +1,6 @@
-'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
@@ -25,15 +25,11 @@ export interface Choice {
 
 export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface ChoiceState {
 
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 
   value: string;
 }
@@ -48,7 +44,7 @@ export class Choice
     super(props);
 
     this.state = {
-      editHistory: [],
+      editHistory: Immutable.List<AuthoringActions>(),
       value: this.props.model.value
     };
     this.ids = {
@@ -62,7 +58,7 @@ export class Choice
 
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
@@ -117,7 +113,6 @@ export class Choice
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
