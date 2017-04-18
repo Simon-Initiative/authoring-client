@@ -45,7 +45,6 @@ it('AssessmentModel', () => {
   const blocks = question.body.contentState.getBlocksAsArray();
   expect(blocks.length).toBe(1);
   expect(blocks[0].getText()).toBe('This is a multiple choice question');
-  expect(blocks[1].getText()).toBe(' ');
 
   const items = question.items.toArray();
   expect(items.length).toBe(1);
