@@ -8,7 +8,7 @@ import { Choice } from './Choice';
 
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
-import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
+import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 
 import '../common/editor.scss';
@@ -178,24 +178,24 @@ export class MultipleChoice
       borderColor: '#AAAAAA'
     }
 
+    const expanded = (
+      <div style={{display: 'inline'}}>
+        <Button type='link' onClick={this.onAddChoice}>Add Choice</Button>
+        <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+      </div>);
+
     return (
-      <div className='itemWrapper'>
-
-        <InlineForm position='right'>
-          <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
-          <Button onClick={this.onAddChoice}>Add Choice</Button>
-        </InlineForm>
-
-        {this.renderChoices()}
-
+      <div>
+        <Collapse caption='Choices' expanded={expanded}>
+          {this.renderChoices()}
+        </Collapse>
         <Hints
-          context={this.props.context}
-          services={this.props.services}
-          model={this.props.partModel}
-          editMode={this.props.editMode}
-          onEdit={this.onHintsEdit}
-        />
-
+            context={this.props.context}
+            services={this.props.services}
+            model={this.props.partModel}
+            editMode={this.props.editMode}
+            onEdit={this.onHintsEdit}
+          />
       </div>);
   }
 

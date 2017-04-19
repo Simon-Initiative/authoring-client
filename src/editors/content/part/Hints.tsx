@@ -67,16 +67,12 @@ export abstract class Hints
 
   render() : JSX.Element {
 
-    const expanded = (
-      <InlineForm position='right'>
-        <Button onClick={this.onAddHint}>Add Hint</Button>
-      </InlineForm>
-    );
-
+    const expanded = 
+        <Button type='link' onClick={this.onAddHint}>Add Hint</Button>;
+      
     return (
       <Collapse 
         caption='Hints' 
-        details='Expand to edit the hints'
         expanded={expanded}>
 
         {this.renderHints()}

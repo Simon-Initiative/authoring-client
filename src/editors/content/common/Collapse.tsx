@@ -47,6 +47,7 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
 
     return (
       <div>
+        
         <button onClick={this.onClick} type="button" className="btn btn-link">{this.props.caption} {indicator}</button>
         {detailsOrExpanded}
         <div className={collapsedOrNot} id={this.id}>

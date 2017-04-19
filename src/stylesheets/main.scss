@@ -23,7 +23,28 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	&.serif {
 		font-family: $serif-font;
 	}
+
+	&.focus {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
+
+	&.active {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
 }
+
+.btn-link.focus {
+	box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+}
+
+.btn-link.active {
+	box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+}
+
 
 // Header
 .navbar{ 

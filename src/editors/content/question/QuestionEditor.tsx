@@ -152,19 +152,16 @@ export abstract class QuestionEditor
       borderColor: '#AAAAAA'
     }
 
-    const questionToolbar = (
-      <InlineForm position='right'>
-        <Button onClick={this.onAddItemPart}>Add Part</Button>
-    </InlineForm>);
-    
+    const expanded = 
+        <Button type='link' onClick={this.onAddItemPart}>Add Item/Part</Button>;
+
     return (
     
-
-      <div className="editorWrapper">
-
         <Collapse caption='Question' 
           details={getHtmlDetails(this.props.model.body)}
-          expanded={questionToolbar}>
+          expanded={expanded}>
+
+          <div className='questionWrapper'>
 
           <HtmlContentEditor 
                 context={this.props.context}
@@ -190,9 +187,9 @@ export abstract class QuestionEditor
 
           {this.renderItemsAndParts()}
 
-        </Collapse>
+          </div>
 
-      </div>);
+        </Collapse>);
   }
 
 }

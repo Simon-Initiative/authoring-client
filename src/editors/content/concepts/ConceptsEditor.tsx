@@ -60,14 +60,11 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
 
   render() : JSX.Element {
 
-    const expanded = (
-      <InlineForm position='right'>
-        <Button onClick={this.onAddConcept}>Add Skill</Button>
-      </InlineForm>
-    );
+    const expanded = 
+        <Button type='link' onClick={this.onAddConcept}>Add Skill</Button>;
 
     return (
-      <Collapse caption='Skills' details='Expand to add/remove skills' expanded={expanded}>
+      <Collapse caption='Skills' expanded={expanded}>
         <div className='ConceptWell'>
           {this.renderConcepts()}
         </div>
