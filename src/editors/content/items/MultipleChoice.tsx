@@ -10,6 +10,7 @@ import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/A
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { Choice } from './Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
+import { TextInput, InlineForm, Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
@@ -114,15 +115,29 @@ export class MultipleChoice
               />;
   }
 
+  onScoreEdit(response: contentTypes.Response, score: string) {
+    response = response.with({score});
+    const partModel = this.props.partModel.with({responses: this.props.partModel.responses.set(response.guid, response)});
+    this.props.onEdit(this.props.itemModel, partModel);
+  }
+
   renderFeedback(response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    return <FeedbackEditor 
-              key={feedback.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={feedback}
-              onEdit={this.onFeedbackEdit.bind(this, response)} 
-              />
+    return (
+      <FeedbackEditor 
+        key={feedback.guid}
+        editMode={this.props.editMode}
+        services={this.props.services}
+        context={this.props.context}
+        model={feedback}
+        onEdit={this.onFeedbackEdit.bind(this, response)} 
+        />);
+  }
+
+  onRemoveChoice(choice, response) {
+    let itemModel = this.props.itemModel.with({choices: this.props.itemModel.choices.delete(choice.guid) });
+    let partModel = this.props.partModel.with({responses: this.props.partModel.responses.delete(response.guid)});
+
+    this.props.onEdit(itemModel, partModel);
   }
 
   renderChoices() {
@@ -148,6 +163,11 @@ export class MultipleChoice
         <ChoiceFeedback key={c.guid}>
           {this.renderChoice(c)}
           {renderedFeedback}
+          <InlineForm>
+            <Button onClick={this.onRemoveChoice.bind(this, c, responses[i])}>Remove</Button>
+            <TextInput label='Score' value={responses[i].score} type='number' width='75px'
+                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
+          </InlineForm>
         </ChoiceFeedback>);
     }
 
@@ -171,8 +191,7 @@ export class MultipleChoice
               <input type="checkbox" className="form-check-input"/>Shuffle
               
             </label>
-           
-           <button onClick={this.onAddChoice} type="button" className="btn btn-sm btn-primary">Add Choice</button>
+           <Button onClick={this.onAddChoice}>Add Choice</Button>
         </form>
 
         {this.renderChoices()}

@@ -77,7 +77,7 @@ export class Choice
     return (
       <div className='editorWrapper'>
 
-        <InputLabel label="Choice" style="primary">
+        <InputLabel label="Choice" style="default">
           <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
