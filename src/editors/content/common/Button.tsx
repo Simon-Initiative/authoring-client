@@ -1,6 +1,11 @@
 import * as React from 'react';
 
-export const Button = (props) => {
+export type ButtonProps = {
+  children?: any;
+  onClick: () => void;
+}
+
+export const Button = (props: ButtonProps) => {
   return (
     <button 
       onClick={props.onClick} 

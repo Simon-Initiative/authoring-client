@@ -8,6 +8,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { Concept } from './Concept';
 import { SkillSelection } from '../../../utils/selection/SkillSelection';
 import { Collapse } from '../common/Collapse';
+import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 
 export interface ConceptsEditor {
 
@@ -22,6 +23,10 @@ export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutabl
 export interface ConceptstEditorState {
 
 }
+
+
+const Spacer = (props) => <span>&nbsp;&nbsp;</span>; // There is probably a better way...
+
 
 /**
  * Concepts editor 
@@ -41,19 +46,24 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
 
   renderConcepts() {
     return this.props.model.toArray()
-      .map(c => <Concept key={c} titleOracle={this.props.services.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
+      .map(c => <Concept key={'concept' + c} titleOracle={this.props.services.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
+      .map((c, i) => [c, <Spacer key={i}/>])
+      .reduce((p, c) => p.concat(c), []);
   }
 
   render() : JSX.Element {
+
+    const expanded = (
+      <InlineForm position='right'>
+        <Button onClick={this.onAddConcept}>Add Skill</Button>
+      </InlineForm>
+    );
+
     return (
-      <Collapse caption='Skills' details='Expand to add/remove skills'>
-        <div className="card">
-          <div className="card-block">
-            {this.renderConcepts()}
-          </div>
+      <Collapse caption='Skills' details='Expand to add/remove skills' expanded={expanded}>
+        <div className='ConceptWell'>
+          {this.renderConcepts()}
         </div>
-        <button onClick={this.onAddConcept} type="button" className="btn btn-sm btn-primary">Add Skill</button>
-          
       </Collapse>);
   
   }

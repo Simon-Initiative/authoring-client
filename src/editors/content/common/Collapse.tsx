@@ -8,6 +8,7 @@ export interface Collapse {
 export interface CollapseProps {
   caption: string;
   details?: string;
+  expanded?: any; // Component to display in place of details when expanded
 }
 
 export interface CollapseState {
@@ -35,9 +36,11 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
   render() {
 
     const collapsedOrNot = this.state.collapsed ? 'collapse' : 'collapse.show';
-    let detailsLabel = null;
+    let detailsOrExpanded = null;
     if (this.props.details !== undefined && this.state.collapsed) {
-      detailsLabel = this.props.details;
+      detailsOrExpanded = this.props.details;
+    } else if (this.props.expanded !== undefined && !this.state.collapsed) {
+      detailsOrExpanded = this.props.expanded;
     }
 
     const indicator = this.state.collapsed ? '+' : '-';
@@ -45,7 +48,7 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
     return (
       <div>
         <button onClick={this.onClick} type="button" className="btn btn-link">{this.props.caption} {indicator}</button>
-        {detailsLabel}
+        {detailsOrExpanded}
         <div className={collapsedOrNot} id={this.id}>
           {this.props.children}
         </div>

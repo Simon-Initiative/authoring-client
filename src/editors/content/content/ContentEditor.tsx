@@ -11,7 +11,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
-
+import { TextInput, InlineForm, Button, Checkbox, Select } from '../common/controls';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 
@@ -98,19 +98,23 @@ export class ContentEditor
       borderColor: '#AAAAAA'
     }
 
+    const expanded = (
+      <InlineForm position='right'>
+        <Select onChange={this.onAvailability} label='Availability' value={this.props.model.availability}>
+          <option value="always">Always</option>
+          <option value="instructor_only">Instructor Only</option>
+          <option value="feedback_only">Feedback Only</option>
+          <option value="never">Never</option>
+        </Select>
+      </InlineForm>
+    )
+
     return (
-      <Collapse caption='Content' details={getHtmlDetails(this.props.model.body)}>
-        <form className="form-inline">
-
-           <label className="mr-sm-2" htmlFor={this.ids.availability}>Availability</label>
-            <select value={this.props.model.availability} onChange={this.onAvailability} className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={this.ids.availability}>
-              <option value="always">Always</option>
-              <option value="instructor_only">Instructor Only</option>
-              <option value="feedback_only">Feedback Only</option>
-              <option value="never">Never</option>
-            </select>
-        </form>
-
+      <Collapse 
+        caption='Content' 
+        details={getHtmlDetails(this.props.model.body)}
+        expanded={expanded}>
+        
         <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}

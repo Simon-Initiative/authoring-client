@@ -10,7 +10,7 @@ import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/A
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { Choice } from './Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
-import { TextInput, InlineForm, Button } from '../common/controls';
+import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
@@ -140,6 +140,11 @@ export class MultipleChoice
     this.props.onEdit(itemModel, partModel);
   }
 
+  onShuffleEdit(shuffle: boolean) {
+    const itemModel = this.props.itemModel.with({shuffle});
+    this.props.onEdit(itemModel, this.props.partModel);
+  }
+
   renderChoices() {
 
     const responses = this.props.partModel.responses.toArray();
@@ -163,7 +168,7 @@ export class MultipleChoice
         <ChoiceFeedback key={c.guid}>
           {this.renderChoice(c)}
           {renderedFeedback}
-          <InlineForm>
+          <InlineForm position='right'>
             <Button onClick={this.onRemoveChoice.bind(this, c, responses[i])}>Remove</Button>
             <TextInput label='Score' value={responses[i].score} type='number' width='75px'
                 onEdit={this.onScoreEdit.bind(this, responses[i])}/>
@@ -186,13 +191,10 @@ export class MultipleChoice
     return (
       <div className='itemWrapper'>
 
-        <form className="form-inline">
-           <label className="form-check-label">
-              <input type="checkbox" className="form-check-input"/>Shuffle
-              
-            </label>
-           <Button onClick={this.onAddChoice}>Add Choice</Button>
-        </form>
+        <InlineForm position='right'>
+          <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+          <Button onClick={this.onAddChoice}>Add Choice</Button>
+        </InlineForm>
 
         {this.renderChoices()}
 

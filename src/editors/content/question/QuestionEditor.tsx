@@ -19,6 +19,7 @@ import { getHtmlDetails } from '../common/details';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
+import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 
 type Ids = {
   id: string
@@ -150,19 +151,21 @@ export abstract class QuestionEditor
       borderWith: '1px',
       borderColor: '#AAAAAA'
     }
+
+    const questionToolbar = (
+      <InlineForm position='right'>
+        <Button onClick={this.onAddItemPart}>Add Part</Button>
+    </InlineForm>);
     
     return (
     
 
       <div className="editorWrapper">
 
-        <Collapse caption='Question' details={getHtmlDetails(this.props.model.body)}>
+        <Collapse caption='Question' 
+          details={getHtmlDetails(this.props.model.body)}
+          expanded={questionToolbar}>
 
-          <form className="form-inline">
-            <button onClick={this.onAddItemPart} type="button" className="btn btn-sm btn-primary">Add Item/Part</button>
-          </form>
-
-          <div><b>Body</b></div>
           <HtmlContentEditor 
                 context={this.props.context}
                 editorStyles={bodyStyle}
