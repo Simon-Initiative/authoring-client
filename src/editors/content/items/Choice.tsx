@@ -77,7 +77,7 @@ export class Choice
     return (
       <div className='editorWrapper'>
 
-        <InputLabel label="Choice">
+        <InputLabel label="Choice" style="primary">
           <HtmlContentEditor 
               titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}

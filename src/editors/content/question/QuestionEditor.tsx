@@ -162,12 +162,7 @@ export abstract class QuestionEditor
         <Collapse caption='Question' details={getHtmlDetails(this.props.model.body)}>
 
           <form className="form-inline">
-           
-            <label htmlFor={this.ids.id} className="col-2 col-form-label">Id</label>
-            <input onChange={this.onIdEdit} className="form-control form-control-sm" type="text" value={this.state.id} id={this.ids.id}/>
-
             <button onClick={this.onAddItemPart} type="button" className="btn btn-sm btn-primary">Add Item/Part</button>
-            
           </form>
 
           <div><b>Body</b></div>

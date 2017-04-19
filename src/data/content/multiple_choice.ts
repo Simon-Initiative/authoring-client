@@ -21,7 +21,7 @@ const defaultContent = {
   id: '',
   name: '',
   labels: false,
-  select: 1,
+  select: 'single',
   shuffle: true,
   guid: '',
   contentType: 'MultipleChoice'
@@ -34,7 +34,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
   id : string;
   name : string;
   labels : boolean;
-  select : number;
+  select : string;
   shuffle : boolean;
   guid: string;
   
@@ -91,7 +91,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
     return {
       "multiple_choice": {
         "@shuffle": this.shuffle ? 'true': 'false',
-        "@select": this.select,
+        "@select": 'single',
         "@id": this.id,
         "@name": this.name,
         "@labels": this.labels ? 'true' : 'false',

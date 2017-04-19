@@ -10,15 +10,13 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import { InputLabel } from '../common/InputLabel';
 
 import '../common/editor.scss';
 
-type IdTypes = {
-  targets: string
-}
 
 export interface FeedbackEditor {
-  ids: IdTypes;
+  
 }
 
 export interface FeedbackEditorProps extends AbstractContentEditorProps<contentTypes.Feedback> {
@@ -30,7 +28,6 @@ export interface FeedbackEditorState {
 
   editHistory: Immutable.List<AuthoringActions>;
 
-  targets: string;
 }
 
 /**
@@ -43,14 +40,9 @@ export class FeedbackEditor
     super(props);
 
     this.state = {
-      editHistory: Immutable.List<AuthoringActions>(),
-      targets: this.props.model.targets
+      editHistory: Immutable.List<AuthoringActions>()
     };
-    this.ids = {
-      targets: guid()
-    }
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onTargetChange = this.onTargetChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -74,16 +66,6 @@ export class FeedbackEditor
     this.props.onEdit(concept);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({ targets: nextProps.model.targets});
-  }
-
-  onTargetChange(e) {
-    const targets = e.target.value;
-    this.setState({ targets }, () => 
-      this.props.onEdit(this.props.model.with({targets })));
-  }
-
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
@@ -97,25 +79,14 @@ export class FeedbackEditor
                 actionHandler={this} />;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '20px',
       borderStyle: 'none',
       borderWith: 1,
       borderColor: '#AAAAAA'
     }
 
-    const style = {
-      width: '80px'
-    }
-
     return (
-      <div className='itemWrapper'>
-
-        <form className="form-inline">
-           <div><b>Feedback</b></div>
-           &nbsp;&nbsp;&nbsp;&nbsp;Targets&nbsp;&nbsp;
-           <input style={style} onChange={this.onTargetChange} className="form-control form-control-sm" type="text" value={this.state.targets} id={this.ids.targets}/>
-        </form>
-
+      <InputLabel label="Feedback" style="default">
         <HtmlContentEditor 
               titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
@@ -131,8 +102,7 @@ export class FeedbackEditor
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
               editingAllowed={this.props.editingAllowed}/>
-
-      </div>);
+      </InputLabel>);
   }
 
 }
