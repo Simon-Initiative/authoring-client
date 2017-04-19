@@ -105,46 +105,38 @@ export abstract class PartEditor
   renderResponses() {
     return this.props.model.responses.toArray().map(i => {
       return <ResponseEditor
-              titleOracle={this.props.titleOracle}
               key={i.guid}
-              documentId={this.props.documentId}
-              courseId={this.props.courseId}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               model={i}
               onEdit={this.onResponseEdit} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
     });
   }
 
   renderHints() {
     return this.props.model.hints.toArray().map(i => {
       return <HintEditor
-              titleOracle={this.props.titleOracle}
+              context={this.props.context}
               key={i.guid}
-              documentId={this.props.documentId}
-              courseId={this.props.courseId}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
               model={i}
               onEdit={this.onHintEdit} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
     });
   }
 
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.courseId} 
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
-                courseId={this.props.courseId} 
+                documentId={this.props.context.documentId}
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -184,20 +176,15 @@ export abstract class PartEditor
 
         <div>Explanation</div>
         <HtmlContentEditor 
-              titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              courseId={this.props.courseId}
-              documentId={this.props.documentId}
-              userId={this.props.userId}
               editHistory={this.state.editHistory}
               model={this.props.model.explanation}
               onEdit={this.onExplanationEdit} 
-              editingAllowed={this.props.editingAllowed}
+              context={this.props.context}
               />
 
       </div>);

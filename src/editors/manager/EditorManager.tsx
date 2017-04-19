@@ -30,9 +30,6 @@ interface EditorManager {
 
   _onEdit: (model : models.ContentModel) => void;
 
-  _onEditModeChange: (blockKey: string, mode: boolean) => void;
-
-  titleOracle: TitleOracle;
 
 }
 
@@ -69,9 +66,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this.componentDidUnmount = false;
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);
-    this._onEditModeChange = this.onEditModeChange.bind(this);
-    this.titleOracle = new MockTitleOracle();
-
+    
     this.onSaveCompleted = (doc: persistence.Document) => {
   
       if (!this.componentDidUnmount) {
@@ -91,13 +86,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this.setState({ document: doc}, () => this.persistenceStrategy.save(doc));
   }
 
-  onEditModeChange(blockKey: string, editMode: boolean) {
-    if (editMode) {
-      this.setState({activeSubEditorKey: blockKey, editMode: false});
-    } else {
-      this.setState({activeSubEditorKey: null, editMode: true});
-    }
-  }
 
   initPersistence(document: persistence.Document) {
 
@@ -201,16 +189,19 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     if (this.state.document === null || this.state.editingAllowed === null) {
       return null;
     } else {
+
+      let courseId = (this.state.document.model as any).courseId === undefined ? null : (this.state.document.model as any).courseId;
+
       const childProps : AbstractEditorProps<any> = {
         model : this.state.document.model,
-        documentId: this.props.documentId,
+        context: { 
+          documentId: this.props.documentId, 
+          userId: this.props.userId,
+          courseId: courseId
+        },
         onEdit: this._onEdit,
-        userId: this.props.userId,
-        editingAllowed: this.state.editingAllowed,
         services: this.props.services,
-        editMode: this.state.editMode,
-        onEditModeChange: this._onEditModeChange,
-        titleOracle: this.titleOracle
+        editMode: this.state.editMode
       }
       
       const registeredEditor = lookUpByName(this.state.document.model.modelType);

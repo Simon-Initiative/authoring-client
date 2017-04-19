@@ -50,58 +50,42 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (n.contentType === 'Question') {
       return <QuestionEditor
               key={n.guid}
-              titleOracle={this.props.titleOracle}
-              documentId={this.props.documentId}
-              courseId={this.props.model.courseId}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               model={n}
               onEdit={(c) => this.onEdit(n.guid, c)} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
               
     } else if (n.contentType === 'Content') {
       return <ContentEditor
               key={n.guid}
-              titleOracle={this.props.titleOracle}
-              documentId={this.props.documentId}
-              courseId={this.props.model.courseId}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               model={n}
               onEdit={(c) => this.onEdit(n.guid, c)} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
     } else {
       return <UnsupportedEditor
               key={n.guid}
-              titleOracle={this.props.titleOracle}
-              documentId={this.props.documentId}
-              courseId={this.props.model.courseId}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               model={n}
               onEdit={(c) => this.onEdit(n.guid, c)} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
     }
   }
 
   renderTitle() {
       return <TitleContentEditor 
             services={this.props.services}
-            titleOracle={this.props.titleOracle}
-            userId={this.props.userId}
-            documentId={this.props.documentId}
-            courseId={this.props.model.courseId}
-            onEditModeChange={this.props.onEditModeChange}
+            context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.title}
             onEdit={this.onTitleEdit} 
-            editingAllowed={this.props.editingAllowed}/>
+            />
   }
 
   onAddContent() {

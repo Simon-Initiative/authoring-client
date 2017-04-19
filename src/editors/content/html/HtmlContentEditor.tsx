@@ -41,7 +41,6 @@ export class HtmlContentEditor
   constructor(props) {
     super(props);
 
-
     this._onChange = this.onChange.bind(this);
     this.container = null; 
   }
@@ -74,12 +73,11 @@ export class HtmlContentEditor
             inlineToolbar={this.props.inlineToolbar}
             blockToolbar={this.props.blockToolbar}
             onSelectionChange={this.onSelectionChange.bind(this)}
-            onEditModeChange={this.props.onEditModeChange}
             services={this.props.services}
-            userId={this.props.userId}
+            context={this.props.context}
             editHistory={this.props.editHistory} 
             content={this.props.model} 
-            locked={!this.props.editingAllowed || !this.props.editMode}
+            locked={!this.props.editMode}
             onEdit={this._onChange} />
         
       </div>);

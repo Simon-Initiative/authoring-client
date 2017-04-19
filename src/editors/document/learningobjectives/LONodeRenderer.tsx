@@ -407,6 +407,7 @@ class LONodeRenderer extends Component <any, any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
+        const context = { userId: null, documentId: null, courseId: null};
 
         return (
             <div style={{ height: '100%' }} {...otherProps}>
@@ -434,16 +435,12 @@ class LONodeRenderer extends Component <any, any>
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
                                  <TitleContentEditor 
-                                   titleOracle={null}
-                                   courseId=''
-                                   documentId=''
                                    services={services}
-                                   userId=''
-                                   onEditModeChange={this.props.onEditModeChange}
                                    editMode={true}
                                    model={titleObj}
+                                   context={context}
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
-                                   editingAllowed={true} />
+                                   />
                                </div>
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
                                <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>

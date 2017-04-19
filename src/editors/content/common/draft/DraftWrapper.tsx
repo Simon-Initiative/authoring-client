@@ -11,6 +11,7 @@ import { determineChangeType, SelectionChangeType } from './utils';
 import { BlockProps } from './renderers/properties';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
+import { AppContext } from '../../../common/AppContext';
 import * as common from '../../../../data/content/html/common';
 import { Html } from '../../../../data/contentTypes';
 import { EntityTypes } from '../../../../data/content/html/common';
@@ -42,10 +43,9 @@ export interface DraftWrapperProps {
   editHistory: Immutable.List<AuthoringActions>;
   onEdit: (html : Html) => void;
   onSelectionChange: (state: SelectionState) => void;
-  onEditModeChange: (key: string, mode: boolean) => void;
   content: Html;
   locked: boolean;
-  userId: string;
+  context: AppContext;
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
@@ -353,13 +353,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             this.setState({ lockedByBlockRenderer: locked });
           },
           onEditModeChange: (editMode) => {
-            this.props.onEditModeChange(block.getKey(), editMode);
+            //this.props.onEditModeChange(block.getKey(), editMode);
           },
           onEdit: (data) => {
             this.processBlockEdit(block, data);
           },
           services: this.props.services,
-          userId: this.props.userId
+          userId: this.props.context.userId
         }
       };
     }

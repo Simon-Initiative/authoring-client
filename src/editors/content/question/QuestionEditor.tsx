@@ -106,18 +106,14 @@ export abstract class QuestionEditor
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice') {
           return <MultipleChoice
-            titleOracle={this.props.titleOracle}
+            context={this.props.context}
             key={item.guid}
-            documentId={this.props.documentId}
-            courseId={this.props.courseId}
-            onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
             services={this.props.services}
-            userId={this.props.userId}
             itemModel={item}
             partModel={part}
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
-            editingAllowed={this.props.editingAllowed}/>
+            />
     } else {
       // TODO build unsupported part item editor
     }
@@ -138,12 +134,12 @@ export abstract class QuestionEditor
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.courseId} 
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
-                courseId={this.props.courseId} 
+                documentId={this.props.context.documentId}
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -167,32 +163,21 @@ export abstract class QuestionEditor
 
           <div><b>Body</b></div>
           <HtmlContentEditor 
-                titleOracle={this.props.titleOracle}
+                context={this.props.context}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
-                onEditModeChange={this.props.onEditModeChange}
                 editMode={this.props.editMode}
                 services={this.props.services}
-                courseId={this.props.courseId}
-                documentId={this.props.documentId}
-                userId={this.props.userId}
                 editHistory={this.state.editHistory}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
-                editingAllowed={this.props.editingAllowed}
-                
                 />
 
           <ConceptsEditor 
-            titleOracle={this.props.titleOracle}
+            context={this.props.context}
             model={this.props.model.concepts}
-            courseId={this.props.courseId}
-            documentId={this.props.documentId}
-            userId={this.props.userId}
             onEdit={this.onConceptsEdit} 
-            editingAllowed={this.props.editingAllowed}
-            onEditModeChange={this.props.onEditModeChange}
             editMode={this.props.editMode}
             services={this.props.services}
             title='Skills'

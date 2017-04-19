@@ -93,31 +93,23 @@ export class MultipleChoice
   renderChoice(choice: contentTypes.Choice) {
     return <Choice 
               key={choice.guid}
-              titleOracle={this.props.titleOracle}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              courseId={this.props.courseId}
-              documentId={this.props.documentId}
-              userId={this.props.userId}
+              context={this.props.context}
               model={choice}
               onEdit={this.onChoiceEdit} 
-              editingAllowed={this.props.editingAllowed}/>;
+              />;
   }
 
   renderFeedback(response : contentTypes.Response, feedback: contentTypes.Feedback) {
     return <FeedbackEditor 
-              titleOracle={this.props.titleOracle}
               key={feedback.guid}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              courseId={this.props.courseId}
-              documentId={this.props.documentId}
-              userId={this.props.userId}
+              context={this.props.context}
               model={feedback}
               onEdit={this.onFeedbackEdit.bind(this, response)} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
   }
 
   renderChoices() {

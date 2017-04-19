@@ -114,17 +114,13 @@ export class ResponseEditor
     return this.props.model.feedback.toArray().map(c => {
       return (
         <FeedbackEditor 
-              titleOracle={this.props.titleOracle}
+              context={this.props.context}
               key={c.guid}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              courseId={this.props.courseId}
-              documentId={this.props.documentId}
-              userId={this.props.userId}
               model={c}
               onEdit={this.onFeedbackEdit} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
       )
     })
   }

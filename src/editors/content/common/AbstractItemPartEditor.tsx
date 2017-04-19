@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { TitleOracle } from '../../common/TitleOracle';
+import { AppContext } from '../../common/AppContext';
 
 export interface AbstractItemPartEditor<ItemType, P extends AbstractItemPartEditorProps<ItemType>, S extends AbstractItemPartEditorState> {
   
@@ -19,22 +19,12 @@ export interface AbstractItemPartEditorProps<ItemType> {
 
   onEdit: (item: ItemType, part: contentTypes.Part) => void;
 
-  userId: string;
-
-  courseId: string;
-
-  documentId: string;
-
+  context: AppContext;
+  
   services: AppServices;
-
-  // Whether or not editing is allowed for this user for this content
-  editingAllowed : boolean;
-
+  
   editMode: boolean;
 
-  onEditModeChange: (blockKey: string, mode: boolean) => void;
-
-  titleOracle: TitleOracle;
 }
 
 export interface AbstractItemPartEditorState {

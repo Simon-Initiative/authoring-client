@@ -37,7 +37,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
   componentDidMount() {
     // Fetch the titles of all current course resources
-    this.fetchTitles(this.props.documentId);
+    this.fetchTitles(this.props.context.documentId);
   }
 
   fetchTitles(id: string) {
@@ -46,7 +46,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.documentId !== nextProps.documentId) {
+    if (this.props.context.documentId !== nextProps.context.documentId) {
       this.fetchTitles(nextProps.documentId);
     }
   }
@@ -65,18 +65,18 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     let resource = null;
     if (type === 'workbook') {
       resource = new models.WorkbookPageModel({
-          courseId: this.props.documentId,
+          courseId: this.props.context.documentId,
           head: new contentTypes.Head({ title: new contentTypes.Title({ text: title}) })
         });
     } else {
       resource = new models.AssessmentModel({
-          courseId: this.props.documentId,
+          courseId: this.props.context.documentId,
           title: new contentTypes.Title({ text: title})
         });
     }
 
     persistence.createDocument(resource)
-      .then(result => this.fetchTitles(this.props.documentId));
+      .then(result => this.fetchTitles(this.props.context.documentId));
   }
 
   renderResources() {

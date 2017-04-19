@@ -65,14 +65,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   render() {
 
-    const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
-    
     const inlineToolbar = <InlineToolbar 
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
+                documentId={this.props.context.documentId}
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
@@ -80,34 +78,25 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div>
           <TitleContentEditor 
-            titleOracle={this.props.titleOracle}
             services={this.props.services}
-            userId={this.props.userId}
-            documentId={this.props.documentId}
-            courseId={this.props.model.courseId}
-            onEditModeChange={this.props.onEditModeChange}
+            context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.head.title}
             onEdit={(c) => this.onEdit('title', c)} 
-            editingAllowed={this.props.editingAllowed}/>
+            />
           
           <HtmlContentEditor 
-              titleOracle={this.props.titleOracle}
-              documentId={this.props.documentId}
-              courseId={this.props.model.courseId}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={(c) => this.onEdit('body', c)} 
-              editingAllowed={this.props.editingAllowed}>
+              />
 
               
-          </HtmlContentEditor>
           
       </div>
     )

@@ -58,12 +58,12 @@ export class Choice
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.courseId} 
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
-                courseId={this.props.courseId} 
+                documentId={this.props.context.documentId}
+                courseId={this.props.context.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -79,20 +79,16 @@ export class Choice
 
         <InputLabel label="Choice" style="primary">
           <HtmlContentEditor 
-              titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              courseId={this.props.courseId}
-              documentId={this.props.documentId}
-              userId={this.props.userId}
+              context={this.props.context}
               editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
-              editingAllowed={this.props.editingAllowed}/>
+              />
         </InputLabel>
 
       </div>);

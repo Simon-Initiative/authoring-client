@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import * as models from '../../../data/models';
 import { AppServices } from '../../common/AppServices';
+import { AppContext } from '../../common/AppContext';
 import { TitleOracle } from '../../common/TitleOracle';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState> {
@@ -16,22 +17,11 @@ export interface AbstractContentEditorProps<ModelType> {
 
   onEdit: (updated: ModelType) => void;
 
-  userId: string;
-
-  courseId: string;
-
-  documentId: string;
+  context: AppContext;
 
   services: AppServices;
 
-  // Whether or not editing is allowed for this user for this content
-  editingAllowed : boolean;
-
   editMode: boolean;
-
-  onEditModeChange: (blockKey: string, mode: boolean) => void;
-
-  titleOracle: TitleOracle;
 }
 
 export interface AbstractContentEditorState {

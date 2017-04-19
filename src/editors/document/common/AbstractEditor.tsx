@@ -6,7 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as types from '../../../data/types';
 import { AppServices } from '../../common/AppServices';
-import { TitleOracle } from '../../common/TitleOracle';
+import { AppContext } from '../../common/AppContext';
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
@@ -14,26 +14,18 @@ export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelTy
 
 export interface AbstractEditorProps<ModelType> {
 
-  // Id of the current user
-  userId: string;
-
   // The initial document model passed into the editor.
   model: ModelType;
 
-  // The document id that the model pertains to. 
-  documentId: types.DocumentId;
-
+  // Handles edits to the model
   onEdit: (model: ModelType) => void;  
-
-  editingAllowed : boolean;
 
   services: AppServices;
 
-  onEditModeChange: (blockKey: string, mode: boolean) => void;
-
+  context: AppContext;
+  
   editMode: boolean;
 
-  titleOracle: TitleOracle;
 }
 
 export interface AbstractEditorState {

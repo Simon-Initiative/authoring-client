@@ -41,7 +41,7 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
 
   renderConcepts() {
     return this.props.model.toArray()
-      .map(c => <Concept key={c} titleOracle={this.props.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
+      .map(c => <Concept key={c} titleOracle={this.props.services.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
   }
 
   render() : JSX.Element {
