@@ -33,7 +33,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   hints: Immutable.OrderedMap<string, Hint>(),
   explanation: new Html(),
-  guid: ''
+  guid: createGuid()
 };
 
 export class Part extends Immutable.Record(defaultPartParams) {

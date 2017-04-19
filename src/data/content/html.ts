@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import { ContentState } from 'draft-js';
 import { toPersistence } from './html/topersistence';
 import { toDraft } from './html/todraft';
+import createGuid from '../../utils/guid';
 
 const emptyContent = ContentState.createFromText('');
 
@@ -14,7 +15,7 @@ export type HtmlParams = {
 const defaultHtmlParams = {
   contentType: 'Html',
   contentState: emptyContent,
-  guid: ''
+  guid: createGuid()
 };
 
 export class Html extends Immutable.Record(defaultHtmlParams) {

@@ -16,7 +16,7 @@ const defaultContent = {
   value: '',
   color: '',
   body: new Html(),
-  guid: ''
+  guid: createGuid()
 }
 
 export class Choice extends Immutable.Record(defaultContent) {

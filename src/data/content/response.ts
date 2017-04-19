@@ -23,7 +23,7 @@ const defaultContent = {
   match : '',
   score : '',
   name : '',
-  guid: '',
+  guid: createGuid(),
   contentType: 'Response'
 }
 

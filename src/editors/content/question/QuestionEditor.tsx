@@ -81,7 +81,7 @@ export abstract class QuestionEditor
 
   onItemPartEdit(item, part) {
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
-    model = this.props.model.with({parts: this.props.model.parts.set(part.guid, part)});
+    model = model.with({parts: model.parts.set(part.guid, part)});
     this.props.onEdit(model);
   }
 
@@ -94,11 +94,12 @@ export abstract class QuestionEditor
   onAddItemPart() {
     let item = new contentTypes.MultipleChoice();
     item = item.with({guid: guid()});
+
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
 
     let part = new contentTypes.Part();
     part = part.with({guid: guid()});
-    model = this.props.model.with({parts: this.props.model.parts.set(part.guid, part) });
+    model = model.with({parts: model.parts.set(part.guid, part) });
 
     this.props.onEdit(model);
   }

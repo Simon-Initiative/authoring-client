@@ -31,6 +31,7 @@ interface DraftWrapper {
   focus: () => any; 
   handleKeyCommand: any;
   lastSelectionState: SelectionState;
+  lastContent: ContentState;
   container: any;
   _onKeyDown: () => void;
   _onKeyUp: () => void;
@@ -210,6 +211,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.onBlur = this.onBlur.bind(this);
 
     const contentState = props.content.contentState;
+    this.lastContent = contentState;
 
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
     const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
@@ -235,12 +237,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.handleSelectionChange(changeType, ss);
 
         const content = editorState.getCurrentContent();
-        
-        const html = new Html({ contentState: editorState.getCurrentContent()});
-        this.props.onEdit(html);
+        const contentChange = (content !== this.lastContent);
+        this.lastContent = content;
+
+        if (contentChange) {
+          const html = new Html({ contentState: editorState.getCurrentContent()});
+          this.props.onEdit(html);
+        }
         
         this.setState({editorState});
-        
       }
     };
   }

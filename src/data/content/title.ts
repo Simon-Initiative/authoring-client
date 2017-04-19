@@ -1,11 +1,12 @@
 import * as Immutable from 'immutable';
+import createGuid from '../../utils/guid';
 
 export type TitleParams = {
   text?: string,
   guid?: string;
 };
 
-export class Title extends Immutable.Record({contentType: 'Title', guid: '', text: ''}) {
+export class Title extends Immutable.Record({contentType: 'Title', guid: createGuid(), text: ''}) {
   
   contentType: 'Title';
   text: string;

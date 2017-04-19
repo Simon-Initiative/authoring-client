@@ -11,7 +11,7 @@ export type HeadParams = {
 
 const defaultContent = {
   contentType: 'Head', 
-  guid: '', 
+  guid: createGuid(), 
   title: new Title()
 }
 

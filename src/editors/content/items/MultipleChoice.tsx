@@ -15,6 +15,7 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
 import '../common/editor.scss';
+import './MultipleChoice.scss';
 
 type IdTypes = {
   select: string,
@@ -40,7 +41,11 @@ export interface MultipleChoiceState {
 }
 
 const ChoiceFeedback = (props) => {
-
+  return (
+    <div className='ChoiceFeedback'>
+      {props.children}
+    </div>
+  )
 }
 
 /**
@@ -75,9 +80,17 @@ export class MultipleChoice
   }
 
   onAddChoice() {
-    let content = new contentTypes.Choice();
-    content = content.with({guid: guid()});
-    this.props.onEdit(this.props.itemModel.with({choices: this.props.itemModel.choices.set(content.guid, content) }), this.props.partModel);
+    const value = guid();
+    const match = value; 
+    const choice = new contentTypes.Choice({value});
+    const feedback = new contentTypes.Feedback();
+    let response = new contentTypes.Response({match});
+    response = response.with({feedback: response.feedback.set(feedback.guid, feedback)});
+
+    let itemModel = this.props.itemModel.with({choices: this.props.itemModel.choices.set(choice.guid, choice) });
+    let partModel = this.props.partModel.with({responses: this.props.partModel.responses.set(response.guid, response)});
+
+    this.props.onEdit(itemModel, partModel);
   }
 
   onChoiceEdit(c) {
@@ -132,10 +145,10 @@ export class MultipleChoice
       }
       
       rendered.push(
-        <div>
+        <ChoiceFeedback key={c.guid}>
           {this.renderChoice(c)}
           {renderedFeedback}
-        </div>);
+        </ChoiceFeedback>);
     }
 
     return rendered;

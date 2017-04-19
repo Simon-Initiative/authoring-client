@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Hint',
   targets: '',
   body: new Html(),
-  guid: ''
+  guid: createGuid()
 }
 
 export class Hint extends Immutable.Record(defaultContent) {

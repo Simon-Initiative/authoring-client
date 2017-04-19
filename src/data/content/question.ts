@@ -27,7 +27,7 @@ const defaultQuestionParams = {
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
-  guid: ''
+  guid: createGuid()
 };
 
 export class Question extends Immutable.Record(defaultQuestionParams) {

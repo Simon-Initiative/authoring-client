@@ -23,7 +23,7 @@ const defaultContent = {
   labels: false,
   select: 'single',
   shuffle: true,
-  guid: '',
+  guid: createGuid(),
   contentType: 'MultipleChoice'
 }
 

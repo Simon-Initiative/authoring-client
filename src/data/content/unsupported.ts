@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import createGuid from '../../utils/guid';
 
 export type UnsupportedParams = {
   contentType?: 'Unsupported',
@@ -6,7 +7,7 @@ export type UnsupportedParams = {
   guid: string
 };
 
-export class Unsupported extends Immutable.Record({contentType: 'Unsupported', guid: '', data: {}}) {
+export class Unsupported extends Immutable.Record({contentType: 'Unsupported', guid: createGuid(), data: {}}) {
   
   contentType: 'Unsupported';
   data: Object;

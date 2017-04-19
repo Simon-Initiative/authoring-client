@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Content',
   availability: 'always',
   body: new Html(),
-  guid: ''
+  guid: createGuid()
 }
 
 export class Content extends Immutable.Record(defaultContent) {

@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Feedback',
   targets: '',
   body: new Html(),
-  guid: ''
+  guid: createGuid()
 }
 
 export class Feedback extends Immutable.Record(defaultContent) {
