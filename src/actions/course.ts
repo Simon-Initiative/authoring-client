@@ -33,7 +33,10 @@ export function changeCourse(courseId: string) {
         switch (document.model.modelType) {
 					case models.ModelTypes.CourseModel:
 						const model : models.CourseModel = document.model;
-						dispatch(courseChanged(courseId, model.organizations.get(0), model.learningobjectives.get(0), model.skills.get(0)));
+						dispatch(courseChanged(courseId,
+                                               model.organizations.get(0),
+                                               model.learningobjectives.get(0),
+                                               model.skills.get(0)));
 					default:
 						console.log('unexpected model type');
 				}

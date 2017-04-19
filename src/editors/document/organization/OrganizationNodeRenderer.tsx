@@ -2,7 +2,10 @@ import * as React from 'react';
 import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
-import { removeNodeAtPath } from 'react-sortable-tree';
+import Modal from 'react-modal';
+import * as contentTypes from '../../../data/contentTypes';
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import { AppServices } from '../../common/AppServices';
 
 const styles = {
   orgrowWrapper : {
@@ -270,76 +273,22 @@ const styles = {
   }     
 };
 
-/*
-export interface NRendererState extends AbstractEditorState 
-{
-  treeData : any;
-}
-
-export interface NRendererProps extends AbstractEditorProps<models.CourseModel>
-{
-  deleteFun:function ();    
-}
-*/
-
 /**
  * 
  */
 //class OrganizationNodeRenderer extends Component <NRendererState, NRendererProps> 
 class OrganizationNodeRenderer extends Component <any,any>
 {
-    /*    
-    constructor (props:any) {
-        console.log ("OrganizationNodeRenderer:constructor ()");
-        console.log ("Props: " + props);
-        
-        super(props);
+    deleteNodeFunction:any=null;
+    editNodeTitle:any=null;
 
-        this.state = {
-                        deleteFunc: props.deleteFunc
-                     };
-    }
-    */
-    
-    /*    
-    static propTypes = {
-      node: PropTypes.object.isRequired,
-      path: PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])).isRequired,
-      treeIndex: PropTypes.number.isRequired,
-      isSearchMatch: PropTypes.bool,
-      isSearchFocus: PropTypes.bool,
-      canDrag: PropTypes.bool,
-      scaffoldBlockPxWidth: PropTypes.number.isRequired,
-      toggleChildrenVisibility: PropTypes.func,
-      buttons: PropTypes.arrayOf(PropTypes.node),
-      className: PropTypes.string,
-      style: PropTypes.object,
-      connectDragPreview: PropTypes.func.isRequired,
-      connectDragSource:  PropTypes.func.isRequired,
-      parentNode:         PropTypes.object,          // Needed for drag-and-drop utils
-      startDrag:          PropTypes.func.isRequired, // Needed for drag-and-drop utils
-      endDrag:            PropTypes.func.isRequired, // Needed for drag-and-drop utils
-      isDragging:         PropTypes.bool.isRequired,
-      didDrop:            PropTypes.bool.isRequired,
-      draggedNode:        PropTypes.object,
-      // Drop target
-      isOver:  PropTypes.bool.isRequired,
-      canDrop: PropTypes.bool,
-    };
-    */
-            
-    deleteNode (aNode) : void {
-        console.log ("deleteNode ()");
-        
-        this.state.deleteFunc (aNode);
-    }
-    
     render() {
         
         //console.log ("Styles: " + JSON.stringify (styles));
         
         var {
-            deleteFunc,
+            editNodeTitle,
+            deleteNode,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -365,6 +314,9 @@ class OrganizationNodeRenderer extends Component <any,any>
         } = this.props;
 
         let handle;
+
+        this.editNodeTitle=editNodeTitle;        
+        this.deleteNodeFunction=deleteNode;
 
         canDrag=true;
         
@@ -459,6 +411,18 @@ class OrganizationNodeRenderer extends Component <any,any>
             iStyle ["height"]="0.8rem";
         }
 
+        // If we assign the style directly then React freaks out (or TypeScript it's hard to tell)
+        // and claims that 'bold' isn't a valid option for fontWeight
+        let tStyle:any=styles.orgrowTitle;
+
+        let bStyle:any=styles.orgrowTitle;
+        bStyle ["marginLeft"]="10px";
+
+        //>--------------------------------------------------------------------
+
+        var titleObj=new contentTypes.Title({ text: node.title})
+        const services = ({} as AppServices);
+
         //>--------------------------------------------------------------------
 
         return (
@@ -490,35 +454,20 @@ class OrganizationNodeRenderer extends Component <any,any>
 
                             {handle}
             
-                            <div style={dStyle as any}>
-                                <div style={styles.orgrowLabel as any}>
-                                    <span
-                                        style={iStyle}>
-                                        {typeof node.title === 'function' ?
-                                            node.title({node, path, treeIndex }) :
-                                            node.title
-                                        }
-                                    </span>
-
-                                    {node.subtitle &&
-                                        <span style={styles.orgrowSubtitle as any}>
-                                            {typeof node.subtitle === 'function' ?
-                                                node.subtitle({node, path, treeIndex }) :
-                                                node.subtitle
-                                            }
-                                        </span>
-                                    }
-
-                                   <span className="glyphicon glyphicon-remove" style={{marginLeft: "10px"}}><a href="#" onClick={e => this.deleteNode (e)}>Delete</a></span>
-                                </div>
-
-                                <div style={styles.orgrowToolbar as any}>
-                                    {buttons && buttons.map((btn, index) => (
-                                        <div key={index} style={styles.orgtoolbarButton as any}>
-                                            {btn}
-                                        </div>
-                                    ))}
-                                </div>
+                            <div id="outter" style={dStyle as any}>
+                               <div id="inner" style={tStyle}>
+                                 <TitleContentEditor 
+                                   courseId=''
+                                   documentId=''
+                                   services={services}
+                                   userId=''
+                                   onEditModeChange={this.props.onEditModeChange}
+                                   editMode={true}
+                                   model={titleObj}
+                                   onEdit={(content) => this.editNodeTitle(node,content)} 
+                                   editingAllowed={true} />
+                               </div>
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
                             </div>
                         </div>
                     )}

@@ -1,6 +1,7 @@
 
 import * as Immutable from 'immutable';
 import * as types from '../../../data/types';
+import Linkable from '../../../data/linkable';
 import {Skill} from '../skills/SkillTypes';
 import guid from '../../../utils/guid';
 
@@ -10,22 +11,31 @@ export const LOTypes = types.strEnum([
 
 export type LOTypes = keyof typeof LOTypes;
 
-export class LearningObjective {
+export class LearningObjective extends Linkable {
   orgType:LOTypes=LOTypes.LO;  
-  title:string="unassigned";
-  id:string=guid();    
+  title:string="unassigned";    
   category:string="unassigned";
   children:Array<LearningObjective>;
   skills:Array<string>=new Array (); // only a list of IDs not a list of pointers to skill objects
-        
+      
+  /**
+   * Constructor
+   */     
   constructor() {
+    super ();
     this.children = new Array ();
   }
 
+  /**
+   * 
+   */     
   addNode (aNode: LearningObjective) {
       this.children.push (aNode);
   }
     
+  /**
+   * 
+   */     
   isLeaf ():boolean {
     if (this.children.length==0) {
           return (true);
@@ -35,9 +45,8 @@ export class LearningObjective {
   }
    
   /**
-  * You can only call this if the node is a leaf node, or in other words
-  * an OLI item
-  */  
+   * 
+   */  
   toJSONObject (): Object {
     var ephemeral:Object=new Object ();
       
