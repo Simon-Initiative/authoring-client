@@ -143,7 +143,7 @@ export function createDocument(content: models.ContentModel,
     fetch(`${configuration.baseUrl}/${database}`, {
         method: 'POST',
         headers: getHeaders(credentials),
-        body: JSON.stringify(content.toJS())
+        body: JSON.stringify(content.toPersistence())
       })
     .then(response => {
       if (!response.ok) {
