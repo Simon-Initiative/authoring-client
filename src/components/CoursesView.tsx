@@ -97,7 +97,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
           </div>
         </div>
         <div className="container courseView editor">
-          <h2>Example Courses</h2>
+          <h2>Course Content Packages</h2>
           {rows}  
         </div>
       </div>

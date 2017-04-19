@@ -668,13 +668,13 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
       //console.log ("render()");
           
       return (
-              <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
-                  <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                      <p className="h2" style={tempnavstyle.h2}>Course Content</p>
+              <div>
+                  <div>
+                      <h2 className="h2 organize" style={tempnavstyle.h2}>Course Content</h2>
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                      <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
-                      <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
-                  </nav>
+                      <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
+                      <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                  </div>
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}

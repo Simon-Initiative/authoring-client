@@ -46,11 +46,10 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
     return (
       <form>
         <div className="form-group">
-          <label htmlFor={this.ids.mathEditor}>Edit MathML Expression</label>
           <textarea onChange={this._onChange} className="form-control" id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
         </div>
-        <div className="form-group">
-          <label htmlFor={this.ids.preview}>Preview</label>
+        <div className="form-group mathPreview">
+          <label className="preview" htmlFor={this.ids.preview}>Preview</label>
           <Math inline>{this.state.content}</Math>
         </div>
         

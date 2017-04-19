@@ -1,19 +1,22 @@
 .PulloutSentinel {
-  font-size: 13px;
+	font-size: 11px;
 	font-style: bold;
+	border-bottom: 1px dashed #000;
 	font-variant: normal;
 	font-weight: 400;
 	line-height: 18.5714px;
-  background-color: #000000;
-  color: #FFFFFF;
+    text-transform: uppercase;
+    cursor: pointer;
 }
 
 .SectionSentinel {
-  font-size: 13px;
+    font-size: 11px;
 	font-style: bold;
+	display: block;
+	border-bottom: 1px dashed #000;
 	font-variant: normal;
 	font-weight: 400;
 	line-height: 18.5714px;
-  background-color: #800000;
-  color: #FFFFFF;
+    text-transform: uppercase;
+    cursor: pointer;
 }
