@@ -2,6 +2,7 @@ import * as types from '../../data/types';
 
 import {modalActions} from '../../actions/modal';
 import * as viewActions from '../../actions/view';
+import { TitleOracle, MockTitleOracle } from './TitleOracle';
 
 /**
  * An interface that defines the  'services' that are available to 
@@ -22,14 +23,20 @@ export interface AppServices {
   // Dismiss the modal dialog. 
   dismissModal: () => void;
 
+  // Provides titles for strongly identified items. 
+  titleOracle: TitleOracle;
+
 }
 
 export interface DispatchBasedServices {
   dispatch;
+  titleOrace: TitleOracle;
 }
 
 export class DispatchBasedServices implements AppServices {
   
+  titleOracle = new MockTitleOracle()
+
   constructor(dispatch) {
     this.dispatch = dispatch;
   }

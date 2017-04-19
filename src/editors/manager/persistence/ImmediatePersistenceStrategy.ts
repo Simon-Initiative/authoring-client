@@ -12,8 +12,8 @@ import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
  */
 export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
 
-  save(initialDoc: persistence.Document, changeRequest: models.ChangeRequest) {
-    this.saveDocument(initialDoc, changeRequest, 3, undefined, undefined)
+  save(doc: persistence.Document) {
+    this.saveDocument(doc, 3, undefined, undefined)
       .then(doc => {
         if (this.successCallback !== null) {
           this.successCallback(doc);
@@ -30,14 +30,14 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
    * Attempts to save the document.  Will auto retry a maximum number of times
    * to seamlessly handle conflicts. 
    */
-  saveDocument(initialDoc: persistence.Document, changeRequest: models.ChangeRequest,
+  saveDocument(initialDoc: persistence.Document, 
     remainingRetries: number,
     initialResolve: any, initialReject: any)
     : Promise<persistence.Document> {
 
       return new Promise((resolve, reject) => {
 
-        let toSave = initialDoc.with({ model: changeRequest(initialDoc.model)});
+        let toSave = initialDoc;
 
         persistence.persistDocument(toSave)
           .then(result => {
@@ -49,7 +49,8 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
             } else {
               persistence.retrieveDocument(initialDoc._id)
                 .then(doc => {
-                  this.saveDocument(doc, changeRequest, --remainingRetries,
+                  let updated = toSave.with({_rev: doc._rev});
+                  this.saveDocument(updated, --remainingRetries,
                     initialResolve === undefined ? resolve : initialResolve,
                     initialReject === undefined ? reject : initialReject);
                 })

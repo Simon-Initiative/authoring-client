@@ -5,12 +5,13 @@ import * as React from 'react';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { InlineAssessmentContentEditor } from '../../content/inline/InlineAssessmentContentEditor';
-
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import InlineToolbar from '../workbook/InlineToolbar';
-
+import { QuestionEditor } from '../../content/question/QuestionEditor';
+import { ContentEditor } from '../../content/content/ContentEditor';
+import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
+import { Toolbar } from './Toolbar';
 import * as models from '../../../data/models';
+import * as contentTypes from '../../../data/contentTypes';
+import guid from '../../../utils/guid';
 
 interface AssessmentEditor {
   
@@ -21,83 +22,96 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-  editHistory: AuthoringActions[];
+  
 }
 
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps, 
-  AssessmentEditorState> 
-  implements  AuthoringActionsHandler {
+  AssessmentEditorState>  {
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      editHistory: []
-    };
+    this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onAddContent = this.onAddContent.bind(this);
+    this.onAddQuestion = this.onAddQuestion.bind(this);
   }
 
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: [action, ...this.state.editHistory]
-    });
+  onEdit(guid : string, content : models.Node) {
+    const nodes = this.props.model.nodes.set(guid, content);
+    this.props.onEdit(this.props.model.with({nodes}));
   }
 
-  onEdit(property : string, content : any) {
+  onTitleEdit(content: contentTypes.Title) {
+    this.props.onEdit(this.props.model.with({title: content}));
+  }
 
-    let update = {};
-    update[property] = content;
+  renderNode(n : models.Node) {
+    if (n.contentType === 'Question') {
+      return <QuestionEditor
+              key={n.guid}
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={n}
+              onEdit={(c) => this.onEdit(n.guid, c)} 
+              />
+              
+    } else if (n.contentType === 'Content') {
+      return <ContentEditor
+              key={n.guid}
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={n}
+              onEdit={(c) => this.onEdit(n.guid, c)} 
+              />
+    } else {
+      return <UnsupportedEditor
+              key={n.guid}
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={n}
+              onEdit={(c) => this.onEdit(n.guid, c)} 
+              />
+    }
+  }
 
-    let changeRequest = (model: models.AssessmentModel) => 
-      model.with(update);
-      
-    this.props.onEdit(changeRequest);
+  renderTitle() {
+      return <TitleContentEditor 
+            services={this.props.services}
+            context={this.props.context}
+            editMode={this.props.editMode}
+            model={this.props.model.title}
+            onEdit={this.onTitleEdit} 
+            />
+  }
+
+  onAddContent() {
+    let content = new contentTypes.Content();
+    content = content.with({guid: guid()});
+    this.props.onEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
+  }
+
+  onAddQuestion() {
+    let content = new contentTypes.Question();
+    content = content.with({guid: guid()});
+    this.props.onEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
   }
 
   render() {
-
-    const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
-    const inlineToolbar = <InlineToolbar 
-              courseId={this.props.model.courseId}
-              services={this.props.services} 
-              actionHandler={this} />;
-    const blockToolbar = <InlineToolbar 
-              courseId={this.props.model.courseId}
-              services={this.props.services} 
-              actionHandler={this} />;
-
+    
+    const titleEditor = this.renderTitle();
+    const nodeEditors = this.props.model.nodes.toArray().map(n => this.renderNode(n));
     return (
       <div>
-          <TitleContentEditor 
-            onEditModeChange={this.props.onEditModeChange}
-            editMode={this.props.editMode}
-            content={this.props.model.head}
-            onEdit={(c) => this.onEdit('title', c)} 
-            editingAllowed={this.props.editingAllowed}/>
-          
-          <HtmlContentEditor 
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            activeSubEditorKey={this.props.activeSubEditorKey}
-            onEditModeChange={this.props.onEditModeChange}
-            editMode={this.props.editMode}
-            services={this.props.services}
-            userId={this.props.userId}
-            editHistory={this.state.editHistory}
-            content={this.props.model.context}
-            onEdit={(c) => this.onEdit('context', c)} 
-            editingAllowed={this.props.editingAllowed}>
-          </HtmlContentEditor>
-
-          <InlineAssessmentContentEditor 
-            onEditModeChange={this.props.onEditModeChange}
-            editMode={this.props.editMode}
-            content={this.props.model.assessment}
-            onEdit={(c) => this.onEdit('assessment', c)} 
-            editingAllowed={this.props.editingAllowed}/>
-      </div>
-                
-    )
+        {titleEditor}
+        {nodeEditors}
+        <hr/>
+        <Toolbar onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
+      </div>);
+    
   }
 
 }

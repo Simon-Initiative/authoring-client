@@ -1,149 +1,18 @@
-import * as Immutable from 'immutable';
-import * as types from './types';
+export { Html } from './content/html';
+export { Content } from './content/content';
+export { Title } from './content/title';
+export { Lock } from './content/lock';
+export { Question } from './content/question';
+export { Unsupported } from './content/unsupported';
+export { Part } from './content/part';
+export { Response } from './content/response';
+export { Hint } from './content/hint';
+export { Feedback } from './content/feedback';
+export { MultipleChoice } from './content/multiple_choice';
+export { Choice } from './content/choice';
+export { Head } from './content/head';
 
-export const ContentTypes = types.strEnum([
-  'LockContent',
-  'HtmlContent',
-  'TitleContent',
-  'InlineAssessmentContent'
-])
+import { MultipleChoice } from './content/multiple_choice';
+import { Unsupported } from './content/unsupported';
 
-export type ContentTypes = keyof typeof ContentTypes;
-
-export function createContent(object: any) : ContentType {
-  switch (object.contentType) {
-    case ContentTypes.LockContent: 
-      return new LockContent(object);
-    case ContentTypes.HtmlContent: 
-      return new HtmlContent(object);
-    case ContentTypes.TitleContent: 
-      return new TitleContent(object);
-    case ContentTypes.InlineAssessmentContent:
-      return new InlineAssessmentContent(object);
-  }
-}
-
-export type ContentType =
-  LockContent |
-  HtmlContent |
-  TitleContent |
-  InlineAssessmentContent
-
-
-export type LockContentParams = {
-  lockedBy?: string,
-  lockedAt?: number 
-};
-
-export class LockContent extends Immutable.Record({contentType: 'LockContent', lockedBy: '', lockedAt: 0}) {
-  
-  contentType: 'LockContent';
-  lockedBy: string;
-  lockedAt: number; 
-  
-  constructor(params?: LockContentParams) {
-    params ? super(deserialize(params)) : super();
-  }
-
-  with(values: LockContentParams) {
-    return this.merge(values) as this;
-  }
-}
-
-
-export type TextContent = {
-  '#text': string
-};
-
-export type TitleContentParams = {
-  title?: TextContent
-};
-
-export class TitleContent extends Immutable.Record({contentType: 'TitleContent', title: { '#text': ''}}) {
-  
-  contentType: 'TitleContent';
-  title: TextContent;
-  
-  constructor(params?: TitleContentParams) {
-    params ? super(deserialize(params)) : super();
-  }
-
-  with(values: TitleContentParams) {
-    return this.merge(values) as this;
-  }
-}
-
-export type HtmlContentParams = {
-  body: any
-};
-
-const defaultHtmlContentParams = {
-  body: {
-    "#array": [{
-      "p": {
-        "#text": "Sample text"
-      }
-    }]
-  }
-};
-
-export class HtmlContent extends Immutable.Record(defaultHtmlContentParams) {
-
-  contentType: 'HtmlContent';
-
-  body: any;
-  
-  constructor(params?: HtmlContentParams) {
-    // We do not use the deserielize here only because HtmlContent is still just
-    // a thin wrapper for the Draft.js ContentState object 
-    params ? super(params) : super();
-  }
-
-  with(values: HtmlContentParams) {
-    return this.merge(values) as this;
-  }
-}
-
-export type InlineAssessmentContentParams = {
-  timeLimit?: number,
-  questions?: Immutable.List<types.DocumentId>
-};
-
-export class InlineAssessmentContent extends Immutable.Record({contentType: 'InlineAssessmentContent', timeLimit: 0, questions: Immutable.List<types.DocumentId>()}) {
-
-  contentType: 'InlineAssessmentContent';
-  timeLimit: number;
-  questions: Immutable.List<types.DocumentId>;
-  
-  constructor(params?: InlineAssessmentContentParams) {
-    params ? super(deserialize(params)) : super();
-  }
-
-  with(values: InlineAssessmentContentParams) {
-    return this.merge(values) as this;
-  }
-}
-
-/**
- * Deserialize possible JavaScript primitives back into
- * Immutable primitives or Immutable contentType wrappers
- */
-export function deserialize(object: any) : any {
-  return Object
-    .keys(object)
-    .reduce((o, key) => { 
-
-      if (object[key] instanceof Array) {
-        // TODO handle lists of non JS primitive types
-        o[key] = Immutable.List(object[key]);
-      
-      } else if (object[key].contentType !== undefined
-        && !(object[key] instanceof Immutable.Record)) {
-        o[key] = createContent(object[key]);
-      } else {
-        o[key] = object[key];
-      }
-      return o;
-    }, {});
-}
-
+export type Item = MultipleChoice | Unsupported;

@@ -3,20 +3,25 @@
 import * as React from 'react';
 
 import * as models from '../../../data/models';
+import { AppServices } from '../../common/AppServices';
+import { AppContext } from '../../common/AppContext';
+import { TitleOracle } from '../../common/TitleOracle';
 
-
-export interface AbstractContentEditor<P extends AbstractContentEditorProps, S extends AbstractContentEditorState> {
+export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState> {
   
 }
 
-export interface AbstractContentEditorProps {
+export interface AbstractContentEditorProps<ModelType> {
 
-  // Whether or not editing is allowed for this user for this content
-  editingAllowed : boolean;
+  model: ModelType,
+
+  onEdit: (updated: ModelType) => void;
+
+  context: AppContext;
+
+  services: AppServices;
 
   editMode: boolean;
-
-  onEditModeChange: (blockKey: string, mode: boolean) => void;
 }
 
 export interface AbstractContentEditorState {
@@ -27,14 +32,15 @@ export interface AbstractContentEditorState {
 /**
  * The abstract content editor. 
  */
-export abstract class AbstractContentEditor<P extends AbstractContentEditorProps, S extends AbstractContentEditorState>
+export abstract class AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState>
   extends React.Component<P, S> {
 
   constructor(props) {
     super(props);
   }
 
-
+  // Force concrete classes to implement their own logic
+  abstract shouldComponentUpdate(nextProps, nextState);
 
 }
 

@@ -1,18 +1,17 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import InlineToolbar from './InlineToolbar';
-import BlockToolbar from './BlockToolbar';
+import InlineToolbar from '../../content/html/InlineToolbar';
+import BlockToolbar from '../../content/html//BlockToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
 import * as models from '../../../data/models';
-
-
 
 
 interface WorkbookPageEditor {
@@ -25,7 +24,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   
-  editHistory: AuthoringActions[];
+  editHistory: Immutable.List<AuthoringActions>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -37,41 +36,41 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     super(props);
 
     this.state = {
-      editHistory: []
+      editHistory: Immutable.List<AuthoringActions>()
     };
   }
 
   
   handleAction(action: AuthoringActions) {
     this.setState({
-      editHistory: [action, ...this.state.editHistory]
+      editHistory: this.state.editHistory.insert(0, action)
     });
   }
 
 
   onEdit(property : string, content : any) {
 
-    let update = {};
-    update[property] = content;
+    let model; 
 
-    let changeRequest = (model: models.WorkbookPageModel) => 
-      model.with(update);
+    if (property === 'title') {
+      const head = model.head.with({ title: content});
+      model = this.props.model.with({ head });
+        
+    } else {
+      model = this.props.model.with({ body: content });
+    }
       
-    this.props.onEdit(changeRequest);
+    this.props.onEdit(model);
   }
-
-
 
   render() {
 
-    const locked = this.props.editingAllowed === null || this.props.editingAllowed === false;
-    
     const inlineToolbar = <InlineToolbar 
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.documentId}
+                documentId={this.props.context.documentId}
                 courseId={this.props.model.courseId} 
                 services={this.props.services} 
                 actionHandler={this} />;
@@ -79,27 +78,25 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div>
           <TitleContentEditor 
-            onEditModeChange={this.props.onEditModeChange}
+            services={this.props.services}
+            context={this.props.context}
             editMode={this.props.editMode}
-            content={this.props.model.head}
+            model={this.props.model.head.title}
             onEdit={(c) => this.onEdit('title', c)} 
-            editingAllowed={this.props.editingAllowed}/>
+            />
           
           <HtmlContentEditor 
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              activeSubEditorKey={this.props.activeSubEditorKey}
-              onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}
-              userId={this.props.userId}
+              context={this.props.context}
               editHistory={this.state.editHistory}
-              content={this.props.model.body}
+              model={this.props.model.body}
               onEdit={(c) => this.onEdit('body', c)} 
-              editingAllowed={this.props.editingAllowed}>
+              />
 
               
-          </HtmlContentEditor>
           
       </div>
     )

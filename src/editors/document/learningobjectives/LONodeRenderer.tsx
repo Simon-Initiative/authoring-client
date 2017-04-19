@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 
 import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import { AppServices } from '../../common/AppServices';
 
 const styles = {
     
@@ -404,7 +405,9 @@ class LONodeRenderer extends Component <any, any>
 
         //>--------------------------------------------------------------------
 
-        var titleObj=new contentTypes.TitleContent({ title: {'#text': node.title}})
+        var titleObj=new contentTypes.Title({ text: node.title})
+        const services = ({} as AppServices);
+        const context = { userId: null, documentId: null, courseId: null};
 
         return (
             <div style={{ height: '100%' }} {...otherProps}>
@@ -432,11 +435,12 @@ class LONodeRenderer extends Component <any, any>
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
                                  <TitleContentEditor 
-                                   onEditModeChange={this.props.onEditModeChange}
+                                   services={services}
                                    editMode={true}
-                                   content={titleObj}
+                                   model={titleObj}
+                                   context={context}
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
-                                   editingAllowed={true} />
+                                   />
                                </div>
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
                                <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>

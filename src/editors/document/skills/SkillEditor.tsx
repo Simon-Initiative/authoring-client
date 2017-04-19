@@ -3,6 +3,8 @@ import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
+import { CourseResource, fetchCourseResources } from '../common/resources';
+
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
@@ -34,7 +36,7 @@ interface SkillEditor
 
 export interface SkillEditorState extends AbstractEditorState 
 {
-    treeData : any;  
+    treeData : any;
 }
 
 export interface SkillEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -59,8 +61,6 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         this.state = {
                         treeData: this.processData(skillData)
                     };
-        
-        this.deleteNode = this.deleteNode.bind(new Object());
     }
        
     /**
@@ -72,6 +72,7 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         this.extractData (newData);        
         
         this.setState (newData);
+
     }
     
     /**
@@ -116,13 +117,11 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
      * onChange event. That's why we call extractData manually as the very
      * last function call.
      */
-    addNode (anEvent) {
+    addNode (anEvent:any) {
         console.log ("addNode ()");
         
-        var immutableHelper = this.state.treeData.slice()
+        var immutableHelper = this.state.treeData.slice();
         
-        //var aData=this.state.treeData;
-
         if (immutableHelper==null)
         {
             console.log ("Bump");
@@ -140,30 +139,56 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
 
     deleteNode (aNode:any): void {
         console.log ("SkillEditor:deleteNode ()");
-        //console.log ("Deleting: " + JSON.stringify (aNode));
+            
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                immutableHelper.splice (i,1);
+                break;
+            }
+        }
+        
+        this.setState({treeData: immutableHelper});
     }
     
     editTitle (aNode:any, aTitle:any):void {
-        console.log ("editTitle ()");
+        console.log ("SkillEditor:editTitle ()");
         
         let newTitle=aTitle.title.get ("#text");
+            
+        var immutableHelper = this.state.treeData.slice();
         
-        //console.log ("Changing title for: " + JSON.stringify (aNode));
-        console.log ("New title: " + newTitle);
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+            
+            if (testNode.id==aNode.id) {
+                testNode.title=newTitle;
+                break;
+            }
+        }
         
-        aNode.title=newTitle;
+        this.setState({treeData: immutableHelper});    
     }
     
-    genProps () {
-        console.log ("SkillEditor:genProps ()");
-        
+    genProps () {       
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
-        
-        console.log ("SkillEditor:genProps () all done");
         
         return (optionalProps);
     }

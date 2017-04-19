@@ -3,9 +3,10 @@ import { WorkbookPageModel, ModelTypes } from './models';
 import * as contentTypes from './contentTypes';
 import * as models from './models';
 
-export function initWorkbook(title: string) : WorkbookPageModel {
+export function initWorkbook(titleText: string) : WorkbookPageModel {
+  const title = new contentTypes.Title({ text: titleText});
   return new WorkbookPageModel({
-    head: new contentTypes.TitleContent({ title: {'#text': title}})
+    head: new contentTypes.Head({ title })
   });
 }
 
@@ -24,8 +25,7 @@ export function titlesForCoursesResources(courseId: string) : Object {
     selector: {
       'courseId': {'$eq': courseId},
       'modelType': {'$in': ['WorkbookPageModel', 'AssessmentModel']}
-    },
-    fields: ['_id', 'head', 'modelType']
+    }
   }
 }
 

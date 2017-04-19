@@ -1,10 +1,8 @@
 import * as Immutable from 'immutable';
 
 import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
-import { HtmlContent } from '../../../../../data/contentTypes';
 import * as common from './common';
-import { getKey } from './common';
-import { EntityTypes } from '../custom';
+import { getKey, EntityTypes } from './common';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -47,7 +45,10 @@ const blockHandlers = {
   table,
   audio,
   video,
-  youtube
+  youtube,
+  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
+  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
+  '#array': arrayHandler
 };
 
 const inlineHandlers = {
@@ -134,21 +135,22 @@ function getInlineHandler(key: string) : InlineHandler {
 }
 
 
-export function htmlContentToDraft(htmlContent: HtmlContent) : ContentState {
+export function toDraft(persistenceFormat: Object) : ContentState {
   
   const draft : common.RawDraft = {
     entityMap : {},
     blocks : []
   };
   
-  parse(htmlContent, { draft, depth: 0 });
+  parse(persistenceFormat, { draft, depth: 0 });
   
   // Add a final empty block that will ensure that we have content past
-  // any last positioned atomic blocks
-  addNewBlock(draft, {});
-
-  console.log(draft);
-
+  // any last positioned atomic blocks. This allows the user to click
+  // past the last atomic block and begin inserting new text
+  if (draft.blocks[draft.blocks.length - 1].type === 'atomic') {
+    addNewBlock(draft, {});
+  }
+  
   return convertFromRaw(draft);
 }
 
@@ -263,6 +265,18 @@ function p(item: Object, context: ParsingContext) {
     entityRanges: blockContext.entities
   });
 
+}
+
+function pureTextBlockHandler(key: string, item: Object, context: ParsingContext) {
+  addNewBlock(context.draft, { 
+    text: item[key],
+    inlineStyleRanges: [],
+    entityRanges: []
+  });
+}
+
+function arrayHandler(item: Object, context: ParsingContext) {
+  item['#array'].forEach(item => parse(item, context));
 }
 
 function createRichTitle(item: Object, context: ParsingContext, blockType: string, beginBlockKey: string) {
@@ -401,8 +415,8 @@ function example(item: Object, context: ParsingContext) {
 
 function body(item: Object, context: ParsingContext) {
 
-  const key = getKey(item);
-  item[key][common.ARRAY].forEach(subItem => parse(subItem, context));
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
 }
 
 function handleUnsupported(item: Object, context: ParsingContext) {

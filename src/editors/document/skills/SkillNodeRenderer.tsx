@@ -5,6 +5,7 @@ import { isDescendant } from 'react-sortable-tree';
 
 import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import { AppServices } from '../../common/AppServices';
 
 const styles = {
     
@@ -401,7 +402,9 @@ class SkillNodeRenderer extends Component <any, any>
 
         //>--------------------------------------------------------------------
 
-        var titleObj=new contentTypes.TitleContent({ title: {'#text': node.title}})
+        var titleObj=new contentTypes.Title({ text: node.title})
+        
+        const services = ({} as AppServices);
 
         return (
             <div style={{ height: '100%' }} {...otherProps}>
@@ -429,11 +432,12 @@ class SkillNodeRenderer extends Component <any, any>
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
                                  <TitleContentEditor 
-                                   onEditModeChange={this.props.onEditModeChange}
+                                   services={services}
                                    editMode={true}
-                                   content={titleObj}
+                                   model={titleObj}
+                                   context={{userId: null, documentId: null, courseId: null}}
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
-                                   editingAllowed={true} />
+                                    />
                                </div>
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close">&nbsp;</i></a>
                             </div>

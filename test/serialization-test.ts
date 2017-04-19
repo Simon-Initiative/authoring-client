@@ -3,65 +3,81 @@
 
 import * as contentTypes from '../src/data/contentTypes';
 import * as models from '../src/data/models';
+import { ContentState } from 'draft-js';
 
-it('deserialization of WorkbookPageModel', () => {
+const assessment = require('./assessment.json');
+const workbook_page = require('./master-workbook.json');
 
-  let wb = new models.WorkbookPageModel({ lock: {contentType: 'LockContent', lockedBy: 'alice', lockedAt: 123}, head: {contentType: 'TitleContent', title: {'#text': 'testing'}}} as any);
+it('WorkbookPageModel', () => {
+
+  // A complete test of converting back and forth from
+  // persistence to object model and back:
+  let model = models.WorkbookPageModel.fromPersistence(workbook_page);
+  let persisted = model.toPersistence();
   
-  expect(wb.head.title['#text']).toBe('testing');
-  expect(wb.head instanceof contentTypes.TitleContent).toEqual(true);
+  model = models.WorkbookPageModel.fromPersistence(persisted);
   
-  expect(wb.lock instanceof contentTypes.LockContent).toEqual(true);
-  expect(wb.lock.lockedAt).toBe(123);
-  expect(wb.lock.lockedBy).toBe('alice');
-  
-});
-
-it('construction of WorkbookPageModel via content types', () => {
-  
-  let wb = new models.WorkbookPageModel({ head: new contentTypes.TitleContent({title: {'#text': 'testing'}})} as any);
-  expect(wb.head.title['#text']).toBe('testing');
-});
-
-
-it('roundtrip of TitleContent', () => {
-
-  let titleContent = new contentTypes.TitleContent({ title: {'#text': 'testing'}});
-  expect(titleContent.title['#text']).toBe('testing');
-
-  let json = titleContent.toJS();
-  expect(json).toEqual({ title: {'#text': 'testing'}, contentType: 'TitleContent'});
-
-  let obj = new contentTypes.TitleContent(json);
-  expect(obj.title['#text']).toBe('testing');
+  // Now verify that all the pieces and parts are present:
+  expect(model.head.title.text).toBe('This is the title');
   
 });
 
-it('roundtrip of HtmlContent', () => {
+it('AssessmentModel', () => {
 
-  let html = new contentTypes.HtmlContent();
-  expect(html.body).toEqual({
-      "#array": [{
-        "p": {
-            "#text": "Sample text"
-          }
-        }
-      ]
-  });
+  // A complete test of converting back and forth from
+  // persistence to object model and back:
+  let model = models.AssessmentModel.fromPersistence(assessment);
+  let persisted = model.toPersistence();
   
+  model = models.AssessmentModel.fromPersistence(persisted);
+  
+  // Now verify that all the pieces and parts are present:
 
-  let json = html.toJS();
-  expect(json).toEqual({
-    "body": {
-      "#array": [
-        {
-          "p": {
-            "#text": "Sample text"
-          }
-        }
-      ]
-    }
-  });
+  expect(model.title.text).toBe('Tutor');
+  expect(model.nodes.size).toBe(2);
+
+  const node : models.Node = model.nodes.toArray()[1];
+  expect(node.contentType).toBe('Question');
+
+  const question : contentTypes.Question = (node as contentTypes.Question);
+  expect(question.id).toBe('multiple_choice');
+
+  const blocks = question.body.contentState.getBlocksAsArray();
+  expect(blocks.length).toBe(1);
+  expect(blocks[0].getText()).toBe('This is a multiple choice question');
+
+  const items = question.items.toArray();
+  expect(items.length).toBe(1);
+  expect(items[0].contentType).toBe('MultipleChoice');
+  const mc = (items[0] as contentTypes.MultipleChoice);
+  expect(mc.shuffle).toBe(true);
+  expect(mc.choices.toArray()[0].value).toBe('correct');
+  expect(mc.choices.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is the correct choice');
+  expect(mc.choices.toArray()[1].value).toBe('incorrect');
+  expect(mc.choices.toArray()[1].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is an incorrect choice');
+  expect(mc.choices.toArray()[2].value).toBe('incorrect2');
+  expect(mc.choices.toArray()[2].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is also an incorrect choice');
+  
+  const parts = question.parts.toArray();
+  expect(parts.length).toBe(1);
+
+  const part : contentTypes.Part = parts[0];
+  const responses = part.responses.toArray();
+  expect(responses.length).toBe(2);
+  expect(responses[0].match).toBe('correct');
+  expect(responses[0].score).toBe('10');
+  expect(responses[0].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is feedback for a correct choice');
+  
+  expect(responses[1].match).toBe('*');
+  expect(responses[1].score).toBe('0');
+  expect(responses[1].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is feedback for an incorrect choice');
+  
+  const hints = part.hints.toArray();
+  expect(hints.length).toBe(1);
+  const hintBlocks = hints[0].body.contentState.getBlocksAsArray();
+  expect(hintBlocks.length).toBe(1);
+  expect(hintBlocks[0].getText()).toBe('This is a hint');
 
 });
+
 

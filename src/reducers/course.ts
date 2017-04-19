@@ -15,7 +15,10 @@ type CurrentCourse = {
 export function course(state = null, action: CourseActions): CurrentCourse {
   switch(action.type) {
   case courseActions.COURSE_CHANGED:
-    return { courseId: action.courseId, organizationId: action.organizationId, LOId: action.LOId, skillsId: action.skillsId};
+    return { courseId: action.courseId,
+             organizationId: action.organizationId,
+             LOId: action.LOId,
+             skillsId: action.skillsId};
   default:
     return state;
   }
