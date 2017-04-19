@@ -18,6 +18,7 @@ import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import { ConceptsEditor } from '../concepts/ConceptsEditor';
 
 type Ids = {
   id: string
@@ -60,13 +61,17 @@ export abstract class QuestionEditor
     this.onIdEdit = this.onIdEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
-    
+    this.onConceptsEdit = this.onConceptsEdit.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
     this.setState({
       editHistory: this.state.editHistory.insert(0, action)
     });
+  }
+
+  onConceptsEdit(concepts) {
+    this.props.onEdit(this.props.model.with({concepts}));
   }
 
   onBodyEdit(body) {
@@ -101,6 +106,7 @@ export abstract class QuestionEditor
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice') {
           return <MultipleChoice
+            titleOracle={this.props.titleOracle}
             key={item.guid}
             documentId={this.props.documentId}
             courseId={this.props.courseId}
@@ -147,7 +153,7 @@ export abstract class QuestionEditor
       borderWith: '1px',
       borderColor: '#AAAAAA'
     }
-
+    
     return (
     
 
@@ -166,6 +172,7 @@ export abstract class QuestionEditor
 
           <div><b>Body</b></div>
           <HtmlContentEditor 
+                titleOracle={this.props.titleOracle}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
@@ -181,6 +188,21 @@ export abstract class QuestionEditor
                 editingAllowed={this.props.editingAllowed}
                 
                 />
+
+          <ConceptsEditor 
+            titleOracle={this.props.titleOracle}
+            model={this.props.model.concepts}
+            courseId={this.props.courseId}
+            documentId={this.props.documentId}
+            userId={this.props.userId}
+            onEdit={this.onConceptsEdit} 
+            editingAllowed={this.props.editingAllowed}
+            onEditModeChange={this.props.onEditModeChange}
+            editMode={this.props.editMode}
+            services={this.props.services}
+            title='Skills'
+            conceptType='skill'    
+            />
 
           {this.renderItemsAndParts()}
 

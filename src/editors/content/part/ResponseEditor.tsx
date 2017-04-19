@@ -114,6 +114,7 @@ export class ResponseEditor
     return this.props.model.feedback.toArray().map(c => {
       return (
         <FeedbackEditor 
+              titleOracle={this.props.titleOracle}
               key={c.guid}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}

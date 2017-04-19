@@ -12,6 +12,8 @@ import { PersistenceStrategy,
   onFailureCallback } from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
+import { TitleOracle, MockTitleOracle } from '../common/TitleOracle';
+
 //import { OrganizationEditor } from '../document/organization/OrganizationEditor';
 
 interface EditorManager {
@@ -29,6 +31,8 @@ interface EditorManager {
   _onEdit: (model : models.ContentModel) => void;
 
   _onEditModeChange: (blockKey: string, mode: boolean) => void;
+
+  titleOracle: TitleOracle;
 
 }
 
@@ -66,6 +70,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);
     this._onEditModeChange = this.onEditModeChange.bind(this);
+    this.titleOracle = new MockTitleOracle();
 
     this.onSaveCompleted = (doc: persistence.Document) => {
   
@@ -205,7 +210,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         services: this.props.services,
         editMode: this.state.editMode,
         onEditModeChange: this._onEditModeChange,
-        activeSubEditorKey: this.state.activeSubEditorKey
+        titleOracle: this.titleOracle
       }
       
       const registeredEditor = lookUpByName(this.state.document.model.modelType);

@@ -50,6 +50,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (n.contentType === 'Question') {
       return <QuestionEditor
               key={n.guid}
+              titleOracle={this.props.titleOracle}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
               onEditModeChange={this.props.onEditModeChange}
@@ -63,6 +64,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     } else if (n.contentType === 'Content') {
       return <ContentEditor
               key={n.guid}
+              titleOracle={this.props.titleOracle}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
               onEditModeChange={this.props.onEditModeChange}
@@ -75,6 +77,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     } else {
       return <UnsupportedEditor
               key={n.guid}
+              titleOracle={this.props.titleOracle}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
               onEditModeChange={this.props.onEditModeChange}
@@ -90,6 +93,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderTitle() {
       return <TitleContentEditor 
             services={this.props.services}
+            titleOracle={this.props.titleOracle}
             userId={this.props.userId}
             documentId={this.props.documentId}
             courseId={this.props.model.courseId}

@@ -80,6 +80,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div>
           <TitleContentEditor 
+            titleOracle={this.props.titleOracle}
             services={this.props.services}
             userId={this.props.userId}
             documentId={this.props.documentId}
@@ -91,6 +92,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             editingAllowed={this.props.editingAllowed}/>
           
           <HtmlContentEditor 
+              titleOracle={this.props.titleOracle}
               documentId={this.props.documentId}
               courseId={this.props.model.courseId}
               inlineToolbar={inlineToolbar}

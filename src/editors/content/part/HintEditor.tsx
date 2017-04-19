@@ -116,6 +116,7 @@ export class HintEditor
         </form>
 
         <HtmlContentEditor 
+              titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}

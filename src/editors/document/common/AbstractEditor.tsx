@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as types from '../../../data/types';
 import { AppServices } from '../../common/AppServices';
+import { TitleOracle } from '../../common/TitleOracle';
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
@@ -32,9 +33,7 @@ export interface AbstractEditorProps<ModelType> {
 
   editMode: boolean;
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
+  titleOracle: TitleOracle;
 }
 
 export interface AbstractEditorState {

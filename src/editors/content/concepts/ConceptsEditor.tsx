@@ -5,19 +5,18 @@ import * as Immutable from 'immutable';
 
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { Concept } from './Concept';
+import { SkillSelection } from '../../../utils/selection/SkillSelection';
+import { Collapse } from '../common/Collapse';
 
 export interface ConceptsEditor {
-  _onChange: (e: any) => void;
+
 }
 
 export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
+  conceptType: string;
 
-  // Initial content to display
-  content: Immutable.List<string>;
-
-  onEdit: (newContent: Immutable.List<string>) => void;
-
+  title: string;
 }
 
 export interface ConceptstEditorState {
@@ -32,17 +31,44 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
   constructor(props) {
     super(props);
 
-    this._onChange = this.onChange.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+    this.onAddConcept = this.onAddConcept.bind(this);
   }
 
-  onChange() {
-    this.props.onEdit(this.props.content);
+  onRemove(id: string, type: string) {
+    return this.props.onEdit(this.props.model.filter((v) => v !== id).toList());
+  }
+
+  renderConcepts() {
+    return this.props.model.toArray()
+      .map(c => <Concept key={c} titleOracle={this.props.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
   }
 
   render() : JSX.Element {
-    
-    return null;
+    return (
+      <Collapse caption='Skills' details='Expand to add/remove skills'>
+        <div className="card">
+          <div className="card-block">
+            {this.renderConcepts()}
+          </div>
+        </div>
+        <button onClick={this.onAddConcept} type="button" className="btn btn-sm btn-primary">Add Skill</button>
+          
+      </Collapse>);
   
+  }
+
+  onAddConcept() {
+    this.props.services.displayModal(
+        <SkillSelection
+          onInsert={(item) => {
+            this.props.services.dismissModal();
+            return this.props.onEdit(this.props.model.push(item.id));   
+          }} 
+          onCancel={() => {
+            this.props.services.dismissModal();  
+          }}/>
+    );
   }
 
 }

@@ -15,13 +15,8 @@ import { InputLabel } from '../common/InputLabel';
 
 import '../common/editor.scss';
 
-type IdTypes = {
-  value: string,
-  color: string
-}
 
 export interface Choice {
-  ids: IdTypes;
 }
 
 export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
@@ -32,7 +27,6 @@ export interface ChoiceState {
 
   editHistory: Immutable.List<AuthoringActions>;
 
-  value: string;
 }
 
 /**
@@ -45,16 +39,9 @@ export class Choice
     super(props);
 
     this.state = {
-      editHistory: Immutable.List<AuthoringActions>(),
-      value: this.props.model.value
+      editHistory: Immutable.List<AuthoringActions>()
     };
-    this.ids = {
-      color: guid(),
-      value: guid()
-    }
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onValueChange = this.onValueChange.bind(this);
-    this.onColorChange = this.onColorChange.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -66,18 +53,6 @@ export class Choice
   onBodyEdit(body) {
     const concept = this.props.model.with({body});
     this.props.onEdit(concept);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ value: nextProps.model.value});
-  }
-
-  onValueChange(e) {
-    this.props.onEdit(this.props.model.with({value: e.target.value}));
-  }
-
-  onColorChange(e) {
-    this.props.onEdit(this.props.model.with({color: e.target.value}));
   }
 
   render() : JSX.Element {
@@ -102,16 +77,9 @@ export class Choice
     return (
       <div className='editorWrapper'>
 
-        <form className="form-inline">
-           <label className="mr-sm-2" htmlFor={this.ids.value}>Value</label>
-           <input onChange={this.onValueChange} className="form-control" type="text" value={this.state.value} id={this.ids.value}/>
-          
-           <label htmlFor={this.ids.color} className="col-2 col-form-label">Color</label>
-           <input onChange={this.onColorChange} className="form-control" type="color" value={this.props.model.value} id={this.ids.color}/>
-        </form>
-
         <InputLabel label="Choice">
           <HtmlContentEditor 
+              titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
@@ -126,8 +94,6 @@ export class Choice
               onEdit={this.onBodyEdit} 
               editingAllowed={this.props.editingAllowed}/>
         </InputLabel>
-
-        
 
       </div>);
   }

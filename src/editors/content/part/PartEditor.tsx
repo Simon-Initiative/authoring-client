@@ -105,6 +105,7 @@ export abstract class PartEditor
   renderResponses() {
     return this.props.model.responses.toArray().map(i => {
       return <ResponseEditor
+              titleOracle={this.props.titleOracle}
               key={i.guid}
               documentId={this.props.documentId}
               courseId={this.props.courseId}
@@ -121,6 +122,7 @@ export abstract class PartEditor
   renderHints() {
     return this.props.model.hints.toArray().map(i => {
       return <HintEditor
+              titleOracle={this.props.titleOracle}
               key={i.guid}
               documentId={this.props.documentId}
               courseId={this.props.courseId}
@@ -182,6 +184,7 @@ export abstract class PartEditor
 
         <div>Explanation</div>
         <HtmlContentEditor 
+              titleOracle={this.props.titleOracle}
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}

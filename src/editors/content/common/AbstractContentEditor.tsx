@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import * as models from '../../../data/models';
 import { AppServices } from '../../common/AppServices';
-
+import { TitleOracle } from '../../common/TitleOracle';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState> {
   
@@ -30,6 +30,8 @@ export interface AbstractContentEditorProps<ModelType> {
   editMode: boolean;
 
   onEditModeChange: (blockKey: string, mode: boolean) => void;
+
+  titleOracle: TitleOracle;
 }
 
 export interface AbstractContentEditorState {

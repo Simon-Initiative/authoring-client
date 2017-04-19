@@ -39,6 +39,10 @@ export interface MultipleChoiceState {
   select: number;
 }
 
+const ChoiceFeedback = (props) => {
+
+}
+
 /**
  * The content editor for HtmlContent.
  */
@@ -95,6 +99,7 @@ export class MultipleChoice
       return (
         <Choice 
               key={c.guid}
+              titleOracle={this.props.titleOracle}
               onEditModeChange={this.props.onEditModeChange}
               editMode={this.props.editMode}
               services={this.props.services}

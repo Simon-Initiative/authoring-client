@@ -433,6 +433,7 @@ class LONodeRenderer extends Component <any, any>
                             <div id="outter" style={dStyle as any}>
                                <div id="inner" style={tStyle}>
                                  <TitleContentEditor 
+                                   titleOracle={null}
                                    courseId=''
                                    documentId=''
                                    services={services}

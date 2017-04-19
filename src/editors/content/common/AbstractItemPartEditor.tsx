@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-
+import { TitleOracle } from '../../common/TitleOracle';
 
 export interface AbstractItemPartEditor<ItemType, P extends AbstractItemPartEditorProps<ItemType>, S extends AbstractItemPartEditorState> {
   
@@ -33,6 +33,8 @@ export interface AbstractItemPartEditorProps<ItemType> {
   editMode: boolean;
 
   onEditModeChange: (blockKey: string, mode: boolean) => void;
+
+  titleOracle: TitleOracle;
 }
 
 export interface AbstractItemPartEditorState {
