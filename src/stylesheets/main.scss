@@ -1,15 +1,33 @@
 @import 'abstracts/variables';
 @import '../editors/content/common/draft/DraftWrapper';
 
-body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale; font-family: $sans-font;}
+body { margin-top: 58px !important; background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale; font-family: $sans-font; outline: none;}
 #app { margin: 0px; padding: 0px; width: 100%; height: 100%;}
 .sidebar .nav-link { border-radius: 0px; }
 
+//Content Editable Focus
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
+.document {
+
+	h2 {
+		color: $d_blue;
+		margin-bottom: 42px !important;
+
+		&.organize {
+			display:inline-block;
+		}
+	}
+}
 //Button Global
 .btn {
 	border-radius: 0px;
 	cursor: pointer;
+	background-color: transparent;
+	border: none;
 
 	&.btn-primary {
 		background-color: $color-blue;
@@ -38,6 +56,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	    letter-spacing: 0.01rem;
 	    line-height: 30px;
 	    color: $color-black;
+	    cursor: pointer;
 	    img {
 	    	margin-right:10px;
 	    }
@@ -46,6 +65,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 		margin-left:auto;
 		.nav-link {
 			color: $color-blue;
+			cursor: pointer;
 			&.active {
 				color: $color-blue;
 			}
@@ -116,6 +136,53 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
     		color: $color-blue;
     	}
     }
+
+    &.full {
+    	height: 100vh;
+    	padding: 10rem;
+
+    	h1 {
+    		font-family: $serif-font;
+    	}
+
+    	fieldset {
+    		width: 100%;
+    		position: relative;
+    	}
+
+    	input {
+    		margin-top: 1rem;
+    		padding: 2rem;
+    		color: #000;
+    		font-size: 1.5em;
+    		border: 1px solid #0055ab;
+    	}
+
+    	input::placeholder {
+		  color: #c3c6cb;
+		}
+
+		label {
+		  top: 37px;
+		  position: absolute;
+		  display: block;
+		  transition: 0.2s;
+		  margin-left: 2rem;
+		  margin-top: -25px;
+		}
+
+		input:focus + label{
+		  top: 30px;
+		  margin-top: 0px;
+		  margin-left: 2rem;
+		  color: #000;
+		}
+
+		input:focus {
+			outline: 2px solid #0055ab;
+			// border: solid 8px #0055ab;
+		}
+    }
 }
 
 // My Courses
@@ -178,6 +245,28 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 
 }
 
+//footer
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    height: 124px;
+    background-color: #f2f2f2;
+    border-top: 1px solid #e8e8e8;
+    padding: 3rem;
+    margin-top: 20rem;
+    color: #0067cb;
+    line-height: 1.2em;
+    font-family: $serif-font;
+    font-size: 14px;
+    z-index: 9999;
+
+    .ccLicense {
+	    float: left;
+	    margin-right: 2.5rem;
+	}
+}
+
 // Tables Global
 .table {
 
@@ -201,4 +290,47 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	th {
 		vertical-align: middle;
 	}
+}
+
+figure {
+	line-height: 1.5rem;
+    margin-top: 0px;
+    margin-bottom: 0;
+}
+
+.public-DraftStyleDefault-block {
+  &.public-DraftStyleDefault-ltr {
+    line-height: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+  }
+}
+
+h1 {
+	.public-DraftStyleDefault-block {
+	  &.public-DraftStyleDefault-ltr {
+	    line-height: 4.5rem;
+    	// margin-top: 3rem;
+	  }
+	}
+}
+
+.mathPreview {
+	>span {
+		display: block;
+		text-align: center;
+		backgroud-color: blue;
+	}
+	.preview {
+		// margin-right: 1rem;
+		display: block;
+		color: $color-grey;
+		text-align: center;
+		font-family: $serif-font;
+	}
+}
+
+.public-DraftStyleDefault-ul, .public-DraftStyleDefault-ol {
+    margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
 }

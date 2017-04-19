@@ -102,7 +102,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
       </tr>)
 
     return (
-      <div className="col-12">
+      <div className="">
         <h2>Pages</h2>
         <table className="table table-striped table-hover">
           <thead>
@@ -134,15 +134,13 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
   render() {
     return (
-      <div className="container-fluid editor">
-          <div className="row">
+      <div>
               { /* <div className="col-1"></div> */}
               
               {this.renderResources()}
               {this.renderCreation()}
               
               { /* <div className="col-1"></div> */}
-          </div>
       </div>
     )
   }
