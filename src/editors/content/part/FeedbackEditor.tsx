@@ -21,7 +21,7 @@ export interface FeedbackEditor {
 
 export interface FeedbackEditorProps extends AbstractContentEditorProps<contentTypes.Feedback> {
 
-
+  onRemove: (feedback: contentTypes.Feedback) => void;
 }
 
 export interface FeedbackEditorState {
@@ -51,7 +51,7 @@ export class FeedbackEditor
     });
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }
@@ -87,6 +87,7 @@ export class FeedbackEditor
 
     return (
       <InputLabel label="Feedback" style="default">
+
         <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}

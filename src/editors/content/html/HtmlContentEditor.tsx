@@ -54,7 +54,7 @@ export class HtmlContentEditor
     this.setState({selectionState});
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }

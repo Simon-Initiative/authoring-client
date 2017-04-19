@@ -1,19 +1,15 @@
 'use strict'
 
 import * as React from 'react';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { Choice } from './Choice';
+
 import { FeedbackEditor } from '../part/FeedbackEditor';
+import { Hints } from '../part/Hints';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
 
 import '../common/editor.scss';
 import './MultipleChoice.scss';
@@ -29,15 +25,9 @@ export interface MultipleChoice {
 
 export interface MultipleChoiceProps extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
 
-  blockKey?: string;
-
-  activeSubEditorKey?: string; 
-
 }
 
 export interface MultipleChoiceState {
-
-  editHistory: AuthoringActions[];
 
 }
 
@@ -68,12 +58,7 @@ export class MultipleChoice
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onShuffleChange = this.onShuffleChange.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
-  }
-
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: [action, ...this.state.editHistory]
-    });
+    this.onHintsEdit = this.onHintsEdit.bind(this);
   }
 
   onShuffleChange(e) {
@@ -104,7 +89,7 @@ export class MultipleChoice
     this.props.onEdit(this.props.itemModel, part);
   }
 
-  renderChoice(choice: contentTypes.Choice) {
+  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response,) {
     return <Choice 
               key={choice.guid}
               editMode={this.props.editMode}
@@ -112,7 +97,12 @@ export class MultipleChoice
               context={this.props.context}
               model={choice}
               onEdit={this.onChoiceEdit} 
+              onRemove={this.onRemoveChoice.bind(this, choice, response)}
               />;
+  }
+
+  onHintsEdit(partModel: contentTypes.Part) {
+    this.props.onEdit(this.props.itemModel, partModel);
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
@@ -121,7 +111,7 @@ export class MultipleChoice
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  renderFeedback(response : contentTypes.Response, feedback: contentTypes.Feedback) {
+  renderFeedback(choice: contentTypes.Choice, response : contentTypes.Response, feedback: contentTypes.Feedback) {
     return (
       <FeedbackEditor 
         key={feedback.guid}
@@ -129,6 +119,7 @@ export class MultipleChoice
         services={this.props.services}
         context={this.props.context}
         model={feedback}
+        onRemove={this.onRemoveChoice.bind(this, choice, response)}
         onEdit={this.onFeedbackEdit.bind(this, response)} 
         />);
   }
@@ -160,16 +151,15 @@ export class MultipleChoice
       if (responses.length > i) {
         if (responses[i].feedback.size > 0) {
           let f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(responses[i], f)
+          renderedFeedback = this.renderFeedback(c, responses[i], f)
         }
       }
       
       rendered.push(
         <ChoiceFeedback key={c.guid}>
-          {this.renderChoice(c)}
+          {this.renderChoice(c, responses[i])}
           {renderedFeedback}
           <InlineForm position='right'>
-            <Button onClick={this.onRemoveChoice.bind(this, c, responses[i])}>Remove</Button>
             <TextInput label='Score' value={responses[i].score} type='number' width='75px'
                 onEdit={this.onScoreEdit.bind(this, responses[i])}/>
           </InlineForm>
@@ -197,6 +187,14 @@ export class MultipleChoice
         </InlineForm>
 
         {this.renderChoices()}
+
+        <Hints
+          context={this.props.context}
+          services={this.props.services}
+          model={this.props.partModel}
+          editMode={this.props.editMode}
+          onEdit={this.onHintsEdit}
+        />
 
       </div>);
   }

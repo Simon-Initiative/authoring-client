@@ -20,7 +20,7 @@ export interface Choice {
 }
 
 export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
-
+  onRemove: (choice: contentTypes.Choice) => void;
 }
 
 export interface ChoiceState {
@@ -55,6 +55,16 @@ export class Choice
     this.props.onEdit(concept);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextState.editHistory !== this.state.editHistory) {
+      return true;
+    }
+    return false;
+  }
+
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
@@ -75,23 +85,19 @@ export class Choice
     }
 
     return (
-      <div className='editorWrapper'>
-
-        <InputLabel label="Choice" style="default">
-          <HtmlContentEditor 
-              editorStyles={bodyStyle}
-              inlineToolbar={inlineToolbar}
-              blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              editHistory={this.state.editHistory}
-              model={this.props.model.body}
-              onEdit={this.onBodyEdit} 
-              />
-        </InputLabel>
-
-      </div>);
+      <InputLabel label="Choice" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+        <HtmlContentEditor 
+            editorStyles={bodyStyle}
+            inlineToolbar={inlineToolbar}
+            blockToolbar={blockToolbar}
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
+            editHistory={this.state.editHistory}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit} 
+            />
+      </InputLabel>);
   }
 
 }

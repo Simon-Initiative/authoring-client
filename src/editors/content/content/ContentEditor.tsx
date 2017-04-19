@@ -69,7 +69,7 @@ export class ContentEditor
     this.props.onEdit(this.props.model.with({availability: e.target.value}));
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }

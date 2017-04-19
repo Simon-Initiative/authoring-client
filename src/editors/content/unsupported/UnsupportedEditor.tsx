@@ -21,7 +21,7 @@ export class UnsupportedEditor extends AbstractContentEditor<contentTypes.Unsupp
     return <div className='editorWrapper'>{JSON.stringify(this.props.model.data)}</div>;
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }

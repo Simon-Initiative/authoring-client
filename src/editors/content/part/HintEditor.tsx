@@ -10,6 +10,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import { InputLabel } from '../common/InputLabel';
 
 import '../common/editor.scss';
 
@@ -22,7 +23,7 @@ export interface HintEditor {
 }
 
 export interface HintEditorProps extends AbstractContentEditorProps<contentTypes.Hint> {
-
+  onRemove: (hint: contentTypes.Hint) => void;
 }
 
 export interface HintEditorState {
@@ -58,7 +59,7 @@ export class HintEditor
     });
   }
 
-  shouldComponetUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }
@@ -96,7 +97,7 @@ export class HintEditor
                 actionHandler={this} />;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '20px',
       borderStyle: 'none',
       borderWith: 1,
       borderColor: '#AAAAAA'
@@ -109,23 +110,19 @@ export class HintEditor
     return (
       <div className='itemWrapper'>
 
-        <form className="form-inline">
-           <div><b>Hint</b></div>
-           &nbsp;&nbsp;&nbsp;&nbsp;Targets&nbsp;&nbsp;
-           <input style={style} onChange={this.onTargetChange} className="form-control form-control-sm" type="text" value={this.state.targets} id={this.ids.targets}/>
-        </form>
-
-        <HtmlContentEditor 
-              editorStyles={bodyStyle}
-              inlineToolbar={inlineToolbar}
-              blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              editHistory={this.state.editHistory}
-              model={this.props.model.body}
-              onEdit={this.onBodyEdit} 
-              />
+      <InputLabel label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+          <HtmlContentEditor 
+            editorStyles={bodyStyle}
+            inlineToolbar={inlineToolbar}
+            blockToolbar={blockToolbar}
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
+            editHistory={this.state.editHistory}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit} 
+            />
+        </InputLabel>
 
       </div>);
   }

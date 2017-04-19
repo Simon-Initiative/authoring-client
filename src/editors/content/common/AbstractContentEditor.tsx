@@ -39,9 +39,8 @@ export abstract class AbstractContentEditor<ModelType, P extends AbstractContent
     super(props);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.props.model !== nextProps.model;
-  }
+  // Force concrete classes to implement their own logic
+  abstract shouldComponentUpdate(nextProps, nextState);
 
 }
 

@@ -110,6 +110,13 @@ export class ResponseEditor
     this.props.onEdit(this.props.model.with({feedback: this.props.model.feedback.set(c.guid, c) }));
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    return false;
+  }
+
   renderFeedback() {
     return this.props.model.feedback.toArray().map(c => {
       return (
@@ -120,6 +127,7 @@ export class ResponseEditor
               services={this.props.services}
               model={c}
               onEdit={this.onFeedbackEdit} 
+              onRemove={null}
               />
       )
     })

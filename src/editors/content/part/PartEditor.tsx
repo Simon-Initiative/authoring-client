@@ -124,6 +124,7 @@ export abstract class PartEditor
               services={this.props.services}
               model={i}
               onEdit={this.onHintEdit} 
+              onRemove={null}
               />
     });
   }

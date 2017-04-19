@@ -44,6 +44,13 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
     return this.props.onEdit(this.props.model.filter((v) => v !== id).toList());
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    return false;
+  }
+
   renderConcepts() {
     return this.props.model.toArray()
       .map(c => <Concept key={'concept' + c} titleOracle={this.props.services.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
