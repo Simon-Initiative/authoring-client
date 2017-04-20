@@ -1,19 +1,20 @@
 import * as Immutable from 'immutable';
 import createGuid from '../../utils/guid';
+import { augment } from './common';
 
 export type TitleParams = {
   text?: string,
   guid?: string;
 };
 
-export class Title extends Immutable.Record({contentType: 'Title', guid: createGuid(), text: ''}) {
+export class Title extends Immutable.Record({contentType: 'Title', guid: '', text: ''}) {
   
   contentType: 'Title';
   text: string;
   guid: string;
   
   constructor(params?: TitleParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: TitleParams) {

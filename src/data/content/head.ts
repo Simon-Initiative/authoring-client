@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import { Title } from './title';
+import { augment } from './common';
 import createGuid from '../../utils/guid';
 import { getChildren } from './common';
 import { getKey } from '../common';
@@ -11,7 +12,7 @@ export type HeadParams = {
 
 const defaultContent = {
   contentType: 'Head', 
-  guid: createGuid(), 
+  guid: '', 
   title: new Title()
 }
 
@@ -22,7 +23,7 @@ export class Head extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: HeadParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: HeadParams) {

@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import { Html } from './html';
-import createGuid from '../../utils/guid';
+import { augment } from './common';
 import { getKey } from '../common';
 
 export type FeedbackParams = {
@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Feedback',
   targets: '',
   body: new Html(),
-  guid: createGuid()
+  guid: ''
 }
 
 export class Feedback extends Immutable.Record(defaultContent) {
@@ -25,7 +25,7 @@ export class Feedback extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: FeedbackParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: FeedbackParams) {

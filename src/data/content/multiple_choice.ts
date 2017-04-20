@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 
 import { Choice } from './choice';
 import createGuid from '../../utils/guid';
+import { augment } from './common';
 import { getKey } from '../common';
 import { getChildren } from './common';
 
@@ -23,7 +24,7 @@ const defaultContent = {
   labels: false,
   select: 'single',
   shuffle: true,
-  guid: createGuid(),
+  guid: '',
   contentType: 'MultipleChoice'
 }
 
@@ -39,7 +40,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: MultipleChoiceParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: MultipleChoiceParams) {
