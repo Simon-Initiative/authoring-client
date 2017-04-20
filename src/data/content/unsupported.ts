@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import createGuid from '../../utils/guid';
+import { augment } from './common';
 
 export type UnsupportedParams = {
   contentType?: 'Unsupported',
@@ -7,14 +8,14 @@ export type UnsupportedParams = {
   guid: string
 };
 
-export class Unsupported extends Immutable.Record({contentType: 'Unsupported', guid: createGuid(), data: {}}) {
+export class Unsupported extends Immutable.Record({contentType: 'Unsupported', guid: '', data: {}}) {
   
   contentType: 'Unsupported';
   data: Object;
   guid: string;
   
   constructor(params?: UnsupportedParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: UnsupportedParams) {

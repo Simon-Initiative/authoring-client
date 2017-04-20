@@ -3,6 +3,7 @@ import { ContentState } from 'draft-js';
 import { toPersistence } from './html/topersistence';
 import { toDraft } from './html/todraft';
 import createGuid from '../../utils/guid';
+import { augment } from './common';
 
 const emptyContent = ContentState.createFromText('');
 
@@ -15,7 +16,7 @@ export type HtmlParams = {
 const defaultHtmlParams = {
   contentType: 'Html',
   contentState: emptyContent,
-  guid: createGuid()
+  guid: ''
 };
 
 export class Html extends Immutable.Record(defaultHtmlParams) {
@@ -26,9 +27,7 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
   guid: string;
   
   constructor(params?: HtmlParams) {
-    // We do not use the deserialize here only because Html is just
-    // a thin wrapper for the Draft.js ContentState object 
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: HtmlParams) {

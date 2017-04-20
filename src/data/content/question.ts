@@ -6,6 +6,7 @@ import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
 import { getChildren } from './common';
+import { augment } from './common';
 
 export type Item = MultipleChoice | Unsupported;
 
@@ -21,13 +22,13 @@ export type QuestionParams = {
 
 const defaultQuestionParams = {
   contentType: 'Question',
-  id: createGuid(),
+  id: '',
   body: new Html(),
   concepts: Immutable.List<string>(),
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
-  guid: createGuid()
+  guid: ''
 };
 
 export class Question extends Immutable.Record(defaultQuestionParams) {
@@ -42,7 +43,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   guid: string;
   
   constructor(params?: QuestionParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: QuestionParams) {

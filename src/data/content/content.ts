@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import { Html } from './html';
-import createGuid from '../../utils/guid';
+import { augment } from './common';
 import { getKey } from '../common';
 
 export type ContentParams = {
@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Content',
   availability: 'always',
   body: new Html(),
-  guid: createGuid()
+  guid: ''
 }
 
 export class Content extends Immutable.Record(defaultContent) {
@@ -25,7 +25,7 @@ export class Content extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: ContentParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: ContentParams) {

@@ -4,7 +4,7 @@ import { Title } from './title';
 import { Response } from './response';
 import { Hint } from './hint';
 import { getChildren } from './common';
-
+import { augment } from './common';
 
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
@@ -33,7 +33,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   hints: Immutable.OrderedMap<string, Hint>(),
   explanation: new Html(),
-  guid: createGuid()
+  guid: ''
 };
 
 export class Part extends Immutable.Record(defaultPartParams) {
@@ -51,7 +51,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   guid: string;
   
   constructor(params?: PartParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: PartParams) {

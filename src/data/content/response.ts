@@ -4,6 +4,7 @@ import { Feedback } from './feedback';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
 import { getChildren } from './common';
+import { augment } from './common';
 
 export type ResponseParams = {
 
@@ -23,7 +24,7 @@ const defaultContent = {
   match : '',
   score : '',
   name : '',
-  guid: createGuid(),
+  guid: '',
   contentType: 'Response'
 }
 
@@ -39,7 +40,7 @@ export class Response extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: ResponseParams) {
-    params ? super(params) : super();
+    super(augment(params));
   }
 
   with(values: ResponseParams) {
