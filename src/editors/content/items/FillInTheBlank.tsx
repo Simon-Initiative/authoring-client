@@ -182,7 +182,9 @@ export class FillInTheBlank
       </div>);
 
     return (
-      <div>
+      <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
+        >
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

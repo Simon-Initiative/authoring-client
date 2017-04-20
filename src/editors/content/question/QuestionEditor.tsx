@@ -42,7 +42,7 @@ export interface QuestionEditorState {
 
   editHistory: Immutable.List<AuthoringActions>;
 
-  id: string;
+  activeItemId: string;
 }
 
 /**
@@ -56,7 +56,7 @@ export abstract class QuestionEditor
 
     this.state = {
       editHistory: Immutable.List<AuthoringActions>(),
-      id: this.props.model.id
+      activeItemId: null
     };
 
     this.ids = {
@@ -64,11 +64,18 @@ export abstract class QuestionEditor
     }
 
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onIdEdit = this.onIdEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
+    this.onFocusChange = this.onFocusChange.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+  }
+
+  onBlur(activeItemId: string) {
+    if (this.state.activeItemId === activeItemId) {
+      this.setState({ activeItemId: null });
+    }
   }
 
   handleAction(action: AuthoringActions) {
@@ -79,6 +86,10 @@ export abstract class QuestionEditor
 
   onConceptsEdit(concepts) {
     this.props.onEdit(this.props.model.with({concepts}));
+  }
+
+  onFocusChange(activeItemId: string) {
+    this.setState({ activeItemId });
   }
 
   onBodyEdit(body) {
@@ -126,11 +137,6 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onIdEdit(e) {
-    const id = e.target.value;
-    this.setState({ id }, () => 
-      this.props.onEdit(this.props.model.with({id })));
-  }
 
   onAddItemPart() {
     let item = new contentTypes.MultipleChoice();
@@ -148,6 +154,8 @@ export abstract class QuestionEditor
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice') {
         return <MultipleChoice
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
           context={this.props.context}
           key={item.guid}
           editMode={this.props.editMode}
@@ -158,6 +166,8 @@ export abstract class QuestionEditor
           />
     } else if (item.contentType === 'FillInTheBlank') {
         return <FillInTheBlank
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
             context={this.props.context}
             key={item.guid}
             editMode={this.props.editMode}
@@ -240,6 +250,7 @@ export abstract class QuestionEditor
           <div className='questionWrapper'>
 
           <HtmlContentEditor 
+                activeItemId={this.state.activeItemId}
                 context={this.props.context}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}

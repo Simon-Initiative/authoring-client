@@ -185,7 +185,7 @@ export class MultipleChoice
       </div>);
 
     return (
-      <div>
+      <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}>
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

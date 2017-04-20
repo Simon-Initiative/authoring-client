@@ -53,6 +53,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
+  activeItemId: string;
   editorStyles?: Object;
   changePreviewer?: ChangePreviewer;
 }
@@ -218,7 +219,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.lastContent = contentState;
 
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
+    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
 
     this.state = {
       editorState: EditorState.createWithContent(contentState, compositeDecorator),
@@ -391,18 +392,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     if (command === 'backspace') {
       if (handleBackspace(editorState, this.onChange) === 'handled') {
-        console.log('handled by custom backspace');
         return 'handled';
       }
     }
 
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      console.log('handled by richutils');
       this.onChange(newState);
       return 'handled';
     } else {
-      console.log('not handled at all');
       return 'not-handled';
     }
     
@@ -433,7 +431,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       } else if (action.type === 'INSERT_INLINE_ENTITY') {
         this.insertInlineEntity(action.entityType, action.mutability, action.data);
       }
-    } 
+    } else if (this.props.activeItemId !== nextProps.activeItemId) {
+      setTimeout(() => this.forceRender(), 100);
+    }
   }
 
   insertInlineEntity(type: string, mutability: string, data: Object) {
@@ -537,6 +537,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return updated;
   }
 
+  forceRender() {
+
+    const editorState = this.state.editorState;
+    const content = editorState.getCurrentContent();
+    const onDecoratorEdit = () => this.onChange(this.state.editorState);
+    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+    const newEditorState = EditorState.createWithContent(content, compositeDecorator);
+    this.setState({editorState: newEditorState});
+  }
+
   renderToolbar() {
     let toolbarAndContainer = null;
     if (this.state.show) {
@@ -562,7 +573,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
-
+    
     return (
       <div ref={(container => this.container = container)} 
         onBlur={this.onBlur}

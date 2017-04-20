@@ -29,6 +29,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   editorStyles?: Object;
 
   changePreviewer?: ChangePreviewer;
+
+  activeItemId?: string;
 }
 
 export interface HtmlContentEditorState {
@@ -65,6 +67,9 @@ export class HtmlContentEditor
     if (nextProps.editHistory !== this.props.editHistory) {
       return true;
     }
+    if (nextProps.activeItemId !== this.props.activeItemId) {
+      return true;
+    }
     return false;
   }
 
@@ -73,6 +78,7 @@ export class HtmlContentEditor
       <div className="form-control">
         
           <DraftWrapper 
+            activeItemId={this.props.activeItemId}
             changePreviewer={this.props.changePreviewer}
             editorStyles={this.props.editorStyles}
             inlineToolbar={this.props.inlineToolbar}

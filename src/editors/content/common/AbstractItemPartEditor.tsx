@@ -25,6 +25,10 @@ export interface AbstractItemPartEditorProps<ItemType> {
   
   editMode: boolean;
 
+  onFocus: (itemId: string) => void;
+
+  onBlur: (itemId: string) => void;
+  
 }
 
 export interface AbstractItemPartEditorState {
