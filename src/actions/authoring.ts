@@ -1,8 +1,8 @@
-
+import { EntityTypes } from '../data/content/html/common';
 
 export type AuthoringActions = 
   toggleInlineStyleAction |
-  insertActivityAction |
+  insertAtomicBlockAction |
   toggleBlockTypeAction | 
   insertInlineEntityAction
 
@@ -17,8 +17,8 @@ export const TOGGLE_BLOCK_TYPE : TOGGLE_BLOCK_TYPE = 'TOGGLE_BLOCK_TYPE';
 export type TOGGLE_INLINE_STYLE = 'TOGGLE_INLINE_STYLE';
 export const TOGGLE_INLINE_STYLE : TOGGLE_INLINE_STYLE = 'TOGGLE_INLINE_STYLE';
 
-export type INSERT_ACTIVITY = 'INSERT_ACTIVITY';
-export const INSERT_ACTIVITY : INSERT_ACTIVITY = 'INSERT_ACTIVITY';
+export type INSERT_ATOMIC_BLOCK = 'INSERT_ATOMIC_BLOCK';
+export const INSERT_ATOMIC_BLOCK : INSERT_ATOMIC_BLOCK = 'INSERT_ATOMIC_BLOCK';
 
 export type INSERT_INLINE_ENTITY = 'INSERT_INLINE_ENTITY';
 export const INSERT_INLINE_ENTITY : INSERT_INLINE_ENTITY = 'INSERT_INLINE_ENTITY';
@@ -33,9 +33,9 @@ export type toggleInlineStyleAction = {
   style: string
 };
 
-export type insertActivityAction = {
-  type: INSERT_ACTIVITY,
-  activityType: string,
+export type insertAtomicBlockAction = {
+  type: INSERT_ATOMIC_BLOCK,
+  entityType: EntityTypes,
   data: Object
 };
 
@@ -46,10 +46,10 @@ export type insertInlineEntityAction = {
   data: Object
 }
 
-export function insertActivity(activityType: string, data: Object) : insertActivityAction {
+export function insertAtomicBlock(entityType: EntityTypes, data: Object) : insertAtomicBlockAction {
   return {
-    type: INSERT_ACTIVITY,
-    activityType,
+    type: INSERT_ATOMIC_BLOCK,
+    entityType,
     data
   }
 }

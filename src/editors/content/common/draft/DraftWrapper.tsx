@@ -19,7 +19,7 @@ import { getActivityByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
-
+import { changes } from '../../../../data/content/html/changes';
 
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
@@ -238,9 +238,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         const content = editorState.getCurrentContent();
         const contentChange = (content !== this.lastContent);
-        this.lastContent = content;
+        
 
         if (contentChange) {
+
+          const delta = changes(EntityTypes.input_ref, '@input', this.lastContent, content);
+          console.log(delta.deletions.toArray());
+
+          this.lastContent = content;
           const html = new Html({ contentState: editorState.getCurrentContent()});
           this.props.onEdit(html);
         }
@@ -413,8 +418,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       let action : any = nextProps.editHistory.get(0);
       if (action.type === 'TOGGLE_INLINE_STYLE') {
         this.toggleInlineStyle(action.style);
-      } else if (action.type === 'INSERT_ACTIVITY') {
-        this.insertActivity(action.activityType, action.data);
+      } else if (action.type === 'INSERT_ATOMIC_BLOCK') {
+        this.insertActivity(action.entityType, action.data);
       } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
         this.toggleBlockType(action.blockType);
       } else if (action.type === 'INSERT_INLINE_ENTITY') {

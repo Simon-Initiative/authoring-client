@@ -6,8 +6,8 @@ import * as Immutable from 'immutable';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import InlineToolbar from '../../content/html/InlineToolbar';
-import BlockToolbar from '../../content/html//BlockToolbar';
+import { InlineToolbar } from './InlineToolbar';
+import { BlockToolbar } from './BlockToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
@@ -66,12 +66,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   render() {
 
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.model.courseId} 
+                context={this.props.context} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.model.courseId} 
+                context={this.props.context} 
                 services={this.props.services} 
                 actionHandler={this} />;
 

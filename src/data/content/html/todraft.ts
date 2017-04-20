@@ -52,6 +52,7 @@ const blockHandlers = {
 };
 
 const inlineHandlers = {
+  input_ref: insertEntity.bind(undefined, 'IMMUTABLE', EntityTypes.input_ref),
   activity_link: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.activity_link),
   xref: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.xref),
   wb_manual: insertEntity.bind(undefined, 'MUTABLE', EntityTypes.wb_manual),
@@ -219,15 +220,15 @@ function processInline(item: Object,
     blockContext.fullText += item[key];
 
   } else {
-
-    const children = getChildren(item);
+    
     const offset = blockContext.fullText.length;
 
-    if (key === 'math') {
-
+    if (key === 'math' || key === 'input_ref') {
       blockContext.fullText += ' ';
 
     } else {
+
+      const children = getChildren(item);
 
       children.forEach(subItem => {
         const subKey = getKey(subItem);

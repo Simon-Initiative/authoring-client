@@ -13,11 +13,14 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
+import { FillInTheBlank } from '../items/FillInTheBlank';
 import { PartEditor } from '../part/PartEditor';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
+import { EntityTypes } from '../../../data/content/html/common';
+import { Toolbar, ToolbarActionProvider } from '../common/toolbar/Toolbar';
+import { ToolbarButton } from '../common/toolbar/ToolbarButton';
+import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 
@@ -63,6 +66,7 @@ export abstract class QuestionEditor
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddItemPart = this.onAddItemPart.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
@@ -107,7 +111,17 @@ export abstract class QuestionEditor
 
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice') {
-          return <MultipleChoice
+        return <MultipleChoice
+          context={this.props.context}
+          key={item.guid}
+          editMode={this.props.editMode}
+          services={this.props.services}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />
+    } else if (item.contentType === 'FillInTheBlank') {
+        return <FillInTheBlank
             context={this.props.context}
             key={item.guid}
             editMode={this.props.editMode}
@@ -117,7 +131,7 @@ export abstract class QuestionEditor
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
             />
     } else {
-      // TODO build unsupported part item editor
+
     }
   }
 
@@ -133,17 +147,43 @@ export abstract class QuestionEditor
     return toRender;
   }
 
+  onFillInTheBlank(a: ToolbarActionProvider) {
+
+    const input = guid();
+    const data = {};
+    data['@input'] = input;
+    data['$type'] = contentTypes.FillInTheBlank;
+
+    a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
+    
+    let item = new contentTypes.FillInTheBlank();
+    item = item.with({guid: input, id: input});
+
+    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    part = part.with({guid: guid()});
+    model = model.with({parts: model.parts.set(part.guid, part) });
+
+    this.props.onEdit(model);
+
+  }
+
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
+    const inlineToolbar = <Toolbar 
+                context={this.props.context} 
                 services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                actionHandler={this}>
+                  {toolbarConfigs.flowInline()}
+                  <ToolbarButton icon='server' action={this.onFillInTheBlank}/>
+                </Toolbar>
+    const blockToolbar = <Toolbar 
+                context={this.props.context} 
                 services={this.props.services} 
-                actionHandler={this} />;
+                actionHandler={this}>
+                  {toolbarConfigs.flowBlock()}
+                </Toolbar>
 
     const bodyStyle = {
       minHeight: '30px',

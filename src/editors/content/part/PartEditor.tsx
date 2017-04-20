@@ -132,12 +132,11 @@ export abstract class PartEditor
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
+                context={this.props.context} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                context={this.props.context}
                 services={this.props.services} 
                 actionHandler={this} />;
 

@@ -11,11 +11,11 @@ interface InlineToolbarProps extends ToolbarProps {
   
 }
 
-interface InlineToolbar {
+export interface InlineToolbar {
   
 }
 
-class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
+export class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
   render() {
     return (
@@ -25,5 +25,3 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
   }
 
 }
-
-export default InlineToolbar;

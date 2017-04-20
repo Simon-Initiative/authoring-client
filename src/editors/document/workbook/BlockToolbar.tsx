@@ -10,21 +10,18 @@ interface BlockToolbarProps extends ToolbarProps {
   
 }
 
-interface BlockToolbar {
+export interface BlockToolbar {
   
 }
 
-class BlockToolbar extends React.PureComponent<BlockToolbarProps, {}> {
+export class BlockToolbar extends React.PureComponent<BlockToolbarProps, {}> {
 
   render() {
     return (
       <Toolbar {...this.props}>
         {flowBlock()}
+        {bodyBlock()}
       </Toolbar>);
   }
 
 }
-
-export default BlockToolbar;
-
-
