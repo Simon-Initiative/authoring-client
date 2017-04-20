@@ -23,6 +23,7 @@ import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
+import { changes } from '../../../data/content/html/changes';
 
 type Ids = {
   id: string
@@ -30,6 +31,7 @@ type Ids = {
 
 export interface QuestionEditor {
   ids: Ids;
+  lastBody: contentTypes.Html
 }
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
@@ -80,7 +82,41 @@ export abstract class QuestionEditor
   }
 
   onBodyEdit(body) {
-    const question = this.props.model.with({body});
+
+    let question = this.props.model.with({body});
+
+    if (this.lastBody !== undefined) {
+      const delta = changes(EntityTypes.input_ref, '@input', this.lastBody.contentState, body.contentState);
+    
+      // For any deletions of input_refs, we need to make sure that we remove
+      // the corresponding item and part from the question model
+      if (delta.deletions.size > 0) {
+        let items = this.props.model.items;
+        let parts = this.props.model.parts;
+        let itemArray = items.toArray();
+        let partsArray = parts.toArray();
+        delta.deletions.toArray().forEach(d => {
+          
+          
+          // Find the item whose id matches this entity @input data field
+          // and remove it and the corresponding part
+          for (let i = 0; i < itemArray.length; i++) {
+            let currentItem = (itemArray[i] as any);
+
+            if (currentItem.id !== undefined && currentItem.id === d.entity.data['@input']) {
+              items = items.delete(currentItem.guid);
+              parts = parts.delete(partsArray[i].guid);
+              break;
+            }
+          }
+
+        });
+        question = question.with({ items, parts});
+      }
+    }
+    
+    this.lastBody = body;
+    
     this.props.onEdit(question);
   }
 
@@ -152,7 +188,7 @@ export abstract class QuestionEditor
     const input = guid();
     const data = {};
     data['@input'] = input;
-    data['$type'] = contentTypes.FillInTheBlank;
+    data['$type'] = 'FillInTheBlank';
 
     a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
     
@@ -176,7 +212,7 @@ export abstract class QuestionEditor
                 services={this.props.services} 
                 actionHandler={this}>
                   {toolbarConfigs.flowInline()}
-                  <ToolbarButton icon='server' action={this.onFillInTheBlank}/>
+                  <ToolbarButton key='server' icon='server' action={this.onFillInTheBlank}/>
                 </Toolbar>
     const blockToolbar = <Toolbar 
                 context={this.props.context} 

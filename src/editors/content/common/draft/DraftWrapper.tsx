@@ -19,7 +19,10 @@ import { getActivityByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
-import { changes } from '../../../../data/content/html/changes';
+
+
+export type ChangePreviewer = (current: Html, next: Html) => Html;
+
 
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
@@ -51,6 +54,7 @@ export interface DraftWrapperProps {
   inlineToolbar: any;
   blockToolbar: any;
   editorStyles?: Object;
+  changePreviewer?: ChangePreviewer;
 }
 
 
@@ -241,13 +245,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         
 
         if (contentChange) {
+          
+          let currentHtml = new Html({ contentState: content});
+          let nextHtml = new Html({ contentState: editorState.getCurrentContent()});
 
-          const delta = changes(EntityTypes.input_ref, '@input', this.lastContent, content);
-          console.log(delta.deletions.toArray());
+          if (this.props.changePreviewer !== undefined) {
+            nextHtml = this.props.changePreviewer(currentHtml, nextHtml);            
+          }
+          this.lastContent = nextHtml.contentState;
 
-          this.lastContent = content;
-          const html = new Html({ contentState: editorState.getCurrentContent()});
-          this.props.onEdit(html);
+          this.props.onEdit(nextHtml);
+          
         }
         
         this.setState({editorState});

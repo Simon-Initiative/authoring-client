@@ -11,6 +11,8 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 
 import '../common/editor.scss';
 
+export type ChangePreviewer = (current: contentTypes.Html, next: contentTypes.Html) => contentTypes.Html;
+
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
   container: any;
@@ -25,6 +27,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   blockToolbar: any;
 
   editorStyles?: Object;
+
+  changePreviewer?: ChangePreviewer;
 }
 
 export interface HtmlContentEditorState {
@@ -69,6 +73,7 @@ export class HtmlContentEditor
       <div className="form-control">
         
           <DraftWrapper 
+            changePreviewer={this.props.changePreviewer}
             editorStyles={this.props.editorStyles}
             inlineToolbar={this.props.inlineToolbar}
             blockToolbar={this.props.blockToolbar}
