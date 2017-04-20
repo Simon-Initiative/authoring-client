@@ -172,10 +172,10 @@ body { margin-top: 58px !important; background: $color-offwhite; width: 100%; he
     	}
 
     	input {
-    		margin-top: 1rem;
+    		//margin-top: 1rem;
     		padding: 2rem;
     		color: #000;
-    		font-size: 1.5em;
+    		//font-size: 1.5em;
     		border: 1px solid #0055ab;
     	}
 
@@ -321,8 +321,7 @@ figure {
 
 .public-DraftStyleDefault-block {
   &.public-DraftStyleDefault-ltr {
-    line-height: 1.5rem;
-    margin-top: 1.5rem;
+    margin-top: 0rem;
     margin-bottom: 0;
   }
 }
@@ -340,7 +339,7 @@ h1 {
 	>span {
 		display: block;
 		text-align: center;
-		backgroud-color: blue;
+		background-color: blue;
 	}
 	.preview {
 		// margin-right: 1rem;
