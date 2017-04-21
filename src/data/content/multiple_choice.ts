@@ -12,7 +12,7 @@ export type MultipleChoiceParams = {
   id? : string,
   name? : string,
   labels? : boolean,
-  select? : number,
+  select? : string,
   shuffle? : boolean,
   guid?: string
 };
@@ -92,7 +92,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
     return {
       "multiple_choice": {
         "@shuffle": this.shuffle ? 'true': 'false',
-        "@select": 'single',
+        "@select": this.select,
         "@id": this.id,
         "@name": this.name,
         "@labels": this.labels ? 'true' : 'false',

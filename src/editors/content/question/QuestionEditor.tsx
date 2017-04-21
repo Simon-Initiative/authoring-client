@@ -13,6 +13,7 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
+import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { Numeric } from '../items/Numeric';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
@@ -144,7 +145,7 @@ export abstract class QuestionEditor
 
   onAddItemPart() {
     let item = new contentTypes.MultipleChoice();
-    item = item.with({guid: guid()});
+    item = item.with({guid: guid(), select: 'multiple'});
 
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
 
@@ -156,8 +157,18 @@ export abstract class QuestionEditor
   }
 
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
-    if (item.contentType === 'MultipleChoice') {
+    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
         return <MultipleChoice
+          {...this.props}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />
+    } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
+        return <CheckAllThatApply
           {...this.props}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}

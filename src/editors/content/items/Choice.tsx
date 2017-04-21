@@ -19,6 +19,7 @@ export interface Choice {
 
 export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
   onRemove: (choice: contentTypes.Choice) => void;
+  label?: string;
 }
 
 export interface ChoiceState {
@@ -81,8 +82,10 @@ export class Choice
       borderColor: '#AAAAAA'
     }
 
+    const label = this.props.label === undefined ? 'Choice' : this.props.label;
+
     return (
-      <InputLabel label="Choice" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+      <InputLabel label={label} style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
         <HtmlContentEditor 
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}
