@@ -64,9 +64,8 @@ export class ContentEditor
     this.props.onEdit(concept);
   }
 
-  onAvailability(e) {
-    console.log(e.target.value);
-    this.props.onEdit(this.props.model.with({availability: e.target.value}));
+  onAvailability(availability) {
+    this.props.onEdit(this.props.model.with({availability}));
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -118,9 +117,7 @@ export class ContentEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
+              {...this.props}
               editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 

@@ -4,7 +4,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
-
+import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
@@ -56,6 +56,12 @@ export class FillInTheBlank
     this.onShuffleChange = this.onShuffleChange.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onExplanation = this.onExplanation.bind(this);
+  }
+
+  onExplanation(explanation) {
+    const part = this.props.partModel.with({explanation});
+    this.props.onEdit(this.props.itemModel, part);
   }
 
   onShuffleChange(e) {
@@ -89,9 +95,7 @@ export class FillInTheBlank
   renderChoice(choice: contentTypes.Choice, response : contentTypes.Response,) {
     return <Choice 
               key={choice.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
+              {...this.props}
               model={choice}
               onEdit={this.onChoiceEdit} 
               onRemove={this.onRemoveChoice.bind(this, choice, response)}
@@ -112,10 +116,9 @@ export class FillInTheBlank
     return (
       <FeedbackEditor 
         key={feedback.guid}
-        editMode={this.props.editMode}
-        services={this.props.services}
-        context={this.props.context}
+        {...this.props}
         model={feedback}
+        showLabel={true}
         onRemove={this.onRemoveChoice.bind(this, choice, response)}
         onEdit={this.onFeedbackEdit.bind(this, response)} 
         />);
@@ -189,11 +192,14 @@ export class FillInTheBlank
           {this.renderChoices()}
         </Collapse>
         <Hints
-            context={this.props.context}
-            services={this.props.services}
+            {...this.props}
             model={this.props.partModel}
-            editMode={this.props.editMode}
             onEdit={this.onHintsEdit}
+          />
+        <ExplanationEditor
+            {...this.props}
+            model={this.props.partModel.explanation}
+            onEdit={this.onExplanation}
           />
       </div>);
   }

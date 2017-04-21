@@ -54,10 +54,8 @@ export abstract class Hints
   renderHints() {
     return this.props.model.hints.toArray().map(i => {
       return <HintEditor
-              context={this.props.context}
               key={i.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
+              {...this.props}
               model={i}
               onEdit={this.onHintEdit} 
               onRemove={this.onRemove}

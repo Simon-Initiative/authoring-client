@@ -13,8 +13,8 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
+import { Numeric } from '../items/Numeric';
 import { FillInTheBlank } from '../items/FillInTheBlank';
-import { PartEditor } from '../part/PartEditor';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 import { EntityTypes } from '../../../data/content/html/common';
@@ -68,6 +68,8 @@ export abstract class QuestionEditor
     this.onAddItemPart = this.onAddItemPart.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
+    this.onNumeric = this.onNumeric.bind(this);
+    
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
   }
@@ -154,30 +156,35 @@ export abstract class QuestionEditor
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice') {
         return <MultipleChoice
+          {...this.props}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          context={this.props.context}
           key={item.guid}
-          editMode={this.props.editMode}
-          services={this.props.services}
           itemModel={item}
           partModel={part}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} 
           />
     } else if (item.contentType === 'FillInTheBlank') {
         return <FillInTheBlank
+            {...this.props}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
-            context={this.props.context}
             key={item.guid}
-            editMode={this.props.editMode}
-            services={this.props.services}
             itemModel={item}
             partModel={part}
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
             />
-    } else {
-
+    } else if (item.contentType === 'Numeric') {
+        return <Numeric
+            {...this.props}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
+        
     }
   }
 
@@ -215,6 +222,28 @@ export abstract class QuestionEditor
 
   }
 
+  onNumeric(a: ToolbarActionProvider) {
+
+    const input = guid();
+    const data = {};
+    data['@input'] = input;
+    data['$type'] = 'Numeric';
+
+    a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
+    
+    let item = new contentTypes.Numeric();
+    item = item.with({guid: input, id: input});
+
+    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    part = part.with({guid: guid()});
+    model = model.with({parts: model.parts.set(part.guid, part) });
+
+    this.props.onEdit(model);
+
+  }
+
   render() : JSX.Element {
     
     const inlineToolbar = <Toolbar 
@@ -223,6 +252,7 @@ export abstract class QuestionEditor
                 actionHandler={this}>
                   {toolbarConfigs.flowInline()}
                   <ToolbarButton key='server' icon='server' action={this.onFillInTheBlank}/>
+                  <ToolbarButton key='info' icon='info' action={this.onNumeric}/>
                 </Toolbar>
     const blockToolbar = <Toolbar 
                 context={this.props.context} 
@@ -250,24 +280,20 @@ export abstract class QuestionEditor
           <div className='questionWrapper'>
 
           <HtmlContentEditor 
+                {...this.props}
                 activeItemId={this.state.activeItemId}
-                context={this.props.context}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
-                editMode={this.props.editMode}
-                services={this.props.services}
                 editHistory={this.state.editHistory}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
                 />
 
           <ConceptsEditor 
-            context={this.props.context}
+            {...this.props}
             model={this.props.model.concepts}
             onEdit={this.onConceptsEdit} 
-            editMode={this.props.editMode}
-            services={this.props.services}
             title='Skills'
             conceptType='skill'    
             />

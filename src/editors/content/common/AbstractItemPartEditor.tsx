@@ -48,7 +48,7 @@ export abstract class AbstractItemPartEditor<ItemType, P extends AbstractItemPar
 
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.partModel !== nextProps.partModel
-      || this.props.itemModel !== this.props.itemModel;
+      || this.props.itemModel !== nextProps.itemModel;
   }
 
 }

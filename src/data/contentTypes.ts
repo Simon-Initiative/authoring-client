@@ -10,11 +10,13 @@ export { Hint } from './content/hint';
 export { Feedback } from './content/feedback';
 export { MultipleChoice } from './content/multiple_choice';
 export { FillInTheBlank } from './content/fill_in_the_blank';
+export { Numeric } from './content/numeric';
 export { Choice } from './content/choice';
 export { Head } from './content/head';
 
 import { FillInTheBlank } from './content/fill_in_the_blank';
 import { MultipleChoice } from './content/multiple_choice';
+import { Numeric } from './content/numeric';
 import { Unsupported } from './content/unsupported';
 
-export type Item = MultipleChoice | FillInTheBlank | Unsupported;
+export type Item = MultipleChoice | FillInTheBlank | Numeric | Unsupported;

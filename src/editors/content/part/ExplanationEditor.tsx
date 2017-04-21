@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
@@ -9,29 +8,27 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
-import { InputLabel } from '../common/InputLabel';
+import { Collapse } from '../common/controls';
 
 import '../common/editor.scss';
 
-
-export interface Choice {
+export interface ExplanationEditor {
+  
 }
 
-export interface ChoiceProps extends AbstractContentEditorProps<contentTypes.Choice> {
-  onRemove: (choice: contentTypes.Choice) => void;
+export interface ExplanationEditorProps extends AbstractContentEditorProps<contentTypes.Html> {
+  onEdit: (model: contentTypes.Html) => void;
 }
 
-export interface ChoiceState {
-
+export interface ExplanationEditorState {
   editHistory: Immutable.List<AuthoringActions>;
-
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export class Choice 
-  extends AbstractContentEditor<contentTypes.Choice, ChoiceProps, ChoiceState> {
+export class ExplanationEditor 
+  extends AbstractContentEditor<contentTypes.Html, ExplanationEditorProps, ExplanationEditorState> {
     
   constructor(props) {
     super(props);
@@ -39,18 +36,12 @@ export class Choice
     this.state = {
       editHistory: Immutable.List<AuthoringActions>()
     };
-    this.onBodyEdit = this.onBodyEdit.bind(this);
   }
 
   handleAction(action: AuthoringActions) {
     this.setState({
       editHistory: this.state.editHistory.insert(0, action)
     });
-  }
-
-  onBodyEdit(body) {
-    const concept = this.props.model.with({body});
-    this.props.onEdit(concept);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -66,8 +57,8 @@ export class Choice
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                context={this.props.context} 
-                services={this.props.services} 
+                context={this.props.context}
+                services={this.props.services}
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
                 context={this.props.context}
@@ -82,17 +73,17 @@ export class Choice
     }
 
     return (
-      <InputLabel label="Choice" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+      <Collapse caption='Explanation'>
         <HtmlContentEditor 
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            {...this.props}
-            editHistory={this.state.editHistory}
-            model={this.props.model.body}
-            onEdit={this.onBodyEdit} 
-            />
-      </InputLabel>);
+          editorStyles={bodyStyle}
+          inlineToolbar={inlineToolbar}
+          blockToolbar={blockToolbar}
+          {...this.props}
+          editHistory={this.state.editHistory}
+          model={this.props.model}
+          onEdit={this.props.onEdit} 
+          />
+      </Collapse>);
   }
 
 }

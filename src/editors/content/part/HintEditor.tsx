@@ -114,9 +114,7 @@ export class HintEditor
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}
             blockToolbar={blockToolbar}
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
+            {...this.props}
             editHistory={this.state.editHistory}
             model={this.props.model.body}
             onEdit={this.onBodyEdit} 

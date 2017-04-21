@@ -5,7 +5,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
-
+import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
@@ -59,6 +59,12 @@ export class MultipleChoice
     this.onShuffleChange = this.onShuffleChange.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onExplanation = this.onExplanation.bind(this);
+  }
+
+  onExplanation(explanation) {
+    const part = this.props.partModel.with({explanation});
+    this.props.onEdit(this.props.itemModel, part);
   }
 
   onShuffleChange(e) {
@@ -92,9 +98,7 @@ export class MultipleChoice
   renderChoice(choice: contentTypes.Choice, response : contentTypes.Response,) {
     return <Choice 
               key={choice.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
+              {...this.props}
               model={choice}
               onEdit={this.onChoiceEdit} 
               onRemove={this.onRemoveChoice.bind(this, choice, response)}
@@ -115,9 +119,8 @@ export class MultipleChoice
     return (
       <FeedbackEditor 
         key={feedback.guid}
-        editMode={this.props.editMode}
-        services={this.props.services}
-        context={this.props.context}
+        {...this.props}
+        showLabel={true}
         model={feedback}
         onRemove={this.onRemoveChoice.bind(this, choice, response)}
         onEdit={this.onFeedbackEdit.bind(this, response)} 
@@ -185,16 +188,21 @@ export class MultipleChoice
       </div>);
 
     return (
-      <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}>
+      <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
+        >
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>
         <Hints
-            context={this.props.context}
-            services={this.props.services}
+            {...this.props}
             model={this.props.partModel}
-            editMode={this.props.editMode}
             onEdit={this.onHintsEdit}
+          />
+        <ExplanationEditor
+            {...this.props}
+            model={this.props.partModel.explanation}
+            onEdit={this.onExplanation}
           />
       </div>);
   }
