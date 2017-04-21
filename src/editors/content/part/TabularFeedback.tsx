@@ -57,6 +57,7 @@ export abstract class TabularFeedback
     return this.props.model.responses.toArray()
       .map(r => <FeedbackRow
                   {...this.props}
+                  key={r.guid}
                   onEdit={this.onResponseEdit}
                   model={r}
                   onRemove={this.onResponseRemove}

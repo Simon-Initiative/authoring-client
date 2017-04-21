@@ -221,8 +221,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
     const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
 
+    const es = EditorState.createWithContent(contentState, compositeDecorator);
+    const newEditorState = EditorState.set(es, { allowUndo: false });
+
     this.state = {
-      editorState: EditorState.createWithContent(contentState, compositeDecorator),
+      editorState: newEditorState,
       lockedByBlockRenderer: false,
       show: false,
       x: null,
@@ -433,6 +436,18 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       }
     } else if (this.props.activeItemId !== nextProps.activeItemId) {
       setTimeout(() => this.forceRender(), 100);
+      
+    } else if (this.props.content.contentState !== nextProps.content.contentState) {
+
+      const onDecoratorEdit = () => this.onChange(this.state.editorState);
+      const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+      const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
+      const newEditorState = EditorState.set(es, { allowUndo: false });
+
+      this.setState({
+        editorState: newEditorState
+      });
     }
   }
 
@@ -544,7 +559,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
     const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
 
-    const newEditorState = EditorState.createWithContent(content, compositeDecorator);
+    const es = EditorState.createWithContent(content, compositeDecorator);
+    const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({editorState: newEditorState});
   }
 

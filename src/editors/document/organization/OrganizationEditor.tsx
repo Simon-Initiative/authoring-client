@@ -55,13 +55,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * 
      */
     constructor(props) {
-       
-        super(props);
-
-        this.state = {
-                        treeData: this.processData(orgData),
-                        orgData: this.createEmtpyOrganization(orgData)
-                     };
+      super(props, {
+        treeData: OrganizationEditor.processData(orgData),
+        orgData: OrganizationEditor.createEmtpyOrganization(orgData)
+      });
     }
         
     /**
@@ -109,7 +106,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * That might change as the specs change but at least we won't have to
      * redo the code.
      */
-    createEmtpyOrganization (aData:any) : OrgOrganization {
+    static createEmtpyOrganization (aData:any) : OrgOrganization {
         
       var orgNode=new OrgOrganization ();// throw away for now
                        
@@ -129,15 +126,15 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                   var destNode = obj [j];
                                          
                   if (j=='title') {
-                    orgNode.title=this.getTextFromNode (destNode);
+                    orgNode.title=OrganizationEditor.getTextFromNode (destNode);
                   }
                     
                   if (j=='description') {
-                    orgNode.description=this.getTextFromNode (destNode);
+                    orgNode.description=OrganizationEditor.getTextFromNode (destNode);
                   }
                     
                   if (j=='audience') {
-                    orgNode.audience=this.getTextFromNode (destNode);
+                    orgNode.audience=OrganizationEditor.getTextFromNode (destNode);
                   }                
                 }
               }
@@ -151,7 +148,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    getTextFromNode (aNode: any) : string {
+    static getTextFromNode (aNode: any) : string {
         
       console.log ("getTextFromNode: " + JSON.stringify (aNode));
           
@@ -291,7 +288,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    getNodeContentType (aNode:any):string {
+    static getNodeContentType (aNode:any):string {
         
         //console.log ("getNodeContentType: " + JSON.stringify (aNode));
         
@@ -333,7 +330,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      *   }
      * },
      */
-    parseItem (anItem: any): OrgItem {
+    static parseItem (anItem: any): OrgItem {
         //console.log ("parseItem ()");
         
         var newNode: OrgItem=new OrgItem ();
@@ -358,7 +355,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    parseSection (aSection: any): OrgSection {
+    static parseSection (aSection: any): OrgSection {
         console.log ("parseSection ()");
         
         //console.log ("parseSection: " + JSON.stringify (aSection));
@@ -372,11 +369,11 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             
             for (var j in potentialSection) {
                 if (j=="title") {
-                  newNode.title=this.getTextFromNode (potentialSection [j]);  
+                  newNode.title=OrganizationEditor.getTextFromNode (potentialSection [j]);  
                 }
                 
                 if (j=="item") {
-                  newNode.addNode (this.parseItem (potentialSection [j]));
+                  newNode.addNode (OrganizationEditor.parseItem (potentialSection [j]));
                 }
             }
         }
@@ -387,7 +384,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     /**
      * 
      */
-    parseModule (aModule: any) : OrgItem {
+    static parseModule (aModule: any) : OrgItem {
       console.log ("parseModule ()");
                 
       //console.log ("Parsing " + aModule ["#array"].length + " module sub items ...");  
@@ -398,19 +395,19 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
 
         var mdl=aModule ["#array"] [t];
           
-        var typeSwitch:string=this.getNodeContentType (mdl);
+        var typeSwitch:string=OrganizationEditor.getNodeContentType (mdl);
                                    
         if (typeSwitch=="title") {
           //console.log ("Found module title: " + this.getTextFromNode (mdl ["title"]));                                  
-          moduleNode.title=this.getTextFromNode (mdl ["title"]); 
+          moduleNode.title=OrganizationEditor.getTextFromNode (mdl ["title"]); 
         }                                 
           
         if (typeSwitch=="item") {              
-          moduleNode.addNode (this.parseItem (mdl ["item"]));
+          moduleNode.addNode (OrganizationEditor.parseItem (mdl ["item"]));
         }                
             
         if (typeSwitch=="section") {              
-          moduleNode.addNode (this.parseSection (mdl ["section"]));
+          moduleNode.addNode (OrganizationEditor.parseSection (mdl ["section"]));
         }
       }
         
@@ -424,7 +421,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * Note that the tree widget needs to maintain any attributes we add to a node
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
-    processData (treeData: any) {
+    static processData (treeData: any) {
 
         var newData:Array<OrgSequence>=new Array ();
                         
@@ -459,12 +456,12 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                              var mdl=seq [s];
                                                                     
                              if (s=="title") {
-                               console.log ("Found sequence title: " + this.getTextFromNode (mdl));                                  
-                               newSequence.title=this.getTextFromNode (mdl); 
+                               console.log ("Found sequence title: " + OrganizationEditor.getTextFromNode (mdl));                                  
+                               newSequence.title=OrganizationEditor.getTextFromNode (mdl); 
                              }                                 
                                       
                              if (s=="module") {
-                               let newModule=this.parseModule (mdl);
+                               let newModule=OrganizationEditor.parseModule (mdl);
                                newSequence.children.push (newModule);
                              }
                            }

@@ -33,11 +33,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   implements AuthoringActionsHandler {
     
   constructor(props) {
-    super(props);
-
-    this.state = {
+    super(props, {
       editHistory: Immutable.List<AuthoringActions>()
-    };
+    });
   }
 
   

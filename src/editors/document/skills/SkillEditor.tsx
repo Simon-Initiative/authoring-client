@@ -57,10 +57,9 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
     constructor(props) {
         console.log ("SkillEditor ()");
         
-        super(props);
-        this.state = {
-                        treeData: this.processData(skillData)
-                    };
+        super(props, {
+                        treeData: SkillEditor.processData(skillData)
+                    });
     }
        
     /**
@@ -105,7 +104,7 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
      * Note that the tree widget needs to maintain any attributes we add to a node
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
-    processData (treeData: any) {
+    static processData (treeData: any) {
         
         var newData:Array<Object>=new Array ();
 

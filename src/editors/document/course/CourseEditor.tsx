@@ -28,11 +28,7 @@ interface CourseEditorState extends AbstractEditorState {
 class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState>  {
 
   constructor(props) {
-    super(props);
-
-    this.state = { 
-      resources: []
-    };
+    super(props, { resources: []});
   }
 
   componentDidMount() {

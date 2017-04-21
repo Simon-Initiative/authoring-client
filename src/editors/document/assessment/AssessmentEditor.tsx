@@ -30,7 +30,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   constructor(props) {
-    super(props);
+    super(props, ({} as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
@@ -39,11 +39,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEdit(guid : string, content : models.Node) {
     const nodes = this.props.model.nodes.set(guid, content);
-    this.props.onEdit(this.props.model.with({nodes}));
+    this.handleEdit(this.props.model.with({nodes}));
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    this.props.onEdit(this.props.model.with({title: content}));
+    this.handleEdit(this.props.model.with({title: content}));
   }
 
   renderNode(n : models.Node) {
@@ -91,25 +91,30 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddContent() {
     let content = new contentTypes.Content();
     content = content.with({guid: guid()});
-    this.props.onEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
+    this.handleEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
   }
 
   onAddQuestion() {
     let content = new contentTypes.Question();
     content = content.with({guid: guid()});
-    this.props.onEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
+    this.handleEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
   }
 
   render() {
-    
+
     const titleEditor = this.renderTitle();
     const nodeEditors = this.props.model.nodes.toArray().map(n => this.renderNode(n));
     return (
       <div>
+        <Toolbar 
+          undoEnabled={this.state.undoStackSize > 0}
+          redoEnabled={this.state.redoStackSize > 0}
+          onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
+          onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
         {titleEditor}
         {nodeEditors}
         <hr/>
-        <Toolbar onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
+        
       </div>);
     
   }
