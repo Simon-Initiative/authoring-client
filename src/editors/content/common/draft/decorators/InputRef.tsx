@@ -26,8 +26,18 @@ const InputRef = (props) => {
           style={{width:'65px', marginRight: '2px', display: 'inline'}}
           disabled
           className={classes}
-          type='number'
-          value='10'/>
+          value='Number'/>
+      );
+
+  } else if (data.$type === 'Text') {
+    let classes = 'form-control form-control-sm ' + selected;
+    return (
+        <input 
+          data-offset-key={props.offsetKey} 
+          style={{width:'65px', marginRight: '2px', display: 'inline'}}
+          disabled
+          className={classes}
+          value='Text'/>
       );
 
   } else {

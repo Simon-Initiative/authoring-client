@@ -14,6 +14,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { Numeric } from '../items/Numeric';
+import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
@@ -69,6 +70,7 @@ export abstract class QuestionEditor
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
     this.onNumeric = this.onNumeric.bind(this);
+    this.onText = this.onText.bind(this);
     
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -185,6 +187,17 @@ export abstract class QuestionEditor
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
             />
         
+    } else if (item.contentType === 'Text') {
+        return <Text
+            {...this.props}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
+        
     }
   }
 
@@ -200,16 +213,14 @@ export abstract class QuestionEditor
     return toRender;
   }
 
-  onFillInTheBlank(a: ToolbarActionProvider) {
-
+  addItem(a: ToolbarActionProvider, item, typeLabel) {
     const input = guid();
     const data = {};
     data['@input'] = input;
-    data['$type'] = 'FillInTheBlank';
+    data['$type'] = typeLabel;
 
     a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
     
-    let item = new contentTypes.FillInTheBlank();
     item = item.with({guid: input, id: input});
 
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
@@ -219,29 +230,18 @@ export abstract class QuestionEditor
     model = model.with({parts: model.parts.set(part.guid, part) });
 
     this.props.onEdit(model);
+  }
 
+  onFillInTheBlank(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.FillInTheBlank(), 'FillInTheBlank');
   }
 
   onNumeric(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.Numeric(), 'Numeric');
+  }
 
-    const input = guid();
-    const data = {};
-    data['@input'] = input;
-    data['$type'] = 'Numeric';
-
-    a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
-    
-    let item = new contentTypes.Numeric();
-    item = item.with({guid: input, id: input});
-
-    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
-
-    let part = new contentTypes.Part();
-    part = part.with({guid: guid()});
-    model = model.with({parts: model.parts.set(part.guid, part) });
-
-    this.props.onEdit(model);
-
+  onText(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.Text(), 'Text');
   }
 
   render() : JSX.Element {
@@ -253,6 +253,7 @@ export abstract class QuestionEditor
                   {toolbarConfigs.flowInline()}
                   <ToolbarButton key='server' icon='server' action={this.onFillInTheBlank}/>
                   <ToolbarButton key='info' icon='info' action={this.onNumeric}/>
+                  <ToolbarButton key='i-cursor' icon='i-cursor' action={this.onText}/>
                 </Toolbar>
     const blockToolbar = <Toolbar 
                 context={this.props.context} 
