@@ -36,19 +36,26 @@ export abstract class FeedbackRow
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      match: nextProps.model.match,
+      score: nextProps.model.score
+    })
+  }
+
   onFeedbackEdit(model: contentTypes.Feedback) {
     const response = this.props.model.with({feedback: this.props.model.feedback.set(model.guid, model)});
     this.props.onEdit(response);
   }
 
-  onScore(score) {
-    const response = this.props.model.with({score});
-    this.props.onEdit(response);
+  onScore(e) {
+    const response = this.props.model.with({score: e.target.value});
+    this.setState({score: e.target.value}, () => this.props.onEdit(response));
   }
 
-  onMatch(match) {
-    const response = this.props.model.with({match});
-    this.props.onEdit(response);
+  onMatch(e) {
+    const response = this.props.model.with({match: e.target.value});
+    this.setState({match: e.target.value}, () => this.props.onEdit(response));
   }
 
   renderMatch(response: contentTypes.Response) {
