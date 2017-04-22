@@ -31,6 +31,10 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
     this.onChange = this.onChange.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({value: nextProps.value});
+  }
+
   onChange(e) {
     const value = e.target.value;
     this.setState({ value }, () => this.props.onEdit(value));
