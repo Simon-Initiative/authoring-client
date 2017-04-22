@@ -67,7 +67,7 @@ export abstract class QuestionEditor
 
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
-    this.onAddItemPart = this.onAddItemPart.bind(this);
+    this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
     this.onNumeric = this.onNumeric.bind(this);
@@ -143,9 +143,9 @@ export abstract class QuestionEditor
   }
 
 
-  onAddItemPart() {
+  onAddMultipleChoice(select) {
     let item = new contentTypes.MultipleChoice();
-    item = item.with({guid: guid(), select: 'multiple'});
+    item = item.with({guid: guid(), select});
 
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
 
@@ -280,8 +280,18 @@ export abstract class QuestionEditor
       borderColor: '#AAAAAA'
     }
 
-    const expanded = 
-        <Button type='link' onClick={this.onAddItemPart}>Add Item/Part</Button>;
+    const expanded = (
+    <div className="dropdown" style={{display: 'inline'}}>
+      <button className="btn btn-secondary btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Add Item
+      </button>
+      <div className="dropdown-menu">
+        <a onClick={() => this.onAddMultipleChoice('single')} className="dropdown-item" href="#">Multiple choice</a>
+        <a onClick={() => this.onAddMultipleChoice('multiple')} className="dropdown-item" href="#">Check all that apply</a>
+        <a className="dropdown-item" href="#">Ordering</a>
+        <a className="dropdown-item" href="#">Short answer</a>
+      </div>
+    </div>);
 
     return (
     
