@@ -15,7 +15,6 @@ import '../common/editor.scss';
 import './MultipleChoice.scss';
 
 type IdTypes = {
-  select: string,
   shuffle: string
 }
 
@@ -44,7 +43,6 @@ export class CheckAllThatApply
       editHistory: []
     };
     this.ids = {
-      select: guid(),
       shuffle: guid()
     }
     this.onAddChoice = this.onAddChoice.bind(this);
@@ -95,6 +93,10 @@ export class CheckAllThatApply
   }
 
   updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
+    
+    // For each response, adjust matches that may have 
+    // utilized the removedValue...
+    
     return partModel;
   }
 

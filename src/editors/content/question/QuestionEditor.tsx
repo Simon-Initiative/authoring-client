@@ -14,6 +14,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { CheckAllThatApply } from '../items/CheckAllThatApply';
+import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
@@ -68,6 +69,7 @@ export abstract class QuestionEditor
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
+    this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
     this.onNumeric = this.onNumeric.bind(this);
@@ -156,6 +158,19 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
+  onAddShortAnswer() {
+    let item = new contentTypes.ShortAnswer();
+    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    let response = new contentTypes.Response({ match: '*', score: '1'});
+
+    part = part.with({responses: part.responses.set(response.guid, response)});
+    model = model.with({parts: model.parts.set(part.guid, part) });
+
+    this.props.onEdit(model);
+  }
+
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
         return <MultipleChoice
@@ -209,6 +224,16 @@ export abstract class QuestionEditor
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
             />
         
+    } else if (item.contentType === 'ShortAnswer') {
+        return <ShortAnswer
+            {...this.props}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
     }
   }
 
@@ -289,7 +314,7 @@ export abstract class QuestionEditor
         <a onClick={() => this.onAddMultipleChoice('single')} className="dropdown-item" href="#">Multiple choice</a>
         <a onClick={() => this.onAddMultipleChoice('multiple')} className="dropdown-item" href="#">Check all that apply</a>
         <a className="dropdown-item" href="#">Ordering</a>
-        <a className="dropdown-item" href="#">Short answer</a>
+        <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
       </div>
     </div>);
 

@@ -4,7 +4,7 @@ import createGuid from '../../utils/guid';
 import { augment, getChildren } from './common';
 import { getKey } from '../common';
 
-export type TextParams = {
+export type ShortAnswerParams = {
   id? : string,
   name? : string,
   caseSensitive?: boolean;
@@ -18,14 +18,14 @@ const defaultContent = {
   name: '',
   caseSensitive: false,
   whitespace: 'trim',
-  inputSize: 'small',
+  inputSize: 'medium',
   guid: '',
-  contentType: 'Text'
+  contentType: 'ShortAnswer'
 }
 
-export class Text extends Immutable.Record(defaultContent) {
+export class ShortAnswer extends Immutable.Record(defaultContent) {
   
-  contentType: 'Text';
+  contentType: 'ShortAnswer';
   id : string;
   name : string;
   caseSensitive: boolean;
@@ -33,18 +33,18 @@ export class Text extends Immutable.Record(defaultContent) {
   inputSize: string;
   guid: string;
   
-  constructor(params?: TextParams) {
+  constructor(params?: ShortAnswerParams) {
     super(augment(params));
   }
 
-  with(values: TextParams) {
+  with(values: ShortAnswerParams) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object, guid: string) : Text {
+  static fromPersistence(json: Object, guid: string) : ShortAnswer {
     
-    let n = (json as any).text;
-    let model = new Text({ guid });
+    let n = (json as any).short_answer;
+    let model = new ShortAnswer({ guid });
 
     if (n['@id'] !== undefined) {
       model = model.with({ id: n['@id']});
@@ -69,7 +69,7 @@ export class Text extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     return {
-      "text": {
+      "short_answer": {
         "@id": this.id,
         "@name": this.name,
         "@size": this.inputSize,

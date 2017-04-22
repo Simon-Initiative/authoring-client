@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
@@ -15,15 +13,15 @@ import '../common/editor.scss';
 import './MultipleChoice.scss';
 
 
-export interface Text {
+export interface ShortAnswer {
   
 }
 
-export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
+export interface ShortAnswerProps extends AbstractItemPartEditorProps<contentTypes.ShortAnswer> {
 
 }
 
-export interface TextState {
+export interface ShortAnswerState {
 
 }
 
@@ -31,8 +29,8 @@ export interface TextState {
 /**
  * The content editor for HtmlContent.
  */
-export class Text 
-  extends AbstractItemPartEditor<contentTypes.Text, TextProps, TextState> {
+export class ShortAnswer 
+  extends AbstractItemPartEditor<contentTypes.ShortAnswer, ShortAnswerProps, ShortAnswerState> {
     
   constructor(props) {
     super(props);
@@ -90,11 +88,6 @@ export class Text
         {controls}
 
         <Hints
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
-        <TabularFeedback
             {...this.props}
             model={this.props.partModel}
             onEdit={this.onPartEdit}
