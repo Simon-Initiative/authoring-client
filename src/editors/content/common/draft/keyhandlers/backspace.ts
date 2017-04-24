@@ -10,15 +10,18 @@ export default function handle(editorState: EditorState, onChange: (e: EditorSta
   // Handle backspacing at the beginning of a block to 
   // account for removing sentinel blocks
   if (start === 0) {
+    console.log('beginning');
     return handleBackspaceAtBeginning(editorState, onChange);
   } 
 
   // Handle backspacing to delete an immutable entity
   const entityBefore = getEntityBefore(start - 1, editorState);
   if (entityBefore !== null) {
+    console.log('entity');
     return handleBackspaceAtEntity(editorState, onChange);
   }
   
+  console.log('not-handled');
   return 'not-handled';
   
 }
@@ -39,9 +42,6 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
     isBackwards: false,
     hasFocus: false
   });
-
-  console.log('range to remove');
-  console.log(rangeToRemove);
 
   const updatedContent = Modifier.removeRange(
     editorState.getCurrentContent(),
