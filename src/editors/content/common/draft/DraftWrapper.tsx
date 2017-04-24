@@ -198,6 +198,8 @@ function splitBlockInContentState(
 }
 
 
+
+
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
   constructor(props) {
@@ -265,6 +267,22 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.setState({editorState});
       }
     };
+  }
+
+  appendText(contentBlock, contentState, text) {
+
+    const targetRange = new SelectionState({
+      anchorKey: contentBlock.key,
+      focusKey: contentBlock.key,
+      anchorOffset: contentBlock.text.length,
+      focusOffset: contentBlock.text.length
+    })
+
+    return Modifier.insertText(
+      contentState,
+      targetRange,
+      text);
+    
   }
 
   onBlur() {
@@ -452,8 +470,27 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   insertInlineEntity(type: string, mutability: string, data: Object) {
-    const contentState = this.state.editorState.getCurrentContent();
-    const selectionState = this.state.editorState.getSelection();
+
+    let contentState = this.state.editorState.getCurrentContent();
+    let selectionState = this.state.editorState.getSelection();
+
+    if (selectionState.focusOffset === 0 && selectionState.anchorOffset === 0) {
+      
+      selectionState = new SelectionState({ 
+        anchorKey: selectionState.anchorKey,
+        focusKey: selectionState.focusKey,
+        anchorOffset: 0,
+        focusOffset: 1
+      });
+    }
+
+    const block = contentState.getBlockForKey(selectionState.anchorKey);
+    const text = block.getText();
+
+    if (text.length < selectionState.focusOffset) {
+      contentState = this.appendText(block, contentState, '  ');
+    }
+
     const contentStateWithEntity = contentState.createEntity(type, mutability, data);
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const contentStateWithLink = Modifier.applyEntity(
@@ -465,7 +502,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const newEditorState = EditorState.set(
         this.state.editorState,
         { currentContent: contentStateWithLink });
-
     this.onChange(newEditorState);
   }
 

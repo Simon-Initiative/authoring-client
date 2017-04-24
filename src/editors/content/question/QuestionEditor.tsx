@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
+import { AuthoringActionsHandler, AuthoringActions, insertInlineEntity } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -78,6 +78,11 @@ export abstract class QuestionEditor
     this.onNumeric = this.onNumeric.bind(this);
     this.onText = this.onText.bind(this);
     this.onRemove = this.onRemove.bind(this);
+    this.onInsertFillInTheBlank = this.onInsertFillInTheBlank.bind(this);
+    this.onInsertNumeric = this.onInsertNumeric.bind(this);
+    this.onInsertText = this.onInsertText.bind(this);
+    
+    
     
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -89,6 +94,27 @@ export abstract class QuestionEditor
     if (this.state.activeItemId === activeItemId) {
       this.setState({ activeItemId: null });
     }
+  }
+
+  onInsert(item, typeLabel) {
+    this.itemToAdd = item; 
+
+    const input = guid();
+    const data = {};
+    data['@input'] = input;
+    data['$type'] = typeLabel;
+
+    this.handleAction(insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data));
+  }
+
+  onInsertNumeric() {
+    this.onInsert(new contentTypes.Numeric(), 'Numeric');
+  }
+  onInsertText() {
+    this.onInsert(new contentTypes.Text(), 'Text');
+  }
+  onInsertFillInTheBlank() {
+    this.onInsert(new contentTypes.FillInTheBlank(), 'FillInTheBlank');
   }
 
   handleAction(action: AuthoringActions) {
@@ -323,9 +349,7 @@ export abstract class QuestionEditor
 
     a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
     
-    
   }
-
 
 
   onFillInTheBlank(a: ToolbarActionProvider) {
@@ -375,6 +399,9 @@ export abstract class QuestionEditor
         <a onClick={() => this.onAddMultipleChoice('multiple')} className="dropdown-item" href="#">Check all that apply</a>
         <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
         <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
+        <a onClick={this.onInsertNumeric} className="dropdown-item" href="#">Numeric</a>
+        <a onClick={this.onInsertText} className="dropdown-item" href="#">Text</a>
+        <a onClick={this.onInsertFillInTheBlank} className="dropdown-item" href="#">Fill in the Blank</a>
       </div>
     </div>);
 
