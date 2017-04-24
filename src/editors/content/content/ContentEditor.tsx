@@ -108,21 +108,23 @@ export class ContentEditor
     )
 
     return (
-      <Collapse 
-        caption='Content' 
-        details={getHtmlDetails(this.props.model.body)}
-        expanded={expanded}>
-        
-        <HtmlContentEditor 
-              editorStyles={bodyStyle}
-              inlineToolbar={inlineToolbar}
-              blockToolbar={blockToolbar}
-              {...this.props}
-              editHistory={this.state.editHistory}
-              model={this.props.model.body}
-              onEdit={this.onBodyEdit} 
-              />
-      </Collapse>);
+      <div className='componentWrapper'>
+        <Collapse 
+          caption='Content' 
+          details={getHtmlDetails(this.props.model.body)}
+          expanded={expanded}>
+          
+          <HtmlContentEditor 
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                blockToolbar={blockToolbar}
+                {...this.props}
+                editHistory={this.state.editHistory}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit} 
+                />
+        </Collapse>
+      </div>);
   }
 
 }

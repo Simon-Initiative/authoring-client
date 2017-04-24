@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
@@ -9,6 +7,7 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
+import { ItemLabel } from './ItemLabel';
 import guid from '../../../utils/guid';
 
 import '../common/editor.scss';
@@ -137,6 +136,10 @@ export class Ordering
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
+
+        <ItemLabel label='Ordering' 
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

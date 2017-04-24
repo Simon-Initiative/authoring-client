@@ -28,6 +28,8 @@ export interface AbstractItemPartEditorProps<ItemType> {
   onFocus: (itemId: string) => void;
 
   onBlur: (itemId: string) => void;
+
+  onRemove: (item: ItemType, part: contentTypes.Part) => void;
   
 }
 

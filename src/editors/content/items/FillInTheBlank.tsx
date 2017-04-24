@@ -7,6 +7,7 @@ import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
+import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -188,6 +189,10 @@ export class FillInTheBlank
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
+
+        <ItemLabel label='Fill in the Blank' 
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+       
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

@@ -8,6 +8,7 @@ import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
+import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -137,6 +138,10 @@ export class CheckAllThatApply
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
+
+        <ItemLabel label='Check all that apply' 
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+       
         <Collapse caption='Choices' expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

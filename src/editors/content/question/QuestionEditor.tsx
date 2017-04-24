@@ -76,6 +76,7 @@ export abstract class QuestionEditor
     this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
     this.onNumeric = this.onNumeric.bind(this);
     this.onText = this.onText.bind(this);
+    this.onRemove = this.onRemove.bind(this);
     
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -160,6 +161,15 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
+  onRemove(itemModel, partModel) {
+    const items = this.props.model.items.delete(itemModel.guid);
+    const parts = this.props.model.parts.delete(partModel.guid);
+
+    const model = this.props.model.with({items, parts});
+
+    this.props.onEdit(model);
+  }
+
   onAddShortAnswer() {
     let item = new contentTypes.ShortAnswer();
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
@@ -187,6 +197,7 @@ export abstract class QuestionEditor
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
         return <MultipleChoice
           {...this.props}
+          onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           key={item.guid}
@@ -197,6 +208,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
         return <CheckAllThatApply
           {...this.props}
+          onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           key={item.guid}
@@ -207,6 +219,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'FillInTheBlank') {
         return <FillInTheBlank
             {...this.props}
+            onRemove={this.onRemove}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
             key={item.guid}
@@ -217,6 +230,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'Numeric') {
         return <Numeric
             {...this.props}
+            onRemove={this.onRemove}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
             key={item.guid}
@@ -228,6 +242,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'Text') {
         return <Text
             {...this.props}
+            onRemove={this.onRemove}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
             key={item.guid}
@@ -239,6 +254,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'ShortAnswer') {
         return <ShortAnswer
             {...this.props}
+            onRemove={this.onRemove}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
             key={item.guid}
@@ -249,6 +265,7 @@ export abstract class QuestionEditor
     } else if (item.contentType === 'Ordering') {
         return <Ordering
             {...this.props}
+            onRemove={this.onRemove}
             onFocus={this.onFocusChange}
             onBlur={this.onBlur}
             key={item.guid}
@@ -265,7 +282,7 @@ export abstract class QuestionEditor
     const parts = this.props.model.parts.toArray()
     const toRender = [];
     for (let i = 0; i < items.length; i++) {
-      toRender.push(this.renderItemPartEditor(items[i], parts[i]));
+      toRender.push(<div key={items[i].guid} className='itemPart'>{this.renderItemPartEditor(items[i], parts[i])}</div>);
     }
 
     return toRender;
@@ -342,11 +359,11 @@ export abstract class QuestionEditor
 
     return (
     
+      <div className='componentWrapper'>
+
         <Collapse caption='Question' 
           details={getHtmlDetails(this.props.model.body)}
           expanded={expanded}>
-
-          <div className='questionWrapper'>
 
           <HtmlContentEditor 
                 {...this.props}
@@ -369,9 +386,8 @@ export abstract class QuestionEditor
 
           {this.renderItemsAndParts()}
 
-          </div>
-
-        </Collapse>);
+        </Collapse>
+      </div>);
   }
 
 }

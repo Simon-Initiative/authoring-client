@@ -92,7 +92,7 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
   const currentContentBlock = currentContent.getBlockForKey(anchorKey);
   const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
     
-  if (blockBefore !== null && blockBefore.getType() === 'atomic') {
+  if (blockBefore !== undefined && blockBefore !== null && blockBefore.getType() === 'atomic') {
     
     const key = blockBefore.getEntityAt(0);
     const entity = currentContent.getEntity(key);
