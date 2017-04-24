@@ -27,7 +27,7 @@ import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
-import { changes } from '../../../data/content/html/changes';
+import { changes, removeInputRef } from '../../../data/content/html/changes';
 
 type Ids = {
   id: string
@@ -36,6 +36,7 @@ type Ids = {
 export interface QuestionEditor {
   ids: Ids;
   lastBody: contentTypes.Html
+  itemToAdd: any
 }
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
@@ -80,6 +81,8 @@ export abstract class QuestionEditor
     
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
+
+    this.lastBody = this.props.model.body;
   }
 
   onBlur(activeItemId: string) {
@@ -133,6 +136,19 @@ export abstract class QuestionEditor
 
         });
         question = question.with({ items, parts});
+
+      } else if (delta.additions.size > 0) {
+
+        const input = delta.additions.toArray()[0].entity.data['@input'];
+
+        const item = this.itemToAdd.with({guid: input, id: input});
+
+        question = question.with({items: question.items.set(item.guid, item) });
+
+        let part = new contentTypes.Part();
+        part = part.with({guid: guid()});
+        question = question.with({parts: question.parts.set(part.guid, part) });
+
       }
     }
     
@@ -161,12 +177,20 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onRemove(itemModel, partModel) {
+  onRemove(itemModel: contentTypes.Item, partModel) {
+    
     const items = this.props.model.items.delete(itemModel.guid);
     const parts = this.props.model.parts.delete(partModel.guid);
+    let body = this.props.model.body;
 
-    const model = this.props.model.with({items, parts});
-
+    switch (itemModel.contentType) {
+      case 'Numeric':
+      case 'Text':
+      case 'FillInTheBlank':
+        body = removeInputRef(body, itemModel.id);
+    }
+    
+    const model = this.props.model.with({items, parts, body});
     this.props.onEdit(model);
   }
 
@@ -289,6 +313,9 @@ export abstract class QuestionEditor
   }
 
   addItem(a: ToolbarActionProvider, item, typeLabel) {
+
+    this.itemToAdd = item; 
+
     const input = guid();
     const data = {};
     data['@input'] = input;
@@ -296,16 +323,10 @@ export abstract class QuestionEditor
 
     a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
     
-    item = item.with({guid: input, id: input});
-
-    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
-
-    let part = new contentTypes.Part();
-    part = part.with({guid: guid()});
-    model = model.with({parts: model.parts.set(part.guid, part) });
-
-    this.props.onEdit(model);
+    
   }
+
+
 
   onFillInTheBlank(a: ToolbarActionProvider) {
     this.addItem(a, new contentTypes.FillInTheBlank(), 'FillInTheBlank');

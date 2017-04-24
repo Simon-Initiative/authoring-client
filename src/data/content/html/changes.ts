@@ -1,10 +1,17 @@
-import { ContentState, ContentBlock, EntityMap, Entity } from 'draft-js';
+import { ContentState, ContentBlock, EntityMap, Entity, Modifier, SelectionState } from 'draft-js';
 import * as Immutable from 'immutable';
 import { EntityTypes } from './common';
+import { Html } from '../html';
 
 export type Changes = {
   additions: Immutable.List<Entity>;
   deletions: Immutable.List<Entity>;
+}
+
+export type EntityRange = {
+  start: number,
+  end: number, 
+  contentBlock: ContentBlock
 }
 
 export type EntityInfo = {
@@ -12,22 +19,77 @@ export type EntityInfo = {
   entity: Entity
 }
 
-function getEntitiesForBlock(type: EntityTypes, contentBlock: ContentBlock, contentState: ContentState) : EntityInfo[] {
+export function removeInputRef(html: Html, itemModelId: string) : Html {
+    // Find the range that represents the entity
+    const range = findEntityRangeByInput(itemModelId, html.contentState);
+
+    // Remove that entity via its range
+    if (range !== null) {
+      const selectionState = new SelectionState({ 
+        anchorKey: range.contentBlock.key,
+        focusKey: range.contentBlock.key,
+        anchorOffset: range.start,
+        focusOffset: range.end
+      });
+      return new Html({contentState: Modifier.applyEntity(html.contentState, selectionState, null)});
+    } else {
+      return html;
+    }
+  }
+
+function findEntityRangeByInput(inputId: string, contentState: ContentState) : EntityRange {
+  
+  const matchPredicate = (key: string) => {
+     return key !== null &&
+        contentState.getEntity(key).getData()['@input'] === inputId;
+  }
+
+  const result = contentState.getBlocksAsArray()
+    .map(block => findEntityRangeForBlock(block, contentState, matchPredicate))  
+    .reduce((p, c) => p.concat(c), []);
+
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    return null;
+  }
+}
+
+function findEntityRangeForBlock(contentBlock: ContentBlock, 
+  contentState: ContentState, isMatch: (key: string) => boolean) : EntityRange[] {
+  
+  const ranges = [];
+  
+  contentBlock.findEntityRanges(
+    (character) => {
+      const entityKey = character.getEntity();
+      return isMatch(entityKey);
+    },
+    (start: number, end: number) => {
+      ranges.push({ start, end, contentBlock });
+    }
+  );
+
+  return ranges;
+}
+
+function getEntitiesForBlock(contentBlock: ContentBlock, 
+  contentState: ContentState, isMatch: (key: string) => boolean) : EntityInfo[] {
   
   const entities = [];
   
   contentBlock.findEntityRanges(
     (character) => {
       const entityKey = character.getEntity();
-      const matches = entityKey !== null &&
-        contentState.getEntity(entityKey).getType() === type;
-
+      const matches = isMatch(entityKey);
       if (matches) {
         entities.push({ entityKey, entity: contentState.getEntity(entityKey)});
       }
       return false;
     },
-    () => {}
+    (start: number, end: number) => {
+
+    }
   );
 
   return entities;
@@ -36,8 +98,13 @@ function getEntitiesForBlock(type: EntityTypes, contentBlock: ContentBlock, cont
 export function getEntities(type: EntityTypes, 
   contentState: ContentState) : EntityInfo[] {
 
+  const matchPredicate = (key: string) => {
+     return key !== null &&
+        contentState.getEntity(key).getType() === type;
+  }
+
   return contentState.getBlocksAsArray()
-    .map(block => getEntitiesForBlock(type, block, contentState))
+    .map(block => getEntitiesForBlock(block, contentState, matchPredicate))
     .reduce((p, c) => p.concat(c), []);
 }
 
@@ -77,4 +144,5 @@ export function changes(
       deletions
     }
 }
+
 
