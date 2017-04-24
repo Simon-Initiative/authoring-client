@@ -6,6 +6,7 @@ import { Html } from './html';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
+import { Ordering } from './ordering';
 import { Text } from './text';
 import { ShortAnswer } from './short_answer';
 import { Numeric } from './numeric';
@@ -17,7 +18,7 @@ import { augment } from './common';
 import { getEntities } from './html/changes';
 import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | FillInTheBlank | ShortAnswer | Numeric | Text | Unsupported;
+export type Item = MultipleChoice | FillInTheBlank | Ordering | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
@@ -121,9 +122,11 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         case 'short_answer':
           model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
           break;
-
-        // We do not yet support these question item.types:
         case 'ordering':
+          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          break;
+        
+        // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
           break;
