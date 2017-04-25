@@ -115,7 +115,8 @@ export class Skill extends Linkable {
   orgType:SkillTypes=SkillTypes.Skill;
       
   title:string="unassigned";    
-  skillModel:SkillModel=new SkillModelBKT ();  
+  skillModel:SkillModel=new SkillModelBKT ();
+  folded:boolean=true;  
               
   constructor() {
     super ();

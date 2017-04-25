@@ -133,7 +133,7 @@ var createSkills = function(input) {
     var data = { 
       modelType: 'SkillModel',
       title: {text: 'Sample Skill Model'},
-      nodes: []
+      skills: []
     }
     request('POST', '/editor', data)
       .then(result => { skillDocID=result.id; resolve(input)});
@@ -145,7 +145,7 @@ var createLearningObjectives = function(input) {
     var data = { 
       modelType: 'LearningObjectiveModel',
       title: {text: 'Sample Learning Objective Model'},
-      nodes: []
+      lobjectives: []
     }
     request('POST', '/editor', data)
       .then(result => { LODocID=result.id; resolve(input)});
@@ -156,7 +156,7 @@ var createOrganization = function() {
   var data = { 
     modelType: 'OrganizationModel',
     title: {text: 'Sample Organization'},
-    nodes: []
+    skills: []
   }
   return request('POST', '/editor', data);
 }

@@ -12,6 +12,9 @@ import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import { AppServices } from '../../common/AppServices';
+
 import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
@@ -21,6 +24,106 @@ import {Skill} from './SkillTypes';
 
 var skillData=require ('./Skills.json');
 
+const styles = {
+  skillContainer : {
+    "marginTop" : "10px"
+  },
+    
+  skillTitleEditorFolded : {
+    "color" : "#0067cb"
+  },
+  
+  skillTitleEditorUnfolded : {
+    "color" : "#ffffff"
+  }, 
+
+  skillRowUnselected: {
+    "border": "0px solid grey",
+    "background": "#ffffff",
+    "height": "50px",
+    "marginBottom" : "10px",
+    "padding" : "2px",
+    "display" : "flex",
+    "flexDirection" : "column"
+  },
+  
+  skillRowSelected: {
+    "border": "0px solid blue",
+    "background": "#0067cb",
+    "height": "120px",
+    "marginBottom" : "10px",
+    "padding" : "2px",
+    "display" : "flex",    
+    "flexDirection" : "column"
+  },     
+    
+  titleContainer : {
+    "border" : "0px solid grey",
+    "height": "40px",
+    "flex": "1",
+    "margin" : "1px",
+    "verticalAlign": "middle"
+  },
+    
+  toolContainer : {      
+      "margin" : "15px" 
+  },
+  
+  orgrowTitleFolded : {    
+    "border": "0px solid red",
+    "height": "40px",
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "margin" : "0px", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "40px",
+    "color" : "#0067cb"
+  },
+  
+  orgrowTitleUnfolded : {    
+    "border": "0px solid red",
+    "height": "40px",
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "margin" : "0px", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "40px",
+    "color" : "white"      
+  },  
+  
+  titleBarFolded : {
+    "display" : "flex",
+    "flexDirection" : "row",
+    "height": "50px",
+    "color" : "#0067cb"
+  },
+  
+  titleBarUnfolded : {
+    "display" : "flex",
+    "flexDirection" : "row",
+    "height": "50px",
+    "color" : "white"    
+  },  
+  
+  controlBar : {
+    "background" : "#ffffff",
+    "display" : "flex",
+    "flexDirection" : "row",
+    "flex": "1",
+    "visibility" : "visible"
+  },
+  
+  controlBarHidden : {
+    "background" : "#ffffff",
+    "display" : "flex",
+    "flexDirection" : "row",
+    "flex": "1",
+    "visibility" : "hidden"
+  }  
+};
+    
 const tempnavstyle=
 {
     h2:
@@ -36,33 +139,72 @@ interface SkillEditor
 
 export interface SkillEditorState extends AbstractEditorState 
 {
-    treeData : any;
+  model: models.SkillModel;
+  treeData : any;
+  documentId: string;
+  document: any;
 }
 
-export interface SkillEditorProps extends AbstractEditorProps<models.CourseModel>
+export interface SkillEditorProps extends AbstractEditorProps<models.SkillModel>
 {
   dispatch: any;
   documentId: string;
-  userId: string;    
+  userId: string;
 }
 
 /**
 *
 */
-class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, SkillEditorState> 
-{
+class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, SkillEditorState> 
+{            
     /**
      * 
      */
     constructor(props) {
-        console.log ("SkillEditor ()");
         
         super(props);
+        
+        //let dummyDocID="4eb628e9d4ab4be3007c345edb004406";        
+        //console.log ("SkillEditor ("+this.props.context.documentId+")");        
+        //console.log ("Model: " + this.props.model);
+               
         this.state = {
-                        treeData: this.processData(skillData)
+                        treeData: [],
+                        documentId: this.props.context.documentId,
+                        model: this.props.model,
+                        document: this.loadDocument(this.props.context.documentId)
                     };
     }
-       
+    
+    componentWillReceiveProps(nextProps) {
+        console.log ("componentWillReceiveProps ();");
+        console.log ("Props: " + JSON.stringify (nextProps));    
+    }     
+
+    /**
+     * Just as a reference the Skills document should look something like
+     * this:
+     * {
+     *   "_id": "cb0d5b137423d16d846aa77839001389",
+     *   "_rev": "1-e9711c89ff6fe68d6ce1037056af836f",
+     *   "modelType": "SkillModel",
+     *   "title": {
+     *     "text": "Sample Skill Model"
+     *   },
+     *   "nodes": []
+     * }
+     */
+    loadDocument (anID:string):any {
+        console.log ("loadDocument ("+anID+")");
+
+        persistence.retrieveDocument(anID).then(doc => {
+            //console.log ("Document: " + JSON.stringify (doc));
+            this.setState ({document: doc});
+        });
+        
+       return (null); 
+    }    
+    
     /**
      * 
      */
@@ -76,16 +218,44 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
     }
     
     /**
+     *
+     */
+    saveToDB (aData:any): void {
+        console.log ("saveToDB ()");
+        
+        let immutableDocument = this.state.document;
+        
+        if (immutableDocument==null)
+        {
+            console.log ("immutableDocument is null, bump");
+            return;
+        }
+
+        var extractedData:any=this.extractData (this.state.treeData);
+                
+        // Keep in mind that extractData creates a skills object, but in our
+        // model we already have one so we need to extract the contents from
+        // inside that object. Bit confusing prehaps but we'll clean it up
+        // later.
+        var newModel=immutableDocument.model.updateModel (extractedData.skills);
+         
+        var updatedDocument=this.state.document.set ('model',newModel);
+               
+        this.setState ({'document' : updatedDocument },function () {         
+          persistence.persistDocument(this.state.document)
+            .then(result => {console.log ("Document saved ");});
+        }); 
+    }
+    
+    /**
      * Here we go from visual data to database-ready data. We walk the tree
      * and build a db JSON ready representation. We could have done this
      * recursively but since we have to tag every level with a certain type
      * in output tree it was easier to do this in one function for now.
      */
     extractData (aData: any): Object {
-        //console.log ("extractData ()");
-        
-        //console.log ("Extracting from: " + JSON.stringify (aData));
-                        
+        console.log ("extractData ()");
+                                
         var dbReady:Object=new Object();
         dbReady ["skills"]=new Array ();
                                                 
@@ -94,9 +264,9 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
             dbReady ["skills"].push (targetSkillObject.toJSONObject ());
         }
 
-        //console.log ("From: " + JSON.stringify (aData));
-        //console.log ("To: " + JSON.stringify (dbReady));
-        
+        console.log ("From: " + JSON.stringify (aData));
+        console.log ("To: " + JSON.stringify (dbReady));
+                
         return (dbReady);
     }
         
@@ -110,7 +280,7 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         var newData:Array<Object>=new Array ();
 
         return (newData);
-    }    
+    }
     
     /**
      * Note that this manual method of adding a new node does not generate an
@@ -120,7 +290,7 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
     addNode (anEvent:any) {
         console.log ("addNode ()");
         
-        var immutableHelper = this.state.treeData.slice();
+        let immutableHelper = this.state.treeData.slice();
         
         if (immutableHelper==null)
         {
@@ -128,15 +298,20 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
             return;
         }
         
-        var newNode:Skill=new Skill ();
+        let newNode:Skill=new Skill ();
         newNode.title="New Skill";
         immutableHelper.push (newNode);
 
-        this.extractData (immutableHelper);
-        
-        this.setState({treeData: immutableHelper});
+        let formattedData=this.extractData (immutableHelper);
+                
+        this.setState({treeData: immutableHelper},function (){         
+          this.saveToDB (formattedData);
+        });    
     }     
 
+    /**
+     *
+     */    
     deleteNode (aNode:any): void {
         console.log ("SkillEditor:deleteNode ()");
             
@@ -156,9 +331,16 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
             }
         }
         
-        this.setState({treeData: immutableHelper});
+        let formattedData=this.extractData (immutableHelper);
+                
+        this.setState({treeData: immutableHelper},function (){         
+          this.saveToDB (formattedData);
+        });  
     }
     
+    /**
+     *
+     */    
     editTitle (aNode:any, aTitle:any):void {
         console.log ("SkillEditor:editTitle ()");
         
@@ -180,9 +362,48 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
             }
         }
         
+        let formattedData=this.extractData (immutableHelper);
+        
+        this.saveToDB (formattedData);
+        
         this.setState({treeData: immutableHelper});    
     }
     
+    /**
+     * 
+     */
+    fold (aNode:any) : void {
+        console.log ("SkillEditor:fold ()");      
+                
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+                        
+            if (testNode.id==aNode.id) {
+              if (testNode.folded==true) {
+                testNode.folded=false;
+              } else {
+                testNode.folded=true;
+              }
+            }
+            else {
+                testNode.folded=true;
+            }
+        }
+                
+        this.setState({treeData: immutableHelper});          
+    }    
+    
+    /**
+     *
+     */
+    /*    
     genProps () {       
         var optionalProps:Object=new Object ();
         
@@ -192,25 +413,84 @@ class SkillEditor extends AbstractEditor<models.CourseModel,SkillEditorProps, Sk
         
         return (optionalProps);
     }
+    */
         
     /**
      * 
      */
     render() {  
-        //console.log ("SkillEditor:render ()");          
+        //console.log ("SkillEditor:render ()");
+                
+        var options;
+        const services = ({} as AppServices);
+        
+        /**
+         * This will go into it's own renderer once the basic version is complete.
+         */        
+        options = this.state.treeData.map(function(item, index) 
+        {
+            var titleObj=new contentTypes.Title({ text: item.title })
+            
+            if (item.folded==true) {
+              return (
+                  <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowUnselected}>
+                      <div style={styles.titleBarFolded}>
+                         <div style={styles.titleContainer}>
+                            <TitleContentEditor 
+                             services={services}
+                             editMode={true}
+                             model={titleObj}
+                             styles={styles.skillTitleEditorFolded}
+                             context={{userId: null, documentId: null, courseId: null}}
+                             onEdit={(content) => this.editTitle(item,content)}
+                            />
+                         </div>
+                         <div style={styles.toolContainer}>
+                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
+                         </div>  
+                      </div>
+                      <div style={styles.controlBarHidden}>
+                      controlBar
+                      </div>        
+                  </div> 
+              );
+            } else {
+              return (
+              <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowSelected}>
+                      <div style={styles.titleBarUnfolded}>
+                         <div style={styles.titleContainer}>
+                            <TitleContentEditor 
+                             services={services}
+                             editMode={true}
+                             model={titleObj}
+                             styles={styles.skillTitleEditorUnfolded}
+                             context={{userId: null, documentId: null, courseId: null}}
+                             onEdit={(content) => this.editTitle(item,content)} 
+                            />
+                         </div>
+                         <div style={styles.toolContainer}>
+                           <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
+                         </div>  
+                      </div>
+                      <div style={styles.controlBar}>
+                      controlBar
+                      </div>   
+              </div>         
+             );
+            }
+        }.bind(this));         
+        
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                     </nav>
-                    <SortableTree
-                        maxDepth={1}
-                        treeData={this.state.treeData}
-                        onChange={ treeData => this.processDataChange({treeData}) }
-                        nodeContentRenderer={SkillNodeRenderer}
-                        generateNodeProps={this.genProps.bind(this)}
-                    />
+                    <div style={styles.skillContainer}>
+                    {options}
+                    </div>        
                 </div>
         );
     }

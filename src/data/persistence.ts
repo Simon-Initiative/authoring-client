@@ -174,6 +174,8 @@ export function persistDocument(doc: Document) : Promise<Document> {
     // of under 'model'.  This allows for more granular field selection during queries. 
     const toPersist = Object.assign({}, {_id: doc._id, _rev: doc._rev}, doc.model.toPersistence());
 
+    console.log ("Going to persist: " + JSON.stringify(toPersist));  
+      
     fetch(`${configuration.baseUrl}/${configuration.database}/${doc._id}`, {
         method: 'PUT',
         headers: getHeaders(credentials),

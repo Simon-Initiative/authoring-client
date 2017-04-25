@@ -22,6 +22,8 @@ export interface AbstractContentEditorProps<ModelType> {
   services: AppServices;
 
   editMode: boolean;
+    
+  styles?: any;
 }
 
 export interface AbstractContentEditorState {
