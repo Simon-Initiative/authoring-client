@@ -481,5 +481,3 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     return (root);
   }
 }
-
-
