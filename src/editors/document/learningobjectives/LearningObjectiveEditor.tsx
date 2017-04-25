@@ -298,7 +298,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     editTitle (aNode:any, aTitle:any):void {
         console.log ("LearningObjectiveEditor:editTitle ()");
         
-        let newTitle=aTitle.title.get ("#text");
+        //let newTitle=aTitle.title.get ("#text");
+        let newTitle=aTitle.text;
             
         var immutableHelper = this.state.treeData.slice();
         

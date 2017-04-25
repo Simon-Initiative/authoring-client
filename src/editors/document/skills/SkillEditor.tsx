@@ -274,8 +274,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
             dbReady ["skills"].push (targetSkillObject.toJSONObject ());
         }
 
-        console.log ("From: " + JSON.stringify (aData));
-        console.log ("To: " + JSON.stringify (dbReady));
+        //console.log ("From: " + JSON.stringify (aData));
+        //console.log ("To: " + JSON.stringify (dbReady));
                 
         return (dbReady);
     }
@@ -353,8 +353,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      */    
     editTitle (aNode:any, aTitle:any):void {
         console.log ("SkillEditor:editTitle ()");
+        console.log ("content: " + JSON.stringify(aTitle));
         
-        let newTitle=aTitle.title.get ("#text");
+        let newTitle=aTitle.text;
             
         var immutableHelper = this.state.treeData.slice();
         
@@ -376,7 +377,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         
         this.saveToDB (formattedData);
         
-        this.setState({treeData: immutableHelper});    
+        //this.setState({treeData: immutableHelper});    
     }
     
     /**
