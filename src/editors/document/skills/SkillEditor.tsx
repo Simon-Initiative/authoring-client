@@ -173,24 +173,12 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      */
     constructor(props) {
         
-<<<<<<< HEAD
-        super(props);
-        
-        //let dummyDocID="4eb628e9d4ab4be3007c345edb004406";        
-        //console.log ("SkillEditor ("+this.props.context.documentId+")");        
-        //console.log ("Model: " + this.props.model);
-               
-        this.state = {
+        super(props,{
                         treeData: [],
-                        documentId: this.props.context.documentId,
-                        model: this.props.model,
-                        document: this.loadDocument(this.props.context.documentId)
-                    };
-=======
-        super(props, {
-                        treeData: SkillEditor.processData(skillData)
-                    });
->>>>>>> refs/remotes/origin/master
+                        documentId: props.context.documentId,
+                        model: props.model,
+                        document: SkillEditor.loadDocument(props.context.documentId)
+                    });        
     }
     
     componentWillReceiveProps(nextProps) {
@@ -211,11 +199,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      *   "skills": []
      * }
      */
-    loadDocument (anID:string):any {
+    static loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({document: doc});
+            //this.setState ({document: doc});
         });
         
        return (null); 
@@ -281,7 +269,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         }
 
         //console.log ("From: " + JSON.stringify (aData));
-        //console.log ("To: " + JSON.stringify (dbReady));
+        console.log ("To: " + JSON.stringify (dbReady));
                 
         return (dbReady);
     }
@@ -291,7 +279,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      * Note that the tree widget needs to maintain any attributes we add to a node
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
-    static processData (treeData: any) {
+    processData (treeData: any) {
         
         var newData:Array<Object>=new Array ();
 
