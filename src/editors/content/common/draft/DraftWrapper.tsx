@@ -246,25 +246,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.lastSelectionState = ss; 
         this.handleSelectionChange(changeType, ss);
 
-        const content = editorState.getCurrentContent();
-        const contentChange = (content !== this.lastContent);
+        const contentState = editorState.getCurrentContent();
+        const contentChange = (contentState !== this.lastContent);
         
-
         if (contentChange) {
-          
-          let currentHtml = new Html({ contentState: content});
-          let nextHtml = new Html({ contentState: editorState.getCurrentContent()});
-
-          if (this.props.changePreviewer !== undefined) {
-            nextHtml = this.props.changePreviewer(currentHtml, nextHtml);            
-          }
-          this.lastContent = nextHtml.contentState;
-
-          this.props.onEdit(nextHtml);
-          
+          this.lastContent = contentState;
+          this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
+        } else {
+          this.setState({editorState});
         }
         
-        this.setState({editorState});
+        
       }
     };
   }
@@ -460,6 +452,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const current = this.state.editorState.getCurrentContent();
 
       if (nextProps.content.contentState !== current) {
+
+        console.log('forcing selection');
 
         const selection = this.state.editorState.getSelection();
 

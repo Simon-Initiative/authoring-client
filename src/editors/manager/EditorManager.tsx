@@ -83,9 +83,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   onEdit(model : models.ContentModel) {
-
-    
-
     const doc = this.state.document.with({model: model});
     this.setState({ document: doc}, () => this.persistenceStrategy.save(doc));
   }
