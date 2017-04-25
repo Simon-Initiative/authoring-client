@@ -17,10 +17,18 @@ import { AppServices } from '../../common/AppServices';
 
 import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
+
 import NodeRendererDefault from 'react-sortable-tree';
 
 import SkillNodeRenderer from './SkillNodeRenderer';
 import {Skill} from './SkillTypes';
+
+import Slider from 'rc-slider';
+// We can just import Slider or Range to reduce bundle size
+// import Slider from 'rc-slider/lib/Slider';
+// import Range from 'rc-slider/lib/Range';
+//import 'rc-slider/assets/index.css';
+import 'rc-slider/assets/index.css';
 
 var skillData=require ('./Skills.json');
 
@@ -121,32 +129,36 @@ const styles = {
     "flexDirection" : "row",
     "flex": "1",
     "visibility" : "hidden"
-  }  
+  },
+  
+  sliderPanel: {
+    "border" : "0px solid grey",
+    "width" : "75px",
+    "height" : "35px",
+    "fontSize" : "10pt",
+    "margin" : "4px"
+  }
 };
     
 const tempnavstyle=
 {
-    h2:
-    {
+    h2: {
         marginRight: '10px'
     }
 };
 
-interface SkillEditor 
-{
+interface SkillEditor {
 
 }
 
-export interface SkillEditorState extends AbstractEditorState 
-{
+export interface SkillEditorState extends AbstractEditorState {
   model: models.SkillModel;
   treeData : any;
   documentId: string;
   document: any;
 }
 
-export interface SkillEditorProps extends AbstractEditorProps<models.SkillModel>
-{
+export interface SkillEditorProps extends AbstractEditorProps<models.SkillModel> {
   dispatch: any;
   documentId: string;
   userId: string;
@@ -401,6 +413,13 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     }    
     
     /**
+     * 
+     */
+    handleOnChange (aChange) : void {
+        console.log ("handleOnChange ()");
+    }
+    
+    /**
      *
      */
     /*    
@@ -451,7 +470,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          </div>  
                       </div>
                       <div style={styles.controlBarHidden}>
-                      controlBar
                       </div>        
                   </div> 
               );
@@ -475,7 +493,21 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          </div>  
                       </div>
                       <div style={styles.controlBar}>
-                      controlBar
+                        <div style={styles.sliderPanel}>
+                         pKnown: <Slider step={0.01} defaultValue={item.skillModel.pKnown} min={0} max={1}/>
+                        </div>
+
+                        <div style={styles.sliderPanel}>
+                         pGuess: <Slider step={0.01} defaultValue={item.skillModel.pGuess} min={0} max={1}/>
+                        </div>
+
+                        <div style={styles.sliderPanel}>
+                         pSlip: <Slider step={0.01} defaultValue={item.skillModel.pSlip} min={0} max={1}/>
+                        </div>
+
+                        <div style={styles.sliderPanel}>
+                         pMastery: <Slider step={0.01} defaultValue={0.95} min={0} max={1}/>
+                        </div>                             
                       </div>   
               </div>         
              );
@@ -487,7 +519,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                    </nav>
+                    </nav>         
                     <div style={styles.skillContainer}>
                     {options}
                     </div>        
