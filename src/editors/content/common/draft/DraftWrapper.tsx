@@ -453,8 +453,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       if (nextProps.content.contentState !== current) {
 
-        console.log('forcing selection');
-
         const selection = this.state.editorState.getSelection();
 
         const onDecoratorEdit = () => this.onChange(this.state.editorState);
@@ -475,6 +473,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     let contentState = this.state.editorState.getCurrentContent();
     let selectionState = this.state.editorState.getSelection();
 
+    // We cannot insert an entity at the beginning of a content block,
+    // to handle that case we adjust and add 1 to the focus offset 
     if (selectionState.focusOffset === 0 && selectionState.anchorOffset === 0) {
       
       selectionState = new SelectionState({ 
@@ -638,6 +638,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         {this.renderToolbar()}
 
         <Editor ref="editor"
+          spellCheck={true}
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}
