@@ -457,17 +457,22 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       
     } else if (this.props.content.contentState !== nextProps.content.contentState) {
 
-      const selection = this.state.editorState.getSelection();
+      const current = this.state.editorState.getCurrentContent();
 
-      const onDecoratorEdit = () => this.onChange(this.state.editorState);
-      const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+      if (nextProps.content.contentState !== current) {
 
-      const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
-      const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
+        const selection = this.state.editorState.getSelection();
 
-      this.setState({
-        editorState: newEditorState
-      });
+        const onDecoratorEdit = () => this.onChange(this.state.editorState);
+        const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+        const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
+        const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
+
+        this.setState({
+          editorState: newEditorState
+        });
+      }
     }
   }
 

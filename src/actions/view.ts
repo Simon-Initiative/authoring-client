@@ -1,3 +1,5 @@
+import * as models from '../data/models';
+import { CourseResource } from '../editors/document/common/resources';
 
 export type VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
 export const VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
@@ -24,6 +26,27 @@ export function viewDocument(documentId: string) : viewDocumentAction {
 	return {
 		type: VIEW_DOCUMENT,
 		documentId
+	}
+}
+
+export type VIEW_RESOURCES = 'VIEW_RESOURCES';
+export const VIEW_RESOURCES : VIEW_RESOURCES = 'VIEW_RESOURCES';
+
+export type viewResourcesAction = {
+	type: VIEW_RESOURCES,
+	courseId: string,
+	title: string,
+  filterFn: (resource: CourseResource) => boolean,
+  createResourceFn: (title: string, courseId: string) => models.ContentModel
+}
+
+export function viewResources(courseId: string, title: string, filterFn, createResourceFn) : viewResourcesAction {
+	return {
+		type: VIEW_RESOURCES,
+		courseId,
+		title,
+		filterFn,
+		createResourceFn
 	}
 }
 
