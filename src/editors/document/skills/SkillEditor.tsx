@@ -23,11 +23,10 @@ import NodeRendererDefault from 'react-sortable-tree';
 import SkillNodeRenderer from './SkillNodeRenderer';
 import {Skill} from './SkillTypes';
 
+//import { Button, ButtonToolbar, SplitButton, MenuItem } from 'react-bootstrap';
+
+// From: https://www.npmjs.com/package/rc-slider
 import Slider from 'rc-slider';
-// We can just import Slider or Range to reduce bundle size
-// import Slider from 'rc-slider/lib/Slider';
-// import Range from 'rc-slider/lib/Range';
-//import 'rc-slider/assets/index.css';
 import 'rc-slider/assets/index.css';
 
 var skillData=require ('./Skills.json');
@@ -120,7 +119,7 @@ const styles = {
     "display" : "flex",
     "flexDirection" : "row",
     "flex": "1",
-    "visibility" : "visible"
+    "visibility" : "visible"    
   },
   
   controlBarHidden : {
@@ -136,7 +135,7 @@ const styles = {
     "width" : "75px",
     "height" : "35px",
     "fontSize" : "10pt",
-    "margin" : "4px"
+    "margin" : "10px"
   }
 };
     
@@ -203,14 +202,13 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      *   "title": {
      *     "text": "Sample Skill Model"
      *   },
-     *   "nodes": []
+     *   "skills": []
      * }
      */
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            //console.log ("Document: " + JSON.stringify (doc));
             this.setState ({document: doc});
         });
         
@@ -418,7 +416,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     handleOnChange (aChange) : void {
         console.log ("handleOnChange ()");
     }
-    
+
     /**
      *
      */
@@ -506,20 +504,24 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         </div>
 
                         <div style={styles.sliderPanel}>
-                         pMastery: <Slider step={0.01} defaultValue={0.95} min={0} max={1}/>
+                         pMastery: <Slider step={0.01} defaultValue={item.skillModel.pMastery} min={0} max={1}/>
                         </div>                             
                       </div>   
               </div>         
              );
             }
         }.bind(this));         
-        
+
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                    </nav>         
+                        <select className="form-control">
+                          <option value="bkt">Bayesian Knowledge Tracing</option>
+                          <option value="oli">OLI Skill Modeling</option>
+                        </select> 
+                    </nav>                                  
                     <div style={styles.skillContainer}>
                     {options}
                     </div>        
