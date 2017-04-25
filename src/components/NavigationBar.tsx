@@ -282,9 +282,11 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         
         let menuData=this.generateMenu(this.state.closed);
         
+        const title = this.props.course === null ? '' : this.props.course.title;
+
         return (
                 <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-                    <h1>Title of Course</h1>                    
+                    <h1>{title}</h1>                    
                     <ul className="nav nav-pills flex-column">
                         {menuData}
                     </ul>

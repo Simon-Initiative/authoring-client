@@ -7,6 +7,7 @@ type CourseActions =
 
 type CurrentCourse = {
   courseId: string,
+  title: string,
   organizationId: string,
   LOId:string,
   skillsId:string
@@ -16,6 +17,7 @@ export function course(state = null, action: CourseActions): CurrentCourse {
   switch(action.type) {
   case courseActions.COURSE_CHANGED:
     return { courseId: action.courseId,
+             title: action.title,
              organizationId: action.organizationId,
              LOId: action.LOId,
              skillsId: action.skillsId};

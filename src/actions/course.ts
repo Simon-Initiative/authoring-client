@@ -11,18 +11,20 @@ export const COURSE_CHANGED = 'COURSE_CHANGED';
 export type courseChangedAction = {
 	type: COURSE_CHANGED,
 	courseId: string,
+	title: string,
 	organizationId: string,
-    LOId: string,
-    skillsId: string
+	LOId: string,
+	skillsId: string
 }
 
-export function courseChanged(courseId: string, organizationId: string, LOId: string, skillsId: string) : courseChangedAction {
+export function courseChanged(courseId: string, title: string, organizationId: string, LOId: string, skillsId: string) : courseChangedAction {
 	return {
 		type: COURSE_CHANGED,
 		courseId,
+		title,
 		organizationId,
-        LOId,
-        skillsId
+    LOId,
+    skillsId
 	}
 }
 
@@ -34,9 +36,10 @@ export function changeCourse(courseId: string) {
 					case models.ModelTypes.CourseModel:
 						const model : models.CourseModel = document.model;
 						dispatch(courseChanged(courseId,
-                                               model.organizations.get(0),
-                                               model.learningobjectives.get(0),
-                                               model.skills.get(0)));
+							model.title.text,
+							model.organizations.get(0),
+							model.learningobjectives.get(0),
+							model.skills.get(0)));
 					default:
 						console.log('unexpected model type');
 				}
