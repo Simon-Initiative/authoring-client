@@ -9,25 +9,48 @@ import { EntityTypes } from '../../../data/content/html/common';
 export interface ToolbarProps {  
   onAddQuestion: () => void;
   onAddContent: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  undoEnabled: boolean;
+  redoEnabled: boolean;
 }
 
 export interface Toolbar {
   
 }
 
-
 export class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
   shouldComponentUpdate(nextProps, nextState) {
-    return false; 
+    return nextProps.undoEnabled !== this.props.undoEnabled ||
+      nextProps.redoEnabled !== this.props.redoEnabled; 
+  }
+
+  button(icon, handler, enabled) {
+    const iconClasses = 'icon icon-' + icon;
+    const style = {
+      color: 'white'
+    }
+    const buttonStyle = {
+      backgroundColor: 'black'
+    }
+    return (
+      <button disabled={!enabled} onClick={handler} type="button" className="btn" style={buttonStyle}>
+        <i style={style} className={iconClasses}></i>
+      </button>
+    );
   }
 
   render() {
     return (
-      <div>
+      <div style={{float: 'right'}}>
         <div className="btn-group btn-group-sm" role="group" aria-label="Assessment Toolbar">
-          <button onClick={this.props.onAddContent} type="button" className="btn btn-primary">Add Content</button>
-          <button onClick={this.props.onAddQuestion} type="button" className="btn btn-primary">Add Question</button>
+          
+          {this.button('file-text-o', this.props.onAddContent, true)}
+          {this.button('question', this.props.onAddQuestion, true)}
+          {this.button('undo', this.props.onUndo, this.props.undoEnabled)}
+          {this.button('repeat', this.props.onRedo, this.props.redoEnabled)}
+          
         </div>
       </div>
       );

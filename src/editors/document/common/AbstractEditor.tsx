@@ -1,6 +1,5 @@
-'use strict'
-
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
@@ -10,6 +9,8 @@ import { AppContext } from '../../common/AppContext';
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
+  undoStack: Immutable.Stack<ModelType>;
+  redoStack: Immutable.Stack<ModelType>;
 }
 
 export interface AbstractEditorProps<ModelType> {
@@ -30,6 +31,9 @@ export interface AbstractEditorProps<ModelType> {
 
 export interface AbstractEditorState {
   
+  undoStackSize: number;
+
+  redoStackSize: number;
 }
 
 /**
@@ -39,6 +43,56 @@ export interface AbstractEditorState {
 export abstract class AbstractEditor<ModelType, 
   P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState>
   extends React.Component<P, S> {
+
+    constructor(props: P, childState: Object) {
+      super(props);
+
+      this.undoStack = Immutable.Stack<ModelType>().push(props.model);
+      this.redoStack = Immutable.Stack<ModelType>();
+
+      this.state = (Object.assign({}, { 
+        undoStackSize: 0, 
+        redoStackSize: 0
+      }, childState) as S);
+    }
+
+    undo() {
+      const currentModel = this.undoStack.peek();
+      this.redoStack = this.redoStack.push(currentModel);
+
+      this.undoStack = this.undoStack.pop();
+
+      let model = this.undoStack.peek();
+
+      this.setState({ 
+        undoStackSize: this.undoStack.size - 1, 
+        redoStackSize: this.redoStack.size
+      }, () => this.props.onEdit(model));
+     
+    }
+
+    handleEdit(model: ModelType) {
+      this.undoStack = this.undoStack.push(model);
+      this.redoStack = Immutable.Stack<ModelType>();
+
+      this.setState({ 
+        undoStackSize: this.undoStack.size - 1, 
+        redoStackSize: this.redoStack.size
+      }, () => this.props.onEdit(model));
+
+    }
+
+    redo() {
+      const model = this.redoStack.peek();
+      this.undoStack = this.undoStack.push(model);
+      this.redoStack = this.redoStack.pop();
+
+      this.setState({ 
+        undoStackSize: this.undoStack.size - 1, 
+        redoStackSize: this.redoStack.size
+      }, () => this.props.onEdit(model));
+    }
+
 
 }
 

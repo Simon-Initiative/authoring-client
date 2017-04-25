@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
+import { AuthoringActionsHandler, AuthoringActions, insertInlineEntity } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -13,13 +13,21 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
-import { PartEditor } from '../part/PartEditor';
+import { CheckAllThatApply } from '../items/CheckAllThatApply';
+import { ShortAnswer } from '../items/ShortAnswer';
+import { Numeric } from '../items/Numeric';
+import { Ordering } from '../items/Ordering';
+import { Text } from '../items/Text';
+import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
+import { EntityTypes } from '../../../data/content/html/common';
+import { Toolbar, ToolbarActionProvider } from '../common/toolbar/Toolbar';
+import { ToolbarButton } from '../common/toolbar/ToolbarButton';
+import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
+import { changes, removeInputRef } from '../../../data/content/html/changes';
 
 type Ids = {
   id: string
@@ -27,6 +35,8 @@ type Ids = {
 
 export interface QuestionEditor {
   ids: Ids;
+  lastBody: contentTypes.Html
+  itemToAdd: any
 }
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
@@ -37,7 +47,7 @@ export interface QuestionEditorState {
 
   editHistory: Immutable.List<AuthoringActions>;
 
-  id: string;
+  activeItemId: string;
 }
 
 /**
@@ -51,7 +61,7 @@ export abstract class QuestionEditor
 
     this.state = {
       editHistory: Immutable.List<AuthoringActions>(),
-      id: this.props.model.id
+      activeItemId: null
     };
 
     this.ids = {
@@ -59,10 +69,52 @@ export abstract class QuestionEditor
     }
 
     this.onBodyEdit = this.onBodyEdit.bind(this);
-    this.onIdEdit = this.onIdEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
-    this.onAddItemPart = this.onAddItemPart.bind(this);
+    this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
+    this.onAddOrdering = this.onAddOrdering.bind(this);
+    this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
+    this.onNumeric = this.onNumeric.bind(this);
+    this.onText = this.onText.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+    this.onInsertFillInTheBlank = this.onInsertFillInTheBlank.bind(this);
+    this.onInsertNumeric = this.onInsertNumeric.bind(this);
+    this.onInsertText = this.onInsertText.bind(this);
+    
+    
+    
+    this.onFocusChange = this.onFocusChange.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+
+    this.lastBody = this.props.model.body;
+  }
+
+  onBlur(activeItemId: string) {
+    if (this.state.activeItemId === activeItemId) {
+      this.setState({ activeItemId: null });
+    }
+  }
+
+  onInsert(item, typeLabel) {
+    this.itemToAdd = item; 
+
+    const input = guid();
+    const data = {};
+    data['@input'] = input;
+    data['$type'] = typeLabel;
+
+    this.handleAction(insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data));
+  }
+
+  onInsertNumeric() {
+    this.onInsert(new contentTypes.Numeric(), 'Numeric');
+  }
+  onInsertText() {
+    this.onInsert(new contentTypes.Text(), 'Text');
+  }
+  onInsertFillInTheBlank() {
+    this.onInsert(new contentTypes.FillInTheBlank(), 'FillInTheBlank');
   }
 
   handleAction(action: AuthoringActions) {
@@ -75,8 +127,59 @@ export abstract class QuestionEditor
     this.props.onEdit(this.props.model.with({concepts}));
   }
 
+  onFocusChange(activeItemId: string) {
+    this.setState({ activeItemId });
+  }
+
   onBodyEdit(body) {
-    const question = this.props.model.with({body});
+
+    let question = this.props.model.with({body});
+
+    if (this.lastBody !== undefined) {
+      const delta = changes(EntityTypes.input_ref, '@input', this.lastBody.contentState, body.contentState);
+    
+      // For any deletions of input_refs, we need to make sure that we remove
+      // the corresponding item and part from the question model
+      if (delta.deletions.size > 0) {
+        let items = this.props.model.items;
+        let parts = this.props.model.parts;
+        let itemArray = items.toArray();
+        let partsArray = parts.toArray();
+        delta.deletions.toArray().forEach(d => {
+          
+          
+          // Find the item whose id matches this entity @input data field
+          // and remove it and the corresponding part
+          for (let i = 0; i < itemArray.length; i++) {
+            let currentItem = (itemArray[i] as any);
+
+            if (currentItem.id !== undefined && currentItem.id === d.entity.data['@input']) {
+              items = items.delete(currentItem.guid);
+              parts = parts.delete(partsArray[i].guid);
+              break;
+            }
+          }
+
+        });
+        question = question.with({ items, parts});
+
+      } else if (delta.additions.size > 0) {
+
+        const input = delta.additions.toArray()[0].entity.data['@input'];
+
+        const item = this.itemToAdd.with({guid: input, id: input});
+
+        question = question.with({items: question.items.set(item.guid, item) });
+
+        let part = new contentTypes.Part();
+        part = part.with({guid: guid()});
+        question = question.with({parts: question.parts.set(part.guid, part) });
+
+      }
+    }
+    
+    this.lastBody = body;
+    
     this.props.onEdit(question);
   }
 
@@ -86,15 +189,10 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onIdEdit(e) {
-    const id = e.target.value;
-    this.setState({ id }, () => 
-      this.props.onEdit(this.props.model.with({id })));
-  }
 
-  onAddItemPart() {
+  onAddMultipleChoice(select) {
     let item = new contentTypes.MultipleChoice();
-    item = item.with({guid: guid()});
+    item = item.with({guid: guid(), select});
 
     let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
 
@@ -105,19 +203,126 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
+  onRemove(itemModel: contentTypes.Item, partModel) {
+    
+    const items = this.props.model.items.delete(itemModel.guid);
+    const parts = this.props.model.parts.delete(partModel.guid);
+    let body = this.props.model.body;
+
+    switch (itemModel.contentType) {
+      case 'Numeric':
+      case 'Text':
+      case 'FillInTheBlank':
+        body = removeInputRef(body, itemModel.id);
+    }
+    
+    const model = this.props.model.with({items, parts, body});
+    this.props.onEdit(model);
+  }
+
+  onAddShortAnswer() {
+    let item = new contentTypes.ShortAnswer();
+    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    let response = new contentTypes.Response({ match: '*', score: '1'});
+
+    part = part.with({responses: part.responses.set(response.guid, response)});
+    model = model.with({parts: model.parts.set(part.guid, part) });
+
+    this.props.onEdit(model);
+  }
+
+  onAddOrdering() {
+    let item = new contentTypes.Ordering();
+    let model = this.props.model.with({items: this.props.model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    model = model.with({parts: model.parts.set(part.guid, part) });
+
+    this.props.onEdit(model);
+  }
+
   renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
-    if (item.contentType === 'MultipleChoice') {
-          return <MultipleChoice
-            context={this.props.context}
+    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+        return <MultipleChoice
+          {...this.props}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />
+    } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
+        return <CheckAllThatApply
+          {...this.props}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />
+    } else if (item.contentType === 'FillInTheBlank') {
+        return <FillInTheBlank
+            {...this.props}
+            onRemove={this.onRemove}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
             key={item.guid}
-            editMode={this.props.editMode}
-            services={this.props.services}
             itemModel={item}
             partModel={part}
             onEdit={(c, p) => this.onItemPartEdit(c, p)} 
             />
-    } else {
-      // TODO build unsupported part item editor
+    } else if (item.contentType === 'Numeric') {
+        return <Numeric
+            {...this.props}
+            onRemove={this.onRemove}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
+        
+    } else if (item.contentType === 'Text') {
+        return <Text
+            {...this.props}
+            onRemove={this.onRemove}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
+        
+    } else if (item.contentType === 'ShortAnswer') {
+        return <ShortAnswer
+            {...this.props}
+            onRemove={this.onRemove}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
+    } else if (item.contentType === 'Ordering') {
+        return <Ordering
+            {...this.props}
+            onRemove={this.onRemove}
+            onFocus={this.onFocusChange}
+            onBlur={this.onBlur}
+            key={item.guid}
+            itemModel={item}
+            partModel={part}
+            onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+            />
     }
   }
 
@@ -127,23 +332,55 @@ export abstract class QuestionEditor
     const parts = this.props.model.parts.toArray()
     const toRender = [];
     for (let i = 0; i < items.length; i++) {
-      toRender.push(this.renderItemPartEditor(items[i], parts[i]));
+      toRender.push(<div key={items[i].guid} className='itemPart'>{this.renderItemPartEditor(items[i], parts[i])}</div>);
     }
 
     return toRender;
   }
 
+  addItem(a: ToolbarActionProvider, item, typeLabel) {
+
+    this.itemToAdd = item; 
+
+    const input = guid();
+    const data = {};
+    data['@input'] = input;
+    data['$type'] = typeLabel;
+
+    a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
+    
+  }
+
+
+  onFillInTheBlank(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.FillInTheBlank(), 'FillInTheBlank');
+  }
+
+  onNumeric(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.Numeric(), 'Numeric');
+  }
+
+  onText(a: ToolbarActionProvider) {
+    this.addItem(a, new contentTypes.Text(), 'Text');
+  }
+
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
+    const inlineToolbar = <Toolbar 
+                context={this.props.context} 
                 services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                actionHandler={this}>
+                  {toolbarConfigs.flowInline()}
+                  <ToolbarButton key='server' icon='server' action={this.onFillInTheBlank}/>
+                  <ToolbarButton key='info' icon='info' action={this.onNumeric}/>
+                  <ToolbarButton key='i-cursor' icon='i-cursor' action={this.onText}/>
+                </Toolbar>
+    const blockToolbar = <Toolbar 
+                context={this.props.context} 
                 services={this.props.services} 
-                actionHandler={this} />;
+                actionHandler={this}>
+                  {toolbarConfigs.flowBlock()}
+                </Toolbar>
 
     const bodyStyle = {
       minHeight: '30px',
@@ -152,44 +389,53 @@ export abstract class QuestionEditor
       borderColor: '#AAAAAA'
     }
 
-    const expanded = 
-        <Button type='link' onClick={this.onAddItemPart}>Add Item/Part</Button>;
+    const expanded = (
+    <div className="dropdown" style={{display: 'inline'}}>
+      <button className="btn btn-secondary btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Add Item
+      </button>
+      <div className="dropdown-menu">
+        <a onClick={() => this.onAddMultipleChoice('single')} className="dropdown-item" href="#">Multiple choice</a>
+        <a onClick={() => this.onAddMultipleChoice('multiple')} className="dropdown-item" href="#">Check all that apply</a>
+        <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
+        <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
+        <a onClick={this.onInsertNumeric} className="dropdown-item" href="#">Numeric</a>
+        <a onClick={this.onInsertText} className="dropdown-item" href="#">Text</a>
+        <a onClick={this.onInsertFillInTheBlank} className="dropdown-item" href="#">Fill in the Blank</a>
+      </div>
+    </div>);
 
     return (
     
+      <div className='componentWrapper'>
+
         <Collapse caption='Question' 
           details={getHtmlDetails(this.props.model.body)}
           expanded={expanded}>
 
-          <div className='questionWrapper'>
-
           <HtmlContentEditor 
-                context={this.props.context}
+                {...this.props}
+                activeItemId={this.state.activeItemId}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
-                editMode={this.props.editMode}
-                services={this.props.services}
                 editHistory={this.state.editHistory}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
                 />
 
           <ConceptsEditor 
-            context={this.props.context}
+            {...this.props}
             model={this.props.model.concepts}
             onEdit={this.onConceptsEdit} 
-            editMode={this.props.editMode}
-            services={this.props.services}
             title='Skills'
             conceptType='skill'    
             />
 
           {this.renderItemsAndParts()}
 
-          </div>
-
-        </Collapse>);
+        </Collapse>
+      </div>);
   }
 
 }

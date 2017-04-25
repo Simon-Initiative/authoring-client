@@ -13,6 +13,7 @@ interface Formula {
 }
 
 interface FormulaProps {
+  
   services: AppServices;
   offsetKey: string;
   contentState: ContentState;

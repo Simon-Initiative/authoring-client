@@ -20,7 +20,7 @@ export interface FeedbackEditor {
 }
 
 export interface FeedbackEditorProps extends AbstractContentEditorProps<contentTypes.Feedback> {
-
+  showLabel: boolean;
   onRemove: (feedback: contentTypes.Feedback) => void;
 }
 
@@ -69,12 +69,11 @@ export class FeedbackEditor
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
+                context={this.props.context} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                context={this.props.context}
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -85,16 +84,16 @@ export class FeedbackEditor
       borderColor: '#AAAAAA'
     }
 
+    const label = this.props.showLabel ? 'Feedback' : undefined;
+    
     return (
-      <InputLabel label="Feedback" style="default">
+      <InputLabel label={label} onRemove={this.props.onRemove.bind(this)}>
 
         <HtmlContentEditor 
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
+              {...this.props}
               editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 

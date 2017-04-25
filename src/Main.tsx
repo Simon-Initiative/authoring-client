@@ -1,9 +1,3 @@
-/**
-*
-*/
-
-'use strict'
-
 import * as React from 'react';
 import { returnType } from './utils/types';
 import { connect }  from 'react-redux';
@@ -19,6 +13,7 @@ import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
+import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
 
 function mapStateToProps(state: any) {
@@ -67,6 +62,8 @@ class Main extends React.Component<MainProps, {}> {
     switch (view.type) {
       case 'LoginView':
         return <LoginView dispatch={this.props.dispatch} />
+      case 'ResourcesView':
+        return <ResourceView {...view} dispatch={this.props.dispatch}/>
       case 'DocumentView':
         return <DocumentView 
                 dispatch={this.props.dispatch}

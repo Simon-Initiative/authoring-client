@@ -87,12 +87,11 @@ export class HintEditor
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
-                services={this.props.services} 
+                context={this.props.context}
+                services={this.props.services}
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                context={this.props.context}
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -115,9 +114,7 @@ export class HintEditor
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}
             blockToolbar={blockToolbar}
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
+            {...this.props}
             editHistory={this.state.editHistory}
             model={this.props.model.body}
             onEdit={this.onBodyEdit} 

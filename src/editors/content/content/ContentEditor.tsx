@@ -64,9 +64,8 @@ export class ContentEditor
     this.props.onEdit(concept);
   }
 
-  onAvailability(e) {
-    console.log(e.target.value);
-    this.props.onEdit(this.props.model.with({availability: e.target.value}));
+  onAvailability(availability) {
+    this.props.onEdit(this.props.model.with({availability}));
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -82,12 +81,11 @@ export class ContentEditor
   render() : JSX.Element {
     
     const inlineToolbar = <InlineToolbar 
-                courseId={this.props.context.courseId} 
+                context={this.props.context} 
                 services={this.props.services} 
                 actionHandler={this} />;
     const blockToolbar = <BlockToolbar 
-                documentId={this.props.context.documentId}
-                courseId={this.props.context.courseId} 
+                context={this.props.context}
                 services={this.props.services} 
                 actionHandler={this} />;
 
@@ -110,23 +108,23 @@ export class ContentEditor
     )
 
     return (
-      <Collapse 
-        caption='Content' 
-        details={getHtmlDetails(this.props.model.body)}
-        expanded={expanded}>
-        
-        <HtmlContentEditor 
-              editorStyles={bodyStyle}
-              inlineToolbar={inlineToolbar}
-              blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              editHistory={this.state.editHistory}
-              model={this.props.model.body}
-              onEdit={this.onBodyEdit} 
-              />
-      </Collapse>);
+      <div className='componentWrapper'>
+        <Collapse 
+          caption='Content' 
+          details={getHtmlDetails(this.props.model.body)}
+          expanded={expanded}>
+          
+          <HtmlContentEditor 
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                blockToolbar={blockToolbar}
+                {...this.props}
+                editHistory={this.state.editHistory}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit} 
+                />
+        </Collapse>
+      </div>);
   }
 
 }

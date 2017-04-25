@@ -28,11 +28,7 @@ interface CourseEditorState extends AbstractEditorState {
 class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState>  {
 
   constructor(props) {
-    super(props);
-
-    this.state = { 
-      resources: []
-    };
+    super(props, { resources: []});
   }
 
   componentDidMount() {
@@ -93,7 +89,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
     return (
       <div className="">
-        <h2>Pages</h2>
+        <h2>All Resources</h2>
         <table className="table table-striped table-hover">
           <thead>
               <tr>

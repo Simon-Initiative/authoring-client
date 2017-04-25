@@ -25,6 +25,12 @@ export interface AbstractItemPartEditorProps<ItemType> {
   
   editMode: boolean;
 
+  onFocus: (itemId: string) => void;
+
+  onBlur: (itemId: string) => void;
+
+  onRemove: (item: ItemType, part: contentTypes.Part) => void;
+  
 }
 
 export interface AbstractItemPartEditorState {
@@ -44,7 +50,7 @@ export abstract class AbstractItemPartEditor<ItemType, P extends AbstractItemPar
 
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.partModel !== nextProps.partModel
-      || this.props.itemModel !== this.props.itemModel;
+      || this.props.itemModel !== nextProps.itemModel;
   }
 
 }

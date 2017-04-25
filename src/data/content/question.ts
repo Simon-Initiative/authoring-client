@@ -1,14 +1,24 @@
 import * as Immutable from 'immutable';
+
+import { ContentState, ContentBlock, convertToRaw } from 'draft-js';
+
 import { Html } from './html';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
+import { FillInTheBlank } from './fill_in_the_blank';
+import { Ordering } from './ordering';
+import { Text } from './text';
+import { ShortAnswer } from './short_answer';
+import { Numeric } from './numeric';
 import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
 import { getChildren } from './common';
 import { augment } from './common';
+import { getEntities } from './html/changes';
+import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | Unsupported;
+export type Item = MultipleChoice | FillInTheBlank | Ordering | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
@@ -30,6 +40,28 @@ const defaultQuestionParams = {
   explanation: new Html(),
   guid: ''
 };
+
+// Find all input ref tags and add a '$type' attribute to its data
+// to indicate the type of the item
+function tagInputRefsWithType(model: Question) {
+  
+  const byId = model.items.toArray().reduce((p, c) => {
+    if ((c as any).id !== undefined) {
+      p[(c as any).id] = c;
+      return p;
+    }
+  }, {});
+
+  const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
+    .reduce((contentState, info) => {
+      console.log(info);
+      const type = byId[info.entity.data['@input']].contentType;
+      return contentState.mergeEntityData(info.entityKey, { '$type':  type});
+    }, model.body.contentState);
+
+  const body = model.body.with({contentState});
+  return model.with({body});
+}
 
 export class Question extends Immutable.Record(defaultQuestionParams) {
 
@@ -78,15 +110,24 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         case 'multiple_choice':
           model = model.with({ items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
           break;
-        
-        // We do not yet support these question item.types:
         case 'fill_in_the_blank':
-        case 'ordering':
+          model = model.with({ items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
+          break;
         case 'numeric':
+          model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
+          break;
         case 'text':
+          model = model.with({ items: model.items.set(id, Text.fromPersistence(item, id)) });
+          break;
         case 'short_answer':
+          model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
+          break;
+        case 'ordering':
+          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          break;
+        
+        // We do not yet support image_hotspot:
         case 'image_hotspot':
-        case 'fill_in_the_blank':
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
           break;
         case 'explanation':
@@ -97,7 +138,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       }
     });
 
-    return model;
+    return tagInputRefsWithType(model);
   }
 
   toPersistence() : Object {

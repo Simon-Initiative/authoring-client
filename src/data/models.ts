@@ -81,7 +81,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   static fromPersistence(json: Object) : CourseModel {
     let model = new CourseModel();
     const c = json as any;
-    model = model.with({ title: new contentTypes.Title(c) });
+    model = model.with({ title: new contentTypes.Title(c.title) });
     model = model.with({ organizations: Immutable.List<types.DocumentId>(c.organizations) });
     model = model.with({ learningobjectives: Immutable.List<types.DocumentId>(c.learningobjectives) });
     model = model.with({ skills: Immutable.List<types.DocumentId>(c.skills) });

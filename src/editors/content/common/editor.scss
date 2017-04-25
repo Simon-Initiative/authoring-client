@@ -1,3 +1,4 @@
+@import '../../../stylesheets/abstracts/variables';
 
 .editorWrapper {
   margin: 1;
@@ -8,7 +9,21 @@
   margin: 1;
 }
 
-.questionWrapper {
+.questionContentWrapper {
   
   margin-left: 20px;
+  background-color: $color-lblue;
+}
+
+.componentWrapper {
+  border-style: solid;
+  border-color: $color-blue;
+  border-width: 1px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.itemPart {
+  background-color: #dddddd;
+  padding: 9px;
 }

@@ -39,7 +39,8 @@ type EntityHandler = (s : common.RawEntityRange, text : string, entityMap : comm
 
 const entityHandlers = {
   link,
-  formula
+  formula,
+  input_ref
 }
 
 // Converts the draft ContentState object to the HtmlContent format
@@ -626,6 +627,16 @@ function link(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   data['#array'] = [];
   
+  const item = {};
+  item[type] = data;
+  
+  return item;
+}
+
+function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+
   const item = {};
   item[type] = data;
   

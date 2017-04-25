@@ -21,6 +21,9 @@ import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 
 
+export type ChangePreviewer = (current: Html, next: Html) => Html;
+
+
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
 const ALT_KEY = 18; 
@@ -50,7 +53,9 @@ export interface DraftWrapperProps {
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
+  activeItemId: string;
   editorStyles?: Object;
+  changePreviewer?: ChangePreviewer;
 }
 
 
@@ -193,6 +198,8 @@ function splitBlockInContentState(
 }
 
 
+
+
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
   constructor(props) {
@@ -214,10 +221,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.lastContent = contentState;
 
     const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ services: this.props.services, onEdit: onDecoratorEdit });
+    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+    const es = EditorState.createWithContent(contentState, compositeDecorator);
+    const newEditorState = EditorState.set(es, { allowUndo: false });
 
     this.state = {
-      editorState: EditorState.createWithContent(contentState, compositeDecorator),
+      editorState: newEditorState,
       lockedByBlockRenderer: false,
       show: false,
       x: null,
@@ -236,18 +246,35 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.lastSelectionState = ss; 
         this.handleSelectionChange(changeType, ss);
 
-        const content = editorState.getCurrentContent();
-        const contentChange = (content !== this.lastContent);
-        this.lastContent = content;
-
+        const contentState = editorState.getCurrentContent();
+        const contentChange = (contentState !== this.lastContent);
+        
         if (contentChange) {
-          const html = new Html({ contentState: editorState.getCurrentContent()});
-          this.props.onEdit(html);
+          this.lastContent = contentState;
+          this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
+        } else {
+          this.setState({editorState});
         }
         
-        this.setState({editorState});
+        
       }
     };
+  }
+
+  appendText(contentBlock, contentState, text) {
+
+    const targetRange = new SelectionState({
+      anchorKey: contentBlock.key,
+      focusKey: contentBlock.key,
+      anchorOffset: contentBlock.text.length,
+      focusOffset: contentBlock.text.length
+    })
+
+    return Modifier.insertText(
+      contentState,
+      targetRange,
+      text);
+    
   }
 
   onBlur() {
@@ -378,18 +405,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     if (command === 'backspace') {
       if (handleBackspace(editorState, this.onChange) === 'handled') {
-        console.log('handled by custom backspace');
         return 'handled';
       }
     }
 
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      console.log('handled by richutils');
       this.onChange(newState);
       return 'handled';
     } else {
-      console.log('not handled at all');
       return 'not-handled';
     }
     
@@ -413,19 +437,61 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       let action : any = nextProps.editHistory.get(0);
       if (action.type === 'TOGGLE_INLINE_STYLE') {
         this.toggleInlineStyle(action.style);
-      } else if (action.type === 'INSERT_ACTIVITY') {
-        this.insertActivity(action.activityType, action.data);
+      } else if (action.type === 'INSERT_ATOMIC_BLOCK') {
+        this.insertActivity(action.entityType, action.data);
       } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
         this.toggleBlockType(action.blockType);
       } else if (action.type === 'INSERT_INLINE_ENTITY') {
         this.insertInlineEntity(action.entityType, action.mutability, action.data);
       }
-    } 
+    } else if (this.props.activeItemId !== nextProps.activeItemId) {
+      setTimeout(() => this.forceRender(), 100);
+      
+    } else if (this.props.content.contentState !== nextProps.content.contentState) {
+
+      const current = this.state.editorState.getCurrentContent();
+
+      if (nextProps.content.contentState !== current) {
+
+        const selection = this.state.editorState.getSelection();
+
+        const onDecoratorEdit = () => this.onChange(this.state.editorState);
+        const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+        const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
+        const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
+
+        this.setState({
+          editorState: newEditorState
+        });
+      }
+    }
   }
 
   insertInlineEntity(type: string, mutability: string, data: Object) {
-    const contentState = this.state.editorState.getCurrentContent();
-    const selectionState = this.state.editorState.getSelection();
+
+    let contentState = this.state.editorState.getCurrentContent();
+    let selectionState = this.state.editorState.getSelection();
+
+    // We cannot insert an entity at the beginning of a content block,
+    // to handle that case we adjust and add 1 to the focus offset 
+    if (selectionState.focusOffset === 0 && selectionState.anchorOffset === 0) {
+      
+      selectionState = new SelectionState({ 
+        anchorKey: selectionState.anchorKey,
+        focusKey: selectionState.focusKey,
+        anchorOffset: 0,
+        focusOffset: 1
+      });
+    }
+
+    const block = contentState.getBlockForKey(selectionState.anchorKey);
+    const text = block.getText();
+
+    if (text.length < selectionState.focusOffset) {
+      contentState = this.appendText(block, contentState, '  ');
+    }
+
     const contentStateWithEntity = contentState.createEntity(type, mutability, data);
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const contentStateWithLink = Modifier.applyEntity(
@@ -437,7 +503,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const newEditorState = EditorState.set(
         this.state.editorState,
         { currentContent: contentStateWithLink });
-
     this.onChange(newEditorState);
   }
 
@@ -524,6 +589,18 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return updated;
   }
 
+  forceRender() {
+
+    const editorState = this.state.editorState;
+    const content = editorState.getCurrentContent();
+    const onDecoratorEdit = () => this.onChange(this.state.editorState);
+    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
+
+    const es = EditorState.createWithContent(content, compositeDecorator);
+    const newEditorState = EditorState.set(es, { allowUndo: false });
+    this.setState({editorState: newEditorState});
+  }
+
   renderToolbar() {
     let toolbarAndContainer = null;
     if (this.state.show) {
@@ -549,7 +626,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
-
+    
     return (
       <div ref={(container => this.container = container)} 
         onBlur={this.onBlur}
@@ -561,6 +638,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         {this.renderToolbar()}
 
         <Editor ref="editor"
+          spellCheck={true}
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}

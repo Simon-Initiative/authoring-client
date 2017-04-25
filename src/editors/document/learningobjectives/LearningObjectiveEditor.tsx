@@ -59,12 +59,11 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     constructor(props) {
         console.log ("LearningObjectiveEditor ()");
         
-        super(props);
-        this.state = {
-                        treeData: this.processData (loData),
-                        rootLO: this.createRootLO (loData),
+        super(props, {
+                        treeData: LearningObjectiveEditor.processData (loData),
+                        rootLO: LearningObjectiveEditor.createRootLO (loData),
                         modalIsOpen : false                    
-                     };        
+                     });
     }
     
     componentDidMount() {
@@ -75,7 +74,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         console.log ("componentWillReceiveProps ();");    
     }    
     
-    createRootLO (aData: any):Object {
+    static createRootLO (aData: any):Object {
         
         var newRootLO:LearningObjective=new LearningObjective ();
         
@@ -90,7 +89,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                     
                     for (var k in lObjectiveTest) {
                         if (k=="title") {
-                            newRootLO.title=this.getTextFromNode (lObjectiveTest [k]);                            
+                            newRootLO.title= LearningObjectiveEditor.getTextFromNode (lObjectiveTest [k]);                            
                         }
                     }
                 }
@@ -141,7 +140,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */
-    getTextFromNode (aNode: any) : string {
+    static getTextFromNode (aNode: any) : string {
         
       console.log ("getTextFromNode: " + JSON.stringify (aNode));
           
@@ -197,7 +196,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */    
-    parseLearningObjective (anObjective:Object): LearningObjective {
+    static parseLearningObjective (anObjective:Object): LearningObjective {
 
         var newLO:LearningObjective=new LearningObjective ();
         
@@ -213,7 +212,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      * Note that the tree widget needs to maintain any attributes we add to a node
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
-    processData (treeData: any) {
+    static processData (treeData: any) {
         
         var newData:Array<Object>=new Array ();
                 
@@ -228,7 +227,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                     for (var k in lObjectiveTest) {
                         
                         if (k=="objective") {
-                            newData.push (this.parseLearningObjective (lObjectiveTest [k]));                            
+                            newData.push (LearningObjectiveEditor.parseLearningObjective (lObjectiveTest [k]));                            
                         }                        
                     }
                 }

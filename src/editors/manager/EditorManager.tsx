@@ -1,4 +1,6 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
+
 import { bindActionCreators } from 'redux';
 
 import * as persistence from '../../data/persistence';
@@ -13,8 +15,6 @@ import { PersistenceStrategy,
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { TitleOracle, MockTitleOracle } from '../common/TitleOracle';
-
-//import { OrganizationEditor } from '../document/organization/OrganizationEditor';
 
 interface EditorManager {
 
@@ -63,6 +63,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       editMode: true,
       activeSubEditorKey: null
     };
+    
+
     this.componentDidUnmount = false;
     this.persistenceStrategy = null; 
     this._onEdit = this.onEdit.bind(this);
@@ -81,7 +83,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   onEdit(model : models.ContentModel) {
-
     const doc = this.state.document.with({model: model});
     this.setState({ document: doc}, () => this.persistenceStrategy.save(doc));
   }
@@ -115,16 +116,17 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     });
   }
 
+  
+
   fetchDocument(documentId: string) {
       console.log ("fetchDocument ("+documentId+")");
     persistence.retrieveDocument(documentId)
       .then(document => {
         
-        console.log ("fetched document: " + JSON.stringify (document));  
-
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(courseActions.courseChanged(documentId, 
+            document.model.title.text,
             document.model.organizations.get(0),
             document.model.learningobjectives.get(0),
             document.model.skills.get(0)));

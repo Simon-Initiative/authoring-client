@@ -1,10 +1,8 @@
-/**
-*
-*/
-
 import * as React from 'react';
 import { returnType } from '../utils/types';
 import { connect }  from 'react-redux';
+import * as models from '../data/models';
+import * as contentTypes from '../data/contentTypes';
 
 /**
 *
@@ -239,9 +237,35 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         let menuControl = null;        
         let mStyle = null;
 
+        const viewActivities = () => 
+            this.props.viewActions.viewResources(
+                this.props.course.courseId,
+                'Activities',
+                (resource) => resource.type === 'AssessmentModel',
+                (title, courseId) => new models.AssessmentModel({
+                    courseId,
+                    title: new contentTypes.Title({ text: title})
+                    })
+            );
+
+        const viewWorkbookPages = () => 
+            this.props.viewActions.viewResources(
+                this.props.course.courseId,
+                'Workbook Pages',
+                (resource) => resource.type === 'WorkbookPageModel',
+                (title, courseId) => new models.WorkbookPageModel({
+                    courseId,
+                    head: new contentTypes.Head({ title: new contentTypes.Title({ text: title}) })
+                    })
+            );
+
+
         // Bad way of doing this, will be changed soon!
         this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);        
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
+        this.opts [2].onclick = viewWorkbookPages;
+        this.opts [3].onclick = viewActivities;
+        
         this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
         this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);        
         
@@ -258,9 +282,11 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         
         let menuData=this.generateMenu(this.state.closed);
         
+        const title = this.props.course === null ? '' : this.props.course.title;
+
         return (
                 <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-                    <h1>Title of Course</h1>                    
+                    <h1>{title}</h1>                    
                     <ul className="nav nav-pills flex-column">
                         {menuData}
                     </ul>

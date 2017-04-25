@@ -4,12 +4,14 @@ import unsupported from './Unsupported';
 import link from './Link';
 import cite from './Cite';
 import formula from './Formula';
+import inputRef from './InputRef';
 
 const decorators = [
   unsupported,
   link,
   cite,
-  formula
+  formula, 
+  inputRef
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

@@ -10,7 +10,6 @@ import { PulloutEnd } from './PulloutEnd';
 import { SectionBegin } from './SectionBegin';
 import { SectionEnd } from './SectionEnd';
 
-
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
 

@@ -23,6 +23,7 @@ export const EntityTypes = types.strEnum([
   'wb_manual',
   'cite',
   'image',
+  'input_ref',
   
   // Block entities
   'codeblock',

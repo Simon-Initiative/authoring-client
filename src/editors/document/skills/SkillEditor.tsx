@@ -173,6 +173,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      */
     constructor(props) {
         
+<<<<<<< HEAD
         super(props);
         
         //let dummyDocID="4eb628e9d4ab4be3007c345edb004406";        
@@ -185,6 +186,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         model: this.props.model,
                         document: this.loadDocument(this.props.context.documentId)
                     };
+=======
+        super(props, {
+                        treeData: SkillEditor.processData(skillData)
+                    });
+>>>>>>> refs/remotes/origin/master
     }
     
     componentWillReceiveProps(nextProps) {
@@ -285,7 +291,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      * Note that the tree widget needs to maintain any attributes we add to a node
      * object. Otherwise we can't annotate and enrich the structuer. 
      */
-    processData (treeData: any) {
+    static processData (treeData: any) {
         
         var newData:Array<Object>=new Array ();
 
