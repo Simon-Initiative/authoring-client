@@ -110,13 +110,13 @@ function handleSentinelTransition(type: EntityTypes, iterator: BlockIterator,
       context.pop();
 
     } else if (type === EntityTypes.section_begin) {
-      translateSection(iterator, entityMap, context);
+      translateSection(iterator, rawBlock, entityMap, context);
 
     } else if (type === EntityTypes.pullout_begin) {
-      translatePullout(iterator, entityMap, context);
+      translatePullout(iterator, rawBlock, entityMap, context);
 
     } else if (type === EntityTypes.example_begin) {
-      translateExample(iterator, entityMap, context);
+      translateExample(iterator, rawBlock, entityMap, context);
 
     } else if (type === EntityTypes.figure_begin) {
       //translateFigure(iterator, entityMap, context);
@@ -194,7 +194,7 @@ function translateUnsupported(rawBlock : common.RawContentBlock,
   top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
 }
 
-function translateSection(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+function translateSection(iterator: BlockIterator, rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   let block = iterator.peek();
   let title;
@@ -225,7 +225,7 @@ function translateSection(iterator: BlockIterator, entityMap : common.RawEntityM
 }
 
 
-function translatePullout(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+function translatePullout(iterator: BlockIterator, rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   let block = iterator.peek();
   let arr = [];
@@ -236,7 +236,7 @@ function translatePullout(iterator: BlockIterator, entityMap : common.RawEntityM
 
   const p = {
     "pullout": {
-      "@type": "note",
+      "@type": entityMap[rawBlock.entityRanges[0].key].data.subType,
       "#array": arr
     }
   };
@@ -256,7 +256,7 @@ function processTitle(rawBlock: common.RawContentBlock, block: ContentBlock, ent
   }
 }
 
-function translateExample(iterator: BlockIterator, entityMap : common.RawEntityMap, context: Stack) {
+function translateExample(iterator: BlockIterator, rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   let block = iterator.peek();
   let arr = [];

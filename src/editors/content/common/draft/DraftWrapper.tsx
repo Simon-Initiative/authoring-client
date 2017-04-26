@@ -261,6 +261,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
+  forceContentChange(contentState, changeType) {
+    this.lastContent = contentState;
+    const editorState = EditorState.push(this.state.editorState, contentState, changeType);
+    this.setState({editorState}, () => {
+      this.props.onEdit(new Html({ contentState }));
+      this.forceRender();
+    });
+  }
+
   appendText(contentBlock, contentState, text) {
 
     const targetRange = new SelectionState({
@@ -369,9 +378,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const entityKey = block.getEntityAt(0);
     const newContentState = content.mergeEntityData(entityKey, data);
 
-    const editorState = EditorState.push(this.state.editorState, newContentState, '');
-    
-    this.onChange(editorState);
+    this.forceContentChange(newContentState, 'apply-entity');
 
   }
 
