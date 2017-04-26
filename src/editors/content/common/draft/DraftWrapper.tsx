@@ -427,15 +427,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
   
 
-  toggleInlineStyle(inlineStyle) {
-
-    const updateStyle = RichUtils.toggleInlineStyle(this.state.editorState, inlineStyle);
-
-    const key : string = this.state.editorState.getSelection().getAnchorKey();
-    const clearedSelection = EditorState.acceptSelection(updateStyle, SelectionState.createEmpty(key))
-
-    this.onChange(clearedSelection);
-  }
+  
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
@@ -475,71 +467,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
-  insertInlineEntity(type: string, mutability: string, data: Object) {
+  
 
-    let contentState = this.state.editorState.getCurrentContent();
-    let selectionState = this.state.editorState.getSelection();
-
-    // We cannot insert an entity at the beginning of a content block,
-    // to handle that case we adjust and add 1 to the focus offset 
-    if (selectionState.focusOffset === 0 && selectionState.anchorOffset === 0) {
-      
-      selectionState = new SelectionState({ 
-        anchorKey: selectionState.anchorKey,
-        focusKey: selectionState.focusKey,
-        anchorOffset: 0,
-        focusOffset: 1
-      });
-    }
-
-    const block = contentState.getBlockForKey(selectionState.anchorKey);
-    const text = block.getText();
-
-    if (text.length < selectionState.focusOffset) {
-      contentState = this.appendText(block, contentState, '  ');
-    }
-
-    const contentStateWithEntity = contentState.createEntity(type, mutability, data);
-    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    const contentStateWithLink = Modifier.applyEntity(
-      contentState,
-      selectionState,
-      entityKey
-    );
-
-    const newEditorState = EditorState.set(
-        this.state.editorState,
-        { currentContent: contentStateWithLink });
-    this.onChange(newEditorState);
-  }
-
-  insertActivity(type, data) {
-      const {editorState} = this.state;
-      const contentState = editorState.getCurrentContent();
-      const contentStateWithEntity = contentState.createEntity(
-        type,
-        'IMMUTABLE',
-        data
-      );
-      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-      const newEditorState = EditorState.set(
-        editorState,
-        {currentContent: contentStateWithEntity}
-      );
-
-      this.onChange(AtomicBlockUtils.insertAtomicBlock(
-          newEditorState,
-          entityKey,
-          ' '
-        ));
-    }
-
-  toggleBlockType(type) {
-    const updateStyle = RichUtils.toggleBlockType(this.state.editorState, type);
-    this.onChange(updateStyle);
-  }
-
-
+  
 
   renderPostProcess(components, blocks) {
     
