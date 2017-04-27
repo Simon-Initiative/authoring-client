@@ -1,27 +1,32 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../data/content/html/common';
+import { EditorState } from 'draft-js';
 
-import { ToolbarProps, Toolbar } from '../../content/common/toolbar/Toolbar';
+import { EntityTypes } from '../../../data/content/html/common';
+import { HtmlToolbar, HtmlToolbarButton } from '../../content/html/TypedToolbar';
+import { CommandProcessor } from '../../content/common/command';
 import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
+import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowInline } from '../../content/common/toolbar/Configs';
 
-
-interface InlineToolbarProps extends ToolbarProps {  
+interface InlineToolbarProps extends ToolbarProps<EditorState> {  
   
 }
 
-export interface InlineToolbar {
+interface InlineToolbar {
   
 }
 
-export class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
+class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
   render() {
     return (
-      <Toolbar {...this.props}>
+      <HtmlToolbar {...this.props}>
         {flowInline()}
-      </Toolbar>);
+      </HtmlToolbar>);
   }
 
 }
+
+
+export default InlineToolbar;

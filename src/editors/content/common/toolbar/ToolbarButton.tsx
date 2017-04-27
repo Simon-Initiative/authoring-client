@@ -1,25 +1,48 @@
 import * as React from 'react';
 
-import { ToolbarActionProvider } from './Toolbar';
+import { Command, CommandProcessor } from '../command';
 
-export type ToolbarButtonProps = {
-  action: (controller: ToolbarActionProvider) => void,
+export type ToolbarButtonProps<DataType> = {
+  command: Command<DataType>,
   icon: string,
-  provider?: ToolbarActionProvider
+  tooltip: string,
+  processor?: CommandProcessor<DataType>
 }
 
-export const ToolbarButton = (props) => {
-  const { action, icon, provider } = props;
-  const iconClasses = 'icon icon-' + icon;
-  const style = {
-    color: 'white'
+export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonProps<DataType>, {}> {
+  
+  constructor(props) {
+    super(props);
+
+    this.onClick = this.onClick.bind(this);
   }
-  const buttonStyle = {
-    backgroundColor: 'black'
+
+  onClick() {
+    this.props.processor.process(this.props.command);
   }
-  return (
-    <button onClick={() => action(provider)} type="button" className="btn" style={buttonStyle}>
-      <i style={style} className={iconClasses}></i>
-    </button>
-  );
+  
+  render() {
+    const { command, icon, tooltip } = this.props;
+    const iconClasses = 'icon icon-' + icon;
+    const style = {
+      color: 'white'
+    }
+    const buttonStyle = {
+      backgroundColor: 'black'
+    }
+
+    return (
+      <button 
+        onClick={this.onClick} 
+        data-toggle='tooltip'
+        data-placement='top'
+        title={this.props.tooltip}
+        type="button" 
+        className="btn" 
+        style={buttonStyle}>
+        <i style={style} className={iconClasses}></i>
+      </button>
+    );
+  }
 }
+

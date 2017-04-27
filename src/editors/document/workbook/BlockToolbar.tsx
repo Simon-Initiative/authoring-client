@@ -1,27 +1,31 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../data/content/html/common';
+import { EditorState } from 'draft-js';
 
-import { ToolbarProps, Toolbar, ToolbarActionProvider } from '../../content/common/toolbar/Toolbar';
+import { EntityTypes } from '../../../data/content/html/common';
+import { HtmlToolbar, HtmlToolbarButton } from '../../content/html/TypedToolbar';
+import { CommandProcessor } from '../../content/common/command';
 import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
+import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowBlock, bodyBlock } from '../../content/common/toolbar/Configs';
 
-interface BlockToolbarProps extends ToolbarProps {  
+interface BlockToolbarProps extends ToolbarProps<EditorState> {  
   
 }
 
-export interface BlockToolbar {
+interface BlockToolbar {
   
 }
 
-export class BlockToolbar extends React.PureComponent<BlockToolbarProps, {}> {
+class BlockToolbar extends React.PureComponent<BlockToolbarProps, {}> {
 
   render() {
     return (
-      <Toolbar {...this.props}>
-        {flowBlock()}
-        {bodyBlock()}
-      </Toolbar>);
+      <HtmlToolbar {...this.props}>
+        {[...flowBlock(), ...bodyBlock()]}
+      </HtmlToolbar>);
   }
 
 }
+
+export default BlockToolbar;

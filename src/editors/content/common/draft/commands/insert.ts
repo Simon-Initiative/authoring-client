@@ -1,7 +1,9 @@
-import { AbstractDraftCommand, appendText } from './common';
+import { appendText } from './common';
+import { AbstractCommand } from '../../command';
 import { EditorState, ContentState, SelectionState, Modifier, AtomicBlockUtils } from 'draft-js';
 
-export class InsertBlockEntityCommand extends AbstractDraftCommand {
+export class InsertBlockEntityCommand
+ extends AbstractCommand<EditorState> {
 
   type: string;
   data: Object;
@@ -13,7 +15,7 @@ export class InsertBlockEntityCommand extends AbstractDraftCommand {
     this.data = data;
   }
 
-  execute(editorState: EditorState) : EditorState {
+  execute(editorState: EditorState, context, services) : Promise<EditorState> {
     
     const contentState = editorState.getCurrentContent();
     const contentStateWithEntity = contentState.createEntity(
@@ -34,7 +36,7 @@ export class InsertBlockEntityCommand extends AbstractDraftCommand {
   }
 }
 
-export class InsertInlineEntityCommand extends AbstractDraftCommand {
+export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
 
   type: string;
   mutability: string;
@@ -48,7 +50,7 @@ export class InsertInlineEntityCommand extends AbstractDraftCommand {
     this.data = data;
   }
 
-  execute(editorState: EditorState) : EditorState {
+  execute(editorState: EditorState, context, services) : Promise<EditorState> {
     let contentState = editorState.getCurrentContent();
     let selectionState = editorState.getSelection();
 

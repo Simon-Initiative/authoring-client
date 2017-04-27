@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
+import { CommandProcessor, Command } from '../command';
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType } from './utils';
@@ -44,7 +45,6 @@ interface DraftWrapper {
 }
 
 export interface DraftWrapperProps {
-  editHistory: Immutable.List<AuthoringActions>;
   onEdit: (html : Html) => void;
   onSelectionChange: (state: SelectionState) => void;
   content: Html;
@@ -200,7 +200,8 @@ function splitBlockInContentState(
 
 
 
-class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
+class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
+  implements CommandProcessor<EditorState> {
 
   constructor(props) {
     super(props);
@@ -261,6 +262,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
+
+
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
@@ -299,6 +302,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const selection = document.getSelection();
         if (selection.rangeCount !== 0) {
           let topRect = getPosition();
+
+          if (topRect === null) {
+            this.setState({ show: false, x: null, y: null});
+            return;
+          }
           
           const divRect = this.container.getBoundingClientRect();
 
@@ -431,19 +439,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    // Determine if we have received a new edit action
-    if (this.props.editHistory !== nextProps.editHistory) {
-      let action : any = nextProps.editHistory.get(0);
-      if (action.type === 'TOGGLE_INLINE_STYLE') {
-        this.toggleInlineStyle(action.style);
-      } else if (action.type === 'INSERT_ATOMIC_BLOCK') {
-        this.insertActivity(action.entityType, action.data);
-      } else if (action.type === 'TOGGLE_BLOCK_TYPE') {
-        this.toggleBlockType(action.blockType);
-      } else if (action.type === 'INSERT_INLINE_ENTITY') {
-        this.insertInlineEntity(action.entityType, action.mutability, action.data);
-      }
-    } else if (this.props.activeItemId !== nextProps.activeItemId) {
+    if (this.props.activeItemId !== nextProps.activeItemId) {
       setTimeout(() => this.forceRender(), 100);
       
     } else if (this.props.content.contentState !== nextProps.content.contentState) {
@@ -526,6 +522,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return updated;
   }
 
+  process(command: Command<EditorState>) {
+    command.execute(this.state.editorState, this.props.context, this.props.services)
+      .then(newState => this.onChange(newState));
+  }
+
   forceRender() {
 
     const editorState = this.state.editorState;
@@ -542,7 +543,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     let toolbarAndContainer = null;
     if (this.state.show) {
       
-      const clonedToolbar = React.cloneElement(this.state.component, { dismissToolbar: this._dismissToolbar});
+      const clonedToolbar = React.cloneElement(this.state.component, { commandProcessor: this, dismissToolbar: this._dismissToolbar});
       
       const positionStyle = {
         position: 'fixed',

@@ -31,7 +31,6 @@ export interface ContentEditorProps extends AbstractContentEditorProps<contentTy
 
 export interface ContentEditorState {
 
-  editHistory: Immutable.List<AuthoringActions>;
 }
 
 /**
@@ -43,20 +42,11 @@ export class ContentEditor
   constructor(props) {
     super(props);
 
-    this.state = {
-      editHistory: Immutable.List<AuthoringActions>()
-    };
     this.ids = {
       availability: guid()
     }
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onAvailability = this.onAvailability.bind(this);
-  }
-
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: this.state.editHistory.insert(0, action)
-    });
   }
 
   onBodyEdit(body) {
@@ -72,22 +62,13 @@ export class ContentEditor
     if (nextProps.model !== this.props.model) {
       return true;
     }
-    if (nextState.editHistory !== this.state.editHistory) {
-      return true;
-    }
     return false;
   }
 
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                context={this.props.context}
-                services={this.props.services} 
-                actionHandler={this} />;
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
 
     const bodyStyle = {
       minHeight: '30px',
@@ -119,7 +100,6 @@ export class ContentEditor
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
                 {...this.props}
-                editHistory={this.state.editHistory}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
                 />
