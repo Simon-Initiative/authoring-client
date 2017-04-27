@@ -1,5 +1,5 @@
 import { EditorState, Modifier, ContentState, SelectionState, ContentBlock } from 'draft-js';
-
+import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
 
 export default function handle(editorState: EditorState, onChange: (e: EditorState) => void) : string {
@@ -144,12 +144,12 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
       })
 
     const updatedContent = currentContent.merge({
-      blockMap: newBlocks,
+      blockMap: Immutable.OrderedMap<string, ContentBlock>(newBlocks),
       selectionBefore: ss,
       selectionAfter: ss,
     });
 
-    onChange(EditorState.push(editorState, updatedContent, 'backspace-character'));
+    onChange(EditorState.push(editorState, updatedContent, 'remove-range'));
     
     return 'handled';
         
