@@ -251,6 +251,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const contentChange = (contentState !== this.lastContent);
         
         if (contentChange) {
+          console.log('updated content');
+          console.log(convertToRaw(contentState));
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {
@@ -463,10 +465,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
-  
-
-  
-
   renderPostProcess(components, blocks) {
     
     const updated = [];
@@ -474,7 +472,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     let current = updated;
 
     const content =  this.state.editorState.getCurrentContent();
-
     let currentWrapper : ContentWrapper = null;
     
     for (let i = 0; i < components.length; i++) {
@@ -499,7 +496,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           children = [];
           current = children;
-          
           children.push(components[i]);
 
         } else {
@@ -510,8 +506,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         children.push(components[i]);
         updated.push(React.createElement(currentWrapper.component, {key: 'block-' + block.key}, children));
-
         current = updated;
+        currentWrapper = null;
 
       } else {
         current.push(components[i]);
