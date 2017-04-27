@@ -21,7 +21,6 @@ export interface ExplanationEditorProps extends AbstractContentEditorProps<conte
 }
 
 export interface ExplanationEditorState {
-  editHistory: Immutable.List<AuthoringActions>;
 }
 
 /**
@@ -32,23 +31,10 @@ export class ExplanationEditor
     
   constructor(props) {
     super(props);
-
-    this.state = {
-      editHistory: Immutable.List<AuthoringActions>()
-    };
-  }
-
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: this.state.editHistory.insert(0, action)
-    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextState.editHistory !== this.state.editHistory) {
       return true;
     }
     return false;
@@ -56,14 +42,8 @@ export class ExplanationEditor
 
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                context={this.props.context}
-                services={this.props.services}
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                context={this.props.context}
-                services={this.props.services} 
-                actionHandler={this} />;
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
 
     const bodyStyle = {
       minHeight: '20px',
@@ -79,7 +59,6 @@ export class ExplanationEditor
           inlineToolbar={inlineToolbar}
           blockToolbar={blockToolbar}
           {...this.props}
-          editHistory={this.state.editHistory}
           model={this.props.model}
           onEdit={this.props.onEdit} 
           />

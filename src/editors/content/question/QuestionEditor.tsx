@@ -19,15 +19,20 @@ import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
+import { CommandProcessor, Command } from '../common/command';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 import { EntityTypes } from '../../../data/content/html/common';
-import { Toolbar, ToolbarActionProvider } from '../common/toolbar/Toolbar';
+import InlineToolbar from '../html/InlineToolbar';
+import BlockToolbar from '../html/BlockToolbar';
+import { HtmlToolbarButton } from '../html/TypedToolbar';
+import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
+import { InsertInputRefCommand } from './commands';
 
 type Ids = {
   id: string
@@ -36,7 +41,11 @@ type Ids = {
 export interface QuestionEditor {
   ids: Ids;
   lastBody: contentTypes.Html
-  itemToAdd: any
+  itemToAdd: any;
+  fillInTheBlankCommand: InsertInputRefCommand;
+  numericCommand: InsertInputRefCommand;
+  textCommand: InsertInputRefCommand;
+  htmlEditor: CommandProcessor<EditorState>;
 }
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
@@ -44,8 +53,6 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
 }
 
 export interface QuestionEditorState {
-
-  editHistory: Immutable.List<AuthoringActions>;
 
   activeItemId: string;
 }
@@ -60,7 +67,6 @@ export abstract class QuestionEditor
     super(props);
 
     this.state = {
-      editHistory: Immutable.List<AuthoringActions>(),
       activeItemId: null
     };
 
@@ -74,15 +80,14 @@ export abstract class QuestionEditor
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
-    this.onFillInTheBlank = this.onFillInTheBlank.bind(this);
-    this.onNumeric = this.onNumeric.bind(this);
-    this.onText = this.onText.bind(this);
+    this.fillInTheBlankCommand = new InsertInputRefCommand(this, () => new contentTypes.FillInTheBlank(), 'FillInTheBlank');
+    this.numericCommand = new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
+    this.textCommand = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
+    
     this.onRemove = this.onRemove.bind(this);
     this.onInsertFillInTheBlank = this.onInsertFillInTheBlank.bind(this);
     this.onInsertNumeric = this.onInsertNumeric.bind(this);
     this.onInsertText = this.onInsertText.bind(this);
-    
-    
     
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -96,31 +101,14 @@ export abstract class QuestionEditor
     }
   }
 
-  onInsert(item, typeLabel) {
-    this.itemToAdd = item; 
-
-    const input = guid();
-    const data = {};
-    data['@input'] = input;
-    data['$type'] = typeLabel;
-
-    this.handleAction(insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data));
-  }
-
   onInsertNumeric() {
-    this.onInsert(new contentTypes.Numeric(), 'Numeric');
+    this.htmlEditor.process(this.numericCommand);
   }
   onInsertText() {
-    this.onInsert(new contentTypes.Text(), 'Text');
+    this.htmlEditor.process(this.textCommand);
   }
   onInsertFillInTheBlank() {
-    this.onInsert(new contentTypes.FillInTheBlank(), 'FillInTheBlank');
-  }
-
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: this.state.editHistory.insert(0, action)
-    });
+    this.htmlEditor.process(this.fillInTheBlankCommand);
   }
 
   onConceptsEdit(concepts) {
@@ -338,49 +326,15 @@ export abstract class QuestionEditor
     return toRender;
   }
 
-  addItem(a: ToolbarActionProvider, item, typeLabel) {
-
-    this.itemToAdd = item; 
-
-    const input = guid();
-    const data = {};
-    data['@input'] = input;
-    data['$type'] = typeLabel;
-
-    a.insertInlineEntity(EntityTypes.input_ref, 'IMMUTABLE', data);
-    
-  }
-
-
-  onFillInTheBlank(a: ToolbarActionProvider) {
-    this.addItem(a, new contentTypes.FillInTheBlank(), 'FillInTheBlank');
-  }
-
-  onNumeric(a: ToolbarActionProvider) {
-    this.addItem(a, new contentTypes.Numeric(), 'Numeric');
-  }
-
-  onText(a: ToolbarActionProvider) {
-    this.addItem(a, new contentTypes.Text(), 'Text');
-  }
-
   render() : JSX.Element {
     
-    const inlineToolbar = <Toolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this}>
-                  {toolbarConfigs.flowInline()}
-                  <ToolbarButton key='server' icon='server' action={this.onFillInTheBlank}/>
-                  <ToolbarButton key='info' icon='info' action={this.onNumeric}/>
-                  <ToolbarButton key='i-cursor' icon='i-cursor' action={this.onText}/>
-                </Toolbar>
-    const blockToolbar = <Toolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this}>
-                  {toolbarConfigs.flowBlock()}
-                </Toolbar>
+    const inlineToolbar = <InlineToolbar>
+                            <HtmlToolbarButton tooltip='Insert Fill In the Blank' key='server' icon='server' command={this.fillInTheBlankCommand}/>
+                            <HtmlToolbarButton tooltip='Insert Numeric Input' key='info' icon='info' command={this.numericCommand}/>
+                            <HtmlToolbarButton tooltip='Insert Text Input' key='i-cursor' icon='i-cursor' command={this.textCommand}/>
+                          </InlineToolbar>;
+
+    const blockToolbar = <BlockToolbar/>;
 
     const bodyStyle = {
       minHeight: '30px',
@@ -414,12 +368,12 @@ export abstract class QuestionEditor
           expanded={expanded}>
 
           <HtmlContentEditor 
+                ref={(c) => this.htmlEditor = c}
                 {...this.props}
                 activeItemId={this.state.activeItemId}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
                 blockToolbar={blockToolbar}
-                editHistory={this.state.editHistory}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
                 />

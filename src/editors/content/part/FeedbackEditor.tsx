@@ -26,8 +26,6 @@ export interface FeedbackEditorProps extends AbstractContentEditorProps<contentT
 
 export interface FeedbackEditorState {
 
-  editHistory: Immutable.List<AuthoringActions>;
-
 }
 
 /**
@@ -39,23 +37,11 @@ export class FeedbackEditor
   constructor(props) {
     super(props);
 
-    this.state = {
-      editHistory: Immutable.List<AuthoringActions>()
-    };
     this.onBodyEdit = this.onBodyEdit.bind(this);
-  }
-
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: this.state.editHistory.insert(0, action)
-    });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextState.editHistory !== this.state.editHistory) {
       return true;
     }
     return false;
@@ -68,14 +54,8 @@ export class FeedbackEditor
 
   render() : JSX.Element {
     
-    const inlineToolbar = <InlineToolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                context={this.props.context}
-                services={this.props.services} 
-                actionHandler={this} />;
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
 
     const bodyStyle = {
       minHeight: '20px',
@@ -94,7 +74,6 @@ export class FeedbackEditor
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
               {...this.props}
-              editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 
               />

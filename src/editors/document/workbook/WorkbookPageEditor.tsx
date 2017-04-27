@@ -6,8 +6,8 @@ import * as Immutable from 'immutable';
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { InlineToolbar } from './InlineToolbar';
-import { BlockToolbar } from './BlockToolbar';
+import InlineToolbar  from './InlineToolbar';
+import BlockToolbar  from './BlockToolbar';
 
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
@@ -24,25 +24,14 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   
-  editHistory: Immutable.List<AuthoringActions>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, 
-  WorkbookPageEditorState> 
-  implements AuthoringActionsHandler {
+  WorkbookPageEditorState> {
     
   constructor(props) {
-    super(props, {
-      editHistory: Immutable.List<AuthoringActions>()
-    });
-  }
-
-  
-  handleAction(action: AuthoringActions) {
-    this.setState({
-      editHistory: this.state.editHistory.insert(0, action)
-    });
+    super(props, {});
   }
 
 
@@ -63,14 +52,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   render() {
 
-    const inlineToolbar = <InlineToolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this} />;
-    const blockToolbar = <BlockToolbar 
-                context={this.props.context} 
-                services={this.props.services} 
-                actionHandler={this} />;
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
 
     return (
       <div>
@@ -88,13 +71,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              editHistory={this.state.editHistory}
               model={this.props.model.body}
               onEdit={(c) => this.onEdit('body', c)} 
               />
-
-              
-          
       </div>
     )
   }

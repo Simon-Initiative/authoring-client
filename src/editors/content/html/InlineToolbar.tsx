@@ -1,13 +1,14 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../data/content/html/common';
+import { EditorState } from 'draft-js';
 
-import { ToolbarProps, Toolbar } from '../../content/common/toolbar/Toolbar';
+import { EntityTypes } from '../../../data/content/html/common';
+import { HtmlToolbar, HtmlToolbarButton } from './TypedToolbar';
 import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
+import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowInline } from '../../content/common/toolbar/Configs';
 
-
-interface InlineToolbarProps extends ToolbarProps {  
+interface InlineToolbarProps extends ToolbarProps<EditorState> {  
   
 }
 
@@ -17,13 +18,24 @@ interface InlineToolbar {
 
 class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
 
+  renderChildren() {
+    if (React.Children.count(this.props.children) > 0) {
+      return React.Children.map(this.props.children, (child) => {
+        return React.cloneElement(child as any);
+      });
+    } else {
+      return [];
+    }
+  }
+
   render() {
     return (
-      <Toolbar {...this.props}>
-        {flowInline()}
-      </Toolbar>);
+      <HtmlToolbar {...this.props}>
+        {[...flowInline(), ...this.renderChildren()]}
+      </HtmlToolbar>);
   }
 
 }
+
 
 export default InlineToolbar;
