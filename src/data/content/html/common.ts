@@ -1,5 +1,23 @@
 import * as types from '../../types';
 
+export type PurposeType = {
+  value: string,
+  label: string
+}
+
+export const PurposeTypes : PurposeType[] = [
+  { value: 'checkpoint', label: 'Checkpoint'},
+  { value: 'lab', label: 'Lab'},
+  { value: 'learnbydoing', label: 'Learn by doing'},
+  { value: 'learnmore', label: 'Learn more'},
+  { value: 'manystudentswonder', label: 'Many students wonder'},
+  { value: 'myresponse', label: 'My response'},
+  { value: 'quiz', label: 'Quiz'},
+  { value: 'simulation', label: 'Simulation'},
+  { value: 'walkthrough', label: 'Walkthrough'},
+  { value: 'didigetthis', label: 'Did I get this?'}
+];
+
 export const EntityTypes = types.strEnum([
 
   // Sentinals

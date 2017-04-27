@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 
 import { CodeBlock } from './codeblock';
+import { WbInline } from './wbinline';
 
 import * as common from './common';
 import { EntityTypes } from './common';
@@ -98,6 +99,8 @@ function translateBlock(iterator : BlockIterator,
     translateList('ul', rawBlock, block, iterator, entityMap, context);
   } else if (isCodeBlock(rawBlock, entityMap)) {
     translateCodeBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isWbInline(rawBlock, entityMap)) {
+    translateWbInline(rawBlock, draftBlock, entityMap, context);
   } else {
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
@@ -165,6 +168,15 @@ function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntity
   return false; 
 }
 
+function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
+  const { type } = block; 
+  if (block.type === 'atomic') {
+    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
+    return entity.type === 'wb_inline';
+  } 
+  return false; 
+}
+
 
 
 function translateList(listType : string, 
@@ -216,6 +228,13 @@ function translateCodeBlock(rawBlock : common.RawContentBlock,
 
   const codeblock : CodeBlock = entityMap[rawBlock.entityRanges[0].key].data.codeblock;
   top(context).push(codeblock.toPersistence());
+}
+
+function translateWbInline(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const wb : WbInline = entityMap[rawBlock.entityRanges[0].key].data.wbinline;
+  top(context).push(wb.toPersistence());
 }
 
 function translateSection(iterator: BlockIterator, rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {

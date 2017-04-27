@@ -4,6 +4,7 @@ import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} fr
 import * as common from './common';
 import { getKey, EntityTypes } from './common';
 import { CodeBlock } from './codeblock';
+import { WbInline } from './wbinline';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -33,7 +34,7 @@ const youtube = addAtomicBlock.bind(undefined, EntityTypes.youtube);
 
 const blockHandlers = {
   objref,
-  wb_inline,
+  'wb:inline': wb_inline,
   pullout,
   example,
   p,
@@ -124,7 +125,8 @@ function insertEntity(mutability: string, type: string, offset: number, length: 
 }
 
 function wb_inline(item: Object, context: ParsingContext) {
-  addAtomicBlock(EntityTypes.wb_inline, item, context);
+  const wb = WbInline.fromPersistence(item, '');
+  addAtomicBlock(EntityTypes.wb_inline, { wbinline: wb}, context);
 }
 
 function codeblock(item: Object, context: ParsingContext) {

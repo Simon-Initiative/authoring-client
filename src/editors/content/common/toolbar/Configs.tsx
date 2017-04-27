@@ -42,7 +42,8 @@ export function bodyBlock() {
   return [
     <Button key='pullout' command={new commands.InsertPulloutCommand()} tooltip='Insert pullout' icon="external-link-square"/>,
     <Button key='example' command={new commands.InsertExampleCommand()} tooltip='Insert example' icon="bar-chart"/>,
-    <Button key='section' command={new commands.InsertSectionCommand()} tooltip='Insert section' icon="list-alt"/>
+    <Button key='section' command={new commands.InsertSectionCommand()} tooltip='Insert section' icon="list-alt"/>,
+    <Button key='wbinline' command={new commands.InsertAssessmentCommand()} tooltip='Insert inline assessment' icon="flask"/>
   ]; 
 }
 

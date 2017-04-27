@@ -1,3 +1,6 @@
+import { AppContext } from '../../../../common/AppContext';
+import { AppServices } from '../../../../common/AppServices';
+
 export type BlockProps = {
 
   // Callback to indicate the block renderer has set
@@ -9,5 +12,9 @@ export type BlockProps = {
   onLockChange: (locked: boolean) => void;
 
   onEdit: (data: any) => void;
+
+  services: AppServices;
+
+  context: AppContext;
 
 };

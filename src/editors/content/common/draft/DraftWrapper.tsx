@@ -406,7 +406,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             this.processBlockEdit(block, data);
           },
           services: this.props.services,
-          userId: this.props.context.userId
+          context: this.props.context
         }
       };
     }
