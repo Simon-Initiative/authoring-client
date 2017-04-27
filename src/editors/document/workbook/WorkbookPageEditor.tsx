@@ -40,7 +40,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     let model; 
 
     if (property === 'title') {
-      const head = model.head.with({ title: content});
+      const head = this.props.model.head.with({ title: content});
       model = this.props.model.with({ head });
         
     } else {
