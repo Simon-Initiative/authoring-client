@@ -10,7 +10,7 @@ export function register(name: string, viewer: Object, editor: Object) {
   RendererRegistry[name] = { viewer, editor}; 
 }
 
-export function getActivityByName(name: string) : BlockRenderer {
+export function getRendererByName(name: string) : BlockRenderer {
   return RendererRegistry[name];
 }
 

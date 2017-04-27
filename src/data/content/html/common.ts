@@ -54,13 +54,13 @@ export interface PulloutEnd {
 
 export interface SectionBegin {
   type: 'section_begin';
-  '@purpose': string;
+  purpose: string;
 }
 
 export interface SectionEnd {
   type: 'section_end';
   beginBlockKey: string;
-  '@purpose': string;
+  purpose: string;
 }
 
 export interface ExampleBegin {

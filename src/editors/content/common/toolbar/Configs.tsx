@@ -2,17 +2,14 @@ import * as React from 'react';
 
 import { HtmlToolbarButton as Button } from '../../html/TypedToolbar';
 import { EntityTypes } from '../../../../data/content/html/common';
-import { ToggleStyleCommand, ToggleBlockTypeCommand } from '../draft/commands/toggle';
-import { InsertInlineEntityCommand, InsertBlockEntityCommand } from '../draft/commands/insert';
-import { InsertPulloutCommand } from '../draft/commands/pullout';
-import { InsertMediaCommand } from '../draft/commands/media';
+import * as commands from '../draft/commands';
 const formula = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo>&sum;</mo></math>"
 const defaultFormula = { '#cdata': formula};
 
-const style = (style) => new ToggleStyleCommand(style);
-const block = (type) => new ToggleBlockTypeCommand(type);
-const insertBlock = (type, mutability, data) => new InsertBlockEntityCommand(type, mutability, data);
-const insertInline = (type, mutability, data) => new InsertInlineEntityCommand(type, mutability, data);
+const style = (style) => new commands.ToggleStyleCommand(style);
+const block = (type) => new commands.ToggleBlockTypeCommand(type);
+const insertBlock = (type, mutability, data) => new commands.InsertBlockEntityCommand(type, mutability, data);
+const insertInline = (type, mutability, data) => new commands.InsertInlineEntityCommand(type, mutability, data);
 
 
 export function flowInline() {
@@ -36,14 +33,16 @@ export function flowBlock() {
     <Button key='codeblock' command={insertBlock(EntityTypes.codeblock, 'IMMUTABLE', {src: 'Your code here...'})} 
       tooltip='Code block' icon="code"/>,
 
-    <Button key='image' command={new InsertMediaCommand(EntityTypes.image, 'image', 'image/*')} tooltip='Insert image' icon="image"/>
+    <Button key='image' command={new commands.InsertMediaCommand(EntityTypes.image, 'image', 'image/*')} tooltip='Insert image' icon="image"/>
   ]
 }
 
 export function bodyBlock() {
   return [
-    <Button key='pullout' command={new InsertPulloutCommand()} tooltip='Insert pullout' icon="external-link-square"/>
-  ];  // TODO add section, pullout, example, etc support
+    <Button key='pullout' command={new commands.InsertPulloutCommand()} tooltip='Insert pullout' icon="external-link-square"/>,
+    <Button key='example' command={new commands.InsertExampleCommand()} tooltip='Insert example' icon="bar-chart"/>,
+    <Button key='section' command={new commands.InsertSectionCommand()} tooltip='Insert section' icon="list-alt"/>
+  ]; 
 }
 
 

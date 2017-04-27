@@ -16,7 +16,7 @@ import { AppContext } from '../../../common/AppContext';
 import * as common from '../../../../data/content/html/common';
 import { Html } from '../../../../data/contentTypes';
 import { EntityTypes } from '../../../../data/content/html/common';
-import { getActivityByName, BlockRenderer } from './renderers/registry';
+import { getRendererByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
@@ -133,7 +133,7 @@ const BlockRendererFactory = (props) => {
   const data = entity.getData();
   const type = entity.getType();
 
-  let viewer = getActivityByName(type).viewer;
+  let viewer = getRendererByName(type).viewer;
 
   let childProps = Object.assign({}, props, data);
 

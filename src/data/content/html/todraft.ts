@@ -320,7 +320,7 @@ function section(item: Object, context: ParsingContext) {
   const key = getKey(item);
   const beginData : common.SectionBegin = {
     type: 'section_begin',
-    '@purpose': extractAttrs(item)['@purpose']
+    purpose: extractAttrs(item)['@purpose']
   };
   
   const beginBlock = addAtomicBlock(EntityTypes.section_begin, beginData, context);
@@ -336,7 +336,7 @@ function section(item: Object, context: ParsingContext) {
   // Create then ending block 
   const endData : common.SectionEnd = {
     type: 'section_end',
-    '@purpose': extractAttrs(item)['@purpose'],
+    purpose: extractAttrs(item)['@purpose'],
     beginBlockKey: beginBlock.key
   };
   addAtomicBlock(EntityTypes.section_end, endData, context);
@@ -396,7 +396,7 @@ function example(item: Object, context: ParsingContext) {
   const beginData : common.ExampleBegin = {
     type: 'example_begin'
   };
-  const beginBlock = addAtomicBlock(EntityTypes.pullout_begin, beginData, context);
+  const beginBlock = addAtomicBlock(EntityTypes.example_begin, beginData, context);
 
   // Process the title
   processTitle(item, context, 'header-three', beginBlock.key);
@@ -410,7 +410,7 @@ function example(item: Object, context: ParsingContext) {
     type: 'example_end',
     beginBlockKey: beginBlock.key
   };
-  addAtomicBlock(EntityTypes.pullout_end, endData, context);
+  addAtomicBlock(EntityTypes.example_end, endData, context);
 
 }
 

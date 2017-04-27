@@ -32,15 +32,17 @@ export class PulloutBegin extends InteractiveRenderer<PulloutBeginProps, Pullout
     return (
       <span ref={(c) => this.focusComponent = c} className='PulloutSentinel' onFocus={this.onFocus} onBlur={this.onBlur}>
         Pullout&nbsp;
-        <Select  label='Type' value={this.props.subType} onChange={onClick}>
-          <option value='note'>Note</option>
-          <option value='notation'>Notation</option>
-          <option value='observation'>Observation</option>
-          <option value='research'>Research</option>
-          <option value='tip'>Tip</option>
-          <option value='tosumpup'>To sum up</option>
-          
-        </Select>
+        <span className='SentinelUI'>
+          <Select  label='Type' value={this.props.subType} onChange={onClick}>
+            <option value='note'>Note</option>
+            <option value='notation'>Notation</option>
+            <option value='observation'>Observation</option>
+            <option value='research'>Research</option>
+            <option value='tip'>Tip</option>
+            <option value='tosumpup'>To sum up</option>
+            
+          </Select>
+        </span>
       </span>);
     }
 }

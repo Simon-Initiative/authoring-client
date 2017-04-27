@@ -211,6 +211,7 @@ function translateSection(iterator: BlockIterator, rawBlock: common.RawContentBl
 
   const s = { 
     section: {
+      '@purpose': entityMap[rawBlock.entityRanges[0].key].data.purpose,
       '#array': [title, {
         body: {
           '#array': []
@@ -267,7 +268,6 @@ function translateExample(iterator: BlockIterator, rawBlock: common.RawContentBl
 
   const e = {
     "example": {
-      "@type": "note",
       "#array": arr
     }
   };

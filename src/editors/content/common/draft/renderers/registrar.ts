@@ -9,6 +9,9 @@ import { PulloutBegin } from './PulloutBegin';
 import { PulloutEnd } from './PulloutEnd';
 import { SectionBegin } from './SectionBegin';
 import { SectionEnd } from './SectionEnd';
+import { ExampleBegin } from './ExampleBegin';
+import { ExampleEnd } from './ExampleEnd';
+
 
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
@@ -25,4 +28,6 @@ export default function init() {
   register(EntityTypes.pullout_end, PulloutEnd, undefined);
   register(EntityTypes.section_begin, SectionBegin, undefined);
   register(EntityTypes.section_end, SectionEnd, undefined);  
+  register(EntityTypes.example_begin, ExampleBegin, undefined);
+  register(EntityTypes.example_end, ExampleEnd, undefined);  
 }
