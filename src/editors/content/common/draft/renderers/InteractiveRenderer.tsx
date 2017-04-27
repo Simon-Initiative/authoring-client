@@ -28,10 +28,19 @@ export abstract class InteractiveRenderer<P extends InteractiveRendererProps, S 
   }
 
 
-  onBlur() {
+  onBlur(e) {
+
     if (this.state.editMode) {
-      this.setState({editMode: false});
-      this.props.blockProps.onLockChange(false);
+
+      const currentTarget = e.currentTarget;
+
+      setTimeout(() => {
+        if (!currentTarget.contains(document.activeElement)) {
+          this.setState({editMode: false});
+          this.props.blockProps.onLockChange(false);
+        }
+      }, 0);
+    
     }
   }
 

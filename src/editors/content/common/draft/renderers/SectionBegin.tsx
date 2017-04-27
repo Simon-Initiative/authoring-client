@@ -6,8 +6,12 @@ import { BlockProps } from './properties';
 import { Select } from '../../Select';
 import './markers.scss';
 
-export interface SectionBeginProps extends InteractiveRendererProps {
+type Data = {
   purpose: string;
+}
+
+export interface SectionBeginProps extends InteractiveRendererProps {
+  data: Data;
 }
 
 export interface SectionBeginState extends InteractiveRendererState {
@@ -33,7 +37,7 @@ export class SectionBegin extends InteractiveRenderer<SectionBeginProps, Section
       <span ref={(c) => this.focusComponent = c} className='PulloutSentinel' onFocus={this.onFocus} onBlur={this.onBlur}>
         Section&nbsp;
         <span className='SentinelUI'>
-          <Select label='Purpose' value={this.props.purpose} onChange={onClick}>
+          <Select label='Purpose' value={this.props.data.purpose} onChange={onClick}>
             <option value='checkpoint'>Checkpoint</option>
             <option value='didigetthis'>Did I get this</option>
             <option value='lab'>Lab</option>

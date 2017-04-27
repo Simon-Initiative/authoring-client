@@ -1,30 +1,36 @@
 import * as React from 'react';
-import PreformattedText from './PreformattedText';
+import { InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState} from './InteractiveRenderer'
 import { BlockProps } from './properties';
+import PreformattedText from './PreformattedText';
 
 import './Unsupported.scss';
 
-interface Unsupported {
+export interface UnsupportedProps extends InteractiveRendererProps {
+  data: Object;
+}
+
+export interface UnsupportedState extends InteractiveRendererState {
   
 }
 
-export interface UnsupportedProps {
-  blockProps: BlockProps;
-  src: string; 
-}
-
-export interface UnsupportedState {
-  
-}
-
-class Unsupported extends React.PureComponent<UnsupportedProps, UnsupportedState> {
+class Unsupported extends InteractiveRenderer<UnsupportedProps, UnsupportedState> {
 
   constructor(props) {
-    super(props);
+    super(props, {});
+
+    this.onEdit = this.onEdit.bind(this);
+  }
+
+  onEdit(data) {
+    this.props.blockProps.onEdit(JSON.parse(data));
   }
 
   render() : JSX.Element {
-    return <PreformattedText {...this.props} styleName='Unsupported-style'/>
+    return <PreformattedText 
+      editMode={this.state.editMode} 
+      onEdit={this.onEdit} 
+      src={JSON.stringify(this.props.data)} 
+      styleName='Unsupported-style'/>
   }
 };
 

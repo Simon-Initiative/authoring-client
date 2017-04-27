@@ -135,7 +135,7 @@ const BlockRendererFactory = (props) => {
 
   let viewer = getRendererByName(type).viewer;
 
-  let childProps = Object.assign({}, props, data);
+  let childProps = Object.assign({}, props, { data });
 
   return React.createElement((viewer as any), childProps);
 };

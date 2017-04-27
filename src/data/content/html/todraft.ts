@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 import * as common from './common';
 import { getKey, EntityTypes } from './common';
+import { CodeBlock } from './codeblock';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -24,7 +25,6 @@ type InlineHandler = (offset: number, length: number, item: Object, context: Par
 
 const ol = listHandler.bind(undefined, 'ordered-list-item');
 const ul = listHandler.bind(undefined, 'unordered-list-item');
-const codeblock = addAtomicBlock.bind(undefined, EntityTypes.codeblock);
 const table = addAtomicBlock.bind(undefined, EntityTypes.table);
 const audio = addAtomicBlock.bind(undefined, EntityTypes.audio);
 const video = addAtomicBlock.bind(undefined, EntityTypes.video);
@@ -125,6 +125,12 @@ function insertEntity(mutability: string, type: string, offset: number, length: 
 
 function wb_inline(item: Object, context: ParsingContext) {
   addAtomicBlock(EntityTypes.wb_inline, item, context);
+}
+
+function codeblock(item: Object, context: ParsingContext) {
+
+  const codeblock = CodeBlock.fromPersistence(item, '');
+  addAtomicBlock(EntityTypes.codeblock, { codeblock }, context);
 }
 
 function getInlineHandler(key: string) : InlineHandler {

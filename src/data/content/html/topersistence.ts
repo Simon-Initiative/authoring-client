@@ -2,6 +2,8 @@ import * as Immutable from 'immutable';
 
 import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
 
+import { CodeBlock } from './codeblock';
+
 import * as common from './common';
 import { EntityTypes } from './common';
 import { getKey } from './common';
@@ -94,11 +96,15 @@ function translateBlock(iterator : BlockIterator,
     translateList('ol', rawBlock, block, iterator, entityMap, context);
   } else if (isUnorderedListBlock(rawBlock)) {
     translateList('ul', rawBlock, block, iterator, entityMap, context);
+  } else if (isCodeBlock(rawBlock, entityMap)) {
+    translateCodeBlock(rawBlock, draftBlock, entityMap, context);
   } else {
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
   
 }
+
+
 
 const top = (stack : Stack) => stack[stack.length - 1];
 
@@ -150,6 +156,17 @@ function isOrderedListBlock(block : common.RawContentBlock) : boolean {
   return (type === 'ordered-list-item');
 }
 
+function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
+  const { type } = block; 
+  if (block.type === 'atomic') {
+    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
+    return entity.type === 'codeblock';
+  } 
+  return false; 
+}
+
+
+
 function translateList(listType : string, 
   rawBlock : common.RawContentBlock, 
   block: ContentBlock, iterator : BlockIterator, 
@@ -192,6 +209,13 @@ function translateUnsupported(rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
+}
+
+function translateCodeBlock(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const codeblock : CodeBlock = entityMap[rawBlock.entityRanges[0].key].data.codeblock;
+  top(context).push(codeblock.toPersistence());
 }
 
 function translateSection(iterator: BlockIterator, rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {

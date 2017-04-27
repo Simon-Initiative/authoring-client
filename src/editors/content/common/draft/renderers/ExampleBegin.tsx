@@ -7,7 +7,7 @@ import { Select } from '../../Select';
 import './markers.scss';
 
 export interface ExampleBeginProps extends InteractiveRendererProps {
-  subType: string;
+  
 }
 
 export interface ExampleBeginState extends InteractiveRendererState {
@@ -25,10 +25,7 @@ export class ExampleBegin extends InteractiveRenderer<ExampleBeginProps, Example
   }
 
   render() {
-    const onClick = (subType) => {  
-      this.props.blockProps.onEdit({subType});
-    }
-
+    
     return (
       <span ref={(c) => this.focusComponent = c} className='ExampleSentinel'>
         Example&nbsp;
