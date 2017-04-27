@@ -4,7 +4,7 @@ import { augment } from './common';
 
 export type TitleParams = {
   text?: string,
-  guid?: string;
+  guid?: string  
 };
 
 export class Title extends Immutable.Record({contentType: 'Title', guid: '', text: ''}) {

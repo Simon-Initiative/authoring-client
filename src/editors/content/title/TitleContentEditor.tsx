@@ -34,13 +34,21 @@ export abstract class TitleContentEditor extends AbstractContentEditor<contentTy
   }
 
   renderView(): JSX.Element {
+    if (this.props.styles) {
+      return <div style={this.props.styles}>{this.props.model.text}</div>;
+    }    
+      
     return <div>{this.props.model.text}</div>;
   }
 
   renderEdit(): JSX.Element {
     const html = { __html: this.props.model.text };
-    return <h2 ref='text' onInput={this._onChange} 
-      contentEditable dangerouslySetInnerHTML={html}></h2>;
+          
+    if (this.props.styles) {
+      return <h2 style={this.props.styles} ref='text' onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
+    }     
+          
+    return <h2 ref='text' onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
   }
 
   render() : JSX.Element {

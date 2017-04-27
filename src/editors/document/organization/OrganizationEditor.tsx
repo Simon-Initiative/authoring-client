@@ -35,8 +35,8 @@ interface OrganizationEditor
 
 export interface OrganizationEditorState extends AbstractEditorState 
 {
-    treeData : any;
-    orgData: OrgOrganization;  
+  treeData : any;
+  orgData: OrgOrganization;  
 }
 
 export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>

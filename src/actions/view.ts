@@ -23,6 +23,7 @@ export type viewDocumentAction = {
 }
 
 export function viewDocument(documentId: string) : viewDocumentAction {
+    console.log ("viewDocument ("+documentId+")");
 	return {
 		type: VIEW_DOCUMENT,
 		documentId

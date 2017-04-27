@@ -436,17 +436,20 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 //>------------------------------------------------------------------
 
 export type SkillModelParams = {
-  title?: contentTypes.Title
+  title?: contentTypes.Title,
+  skills: any
 };
 
 const defaultSkillModel = {
   modelType: 'SkillModel',
   title: new contentTypes.Title(),
+  skills: []
 }
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {    
   modelType: 'SkillModel';
   title: contentTypes.Title;
+  skills: any;
   
   constructor(params?: SkillModelParams) {
       params ? super(params) : super();
@@ -460,9 +463,21 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     return new SkillModel();
   }
 
+  updateModel (newSkillModel:any): SkillModel {
+      console.log ("updateModel ()");
+      var newModel=new SkillModel ({'title' : this.title, 'skills' : newSkillModel});      
+      return newModel;
+  }
+    
   toPersistence() : Object {
-    return {};
+    console.log ("toPersistence ()");
+    const root = {
+      "modelType": "SkillModel",
+      "title" : this.title,
+      "skills": this.skills
+    };
+
+    //return Object.assign({}, root, this.lock.toPersistence());
+    return (root);
   }
 }
-
-

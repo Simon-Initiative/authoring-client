@@ -57,7 +57,8 @@ class Main extends React.Component<MainProps, {}> {
     this.props.dispatch(userActions.login(user, user));
   }
 
-  getView(view: CurrentView): JSX.Element { 
+  getView(view: CurrentView): JSX.Element {
+    //console.log ("getView ("+view.documentId+")");   
     switch (view.type) {
       case 'LoginView':
         return <LoginView dispatch={this.props.dispatch} />
