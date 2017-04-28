@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { insertBlocksAfter, stateFromKey } from './common';
+import { insertBlocksAfter, stateFromKey, containerPrecondition } from './common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { AbstractCommand } from '../../command';
 import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
@@ -7,6 +7,13 @@ import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, Charact
 
 
 export class InsertPulloutCommand extends AbstractCommand<EditorState> {
+
+  precondition(editorState: EditorState) : boolean {
+    return containerPrecondition(editorState, 
+      [EntityTypes.pullout_begin, EntityTypes.example_begin], 
+      [EntityTypes.pullout_end, EntityTypes.example_end]
+    );
+  }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
 

@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { insertBlocksAfter, stateFromKey } from './common';
+import { insertBlocksAfter, stateFromKey, containerPrecondition } from './common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { AbstractCommand } from '../../command';
 import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
@@ -9,32 +9,10 @@ import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, Charact
 export class InsertSectionCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
-
-    // Do not allow a section to be inserted inside of another section, 
-    // example or pullout
-    const contentState = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const insertionPointKey = selection.getAnchorKey();
-    const blocks = contentState.getBlocksAsArray();
-
-    let depthCount = 0;
-    for (let i = 0; i < blocks.length; i++) {
-      const block = blocks[i];
-      if (block.type === 'atomic') {
-        const entityType : string = contentState.getEntity(block.getEntityAt(0)).type;
-
-        if (entityType.endsWith('begin')) {
-          depthCount++;
-        } else if (entityType.endsWith('end')) {
-          depthCount--;
-        }
-
-      } else if (block.key === insertionPointKey) {
-        return depthCount === 0;
-      }
-    }
-    
-    return true;
+    return containerPrecondition(editorState, 
+      [EntityTypes.section_begin, EntityTypes.pullout_begin, EntityTypes.example_begin], 
+      [EntityTypes.section_end, EntityTypes.pullout_end, EntityTypes.example_end]
+    );
   }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {

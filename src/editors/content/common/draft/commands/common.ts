@@ -26,6 +26,47 @@ export function stateFromKey(key: string) : SelectionState {
   });
 }
 
+// A reusable precondition that allows commands to be executed when
+// the current editor selection anchor point is not within a 
+// set of entity containers specified by entity begin and entity end types
+export function containerPrecondition(editorState: EditorState,
+  beginTypes: EntityTypes[], endTypes: EntityTypes[]) : boolean {
+
+  // Do not allow a pullout to be inserted inside of another pullout, 
+  // or example.  They are allowed to be inserted inside of sections.
+  const contentState = editorState.getCurrentContent();
+  const selection = editorState.getSelection();
+  const insertionPointKey = selection.getAnchorKey();
+  const blocks = contentState.getBlocksAsArray();
+
+  const setKey = (c, p) => {
+    c[p] = true;
+    return c;
+  }
+  const beginMap = beginTypes.reduce((c, p) => setKey(c, p), {});
+  const endMap = endTypes.reduce((c, p) => setKey(c, p), {});
+
+  let depthCount = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    if (block.type === 'atomic') {
+      const entityType : string = contentState.getEntity(block.getEntityAt(0)).type;
+
+      if (beginMap[entityType]) {
+        depthCount++;
+      } else if (endMap[entityType]) {
+        depthCount--;
+      }
+
+    } else if (block.key === insertionPointKey) {
+      return depthCount === 0;
+    }
+  }
+  
+  return true;
+
+}
+
 export function insertAtomicBlockWithEntity(editorState: EditorState, type: EntityTypes, data: Object) {
 
   const contentState = editorState.getCurrentContent();
