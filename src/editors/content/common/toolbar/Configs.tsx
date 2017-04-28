@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { HtmlToolbarButton as Button } from '../../html/TypedToolbar';
+import { Separator } from './Separator';
 import { EntityTypes } from '../../../../data/content/html/common';
 import { CodeBlock } from '../../../../data/content/html/codeblock';
 import * as commands from '../draft/commands';
@@ -20,10 +21,12 @@ export function flowInline() {
     <Button key='superscript' command={style('SUPERSCRIPT')} tooltip='Superscript' icon="superscript"/>,
     <Button key='subscript' command={style('SUBSCRIPT')} tooltip='Subscript' icon="subscript"/>,
     <Button key='code' command={style('CODE')} tooltip='Code' icon="code"/>,
-
+    <Button key='term' command={style('TERM')} tooltip='Term' icon="book"/>,
+    <Button key='foreign' command={style('FOREIGN')} tooltip='Foreign' icon="globe"/>,
+    <Separator/>,
     <Button key='ordered' command={block('ordered-list-item')} tooltip='Ordered list' icon="list-ol"/>,
     <Button key='undordered' command={block('unordered-list-item')} tooltip='Unordered list' icon="list-ul"/>,
-    
+    <Separator/>,
     <Button key='math' command={insertInline(EntityTypes.formula, 'IMMUTABLE', defaultFormula)} 
       tooltip='Math expression' icon="etsy"/>
   ]
@@ -43,6 +46,7 @@ export function bodyBlock() {
     <Button key='pullout' command={new commands.InsertPulloutCommand()} tooltip='Insert pullout' icon="external-link-square"/>,
     <Button key='example' command={new commands.InsertExampleCommand()} tooltip='Insert example' icon="bar-chart"/>,
     <Button key='section' command={new commands.InsertSectionCommand()} tooltip='Insert section' icon="list-alt"/>,
+    <Separator/>,
     <Button key='wbinline' command={new commands.InsertAssessmentCommand()} tooltip='Insert inline assessment' icon="flask"/>
   ]; 
 }

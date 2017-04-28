@@ -104,7 +104,7 @@ const styleMap = {
     // TODO
   },
   FOREIGN: {
-    // TODO
+    fontStyle: 'italic'
   },
   SYM: {
     // TODO
