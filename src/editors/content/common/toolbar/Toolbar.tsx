@@ -3,8 +3,6 @@ import { CommandProcessor, Command } from '../command';
 import { AppContext } from '../../../common/AppContext';
 
 export interface ToolbarProps<DataType> {
-  state: DataType;
-  context: AppContext;
   commandProcessor?: CommandProcessor<DataType>;
   dismissToolbar?: () => void;  
 }

@@ -75,6 +75,9 @@ export class HtmlContentEditor
     this.draft.process(command);
   }
 
+  checkPrecondition(command: Command<EditorState>) {
+    return this.draft.checkPrecondition(command);
+  }
 
   render() : JSX.Element {
     return (
