@@ -18,6 +18,7 @@ import { Html } from '../../../../data/contentTypes';
 import { EntityTypes } from '../../../../data/content/html/common';
 import { getRendererByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
+import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/content/html/changes';
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 
@@ -127,9 +128,11 @@ const blockRenderMap = Immutable.Map({
 
 
 const BlockRendererFactory = (props) => {
+
   const entity = props.contentState.getEntity(
     props.block.getEntityAt(0)
   );
+
   const data = entity.getData();
   const type = entity.getType();
 
@@ -247,12 +250,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.lastSelectionState = ss; 
         this.handleSelectionChange(changeType, ss);
 
-        const contentState = editorState.getCurrentContent();
+        let contentState = editorState.getCurrentContent();
         const contentChange = (contentState !== this.lastContent);
         
         if (contentChange) {
-          console.log('updated content');
-          console.log(convertToRaw(contentState));
+          
+          contentState = this.cloneDuplicatedEntities(contentState);
+
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {
@@ -390,6 +394,33 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.forceContentChange(newContentState, 'apply-entity');
 
+  }
+
+  cloneDuplicatedEntities(contentState: ContentState) : ContentState {
+    
+    const entities = getAllEntities(contentState);
+    
+    // Find any duplicated entities and clone them
+    const seenKeys = {};
+    entities.forEach(e => {
+      if (seenKeys[e.entityKey] === undefined) {
+        seenKeys[e.entityKey] = e;
+      } else {
+        // This is a duplicate, clone it
+        contentState = contentState.createEntity(
+          e.entity.type, e.entity.mutability, Object.assign({}, e.entity.data));
+        const createdKey = contentState.getLastCreatedEntityKey();
+        const range = new SelectionState({
+          anchorKey: e.range.contentBlock.key,
+          focusKey: e.range.contentBlock.key,
+          anchorOffset: e.range.start,
+          focusOffset: e.range.end
+        })
+        contentState = Modifier.applyEntity(contentState, range, createdKey);
+      }
+    });
+    
+    return contentState;
   }
 
   blockRenderer(block) {

@@ -15,6 +15,7 @@ export type EntityRange = {
 }
 
 export type EntityInfo = {
+  range: EntityRange,
   entityKey: string,
   entity: Entity
 }
@@ -77,18 +78,29 @@ function getEntitiesForBlock(contentBlock: ContentBlock,
   contentState: ContentState, isMatch: (key: string) => boolean) : EntityInfo[] {
   
   const entities = [];
+  let lastEntityKey = null;
   
   contentBlock.findEntityRanges(
     (character) => {
       const entityKey = character.getEntity();
-      const matches = isMatch(entityKey);
+      const matches = entityKey !== null && isMatch(entityKey);
       if (matches) {
-        entities.push({ entityKey, entity: contentState.getEntity(entityKey)});
+        lastEntityKey = entityKey;
+        return true;
+        
       }
       return false;
     },
     (start: number, end: number) => {
-
+      entities.push({
+        range: {
+          start,
+          end,
+          contentBlock
+        },
+        entityKey: lastEntityKey, 
+        entity: contentState.getEntity(lastEntityKey)
+      });
     }
   );
 
@@ -102,6 +114,16 @@ export function getEntities(type: EntityTypes,
      return key !== null &&
         contentState.getEntity(key).getType() === type;
   }
+
+  return contentState.getBlocksAsArray()
+    .map(block => getEntitiesForBlock(block, contentState, matchPredicate))
+    .reduce((p, c) => p.concat(c), []);
+}
+
+export function getAllEntities(
+  contentState: ContentState) : EntityInfo[] {
+
+  const matchPredicate = (key: string) => true;
 
   return contentState.getBlocksAsArray()
     .map(block => getEntitiesForBlock(block, contentState, matchPredicate))
