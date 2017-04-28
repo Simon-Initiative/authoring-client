@@ -49,7 +49,8 @@ export class Toolbar<DataType> extends React.PureComponent<ToolbarProps<DataType
 
   render() {
     const style = {
-      boxShadow: "5px 5px 5px #888888"
+      boxShadow: "5px 5px 5px #888888",
+      backgroundColor: 'black'
     }
     return (
       <div style={style} ref={(c) => this.component = c} onBlur={this.onBlur} className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
