@@ -198,8 +198,21 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
 function listHandler(listBlockType, item: Object, context: ParsingContext) {
   const key = getKey(item);
   item[key][common.ARRAY].forEach(listItem => {
+
+    const children = getChildren(listItem);
+  
+    const blockContext = {
+      fullText: '',
+      markups : [],
+      entities : []
+    }
+
+    children.forEach(subItem => processInline(subItem, context, blockContext));
+
     addNewBlock(context.draft, { 
-      text: listItem.li[common.TEXT],
+      text: blockContext.fullText,
+      inlineStyleRanges: blockContext.markups,
+      entityRanges: blockContext.entities,
       type: listBlockType
     });
   });
