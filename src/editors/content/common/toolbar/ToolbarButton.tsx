@@ -33,7 +33,8 @@ export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonPr
 
     return (
       <button 
-        onClick={this.onClick} 
+        onClick={this.onClick}
+        disabled={!this.props.processor.checkPrecondition(this.props.command)} 
         data-toggle='tooltip'
         data-placement='top'
         title={this.props.tooltip}

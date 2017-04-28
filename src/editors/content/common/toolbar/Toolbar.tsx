@@ -1,18 +1,17 @@
 import * as React from 'react';
 import { CommandProcessor, Command } from '../command';
+import { AppContext } from '../../../common/AppContext';
 
-export interface ToolbarProps<DataType> {  
+export interface ToolbarProps<DataType> {
+  state: DataType;
+  context: AppContext;
   commandProcessor?: CommandProcessor<DataType>;
   dismissToolbar?: () => void;  
 }
 
 export interface Toolbar<DataType> {
-  
   component: any;
 }
-
-const formula = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo>&sum;</mo></math>"
-const defaultFormula = { '#cdata': formula};
 
 export class Toolbar<DataType> extends React.PureComponent<ToolbarProps<DataType>, {}>
   implements CommandProcessor<DataType> {
@@ -45,6 +44,10 @@ export class Toolbar<DataType> extends React.PureComponent<ToolbarProps<DataType
     // Delegate processing and dismiss the toolbar
     this.props.commandProcessor.process(command);
     this.props.dismissToolbar();
+  }
+
+  checkPrecondition(command: Command<DataType>) {
+    return this.props.commandProcessor.checkPrecondition(command);
   }
 
   render() {

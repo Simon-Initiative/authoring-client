@@ -554,6 +554,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       .then(newState => this.onChange(newState));
   }
 
+  checkPrecondition(command: Command<EditorState>) {
+    return command.precondition(this.state.editorState, this.props.context);
+  }
+
   forceRender() {
 
     const editorState = this.state.editorState;
@@ -570,7 +574,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     let toolbarAndContainer = null;
     if (this.state.show) {
       
-      const clonedToolbar = React.cloneElement(this.state.component, { commandProcessor: this, dismissToolbar: this._dismissToolbar});
+      const additionalProps = {
+        editorState: this.state.editorState,
+        commandProcessor: this, 
+        dismissToolbar: this._dismissToolbar
+      }
+      const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
       
       const positionStyle = {
         position: 'fixed',
