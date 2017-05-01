@@ -20,6 +20,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 
 import NodeRendererDefault from 'react-sortable-tree';
+import Knob from 'react-canvas-knob';
 
 import SkillNodeRenderer from './SkillNodeRenderer';
 
@@ -428,6 +429,13 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     }
 
     /**
+     * 
+     */
+    handleDial (aValue) : void {
+        console.log ("handleDial ()");        
+    }
+    
+    /**
      *
      */
     /*    
@@ -501,6 +509,18 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          </div>  
                       </div>
                       <div style={styles.controlBar}>
+                        <div style={styles.sliderPanel}>
+                          <Knob
+                            min={0}
+                            width={50}
+                            height={50}
+                            max={100}
+                            value={50}
+                            fgColor={"#abe2fb"}
+                            onChange={this.handleDial}
+                          />
+                        </div>
+        
                         <div style={styles.sliderPanel}>
                          pKnown: <Slider step={0.01} defaultValue={item.skillModel.pKnown} min={0} max={1}/>
                         </div>
