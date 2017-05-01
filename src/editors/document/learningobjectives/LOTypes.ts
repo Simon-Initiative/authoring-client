@@ -2,7 +2,7 @@
 import * as Immutable from 'immutable';
 import * as types from '../../../data/types';
 import Linkable from '../../../data/linkable';
-import {Skill} from '../skills/SkillTypes';
+import {Skill} from '../../../data/skills';
 import guid from '../../../utils/guid';
 
 export const LOTypes = types.strEnum([

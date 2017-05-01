@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
+import {Skill} from '../../../data/skills';
 import { CourseResource, fetchCourseResources } from '../common/resources';
 
 import * as contentTypes from '../../../data/contentTypes';
@@ -21,9 +22,6 @@ import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
 import SkillNodeRenderer from './SkillNodeRenderer';
-import {Skill} from './SkillTypes';
-
-//import { Button, ButtonToolbar, SplitButton, MenuItem } from 'react-bootstrap';
 
 // From: https://www.npmjs.com/package/rc-slider
 import Slider from 'rc-slider';
@@ -209,9 +207,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            console.log ("Document loaded");
-            console.log ("Document: " + JSON.stringify (doc));
-            this.setState ({document: doc});
+            console.log ("Document loaded, assigning to state ...");
+            console.log ("Model: " + JSON.stringify (doc.model));
+            this.setState ({treeData: doc.model ["skills"],document: doc});
             return (doc);
         });
         

@@ -1,8 +1,8 @@
 
 import * as Immutable from 'immutable';
-import * as types from '../../../data/types';
-import Linkable from '../../../data/linkable';
-import guid from '../../../utils/guid';
+import * as types from './types';
+import Linkable from './linkable';
+import guid from '../utils/guid';
 
 export const SkillTypes = types.strEnum([
   'Skill'
@@ -122,6 +122,34 @@ export class Skill extends Linkable {
     super ();
   }
    
+  fromJSONObject (aData:any):void {  
+     console.log ("fromJSONObject ()");
+      
+     this.id=aData ["@id"];
+     this.title=aData ["@title"]; 
+     
+     let sModel=aData ["#skillModel"];
+                
+     if (sModel.type=="BKT") {
+       console.log ("Assigning type: SkillModelBKT");  
+       let tModel:SkillModelBKT=new SkillModelBKT ();  
+       this.skillModel=tModel;
+       tModel.pGuess=sModel ["@pGuess"];      
+       tModel.pGuess=sModel ["@pKnown"];
+       tModel.pGuess=sModel ["@pSlip"];
+       tModel.pGuess=sModel ["@pMastery"];   
+     }
+      
+     if (sModel.type=="OLI") {
+       console.log ("Assigning type: SkillModelOLI");
+       let tModel:SkillModelOLI =new SkillModelOLI ();
+       this.skillModel=tModel;  
+       tModel.gamma0=sModel ["@gamma0"];      
+       tModel.gamma1=sModel ["@gamma1"];
+       tModel.lambda0=sModel ["@lambda0"];   
+     }      
+  }
+
   /**
    * 
    */  

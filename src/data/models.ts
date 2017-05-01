@@ -3,6 +3,7 @@ import * as types from './types';
 import * as contentTypes from './contentTypes';
 import { getKey } from './common';
 import guid from '../utils/guid';
+import {Skill} from './skills';
 
 export type EmptyModel = 'EmptyModel';
 export const EmptyModel : EmptyModel = 'EmptyModel';
@@ -459,10 +460,6 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object) : SkillModel {
-    return new SkillModel();
-  }
-
   updateModel (newSkillModel:any): SkillModel {
       console.log ("updateModel ()");
       var newModel=new SkillModel ({'title' : this.title, 'skills' : newSkillModel});      
@@ -480,4 +477,23 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     //return Object.assign({}, root, this.lock.toPersistence());
     return (root);
   }
+    
+  static fromPersistence(json: Object) : SkillModel {
+    console.log ("SkillModel: fromPersistence ()");
+     
+    //console.log ("Parsing: " + JSON.stringify (json));  
+      
+    let model = new SkillModel();
+      
+    let skillData:any=json ["skills"];  
+
+    for (var i=0;i<skillData.length;i++) {      
+      let newSkill:Skill=new Skill ();
+      newSkill.fromJSONObject (skillData [i]);
+        
+      model.skills.push (newSkill);
+    }        
+      
+    return model;
+  }    
 }
