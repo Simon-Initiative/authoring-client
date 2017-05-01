@@ -28,7 +28,7 @@ import SkillNodeRenderer from './SkillNodeRenderer';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-var skillData=require ('./Skills.json');
+//var skillData=require ('./Skills.json');
 
 const styles = {
   skillContainer : {
@@ -186,10 +186,12 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         this.loadDocument(this.state.documentId);
     }
     
+    /*
     componentWillReceiveProps(nextProps) {
         console.log ("componentWillReceiveProps ();");
         console.log ("Props: " + JSON.stringify (nextProps));    
-    }     
+    } 
+    */    
 
     /**
      * Just as a reference the Skills document should look something like
@@ -205,18 +207,18 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      * }
      */
     loadDocument (anID:string):any {
-        console.log ("loadDocument ("+anID+")");
+        //console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            console.log ("Document loaded, assigning to state ...");
-            console.log ("Model: " + JSON.stringify (doc.model));
+            //console.log ("Document loaded, assigning to state ...");
+            //console.log ("Model: " + JSON.stringify (doc.model));
             this.setState ({treeData: doc.model ["skills"],document: doc});
             return (doc);
         });
-        
+
        return (null); 
     }    
-    
+
     /**
      * 
      */
@@ -276,15 +278,13 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         // inside that object. Bit confusing prehaps but we'll clean it up
         // later.
         var newModel=immutableDocument.model.updateModel (extractedData.skills);
-        //var newModel=this.state.document.model.updateModel (extractedData.skills);
                  
         var updatedDocument=this.state.document.set ('model',newModel);
                
         this.setState ({'document' : updatedDocument },function () {         
           persistence.persistDocument(this.state.document)
             .then(result => {
-                console.log ("Document saved, loading to get new revision ... ");
-                
+                console.log ("Document saved, loading to get new revision ... ");                
                 this.loadDocument (this.state.documentId);
             });
         }); 
@@ -323,7 +323,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         immutableHelper.push (newNode);
 
         //let formattedData=this.extractData (immutableHelper);
-                
+                        
         this.setState({treeData: immutableHelper},function (){         
           this.saveToDB ();
         });    
@@ -422,19 +422,30 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     }    
     
     /**
-     * 
-     */
-    handleOnChange (aChange) : void {
-        console.log ("handleOnChange ()");
+     * https://github.com/joshjg/react-canvas-knob
+     * http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs
+     */    
+    handleDial (aValue,aSkill) : void {
+        //console.log ("handleDial ()");
+        
+        var immutableHelper = this.state.treeData.slice();
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+                
+        for (var i=0;i<immutableHelper.length;i++) {
+            let testNode:Skill=immutableHelper [i];
+                        
+            if (testNode.id==aSkill.id) {
+              testNode.skillModel ["pKnown"]=(aValue/100);
+            }
+        }
+                
+        this.setState({treeData: immutableHelper});         
     }
-
-    /**
-     * 
-     */
-    handleDial (aValue) : void {
-        console.log ("handleDial ()");        
-    }
-    
+        
     /**
      *
      */
@@ -500,7 +511,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                              model={titleObj}
                              styles={styles.skillTitleEditorUnfolded}
                              context={{userId: null, documentId: null, courseId: null}}
-                             onEdit={(content) => this.editTitle(item,content)} 
+                             onEdit={(content) => this.editTitle(item,content)}
                             />
                          </div>
                          <div style={styles.toolContainer}>
@@ -515,9 +526,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             width={50}
                             height={50}
                             max={100}
-                            value={50}
+                            displayInput={true}
+                            value={(item.skillModel.pKnown*100)}
                             fgColor={"#abe2fb"}
-                            onChange={this.handleDial}
+                            onChange={(e) => this.handleDial (e,item)}
+                            onChangeEnd={(e) => this.handleDial (e,item)}
                           />
                         </div>
         

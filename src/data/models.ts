@@ -27,6 +27,7 @@ export function isLockable(model: ContentModel) {
 }
 
 export function createModel(object: any) : ContentModel {
+  console.log ("createModel ()");
   switch (object.modelType) {
     case ModelTypes.CourseModel: 
       return CourseModel.fromPersistence(object);
@@ -450,15 +451,17 @@ const defaultSkillModel = {
 export class SkillModel extends Immutable.Record(defaultSkillModel) {    
   modelType: 'SkillModel';
   title: contentTypes.Title;
-  skills: any;
+  skills: Array <Skill>;
   
   constructor(params?: SkillModelParams) {
       params ? super(params) : super();
   }
 
+  /*  
   with(values: SkillModelParams) {
       return this.merge(values) as this;
   }
+  */
 
   updateModel (newSkillModel:any): SkillModel {
       console.log ("updateModel ()");
@@ -480,20 +483,27 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     
   static fromPersistence(json: Object) : SkillModel {
     console.log ("SkillModel: fromPersistence ()");
-     
-    //console.log ("Parsing: " + JSON.stringify (json));  
       
-    let model = new SkillModel();
+    let newModel = new SkillModel();
       
-    let skillData:any=json ["skills"];  
+    console.log ("Check: " + JSON.stringify (newModel.skills));      
+      
+    let skillData:Array<Skill>=json ["skills"];
+            
+    console.log ("Parsing: ("+skillData.length+")" + JSON.stringify (skillData));  
 
-    for (var i=0;i<skillData.length;i++) {      
+    for (let i=0;i<skillData.length;i++) {
+      console.log ("Adding new skill ["+i+"] ...");  
       let newSkill:Skill=new Skill ();
       newSkill.fromJSONObject (skillData [i]);
         
-      model.skills.push (newSkill);
+      newModel.skills.push (newSkill);
+        
+      console.log ("Model check : " + JSON.stringify (newModel));  
     }        
       
-    return model;
+    console.log ("Parsed into new model: " + JSON.stringify (newModel));
+      
+    return newModel;
   }    
 }

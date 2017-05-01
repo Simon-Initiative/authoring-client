@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
+import { LOTypes, LearningObjective } from '../../../data/los';
 import * as types from '../../../data/types';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
@@ -15,7 +16,6 @@ import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
 import { OrgItem } from '../organization/OrganizationTypes';
-import { LOTypes, LearningObjective } from './LOTypes';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from './LearningObjectiveLinker';
 
