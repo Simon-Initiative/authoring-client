@@ -5,6 +5,7 @@ import * as common from './common';
 import { getKey, EntityTypes } from './common';
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
+import { Table } from './table';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -26,7 +27,6 @@ type InlineHandler = (offset: number, length: number, item: Object, context: Par
 
 const ol = listHandler.bind(undefined, 'ordered-list-item');
 const ul = listHandler.bind(undefined, 'unordered-list-item');
-const table = addAtomicBlock.bind(undefined, EntityTypes.table);
 const audio = addAtomicBlock.bind(undefined, EntityTypes.audio);
 const video = addAtomicBlock.bind(undefined, EntityTypes.video);
 const youtube = addAtomicBlock.bind(undefined, EntityTypes.youtube);
@@ -134,6 +134,13 @@ function codeblock(item: Object, context: ParsingContext) {
   const codeblock = CodeBlock.fromPersistence(item, '');
   addAtomicBlock(EntityTypes.codeblock, { codeblock }, context);
 }
+
+function table(item: Object, context: ParsingContext) {
+
+  const table = Table.fromPersistence(item, '');
+  addAtomicBlock(EntityTypes.table, { table }, context);
+}
+
 
 function getInlineHandler(key: string) : InlineHandler {
   if (inlineHandlers[key] !== undefined) {

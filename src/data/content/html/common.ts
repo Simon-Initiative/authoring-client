@@ -51,8 +51,7 @@ export const EntityTypes = types.strEnum([
   'audio',
   'video',
   'youtube',
-  'unsupported',
-  'document'
+  'unsupported'
 ])
 
 export type EntityTypes = keyof typeof EntityTypes;

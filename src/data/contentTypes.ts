@@ -16,6 +16,7 @@ export { Head } from './content/head';
 export { Text } from './content/text';
 export { ShortAnswer } from './content/short_answer';
 export { Ordering } from './content/ordering';
+export { Table } from './content/html/table';
 
 import { Ordering} from './content/ordering';
 import { ShortAnswer } from './content/short_answer';

@@ -4,13 +4,19 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { Row } from './row';
 import { getKey } from '../../common';
-import { Param } from './param';
+
+import { ContentState } from 'draft-js';
+
+const emptyContent = ContentState.createFromText('');
+
+import { toPersistence } from './topersistence';
+import { toDraft } from './todraft';
 
 export type CellHeaderParams = {
   align?: string,
   colspan?: string,
   rowspan?: string,
-  content?: any,
+  content?: ContentState,
   guid?: string
 };
 
@@ -19,7 +25,7 @@ const defaultContent = {
   align: 'left',
   colspan: '1',
   rowspan: '1',
-  content: '',
+  content: emptyContent,
   guid: ''
 }
 
@@ -29,7 +35,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
   align: string;
   colspan: string;
   rowspan: string;
-  content: any;
+  content: ContentState;
   guid: string;
   
   constructor(params?: CellHeaderParams) {
@@ -56,7 +62,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
       model = model.with({ align: t['@align']});
     }
     
-    model = model.with({content: getChildren(t)});
+    model = model.with({content: toDraft(getChildren(t))});
     
     return model;
   }
@@ -67,7 +73,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
         '@colspan': this.colspan,
         '@rowspan': this.rowspan,
         '@align': this.align,
-        '#array': this.content
+        '#array': toPersistence(this.content)
       } 
     };
   }

@@ -12,7 +12,8 @@ import { SectionEnd } from './SectionEnd';
 import { ExampleBegin } from './ExampleBegin';
 import { ExampleEnd } from './ExampleEnd';
 import { WbInline } from './WbInline';
-
+import { Table } from './Table';
+ 
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
 
@@ -31,5 +32,5 @@ export default function init() {
   register(EntityTypes.example_begin, ExampleBegin, undefined);
   register(EntityTypes.example_end, ExampleEnd, undefined);  
   register(EntityTypes.wb_inline, WbInline, undefined);  
-  
+  register(EntityTypes.table, Table, undefined);
 }

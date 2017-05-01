@@ -4,6 +4,7 @@ import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw,
 
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
+import { Table } from './table';
 
 import * as common from './common';
 import { EntityTypes } from './common';
@@ -97,6 +98,8 @@ function translateBlock(iterator : BlockIterator,
     translateList('ol', rawBlock, block, iterator, entityMap, context);
   } else if (isUnorderedListBlock(rawBlock)) {
     translateList('ul', rawBlock, block, iterator, entityMap, context);
+  } else if (isTable(rawBlock, entityMap)) {
+    translateTable(rawBlock, draftBlock, entityMap, context);
   } else if (isCodeBlock(rawBlock, entityMap)) {
     translateCodeBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
@@ -168,6 +171,15 @@ function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntity
   return false; 
 }
 
+function isTable(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
+  const { type } = block; 
+  if (block.type === 'atomic') {
+    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
+    return entity.type === 'table';
+  } 
+  return false; 
+}
+
 function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
   const { type } = block; 
   if (block.type === 'atomic') {
@@ -228,6 +240,13 @@ function translateCodeBlock(rawBlock : common.RawContentBlock,
 
   const codeblock : CodeBlock = entityMap[rawBlock.entityRanges[0].key].data.codeblock;
   top(context).push(codeblock.toPersistence());
+}
+
+function translateTable(rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const table : Table = entityMap[rawBlock.entityRanges[0].key].data.table;
+  top(context).push(table.toPersistence());
 }
 
 function translateWbInline(rawBlock : common.RawContentBlock, 

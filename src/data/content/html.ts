@@ -9,7 +9,7 @@ const emptyContent = ContentState.createFromText('');
 
 
 export type HtmlParams = {
-  contentState: ContentState,
+  contentState?: ContentState,
   guid?: string
 };
 

@@ -1,6 +1,7 @@
 import * as models from '../data/models';
 import { CourseResource } from '../editors/document/common/resources';
 
+
 export type VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
 export const VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
 
