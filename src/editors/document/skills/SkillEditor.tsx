@@ -177,8 +177,14 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         treeData: [],
                         documentId: props.context.documentId,
                         model: props.model,
-                        document: SkillEditor.loadDocument(props.context.documentId)
-                    });        
+                        document: {}
+                    });            
+    }
+    
+    componentDidMount () {
+        console.log ("componentDidMount ("+this.state.documentId+")");
+        
+        this.loadDocument(this.state.documentId);
     }
     
     componentWillReceiveProps(nextProps) {
@@ -199,11 +205,14 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      *   "skills": []
      * }
      */
-    static loadDocument (anID:string):any {
+    loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            //this.setState ({document: doc});
+            console.log ("Document loaded");
+            console.log ("Document: " + JSON.stringify (doc));
+            this.setState ({document: doc});
+            return (doc);
         });
         
        return (null); 
@@ -215,40 +224,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     processDataChange (newData: any) {
         console.log ("processDataChange ()");
         
+        /*
         this.extractData (newData);        
         
         this.setState (newData);
-
-    }
-    
-    /**
-     *
-     */
-    saveToDB (aData:any): void {
-        console.log ("saveToDB ()");
-        
-        let immutableDocument = this.state.document;
-        
-        if (immutableDocument==null)
-        {
-            console.log ("immutableDocument is null, bump");
-            return;
-        }
-
-        var extractedData:any=this.extractData (this.state.treeData);
-                
-        // Keep in mind that extractData creates a skills object, but in our
-        // model we already have one so we need to extract the contents from
-        // inside that object. Bit confusing prehaps but we'll clean it up
-        // later.
-        var newModel=immutableDocument.model.updateModel (extractedData.skills);
-         
-        var updatedDocument=this.state.document.set ('model',newModel);
-               
-        this.setState ({'document' : updatedDocument },function () {         
-          persistence.persistDocument(this.state.document)
-            .then(result => {console.log ("Document saved ");});
-        }); 
+        */       
     }
     
     /**
@@ -269,11 +249,48 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         }
 
         //console.log ("From: " + JSON.stringify (aData));
-        console.log ("To: " + JSON.stringify (dbReady));
+        //console.log ("To: " + JSON.stringify (dbReady));
                 
         return (dbReady);
-    }
+    }    
+    
+    /**
+     *
+     */
+    saveToDB (): void {
+        console.log ("saveToDB ()");
+
+        console.log ("Document: " + JSON.stringify (this.state.document));
         
+        let immutableDocument = this.state.document;
+        
+        if (immutableDocument==null)
+        {
+            console.log ("immutableDocument is null, bump");
+            return;
+        }
+
+        var extractedData:any=this.extractData (this.state.treeData);
+                
+        // Keep in mind that extractData creates a skills object, but in our
+        // model we already have one so we need to extract the contents from
+        // inside that object. Bit confusing prehaps but we'll clean it up
+        // later.
+        var newModel=immutableDocument.model.updateModel (extractedData.skills);
+        //var newModel=this.state.document.model.updateModel (extractedData.skills);
+                 
+        var updatedDocument=this.state.document.set ('model',newModel);
+               
+        this.setState ({'document' : updatedDocument },function () {         
+          persistence.persistDocument(this.state.document)
+            .then(result => {
+                console.log ("Document saved, loading to get new revision ... ");
+                
+                this.loadDocument (this.state.documentId);
+            });
+        }); 
+    }
+            
     /**
      * This method goes from external format to the format used by the tree renderer
      * Note that the tree widget needs to maintain any attributes we add to a node
@@ -306,10 +323,10 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         newNode.title="New Skill";
         immutableHelper.push (newNode);
 
-        let formattedData=this.extractData (immutableHelper);
+        //let formattedData=this.extractData (immutableHelper);
                 
         this.setState({treeData: immutableHelper},function (){         
-          this.saveToDB (formattedData);
+          this.saveToDB ();
         });    
     }     
 
@@ -335,10 +352,10 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
             }
         }
         
-        let formattedData=this.extractData (immutableHelper);
+        //let formattedData=this.extractData (immutableHelper);
                 
         this.setState({treeData: immutableHelper},function (){         
-          this.saveToDB (formattedData);
+          this.saveToDB ();
         });  
     }
     
@@ -367,9 +384,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
             }
         }
         
-        let formattedData=this.extractData (immutableHelper);
+        //let formattedData=this.extractData (immutableHelper);
         
-        this.saveToDB (formattedData);
+        this.saveToDB ();
         
         //this.setState({treeData: immutableHelper});    
     }
