@@ -456,7 +456,10 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   skills: Array <Skill>;
   
   constructor(params?: SkillModelParams) {
+      console.log ("constructor ()");
       params ? super(params) : super();
+      //super();
+      //console.log ("constructor postcheck: " + JSON.stringify (this.skills));
   }
 
   /*  
@@ -465,9 +468,9 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   }
   */
 
-  updateModel (newSkillModel:any): SkillModel {
+  static updateModel (newSkillModel:any): SkillModel {
       console.log ("updateModel ()");
-      var newModel=new SkillModel ({'title' : this.title, 'skills' : newSkillModel});      
+      var newModel=new SkillModel ({'skills' : newSkillModel});      
       return newModel;
   }
     
@@ -485,11 +488,9 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     
   static fromPersistence(json: Object) : SkillModel {
     console.log ("SkillModel: fromPersistence ()");
-      
-    let newModel = new SkillModel();
-      
-    console.log ("Check: " + JSON.stringify (newModel.skills));      
-      
+    
+    var replacementSkills:Array<Skill>=new Array<Skill>();
+
     let skillData:Array<Skill>=json ["skills"];
             
     console.log ("Parsing: ("+skillData.length+")" + JSON.stringify (skillData));  
@@ -499,13 +500,11 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       let newSkill:Skill=new Skill ();
       newSkill.fromJSONObject (skillData [i]);
         
-      newModel.skills.push (newSkill);
-        
-      console.log ("Model check : " + JSON.stringify (newModel));  
+      replacementSkills.push (newSkill);
     }        
       
-    console.log ("Parsed into new model: " + JSON.stringify (newModel));
+    console.log ("New skill list: " + JSON.stringify (replacementSkills));
       
-    return newModel;
+    return (SkillModel.updateModel (replacementSkills))
   }    
 }
