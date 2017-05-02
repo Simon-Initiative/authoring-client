@@ -30,6 +30,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   changePreviewer?: ChangePreviewer;
 
   activeItemId?: string;
+
+  showBorder?: boolean;
 }
 
 export interface HtmlContentEditorState {
@@ -80,8 +82,11 @@ export class HtmlContentEditor
   }
 
   render() : JSX.Element {
+
+    const classes = this.props.showBorder ? 'form-control' : '';
+
     return (
-      <div className="form-control">
+      <div className={classes}>
         
           <DraftWrapper
             ref={(draft) => this.draft = draft}

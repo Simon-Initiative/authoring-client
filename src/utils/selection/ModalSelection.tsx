@@ -5,6 +5,8 @@ interface ModalSelection {
 }
 
 export interface ModalSelectionProps {
+  okLabel?: string;
+  cancelLabel?: string;
   title: string;
   onInsert: () => void;
   onCancel: () => void;
@@ -13,9 +15,13 @@ export interface ModalSelectionProps {
 class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 
   render() {
+
+    const okLabel = this.props.okLabel !== undefined ? this.props.okLabel : 'Insert';
+    const cancelLabel = this.props.cancelLabel !== undefined ? this.props.cancelLabel : 'Cancel';
+
     return (      
       <div ref={(modal) => { this.modal = modal; }} className="modal fade">
-        <div className="modal-dialog" role="document">
+        <div className="modal-dialog modal-lg" role="document">
             <div className="modal-content">
             <div className="modal-header">
                 <h5 className="modal-title">{this.props.title}</h5>
@@ -27,8 +33,8 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
                 {this.props.children}
             </div>
             <div className="modal-footer">
-                <button onClick={this.props.onCancel} type="button" data-dismiss="modal" className="btn btn-secondary">Close</button>
-                <button onClick={this.props.onInsert} type="button" data-dismiss="modal" className="btn btn-primary">Insert</button>
+                <button onClick={this.props.onCancel} type="button" data-dismiss="modal" className="btn btn-secondary">{cancelLabel}</button>
+                <button onClick={this.props.onInsert} type="button" data-dismiss="modal" className="btn btn-primary">{okLabel}</button>
             </div>
             </div>
         </div>

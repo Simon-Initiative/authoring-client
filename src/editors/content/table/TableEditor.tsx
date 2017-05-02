@@ -60,13 +60,6 @@ export class TableEditor
     this.props.onEdit(model);
   }
 
-  renderRow(row: Row, inlineToolbar: any, blockToolbar: any) {
-    return (
-      <tr key={row.guid}>
-        {row.cells.toArray().map(c => this.renderCell(row.guid, c, inlineToolbar, blockToolbar))}
-      </tr>
-    )
-  }
 
   onRowAdd() {
     const colCount = this.props.model.rows.size === 0 ? 1 : this.props.model.rows.last().cells.size;
@@ -119,11 +112,13 @@ export class TableEditor
 
     }).toOrderedMap();
 
-    this.props.onEdit(model);
+    this.props.onEdit(model.with({rows}));
   }
 
-  renderCell(rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any) {
+  renderCell(rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, totalCells: number) {
 
+    const width = ((1 / totalCells) * 100) + '%';
+    const verticalAlign = 'top';
     const bodyStyle = {
       minHeight: '20px',
       borderStyle: 'none',
@@ -131,6 +126,7 @@ export class TableEditor
       borderColor: '#AAAAAA'
     }
     const editor = <HtmlContentEditor 
+      showBorder={false}
       editorStyles={bodyStyle}
       inlineToolbar={inlineToolbar}
       blockToolbar={blockToolbar}
@@ -139,10 +135,32 @@ export class TableEditor
       onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)} 
       />
     if (cell.contentType === 'CellData') {
-      return <td key={cell.guid}>{editor}</td>;
+      return <td style={{width, verticalAlign}} key={cell.guid}>{editor}</td>;
     } else {
-      return <th key={cell.guid}>{editor}</th>;
+      return <th style={{width, verticalAlign}} key={cell.guid}>{editor}</th>;
     }
+  }
+
+  renderDeleteColumn() {
+    const rows = this.props.model.rows.toArray();
+    if (rows.length > 0) {  
+      const tds = [];
+      for (let i = 0; i < this.props.model.rows.first().cells.size; i++) {
+        tds.push(<td key={i}><span className="closebtn input-group-addon" onClick={this.onColRemove.bind(this, i)}>&times;</span></td>);
+      }
+      return <tr>{tds}</tr>;
+    } else {
+      return null;
+    }
+  }
+
+  renderRow(row: Row, inlineToolbar: any, blockToolbar: any) {
+    return (
+      <tr key={row.guid}>
+        {row.cells.toArray().map(c => this.renderCell(row.guid, c, inlineToolbar, blockToolbar, row.cells.size))}
+        <td><span className="closebtn input-group-addon" onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
+      </tr>
+    )
   }
 
   render() : JSX.Element {
@@ -155,15 +173,15 @@ export class TableEditor
 
     return (
       <div className='itemWrapper'>
-        <h5>Edit Table</h5>
         <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
           <div className="btn-group mr-2" role="group" aria-label="First group">
             <button onClick={this.onRowAdd} type="button" className="btn btn-secondary btn-sm">Add Row</button>
             <button onClick={this.onColAdd} type="button" className="btn btn-secondary btn-sm">Add Column</button>
           </div>
         </div>
-        <table style={{width: '100%'}}>
+        <table className='table table-bordered' style={{width: '100%'}}>
           <tbody>
+          {this.renderDeleteColumn()}
           {rows.map(row => this.renderRow(row, inlineToolbar, blockToolbar))}
           </tbody>
         </table>

@@ -5,6 +5,8 @@ import { InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState
 import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalTableEditor from '../../../table/ModalTableEditor';
+import { getHtmlDetails } from '../../../common/details';
+import { Html } from '../../../../../data/content/html';
 
 type Data = {
   table: TableType;
@@ -50,19 +52,26 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
 
   render() : JSX.Element {
 
-    const table = this.props.data.table;
-    const rowCount = table.rows.size;
-    const colCount = rowCount > 0 ? table.rows.first().cells.size : 0;
+    const rows = this.props.data.table.rows.toArray();
+    const empty = <tr><td>&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;</td></tr>;
+    let renderedRows;
 
-    const rows = new Array(rowCount);
-    const cols = new Array(colCount);
+    const renderCell = (cell) => <td key={cell.guid}>{getHtmlDetails(new Html({contentState: cell.content}))}</td>
+
+    if (rows.length > 0) {
+      renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.map(renderCell)}</tr>);
+    } else {
+      renderedRows = empty;
+    }
 
     return (
       <div ref={(c) => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <table>
-          {rows.map(r => <tr>{cols.map(c => <td>&nbsp;</td>)}</tr>)}
+        <table className="table table-bordered" style={{width: '50%'}}>
+          <tbody>
+            {renderedRows}
+          </tbody>
         </table>
-        <Button onClick={this.onClick}>Edit</Button> 
+        <Button onClick={this.onClick}>Edit Table</Button> 
       </div>);
   }
 };

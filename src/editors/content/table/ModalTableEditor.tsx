@@ -41,7 +41,8 @@ class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalT
 
   render() {
     return (
-      <ModalSelection title="Edit Table" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.model)}>
+      <ModalSelection title="Edit Table" okLabel='Done' cancelLabel='Cancel' 
+        onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.model)}>
         <TableEditor
           {...this.props}
           model={this.state.model}
