@@ -4,6 +4,8 @@ import { HtmlToolbarButton as Button } from '../../html/TypedToolbar';
 import { Separator } from './Separator';
 import { EntityTypes } from '../../../../data/content/html/common';
 import { CodeBlock } from '../../../../data/content/html/codeblock';
+import { Table } from '../../../../data/content/html/table';
+
 import * as commands from '../draft/commands';
 const formula = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo>&sum;</mo></math>"
 const defaultFormula = { '#cdata': formula};
@@ -36,7 +38,7 @@ export function flowBlock() {
   return [
     <Button key='codeblock' command={insertBlock(EntityTypes.codeblock, 'IMMUTABLE', {codeblock: new CodeBlock({source: 'Your code here...'})} )} 
       tooltip='Code block' icon="code"/>,
-
+    <Button key='table' command={insertBlock(EntityTypes.table, 'IMMUTABLE', {table: new Table()})} tooltip='Insert table' icon="table"/>,
     <Button key='image' command={new commands.InsertMediaCommand(EntityTypes.image, 'image', 'image/*')} tooltip='Insert image' icon="image"/>
   ]
 }

@@ -47,6 +47,9 @@ export class Choice
     if (nextProps.model !== this.props.model) {
       return true;
     }
+    if (nextProps.label !== this.props.label) {
+      return true;
+    }
     return false;
   }
 
