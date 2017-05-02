@@ -686,7 +686,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <button type="button" className="btn btn-secondary" onClick={e => this.testCode (e)}>Test</button>
                         <button type="button" className="btn btn-secondary" onClick={e => this.toggleAdvanced (e)}>Advanced</button>
                     </nav>
                     {advancedcontrols}        
