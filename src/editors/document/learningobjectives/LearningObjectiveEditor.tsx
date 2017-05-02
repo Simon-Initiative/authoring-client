@@ -21,28 +21,24 @@ import LearningObjectiveLinker from './LearningObjectiveLinker';
 
 var loData=require ('./LO.json');
 
-const tempnavstyle=
-{
-    h2:
-    {
+const tempnavstyle= {
+    h2: {
         marginRight: '10px'
     }
 };
 
-interface LearningObjectiveEditor 
-{
+interface LearningObjectiveEditor {
 
 }
 
-export interface LearningObjectiveEditorState extends AbstractEditorState 
-{
-    treeData : any;  
-    rootLO: any;
-    modalIsOpen : boolean;
+export interface LearningObjectiveEditorState extends AbstractEditorState {
+  treeData : any;  
+  rootLO: any;
+  modalIsOpen : boolean;
+  model: any;
 }
 
-export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel>
-{
+export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel> {
   dispatch: any;
   documentId: string;
   userId: string;    
@@ -51,8 +47,7 @@ export interface LearningObjectiveEditorProps extends AbstractEditorProps<models
 /**
 *
 */
-class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,LearningObjectiveEditorProps, LearningObjectiveEditorState> 
-{
+class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,LearningObjectiveEditorProps, LearningObjectiveEditorState> {
     /**
      * 
      */
@@ -60,6 +55,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         console.log ("LearningObjectiveEditor ()");
         
         super(props, {
+                        model: {},    
                         treeData: LearningObjectiveEditor.processData (loData),
                         rootLO: LearningObjectiveEditor.createRootLO (loData),
                         modalIsOpen : false                    
@@ -364,7 +360,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                     </nav>
-                    <LearningObjectiveLinker defaultData={data} modalIsOpen={this.state.modalIsOpen} />
+                    <LearningObjectiveLinker defaultData={data} modalIsOpen={this.state.modalIsOpen} model={this.state.model} los={this.state.treeData}/>
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}

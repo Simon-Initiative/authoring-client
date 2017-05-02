@@ -5,29 +5,13 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import { LOTypes, LearningObjective } from '../../../data/los';
+import {Skill} from '../../../data/skills';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 import Modal from 'react-modal';
 
-interface LearningObjectiveLinker 
-{
-
-}
-
-export interface LearningObjectiveLinkerProps
-{
-  defaultData : any;
-  modalIsOpen : boolean;    
-}
-
-export interface LearningObjectiveLinkerState 
-{
-  data : any; 
-  modalIsOpen : boolean;       
-}
-
-const tempnavstyle=
-{
+const tempnavstyle= {
     h2: {
        marginRight: '10px'
     },
@@ -63,6 +47,24 @@ const customStyles = {
   }    
 };
 
+interface LearningObjectiveLinker {
+
+}
+
+export interface LearningObjectiveLinkerProps {
+  los: any;
+  model: models.SkillModel;        
+  defaultData : any;
+  modalIsOpen : boolean;    
+}
+
+export interface LearningObjectiveLinkerState {
+  los: any;
+  model: models.SkillModel;
+  data : any; 
+  modalIsOpen : boolean;       
+}
+
 /**
 *
 */
@@ -77,6 +79,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     super(props);
       
     this.state = {
+                   los: this.props.los,
+                   model: this.props.model,
                    modalIsOpen: this.props.modalIsOpen,
                    data: this.props.defaultData                        
                  };

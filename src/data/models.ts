@@ -445,12 +445,14 @@ export type SkillModelParams = {
 const defaultSkillModel = {
   modelType: 'SkillModel',
   title: new contentTypes.Title(),
+  skillDefaults: Skill,
   skills: []
 }
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {    
   modelType: 'SkillModel';
   title: contentTypes.Title;
+  skillDefaults: Skill;
   skills: Array <Skill>;
   
   constructor(params?: SkillModelParams) {

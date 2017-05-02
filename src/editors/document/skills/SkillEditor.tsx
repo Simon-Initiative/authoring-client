@@ -135,6 +135,37 @@ const styles = {
     "height" : "35px",
     "fontSize" : "10pt",
     "margin" : "10px"
+  },
+  
+  advancedSettingsContainer: {
+    "background" : "#ffffff",
+    "margin" : "0px",
+    "marginTop" : "4px",
+    "padding" : "4px",
+    "display" : "flex", 
+    "flexDirection" : 'column',    
+    "height": "120px"
+  },
+  
+  settingsPreviewContainer: {
+    "marginTop": "4px",
+    "paddingLeft": "4px",  
+    "paddingRight": "4px",
+    "display" : "flex", 
+    "flexDirection" : 'row',
+    "justifyContent": "space-between"   
+  },  
+  
+  settingsPreview: {
+    "margin" : "4px",
+    "width": "100", 
+    "height": "100",
+    "display" : "flex", 
+    "flexDirection" : 'column',    
+  },
+  
+  settingLabel: {
+    "fontSize" : "10pt"
   }
 };
     
@@ -154,6 +185,7 @@ export interface SkillEditorState extends AbstractEditorState {
   treeData : any;
   documentId: string;
   document: any;
+  advanced: boolean;
 }
 
 export interface SkillEditorProps extends AbstractEditorProps<models.SkillModel> {
@@ -173,6 +205,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     constructor(props) {
         
         super(props,{
+                        advanced: false,
                         treeData: [],
                         documentId: props.context.documentId,
                         model: props.model,
@@ -185,13 +218,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         
         this.loadDocument(this.state.documentId);
     }
-    
-    /*
-    componentWillReceiveProps(nextProps) {
-        console.log ("componentWillReceiveProps ();");
-        console.log ("Props: " + JSON.stringify (nextProps));    
-    } 
-    */    
 
     /**
      * Just as a reference the Skills document should look something like
@@ -207,11 +233,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      * }
      */
     loadDocument (anID:string):any {
-        //console.log ("loadDocument ("+anID+")");
+        console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            //console.log ("Document loaded, assigning to state ...");
-            //console.log ("Model: " + JSON.stringify (doc.model));
             this.setState ({treeData: doc.model ["skills"],document: doc});
             return (doc);
         });
@@ -445,22 +469,118 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                 
         this.setState({treeData: immutableHelper});         
     }
-        
+    
     /**
-     *
+     * 
      */
-    /*    
-    genProps () {       
-        var optionalProps:Object=new Object ();
+    testCode (e):void {
+        console.log ("testCode ()");
         
-        optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
-        optionalProps ["deleteNode"]=this.deleteNode.bind (this);
-        optionalProps ["treeData"]=this.state.treeData;
-        
-        return (optionalProps);
+        this.loadDocument (this.state.documentId);
     }
-    */
+    
+    /**
+     * 
+     */
+    toggleAdvanced (e):void {
+        console.log ("testCode ()");
         
+        if (this.state.advanced==true) {
+            this.setState ({advanced : false});
+        }
+        else {
+            this.setState ({advanced : true});
+        }
+    }
+    
+    /**
+     * 
+     */
+    createAdvancedPanel ():any {
+      let dStyle:any=styles.settingsPreviewContainer;
+      if (this.state.advanced==true) {    
+        return (
+           <div style={styles.advancedSettingsContainer}>
+             <select className="form-control">
+               <option value="bkt">Bayesian Knowledge Tracing</option>
+               <option value="oli">OLI Skill Modeling</option>
+             </select>
+             
+             <div style={dStyle as any}>
+                 <div style={styles.settingsPreview as any}>      
+                   <Knob min={0}
+                         width={50}
+                         height={50}
+                         max={100}
+                         displayInput={true}
+                         value={50}
+                         fgColor={"#0067cb"}
+                         onChange={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                         onChangeEnd={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                   />
+                   <div style={styles.settingLabel as any}>
+                   pKnown
+                   </div>    
+                 </div>
+    
+                 <div style={styles.settingsPreview as any}>      
+                   <Knob min={0}
+                         width={50}
+                         height={50}
+                         max={100}
+                         displayInput={true}
+                         value={50}
+                         fgColor={"#0067cb"}
+                         onChange={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                         onChangeEnd={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                   />
+                   <div style={styles.settingLabel as any}>
+                   pGuess
+                   </div>    
+                 </div>
+    
+                 <div style={styles.settingsPreview as any}>      
+                   <Knob min={0}
+                         width={50}
+                         height={50}
+                         max={100}
+                         displayInput={true}
+                         value={50}
+                         fgColor={"#0067cb"}
+                         onChange={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                         onChangeEnd={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                   />
+                   <div style={styles.settingLabel as any}>
+                   pSlip
+                   </div>
+                 </div>
+    
+                 <div style={styles.settingsPreview as any}>      
+                   <Knob min={0}
+                         width={50}
+                         height={50}
+                         max={100}
+                         displayInput={true}
+                         value={50}
+                         fgColor={"#0067cb"}
+                         onChange={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                         onChangeEnd={(e) => this.handleDial (e,this.state.model.skillDefaults)}
+                   />
+                   <div style={styles.settingLabel as any}>
+                   pMastery
+                   </div>    
+                 </div>
+             </div>  
+          </div>  
+        );
+      } else {
+        return (
+           <div>
+           </div>        
+        );  
+      }         
+    }
+
     /**
      * 
      */
@@ -469,6 +589,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                 
         var options;
         const services = ({} as AppServices);
+        
+        var advancedcontrols=this.createAdvancedPanel ();
         
         /**
          * This will go into it's own renderer once the basic version is complete.
@@ -528,7 +650,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             max={100}
                             displayInput={true}
                             value={(item.skillModel.pKnown*100)}
-                            fgColor={"#abe2fb"}
+                            fgColor={"#0067cb"}
                             onChange={(e) => this.handleDial (e,item)}
                             onChangeEnd={(e) => this.handleDial (e,item)}
                           />
@@ -560,11 +682,10 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <select className="form-control">
-                          <option value="bkt">Bayesian Knowledge Tracing</option>
-                          <option value="oli">OLI Skill Modeling</option>
-                        </select> 
-                    </nav>                                  
+                        <button type="button" className="btn btn-secondary" onClick={e => this.testCode (e)}>Test</button>
+                        <button type="button" className="btn btn-secondary" onClick={e => this.toggleAdvanced (e)}>Advanced</button>
+                    </nav>
+                    {advancedcontrols}        
                     <div style={styles.skillContainer}>
                     {options}
                     </div>        

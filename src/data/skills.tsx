@@ -116,7 +116,7 @@ export class Skill extends Linkable {
       
   title:string="unassigned";    
   skillModel:SkillModel=new SkillModelBKT ();
-  folded:boolean=true;  
+  folded:boolean=true; 
               
   constructor() {
     super ();
