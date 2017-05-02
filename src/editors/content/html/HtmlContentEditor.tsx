@@ -83,7 +83,7 @@ export class HtmlContentEditor
 
   render() : JSX.Element {
 
-    const classes = this.props.showBorder ? 'form-control' : '';
+    const classes = this.props.showBorder === undefined || !this.props.showBorder ? 'form-control' : '';
 
     return (
       <div className={classes}>
