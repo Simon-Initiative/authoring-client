@@ -114,6 +114,12 @@ add-cors-to-couchdb@^0.0.6:
     node-fetch "^1.4.0"
     yargs "^1.3.1"
 
+add-dom-event-listener@1.x:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/add-dom-event-listener/-/add-dom-event-listener-1.0.2.tgz#8faed2c41008721cf111da1d30d995b85be42bed"
+  dependencies:
+    object-assign "4.x"
+
 ajv-keywords@^1.0.0:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-1.5.1.tgz#314dd0a4b3368fad3dfcdc54ede6171b886daf3c"
@@ -1135,7 +1141,7 @@ babel-register@^6.22.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
-babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.22.0:
+babel-runtime@6.x, babel-runtime@^6.11.6, babel-runtime@^6.18.0, babel-runtime@^6.22.0:
   version "6.22.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.22.0.tgz#1cf8b4ac67c77a4ddb0db2ae1f74de52ac4ca611"
   dependencies:
@@ -1533,7 +1539,7 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-classnames@^2.2.3:
+classnames@^2.2.3, classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -1699,6 +1705,16 @@ commoner@^0.10.1:
     q "^1.1.2"
     recast "^0.11.17"
 
+component-classes@^1.2.5:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/component-classes/-/component-classes-1.2.6.tgz#c642394c3618a4d8b0b8919efccbbd930e5cd691"
+  dependencies:
+    component-indexof "0.0.3"
+
+component-indexof@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/component-indexof/-/component-indexof-0.0.3.tgz#11d091312239eb8f32c8f25ae9cb002ffe8d3c24"
+
 compressible@~2.0.8:
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/compressible/-/compressible-2.0.9.tgz#6daab4e2b599c2770dd9e21e7a891b1c5a755425"
@@ -1808,6 +1824,13 @@ core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
+create-react-class@^15.5.2:
+  version "15.5.2"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.5.2.tgz#6a8758348df660b88326a0e764d569f274aad681"
+  dependencies:
+    fbjs "^0.8.9"
+    object-assign "^4.1.1"
+
 cross-spawn@^3.0.0, cross-spawn@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-3.0.1.tgz#1256037ecb9f0c5f79e3d6ef135e30770184b982"
@@ -1829,6 +1852,12 @@ crypto-browserify@3.3.0, crypto-browserify@^3.0.0:
     pbkdf2-compat "2.0.1"
     ripemd160 "0.2.0"
     sha.js "2.2.6"
+
+css-animation@^1.3.0:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/css-animation/-/css-animation-1.3.2.tgz#df515820ef5903733ad2db0999403b3037b8b880"
+  dependencies:
+    component-classes "^1.2.5"
 
 css-color-names@0.0.4:
   version "0.0.4"
@@ -2117,6 +2146,10 @@ doctrine@^2.0.0:
     esutils "^2.0.2"
     isarray "^1.0.0"
 
+dom-align@1.x:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/dom-align/-/dom-align-1.5.3.tgz#b906b616822a5e599f579ec8505e367c51da7588"
+
 "dom-helpers@^2.4.0 || ^3.0.0":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
@@ -2139,41 +2172,9 @@ draft-js@Simon-Initiative/draft-js:
   version "0.9.0"
   resolved "https://codeload.github.com/Simon-Initiative/draft-js/tar.gz/ea08ea994d0f03e8deb300091a2b709c1e8308ab"
   dependencies:
-    babel-core "^6.8.0"
-    babel-eslint "^6.1.2"
-    babel-plugin-transform-class-properties "^6.24.1"
-    babel-preset-fbjs "^2.1.0"
-    del "^2.2.0"
-    envify "^3.4.0"
-    es6-shim "^0.34.4"
-    eslint "^3.0.1"
-    eslint-config-fbjs "^1.1.0"
-    eslint-plugin-babel "^3.3.0"
-    eslint-plugin-flowtype "^2.17.1"
-    eslint-plugin-react "^5.2.2"
     fbjs "^0.8.7"
-    fbjs-scripts "^0.7.0"
-    flow-bin "^0.38.0"
-    gulp "^3.9.0"
-    gulp-babel "^6.1.2"
-    gulp-browserify-thin "^0.1.5"
-    gulp-clean-css "^2.0.3"
-    gulp-concat-css "^2.2.0"
-    gulp-derequire "^2.1.0"
-    gulp-flatten "^0.2.0"
-    gulp-header "1.8.2"
-    gulp-rename "^1.2.2"
-    gulp-uglify "^1.2.0"
-    gulp-util "^3.0.6"
     immutable "~3.7.4"
-    jest "^15.1.1"
     object-assign "^4.1.0"
-    react "^15.0.0-rc.1"
-    react-dom "^15.0.0-rc.1"
-    run-sequence "^1.1.2"
-    through2 "^2.0.1"
-    vinyl-buffer "^1.0.0"
-    webpack-stream "^3.0.0"
 
 duplexer2@0.0.2, duplexer2@~0.0.2:
   version "0.0.2"
@@ -2203,6 +2204,10 @@ ee-first@1.1.1:
 electron-to-chromium@^1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.2.1.tgz#63ac7579a1c5bedb296c8607621f2efc9a54b968"
+
+element-class@^0.2.0:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/element-class/-/element-class-0.2.2.tgz#9d3bbd0767f9013ef8e1c8ebe722c1402a60050e"
 
 emojis-list@^2.0.0:
   version "2.1.0"
@@ -2498,6 +2503,10 @@ exec-sh@^0.2.0:
   dependencies:
     merge "^1.1.3"
 
+exenv@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/exenv/-/exenv-1.2.0.tgz#3835f127abf075bfe082d0aed4484057c78e3c89"
+
 exit-hook@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/exit-hook/-/exit-hook-1.1.1.tgz#f05ca233b48c05d54fff07765df8507e95c02ff8"
@@ -2615,9 +2624,21 @@ fbjs-scripts@^0.7.0:
     semver "^5.1.0"
     through2 "^2.0.0"
 
-fbjs@^0.8.1, fbjs@^0.8.4, fbjs@^0.8.7:
+fbjs@^0.8.1, fbjs@^0.8.4:
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.8.tgz#02f1b6e0ea0d46c24e0b51a2d24df069563a5ad6"
+  dependencies:
+    core-js "^1.0.0"
+    isomorphic-fetch "^2.1.1"
+    loose-envify "^1.0.0"
+    object-assign "^4.1.0"
+    promise "^7.1.1"
+    setimmediate "^1.0.5"
+    ua-parser-js "^0.7.9"
+
+fbjs@^0.8.7, fbjs@^0.8.9:
+  version "0.8.12"
+  resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.12.tgz#10b5d92f76d45575fd63a217d4ea02bea2f8ed04"
   dependencies:
     core-js "^1.0.0"
     isomorphic-fetch "^2.1.1"
@@ -4307,6 +4328,10 @@ jsx-loader@^0.13.2:
     jstransform "11"
     loader-utils "^0.2.2"
 
+keycloak-js@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-3.1.0.tgz#094a620837f147190b0877b707f11a8e2fb76bcf"
+
 kind-of@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.1.0.tgz#475d698a5e49ff5e53d14e3e732429dc8bf4cf47"
@@ -4553,7 +4578,7 @@ lodash.isstring@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/lodash.isstring/-/lodash.isstring-4.0.1.tgz#d527dfb5456eca7cc9bb95d5daeaf88ba54a5451"
 
-lodash.keys@^3.0.0:
+lodash.keys@^3.0.0, lodash.keys@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/lodash.keys/-/lodash.keys-3.1.2.tgz#4dbc0472b156be50a0b286855d1bd0b0c656098a"
   dependencies:
@@ -5068,7 +5093,7 @@ oauth-sign@~0.8.1:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.8.2.tgz#46a6ab7f0aead8deae9ec0565780b7d4efeb9d43"
 
-object-assign@*, object-assign@^4.0.1, object-assign@^4.1.0, object-assign@^4.1.1:
+object-assign@*, object-assign@4.x, object-assign@^4.0.1, object-assign@^4.1.0, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
 
@@ -5623,6 +5648,12 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
+prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8:
+  version "15.5.8"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.8.tgz#6b7b2e141083be38c8595aa51fc55775c7199394"
+  dependencies:
+    fbjs "^0.8.9"
+
 proxy-addr@~1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-1.1.3.tgz#dc97502f5722e888467b3fa2297a7b1ff47df074"
@@ -5698,6 +5729,57 @@ range-parser@^1.0.3, range-parser@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
 
+rc-align@2.x:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/rc-align/-/rc-align-2.3.4.tgz#d83bdab7560f0142e72a3de1d495dab6ba225249"
+  dependencies:
+    dom-align "1.x"
+    prop-types "^15.5.8"
+    rc-util "4.x"
+
+rc-animate@2.x:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/rc-animate/-/rc-animate-2.3.6.tgz#4177a2822c67adf4fd5b908ceba7cee8d13c1fac"
+  dependencies:
+    css-animation "^1.3.0"
+    prop-types "^15.5.6"
+
+rc-slider@^7.0.1:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-7.0.2.tgz#119ea8343233ebf42445728784ec9c1899ae9ac0"
+  dependencies:
+    babel-runtime "6.x"
+    classnames "^2.2.5"
+    prop-types "^15.5.4"
+    rc-tooltip "^3.4.2"
+    rc-util "^4.0.0"
+    warning "^3.0.0"
+
+rc-tooltip@^3.4.2:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-3.4.3.tgz#6ae6ef0eccea39ca2add125bccdb34802c612eec"
+  dependencies:
+    prop-types "^15.5.8"
+    rc-trigger "1.x"
+
+rc-trigger@1.x:
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/rc-trigger/-/rc-trigger-1.10.3.tgz#6bf367ac69705662224003d8b0277b9dfbf5cef4"
+  dependencies:
+    babel-runtime "6.x"
+    create-react-class "^15.5.2"
+    prop-types "^15.5.8"
+    rc-align "2.x"
+    rc-animate "2.x"
+    rc-util "4.x"
+
+rc-util@4.x, rc-util@^4.0.0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-4.0.2.tgz#5804f8b141a13c8c14d7c265a7d21d298195af46"
+  dependencies:
+    add-dom-event-listener "1.x"
+    shallowequal "^0.2.2"
+
 rc@~1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.1.6.tgz#43651b76b6ae53b5c802f1151fa3fc3b059969c9"
@@ -5713,6 +5795,10 @@ react-addons-shallow-compare@^15.3.0:
   dependencies:
     fbjs "^0.8.4"
     object-assign "^4.1.0"
+
+react-canvas-knob@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-canvas-knob/-/react-canvas-knob-0.4.0.tgz#fc0276adb8a9cf4e6ed96c611060429260826b0a"
 
 react-display-name@^0.2.0:
   version "0.2.0"
@@ -5761,6 +5847,16 @@ react-hot-loader@^1.3.1:
   dependencies:
     react-hot-api "^0.4.5"
     source-map "^0.4.4"
+
+react-modal@^1.5.0:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-1.7.7.tgz#70205f51c58708c487aff681ba3fed7946e391d9"
+  dependencies:
+    create-react-class "^15.5.2"
+    element-class "^0.2.0"
+    exenv "1.2.0"
+    lodash.assign "^4.2.0"
+    prop-types "^15.5.7"
 
 react-redux@^5.0.2:
   version "5.0.2"
@@ -6279,6 +6375,12 @@ sha.js@~2.4.4:
 shallow-copy@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/shallow-copy/-/shallow-copy-0.0.1.tgz#415f42702d73d810330292cc5ee86eae1a11a170"
+
+shallowequal@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-0.2.2.tgz#1e32fd5bcab6ad688a4812cb0cc04efc75c7014e"
+  dependencies:
+    lodash.keys "^3.1.2"
 
 shasum@^1.0.0:
   version "1.0.2"
@@ -7090,6 +7192,12 @@ walker@~1.0.5:
   resolved "https://registry.yarnpkg.com/walker/-/walker-1.0.7.tgz#2f7f9b8fd10d677262b18a884e28d19618e028fb"
   dependencies:
     makeerror "1.0.x"
+
+warning@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/warning/-/warning-3.0.0.tgz#32e5377cb572de4ab04753bdf8821c01ed605b7c"
+  dependencies:
+    loose-envify "^1.0.0"
 
 watch@~0.10.0:
   version "0.10.0"
