@@ -50,6 +50,7 @@ export interface EditorManagerState {
   document: persistence.Document;
   editMode: boolean;
   activeSubEditorKey: string;
+  courseId: string;
 }
 
 class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
@@ -61,7 +62,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       document: null, 
       editingAllowed: null, 
       editMode: true,
-      activeSubEditorKey: null
+      activeSubEditorKey: null,
+      courseId: ""
     };
     
 
@@ -89,8 +91,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
 
   initPersistence(document: persistence.Document) {
-
-    console.log ("initPersistence ("+document.model.modelType+")");  
       
     this.persistenceStrategy = lookUpByName(document.model.modelType).persistenceStrategy;
         
@@ -110,8 +110,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           this.stopListening = false;
           this.listenForChanges();
         }
-      }
-      
+      }      
 
     });
   }
@@ -119,7 +118,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   
 
   fetchDocument(documentId: string) {
-      console.log ("fetchDocument ("+documentId+")");
     persistence.retrieveDocument(documentId)
       .then(document => {
         
@@ -130,6 +128,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
             document.model.organizations.get(0),
             document.model.learningobjectives.get(0),
             document.model.skills.get(0)));
+            
+          // If we found out that we just loaded the course document, then save its Id
+          // in the state  
+          this.setState({ courseId: documentId});  
         }
         
         // Tear down previous persistence strategy
@@ -149,7 +151,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log ("componentWillReceiveProps ("+nextProps.documentId+")");
     if (this.props.documentId !== nextProps.documentId) {
       this.stopListening = true;
       this.setState({document: null, editingAllowed: null});
@@ -192,14 +193,19 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       return null;
     } else {
 
-      let courseId = (this.state.document.model as any).courseId === undefined ? null : (this.state.document.model as any).courseId;
+        
+      // I've moved the assignment of the courseId to the state, that way we know that after the course has been
+      // loaded the courseId is always availble in the state and can be given to any subcomponent and be included
+      // more easily in AppServices
+          
+      //let courseId = (this.state.document.model as any).courseId === undefined ? null : (this.state.document.model as any).courseId;
 
       const childProps : AbstractEditorProps<any> = {
         model : this.state.document.model,
         context: { 
           documentId: this.props.documentId, 
           userId: this.props.userId,
-          courseId: courseId
+          courseId: this.state.courseId
         },
         onEdit: this._onEdit,
         services: this.props.services,

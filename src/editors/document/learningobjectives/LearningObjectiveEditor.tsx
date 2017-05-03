@@ -18,6 +18,7 @@ import NodeRendererDefault from 'react-sortable-tree';
 import { OrgItem } from '../organization/OrganizationTypes';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from './LearningObjectiveLinker';
+import { AppContext } from '../../common/AppContext';
 
 var loData=require ('./LO.json');
 
@@ -36,12 +37,15 @@ export interface LearningObjectiveEditorState extends AbstractEditorState {
   rootLO: any;
   modalIsOpen : boolean;
   model: any;
+  context: AppContext;
+  skills: any; 
 }
 
 export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel> {
   dispatch: any;
   documentId: string;
   userId: string;    
+  context: AppContext;
 }
 
 /**
@@ -58,12 +62,23 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         model: {},    
                         treeData: LearningObjectiveEditor.processData (loData),
                         rootLO: LearningObjectiveEditor.createRootLO (loData),
-                        modalIsOpen : false                    
-                     });
+                        modalIsOpen : false,
+                        context: props.context,
+                        skills: null
+                     });        
     }
     
-    componentDidMount() {
-        console.log ("componentDidMount ()");
+    componentDidMount() {                    
+        persistence.retrieveDocument(this.state.context.courseId).then(course => {            
+            let skillObject=course ["model"]["skills"];
+                                    
+            let skillDocId=skillObject.get (0);
+           
+            persistence.retrieveDocument(skillDocId).then(skillsDoc => {
+              this.setState ({skills: skillsDoc ["model"]["skills"]});
+              return (skillsDoc);
+            });    
+        });        
     }    
     
     componentWillReceiveProps(nextProps) {
@@ -322,7 +337,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         console.log ("LearningObjectiveEditor:linkSkill ()");
                 
         this.setState ({modalIsOpen: true});
-    }    
+    }
     
     /**
      * 
@@ -338,19 +353,24 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         optionalProps ["treeData"]=this.state.treeData;
 
         return (optionalProps);
-    }    
+    }
+    
+    /**
+     * 
+     */
+    createLinkerDialog () {           
+      if (this.state.skills!=null) {            
+        return (<LearningObjectiveLinker defaultData={this.state.skills} modalIsOpen={this.state.modalIsOpen} model={this.state.model} los={this.state.treeData}/>);
+      }
+                   
+      return (<div></div>);           
+    }
 
     /**
      * 
      */
     render() {        
-        //console.log ("LearningObjectiveEditor:render ("+this.state.modalIsOpen+")");
-        
-        var data = [
-          {value: 'apple', label: 'Apple'},
-          {value: 'orange', label: 'Orange'},
-          {value: 'banana', label: 'Banana', checked: true} // check by default
-        ];        
+        const skilllinker=this.createLinkerDialog ();          
         
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
@@ -360,7 +380,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                     </nav>
-                    <LearningObjectiveLinker defaultData={data} modalIsOpen={this.state.modalIsOpen} model={this.state.model} los={this.state.treeData}/>
+                   {skilllinker}
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}

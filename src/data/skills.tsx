@@ -123,7 +123,7 @@ export class Skill extends Linkable {
   }
    
   fromJSONObject (aData:any):void {  
-     console.log ("fromJSONObject ()");
+     //console.log ("fromJSONObject ()");
       
      this.id=aData ["@id"];
      this.title=aData ["@title"]; 
@@ -131,7 +131,7 @@ export class Skill extends Linkable {
      let sModel=aData ["#skillModel"];
                 
      if (sModel.type=="BKT") {
-       console.log ("Assigning type: SkillModelBKT");  
+       //console.log ("Assigning type: SkillModelBKT");  
        let tModel:SkillModelBKT=new SkillModelBKT ();  
        this.skillModel=tModel;
        tModel.pGuess=sModel ["@pGuess"];      
@@ -141,7 +141,7 @@ export class Skill extends Linkable {
      }
       
      if (sModel.type=="OLI") {
-       console.log ("Assigning type: SkillModelOLI");
+       //console.log ("Assigning type: SkillModelOLI");
        let tModel:SkillModelOLI =new SkillModelOLI ();
        this.skillModel=tModel;  
        tModel.gamma0=sModel ["@gamma0"];      

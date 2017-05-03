@@ -265,7 +265,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
         this.opts [2].onclick = viewWorkbookPages;
         this.opts [3].onclick = viewActivities;
-        
+
         this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
         this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);        
         

@@ -205,20 +205,21 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   {
     console.log ("LearningObjectiveLinker:render ("+this.state.modalIsOpen+")");
       
-    var options;
-
-    options = this.state.data.map(function(item, index) {
-            return (
-                <div key={'chk-' + index} className="checkbox">
-                    <label>
-                        <input
-                            type="checkbox"
-                            value={item.value}
-                            onChange={this.handleItemChange}
-                            checked={item.checked ? true : false} /> {item.label}
-                    </label>
-                </div>
-            );
+    var options = this.state.data.map(function(item, index) {
+        
+      console.log ("Skill item: " + JSON.stringify (item));  
+        
+      return (
+        <div key={'chk-' + index} className="checkbox">
+            <label>
+                <input
+                    type="checkbox"
+                    value={item.title}
+                    onChange={this.handleItemChange}
+                    checked={item.checked ? true : false} /> {item.title}
+            </label>
+        </div>
+      );
     }.bind(this));      
       
     return (<Modal
