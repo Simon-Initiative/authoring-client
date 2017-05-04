@@ -16,7 +16,6 @@ export class LearningObjective extends Linkable {
   title:string="unassigned";    
   category:string="unassigned";
   children:Array<LearningObjective>;
-  skills:Array<string>=new Array (); // only a list of IDs not a list of pointers to skill objects
       
   /**
    * Constructor
@@ -55,9 +54,9 @@ export class LearningObjective extends Linkable {
     ephemeral ["#text"]=this.title;
     ephemeral ["#skills"]=new Array<string>();
       
-    for (var i=0;i<this.skills.length;i++) {
+    for (var i=0;i<this.annotations.length;i++) {
       
-      ephemeral ["#skills"].push (this.skills [i]);
+      ephemeral ["#skills"].push (this.annotations [i].id);
     }
       
     return (ephemeral);

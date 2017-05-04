@@ -39,6 +39,7 @@ export interface LearningObjectiveEditorState extends AbstractEditorState {
   model: any;
   context: AppContext;
   skills: any; 
+  loTarget : any;
 }
 
 export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel> {
@@ -64,7 +65,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         rootLO: LearningObjectiveEditor.createRootLO (loData),
                         modalIsOpen : false,
                         context: props.context,
-                        skills: null
+                        skills: null,
+                        loTarget: null
                      });        
     }
     
@@ -188,11 +190,16 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
             ephemeral ["@id"]=aData [i].id;
             ephemeral ["@category"]=aData [i].category;
             ephemeral ["#text"]=aData [i].title;
+        
+            // Add all the annotations of type skill to the skill list. Currently
+            // we do not define a type on annotations so for now we will assume
+            // that all annotations are skills
+        
             ephemeral ["#skills"]=new Array<string>();
+                          
+            for (var j=0;j<aData [i].annotations.length;j++) {
               
-            for (var j=0;j<aData [i].skills.length;j++) {
-              
-              ephemeral ["#skills"].push (aData [i].skills [j]);
+              ephemeral ["#skills"].push (aData [i].annotations [j].id);
             }            
             
             newData ["objectives"]["#array"].push (ephemeral);
@@ -335,8 +342,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     linkSkill(aNode:any) {        
         console.log ("LearningObjectiveEditor:linkSkill ()");
+        console.log ("aNode: " + JSON.stringify (aNode));
                 
-        this.setState ({modalIsOpen: true});
+        this.setState ({modalIsOpen: true, loTarget: aNode});
     }
     
     /**
@@ -360,7 +368,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     createLinkerDialog () {           
       if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker defaultData={this.state.skills} modalIsOpen={this.state.modalIsOpen} model={this.state.model} los={this.state.treeData}/>);
+        return (<LearningObjectiveLinker sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.loTarget} />);
       }
                    
       return (<div></div>);           

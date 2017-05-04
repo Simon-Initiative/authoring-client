@@ -51,18 +51,16 @@ interface LearningObjectiveLinker {
 
 }
 
-export interface LearningObjectiveLinkerProps {
-  los: any;
-  model: models.SkillModel;        
-  defaultData : any;
+export interface LearningObjectiveLinkerProps {        
+  sourceData : any;
   modalIsOpen : boolean;    
+  loTarget: any;  
 }
 
 export interface LearningObjectiveLinkerState {
-  los: any;
-  model: models.SkillModel;
-  data : any; 
-  modalIsOpen : boolean;       
+  sourceData: any;   
+  modalIsOpen : boolean;
+  loTarget: any;         
 }
 
 /**
@@ -78,53 +76,116 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         
     super(props);
       
-    this.state = {
-                   los: this.props.los,
-                   model: this.props.model,
+    console.log ("Lo target: " + JSON.stringify (this.props.loTarget));   
+      
+    this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
-                   data: this.props.defaultData                        
+                   sourceData: this.props.sourceData,
+                   loTarget: this.props.loTarget                                           
                  };
             
     this.openModal = this.openModal.bind(this);
     this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);      
+    this.closeModal = this.closeModal.bind(this);  
   }
     
   /**
    * 
    */    
-  componentWillReceiveProps (newProps:any) {      
-      this.setState({modalIsOpen: newProps ["modalIsOpen"]});
+  componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
+      console.log ("componentWillReceiveProps ()");
+      this.setState({sourceData: newProps.sourceData,modalIsOpen: newProps ["modalIsOpen"], loTarget: newProps.loTarget});
   }
+   
+  /**
+   * Take the annotations from the target object and check or uncheck the corresponding
+   * items in the source list so that we can then make changes to the source list and
+   * make sure everything is in sync. We assume that the annotations and source list
+   * a not aligned! This might be a false assumption but for now it's safer.
+   */   
+  resolveAnnotations () {
+    console.log ("resolveAnnotations ()");
+    
+    if (this.state.loTarget==null) {
+      console.log ("No LO target given yet, bump");  
+      return;
+    }  
+      
+    var newData = [];       
+      
+    // First reset everything so that we don't have to keep
+    // checking and comparing, we can just set it checked if
+    // we encounter the item
+    this.state.sourceData.forEach(function(resetItem) {
+       resetItem.checked=false; 
+       newData.push(resetItem);         
+    });      
+            
+    for (var i=0;i<this.state.loTarget.annotations.length;i++) {    
+       let item=this.state.loTarget.annotations [i];  
+       console.log ("Checking item: " + item); 
+        
+       for (var j=0;j<newData.length;j++) {
+         let sourceItem=newData [j];  
+         if (sourceItem.id==item) {
+            sourceItem.checked=true;
+         }
+       }
+    }
+      
+    this.setState({sourceData: newData});     
+  }    
     
   /**
    * 
    */    
   openModal() {  
-    this.setState({modalIsOpen: true});
+    this.setState({modalIsOpen: true}); 
   }
 
   /**
    * 
    */    
   afterOpenModal() {
+    console.log ("afterOpenModal ()");
+    
+    this.resolveAnnotations ();
   }
 
   /**
    * 
    */    
   closeModal() {
+    console.log ("closeModal ()");  
+      
+    let lo:LearningObjective=this.state.loTarget as LearningObjective;
+      
     this.setState({modalIsOpen: false});
+      
+    var newData = [];
+    this.state.sourceData.forEach(function(item) {
+      if (item.checked ==true) {
+       newData.push(item.id);
+      }    
+    });
+      
+    lo.annotations=newData;  
+
+    this.setState ({loTarget : lo}, function (){
+      console.log ("Lo now: " +  JSON.stringify (this.state.loTarget));
+    });      
   }
     
   /**
    * 
-   */    
+   */
+  /*      
   getInitialState () {
     return {
-      data: this.props.defaultData || []
+      sourceData: this.props.sourceData || []
     };
   }
+  */
 
   /**
    * 
@@ -133,7 +194,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     var selectedValues = [];
     var newData = [];
 
-    this.state.data.forEach(function(item) {
+    this.state.sourceData.forEach(function(item) {
   
        if(item.value === e.target.value) {
          item.checked = e.target.checked;
@@ -146,13 +207,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(item);
      });
 
-     this.setState({data: newData});
-      
-     /* 
-     if(this.props.onChange) {
-       this.props.onChange(selectedValues); 
-     }
-     */ 
+     this.setState({sourceData: newData});      
   }
 
   /**
@@ -160,12 +215,12 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   reset () {
     var newData = [];
-    this.state.data.forEach(function(item) {
+    this.state.sourceData.forEach(function(item) {
       item.checked = false;
       newData.push(item);
     });
 
-    this.setState({data: newData});
+    this.setState({sourceData: newData});
   }
     
   /**
@@ -173,12 +228,12 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   checkAll () {
      var newData = [];
-     this.state.data.forEach(function(item) {
+     this.state.sourceData.forEach(function(item) {
        item.checked = true;
        newData.push(item);
      });
 
-    this.setState({data: newData});
+    this.setState({sourceData: newData});
   }
     
   /**
@@ -186,7 +241,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   checkInvert () {
      var newData = [];
-     this.state.data.forEach(function(item) {
+     this.state.sourceData.forEach(function(item) {
        if (item.checked==true) {
          item.checked = false;
        } else {
@@ -195,30 +250,24 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(item);
      });
 
-    this.setState({data: newData});
+    this.setState({sourceData: newData});
   }      
-
+    
   /**
    * 
    */    
-  render ()
-  {
-    console.log ("LearningObjectiveLinker:render ("+this.state.modalIsOpen+")");
-      
-    var options = this.state.data.map(function(item, index) {
-        
-      console.log ("Skill item: " + JSON.stringify (item));  
-        
-      return (
-        <div key={'chk-' + index} className="checkbox">
-            <label>
-                <input
-                    type="checkbox"
-                    value={item.title}
-                    onChange={this.handleItemChange}
-                    checked={item.checked ? true : false} /> {item.title}
-            </label>
-        </div>
+  render () {      
+    var options = this.state.sourceData.map(function(item, index) {
+                
+    return (
+      <div key={'chk-' + index} className="checkbox">
+        <label>
+          <input type="checkbox"
+            value={item.title}
+            onChange={this.handleItemChange}
+            checked={item.checked ? true : false} /> {item.title}
+        </label>
+      </div>
       );
     }.bind(this));      
       
