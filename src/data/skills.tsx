@@ -111,6 +111,13 @@ export class SkillModelOLI extends SkillModel {
   }    
 }    
 
+/**
+ * Notice that the skill class is both linkable and can take
+ * annotations much like the LOs. This is done so that we can
+ * link Skills to other resources that can take annotations
+ * but also so that we can add annotations or other meta
+ * data dynamically to skills. We might e
+ */
 export class Skill extends Linkable {
   orgType:SkillTypes=SkillTypes.Skill;
       

@@ -11,6 +11,12 @@ export const LOTypes = types.strEnum([
 
 export type LOTypes = keyof typeof LOTypes;
 
+/**
+ * Notice that the learning objective is both linkable
+ * and can take annotations. This makes sense since we
+ * link los to things like workbook pages as well as
+ * annotate los with skills.
+ */
 export class LearningObjective extends Linkable {
   orgType:LOTypes=LOTypes.LO;  
   title:string="unassigned";    

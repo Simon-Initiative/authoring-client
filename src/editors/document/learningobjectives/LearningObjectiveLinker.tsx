@@ -178,6 +178,15 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     
   /**
    * 
+   */    
+  cancelModal() {
+    console.log ("cancelModal ()");  
+      
+    this.setState({modalIsOpen: false});      
+  }    
+    
+  /**
+   * 
    */
   /*      
   getInitialState () {
@@ -282,6 +291,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                  <a className="nav-link" href="#" onClick={e => this.checkAll ()}>Check All</a>
                  <a className="nav-link" href="#" onClick={e => this.reset ()}>Check None</a>
                  <a className="nav-link" href="#" onClick={e => this.checkInvert ()}>Check Invert</a>
+                 <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
                </nav>
                <div style={tempnavstyle.objectContainer}>
                 {options}
