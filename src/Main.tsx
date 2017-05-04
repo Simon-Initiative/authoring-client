@@ -36,7 +36,7 @@ interface Main {
 }
 
 interface MainOwnProps {
-  username: string
+  
 }
 
 const stateGeneric = returnType(mapStateToProps);  
@@ -53,8 +53,7 @@ class Main extends React.Component<MainProps, {}> {
   }
 
   componentDidMount() {  
-    let user = this.props.username;
-    this.props.dispatch(userActions.login(user, user));
+    this.props.dispatch(userActions.initAuthenticationProvider());
   }
 
   getView(view: CurrentView): JSX.Element {

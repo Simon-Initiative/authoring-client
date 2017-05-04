@@ -41,16 +41,13 @@ function main() {
   initRegistry();
   initEditorRegistry();
 
-  // Extract the user name from the query parameters
-  const userName = getUserName();
-
   // Create the redux store
   const store = initStore();
 
   // Now do the initial rendering
   ReactDOM.render(
       <Provider store={store}>
-        <Main username={userName}/>
+        <Main/>
       </Provider>, document.getElementById('app')); 
 }
 

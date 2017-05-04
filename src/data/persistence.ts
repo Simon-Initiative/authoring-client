@@ -46,6 +46,32 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
   }
 }
 
+export function getEditablePackages() {
+  return new Promise(function(resolve, reject) {
+    fetch(`${configuration.baseUrl}/api/packages`, {
+        method: 'GET',
+        headers: getHeaders(credentials)
+      })
+    .then(response => {
+
+      if (!response.ok) {
+          throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(json => {
+      console.log(json);
+
+      // TODO: parse the response as a series of CourseModel instances
+      
+      resolve(json.docs as Document[]);
+    })
+    .catch(err => {
+      reject(err);
+    });
+  });    
+}
+
 export function queryDocuments(query: Object) : Promise<Document[]> {
   console.log ("queryDocuments ("+JSON.stringify (query)+")");
   return new Promise(function(resolve, reject) {
