@@ -16,12 +16,12 @@ const styles = {
     "boxSizing": "border-box"
   },
   orgrow : {
+    "border" : '0px solid green',  
     "height": "100%",
-    "display": "flex",
-    "& > *": {
-        "boxSizing": "border-box"
-    }
-    
+    "flexDirection" : "row",  
+    "display": "flex",    
+    "justifyContent": "space-between",
+    "background": "#ffffff",  
   },     
   orgrowLandingPad : {
     "border": "none !important",
@@ -113,7 +113,6 @@ const styles = {
     "height": "42px",
     "width": "45px",
     "border": "0px solid green",
-    "boxShadow": "0 2px 2px -2px",
     "borderRadius": "1px",
     "zIndex": 1,                  
     "cursor": "pointer",
@@ -186,6 +185,16 @@ const styles = {
     "verticalAlign": "middle",
     "lineHeight": "42px"
   },
+  orgrowControl : {    
+    "border": "1px solid red",
+    "width": "26px",
+    "height": "42px",    
+    "overflowY": "hidden",
+    "overflowX": "hidden", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
+  },  
   orgrowTitleWithSubtitle : {
     "fontSize": "85%",
     "display": "block",
@@ -257,7 +266,15 @@ const styles = {
         "bottom": "0",
         "height": "10px"
     }    
-  }     
+  },
+  loTitleRenderer : {
+      'border' : '0px solid black',
+      "overflowY": "hidden",
+      "overflowX": "hidden",
+      "minWidth": "300px",      
+      "maxWidth": "340px",
+      'height' : '42px'
+  }  
 };
 
 /**
@@ -401,7 +418,7 @@ class LONodeRenderer extends Component <any, any>
         let tStyle:any=styles.orgrowTitle;
 
         let bStyle:any=styles.orgrowTitle;
-        bStyle ["marginLeft"]="10px";
+        bStyle ["marginLeft"]="2px";
 
         //>--------------------------------------------------------------------
 
@@ -410,7 +427,7 @@ class LONodeRenderer extends Component <any, any>
         const context = { userId: null, documentId: null, courseId: null};
 
         return (
-            <div style={{ height: '100%' }} {...otherProps}>
+            <div style={{ height: '100%', width: '450px' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
                     <div>
                         <button
@@ -432,19 +449,17 @@ class LONodeRenderer extends Component <any, any>
 
                             {handle}
             
-                            <div id="outter" style={dStyle as any}>
-                               <div id="inner" style={tStyle}>
                                  <TitleContentEditor 
                                    services={services}
                                    editMode={true}
                                    model={titleObj}
                                    context={context}
+                                   styles={styles.loTitleRenderer}
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
                                    />
-                               </div>
+            
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>
-                            </div>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>                        
                         </div>
                     )}
                 </div>

@@ -111,29 +111,38 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         
         return (newRootLO as Object);
     }
-        
+       
+    /**
+     * 
+     */    
+    reparent () {
+      console.log ("reparent ()");
+    }
+            
     /**
      * 
      */
     processDataChange (newData: any) {
-        console.log ("processDataChange ()");
+      console.log ("processDataChange ()");
         
-        this.extractData (newData);        
+      this.reparent ();  
         
-        this.setState (newData);
+      this.extractData (newData);        
+        
+      this.setState (newData);
     }
 
     /**
      * 
      */
     expand(expanded) {
-        this.setState({
-            modalIsOpen : false,
-            treeData: toggleExpandedForAll({
-                treeData: this.state.treeData,                
-                expanded,
-            }),
-        });
+      this.setState({
+         modalIsOpen : false,
+         treeData: toggleExpandedForAll({
+           treeData: this.state.treeData,                
+           expanded,
+         }),
+      });
     }
 
     /**
@@ -334,7 +343,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
             }
         }
         
-        this.setState({treeData: immutableHelper});    
+        this.setState({modalIsOpen: false,treeData: immutableHelper});    
     }
     
     /**
@@ -392,7 +401,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                     <SortableTree
                         maxDepth={3}
                         treeData={this.state.treeData}
-                        onChange={ treeData => this.processDataChange({treeData}) }
+                        onChange={ treeData => this.processDataChange({treeData}) }                        
                         nodeContentRenderer={LONodeRenderer}
                         generateNodeProps={this.genProps.bind(this)}    
                     />

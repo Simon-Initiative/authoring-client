@@ -21,6 +21,7 @@ export class LearningObjective extends Linkable {
   orgType:LOTypes=LOTypes.LO;  
   title:string="unassigned";    
   category:string="unassigned";
+  parent:string="unassigned"; // a link to an LO parent so that we can go back and forth between a tree and a list
   children:Array<LearningObjective>;
       
   /**
@@ -58,6 +59,7 @@ export class LearningObjective extends Linkable {
     ephemeral ["@id"]=this.id;
     ephemeral ["@category"]=this.category;
     ephemeral ["#text"]=this.title;
+    ephemeral ["@pareant"]=this.parent;
     ephemeral ["#skills"]=new Array<string>();
       
     for (var i=0;i<this.annotations.length;i++) {
