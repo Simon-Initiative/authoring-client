@@ -58,8 +58,8 @@ export class LearningObjective extends Linkable {
       
     ephemeral ["@id"]=this.id;
     ephemeral ["@category"]=this.category;
+    ephemeral ["@parent"]=this.parent;
     ephemeral ["#text"]=this.title;
-    ephemeral ["@pareant"]=this.parent;
     ephemeral ["#skills"]=new Array<string>();
       
     for (var i=0;i<this.annotations.length;i++) {

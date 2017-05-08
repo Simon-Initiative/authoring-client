@@ -459,7 +459,7 @@ class LONodeRenderer extends Component <any, any>
                                    />
             
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>                        
+                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
                         </div>
                     )}
                 </div>

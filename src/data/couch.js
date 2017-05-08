@@ -145,7 +145,7 @@ var createLearningObjectives = function(input) {
     var data = { 
       modelType: 'LearningObjectiveModel',
       title: {text: 'Sample Learning Objective Model'},
-      lobjectives: []
+      learningobjectives: []
     }
     request('POST', '/editor', data)
       .then(result => { LODocID=result.id; resolve(input)});

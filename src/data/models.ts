@@ -4,6 +4,8 @@ import * as contentTypes from './contentTypes';
 import { getKey } from './common';
 import guid from '../utils/guid';
 import {Skill} from './skills';
+import {LearningObjective} from './los';
+import {Title} from './contentTypes';
 
 export type EmptyModel = 'EmptyModel';
 export const EmptyModel : EmptyModel = 'EmptyModel';
@@ -27,7 +29,6 @@ export function isLockable(model: ContentModel) {
 }
 
 export function createModel(object: any) : ContentModel {
-  console.log ("createModel ()");
   switch (object.modelType) {
     case ModelTypes.CourseModel: 
       return CourseModel.fromPersistence(object);
@@ -406,17 +407,21 @@ export type ChangeRequest = (input: ContentModel) => ContentModel;
 //>------------------------------------------------------------------
 
 export type LearningObjectiveModelParams = {
-  title?: contentTypes.Title
+  id?: string,
+  title?: string,
+  los: Array<LearningObjective>
 };
 
 const defaultLearningObjectiveModel = {
   modelType: 'LearningObjectiveModel',
-  title: new contentTypes.Title(),
+  los: []
 }
 
 export class LearningObjectiveModel extends Immutable.Record(defaultLearningObjectiveModel) {    
   modelType: 'LearningObjectiveModel';
-  title: contentTypes.Title;
+  los: Array <LearningObjective>;
+  id: string;
+  title: string;
   
   constructor(params?: LearningObjectiveModelParams) {
       params ? super(params) : super();
@@ -426,12 +431,108 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       return this.merge(values) as this;
   }
 
-  static fromPersistence(json: Object) : LearningObjectiveModel {
-    return new LearningObjectiveModel();
+  /**
+   * 
+   */    
+  static parseLearningObjective (anObjective:Object): LearningObjective {
+
+    var newLO:LearningObjective=new LearningObjective ();
+        
+    newLO.id=anObjective ["@id"];
+    newLO.category=anObjective ["@category"];
+    newLO.title=anObjective ["#text"];
+        
+    return (newLO);
   }
 
+  static updateModel (treeData:any): LearningObjectiveModel {
+      console.log ("updateModel ()");
+      var newModel=new LearningObjectiveModel ({'los': treeData});      
+      return newModel;
+  }    
+
+  static addTextObject (aText,aValue)
+  {
+    let newTextObject:Object=new Object ();
+    newTextObject [aText]=new Object ();
+    newTextObject [aText]["#text"]=aValue;
+    return (newTextObject);
+  }  
+    
   toPersistence() : Object {
-    return {};
+    console.log ("toPersistence ()");
+
+    var newData:Object=new Object ();
+    newData ["objectives"]=new Object();
+    newData ["objectives"]["@id"]=this.id;
+    newData ["objectives"]["#array"]=new Array ();
+    newData ["objectives"]["#array"].push (LearningObjectiveModel.addTextObject ("title",this.title));
+        
+    for (var i=0;i<this.los.length;i++)
+    {
+      var testLOContainer:Object=new Object();
+      var ephemeral:Object=new Object ();
+              
+      ephemeral ["@id"]=this.los [i].id;
+      ephemeral ["@category"]=this.los [i].category;
+      ephemeral ["@parent"]=this.los [i].parent;
+      ephemeral ["#text"]=this.los [i].title;
+        
+      // Add all the annotations of type skill to the skill list. Currently
+      // we do not define a type on annotations so for now we will assume
+      // that all annotations are skills
+        
+      ephemeral ["#skills"]=new Array<string>();
+                          
+      for (var j=0;j<this.los [i].annotations.length;j++) {
+        ephemeral ["#skills"].push (this.los [i].annotations [j].id);
+      }            
+            
+      newData ["objectives"]["#array"].push ({"objective" : ephemeral});
+    }
+       
+    console.log ("To: " + JSON.stringify (newData));
+
+    const root = {
+      "modelType": "LearningObjectiveModel",
+      "learningobjectives": newData
+    };
+
+    return (root);
+  }
+
+  static fromPersistence(json: Object) : LearningObjectiveModel {
+
+    console.log ("LearningObjectiveModel.fromPersistence: " + JSON.stringify (json));
+
+    let loObject:Array<Object>=json ["learningobjectives"];
+   
+    let newData:Array<LearningObjective> = new Array ();
+    let newTitle: string ="";
+    let newId: string =loObject ["@id"];
+
+    for (var i in loObject) {
+      if (i=="title") {
+        newTitle = loObject ["title"]["#text"];
+      }
+
+      if (i=="objectives") {       
+        console.log ("Found objectives, parsing ...");         
+        let loRoot=loObject [i];
+                
+        for (var j=0;j<loRoot ["#array"].length;j++) {
+          let lObjectiveTest=loRoot ["#array"][j];
+                    
+          for (var k in lObjectiveTest) {
+            if (k=="objective") {
+              newData.push (LearningObjectiveModel.parseLearningObjective (lObjectiveTest [k]));                            
+            }                        
+          }
+        }
+      }
+    }
+
+    return new LearningObjectiveModel({'los': newData});
   }
 }
 
@@ -449,7 +550,7 @@ const defaultSkillModel = {
   skills: []
 }
 
-export class SkillModel extends Immutable.Record(defaultSkillModel) {    
+export class SkillModel extends Immutable.Record(defaultSkillModel) {
   modelType: 'SkillModel';
   title: contentTypes.Title;
   skillDefaults: Skill;
@@ -459,7 +560,6 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       console.log ("constructor ()");
       params ? super(params) : super();
       //super();
-      //console.log ("constructor postcheck: " + JSON.stringify (this.skills));
   }
 
   /*  
@@ -482,28 +582,21 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       "skills": this.skills
     };
 
-    //return Object.assign({}, root, this.lock.toPersistence());
     return (root);
   }
-    
+
   static fromPersistence(json: Object) : SkillModel {
-    console.log ("SkillModel: fromPersistence ()");
     
     var replacementSkills:Array<Skill>=new Array<Skill>();
 
     let skillData:Array<Skill>=json ["skills"];
             
-    console.log ("Parsing: ("+skillData.length+")" + JSON.stringify (skillData));  
-
-    for (let i=0;i<skillData.length;i++) {
-      console.log ("Adding new skill ["+i+"] ...");  
+    for (let i=0;i<skillData.length;i++) {  
       let newSkill:Skill=new Skill ();
       newSkill.fromJSONObject (skillData [i]);
         
       replacementSkills.push (newSkill);
     }        
-      
-    console.log ("New skill list: " + JSON.stringify (replacementSkills));
       
     return (SkillModel.updateModel (replacementSkills))
   }    

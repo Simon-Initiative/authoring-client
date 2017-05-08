@@ -283,9 +283,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      *
      */
     saveToDB (): void {
-        console.log ("saveToDB ()");
-
-        //console.log ("Document: " + JSON.stringify (this.state.document));
+        //console.log ("saveToDB ()");
         
         let immutableDocument = this.state.document;
         
@@ -297,7 +295,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
 
         var extractedData:any=this.extractData (this.state.treeData);
         
-        console.log ("extractedData: " + JSON.stringify (extractedData));
+        //console.log ("extractedData: " + JSON.stringify (extractedData));
                 
         // Keep in mind that extractData creates a skills object, but in our
         // model we already have one so we need to extract the contents from
@@ -307,7 +305,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                  
         var updatedDocument=this.state.document.set ('model',newModel);
         
-        console.log ("updatedDocument: " + JSON.stringify (updatedDocument));
+        //console.log ("updatedDocument: " + JSON.stringify (updatedDocument));
                
         this.setState ({'document' : updatedDocument },function () {         
           persistence.persistDocument(this.state.document)
