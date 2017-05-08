@@ -54,13 +54,15 @@ interface LearningObjectiveLinker {
 export interface LearningObjectiveLinkerProps {        
   sourceData : any;
   modalIsOpen : boolean;    
-  loTarget: any;  
+  loTarget: any;
+  closeModal: any;  
 }
 
 export interface LearningObjectiveLinkerState {
   sourceData: any;   
-  modalIsOpen : boolean;
-  loTarget: any;         
+  modalIsOpen : boolean;    
+  loTarget: any;
+  closeModal: any;
 }
 
 /**
@@ -81,7 +83,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
-                   loTarget: this.props.loTarget                                           
+                   loTarget: this.props.loTarget,                                           
+                   closeModal: this.props.closeModal
                  };
             
     this.openModal = this.openModal.bind(this);
@@ -173,7 +176,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
 
     this.setState ({loTarget : lo}, function (){
       console.log ("Lo now: " +  JSON.stringify (this.state.loTarget));
-    });      
+      this.state.closeModal ();  
+    });
   }
     
   /**

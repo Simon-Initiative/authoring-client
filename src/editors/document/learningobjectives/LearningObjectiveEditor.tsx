@@ -80,7 +80,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         loTarget: null,
                         documentId: props.context.documentId,
                         model: props.model,
-                        document: {}                        
+                        document: {},
+                        modalIsOpen: false                      
                      });                        
     }
 
@@ -141,7 +142,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({treeData: doc.model ["los"],document: doc});
+            this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
             return (doc);
         });
 
@@ -184,23 +185,16 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         return (newRootLO as Object);
     }
     */
-       
-    /**
-     * 
-     */    
-    reparent () {
-      console.log ("reparent ()");
-    }
-            
+
     /**
      * 
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
         
+      /*
       this.reparent ();  
-        
-      /*      
+              
       this.extractData (newData);        
         
       this.setState (newData);
@@ -496,9 +490,18 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     /**
      * 
      */
+    closeModal () {
+      console.log ("LearningObjectiveEditor: closeModal ()");
+        
+      this.saveToDB ();  
+    }
+    
+    /**
+     * 
+     */
     createLinkerDialog () {           
       if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.loTarget} />);
+        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.loTarget} />);
       } else {
         console.log ("Internal error: no skills object can be empty but not null");
       }
@@ -526,7 +529,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         treeData={this.state.treeData}
                         onChange={ treeData => this.processDataChange({treeData}) }                        
                         nodeContentRenderer={LONodeRenderer}
-                        generateNodeProps={this.genProps.bind(this)}    
+                        generateNodeProps={this.genProps.bind(this)}
                     />
                 </div>
         );

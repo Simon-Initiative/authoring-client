@@ -457,7 +457,11 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     newTextObject [aText]=new Object ();
     newTextObject [aText]["#text"]=aValue;
     return (newTextObject);
-  }  
+  } 
+        
+  reparent () {
+    console.log ("reparent ()");
+  }    
     
   toPersistence() : Object {
     console.log ("toPersistence ()");
@@ -485,7 +489,9 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       ephemeral ["#skills"]=new Array<string>();
                           
       for (var j=0;j<this.los [i].annotations.length;j++) {
-        ephemeral ["#skills"].push (this.los [i].annotations [j].id);
+        console.log ("Adding annotation: " + JSON.stringify (this.los [i].annotations [j]));  
+          
+        ephemeral ["#skills"].push (this.los [i].annotations [j]);
       }            
             
       newData ["objectives"]["#array"].push ({"objective" : ephemeral});
