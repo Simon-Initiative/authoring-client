@@ -441,7 +441,11 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     newLO.id=anObjective ["@id"];
     newLO.category=anObjective ["@category"];
     newLO.title=anObjective ["#text"];
-        
+      
+    for (let i=0;i<anObjective ["#skills"].length;i++) {
+        newLO.annotations.push (anObjective ["#skills"][i]);
+    }  
+
     return (newLO);
   }
 
