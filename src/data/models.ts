@@ -440,7 +440,9 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
         
     newLO.id=anObjective ["@id"];
     newLO.category=anObjective ["@category"];
+    newLO.parent=anObjective ["@parent"];
     newLO.title=anObjective ["#text"];
+   
       
     for (let i=0;i<anObjective ["#skills"].length;i++) {
         newLO.annotations.push (anObjective ["#skills"][i]);
@@ -463,42 +465,102 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     return (newTextObject);
   } 
         
-  reparent () {
+  static reparent (fromSet:Array<LearningObjective>) : Array<LearningObjective> {
     console.log ("reparent ()");
+       
+    let toSet:Array<LearningObjective>=new Array ();  
+      
+    //let clean:boolean=false;  
+    //let loIndex:number=0;  
+
+    //while (clean==false)
+    for (let i=0;i<fromSet.length;i++)
+    {
+       // clean=true;
+       //loIndex=0;
+         
+       let testLO:LearningObjective=fromSet [i];
+       
+       // This LO has a parent, reparent ... 
+       if ((testLO.parent!="") && (testLO.parent!="unassigned")) {
+         console.log ("We have an LO with a parent: " +  testLO.parent );
+         
+         //clean=false;
+           
+         //let tempRemoved:LearningObjective=fromSet.splice (loIndex,1)[0];
+           
+         // this should be valid since we essentially have a clean fromSet  
+         for (let j=0;j<fromSet.length;j++) {
+           let tempLO:LearningObjective=fromSet [j];
+             
+           if (tempLO.id==testLO.parent) {
+             tempLO.children.push (testLO);  
+           }  
+         }         
+
+         //loIndex=0; 
+       } // This LO doesn't have a parent, just add it to the top-level array
+       else { 
+        //loIndex++;
+        toSet.push (testLO);   
+       }      
+    }
+
+    return (toSet);
   }    
+
+  pushLO (anLO:LearningObjective,anArray:Array<Object>):void {
+    console.log ("pushLO ()");
     
+    // First add the object we're given directly to the array ...  
+      
+    var testLOContainer:Object=new Object();
+    var ephemeral:Object=new Object ();
+              
+    ephemeral ["@id"]=anLO.id;
+    ephemeral ["@category"]=anLO.category;
+    ephemeral ["@parent"]=anLO.parent;
+    ephemeral ["#text"]=anLO.title;
+        
+    // Add all the annotations of type skill to the skill list. Currently
+    // we do not define a type on annotations so for now we will assume
+    // that all annotations are skills
+        
+    ephemeral ["#skills"]=new Array<string>();
+                          
+    for (let i=0;i<anLO.annotations.length;i++) {
+      //console.log ("Adding annotation: " + JSON.stringify (anLO.annotations [i]));  
+          
+      ephemeral ["#skills"].push (anLO.annotations [i]);
+    }            
+            
+    anArray.push ({"objective" : ephemeral});
+      
+    // Then we add any children this LO might have ...  
+      
+    console.log ("Adding " + anLO.children.length + " children ...");  
+      
+    for (let j=0;j<anLO.children.length;j++) {
+        this.pushLO(anLO.children [j],anArray);
+    }  
+  }
+
   toPersistence() : Object {
     console.log ("toPersistence ()");
 
+    let flatLOs:Array<Object>=new Array ();  
+      
     var newData:Object=new Object ();
     newData ["objectives"]=new Object();
     newData ["objectives"]["@id"]=this.id;
-    newData ["objectives"]["#array"]=new Array ();
+    newData ["objectives"]["#array"]=flatLOs;
     newData ["objectives"]["#array"].push (LearningObjectiveModel.addTextObject ("title",this.title));
         
     for (var i=0;i<this.los.length;i++)
     {
-      var testLOContainer:Object=new Object();
-      var ephemeral:Object=new Object ();
-              
-      ephemeral ["@id"]=this.los [i].id;
-      ephemeral ["@category"]=this.los [i].category;
-      ephemeral ["@parent"]=this.los [i].parent;
-      ephemeral ["#text"]=this.los [i].title;
-        
-      // Add all the annotations of type skill to the skill list. Currently
-      // we do not define a type on annotations so for now we will assume
-      // that all annotations are skills
-        
-      ephemeral ["#skills"]=new Array<string>();
-                          
-      for (var j=0;j<this.los [i].annotations.length;j++) {
-        console.log ("Adding annotation: " + JSON.stringify (this.los [i].annotations [j]));  
-          
-        ephemeral ["#skills"].push (this.los [i].annotations [j]);
-      }            
-            
-      newData ["objectives"]["#array"].push ({"objective" : ephemeral});
+      let tempLO=this.los [i];
+
+      this.pushLO (tempLO,flatLOs);  
     }
        
     console.log ("To: " + JSON.stringify (newData));
@@ -542,7 +604,8 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       }
     }
 
-    return new LearningObjectiveModel({'los': newData});
+    return new LearningObjectiveModel({'los': LearningObjectiveModel.reparent (newData)});
+    //return new LearningObjectiveModel({'los': newData});
   }
 }
 

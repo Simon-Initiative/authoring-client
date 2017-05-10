@@ -20,8 +20,6 @@ import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from './LearningObjectiveLinker';
 import { AppContext } from '../../common/AppContext';
 
-//var loData=require ('./LO.json');
-
 const tempnavstyle= {
     h2: {
         marginRight: '10px'
@@ -62,17 +60,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     constructor(props) {
         console.log ("LearningObjectiveEditor ()");
         
-        /*    
-        super(props, {
-                        model: {},    
-                        treeData: LearningObjectiveEditor.processData (loData),
-                        rootLO: LearningObjectiveEditor.createRootLO (loData),
-                        modalIsOpen : false,
-                        context: props.context,
-                        skills: null,
-                        loTarget: null
-                     });
-        */
         super(props, {
                         treeData: [],    
                         context: props.context,
@@ -84,18 +71,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         modalIsOpen: false                      
                      });                        
     }
-
+  
     /**
      *
-     */               
-    /*        
-    componentDidMount () {
-        console.log ("componentDidMount ("+this.state.documentId+")");
-        
-        this.loadDocument(this.state.documentId);
-    }
-    */
-            
+     */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
         persistence.retrieveDocument(this.state.context.courseId).then(course => {            
@@ -122,25 +101,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
 
-        /*
-        persistence.retrieveDocument(anID).then(course => {
-            console.log ("course: " + JSON.stringify (course));
-            
-            let loObject=course ["model"]["los"];
-                                    
-            let loDocId=loObject.get (0);
-           
-            persistence.retrieveDocument(loDocId).then(doc => {
-              this.setState ({treeData: doc ["model"]["los"],document: doc});
-              return (doc);
-            });    
-        }); 
-
-       return (null);
-       */
-        
-        console.log ("loadDocument ("+anID+")");
-
         persistence.retrieveDocument(anID).then(doc => {
             this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
             return (doc);
@@ -148,59 +108,14 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
        return (null);         
     }             
-       
-    /**
-     *
-     */      
-    componentWillReceiveProps(nextProps) {
-        console.log ("componentWillReceiveProps ();");    
-    }    
-    
-    /**
-     *
-     */     
-    /*       
-    static createRootLO (aData: any):Object {
-        
-        var newRootLO:LearningObjective=new LearningObjective ();
-        
-        for (var i in aData) {
-            
-            if (i=="objectives") {                
-                var loRoot=aData [i];
-                newRootLO.id=loRoot ["@id"];
-                
-                for (var j=0;j<loRoot ["#array"].length;j++) {
-                    var lObjectiveTest=loRoot ["#array"][j];
-                    
-                    for (var k in lObjectiveTest) {
-                        if (k=="title") {
-                            newRootLO.title= LearningObjectiveEditor.getTextFromNode (lObjectiveTest [k]);                            
-                        }
-                    }
-                }
-            }
-        }  
-        
-        return (newRootLO as Object);
-    }
-    */
 
     /**
      * 
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
-        
-      /*
-      this.reparent ();  
-              
-      this.extractData (newData);        
-        
-      this.setState (newData);
-      */
-            
-      this.saveToDB ();      
+                    
+      this.saveToDB (newData);      
     }
 
     /**
@@ -244,139 +159,65 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
       return ("");
     }
-    
-    /**
-     * 
-     */
-    /*
-    extractData (aData: Array<LearningObjective>): Object {
-        console.log ("extractData ()");
-                                
-        console.log ("From: " + JSON.stringify (aData));         
-        
-        var newData:Object=new Object ();
-        newData ["objectives"]=new Object();
-        newData ["objectives"]["@id"]=this.state.model.id;
-        newData ["objectives"]["#array"]=new Array ();
-        newData ["objectives"]["#array"].push (OrgItem.addTextObject ("title",this.state.model.title));
-        
-        for (var i=0;i<aData.length;i++)               
-        {
-            var testLOContainer:Object=new Object();
-            
-            var ephemeral:Object=new Object ();
-              
-            ephemeral ["@id"]=aData [i].id;
-            ephemeral ["@category"]=aData [i].category;
-            ephemeral ["#text"]=aData [i].title;
-        
-            // Add all the annotations of type skill to the skill list. Currently
-            // we do not define a type on annotations so for now we will assume
-            // that all annotations are skills
-        
-            ephemeral ["#skills"]=new Array<string>();
-                          
-            for (var j=0;j<aData [i].annotations.length;j++) {
-              
-              ephemeral ["#skills"].push (aData [i].annotations [j].id);
-            }            
-            
-            newData ["objectives"]["#array"].push (ephemeral);
-        }
-       
-        console.log ("To: " + JSON.stringify (newData));
-        
-        return (newData);
-    }
-    */
-    
-    /**
-     *
-     */
-    /*
-    saveToDB (): void {
-        //console.log ("saveToDB ()");
-        
-        let immutableDocument = this.state.document;
-        
-        if (immutableDocument==null)
-        {
-            console.log ("immutableDocument is null, bump");
-            return;
-        }
+ 
+    assignParent (aLOObject:LearningObjective,anId:string):void {
+      console.log ("assignParent ()");
 
-        var extractedData:any=this.extractData (this.state.treeData);
-        
-        //console.log ("extractedData: " + JSON.stringify (extractedData));
-                
-        // Keep in mind that extractData creates a skills object, but in our
-        // model we already have one so we need to extract the contents from
-        // inside that object. Bit confusing prehaps but we'll clean it up
-        // later.
-        var newModel=models.LearningObjectiveModel.updateModel (extractedData);
-                 
-        var updatedDocument=this.state.document.set ('model',newModel);
-        
-        //console.log ("updatedDocument: " + JSON.stringify (updatedDocument));
-               
-        this.setState ({'document' : updatedDocument },function () {         
-          persistence.persistDocument(this.state.document)
-            .then(result => {
-                console.log ("Document saved, loading to get new revision ... ");                
-                this.loadDocument (this.state.documentId);
-            });
-        }); 
-    }
-    */
+      aLOObject.parent=anId;
 
-    saveToDB (): void {
-        //console.log ("saveToDB ()");
+      for (let i=0;i<aLOObject.children.length;i++) {
+        let loHelper=aLOObject.children [i];
 
-        var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
-                 
-        var updatedDocument=this.state.document.set ('model',newModel);
-                       
-        this.setState ({'document' : updatedDocument },function () {         
-          persistence.persistDocument(this.state.document)
-            .then(result => {
-                console.log ("Document saved, loading to get new revision ... ");                
-                this.loadDocument (this.state.documentId);
-            });
-        }); 
-    }    
-    
-    /**
-     * This method goes from external format to the format used by the tree renderer
-     * Note that the tree widget needs to maintain any attributes we add to a node
-     * object. Otherwise we can't annotate and enrich the structuer. 
-     */
-    /*
-    processData (treeData: any) {
-      console.log ("processData ()");    
-    
-      var newData:Array<Object>=new Array ();
-                
-      for (var i in treeData) {
-            
-        if (i=="objectives") {                
-          var loRoot=treeData [i];
-                
-          for (var j=0;j<loRoot ["#array"].length;j++) {
-            var lObjectiveTest=loRoot ["#array"][j];
-                    
-            for (var k in lObjectiveTest) {
-                        
-            if (k=="objective") {
-              newData.push (LearningObjectiveEditor.parseLearningObjective (lObjectiveTest [k]));                            
-              }                        
-            }
-          }
-        }
+        this.assignParent(loHelper,aLOObject.id);
       }
-      return (newData);
     }
-    */
+
+    assignParents (newData:any):void {
     
+      let immutableHelper = this.state.treeData.slice();
+
+      if (newData) {
+        console.log ("We have alternative facts, let's use those instead ...");
+        //console.log ("New Tree: " + JSON.stringify (newData));
+        immutableHelper=newData ["treeData"];
+      }
+        
+      if (immutableHelper==null)
+      {
+        console.log ("Bump");
+        return;
+      }
+
+      console.log ("assignParents ("+immutableHelper.length+")");
+
+      for (let i=0;i<immutableHelper.length;i++) {
+        this.assignParent(immutableHelper [i],"");
+      }
+
+      return (immutableHelper);      
+    }
+
+    saveToDB (newData?:any): void {
+        //console.log ("saveToDB ()");
+        this.setState({
+          modalIsOpen : false, 
+          treeData: this.assignParents (newData)
+        },function (){          
+            console.log ("Parented: " + JSON.stringify (this.state.treeData));
+            var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+                     
+            var updatedDocument=this.state.document.set ('model',newModel);
+                           
+            this.setState ({'document' : updatedDocument },function () {         
+              persistence.persistDocument(this.state.document)
+                .then(result => {
+                    console.log ("Document saved, loading to get new revision ... ");                
+                    this.loadDocument (this.state.documentId);
+                });
+            });
+        });    
+    }    
+        
     /**
      * Note that this manual method of adding a new node does not generate an
      * onChange event. That's why we call extractData manually as the very
@@ -386,7 +227,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         
         console.log ("addNode ()");
                 
-        var immutableHelper = this.state.treeData.slice()
+        var immutableHelper = this.state.treeData.slice();
         
         if (immutableHelper==null)
         {

@@ -188,17 +188,6 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       
     this.setState({modalIsOpen: false});      
   }    
-    
-  /**
-   * 
-   */
-  /*      
-  getInitialState () {
-    return {
-      sourceData: this.props.sourceData || []
-    };
-  }
-  */
 
   /**
    * 
