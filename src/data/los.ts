@@ -21,6 +21,7 @@ export class LearningObjective extends Linkable {
   orgType:LOTypes=LOTypes.LO;  
   title:string="unassigned";    
   category:string="unassigned";
+  expanded:boolean=false;
   parent:string="unassigned"; // a link to an LO parent so that we can go back and forth between a tree and a list
   children:Array<LearningObjective>;
       
@@ -59,7 +60,8 @@ export class LearningObjective extends Linkable {
     ephemeral ["@id"]=this.id;
     ephemeral ["@category"]=this.category;
     ephemeral ["@parent"]=this.parent;
-    ephemeral ["#text"]=this.title;
+    ephemeral ["@expanded"]=this.expanded;
+    ephemeral ["#text"]=this.title;      
       
     // Add all the annotations of type skill to the skill list. Currently
     // we do not define a type on annotations so for now we will assume

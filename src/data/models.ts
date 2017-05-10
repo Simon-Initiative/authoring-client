@@ -441,6 +441,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     newLO.id=anObjective ["@id"];
     newLO.category=anObjective ["@category"];
     newLO.parent=anObjective ["@parent"];
+    newLO.expanded=anObjective ["@expanded"];
     newLO.title=anObjective ["#text"];
    
       
@@ -464,31 +465,24 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     newTextObject [aText]["#text"]=aValue;
     return (newTextObject);
   } 
-        
+
+  /**
+   * Takes a list of learning objective objects and creates a tree of those
+   * objects based on the parent parameter.
+   */   
   static reparent (fromSet:Array<LearningObjective>) : Array<LearningObjective> {
     console.log ("reparent ()");
        
     let toSet:Array<LearningObjective>=new Array ();  
-      
-    //let clean:boolean=false;  
-    //let loIndex:number=0;  
 
-    //while (clean==false)
     for (let i=0;i<fromSet.length;i++)
-    {
-       // clean=true;
-       //loIndex=0;
-         
+    {         
        let testLO:LearningObjective=fromSet [i];
        
        // This LO has a parent, reparent ... 
        if ((testLO.parent!="") && (testLO.parent!="unassigned")) {
          console.log ("We have an LO with a parent: " +  testLO.parent );
-         
-         //clean=false;
-           
-         //let tempRemoved:LearningObjective=fromSet.splice (loIndex,1)[0];
-           
+                    
          // this should be valid since we essentially have a clean fromSet  
          for (let j=0;j<fromSet.length;j++) {
            let tempLO:LearningObjective=fromSet [j];
@@ -496,12 +490,9 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
            if (tempLO.id==testLO.parent) {
              tempLO.children.push (testLO);  
            }  
-         }         
-
-         //loIndex=0; 
+         }          
        } // This LO doesn't have a parent, just add it to the top-level array
        else { 
-        //loIndex++;
         toSet.push (testLO);   
        }      
     }
@@ -520,6 +511,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     ephemeral ["@id"]=anLO.id;
     ephemeral ["@category"]=anLO.category;
     ephemeral ["@parent"]=anLO.parent;
+    ephemeral ["@expanded"]=anLO.expanded;
     ephemeral ["#text"]=anLO.title;
         
     // Add all the annotations of type skill to the skill list. Currently
