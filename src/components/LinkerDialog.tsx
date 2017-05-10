@@ -1,14 +1,14 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import * as persistence from '../../../data/persistence';
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import * as types from '../../../data/types';
-import { LOTypes, LearningObjective } from '../../../data/los';
-import {Skill} from '../../../data/skills';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
-import * as viewActions from '../../../actions/view';
+import * as persistence from '../data/persistence';
+import * as models from '../data/models';
+import * as contentTypes from '../data/contentTypes';
+import * as types from '../data/types';
+import { LOTypes, LearningObjective } from '../data/los';
+import {Skill} from '../data/skills';
+import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../data/domain';
+import * as viewActions from '../actions/view';
 import Modal from 'react-modal';
 
 const tempnavstyle= {
