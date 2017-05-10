@@ -5,6 +5,7 @@ import { getKey } from './common';
 import guid from '../utils/guid';
 import {Skill} from './skills';
 import {LearningObjective} from './los';
+import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, OrgOrganization} from './org';
 import {Title} from './contentTypes';
 
 export type EmptyModel = 'EmptyModel';

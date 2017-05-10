@@ -15,7 +15,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import { OrgItem } from '../organization/OrganizationTypes';
+import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org'
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from './LearningObjectiveLinker';
 import { AppContext } from '../../common/AppContext';

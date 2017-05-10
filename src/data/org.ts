@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import * as types from '../../../data/types';
+import * as types from './types';
 
 export const OrgContentTypes = types.strEnum([
   'Item',
