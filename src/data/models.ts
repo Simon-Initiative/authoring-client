@@ -105,18 +105,24 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
 }
 
 export type OrganizationModelParams = {
-  title?: contentTypes.Title
+  title?: contentTypes.Title,
+  organization: any,
+  toplevel: OrgOrganization    
 };
 
 const defaultOrganizationModel = {
   modelType: 'OrganizationModel',
   title: new contentTypes.Title(),
+  organization: [],
+  toplevel: null
 }
 
 export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {    
   modelType: 'OrganizationModel';
   title: contentTypes.Title;
-  
+  organization: Array <Object>;
+  toplevel:OrgOrganization;
+      
   constructor(params?: OrganizationModelParams) {
       params ? super(params) : super();
   }
@@ -124,12 +130,356 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   with(values: OrganizationModelParams) {
       return this.merge(values) as this;
   }
+    
+  static getTextFromNode (aNode: any) : string {        
+    console.log ("getTextFromNode: " + JSON.stringify (aNode));
+          
+    // Check for old style text nodes  
+    if (aNode ['#text']) { 
+      return (aNode ['#text']);
+    } 
 
-  static fromPersistence(json: Object) : OrganizationModel {
-    return new OrganizationModel();
+    return ("");
+  }    
+
+  /**
+   * This method exists to handle the specific structure we find in serialized OLI
+   * organization content. For example:
+   * {
+   *      "item" : {
+   *          "@scoring_mode" : "default",
+   *          "resourceref" : {
+   *              "@idref" : "test02a_embedded_workbook"
+   *          }
+   *      }
+   *  }
+   */
+  getNodeType (aNode: any): string {
+    //console.log ("getNodeType ()");
+        
+    for (var i in aNode) {            
+      return (i);
+    }
+        
+    return ("");
+  }
+    
+  /**
+   * 
+   */
+  static getNodeContentType (aNode:any):string {
+        
+    //console.log ("getNodeContentType: " + JSON.stringify (aNode));
+        
+    if (aNode==null) {
+      return "";
+    }
+        
+    if (aNode ["title"]) {
+     return ("title");
+    }
+        
+    if (aNode ["section"]) {
+      return ("section");
+    }        
+        
+    if (aNode ["sequence"]) {
+      return ("section");
+    }        
+        
+    if (aNode ["module"]) {
+      return ("module");
+    }
+        
+    if (aNode ["item"]) {
+     return ("item");
+    }        
+        
+    return ("");
+  }    
+
+  /**
+   * Parses a structure that looks like this:
+   * {
+   *   "item": {
+   *            "@scoring_mode": "default",
+   *            "resourceref": {
+   *              "@idref": "test03_sections_workbook"
+   *            }
+   *   }
+   * },
+   */
+  static parseItem (anItem: any): OrgItem {
+    //console.log ("parseItem ()");
+        
+    var newNode: OrgItem=new OrgItem ();
+        
+    for (var i in anItem) {           
+      //console.log ("item: " + i);
+            
+      if (i=="@scoring_mode") {
+        newNode.scoringMode=anItem [i];
+      }
+            
+      if (i=="resourceref") {
+        newNode.title=anItem [i]["@idref"];
+        newNode.resourceRef.idRef=anItem [i]["@idref"];
+      }            
+    }
+        
+    return (newNode);
+  }
+   
+  /**
+   * 
+   */
+  static parseSection (aSection: any): OrgSection {
+    console.log ("parseSection ()");
+               
+    var newNode: OrgSection=new OrgSection ();
+    newNode.id=aSection ["@id"];
+        
+    for (var i=0;i<aSection ["#array"].length;i++)
+    {
+      var potentialSection=aSection ["#array"] [i];
+            
+      for (var j in potentialSection) {
+        if (j=="title") {
+          newNode.title=OrganizationModel.getTextFromNode (potentialSection [j]);  
+        }
+                
+        if (j=="item") {
+          newNode.addNode (OrganizationModel.parseItem (potentialSection [j]));
+        }
+      }
+    }
+    return (newNode);
   }
 
+  /**
+   * 
+   */
+  static parseModule (aModule: any) : OrgItem {
+    console.log ("parseModule ()");
+
+    let moduleNode:OrgModule=new OrgModule (); 
+    moduleNode.id=aModule ["@id"]; 
+    for (var t=0; t<aModule ["#array"].length;t++) {
+      var mdl=aModule ["#array"] [t];
+          
+      var typeSwitch:string=OrganizationModel.getNodeContentType (mdl);
+                                   
+      if (typeSwitch=="title") {
+        //console.log ("Found module title: " + this.getTextFromNode (mdl ["title"]));                                  
+        moduleNode.title=OrganizationModel.getTextFromNode (mdl ["title"]); 
+      }                                 
+          
+      if (typeSwitch=="item") {              
+        moduleNode.addNode (OrganizationModel.parseItem (mdl ["item"]));
+      }                
+            
+      if (typeSwitch=="section") {              
+        moduleNode.addNode (OrganizationModel.parseSection (mdl ["section"]));
+      }
+    }
+        
+    //console.log ("Result " + JSON.stringify (moduleNode));  
+        
+    return (moduleNode);
+  }
+        
+  /**
+   *
+   */   
+  static updateModel (newTopLevel:OrgOrganization,newOrgModel:any): OrganizationModel {
+    console.log ("updateModel ()");
+    var newModel=new OrganizationModel ({'toplevel': newTopLevel,'organization' : newOrgModel});      
+    return newModel;
+  }  
+
+  /**
+   * People might notice that this code is a bit odd because it will return
+   * the last organization object under the root. Right now that is by design.
+   * That might change as the specs change but at least we won't have to
+   * redo the code.
+   */
+  static parseTopLevelOrganization (aData:any) : OrgOrganization {
+        
+    var orgNode=new OrgOrganization ();// throw away for now
+                       
+    if (aData) {  
+      for (var i in aData) { 
+        orgNode=new OrgOrganization ();// throw away for now
+        orgNode.id=aData [i]["@id"];
+        orgNode.version=aData [i]["@version"];
+        var oList=aData [i]["#array"];
+                            
+        if (i=='organization') {
+          for (var k=0;k<oList.length;k++) {                   
+            var obj=oList [k];                 
+                                          
+            for (var j in obj) {
+              var destNode = obj [j];
+                                         
+              if (j=='title') {
+                orgNode.title=OrganizationModel.getTextFromNode (destNode);
+              }
+                    
+              if (j=='description') {
+                orgNode.description=OrganizationModel.getTextFromNode (destNode);
+              }
+                    
+              if (j=='audience') {
+                orgNode.audience=OrganizationModel.getTextFromNode (destNode);
+              }                
+            }
+          }
+        }                   
+      }
+    }   
+        
+    return (orgNode);
+  }    
+    
+  /**
+   *
+   */    
+  static fromPersistence(json: Object) : OrganizationModel {
+    console.log ("fromPersistance ()");    
+    var newData:Array<OrgSequence>=new Array ();
+    var newTopLevel:OrgOrganization=OrganizationModel.parseTopLevelOrganization (json);  
+                        
+    for (var i in json) {
+      var oList=json [i]["#array"];
+                        
+      if (i=='organization') {
+        for (var k=0;k<oList.length;k++) {                   
+          var obj=oList [k];                 
+                                      
+          for (var j in obj) {
+            var destNode = obj [j];
+
+            if (j=='sequences') {  
+              for (var sequenceObject in destNode) {                          
+                if (sequenceObject=="sequence") { // checking to make absolutely sure we're in the right place
+                  let newSequence:OrgSequence=new OrgSequence ();
+                  newData.push (newSequence);
+                  newSequence.id = destNode [sequenceObject]["@id"];
+                  newSequence.category = destNode [sequenceObject]["@category"];
+                  newSequence.audience = destNode [sequenceObject]["@audience"];                           
+                  var sequenceList: Array<any> = destNode [sequenceObject]["#array"];   
+                                                                
+                  for (var t=0; t<sequenceList.length;t++) {
+                    var seq=sequenceList [t];
+        
+                    for (var s in seq) {
+                      var mdl=seq [s];
+                                                                    
+                      if (s=="title") {
+                        console.log ("Found sequence title: " + OrganizationModel.getTextFromNode (mdl));                                  
+                        newSequence.title=OrganizationModel.getTextFromNode (mdl); 
+                      }                                 
+                                      
+                      if (s=="module") {
+                        let newModule=OrganizationModel.parseModule (mdl);
+                        newSequence.children.push (newModule);
+                      }
+                    }
+                  }
+                }
+              }  
+            }   
+          }
+        }
+      }
+    }
+       
+    return (OrganizationModel.updateModel (newTopLevel,newData));
+  }
+
+  /**
+   *
+   */    
   toPersistence() : Object {
+    console.log ("toPersistence ()");    
+
+    var newData=this.organization;
+                
+    // First process our organization object and add it to the tree we're building
+        
+    let orgObject:OrgOrganization=this.toplevel;
+              
+    let orgRoot:Object=orgObject.toJSONObject ();
+    let seqRoot=new Object ();
+    orgRoot ["organization"]["#array"].push (seqRoot);
+        
+    let sequences:Object=new Object ();
+    seqRoot ["sequences"]=sequences;
+                        
+    // We can point directly to .children because we ensure in the constructor that 
+    // this object always exists             
+    for (let j=0;j<newData.length;j++) {            
+      let seqObject:OrgSequence=newData [j] as OrgSequence;
+                        
+      //let sequence:Object=seqObject.toJSONObject (); // This doesn't work for some reason 
+      let sequence:Object=new Object ();          
+      sequence ["@id"]=seqObject.id;
+      sequence ["@category"]=seqObject.category;
+      sequence ["@audience"]=seqObject.audience;
+      sequence ["#array"]=new Array ();
+      sequence ["#array"].push (OrgItem.addTextObject ("title",seqObject.title));
+              
+      sequences["sequence"]=sequence;   
+                       
+      for (let k=0;k<seqObject.children.length;k++) {
+        let mObj:OrgItem=seqObject.children [k];
+                            
+        // Check the type here. We can expect Module, Section and Item  
+        console.log ("Object: " + mObj.orgType);
+             
+        let moduleContainer:Object=new Object ();
+        let moduleObj:Object=new Object ();
+        moduleContainer ["module"]=moduleObj;
+
+        sequence ["#array"].push (moduleContainer);
+             
+        moduleObj["@id"]=mObj.id;
+        moduleObj["#array"]=new Array ();
+        moduleObj["#array"].push (OrgItem.addTextObject ("title",mObj.title));
+  
+        for (let l=0;l<mObj.children.length;l++) {
+          console.log ("Section: " + mObj.children [l].title);
+                
+          let sObj:OrgItem=mObj.children [l];                
+               
+          let sectionObj:Object=new Object();               
+          let sectionContainer:Object=new Object ();
+          sectionContainer ["section"]=sectionObj;  
+           
+          moduleObj["#array"].push (sectionContainer);
+               
+          sectionObj ["#id"]=sObj.id; 
+          sectionObj ["#array"]=new Array ();
+          sectionObj ["#array"].push (OrgItem.addTextObject ("title",sObj.title));                   
+
+          for (let m=0;m<sObj.children.length;m++) {
+            let iObj=sObj.children [m];
+
+             if (iObj.orgType==OrgContentTypes.Item) {
+               var itemObj:OrgItem=iObj as OrgItem; 
+               sectionObj ["#array"].push (iObj.toJSONObject ());   
+             }
+             else {
+               console.log ("Error: undefined type found at this level: " + iObj.orgType);
+             }    
+           }
+         }
+       }
+    }
+        
+    var formattedOrganization=JSON.stringify (orgRoot);        
+    console.log ("To: " + formattedOrganization);      
+      
     return {};
   }
 }

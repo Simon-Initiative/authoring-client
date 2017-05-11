@@ -238,8 +238,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         var newNode:LearningObjective=new LearningObjective ();
         newNode.title="New Learning Objective";
         immutableHelper.push (newNode);
-
-        //this.extractData (immutableHelper);
         
         this.setState({
           modalIsOpen : false, 
@@ -322,7 +320,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
-        optionalProps ["linkSkill"]=this.linkSkill.bind (this);
+        optionalProps ["linkAnnotation"]=this.linkSkill.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
 
         return (optionalProps);

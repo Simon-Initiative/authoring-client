@@ -283,9 +283,9 @@ const styles = {
 class LONodeRenderer extends Component <any, any> 
 {       
     deleteNodeFunction:any=null;
-    parentTreeData:any=null;
+    //parentTreeData:any=null;
     editNodeTitle:any=null;
-    linkSkill:any=null;
+    linkAnnotation:any=null;
         
     /* 
     static propTypes = {
@@ -321,7 +321,7 @@ class LONodeRenderer extends Component <any, any>
             editNodeTitle,
             deleteNode,
             treeData,
-            linkSkill,     
+            linkAnnotation,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -348,9 +348,9 @@ class LONodeRenderer extends Component <any, any>
 
        let handle;
 
-       this.linkSkill=linkSkill;
+       this.linkAnnotation=linkAnnotation;
        this.editNodeTitle=editNodeTitle;
-       this.parentTreeData=treeData;
+       //this.parentTreeData=treeData;
        this.deleteNodeFunction=deleteNode;
 
        canDrag=true;
@@ -459,7 +459,7 @@ class LONodeRenderer extends Component <any, any>
                                    />
             
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkSkill (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
+                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
                         </div>
                     )}
                 </div>

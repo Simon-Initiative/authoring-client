@@ -17,8 +17,9 @@ import NodeRendererDefault from 'react-sortable-tree';
 
 import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
+import LearningObjectiveLinker from '../../../components/LinkerDialog';
 
-var orgData=require ('./organization.json');
+import { AppContext } from '../../common/AppContext';
 
 const tempnavstyle=
 {
@@ -34,16 +35,25 @@ interface OrganizationEditor
 }
 
 export interface OrganizationEditorState extends AbstractEditorState 
-{
-  treeData : any;
+{    
+  treeData : any;  
   orgData: OrgOrganization;  
+  modalIsOpen : boolean;
+  model: any;
+  context: AppContext;
+  los: any;
+  orgTarget : any;
+  document: any;
+  documentId: string;    
 }
 
 export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>
 {
   dispatch: any;
   documentId: string;
+  document: any;
   userId: string;    
+  context: AppContext;
 }
 
 /**
@@ -56,56 +66,85 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     constructor(props) {
       super(props, {
-        treeData: OrganizationEditor.processData(orgData),
-        orgData: OrganizationEditor.createEmtpyOrganization(orgData)
+        treeData: [],
+        orgData: [],
+        context: props.context,
+        los: null,
+        orgTarget: null,
+        documentId: props.context.documentId,
+        model: props.model,
+        document: {},                
+        modalIsOpen: false    
       });
     }
         
     /**
-     * 
-     */
-    componentDidMount() {
-        console.log ("componentDidMount ()");
-        
-        //this.fetchTitles(this.props.documentId);
-        
-        //this.processData (orgData);
-    }    
+     *
+     */    
+    componentDidMount() {                    
+      console.log ("componentDidMount ()");
+        persistence.retrieveDocument(this.state.context.courseId).then(course => {            
+            let orgObject=course ["model"]["organizations"];                                    
+            let orgDocId=orgObject.get (0);
+           
+            persistence.retrieveDocument(orgDocId).then(doc => {
+              this.setState ({treeData: doc ["model"]["organization"],document: doc});
+            }); 
+            
+            let loObject=course ["model"]["learningobjectives"];                                    
+            let logDocId=loObject.get (0);
+           
+            persistence.retrieveDocument(logDocId).then(loDoc => {
+              this.setState ({los: loDoc ["model"]["los"]});
+            });              
+        });        
+    }
     
     /**
-     * 
-     */
-    fetchTitles(documentId: types.DocumentId) {
-        //console.log ("fetchTitles ();");
-        
-        persistence.queryDocuments(titlesForCoursesResources(documentId)).then(docs => {
-            /*
-            this.setState(
-            {
-                resources: docs.map(d => ({ _id: d._id, title: (d as any).title.text, type: (d as any).modelType}))
-            })
-            */
+     *
+     */            
+    loadDocument (anID:string):any {
+        console.log ("loadDocument ("+anID+")");
+
+        persistence.retrieveDocument(anID).then(doc => {
+            this.setState ({modalIsOpen: false, orgData: doc.model ["toplevel"], treeData: doc.model ["organization"],document: doc});
+            return (doc);
         });
+
+       return (null);         
     }
+    
+    saveToDB (newData?:any): void {
+
+      var newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+                     
+      var updatedDocument=this.state.document.set ('model',newModel);
+                           
+      this.setState ({'document' : updatedDocument },function () {         
+        persistence.persistDocument(this.state.document)
+          .then(result => {
+            console.log ("Document saved, loading to get new revision ... ");                
+            this.loadDocument (this.state.documentId);
+        });
+      });    
+    }      
 
     /**
      * 
      */
-    componentWillReceiveProps(nextProps) {
-       // console.log ("componentWillReceiveProps ();");
-        
-        if (this.props.documentId !== nextProps.documentId) 
-        {
-          //this.fetchTitles(nextProps.documentId);
-        }
+    processDataChange (newData: any) {
+      console.log ("processDataChange ()");
+                    
+      this.saveToDB (newData);      
     }    
-    
+        
     /**
      * People might notice that this code is a bit odd because it will return
      * the last organization object under the root. Right now that is by design.
      * That might change as the specs change but at least we won't have to
      * redo the code.
      */
+    /*
     static createEmtpyOrganization (aData:any) : OrgOrganization {
         
       var orgNode=new OrgOrganization ();// throw away for now
@@ -143,11 +182,13 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
       }   
         
       return (orgNode);
-    }           
+    }
+    */  
     
     /**
      * 
      */
+    /*
     static getTextFromNode (aNode: any) : string {
         
       console.log ("getTextFromNode: " + JSON.stringify (aNode));
@@ -159,6 +200,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
 
       return ("");
     }
+    */
         
     /**
      * Here we go from visual data to database-ready data. We walk the tree
@@ -166,6 +208,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * recursively but since we have to tag every level with a certain type
      * in output tree it was easier to do this in one function for now.
      */
+    /*
     extractData (aData: any): Object {
         console.log ("extractData ()");
                 
@@ -254,236 +297,24 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         return (orgRoot);
     }
+    */
     
     /**
      * 
      */
+    /*
     resolveItem (anItem:any):string {
         
         return ("");
     }
+    */
     
-    /**
-     * This method exists to handle the specific structure we find in serialized OLI
-     * organization content. For example:
-     * {
-     *      "item" : {
-     *          "@scoring_mode" : "default",
-     *          "resourceref" : {
-     *              "@idref" : "test02a_embedded_workbook"
-     *          }
-     *      }
-     *  }
-     */
-    getNodeType (aNode: any): string {
-        //console.log ("getNodeType ()");
-        
-        for (var i in aNode) {            
-            return (i);
-        }
-        
-        return ("");
-    }
-    
-    /**
-     * 
-     */
-    static getNodeContentType (aNode:any):string {
-        
-        //console.log ("getNodeContentType: " + JSON.stringify (aNode));
-        
-        if (aNode==null) {
-            return "";
-        }
-        
-        if (aNode ["title"]) {
-          return ("title");
-        }
-        
-        if (aNode ["section"]) {
-          return ("section");
-        }        
-        
-        if (aNode ["sequence"]) {
-          return ("section");
-        }        
-        
-        if (aNode ["module"]) {
-          return ("module");
-        }
-        
-        if (aNode ["item"]) {
-          return ("item");
-        }        
-        
-        return ("");
-    }    
-
-    /**
-     * Parses a structure that looks like this:
-     * {
-     *   "item": {
-     *            "@scoring_mode": "default",
-     *            "resourceref": {
-     *              "@idref": "test03_sections_workbook"
-     *            }
-     *   }
-     * },
-     */
-    static parseItem (anItem: any): OrgItem {
-        //console.log ("parseItem ()");
-        
-        var newNode: OrgItem=new OrgItem ();
-        
-        for (var i in anItem) {
-            
-            //console.log ("item: " + i);
-            
-            if (i=="@scoring_mode") {
-                newNode.scoringMode=anItem [i];
-            }
-            
-            if (i=="resourceref") {
-                newNode.title=anItem [i]["@idref"];
-                newNode.resourceRef.idRef=anItem [i]["@idref"];
-            }            
-        }
-        
-        return (newNode);
-    }
-    
-    /**
-     * 
-     */
-    static parseSection (aSection: any): OrgSection {
-        console.log ("parseSection ()");
-        
-        //console.log ("parseSection: " + JSON.stringify (aSection));
-        
-        var newNode: OrgSection=new OrgSection ();
-        newNode.id=aSection ["@id"];
-        
-        for (var i=0;i<aSection ["#array"].length;i++)
-        {
-            var potentialSection=aSection ["#array"] [i];
-            
-            for (var j in potentialSection) {
-                if (j=="title") {
-                  newNode.title=OrganizationEditor.getTextFromNode (potentialSection [j]);  
-                }
-                
-                if (j=="item") {
-                  newNode.addNode (OrganizationEditor.parseItem (potentialSection [j]));
-                }
-            }
-        }
-
-        return (newNode);
-    }
-
-    /**
-     * 
-     */
-    static parseModule (aModule: any) : OrgItem {
-      console.log ("parseModule ()");
-                
-      //console.log ("Parsing " + aModule ["#array"].length + " module sub items ...");  
-        
-      let moduleNode:OrgModule=new OrgModule (); 
-      moduleNode.id=aModule ["@id"]; 
-      for (var t=0; t<aModule ["#array"].length;t++) {
-
-        var mdl=aModule ["#array"] [t];
-          
-        var typeSwitch:string=OrganizationEditor.getNodeContentType (mdl);
-                                   
-        if (typeSwitch=="title") {
-          //console.log ("Found module title: " + this.getTextFromNode (mdl ["title"]));                                  
-          moduleNode.title=OrganizationEditor.getTextFromNode (mdl ["title"]); 
-        }                                 
-          
-        if (typeSwitch=="item") {              
-          moduleNode.addNode (OrganizationEditor.parseItem (mdl ["item"]));
-        }                
-            
-        if (typeSwitch=="section") {              
-          moduleNode.addNode (OrganizationEditor.parseSection (mdl ["section"]));
-        }
-      }
-        
-      //console.log ("Result " + JSON.stringify (moduleNode));  
-        
-      return (moduleNode);
-    }
-    
-    /**
-     * This method goes from external format to the format used by the tree renderer
-     * Note that the tree widget needs to maintain any attributes we add to a node
-     * object. Otherwise we can't annotate and enrich the structuer. 
-     */
-    static processData (treeData: any) {
-
-        var newData:Array<OrgSequence>=new Array ();
-                        
-        for (var i in treeData) {
-          var oList=treeData [i]["#array"];
-                        
-            if (i=='organization') {
-               for (var k=0;k<oList.length;k++) {                   
-                 var obj=oList [k];                 
-                                      
-                 for (var j in obj) {
-                   var destNode = obj [j];
-
-                   if (j=='sequences') {
-                     //console.log ("org node: " + JSON.stringify (orgNode));
-  
-                     for (var sequenceObject in destNode)
-                     {                          
-                       if (sequenceObject=="sequence") // checking to make absolutely sure we're in the right place
-                       {
-                         let newSequence:OrgSequence=new OrgSequence ();
-                         newData.push (newSequence);
-                         newSequence.id = destNode [sequenceObject]["@id"];
-                         newSequence.category = destNode [sequenceObject]["@category"];
-                         newSequence.audience = destNode [sequenceObject]["@audience"];                           
-                         var sequenceList: Array<any> = destNode [sequenceObject]["#array"];   
-                                                                
-                         for (var t=0; t<sequenceList.length;t++) {
-                           var seq=sequenceList [t];
-        
-                           for (var s in seq) {
-                             var mdl=seq [s];
-                                                                    
-                             if (s=="title") {
-                               console.log ("Found sequence title: " + OrganizationEditor.getTextFromNode (mdl));                                  
-                               newSequence.title=OrganizationEditor.getTextFromNode (mdl); 
-                             }                                 
-                                      
-                             if (s=="module") {
-                               let newModule=OrganizationEditor.parseModule (mdl);
-                               newSequence.children.push (newModule);
-                             }
-                           }
-                         }
-                       }
-                     }  
-                   }   
-                 }
-               }
-            }
-          }
-        
-        //console.log ("Transformed data: " + JSON.stringify (newData));
-        
-        return (newData);
-    }
-
     /**
      * This method is called by the tree component and even though we could access
      * the state directly we're going to assume that the tree component made some
      * changes that haven't been reflected in the global component state yet.
      */
+    /*
     processDataChange (newData: any) {
                 
         console.log ("processDataChange ()");
@@ -492,6 +323,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         
         this.setState (newData);                
     }
+    */
 
     /**
      * 
@@ -541,9 +373,18 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         newNode.title="New Sequence";
         immutableHelper.push (newNode);
 
+        /*
         this.extractData (immutableHelper);
         
         this.setState({treeData: immutableHelper});
+        */
+        
+        this.setState({
+          modalIsOpen : false, 
+          treeData: immutableHelper
+        },function (){
+          this.saveToDB ();
+        });
     }    
 
     findTreeParent (aTree:any,aNode:any) : Array<Object> {
@@ -655,15 +496,39 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
 
         return (optionalProps);
-    }      
+    }
     
+    /**
+     * 
+     */
+    closeModal () {
+      console.log ("LearningObjectiveEditor: closeModal ()");
+        
+      //this.saveToDB ();  
+    }    
+    
+    /**
+     * 
+     */
+    createLinkerDialog () {           
+      if (this.state.los!=null) {            
+        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.los} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.orgTarget} />);
+      } else {
+        console.log ("Internal error: no skills object can be empty but not null");
+      }
+                   
+      return (<div></div>);           
+    }
+            
     /**
      * 
      */
     render() 
     { 
       //console.log ("render()");
-          
+      
+      const lolinker=this.createLinkerDialog ();  
+        
       return (
               <div>
                   <div>
@@ -672,6 +537,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                   </div>
+                  {lolinker}
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}

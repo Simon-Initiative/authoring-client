@@ -8,19 +8,19 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 
 const styles = {
+    
   orgrowWrapper : {
     "padding": "10px 10px 10px 0",
     "height": "100%",
     "boxSizing": "border-box"
   },
   orgrow : {
+    "border" : '0px solid green',  
     "height": "100%",
-    "whiteSpace": "nowrap",
-    "display": "flex",
-    "& > *": {
-        "boxSizing": "border-box"
-    }
-    
+    "flexDirection" : "row",  
+    "display": "flex",    
+    "justifyContent": "space-between",
+    "background": "#ffffff",  
   },     
   orgrowLandingPad : {
     "border": "none !important",
@@ -73,37 +73,19 @@ const styles = {
   orgrowContents : {          
     "position": "relative",
     "height": "100%",
-    "border": "solid #bbb 1px",
+    "border": "solid #bbb 0px",
     "borderLeft": "none",
     "boxShadow": "0 2px 2px -2px",
     "padding": "0 5px 0 10px",
     "borderRadius": "2px",
     "minWidth": "230px",
-    "flex": "1 0 auto",
-    "display": "flex",
-    "alignItems": "center",
+    //"maxWidth": "500px",
+    "alignItems": "left",
     "verticalAlign": "middle",
-    "backgroundColor": "white",
-    "justifyContent": "space-between"    
+    "backgroundColor": "white"
   },
   orgrowContentsDragDisabled : {
     "borderLeft": "solid #bbb 1px"
-  },
-  orgrowLabel : {  
-     //@extend %orgrowItem;
-    "display": "inline-block",
-    "verticalAlign": "middle",
-    
-    "flex": "0 1 auto",
-    "paddingRight": "20px"
-  },
-  orgrowToolbar : { 
-     //@extend %orgrowItem;
-     //"display": "inline-block",
-    "verticalAlign": "middle",
-    
-    "flex": "0 1 auto",
-    "display": "flex"
   },
   orgmoveHandle : {
     //@extend %orgrowItem;
@@ -119,27 +101,32 @@ const styles = {
     "borderRadius": "1px",
     "zIndex": 1,
   },
+  backupHamburger : {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAA4klEQVR4nGP8//8/AymAiSTVDAwMLJt37i+rqvn7n4GRkRGPuv///zMyMvS0tTDqWLuIioqzs7MTNPvnzx8f379jiggLZ2VnZWJhIohYOFiDgoIZ/5Pia0YGBhYIRTxg2bL7YFl17f//BDX+Z2Jg6GxrZjSw95SQlGLj5CRo9q9v39+9ecUUHhrKysHOysRMELGxs/sHBzL+IzGmWUjyMQMDA8uW3YcqGpqIVN3RUMdo5hYgLS/PzsnNhDeU/jH8//nt26tnTxi7Ziw6f/EaMyc7/mT4j4Hh7/efhvrajKQmbwBQa0jTnL7HxQAAAABJRU5ErkJggg==') no-repeat center",
+  },  
   orgloadingHandle : {
-    //@extend %orgrowItem;
-    "display": "inline-block",
-    "verticalAlign": "middle",
-    
-    //@extend %orgmoveHandle;      
-    "height": "100%",
-    "width": "44px",
-    "border": "solid #aaa 1px",
-    "boxShadow": "0 2px 2px -2px",
+    "height": "42px",
+    "width": "45px",
+    "border": "0px solid green",
     "borderRadius": "1px",
-    "zIndex": 1,      
-            
-    "cursor": "default",
-    "background": "#d9d9d9",
+    "zIndex": 1,                  
+    "cursor": "pointer",
+    "background": "#ffffff",
+    "verticalAlign" : "middle",
+    "textAlign": "center",  
+    "display": "flex",
+    "alignItems": "center" 
   },
   orgloadingCircle : {
     "width": "80%",
     "height": "80%",
     "margin": "10%",
-    "position": "relative"
+    "position": "relative",
+    "border" : "1px solid green"
   },
   orgloadingCirclePoint : {
     "width": "100%",
@@ -147,6 +134,8 @@ const styles = {
     "position": "absolute",
     "left": "0",
     "top": "0",
+    
+    "border" : "1px solid blue",
     
     "pointcount": "12",
     "spinAnimationTime": "800ms",
@@ -183,9 +172,28 @@ const styles = {
     "display": "inline-block",
     "verticalAlign": "middle",          
   },
-  orgrowTitle : {
-    "fontWeight": "bold"
+  orgrowTitle : {    
+    "border": "0px solid red",
+    "display": "inline-block",
+    "width": "inherited",
+    "height": "100%",    
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "marginRight": "auto", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
   },
+  orgrowControl : {    
+    "border": "1px solid red",
+    "width": "26px",
+    "height": "42px",    
+    "overflowY": "hidden",
+    "overflowX": "hidden", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
+  },  
   orgrowTitleWithSubtitle : {
     "fontSize": "85%",
     "display": "block",
@@ -243,19 +251,6 @@ const styles = {
         "width": "20px"
     }    
   },
-  orgrow_NoFlex : {
-    
-  },
-  orgrowContents_NoFlex : {
-    "display": "inline-block"
-  },
-  orgrowLabel_NoFlex : {    
-    "width": "50%"
-  },
-  orgrowToolbar_NoFlex : {  
-    "textAlign": "right",
-    "width": "50%"
-  },
   orglineChildren : {
     "height": "100%",
     "display": "inline-block",
@@ -270,17 +265,26 @@ const styles = {
         "bottom": "0",
         "height": "10px"
     }    
-  }     
+  },
+  loTitleRenderer : {
+      'border' : '0px solid black',
+      "overflowY": "hidden",
+      "overflowX": "hidden",
+      "minWidth": "300px",      
+      "maxWidth": "340px",
+      'height' : '42px'
+  }  
 };
 
 /**
  * 
  */
-//class OrganizationNodeRenderer extends Component <NRendererState, NRendererProps> 
 class OrganizationNodeRenderer extends Component <any,any>
 {
     deleteNodeFunction:any=null;
+    //parentTreeData:any=null;
     editNodeTitle:any=null;
+    linkAnnotation:any=null;
 
     render() {
         
@@ -289,6 +293,8 @@ class OrganizationNodeRenderer extends Component <any,any>
         var {
             editNodeTitle,
             deleteNode,
+            treeData,
+            linkAnnotation,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -315,6 +321,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         let handle;
 
+        this.linkAnnotation=linkAnnotation;
         this.editNodeTitle=editNodeTitle;        
         this.deleteNodeFunction=deleteNode;
 
@@ -422,9 +429,11 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
+        const context = { userId: null, documentId: null, courseId: null};
 
         //>--------------------------------------------------------------------
 
+        /*
         return (
             <div
                 style={{ height: '100%' }}
@@ -448,7 +457,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                 )}
 
                 <div style={styles.orgrowWrapper as any}>
-                    {/* Set the row preview to be used during drag and drop */}
+                    {}
                     {connectDragPreview(
                         <div style={gStyle}>
 
@@ -465,12 +474,56 @@ class OrganizationNodeRenderer extends Component <any,any>
                                     />
                                </div>
                                <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>  
                             </div>
                         </div>
                     )}
                 </div>
             </div>
         );
+        */
+
+        return (
+            <div style={{ height: '100%', width: '450px' }} {...otherProps}>
+                {toggleChildrenVisibility && node.children && node.children.length > 0 && (
+                    <div>
+                        <button
+                            type="button"                            
+                            style={handleStyle}
+                            onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
+                        />
+
+                        {node.expanded && !isDragging &&
+                            <div style={nStyle} />
+                        }
+                    </div>
+                )}
+
+                <div style={styles.orgrowWrapper as any}>
+                    {/* Set the row preview to be used during drag and drop */}
+                    {connectDragPreview(
+                        <div style={gStyle}>
+
+                            {handle}
+            
+                                 <TitleContentEditor 
+                                   services={services}
+                                   editMode={true}
+                                   model={titleObj}
+                                   context={context}
+                                   styles={styles.loTitleRenderer}
+                                   onEdit={(content) => this.editNodeTitle(node,content)} 
+                                   />
+            
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+
+
     }
 }
 
