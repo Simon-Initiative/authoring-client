@@ -5,6 +5,7 @@ import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as contentTypes from '../data/contentTypes';
 import * as types from '../data/types';
+import Linkable from '../data/linkable';
 import { LOTypes, LearningObjective } from '../data/los';
 import {Skill} from '../data/skills';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../data/domain';
@@ -54,14 +55,14 @@ interface LearningObjectiveLinker {
 export interface LearningObjectiveLinkerProps {        
   sourceData : any;
   modalIsOpen : boolean;    
-  loTarget: any;
+  target: any;
   closeModal: any;  
 }
 
 export interface LearningObjectiveLinkerState {
   sourceData: any;   
   modalIsOpen : boolean;    
-  loTarget: any;
+  target: any;
   closeModal: any;
 }
 
@@ -78,12 +79,12 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         
     super(props);
       
-    console.log ("Lo target: " + JSON.stringify (this.props.loTarget));   
+    console.log ("Linking target: " + JSON.stringify (this.props.target));   
       
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
-                   loTarget: this.props.loTarget,                                           
+                   target: this.props.target,                                           
                    closeModal: this.props.closeModal
                  };
             
@@ -97,7 +98,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ()");
-      this.setState({sourceData: newProps.sourceData,modalIsOpen: newProps ["modalIsOpen"], loTarget: newProps.loTarget});
+      this.setState({sourceData: newProps.sourceData,modalIsOpen: newProps ["modalIsOpen"], target: newProps.target});
   }
    
   /**
@@ -109,7 +110,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   resolveAnnotations () {
     console.log ("resolveAnnotations ()");
     
-    if (this.state.loTarget==null) {
+    if (this.state.target==null) {
       console.log ("No LO target given yet, bump");  
       return;
     }  
@@ -124,8 +125,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(resetItem);         
     });      
             
-    for (var i=0;i<this.state.loTarget.annotations.length;i++) {    
-       let item=this.state.loTarget.annotations [i];  
+    for (var i=0;i<this.state.target.annotations.length;i++) {    
+       let item=this.state.target.annotations [i];  
        console.log ("Checking item: " + item); 
         
        for (var j=0;j<newData.length;j++) {
@@ -161,7 +162,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   closeModal() {
     console.log ("closeModal ()");  
       
-    let lo:LearningObjective=this.state.loTarget as LearningObjective;
+    let lo:Linkable=this.state.target as Linkable;
       
     this.setState({modalIsOpen: false});
       
@@ -174,8 +175,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       
     lo.annotations=newData;  
 
-    this.setState ({loTarget : lo}, function (){
-      console.log ("Lo now: " +  JSON.stringify (this.state.loTarget));
+    this.setState ({target : lo}, function (){
+      console.log ("Lo now: " +  JSON.stringify (this.state.target));
       this.state.closeModal ();  
     });
   }
@@ -187,7 +188,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     console.log ("cancelModal ()");  
       
     this.setState({modalIsOpen: false});      
-  }    
+  }
 
   /**
    * 

@@ -328,7 +328,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         canDrag=true;
         
         if (canDrag) {
-            console.log ("canDrag: " + canDrag);
+            //console.log ("canDrag: " + canDrag);
             
             if (typeof node.children === 'function' && node.expanded) {
                 console.log ("create handle ...");

@@ -88,7 +88,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             let orgDocId=orgObject.get (0);
            
             persistence.retrieveDocument(orgDocId).then(doc => {
-              this.setState ({treeData: doc ["model"]["organization"],document: doc});
+              
+              console.log ("Org data: " + JSON.stringify (doc ["model"]));
+                
+              this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
             }); 
             
             let loObject=course ["model"]["learningobjectives"];                                    
@@ -107,223 +110,66 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         console.log ("loadDocument ("+anID+")");
 
         persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({modalIsOpen: false, orgData: doc.model ["toplevel"], treeData: doc.model ["organization"],document: doc});
+            
+            console.log ("Loaded doc: " + JSON.stringify (doc));
+            
+            this.setState ({modalIsOpen: false, treeData: doc.model ["organization"],document: doc});
             return (doc);
         });
 
        return (null);         
     }
     
+    /**
+     * 
+     */
     saveToDB (newData?:any): void {
-
-      var newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+      console.log ("saveToDB ()");
+        
+      if (newData) {
+        //console.log ("Using argument to save data ...");  
+        let newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
                      
-      var updatedDocument=this.state.document.set ('model',newModel);
-                           
-      this.setState ({'document' : updatedDocument },function () {         
-        persistence.persistDocument(this.state.document)
-          .then(result => {
-            console.log ("Document saved, loading to get new revision ... ");                
-            this.loadDocument (this.state.documentId);
+        let updatedDocument=this.state.document.set ('model',newModel);
+              
+        //console.log ("Setting state to new document to save: " + JSON.stringify (updatedDocument));           
+          
+        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {
+          //console.log ("New document state: " + JSON.stringify (this.state.document));           
+          persistence.persistDocument(this.state.document)
+            .then(result => {
+              //console.log ("Document saved, loading to get new revision ... ");                
+              this.loadDocument (this.state.documentId);
+          });
+        });         
+      } else {
+        //console.log ("Using state to save data ...");         
+        let newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+                     
+        let updatedDocument=this.state.document.set ('model',newModel);
+              
+        //console.log ("Setting state to new document to save: " + JSON.stringify (updatedDocument));  
+          
+        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {         
+          persistence.persistDocument(this.state.document)
+            .then(result => {
+              //console.log ("Document saved, loading to get new revision ... ");                
+              this.loadDocument (this.state.documentId);
+          });
         });
-      });    
+      }      
     }      
 
-    /**
-     * 
-     */
-    processDataChange (newData: any) {
-      console.log ("processDataChange ()");
-                    
-      this.saveToDB (newData);      
-    }    
-        
-    /**
-     * People might notice that this code is a bit odd because it will return
-     * the last organization object under the root. Right now that is by design.
-     * That might change as the specs change but at least we won't have to
-     * redo the code.
-     */
-    /*
-    static createEmtpyOrganization (aData:any) : OrgOrganization {
-        
-      var orgNode=new OrgOrganization ();// throw away for now
-                       
-      if (aData)
-      {  
-          for (var i in aData) { 
-            orgNode=new OrgOrganization ();// throw away for now
-            orgNode.id=aData [i]["@id"];
-            orgNode.version=aData [i]["@version"];
-            var oList=aData [i]["#array"];
-                            
-            if (i=='organization') {
-              for (var k=0;k<oList.length;k++) {                   
-                var obj=oList [k];                 
-                                          
-                for (var j in obj) {
-                  var destNode = obj [j];
-                                         
-                  if (j=='title') {
-                    orgNode.title=OrganizationEditor.getTextFromNode (destNode);
-                  }
-                    
-                  if (j=='description') {
-                    orgNode.description=OrganizationEditor.getTextFromNode (destNode);
-                  }
-                    
-                  if (j=='audience') {
-                    orgNode.audience=OrganizationEditor.getTextFromNode (destNode);
-                  }                
-                }
-              }
-            }                   
-          }
-      }   
-        
-      return (orgNode);
-    }
-    */  
-    
-    /**
-     * 
-     */
-    /*
-    static getTextFromNode (aNode: any) : string {
-        
-      console.log ("getTextFromNode: " + JSON.stringify (aNode));
-          
-      // Check for old style text nodes  
-      if (aNode ['#text']) { 
-        return (aNode ['#text']);
-      } 
-
-      return ("");
-    }
-    */
-        
-    /**
-     * Here we go from visual data to database-ready data. We walk the tree
-     * and build a db JSON ready representation. We could have done this
-     * recursively but since we have to tag every level with a certain type
-     * in output tree it was easier to do this in one function for now.
-     */
-    /*
-    extractData (aData: any): Object {
-        console.log ("extractData ()");
-                
-        //var newData=aData.treeData;
-        var newData=aData;
-                
-        // First process our organization object and add it to the tree we're building
-        
-        let orgObject:OrgOrganization=this.state.orgData as OrgOrganization;
-               
-        let orgRoot:Object=orgObject.toJSONObject ();
-        let seqRoot=new Object ();
-        orgRoot ["organization"]["#array"].push (seqRoot);
-        
-        let sequences:Object=new Object ();
-        seqRoot ["sequences"]=sequences;
-                        
-        // We can point directly to .children because we ensure in the constructor that 
-        // this object always exists             
-        for (let j=0;j<newData.length;j++)
-        {            
-          let seqObject:OrgSequence=newData [j] as OrgSequence;
-                        
-          //let sequence:Object=seqObject.toJSONObject (); // This doesn't work for some reason 
-          let sequence:Object=new Object ();          
-          sequence ["@id"]=seqObject.id;
-          sequence ["@category"]=seqObject.category;
-          sequence ["@audience"]=seqObject.audience;
-          sequence ["#array"]=new Array ();
-          sequence ["#array"].push (OrgItem.addTextObject ("title",seqObject.title));
-              
-          sequences["sequence"]=sequence;   
-                        
-          for (let k=0;k<seqObject.children.length;k++)
-          {
-            let mObj:OrgItem=seqObject.children [k];
-                            
-            // Check the type here. We can expect Module, Section and Item  
-            console.log ("Object: " + mObj.orgType);
-             
-            let moduleContainer:Object=new Object ();
-            let moduleObj:Object=new Object ();
-            moduleContainer ["module"]=moduleObj;
-
-            sequence ["#array"].push (moduleContainer);
-             
-            moduleObj["@id"]=mObj.id;
-            moduleObj["#array"]=new Array ();
-            moduleObj["#array"].push (OrgItem.addTextObject ("title",mObj.title));
-  
-            for (let l=0;l<mObj.children.length;l++)
-            {
-              console.log ("Section: " + mObj.children [l].title);
-                
-              let sObj:OrgItem=mObj.children [l];                
-               
-              let sectionObj:Object=new Object();               
-              let sectionContainer:Object=new Object ();
-              sectionContainer ["section"]=sectionObj;  
-           
-              moduleObj["#array"].push (sectionContainer);
-               
-              sectionObj ["#id"]=sObj.id; 
-              sectionObj ["#array"]=new Array ();
-              sectionObj ["#array"].push (OrgItem.addTextObject ("title",sObj.title));                   
-
-              for (let m=0;m<sObj.children.length;m++)
-              {
-                let iObj=sObj.children [m];
-
-                if (iObj.orgType==OrgContentTypes.Item)
-                {
-                   var itemObj:OrgItem=iObj as OrgItem; 
-                   sectionObj ["#array"].push (iObj.toJSONObject ());   
-                }
-                else {
-                    console.log ("Error: undefined type found at this level: " + iObj.orgType);
-                }    
-              }
-            }
-          }
-        }
-        
-        var formattedOrganization=JSON.stringify (orgRoot);        
-        console.log ("To: " + formattedOrganization);
-        
-        return (orgRoot);
-    }
-    */
-    
-    /**
-     * 
-     */
-    /*
-    resolveItem (anItem:any):string {
-        
-        return ("");
-    }
-    */
-    
     /**
      * This method is called by the tree component and even though we could access
      * the state directly we're going to assume that the tree component made some
      * changes that haven't been reflected in the global component state yet.
      */
-    /*
     processDataChange (newData: any) {
-                
-        console.log ("processDataChange ()");
-        
-        this.extractData (newData);        
-        
-        this.setState (newData);                
-    }
-    */
+      console.log ("processDataChange ()");
+                    
+      this.saveToDB (newData ["treeData"]);      
+    }    
 
     /**
      * 
@@ -357,12 +203,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * last function call.
      */
     addNode (anEvent) {
-        //console.log ("addNode ()");
+        console.log ("addNode ()");
         
         var immutableHelper = this.state.treeData.slice()
         
-        //var aData=this.state.treeData;
-
         if (immutableHelper==null)
         {
             console.log ("Bump");
@@ -372,19 +216,19 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         var newNode:OrgSequence=new OrgSequence ();
         newNode.title="New Sequence";
         immutableHelper.push (newNode);
-
+        
+        //console.log ("New Data: " + JSON.stringify (immutableHelper));
+        
         /*
-        this.extractData (immutableHelper);
-        
-        this.setState({treeData: immutableHelper});
-        */
-        
         this.setState({
           modalIsOpen : false, 
           treeData: immutableHelper
         },function (){
+          console.log ("New tree: " + JSON.stringify (this.state.treeData));    
           this.saveToDB ();
         });
+        */
+        this.saveToDB (immutableHelper);    
     }    
 
     findTreeParent (aTree:any,aNode:any) : Array<Object> {
@@ -419,7 +263,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
           
         let immutableHelper = this.state.treeData.slice();
         
-        console.log ("Tree: " + JSON.stringify (immutableHelper));
+        //console.log ("Tree: " + JSON.stringify (immutableHelper));
         
         let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
@@ -444,7 +288,16 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             }
         }
         
-        this.setState({treeData: immutableHelper});        
+        /*
+        this.setState({
+          modalIsOpen : false, 
+          treeData: immutableHelper
+        },function (){
+          this.saveToDB ();
+        });
+        */
+            
+        this.saveToDB (immutableHelper);    
     }
         
     /**
@@ -481,8 +334,27 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
             }
         }
         
-        this.setState({treeData: immutableHelper});
+        /*
+        this.setState({
+          modalIsOpen : false, 
+          treeData: immutableHelper
+        },function (){
+          this.saveToDB ();
+        });
+        */
+            
+        this.saveToDB (immutableHelper);   
     }
+    
+    /**
+     * 
+     */
+    linkLO(aNode:any) {        
+        console.log ("OrganizationEditor:linkLO ()");
+        console.log ("aNode: " + JSON.stringify (aNode));
+                
+        this.setState ({modalIsOpen: true, orgTarget: aNode});
+    }    
     
     /**
      * 
@@ -493,7 +365,9 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
+        optionalProps ["linkAnnotation"]=this.linkLO.bind (this);
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
+        optionalProps ["treeData"]=this.state.treeData;
 
         return (optionalProps);
     }
@@ -504,7 +378,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     closeModal () {
       console.log ("LearningObjectiveEditor: closeModal ()");
         
-      //this.saveToDB ();  
+      this.saveToDB ();
     }    
     
     /**
@@ -512,7 +386,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.los} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.los} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
       } else {
         console.log ("Internal error: no skills object can be empty but not null");
       }
@@ -524,9 +398,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * 
      */
     render() 
-    { 
-      //console.log ("render()");
-      
+    {      
       const lolinker=this.createLinkerDialog ();  
         
       return (

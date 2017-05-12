@@ -36,7 +36,7 @@ export interface LearningObjectiveEditorState extends AbstractEditorState {
   model: any;
   context: AppContext;
   skills: any;
-  loTarget : any;
+  target : any;
   document: any;
   documentId: string;
 }
@@ -64,7 +64,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         treeData: [],    
                         context: props.context,
                         skills: null,
-                        loTarget: null,
+                        target: null,
                         documentId: props.context.documentId,
                         model: props.model,
                         document: {},
@@ -110,7 +110,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     }             
 
     /**
-     * 
+     * This method is called by the tree component and even though we could access
+     * the state directly we're going to assume that the tree component made some
+     * changes that haven't been reflected in the global component state yet.
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
@@ -304,10 +306,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      * 
      */
     linkSkill(aNode:any) {        
-        console.log ("LearningObjectiveEditor:linkSkill ()");
+        console.log ("linkSkill ()");
         console.log ("aNode: " + JSON.stringify (aNode));
                 
-        this.setState ({modalIsOpen: true, loTarget: aNode});
+        this.setState ({modalIsOpen: true, target: aNode});
     }
     
     /**
@@ -340,7 +342,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     createLinkerDialog () {           
       if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} loTarget={this.state.loTarget} />);
+        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} target={this.state.target} />);
       } else {
         console.log ("Internal error: no skills object can be empty but not null");
       }

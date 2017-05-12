@@ -156,7 +156,7 @@ var createOrganization = function() {
   var data = { 
     modelType: 'OrganizationModel',
     title: {text: 'Sample Organization'},
-    organization: []
+    organization: {}
   }
   return request('POST', '/editor', data);
 }

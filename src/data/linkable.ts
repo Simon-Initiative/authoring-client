@@ -18,4 +18,34 @@ export default class Linkable {
   reset () {
     this.annotations=new Array ();
   }
+    
+  /**
+   *
+   */  
+  static toJSON (toAnnotations:Array <Linkable>): Object {
+      
+    let ephemeral=new Array <String> ();    
+      
+    for (var i=0;i<toAnnotations.length;i++) {
+      
+      ephemeral.push (toAnnotations [i].id);
+    }
+      
+    return (ephemeral);  
+  }
+    
+  /**
+   *
+   */   
+  static fromJSON (json:Array<string>): Array <Linkable> {
+    let ephemeral:Array <Linkable>=new Array ();
+      
+    for (let j=0;j<json.length;j++) {
+      let newLinkable=new Linkable ();
+      newLinkable.id=json [j];
+      ephemeral.push (newLinkable);
+    }  
+      
+    return (ephemeral);  
+  }
 }
