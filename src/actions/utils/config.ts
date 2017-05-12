@@ -1,10 +1,11 @@
 const protocol = 'http://';
-const hostname = 'localhost';
+const hostname = 'raffmac.local';
 const prefix = 'content-service';
 const baseUrl = protocol + hostname + '/' + prefix;
 
 // These will go away during content-service transition
-const database = 'editor';
+//const database = 'editor';
+const database = 'api/v1/packages';
 const attachmentDatabase = 'attachments';
 
 export type Configuration = {

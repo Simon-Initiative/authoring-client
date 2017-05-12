@@ -50,3 +50,5 @@ jspm_packages
 # App specific stuff
 dev
 dist
+/course-editor.iml
+/.idea/

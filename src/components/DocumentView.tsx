@@ -37,6 +37,7 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
                     <EditorManager 
                       dispatch={this.props.dispatch}
                       services={this.services} 
+                      course={this.props.course}
                       userId={this.props.userId} 
                       documentId={this.props.documentId}/>
                   </div>

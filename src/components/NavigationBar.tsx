@@ -7,7 +7,7 @@ import * as contentTypes from '../data/contentTypes';
 /**
 *
 */
-interface NavigationBarState 
+interface NavigationBarState
 {
    closed: boolean
 }
@@ -20,9 +20,9 @@ export interface NavigationBarOwnProps {
 }
 
 /**
- * 
+ *
  */
-function FoldInButton(props) 
+function FoldInButton(props)
 {
   return (
     <a href="#" onClick={props.onClick}>Collapse Menu</a>
@@ -30,9 +30,9 @@ function FoldInButton(props)
 }
 
 /**
- * 
+ *
  */
-function FoldOutButton(props) 
+function FoldOutButton(props)
 {
   return (
     <a href="#" onClick={props.onClick}>Open</a>
@@ -71,7 +71,7 @@ const navbarStyles=
         order: 0,
         border: "0px solid #c4c0c0",
         padding: "0px",
-        margin: "0 0 0 0"        
+        margin: "0 0 0 0"
     },
     verticalMenu:
     {
@@ -108,64 +108,64 @@ function mapStateToProps(state: any) {
 }
 
 
-const stateGeneric = returnType(mapStateToProps);  
-type NavigationBarReduxProps = typeof stateGeneric; 
+const stateGeneric = returnType(mapStateToProps);
+type NavigationBarReduxProps = typeof stateGeneric;
 type NavigationBarProps = NavigationBarReduxProps & NavigationBarOwnProps & { dispatch };
 
 
 /**
 *
 */
-class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> 
-{    
+class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState>
+{
      opts = [
                 {
-                    label: "Course Content",
+                    label: "Course Package",
                     icon: "C",
                     staticContent: false,
                     onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Content",          
+                    label: "Content",
                     staticContent: true,
-                    onclick: this.placeholderMenuHandler     
-                },     
+                    onclick: this.placeholderMenuHandler
+                },
                 {
                     label: "Pages",
-                    icon: "O",           
+                    icon: "O",
                     staticContent: false,
-                    onclick: this.placeholderMenuHandler                        
+                    onclick: this.placeholderMenuHandler
                 },
-                { 
+                {
                     label: "Activities",
                     icon: "O",
                     staticContent: false,
-                    onclick: this.placeholderMenuHandler                        
+                    onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Learning",          
+                    label: "Learning",
                     staticContent: true,
-                    onclick: this.placeholderMenuHandler                       
+                    onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Learning Objectives",
-                    icon: "A",           
+                    label: "Objectives",
+                    icon: "A",
                     staticContent: false,
-                    onclick: this.placeholderMenuHandler                        
+                    onclick: this.placeholderMenuHandler
                 },
                 {
                     label: "Skills",
-                    icon: "A",           
+                    icon: "A",
                     staticContent: false,
-                    onclick: this.placeholderMenuHandler                        
+                    onclick: this.placeholderMenuHandler
                 },
                 {
-                    label: "Assets",          
+                    label: "Assets",
                     staticContent: true,
                     onclick: this.placeholderMenuHandler
-                },                
+                },
                 {
-                    label: "Media",
+                    label: "Files/Media",
                     icon: "M",
                     staticContent: false,
                     onclick: this.placeholderMenuHandler
@@ -174,36 +174,36 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                     label: "Add-Ons",
                     icon: "L",
                     staticContent: false,
-                    onclick: this.placeholderMenuHandler                        
+                    onclick: this.placeholderMenuHandler
                 }
               ];
-    
-    constructor(props) 
-    {     
+
+    constructor(props)
+    {
         super(props);
         this.state={closed: false};
     }
 
-    handleFoldIn(event: any) 
+    handleFoldIn(event: any)
     {
         this.setState({closed: true});
     }
 
-    handleFoldOut(event: any) 
-    {       
+    handleFoldOut(event: any)
+    {
         this.setState({closed: false});
-    }    
-    
+    }
+
     /**
-     * 
+     *
      */
     placeholderMenuHandler (props)
     {
         console.log ("placeHolderMenuHanlder ()");
-    }    
-    
+    }
+
     /**
-     * 
+     *
      */
     generateMenuItem (closed:boolean, item: any)
     {
@@ -211,35 +211,35 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         {
             return (<h2 key={item.label}>{item.label}</h2>);
         }
-                
+
         if (closed==true)
         {
            return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a></li>);
-        } 
+        }
 
-        return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>);   
+        return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>);
     }
-    
+
     /**
      * We included this dedicated menu generator to ensure we could insert main menu options
      * dynamically from external data and even from a marktplace (yes we can)
      */
     generateMenu (closed:boolean)
-    {        
-        return (this.opts.map(item => this.generateMenuItem (closed,item)));                
+    {
+        return (this.opts.map(item => this.generateMenuItem (closed,item)));
     }
-         
+
     /**
      * Main render function
      */
-    render() 
+    render()
     {
-        let menuControl = null;        
+        let menuControl = null;
         let mStyle = null;
 
-        const viewActivities = () => 
+        const viewActivities = () =>
             this.props.viewActions.viewResources(
-                this.props.course.courseId,
+                this.props.course.model.guid,//courseId,
                 'Activities',
                 (resource) => resource.type === 'AssessmentModel',
                 (title, courseId) => new models.AssessmentModel({
@@ -248,9 +248,9 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                     })
             );
 
-        const viewWorkbookPages = () => 
+        const viewWorkbookPages = () =>
             this.props.viewActions.viewResources(
-                this.props.course.courseId,
+                this.props.course.model.guid,//courseId,
                 'Workbook Pages',
                 (resource) => resource.type === 'WorkbookPageModel',
                 (title, courseId) => new models.WorkbookPageModel({
@@ -261,32 +261,32 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
 
 
         // Bad way of doing this, will be changed soon!
-        this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.organizationId);        
+        this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.model.guid);
         this.opts [1].onclick=this.props.viewActions.viewAllCourses;
         this.opts [2].onclick = viewWorkbookPages;
         this.opts [3].onclick = viewActivities;
-        
-        this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
-        this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);        
-        
-        if (this.state.closed==true) 
+
+        // this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
+        // this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
+
+        if (this.state.closed==true)
         {
             menuControl = <FoldOutButton onClick={ e => this.handleFoldOut(e) } />;
             mStyle = navbarStyles.closedMenu as any;
         }
-        else 
+        else
         {
             menuControl = <FoldInButton onClick={ e => this.handleFoldIn(e) } />;
             mStyle = navbarStyles.openMenu as any;
         }
-        
+
         let menuData=this.generateMenu(this.state.closed);
-        
-        const title = this.props.course === null ? '' : this.props.course.title;
+
+        const title = this.props.course === null || typeof this.props.course  === 'undefined'? '' : this.props.course.model.title;
 
         return (
                 <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-                    <h1>{title}</h1>                    
+                    <h1>{title}</h1>
                     <ul className="nav nav-pills flex-column">
                         {menuData}
                     </ul>

@@ -193,7 +193,7 @@ gulp.task('postdist', function() {
 
 gulp.task('open', function(){
   var options = {
-    uri: 'http://localhost:' + port + '/webpack-dev-server/index.html'
+    uri: 'http://128.237.220.60:' + port + '/webpack-dev-server/index.html'
   };
   gulp.src('').pipe(open(options));
 });
@@ -216,7 +216,7 @@ gulp.task('serve', function(callback) {
       path: webpackDevConfig.output.path,
       // webpack-dev-server options
       contentBase: webpackDevConfig.devServer.contentBase,
-      // or: contentBase: "http://localhost/",
+      // or: contentBase: "http://128.237.220.60/",
 
       hot: true,
       // Enable special support for Hot Module Replacement
@@ -242,16 +242,16 @@ gulp.task('serve', function(callback) {
 
       // Set this if you want webpack-dev-server to delegate a single path to an arbitrary server.
       // Use "*" to proxy all paths to the specified server.
-      // This is useful if you want to get rid of 'http://localhost:8080/' in script[src],
+      // This is useful if you want to get rid of 'http://128.237.220.60:8080/' in script[src],
       // and has many other use cases (see https://github.com/webpack/webpack-dev-server/pull/127 ).
       //proxy: {
-      //  "*": "http://localhost:9090"
+      //  "*": "http://128.237.220.60:9090"
       //}
   }).listen(port, "0.0.0.0", function(err) {
 
       if(err) throw new gutil.PluginError("serve", err);
       // Server listening
-      gutil.log("[serve]", "http://localhost:" + port + "/webpack-dev-server/index.html");
+      gutil.log("[serve]", "http://128.237.220.60:" + port + "/webpack-dev-server/index.html");
 
 
       // keep the server alive or continue?

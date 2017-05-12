@@ -48,7 +48,7 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 
 export function getEditablePackages() {
   return new Promise(function(resolve, reject) {
-    fetch(`${configuration.baseUrl}/api/packages`, {
+    fetch(`${configuration.baseUrl}/${configuration.database}/editable`, {
         method: 'GET',
         headers: getHeaders(credentials)
       })
@@ -63,8 +63,9 @@ export function getEditablePackages() {
       console.log(json);
 
       // TODO: parse the response as a series of CourseModel instances
-      
-      resolve(json.docs as Document[]);
+
+      resolve(json as any);
+      //resolve(json.docs as Document[]);
     })
     .catch(err => {
       reject(err);
@@ -151,8 +152,8 @@ export function retrieveDocument(documentId: types.DocumentId) : Promise<Documen
       })
       .then(json => {
         resolve(new Document({
-          _id: json._id,
-          _rev: json._rev,
+          _id: json.guid,
+          _rev: json.rev,
           model: models.createModel(json)
         }));
       })
