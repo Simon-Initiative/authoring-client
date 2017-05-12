@@ -471,6 +471,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       sequence ["@id"]=seqObject.id;
       sequence ["@category"]=seqObject.category;
       sequence ["@audience"]=seqObject.audience;
+      if (seqObject ["annotations"]) {
+        sequence ["#annotations"]=Linkable.toJSON (seqObject ["annotations"]);  
+      }  
       sequence ["#array"]=new Array ();
       sequence ["#array"].push (OrgItem.addTextObject ("title",seqObject.title));
               
@@ -489,6 +492,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         sequence ["#array"].push (moduleContainer);
              
         moduleObj["@id"]=mObj.id;
+        if (moduleObj ["annotations"]) {
+          moduleObj ["#annotations"]=Linkable.toJSON (moduleObj ["annotations"]);  
+        }          
         moduleObj["#array"]=new Array ();
         moduleObj["#array"].push (OrgItem.addTextObject ("title",mObj.title));
   
@@ -503,7 +509,10 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
            
           moduleObj["#array"].push (sectionContainer);
                
-          sectionObj ["#id"]=sObj.id; 
+          sectionObj ["#id"]=sObj.id;
+          if (sectionObj ["annotations"]) {
+            sectionObj ["#annotations"]=Linkable.toJSON (sectionObj ["annotations"]);  
+          }             
           sectionObj ["#array"]=new Array ();
           sectionObj ["#array"].push (OrgItem.addTextObject ("title",sObj.title));                   
 

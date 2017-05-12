@@ -22,13 +22,20 @@ export default class Linkable {
   /**
    *
    */  
-  static toJSON (toAnnotations:Array <Linkable>): Object {
+  static toJSON (toAnnotations:any): Object {
+      
+    console.log ("Linkable.toJSON ()");
+    console.log ("annotations: " + JSON.stringify (toAnnotations));  
       
     let ephemeral=new Array <String> ();    
       
     for (var i=0;i<toAnnotations.length;i++) {
       
-      ephemeral.push (toAnnotations [i].id);
+      if (toAnnotations [i].id) {  
+        ephemeral.push (toAnnotations [i].id);
+      } else {
+        ephemeral.push (toAnnotations [i]);          
+      }    
     }
       
     return (ephemeral);  
