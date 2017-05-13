@@ -495,16 +495,19 @@ export type ChangeRequest = (input: ContentModel) => ContentModel;
 //>------------------------------------------------------------------
 
 export type LearningObjectiveModelParams = {
+    courseId?: types.DocumentId,
     title?: contentTypes.Title
 };
 
 const defaultLearningObjectiveModel = {
     modelType: 'LearningObjectiveModel',
+    courseId: '',
     title: new contentTypes.Title(),
 }
 
 export class LearningObjectiveModel extends Immutable.Record(defaultLearningObjectiveModel) {
     modelType: 'LearningObjectiveModel';
+    courseId: types.DocumentId;
     title: contentTypes.Title;
 
     constructor(params?: LearningObjectiveModelParams) {
@@ -527,12 +530,14 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 //>------------------------------------------------------------------
 
 export type SkillModelParams = {
+    courseId?: types.DocumentId,
     title?: contentTypes.Title,
-    skills: any
+    skills?: any
 };
 
 const defaultSkillModel = {
     modelType: 'SkillModel',
+    courseId: '',
     title: new contentTypes.Title(),
     skillDefaults: Skill,
     skills: []
@@ -540,6 +545,7 @@ const defaultSkillModel = {
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {
     modelType: 'SkillModel';
+    courseId: types.DocumentId;
     title: contentTypes.Title;
     skillDefaults: Skill;
     skills: Array<Skill>;

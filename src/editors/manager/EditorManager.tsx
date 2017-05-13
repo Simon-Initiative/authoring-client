@@ -119,11 +119,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
                 // Notify that the course has changed when a user views a course
                 if (document.model.modelType === models.ModelTypes.CourseModel) {
-                    // this.props.dispatch(courseActions.courseChanged(documentId, 
-                    //   document.model.title.text,
-                    //   document.model.organizations.get(0),
-                    //   document.model.learningobjectives.get(0),
-                    //   document.model.skills.get(0)));
                     this.props.dispatch(courseActions.courseChanged(document.model));
                 }
 

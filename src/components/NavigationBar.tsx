@@ -1,110 +1,109 @@
-import * as React from 'react';
-import { returnType } from '../utils/types';
-import { connect }  from 'react-redux';
-import * as models from '../data/models';
-import * as contentTypes from '../data/contentTypes';
+import * as React from "react";
+import * as Immutable from "immutable";
+import {returnType} from "../utils/types";
+import {connect} from "react-redux";
+import * as models from "../data/models";
+import * as contentTypes from "../data/contentTypes";
 
 /**
-*
-*/
-interface NavigationBarState
-{
-   closed: boolean
+ *
+ */
+interface NavigationBarState {
+    closed: boolean
 }
 
 /**
-*
-*/
+ *
+ */
 export interface NavigationBarOwnProps {
-  viewActions: any;
+    viewActions: any;
 }
 
 /**
  *
  */
-function FoldInButton(props)
-{
-  return (
-    <a href="#" onClick={props.onClick}>Collapse Menu</a>
-  );
+function FoldInButton(props) {
+    return (
+        <a href="#" onClick={props.onClick}>Collapse Menu</a>
+    );
 }
 
 /**
  *
  */
-function FoldOutButton(props)
-{
-  return (
-    <a href="#" onClick={props.onClick}>Open</a>
-  );
+function FoldOutButton(props) {
+    return (
+        <a href="#" onClick={props.onClick}>Open</a>
+    );
 }
 
 // Nick, do whatever you feel you have to here
-const navbarStyles=
-{
-    openMenu:
+const navbarStyles =
     {
-        width: '200px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'stretch',
-        alignContent: 'stretch',
-        height: 'inherit',
-        borderRight : '1px solid grey'
-    },
-    closedMenu:
-    {
-        width: '64px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        alignItems: 'stretch',
-        alignContent: 'stretch',
-        height: 'inherit',
-        borderRight : '1px solid grey'
-    },
-    mainMenu:
-    {
-        flex: "none",
-        flexGrow: 1,
-        order: 0,
-        border: "0px solid #c4c0c0",
-        padding: "0px",
-        margin: "0 0 0 0"
-    },
-    verticalMenu:
-    {
-        listStyleType : 'none'
-    },
-    bottomMenu:
-    {
-        margin: "0 0 0 14px",
-        height: "24px"
-    },
-    sidebar: {
-        paddingLeft: 0,
-        paddingRight: 0,
-        'position': 'fixed',
-        top: '58px',
-        bottom: 0,
-        left: 0,
-        zIndex: 1000,
-        overflowX: 'hidden',
-        overflowY: 'auto',
-    }
-};
+        openMenu: {
+            width: '200px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'stretch',
+            alignContent: 'stretch',
+            height: 'inherit',
+            borderRight: '1px solid grey'
+        },
+        closedMenu: {
+            width: '64px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'stretch',
+            alignContent: 'stretch',
+            height: 'inherit',
+            borderRight: '1px solid grey'
+        },
+        mainMenu: {
+            flex: "none",
+            flexGrow: 1,
+            order: 0,
+            border: "0px solid #c4c0c0",
+            padding: "0px",
+            margin: "0 0 0 0"
+        },
+        verticalMenu: {
+            listStyleType: 'none'
+        },
+        bottomMenu: {
+            margin: "0 0 0 14px",
+            height: "24px"
+        },
+        sidebar: {
+            paddingLeft: 0,
+            paddingRight: 0,
+            'position': 'fixed',
+            top: '58px',
+            bottom: 0,
+            left: 0,
+            zIndex: 1000,
+            overflowX: 'hidden',
+            overflowY: 'auto',
+        }
+    };
 
+interface MenuItem {
+    label?: string,
+    icon?: string,
+    staticContent?: boolean,
+    onclick?: any
+}
 
 function mapStateToProps(state: any) {
 
-  const {
-    course
-  } = state;
+    const {
+        course
+    } = state;
 
-  return {
-    course
-  }
+    return {
+        course
+    }
 }
 
 
@@ -114,184 +113,221 @@ type NavigationBarProps = NavigationBarReduxProps & NavigationBarOwnProps & { di
 
 
 /**
-*
-*/
-class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState>
-{
-     opts = [
-                {
-                    label: "Course Package",
-                    icon: "C",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Content",
-                    staticContent: true,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Pages",
-                    icon: "O",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Activities",
-                    icon: "O",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Learning",
-                    staticContent: true,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Objectives",
-                    icon: "A",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Skills",
-                    icon: "A",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Assets",
-                    staticContent: true,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Files/Media",
-                    icon: "M",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                },
-                {
-                    label: "Add-Ons",
-                    icon: "L",
-                    staticContent: false,
-                    onclick: this.placeholderMenuHandler
-                }
-              ];
+ *
+ */
+class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> {
+    opts = Immutable.OrderedMap<string, MenuItem>(
+        {
+            package: {
+                label: "Content Package",
+                icon: "C",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            sequencing: {
+                label: "Sequencing",
+                staticContent: true,
+                onclick: this.placeholderMenuHandler
+            },
+            organizations: {
+                label: "Organizations",
+                icon: "O",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            content: {
+                label: "Content",
+                staticContent: true,
+                onclick: this.placeholderMenuHandler
+            },
+            workBookPages: {
+                label: "Pages",
+                icon: "O",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            activities: {
+                label: "Activities",
+                icon: "O",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            learning: {
+                label: "Learning",
+                staticContent: true,
+                onclick: this.placeholderMenuHandler
+            },
+            objectives: {
+                label: "Objectives",
+                icon: "A",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            skills: {
+                label: "Skills",
+                icon: "A",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            assets: {
+                label: "Assets",
+                staticContent: true,
+                onclick: this.placeholderMenuHandler
+            },
+            media: {
+                label: "Files/Media",
+                icon: "M",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            },
+            addOns: {
+                label: "Add-Ons",
+                icon: "L",
+                staticContent: false,
+                onclick: this.placeholderMenuHandler
+            }
+        });
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
-        this.state={closed: false};
+        this.state = {closed: false};
     }
 
-    handleFoldIn(event: any)
-    {
+    handleFoldIn(event: any) {
         this.setState({closed: true});
     }
 
-    handleFoldOut(event: any)
-    {
+    handleFoldOut(event: any) {
         this.setState({closed: false});
     }
 
     /**
      *
      */
-    placeholderMenuHandler (props)
-    {
-        console.log ("placeHolderMenuHanlder ()");
+    placeholderMenuHandler(props) {
+        console.log("placeHolderMenuHanlder ()");
     }
 
     /**
      *
      */
-    generateMenuItem (closed:boolean, item: any)
-    {
-        if (item.staticContent==true)
-        {
+    generateMenuItem(closed: boolean, item: any) {
+        if (item.staticContent == true) {
             return (<h2 key={item.label}>{item.label}</h2>);
         }
 
-        if (closed==true)
-        {
-           return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a></li>);
+        if (closed == true) {
+            return (
+                <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a>
+                </li>);
         }
 
-        return (<li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a></li>);
+        return (
+            <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.label}</a>
+            </li>);
     }
 
     /**
      * We included this dedicated menu generator to ensure we could insert main menu options
      * dynamically from external data and even from a marktplace (yes we can)
      */
-    generateMenu (closed:boolean)
-    {
-        return (this.opts.map(item => this.generateMenuItem (closed,item)));
+    generateMenu(closed: boolean) {
+        return (this.opts.toArray().map(item => this.generateMenuItem(closed, item)));
     }
 
     /**
      * Main render function
      */
-    render()
-    {
+    render() {
         let menuControl = null;
         let mStyle = null;
 
+        const viewOrganizations = () =>
+            this.props.viewActions.viewResources(
+                this.props.course.model.guid,
+                'Organizations',
+                (resource) => resource.type === 'x-oli-organization',
+                (title, courseId) => new models.OrganizationModel({
+                    title: new contentTypes.Title({text: title})
+                })
+            );
+
         const viewActivities = () =>
             this.props.viewActions.viewResources(
-                this.props.course.model.guid,//courseId,
+                this.props.course.model.guid,
                 'Activities',
-                (resource) => resource.type === 'AssessmentModel',
+                (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
                 (title, courseId) => new models.AssessmentModel({
                     courseId,
-                    title: new contentTypes.Title({ text: title})
-                    })
+                    title: new contentTypes.Title({text: title})
+                })
             );
 
         const viewWorkbookPages = () =>
             this.props.viewActions.viewResources(
-                this.props.course.model.guid,//courseId,
+                this.props.course.model.guid,
                 'Workbook Pages',
-                (resource) => resource.type === 'WorkbookPageModel',
+                (resource) => resource.type === 'x-oli-workbook_page',
                 (title, courseId) => new models.WorkbookPageModel({
                     courseId,
-                    head: new contentTypes.Head({ title: new contentTypes.Title({ text: title}) })
-                    })
+                    head: new contentTypes.Head({title: new contentTypes.Title({text: title})})
+                })
+            );
+
+        const viewLearningObjectives = () =>
+            this.props.viewActions.viewResources(
+                this.props.course.model.guid,
+                'Learning Objectives',
+                (resource) => resource.type === 'x-oli-learning_objectives',
+                (title, courseId) => new models.LearningObjectiveModel({
+                    courseId,
+                    title: new contentTypes.Title({text: title})
+                })
+            );
+
+        const viewSkills = () =>
+            this.props.viewActions.viewResources(
+                this.props.course.model.guid,
+                'Skills',
+                (resource) => resource.type === 'x-oli-skill_models',
+                (title, courseId) => new models.SkillModel({
+                    courseId,
+                    title: new contentTypes.Title({text: title})
+                })
             );
 
 
-        // Bad way of doing this, will be changed soon!
-        this.opts [0].onclick=() => this.props.viewActions.viewDocument(this.props.course.model.guid);
-        this.opts [1].onclick=this.props.viewActions.viewAllCourses;
-        this.opts [2].onclick = viewWorkbookPages;
-        this.opts [3].onclick = viewActivities;
+        this.opts.get('package').onclick = () => this.props.viewActions.viewDocument(this.props.course.model.guid);
+        this.opts.get('organizations').onclick = viewOrganizations;
+        this.opts.get('workBookPages').onclick = viewWorkbookPages;
+        this.opts.get('activities').onclick = viewActivities;
+        this.opts.get('objectives').onclick = viewLearningObjectives;
+        this.opts.get('skills').onclick = viewSkills;
+        // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
+        // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
 
-        // this.opts [5].onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
-        // this.opts [6].onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
-
-        if (this.state.closed==true)
-        {
-            menuControl = <FoldOutButton onClick={ e => this.handleFoldOut(e) } />;
+        if (this.state.closed == true) {
+            menuControl = <FoldOutButton onClick={ e => this.handleFoldOut(e) }/>;
             mStyle = navbarStyles.closedMenu as any;
         }
-        else
-        {
-            menuControl = <FoldInButton onClick={ e => this.handleFoldIn(e) } />;
+        else {
+            menuControl = <FoldInButton onClick={ e => this.handleFoldIn(e) }/>;
             mStyle = navbarStyles.openMenu as any;
         }
 
-        let menuData=this.generateMenu(this.state.closed);
+        let menuData = this.generateMenu(this.state.closed);
 
-        const title = this.props.course === null || typeof this.props.course  === 'undefined'? '' : this.props.course.model.title;
+        const title = this.props.course === null || typeof this.props.course === 'undefined' ? '' : this.props.course.model.title;
 
         return (
-                <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-                    <h1>{title}</h1>
-                    <ul className="nav nav-pills flex-column">
-                        {menuData}
-                    </ul>
-                </nav>
-            );
+            <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
+                <h1>{title}</h1>
+                <br/>
+                <ul className="nav nav-pills flex-column">
+                    {menuData}
+                </ul>
+            </nav>
+        );
     }
 }
 

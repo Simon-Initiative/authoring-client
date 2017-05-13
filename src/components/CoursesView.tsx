@@ -34,7 +34,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
         //this.onSelect = this.fetchDocument.bind(this);
         this.onSelect = (id) => {
             this.fetchDocument(id);
-            //this.props.dispatch(viewActions.viewDocument(id));
         }
     }
 
@@ -153,8 +152,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
             </div>
         );
     }
-
-
 }
 
 export default CoursesView;
