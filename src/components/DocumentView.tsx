@@ -14,6 +14,7 @@ export interface DocumentViewProps {
   dispatch: any;
   documentId: string;
   userId: string;
+  course: any;
 }
 
 class DocumentView extends React.PureComponent<DocumentViewProps, {}> {

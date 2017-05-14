@@ -4,7 +4,6 @@ import * as Immutable from 'immutable';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import {Skill} from '../../../data/skills';
-import { CourseResource, fetchCourseResources } from '../common/resources';
 
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
@@ -235,7 +234,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
 
-        persistence.retrieveDocument(anID).then(doc => {
+        persistence.retrieveDocument(null, anID).then(doc => {
             this.setState ({treeData: doc.model ["skills"],document: doc});
             return (doc);
         });

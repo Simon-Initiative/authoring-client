@@ -21,7 +21,7 @@ export class MockTitleOracle implements TitleOracle {
     if (titleCache[id] === undefined) {
 
       return new Promise((resolve, reject) => {
-        persistence.retrieveDocument(id)
+        persistence.retrieveDocument(null, id)
         .then(doc => {
           switch (doc.model.modelType) {
             case 'AssessmentModel':

@@ -1,5 +1,6 @@
 import * as models from '../data/models';
-import { CourseResource } from '../editors/document/common/resources';
+//import { CourseResource } from '../editors/document/common/resources';
+import {Resource} from "../data/resource";
 
 
 export type VIEW_CREATE_COURSE = 'VIEW_CREATE_COURSE';
@@ -38,7 +39,7 @@ export type viewResourcesAction = {
 	type: VIEW_RESOURCES,
 	courseId: string,
 	title: string,
-  filterFn: (resource: CourseResource) => boolean,
+  filterFn: (resource: Resource) => boolean,
   createResourceFn: (title: string, courseId: string) => models.ContentModel
 }
 

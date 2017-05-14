@@ -47,7 +47,7 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
             if (remainingRetries === 0) {
               initialReject !== undefined ? initialReject(err) : reject(err);
             } else {
-              persistence.retrieveDocument(initialDoc._id)
+              persistence.retrieveDocument(initialDoc._courseId, initialDoc._id)
                 .then(doc => {
                   let updated = toSave.with({_rev: doc._rev});
                   this.saveDocument(updated, --remainingRetries,

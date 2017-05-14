@@ -1,10 +1,11 @@
 'use strict'
 
 import * as React from "react";
-import {CourseResource} from "../common/resources";
+//import {CourseResource} from "../common/resources";
 import * as models from "../../../data/models";
 
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from "../common/AbstractEditor";
+import {Resource} from "../../../data/resource";
 
 interface CourseEditor {
 
@@ -16,7 +17,7 @@ export interface CourseEditorProps extends AbstractEditorProps<models.CourseMode
 
 
 interface CourseEditorState extends AbstractEditorState {
-    resources: CourseResource[];
+    resources: Resource[];
 }
 
 class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState> {

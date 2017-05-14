@@ -4,11 +4,12 @@ import * as React from "react";
 import {returnType} from "../utils/types";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {CourseResource, fetchCourseResources} from "../editors/document/common/resources";
+//import {CourseResource, fetchCourseResources} from "../editors/document/common/resources";
 import NavigationBar from "./NavigationBar";
 import * as persistence from "../data/persistence";
 import * as models from "../data/models";
 import * as viewActions from "../actions/view";
+import {Resource} from "../data/resource";
 
 interface ResourceView {
     viewActions: any;
@@ -18,13 +19,13 @@ export interface ResourceViewOwnProps {
     courseId: string;
     dispatch: any;
     title: string;
-    filterFn: (resource: CourseResource) => boolean;
+    filterFn: (resource: Resource) => boolean;
     createResourceFn: (title: string, courseId: string) => models.ContentModel;
 }
 
 
 interface ResourceViewState {
-    resources: CourseResource[];
+    resources: Resource[];
 }
 
 function mapStateToProps(state: any) {
@@ -65,7 +66,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     }
 
     fetchTitles(model : models.CourseModel, filterFn: any) {
-        this.setState({resources: model.resources.filter(filterFn)});
+        this.setState({resources: model.resources.toArray().filter(filterFn)});
     }
 
     // fetchTitles(id: string) {
@@ -161,4 +162,4 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     }
 
 }
-export default connect<ResourceViewReduxProps, {}, ResourceViewrOwnProps>(mapStateToProps)(ResourceView);
+export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>(mapStateToProps)(ResourceView);

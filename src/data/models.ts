@@ -33,7 +33,6 @@ export function createModel(object: any): ContentModel {
     console.log("createModel ()");
     switch (object.type) {
         case 'x-oli-package':
-            console.log("create CourseModel Model");
             return CourseModel.fromPersistence(object);
         case 'x-oli-workbook_page':
             return WorkbookPageModel.fromPersistence(object);
@@ -269,47 +268,6 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
     }
 }
 
-
-export type CoursePermissionModelParams = {
-    userId: types.UserId,
-    courseId: types.DocumentId
-};
-const defaultCoursePermissionModelParams = {
-    modelType: 'CoursePermissionModel',
-    userId: '',
-    courseId: ''
-}
-
-export class CoursePermissionModel extends Immutable.Record(defaultCoursePermissionModelParams) {
-
-    modelType: 'CoursePermissionModel';
-
-    userId: types.UserId;
-    courseId: types.DocumentId;
-
-    constructor(params?: CoursePermissionModelParams) {
-        params ? super(params) : super();
-    }
-
-    with(values: CoursePermissionModelParams) {
-        return this.merge(values) as this;
-    }
-
-    static fromPersistence(json: Object): CoursePermissionModel {
-        const model = new CoursePermissionModel();
-        const p = json as any;
-        return model.with({userId: p.userId, courseId: p.courseId});
-    }
-
-    toPersistence(): Object {
-        return {
-            modelType: 'CoursePermissionModel',
-            userId: this.userId,
-            courseId: this.courseId
-        };
-    }
-}
-
 export type WorkbookPageModelParams = {
     courseId?: types.DocumentId,
     head?: contentTypes.Head,
@@ -478,19 +436,6 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     }
 }
 
-export type ContentModel =
-    AssessmentModel |
-    CourseModel |
-    CoursePermissionModel |
-    MediaModel |
-    WorkbookPageModel |
-    OrganizationModel |
-    LearningObjectiveModel |
-    SkillModel;
-
-// A pure function that takes a content model as 
-// input and returns a changed content model
-export type ChangeRequest = (input: ContentModel) => ContentModel;
 
 //>------------------------------------------------------------------
 
@@ -603,3 +548,58 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
         return (SkillModel.updateModel(replacementSkills))
     }
 }
+
+export type CoursePermissionModelParams = {
+    userId: types.UserId,
+    courseId: types.DocumentId
+};
+const defaultCoursePermissionModelParams = {
+    modelType: 'CoursePermissionModel',
+    userId: '',
+    courseId: ''
+}
+
+export class CoursePermissionModel extends Immutable.Record(defaultCoursePermissionModelParams) {
+
+    modelType: 'CoursePermissionModel';
+
+    userId: types.UserId;
+    courseId: types.DocumentId;
+
+    constructor(params?: CoursePermissionModelParams) {
+        params ? super(params) : super();
+    }
+
+    with(values: CoursePermissionModelParams) {
+        return this.merge(values) as this;
+    }
+
+    static fromPersistence(json: Object): CoursePermissionModel {
+        const model = new CoursePermissionModel();
+        const p = json as any;
+        return model.with({userId: p.userId, courseId: p.courseId});
+    }
+
+    toPersistence(): Object {
+        return {
+            modelType: 'CoursePermissionModel',
+            userId: this.userId,
+            courseId: this.courseId
+        };
+    }
+}
+
+export type ContentModel =
+    AssessmentModel |
+    CourseModel |
+    CoursePermissionModel |
+    MediaModel |
+    WorkbookPageModel |
+    OrganizationModel |
+    LearningObjectiveModel |
+    SkillModel;
+
+// A pure function that takes a content model as
+// input and returns a changed content model
+export type ChangeRequest = (input: ContentModel) => ContentModel;
+

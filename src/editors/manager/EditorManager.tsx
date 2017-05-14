@@ -38,6 +38,8 @@ export interface EditorManagerProps {
 
     services: AppServices;
 
+    course: any;
+
 }
 
 export interface EditorManagerState {
@@ -112,9 +114,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
 
 
-    fetchDocument(documentId: string) {
+    fetchDocument(courseId: string, documentId: string) {
         console.log("fetchDocument (" + documentId + ")");
-        persistence.retrieveDocument(documentId)
+        persistence.retrieveDocument(courseId, documentId)
             .then(document => {
 
                 // Notify that the course has changed when a user views a course
@@ -142,11 +144,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         console.log("componentWillReceiveProps (" + nextProps.documentId + ")");
         if (this.props.documentId !== nextProps.documentId) {
             this.stopListening = true;
-            if (this.props.course && this.props.course.model.guid === nextProps.documentId) {
+            // Special processing if next document is a CourseModel - don't call fetchDocument
+            if (nextProps.course && nextProps.course.model.guid === nextProps.documentId) {
                 let document = new persistence.Document({
-                    _id: this.props.course.model.guid,
-                    _rev: this.props.course.model.rev,
-                    model: this.props.course.model
+                    _id: nextProps.course.model.guid,
+                    _rev: nextProps.course.model.rev,
+                    model: nextProps.course.model
                 });
                 // Tear down previous persistence strategy
                 if (this.persistenceStrategy !== null) {
@@ -160,12 +163,15 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
                 this.setState({document})
             } else {
                 this.setState({document: null, editingAllowed: null});
-                this.fetchDocument(nextProps.documentId);
+                if(nextProps.course) {
+                    this.fetchDocument(nextProps.course.model.guid, nextProps.documentId);
+                }
             }
         }
     }
 
     componentDidMount() {
+        // Special handling for CourseModel  - don't call fetchDocument
         if (this.props.course && this.props.course.model.guid === this.props.documentId) {
             let document = new persistence.Document({
                 _id: this.props.course.model.guid,
@@ -183,7 +189,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
             }
             this.setState({document})
         } else {
-            this.fetchDocument(this.props.documentId);
+            if(this.props.course) {
+                this.fetchDocument(this.props.course.model.guid, this.props.documentId);
+            }
         }
     }
 

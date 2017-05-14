@@ -1,13 +1,13 @@
-
-export type DocumentId = string; 
+export type DocumentId = string;
+export type CourseId = string;
 export type UserId = string;
 
-/** 
- * Utility function to create a K:V from a list of strings 
+/**
+ * Utility function to create a K:V from a list of strings
  */
 export function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
-  return o.reduce((res, key) => {
-    res[key] = key;
-    return res;
-  }, Object.create(null));
+    return o.reduce((res, key) => {
+        res[key] = key;
+        return res;
+    }, Object.create(null));
 }

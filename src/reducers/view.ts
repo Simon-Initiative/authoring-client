@@ -2,7 +2,8 @@ import * as viewActions from '../actions/view';
 import { user as userActions } from '../actions/user';
 import { OtherAction } from './utils';
 import * as models from '../data/models';
-import { CourseResource } from '../editors/document/common/resources';
+//import { CourseResource } from '../editors/document/common/resources';
+import {Resource} from "../data/resource";
 
 
 // The current view of the application can be either the
@@ -35,7 +36,7 @@ export type ResourcesView = {
   type: 'ResourcesView',
   courseId: string,
   title: string,
-  filterFn: (resource: CourseResource) => boolean,
+  filterFn: (resource: Resource) => boolean,
   createResourceFn: (title: string, courseId: string) => models.ContentModel
 }
 

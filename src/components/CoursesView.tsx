@@ -31,7 +31,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
         this.state = {courses: []};
         this._createCourse = this.createCourse.bind(this);
-        //this.onSelect = this.fetchDocument.bind(this);
         this.onSelect = (id) => {
             this.fetchDocument(id);
         }
@@ -43,14 +42,8 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     }
 
     componentDidMount() {
-
         persistence.getEditablePackages()
-        //.then(docs => {
-        //   const courseIds = docs.map(result => (result as any).courseId);
-        //   //return persistence.queryDocuments(titlesForCoursesQuery(courseIds))
-        // })
             .then(docs => {
-                //let courses : CourseDescription[] = docs.map(d => ({ id: d.id, title: (d as any).title['#text']}));
                 let courses: CourseDescription[] = docs.map(d => ({
                     guid: d.guid,
                     id: d.id,
@@ -64,28 +57,16 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
                 console.log(err);
             });
 
-        // persistence.queryDocuments(coursesQuery(this.props.userId))
-        //   .then(docs => {
-        //     const courseIds = docs.map(result => (result as any).courseId);
-        //     return persistence.queryDocuments(titlesForCoursesQuery(courseIds))
-        //   })
-        //   .then(docs => {
-        //     let courses : CourseDescription[] = docs.map(d => ({ id: d._id, title: (d as any).title['#text']}));
-        //     this.setState({ courses });
-        //   })
-        //   .catch(err => {
-        //     console.log(err);
-        //   });onClick={this.onSelect(guid)}
     }
 
-    fetchDocument(documentId: string) {
-        console.log("fetchDocument (" + documentId + ")");
-        persistence.retrieveDocument(documentId)
+    fetchDocument(courseId: string) {
+        console.log("fetchDocument (" + courseId + ")");
+        persistence.retrieveCoursePackage(courseId)
             .then(document => {
                 // Notify that the course has changed when a user views a course
                 if (document.model.modelType === models.ModelTypes.CourseModel) {
                     this.props.dispatch(courseActions.courseChanged(document.model));
-                    this.props.dispatch(viewActions.viewDocument(documentId));
+                    this.props.dispatch(viewActions.viewDocument(courseId));
                 }
 
             })
