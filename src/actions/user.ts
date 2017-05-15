@@ -80,9 +80,7 @@ export module user {
           });
           
         } else {
-          // Requires inserting "http://dev.local/*" in the Valid Redirect URIs entry
-          // of the Content_client settings in the KeyCloak admin UI and mapping
-          // dev.local to localhost in your host /etc/hosts file
+          
           kc.login({redirectUri: kcUrl});
         }
       });
