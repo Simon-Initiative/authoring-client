@@ -211,6 +211,9 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         this.saveToDB (immutableHelper);    
     }    
 
+    /**
+     * 
+     */
     findTreeParent (aTree:any,aNode:any) : Array<Object> {
      
         console.log ("findTreeParent ("+aNode.id+")");

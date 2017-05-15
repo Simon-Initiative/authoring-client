@@ -21,3 +21,44 @@
     /*border: 1px solid red;*/
 }
 
+.onclick-menu {
+    position: relative;
+    display: inline-block;
+    border: 0px solid red;
+}
+
+.onclick-menu:focus .onclick-menu-content {
+    display: block;
+}
+
+.onclick-menu-content {
+    position: absolute;
+    left: -160px;
+    z-index: 1;
+    padding: 4px;
+
+    background: #ffffff; 
+    border-radius: 5px;
+    border: 1px solid grey;
+    
+    display: none;
+    
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);    
+}
+
+.onclick-menu-content-shown {
+    position: absolute;
+    left: -160px;
+    z-index: 1;
+    padding: 4px;
+        
+    background: #ffffff; 
+    border-radius: 5px;
+    border: 1px solid grey;
+    
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);    
+}

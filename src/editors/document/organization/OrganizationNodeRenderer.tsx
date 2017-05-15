@@ -7,6 +7,8 @@ import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 
+import '../../../stylesheets/sortabletree.scss';
+
 const styles = {
     
   orgrowWrapper : {
@@ -273,7 +275,7 @@ const styles = {
       "minWidth": "300px",      
       "maxWidth": "340px",
       'height' : '42px'
-  }  
+  } 
 };
 
 /**
@@ -281,14 +283,70 @@ const styles = {
  */
 class OrganizationNodeRenderer extends Component <any,any>
 {
+    shown:boolean=false;
     deleteNodeFunction:any=null;
-    //parentTreeData:any=null;
     editNodeTitle:any=null;
     linkAnnotation:any=null;
-
-    render() {
+    
+    /**
+     * 
+     */
+    popMenu (aNode:any) {
+      console.log ("popMenu ()");
         
-        //console.log ("Styles: " + JSON.stringify (styles));
+      if (this.shown==true) {  
+        this.shown=false;
+      } else {
+        this.shown=true;          
+      }    
+        
+      this.forceUpdate();
+    }
+    
+    /**
+     * 
+     */
+    generatePopDown (node) {
+      console.log ("generatePopDown ("+this.shown+")");
+          
+      let bStyle:any=styles.orgrowTitle;
+      bStyle ["marginLeft"]="10px";
+        
+      if (this.shown==true) {
+        return (
+          <div>
+            <a style={bStyle} href="#" onClick={(e) => this.popMenu (node)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
+            <div tabIndex={0} className="onclick-menu">
+              <ul className="nav nav-pills flex-column onclick-menu-content-shown">
+                <h6>Content</h6>
+                <li className="nav-item"><a className="nav-link">Learning Objective</a></li>
+                <li className="nav-item"><a className="nav-link">Page</a></li>
+                <li className="nav-item"><a className="nav-link">Activity</a></li>
+                <h6>Assets</h6>
+                <li className="nav-item"><a className="nav-link">Add-On</a></li>
+              </ul>
+            </div>
+          </div>);           
+      }      
+        
+      return (
+        <div>
+          <a style={bStyle} href="#" onClick={(e) => this.popMenu (node)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
+          <div tabIndex={0} className="onclick-menu">
+            <ul className="nav nav-pills flex-column onclick-menu-content">
+              <h2 className="btn btn-secondary">Content</h2>
+              <li className="nav-item"><a className="nav-link">Learning Objective</a></li>
+              <li className="nav-item"><a className="nav-link">Page</a></li>
+              <li className="nav-item"><a className="nav-link">Activity</a></li>
+              <h2 className="btn btn-secondary">Assets</h2>
+              <li className="nav-item"><a className="nav-link">Add-On</a></li>
+            </ul>
+          </div>
+        </div>);        
+    }
+
+    render() {        
+        console.log ("render ()");
         
         var {
             editNodeTitle,
@@ -458,6 +516,8 @@ class OrganizationNodeRenderer extends Component <any,any>
         );
         */
 
+        let popDown=this.generatePopDown (node);
+
         return (
             <div style={{ height: '100%', width: '450px' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
@@ -479,19 +539,22 @@ class OrganizationNodeRenderer extends Component <any,any>
                     {connectDragPreview(
                         <div style={gStyle}>
 
-                            {handle}
+                          {handle}
             
-                                 <TitleContentEditor 
-                                   services={services}
-                                   editMode={true}
-                                   model={titleObj}
-                                   context={context}
-                                   styles={styles.loTitleRenderer}
-                                   onEdit={(content) => this.editNodeTitle(node,content)} 
-                                   />
+                           <TitleContentEditor 
+                             services={services}
+                             editMode={true}
+                             model={titleObj}
+                             context={context}
+                             styles={styles.loTitleRenderer}
+                             onEdit={(content) => this.editNodeTitle(node,content)} 
+                           />
             
-                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
+                           <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                           <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>
+
+                           {popDown}
+                               
                         </div>
                     )}
                 </div>
