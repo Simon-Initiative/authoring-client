@@ -156,9 +156,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *      }
    *  }
    */
-  getNodeType (aNode: any): string {
-    //console.log ("getNodeType ()");
-        
+  getNodeType (aNode: any): string {        
     for (var i in aNode) {            
       return (i);
     }
@@ -169,10 +167,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   /**
    * 
    */
-  static getNodeContentType (aNode:any):string {
-        
-    //console.log ("getNodeContentType: " + JSON.stringify (aNode));
-        
+  static getNodeContentType (aNode:any):string {        
     if (aNode==null) {
       return "";
     }
@@ -211,17 +206,13 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *   }
    * },
    */
-  static parseItem (anItem: any): OrgItem {
-    //console.log ("parseItem ()");
-        
+  static parseItem (anItem: any): OrgItem {        
     var newNode: OrgItem=new OrgItem ();
         
-    for (var i in anItem) {           
-      //console.log ("item: " + i);
-        
+    for (var i in anItem) {
       if(i=="#annotations") {
         newNode.annotations = Linkable.fromJSON (anItem [i]["#annotations"]);
-      }  
+      }
         
       if (i=="@scoring_mode") {
         newNode.scoringMode=anItem [i];
@@ -851,12 +842,6 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     if (anObjective ["#annotations"]) {  
       newLO.annotations=Linkable.fromJSON (anObjective ["#annotations"]);
     }    
-   
-    /*  
-    for (let i=0;i<anObjective ["#skills"].length;i++) {
-        newLO.annotations.push (anObjective ["#skills"][i]);
-    } 
-    */ 
 
     return (newLO);
   }
@@ -931,17 +916,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     // that all annotations are skills
         
     ephemeral ["#annotations"]=Linkable.toJSON (anLO.annotations);
-      
-    /*  
-    ephemeral ["#skills"]=new Array<string>();
-                          
-    for (let i=0;i<anLO.annotations.length;i++) {
-      //console.log ("Adding annotation: " + JSON.stringify (anLO.annotations [i]));  
-          
-      ephemeral ["#annotations"].push (anLO.annotations [i]);
-    } 
-    */           
-            
+
     anArray.push ({"objective" : ephemeral});
       
     // Then we add any children this LO might have ...  
@@ -1013,7 +988,6 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     }
 
     return new LearningObjectiveModel({'los': LearningObjectiveModel.reparent (newData)});
-    //return new LearningObjectiveModel({'los': newData});
   }
 }
 

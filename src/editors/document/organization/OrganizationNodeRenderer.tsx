@@ -327,38 +327,13 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         canDrag=true;
         
-        if (canDrag) {
-            //console.log ("canDrag: " + canDrag);
-            
-            if (typeof node.children === 'function' && node.expanded) {
-                console.log ("create handle ...");
-                // Show a loading symbol on the handle when the children are expanded
-                // and yet still defined by a function (a callback to fetch the children)
-                handle = (
-                    <div style={styles.orgloadingHandle}>
-                        <div style={styles.orgloadingCircle}>
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                            <div style={styles.orgloadingCirclePoint} />
-                        </div>
-                    </div>
-                );
-            } else {
-                // Show the handle used to initiate a drag-and-drop
-                handle = connectDragSource((
-                    <div style={styles.orgmoveHandle as any} />
-                ), { dropEffect: 'copy' });
-            }
-        }
+        let hStyle:any=styles.backupHamburger;
+
+        handle = connectDragSource((
+          <div style={styles.orgloadingHandle}>
+            <div id="handle" style={hStyle}></div>
+          </div>
+        ), { dropEffect: 'copy' });
 
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;

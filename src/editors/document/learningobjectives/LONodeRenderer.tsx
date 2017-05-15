@@ -445,22 +445,19 @@ class LONodeRenderer extends Component <any, any>
                 <div style={styles.orgrowWrapper as any}>
                     {/* Set the row preview to be used during drag and drop */}
                     {connectDragPreview(
-                        <div style={gStyle}>
-
-                            {handle}
-            
-                                 <TitleContentEditor 
-                                   services={services}
-                                   editMode={true}
-                                   model={titleObj}
-                                   context={context}
-                                   styles={styles.loTitleRenderer}
-                                   onEdit={(content) => this.editNodeTitle(node,content)} 
-                                   />
-            
-                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
-                        </div>
+                     <div style={gStyle}>
+                       {handle}
+                       <TitleContentEditor 
+                        services={services}
+                        editMode={true}
+                        model={titleObj}
+                        context={context}
+                        styles={styles.loTitleRenderer}
+                        onEdit={(content) => this.editNodeTitle(node,content)} 
+                       />            
+                       <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                       <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
+                     </div>
                     )}
                 </div>
             </div>

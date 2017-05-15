@@ -126,34 +126,25 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     saveToDB (newData?:any): void {
       console.log ("saveToDB ()");
         
-      if (newData) {
-        //console.log ("Using argument to save data ...");  
+      if (newData) {  
         let newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
                      
         let updatedDocument=this.state.document.set ('model',newModel);
-              
-        //console.log ("Setting state to new document to save: " + JSON.stringify (updatedDocument));           
           
-        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {
-          //console.log ("New document state: " + JSON.stringify (this.state.document));           
+        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {           
           persistence.persistDocument(this.state.document)
-            .then(result => {
-              //console.log ("Document saved, loading to get new revision ... ");                
+            .then(result => {                
               this.loadDocument (this.state.documentId);
           });
         });         
-      } else {
-        //console.log ("Using state to save data ...");         
+      } else {         
         let newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
                      
         let updatedDocument=this.state.document.set ('model',newModel);
-              
-        //console.log ("Setting state to new document to save: " + JSON.stringify (updatedDocument));  
-          
+
         this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {         
           persistence.persistDocument(this.state.document)
-            .then(result => {
-              //console.log ("Document saved, loading to get new revision ... ");                
+            .then(result => {                
               this.loadDocument (this.state.documentId);
           });
         });
@@ -216,18 +207,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         var newNode:OrgSequence=new OrgSequence ();
         newNode.title="New Sequence";
         immutableHelper.push (newNode);
-        
-        //console.log ("New Data: " + JSON.stringify (immutableHelper));
-        
-        /*
-        this.setState({
-          modalIsOpen : false, 
-          treeData: immutableHelper
-        },function (){
-          console.log ("New tree: " + JSON.stringify (this.state.treeData));    
-          this.saveToDB ();
-        });
-        */
+
         this.saveToDB (immutableHelper);    
     }    
 
@@ -262,9 +242,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         console.log ("LearningObjectiveEditor:deleteNode ()");
           
         let immutableHelper = this.state.treeData.slice();
-        
-        //console.log ("Tree: " + JSON.stringify (immutableHelper));
-        
+                
         let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
         if (immutableHelper==null) {
@@ -287,16 +265,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                 break;
             }
         }
-        
-        /*
-        this.setState({
-          modalIsOpen : false, 
-          treeData: immutableHelper
-        },function (){
-          this.saveToDB ();
-        });
-        */
-            
+
         this.saveToDB (immutableHelper);    
     }
         
@@ -333,15 +302,6 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                 break;
             }
         }
-        
-        /*
-        this.setState({
-          modalIsOpen : false, 
-          treeData: immutableHelper
-        },function (){
-          this.saveToDB ();
-        });
-        */
             
         this.saveToDB (immutableHelper);   
     }
