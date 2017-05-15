@@ -206,21 +206,21 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
 
     listenForChanges() {
-        persistence.listenToDocument(this.state.document)
-            .then(document => {
-                if (!this.stopListening) {
-
-                    this.setState({document});
-
-                    this.listenForChanges();
-                }
-
-            })
-            .catch(err => {
-                if (!this.stopListening) {
-                    this.listenForChanges();
-                }
-            })
+        // persistence.listenToDocument(this.state.document)
+        //     .then(document => {
+        //         if (!this.stopListening) {
+        //
+        //             this.setState({document});
+        //
+        //             this.listenForChanges();
+        //         }
+        //
+        //     })
+        //     .catch(err => {
+        //         if (!this.stopListening) {
+        //             this.listenForChanges();
+        //         }
+        //     })
     }
 
     render(): JSX.Element {

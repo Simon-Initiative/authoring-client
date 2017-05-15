@@ -20,7 +20,7 @@ export function createAttachment(name: string, data: any, content_type: string,
     const referencingDocuments = Immutable.List.of<string>(referencingDocumentId);
     const mediaModel = new models.MediaModel({ name, _attachments, referencingDocuments });
     
-    createDocument(mediaModel, configuration.attachmentDatabase)
+    createDocument(this.props.courseId, mediaModel)
       .then((doc: Document) => {
         resolve(relativeToAbsolute(`${doc._id}/${name}`, configuration.attachmentDatabase));
       })

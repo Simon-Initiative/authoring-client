@@ -4,6 +4,7 @@ import * as models from "./models";
 import * as Immutable from "immutable";
 import {credentials, getHeaders} from "../actions/utils/credentials";
 import {configuration} from "../actions/utils/config";
+import {isNullOrUndefined} from "util";
 var fetch = (window as any).fetch;
 
 export type Ok = '200';
@@ -166,11 +167,15 @@ export function listenToDocument(doc: Document): Promise<Document> {
     });
 }
 
-export function createDocument(content: models.ContentModel,
-                               database: string = configuration.database): Promise<Document> {
+export function createDocument(courseId: CourseId, content: models.ContentModel): Promise<Document> {
     console.log("createDocument ()");
+    // :TODO: add resource type
+    let url = `${configuration.baseUrl}/${courseId}/resources/`;
+    if (isNullOrUndefined(courseId)) {
+        url = `${configuration.baseUrl}/packages/`;
+    }
     return new Promise(function (resolve, reject) {
-        fetch(`${configuration.baseUrl}/${database}`, {
+        fetch(url, {
             method: 'POST',
             headers: getHeaders(credentials),
             body: JSON.stringify(content.toPersistence())
@@ -182,8 +187,10 @@ export function createDocument(content: models.ContentModel,
                 return response.json();
             })
             .then(json => {
+                let cId = isNullOrUndefined(courseId)?json.guid:courseId;
                 resolve(new Document({
-                    _id: json.id,
+                    _courseId: cId,
+                    _id: json.guid,
                     _rev: json.rev,
                     model: content
                 }));
@@ -221,8 +228,8 @@ export function persistDocument(doc: Document): Promise<Document> {
 
                 const newDocument = new Document({
                     _courseId: doc._courseId,
-                    _id: (json as any).id,
-                    _rev: (json as any).rev,
+                    _id: json.guid,
+                    _rev: json.rev,
                     model: doc.model
                 });
 
