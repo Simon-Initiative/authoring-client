@@ -161,6 +161,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
       return ("");
     }
  
+    /**
+     * 
+     */
     assignParent (aLOObject:LearningObjective,anId:string):void {
       console.log ("assignParent ()");
 
@@ -173,8 +176,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
       }
     }
 
-    assignParents (newData:any):void {
-    
+    /**
+     * 
+     */
+    assignParents (newData:any):void {    
       let immutableHelper = this.state.treeData.slice();
 
       if (newData) {

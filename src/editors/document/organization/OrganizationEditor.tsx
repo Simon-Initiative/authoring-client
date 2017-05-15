@@ -44,7 +44,8 @@ export interface OrganizationEditorState extends AbstractEditorState
   los: any;
   orgTarget : any;
   document: any;
-  documentId: string;    
+  documentId: string;
+  titleIndex:number;    
 }
 
 export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>
@@ -60,7 +61,7 @@ export interface OrganizationEditorProps extends AbstractEditorProps<models.Cour
 *
 */
 class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationEditorProps, OrganizationEditorState> 
-{
+{    
     /**
      * 
      */
@@ -74,8 +75,9 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         documentId: props.context.documentId,
         model: props.model,
         document: {},                
-        modalIsOpen: false    
-      });
+        modalIsOpen: false,
+        titleIndex: 0
+      });  
     }
         
     /**
@@ -205,8 +207,10 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         }
         
         var newNode:OrgSequence=new OrgSequence ();
-        newNode.title="New Sequence";
+        newNode.title=("Title " + this.state.titleIndex);
         immutableHelper.push (newNode);
+        
+        this.setState ({titleIndex: this.state.titleIndex+1});
 
         this.saveToDB (immutableHelper);    
     }    
@@ -215,27 +219,26 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * 
      */
     findTreeParent (aTree:any,aNode:any) : Array<Object> {
-     
-        console.log ("findTreeParent ("+aNode.id+")");
+      console.log ("findTreeParent ("+aNode.id+")");
         
-        for (var i=0;i<aTree.length;i++) {
-            let testNode:OrgItem=aTree [i];
+      for (var i=0;i<aTree.length;i++) {
+        let testNode:OrgItem=aTree [i];
             
-            if (testNode.id==aNode.id) {
-                return (aTree);
-            }
-            
-            // We can test length here because we always make sure this object exists
-            if (testNode.children.length>0) {
-                let result:Array<Object>=this.findTreeParent (testNode.children,aNode);
-                
-                if (result!=null) {
-                    return (result);
-                }
-            }
+        if (testNode.id==aNode.id) {
+         return (aTree);
         }
+            
+        // We can test length here because we always make sure this object exists
+        if (testNode.children.length>0) {
+          let result:Array<Object>=this.findTreeParent (testNode.children,aNode);
+                
+          if (result!=null) {
+            return (result);
+          }
+        }
+      }
         
-        return (null);
+      return (null);
     }    
     
     /**
@@ -323,7 +326,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      * 
      */    
     genProps () {
-        console.log ("OrganizationEditor:genProps ()");
+        //console.log ("OrganizationEditor:genProps ()");
         
         var optionalProps:Object=new Object ();
         

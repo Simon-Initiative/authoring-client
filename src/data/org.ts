@@ -61,10 +61,12 @@ export class OrgItem extends Linkable {
       ephemeral ["item"]=new Object ();
       
       if (anObject) {
+        ephemeral ["item"]["@expanded"]=anObject.expanded;
         ephemeral ["item"]["@scoring_mode"]=anObject.scoringMode;
         ephemeral ["item"]["resourceref"]=new Object ();
         ephemeral ["item"]["resourceref"]["@idref"]=anObject.resourceRef.idRef;          
       } else {    
+        ephemeral ["item"]["@expanded"]=anObject.expanded;
         ephemeral ["item"]["@scoring_mode"]=this.scoringMode;
         ephemeral ["item"]["resourceref"]=new Object ();
         ephemeral ["item"]["resourceref"]["@idref"]=this.resourceRef.idRef;
@@ -84,10 +86,12 @@ export class OrgSection extends OrgItem {
     let ephemeral:Object=new Object ();
     if (anObject) {
       ephemeral ["@id"]=anObject.id;
-      ephemeral ["#array"]=new Array ();        
+      ephemeral ["@expanded"]=anObject.expanded;
+      ephemeral ["#array"]=new Array ();
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations); 
     } else {  
       ephemeral ["@id"]=this.id;
+      ephemeral ["@expanded"]=this.expanded;
       ephemeral ["#array"]=new Array ();
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);  
     }   
@@ -106,10 +110,12 @@ export class OrgModule extends OrgItem {
     let ephemeral:Object=new Object ();
     if (anObject) {
       ephemeral ["@id"]=anObject.id;
+      ephemeral ["@expanded"]=anObject.expanded;
       ephemeral ["#array"]=new Array ();     
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);     
     } else {  
       ephemeral ["@id"]=this.id;
+      ephemeral ["@expanded"]=this.expanded;
       ephemeral ["#array"]=new Array ();
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);  
     }          
@@ -132,12 +138,14 @@ export class OrgSequence extends OrgItem{
       
     if (anObject) {
       ephemeral ["@id"]=anObject.id;
+      ephemeral ["@expanded"]=anObject.expanded;
       ephemeral ["@category"]=anObject.category;
       ephemeral ["@audience"]=anObject.audience;
       ephemeral ["#array"]=new Array ();
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);          
     } else {  
       ephemeral ["@id"]=this.id;
+      ephemeral ["@expanded"]=this.expanded;
       ephemeral ["@category"]=this.category;
       ephemeral ["@audience"]=this.audience;
       ephemeral ["#array"]=new Array ();
@@ -162,6 +170,7 @@ export class OrgOrganization extends OrgSequence {
     if (anObject) {
       ephemeral ["organization"]=new Object ();  
       ephemeral ["organization"]["@id"]=anObject.id;
+      ephemeral ["organization"]["@expanded"]=anObject.expanded;
       ephemeral ["organization"]["@version"]=anObject.version;
       ephemeral ["organization"]["#array"]=new Array ();
       ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("title",anObject.title));
@@ -171,6 +180,7 @@ export class OrgOrganization extends OrgSequence {
     } else {  
       ephemeral ["organization"]=new Object ();  
       ephemeral ["organization"]["@id"]=this.id;
+      ephemeral ["organization"]["@expanded"]=this.expanded;
       ephemeral ["organization"]["@version"]=this.version;
       ephemeral ["organization"]["#array"]=new Array ();
       ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("title",this.title));

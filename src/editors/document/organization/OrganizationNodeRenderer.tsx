@@ -302,7 +302,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         
       this.forceUpdate();
     }
-    
+      
     /**
      * 
      */
@@ -312,28 +312,17 @@ class OrganizationNodeRenderer extends Component <any,any>
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
         
-      if (this.shown==true) {
-        return (
-          <div>
-            <a style={bStyle} href="#" onClick={(e) => this.popMenu (node)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
-            <div tabIndex={0} className="onclick-menu">
-              <ul className="nav nav-pills flex-column onclick-menu-content-shown">
-                <h6>Content</h6>
-                <li className="nav-item"><a className="nav-link">Learning Objective</a></li>
-                <li className="nav-item"><a className="nav-link">Page</a></li>
-                <li className="nav-item"><a className="nav-link">Activity</a></li>
-                <h6>Assets</h6>
-                <li className="nav-item"><a className="nav-link">Add-On</a></li>
-              </ul>
-            </div>
-          </div>);           
-      }      
+      let menuStyle:string="nav nav-pills flex-column onclick-menu-content-shown";
         
+      if (this.shown==false) {
+        menuStyle="nav nav-pills flex-column onclick-menu-content";
+      }  
+         
       return (
-        <div>
+        <div ref='clickarea'>
           <a style={bStyle} href="#" onClick={(e) => this.popMenu (node)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
           <div tabIndex={0} className="onclick-menu">
-            <ul className="nav nav-pills flex-column onclick-menu-content">
+            <ul className={menuStyle}>
               <h2 className="btn btn-secondary">Content</h2>
               <li className="nav-item"><a className="nav-link">Learning Objective</a></li>
               <li className="nav-item"><a className="nav-link">Page</a></li>

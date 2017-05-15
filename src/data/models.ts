@@ -220,6 +220,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
             
       if (i=="resourceref") {
         newNode.title=anItem [i]["@idref"];
+        //newNode.expanded=anItem [i]["@expanded"];
         newNode.resourceRef.idRef=anItem [i]["@idref"];
       }            
     }
@@ -235,6 +236,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                
     var newNode: OrgSection=new OrgSection ();
     newNode.id=aSection ["@id"];
+    newNode.expanded=aSection ["@expanded"];
     if (aSection ["#annotations"]) {  
       newNode.annotations = Linkable.fromJSON (aSection ["#annotations"]);
     }    
@@ -264,6 +266,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     let moduleNode:OrgModule=new OrgModule (); 
     moduleNode.id=aModule ["@id"];
+    moduleNode.expanded=aModule ["@expanded"];
     if (aModule ["#annotations"]) {         
       moduleNode.annotations = Linkable.fromJSON (aModule ["#annotations"]);
     }
@@ -317,6 +320,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       for (let i in aData) { 
         orgNode=new OrgOrganization ();// throw away for now
         orgNode.id=aData [i]["@id"];
+        orgNode.expanded=aData [i]["@expanded"];
         orgNode.version=aData [i]["@version"];
         if (aData [i]["#annotations"]) {  
           orgNode.annotations = Linkable.fromJSON (aData [i]["#annotations"]);
@@ -388,6 +392,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                     let seqReference=seqObj ["sequence"];
                     newData.push (newSequence);
                     newSequence.id = seqReference["@id"];
+                    newSequence.expanded = seqReference["@expanded"];
                     newSequence.category = seqReference["@category"];
                     newSequence.audience = seqReference["@audience"];                         
                     if (seqReference ["#annotations"]) {  
@@ -460,6 +465,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                          
       let sequence:Object=new Object ();          
       sequence ["@id"]=seqObject.id;
+      sequence ["@expanded"]=seqObject.expanded;  
       sequence ["@category"]=seqObject.category;
       sequence ["@audience"]=seqObject.audience;
       if (seqObject ["annotations"]) {
@@ -483,6 +489,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         sequence ["#array"].push (moduleContainer);
              
         moduleObj["@id"]=mObj.id;
+        moduleObj ["@expanded"]=mObj.expanded;
         if (moduleObj ["annotations"]) {
           moduleObj ["#annotations"]=Linkable.toJSON (moduleObj ["annotations"]);  
         }          
@@ -501,6 +508,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           moduleObj["#array"].push (sectionContainer);
                
           sectionObj ["#id"]=sObj.id;
+          sectionObj ["@expanded"]=sObj.expanded;
           if (sectionObj ["annotations"]) {
             sectionObj ["#annotations"]=Linkable.toJSON (sectionObj ["annotations"]);  
           }             
@@ -935,6 +943,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       
     var newData:Object=new Object ();
     newData ["objectives"]=new Object();
+    //newData ["objectives"]["@expanded"]=this.expanded;
     newData ["objectives"]["@id"]=this.id;
     newData ["objectives"]["#array"]=flatLOs;
     newData ["objectives"]["#array"].push (LearningObjectiveModel.addTextObject ("title",this.title));
