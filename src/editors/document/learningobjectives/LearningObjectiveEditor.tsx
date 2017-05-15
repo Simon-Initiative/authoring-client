@@ -39,6 +39,7 @@ export interface LearningObjectiveEditorState extends AbstractEditorState {
   target : any;
   document: any;
   documentId: string;
+  titleIndex:number; 
 }
 
 export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel> {
@@ -68,7 +69,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                         documentId: props.context.documentId,
                         model: props.model,
                         document: {},
-                        modalIsOpen: false                      
+                        modalIsOpen: false,
+                        titleIndex: 0                      
                      });                        
     }
   
@@ -242,8 +244,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
         }
         
         var newNode:LearningObjective=new LearningObjective ();
-        newNode.title="New Learning Objective";
+        newNode.title=("Title " + this.state.titleIndex);
         immutableHelper.push (newNode);
+        
+        this.setState ({titleIndex: this.state.titleIndex+1});
         
         this.setState({
           modalIsOpen : false, 
@@ -255,17 +259,46 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
     
     /**
      * 
+     */
+    findTreeParent (aTree:any,aNode:any) : Array<Object> {
+      console.log ("findTreeParent ("+aNode.id+")");
+        
+      for (var i=0;i<aTree.length;i++) {
+        let testNode:OrgItem=aTree [i];
+            
+        if (testNode.id==aNode.id) {
+         return (aTree);
+        }
+            
+        // We can test length here because we always make sure this object exists
+        if (testNode.children.length>0) {
+          let result:Array<Object>=this.findTreeParent (testNode.children,aNode);
+                
+          if (result!=null) {
+            return (result);
+          }
+        }
+      }
+        
+      return (null);
+    }     
+    
+    /**
+     * 
      */    
     deleteNode (aNode:any): void {
         console.log ("LearningObjectiveEditor:deleteNode ()");
             
         var immutableHelper = this.state.treeData.slice();
         
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
         if (immutableHelper==null) {
             console.log ("Bump");
             return;
         }
                 
+        /*
         for (var i=0;i<immutableHelper.length;i++) {
             let testNode:LearningObjective=immutableHelper [i];
             
@@ -274,6 +307,16 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                 break;
             }
         }
+        */
+        
+        for (var i=0;i<parentArray.length;i++) {
+            let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+            if (testNode.id==aNode.id) {
+                parentArray.splice (i,1);
+                break;
+            }
+        }        
         
         this.setState({modalIsOpen: false,treeData: immutableHelper});
     }

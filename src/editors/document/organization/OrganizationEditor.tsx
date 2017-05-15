@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import Linkable from '../../../data/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 
@@ -317,10 +318,36 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     linkLO(aNode:any) {        
         console.log ("OrganizationEditor:linkLO ()");
-        console.log ("aNode: " + JSON.stringify (aNode));
+        //console.log ("aNode: " + JSON.stringify (aNode));
                 
         this.setState ({modalIsOpen: true, orgTarget: aNode});
     }    
+    
+    /**
+     * 
+     */
+    toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
+      console.log ("toFlat ()");
+        
+      if (!aTree) {
+        return [];
+      }  
+        
+      for (let i=0;i<aTree.length;i++) {
+        let newObj:Linkable=new Linkable ();
+        newObj.id=aTree [i].id;
+        newObj.title=aTree [i].title;
+        aToList.push (newObj);
+          
+        if (aTree [i]["children"]) {
+          console.log ("Lo has children, processing ...");  
+          let tList=aTree [i]["children"];
+          this.toFlat (tList,aToList);
+        }
+      }
+        
+      return (aToList);  
+    }
     
     /**
      * 
@@ -352,7 +379,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.los} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
       } else {
         console.log ("Internal error: no skills object can be empty but not null");
       }

@@ -8,6 +8,7 @@ import guid from '../utils/guid';
 export default class Linkable {
 
   id:string=guid();
+  title:string="unassigned";        
   expanded:boolean=false;
   annotations:Array <Linkable>=new Array ();  
     
