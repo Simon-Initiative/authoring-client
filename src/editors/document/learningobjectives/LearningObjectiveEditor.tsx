@@ -186,8 +186,12 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
 
       if (newData) {
         console.log ("We have alternative facts, let's use those instead ...");
-        //console.log ("New Tree: " + JSON.stringify (newData));
-        immutableHelper=newData ["treeData"];
+        
+        if (newData ["treeData"]) {
+         immutableHelper=newData ["treeData"];
+        } else {  
+         immutableHelper=newData;
+        }    
       }
         
       if (immutableHelper==null)
@@ -205,25 +209,45 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
       return (immutableHelper);      
     }
 
+    /**
+     * 
+     */
     saveToDB (newData?:any): void {
-        //console.log ("saveToDB ()");
-        this.setState({
-          modalIsOpen : false, 
-          treeData: this.assignParents (newData)
-        },function (){          
-            console.log ("Parented: " + JSON.stringify (this.state.treeData));
-            var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+        console.log ("saveToDB ()");
+        if (newData) {
+            
+          this.setState({
+            modalIsOpen : false, 
+            treeData: this.assignParents (newData)
+          },function (){          
+              console.log ("Parented: " + JSON.stringify (this.state.treeData));
+              var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
                      
-            var updatedDocument=this.state.document.set ('model',newModel);
+              var updatedDocument=this.state.document.set ('model',newModel);
                            
-            this.setState ({'document' : updatedDocument },function () {         
-              persistence.persistDocument(this.state.document)
-                .then(result => {
-                    console.log ("Document saved, loading to get new revision ... ");                
-                    this.loadDocument (this.state.documentId);
-                });
-            });
-        });    
+              this.setState ({'document' : updatedDocument },function () {         
+                persistence.persistDocument(this.state.document)
+                  .then(result => {
+                      console.log ("Document saved, loading to get new revision ... ");                
+                      this.loadDocument (this.state.documentId);
+                  });
+              });
+          });            
+            
+        } else {            
+          console.log ("Parented: " + JSON.stringify (this.state.treeData));
+          var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+                     
+          var updatedDocument=this.state.document.set ('model',newModel);
+                           
+          this.setState ({'document' : updatedDocument },function () {         
+            persistence.persistDocument(this.state.document)
+              .then(result => {
+                console.log ("Document saved, loading to get new revision ... ");                
+                this.loadDocument (this.state.documentId);
+              });
+           });
+       }        
     }    
         
     /**
@@ -316,9 +340,13 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
                 parentArray.splice (i,1);
                 break;
             }
-        }        
+        }
         
-        this.setState({modalIsOpen: false,treeData: immutableHelper});
+        //console.log ("New Tree: " + JSON.stringify (immutableHelper));
+                
+        //this.setState({modalIsOpen: false,treeData: immutableHelper});
+        
+        this.saveToDB (immutableHelper);
     }
     
     /**
@@ -346,7 +374,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
             }
         }
         
-        this.setState({modalIsOpen: false,treeData: immutableHelper});    
+        //this.setState({modalIsOpen: false,treeData: immutableHelper});
+        
+        this.saveToDB (immutableHelper);
     }
     
     /**

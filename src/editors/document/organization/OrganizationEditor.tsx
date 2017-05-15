@@ -86,13 +86,13 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-        persistence.retrieveDocument(this.state.context.courseId).then(course => {            
+        persistence.retrieveDocument(this.state.context.courseId).then(course => {
+            console.log ("course: " + JSON.stringify (course));            
             let orgObject=course ["model"]["organizations"];                                    
             let orgDocId=orgObject.get (0);
            
-            persistence.retrieveDocument(orgDocId).then(doc => {
-              
-              console.log ("Org data: " + JSON.stringify (doc ["model"]));
+            persistence.retrieveDocument(orgDocId).then(doc => {              
+              //console.log ("Org data: " + JSON.stringify (doc ["model"]));
                 
               this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
             }); 
