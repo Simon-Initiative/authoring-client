@@ -1,5 +1,5 @@
-const protocol = 'http://';
-const hostname = 'raffmac.local';
+const protocol = window.location.protocol + '//';
+const hostname = window.location.host;  // host as opposed to hostname picks up the port also
 const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
