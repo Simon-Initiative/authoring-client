@@ -4,6 +4,7 @@ import {FileNode} from "./file_node";
 export type WebContentParams = {
   rev: number,
   guid: string,
+  type?: string,
   fileNode: FileNode,
 };
 
@@ -12,6 +13,7 @@ export class WebContent extends Immutable.Record({contentType: 'WebContent',rev:
   contentType: 'WebContent';
   rev: number;
   guid: string;
+  type: string;
   fileNode: FileNode;
   
   constructor(params?: WebContentParams) {
@@ -24,13 +26,14 @@ export class WebContent extends Immutable.Record({contentType: 'WebContent',rev:
 
   static fromPersistence(root: Object) : WebContent {
     let a = (root as any);
-    return new WebContent({rev: a.rev, guid: a.guid, fileNode: FileNode.fromPersistence(a.fileNode)});
+    return new WebContent({rev: a.rev, guid: a.guid, type:a.type, fileNode: FileNode.fromPersistence(a.fileNode)});
   }
 
   toPersistence() : Object {
     return {
       "rev": this.rev,
       "guid": this.guid,
+      "type": this.type,
       "fileNode": this.fileNode.toPersistence()
     }
   }

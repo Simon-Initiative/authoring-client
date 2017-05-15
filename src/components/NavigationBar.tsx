@@ -247,7 +247,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                 this.props.course.model.guid,
                 'Organizations',
                 (resource) => resource.type === 'x-oli-organization',
-                (title, courseId) => new models.OrganizationModel({
+                (title, resource) => new models.OrganizationModel({
+                    resource,
                     title: new contentTypes.Title({text: title})
                 })
             );
@@ -257,8 +258,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                 this.props.course.model.guid,
                 'Activities',
                 (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
-                (title, courseId) => new models.AssessmentModel({
-                    courseId,
+                (title, resource) => new models.AssessmentModel({
+                    resource,
                     title: new contentTypes.Title({text: title})
                 })
             );
@@ -268,8 +269,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                 this.props.course.model.guid,
                 'Workbook Pages',
                 (resource) => resource.type === 'x-oli-workbook_page',
-                (title, courseId) => new models.WorkbookPageModel({
-                    courseId,
+                (title, resource) => new models.WorkbookPageModel({
+                    resource,
                     head: new contentTypes.Head({title: new contentTypes.Title({text: title})})
                 })
             );

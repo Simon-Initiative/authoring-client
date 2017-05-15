@@ -147,6 +147,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
             // Special processing if next document is a CourseModel - don't call fetchDocument
             if (nextProps.course && nextProps.course.model.guid === nextProps.documentId) {
                 let document = new persistence.Document({
+                    _courseId: nextProps.course.model.guid,
                     _id: nextProps.course.model.guid,
                     _rev: nextProps.course.model.rev,
                     model: nextProps.course.model
@@ -174,6 +175,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         // Special handling for CourseModel  - don't call fetchDocument
         if (this.props.course && this.props.course.model.guid === this.props.documentId) {
             let document = new persistence.Document({
+                _courseId: this.props.course.model.guid,
                 _id: this.props.course.model.guid,
                 _rev: this.props.course.model.rev,
                 model: this.props.course.model
@@ -204,7 +206,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
 
     listenForChanges() {
-        persistence.listenToDocument(this.props.documentId)
+        persistence.listenToDocument(this.state.document)
             .then(document => {
                 if (!this.stopListening) {
 

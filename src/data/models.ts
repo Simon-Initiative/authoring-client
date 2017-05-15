@@ -38,6 +38,8 @@ export function createModel(object: any): ContentModel {
             return WorkbookPageModel.fromPersistence(object);
         case 'x-oli-assessment':
             return AssessmentModel.fromPersistence(object);
+        case 'x-oli-inline-assessment':
+            return AssessmentModel.fromPersistence(object);
         case 'x-oli-organization':
             return OrganizationModel.fromPersistence(object);
         case 'x-oli-learning_objectives':
@@ -80,9 +82,6 @@ export type CourseModelParams = {
     icon?: WebContent,
     resources?: Immutable.OrderedMap<string, Resource>,
     webContents?: Immutable.OrderedMap<string, WebContent>
-    // organizations?: Immutable.List<types.DocumentId>,
-    // learningobjectives?: Immutable.List<types.DocumentId>,
-    // skills?: Immutable.List<types.DocumentId>
 };
 
 const defaultCourseModel = {
@@ -99,9 +98,6 @@ const defaultCourseModel = {
     icon: new WebContent(),
     resources: Immutable.OrderedMap<string, Resource>(),
     webContents: Immutable.OrderedMap<string, WebContent>()
-    // organizations: Immutable.List<types.DocumentId>(),
-    // learningobjectives: Immutable.List<types.DocumentId>(),
-    // skills: Immutable.List<types.DocumentId>()
 }
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
@@ -120,9 +116,6 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     icon: WebContent;
     resources: Immutable.OrderedMap<string, Resource>;
     webContents: Immutable.OrderedMap<string, WebContent>;
-    // organizations: Immutable.List<types.DocumentId>;
-    // learningobjectives: Immutable.List<types.DocumentId>;
-    // skills: Immutable.List<types.DocumentId>;
 
     constructor(params?: CourseModelParams) {
         params ? super(params) : super();
@@ -161,9 +154,6 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
                 model = model.with({webContents: model.webContents.set(id, WebContent.fromPersistence(item))});
             });
         }
-        // model = model.with({ organizations: Immutable.List<types.DocumentId>(c.organizations) });
-        // model = model.with({ learningobjectives: Immutable.List<types.DocumentId>(c.learningobjectives) });
-        // model = model.with({ skills: Immutable.List<types.DocumentId>(c.skills) });
         return model;
     }
 
@@ -181,95 +171,14 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
             options: this.options,
             icon: this.icon.toPersistence(),
             resources: [...this.resources.toArray().map(resource => resource.toPersistence())],
-            webContents: [...this.webContents.toArray().map(webContent => webContent.toPersistence())],
-            // organizations: this.organizations.toArray(),
-            // learningobjectives: this.learningobjectives.toArray(),
-            // skills: this.skills.toArray(),
+            webContents: [...this.webContents.toArray().map(webContent => webContent.toPersistence())]
         }
         return Object.assign({}, values);
     }
 }
 
-export type OrganizationModelParams = {
-    title?: contentTypes.Title
-};
-
-const defaultOrganizationModel = {
-    modelType: 'OrganizationModel',
-    title: new contentTypes.Title(),
-}
-
-export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {
-    modelType: 'OrganizationModel';
-    title: contentTypes.Title;
-
-    constructor(params?: OrganizationModelParams) {
-        params ? super(params) : super();
-    }
-
-    with(values: OrganizationModelParams) {
-        return this.merge(values) as this;
-    }
-
-    static fromPersistence(json: Object): OrganizationModel {
-        return new OrganizationModel();
-    }
-
-    toPersistence(): Object {
-        return {};
-    }
-}
-
-export type MediaModelParams = {
-    name?: string,
-    _attachments?: any,
-    referencingDocuments?: Immutable.List<types.DocumentId>
-};
-const defaultMediaModelParams = {
-    modelType: 'MediaModel',
-    name: '',
-    _attachments: {},
-    referencingDocuments: Immutable.List<types.DocumentId>()
-}
-
-export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
-
-    modelType: 'MediaModel';
-
-    name: string;
-    _attachments: any;
-    referencingDocuments: Immutable.List<types.DocumentId>
-
-    constructor(params?: MediaModelParams) {
-        params ? super(params) : super();
-    }
-
-    with(values: MediaModelParams) {
-        return this.merge(values) as this;
-    }
-
-    static fromPersistence(json: Object): MediaModel {
-        let model = new MediaModel();
-        let m = json as any;
-        model = model.with({name: m.name});
-        model = model.with({_attachments: m._attachments});
-        model = model.with({referencingDocuments: Immutable.List<types.DocumentId>(m.referencingDocuments)});
-
-        return model;
-    }
-
-    toPersistence(): Object {
-        return {
-            modelType: 'MediaModel',
-            name: this.name,
-            _attachments: this._attachments,
-            referencingDocuments: this.referencingDocuments.toArray()
-        };
-    }
-}
-
 export type WorkbookPageModelParams = {
-    courseId?: types.DocumentId,
+    resource?: Resource,
     head?: contentTypes.Head,
     body?: contentTypes.Html,
     lock?: contentTypes.Lock
@@ -277,7 +186,7 @@ export type WorkbookPageModelParams = {
 
 const defaultWorkbookPageModelParams = {
     modelType: 'WorkbookPageModel',
-    courseId: '',
+    resource: new Resource(),
     head: new contentTypes.Head(),
     body: new contentTypes.Html(),
     lock: new contentTypes.Lock()
@@ -286,8 +195,7 @@ const defaultWorkbookPageModelParams = {
 export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModelParams) {
 
     modelType: 'WorkbookPageModel';
-
-    courseId: types.DocumentId;
+    resource: Resource;
     head: contentTypes.Head;
     body: contentTypes.Html;
     lock: contentTypes.Lock;
@@ -304,15 +212,13 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         let model = new WorkbookPageModel();
 
         let wb = (json as any);
+        model = model.with({resource: Resource.fromPersistence(wb)});
 
-        if (wb.lock !== undefined) {
+        if (wb.lock !== undefined && wb.lock !== null) {
             model = model.with({lock: contentTypes.Lock.fromPersistence(wb.lock)});
         }
-        if (wb.courseId !== undefined) {
-            model = model.with({courseId: wb.courseId});
-        }
 
-        wb.workbook_page['#array'].forEach(item => {
+        wb.doc.workbook_page['#array'].forEach(item => {
 
             const key = getKey(item);
             const id = guid();
@@ -332,31 +238,33 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     }
 
     toPersistence(): Object {
-
-        const root = {
-            "courseId": this.courseId,
-            "modelType": "WorkbookPageModel",
+        let resource = this.resource.toPersistence();
+        let doc = [{
             "workbook_page": {
+                "@id": this.resource.id,
                 "#array": [
                     this.head.toPersistence(),
                     {body: this.body.toPersistence()}
                 ]
             }
+        }];
+        const root = {
+            "doc": doc
         };
 
-        return Object.assign({}, root, this.lock.toPersistence());
+        return Object.assign({}, resource, root, this.lock.toPersistence());
     }
 }
 
 export type AssessmentModelParams = {
-    courseId?: types.DocumentId,
+    resource?: Resource,
     lock?: contentTypes.Lock,
     title?: contentTypes.Title,
     nodes?: Immutable.OrderedMap<string, Node>
 };
 const defaultAssessmentModelParams = {
     modelType: 'AssessmentModel',
-    courseId: '',
+    resource: new Resource(),
     lock: new contentTypes.Lock(),
     title: new contentTypes.Title(),
     nodes: Immutable.OrderedMap<string, Node>()
@@ -368,8 +276,7 @@ export type Node = contentTypes.Question | contentTypes.Content | contentTypes.U
 export class AssessmentModel extends Immutable.Record(defaultAssessmentModelParams) {
 
     modelType: 'AssessmentModel';
-
-    courseId: types.DocumentId;
+    resource: Resource;
     lock: contentTypes.Lock;
     title: contentTypes.Title;
     nodes: Immutable.OrderedMap<string, Node>;
@@ -387,15 +294,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         let model = new AssessmentModel();
 
         let a = (json as any);
+        model = model.with({resource: Resource.fromPersistence(a)});
 
-        if (a.lock !== undefined) {
+        if (a.lock !== undefined && a.lock !== null) {
             model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
         }
-        if (a.courseId !== undefined) {
-            model = model.with({courseId: a.courseId});
-        }
 
-        a.assessment['#array'].forEach(item => {
+        a.doc.assessment['#array'].forEach(item => {
 
             const key = getKey(item);
             const id = guid();
@@ -419,20 +324,68 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     }
 
     toPersistence(): Object {
+        let resource = this.resource.toPersistence();
         const children = [
             this.title.toPersistence(),
             ...this.nodes.toArray().map(node => node.toPersistence()),
         ]
-        const root = {
-            "courseId": this.courseId,
-            "modelType": "AssessmentModel",
+        let doc = [{
             "assessment": {
                 "@id": "id",
                 "#array": children
             }
+        }];
+        const root = {
+            "doc": doc
         };
 
-        return Object.assign({}, root, this.lock.toPersistence());
+        return Object.assign({}, resource, root, this.lock.toPersistence());
+    }
+}
+
+export type OrganizationModelParams = {
+    resource?: Resource,
+    title?: contentTypes.Title,
+    lock?: contentTypes.Lock
+};
+
+const defaultOrganizationModel = {
+    modelType: 'OrganizationModel',
+    resource: new Resource(),
+    title: new contentTypes.Title(),
+    lock: new contentTypes.Lock()
+}
+
+export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {
+    modelType: 'OrganizationModel';
+    resource: Resource;
+    title: contentTypes.Title;
+    lock: contentTypes.Lock;
+
+    constructor(params?: OrganizationModelParams) {
+        params ? super(params) : super();
+    }
+
+    with(values: OrganizationModelParams) {
+        return this.merge(values) as this;
+    }
+
+    static fromPersistence(json: Object): OrganizationModel {
+        let model = new OrganizationModel();
+        const id = guid();
+        let a = (json as any);
+        model = model.with({resource: Resource.fromPersistence(a)});
+        let title = model.resource.title;
+        model = model.with({title: contentTypes.Title.fromPersistence(title, id)});
+
+        if (a.lock !== undefined && a.lock !== null) {
+            model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
+        }
+        return model;
+    }
+
+    toPersistence(): Object {
+        return {};
     }
 }
 
@@ -585,6 +538,57 @@ export class CoursePermissionModel extends Immutable.Record(defaultCoursePermiss
             modelType: 'CoursePermissionModel',
             userId: this.userId,
             courseId: this.courseId
+        };
+    }
+}
+
+export type MediaModelParams = {
+    webContent?: WebContent,
+    name?: string,
+    _attachments?: any,
+    referencingDocuments?: Immutable.List<types.DocumentId>
+};
+const defaultMediaModelParams = {
+    modelType: 'MediaModel',
+    webContent: new WebContent(),
+    name: '',
+    _attachments: {},
+    referencingDocuments: Immutable.List<types.DocumentId>()
+}
+
+export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
+
+    modelType: 'MediaModel';
+    webContent: WebContent;
+    name: string;
+    _attachments: any;
+    referencingDocuments: Immutable.List<types.DocumentId>
+
+    constructor(params?: MediaModelParams) {
+        params ? super(params) : super();
+    }
+
+    with(values: MediaModelParams) {
+        return this.merge(values) as this;
+    }
+
+    static fromPersistence(json: Object): MediaModel {
+        let model = new MediaModel();
+        let m = json as any;
+        model = model.with({webContent: WebContent.fromPersistence(m)})
+        model = model.with({name: m.name});
+        model = model.with({_attachments: m._attachments});
+        model = model.with({referencingDocuments: Immutable.List<types.DocumentId>(m.referencingDocuments)});
+
+        return model;
+    }
+
+    toPersistence(): Object {
+        return {
+            modelType: 'MediaModel',
+            name: this.name,
+            _attachments: this._attachments,
+            referencingDocuments: this.referencingDocuments.toArray()
         };
     }
 }
