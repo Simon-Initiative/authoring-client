@@ -60,10 +60,17 @@ export interface LearningObjectiveLinkerProps {
 }
 
 export interface LearningObjectiveLinkerState {
-  sourceData: any;   
+  sourceData: any;
+  localAnnotations: Array<Item>;     
   modalIsOpen : boolean;    
   target: any;
   closeModal: any;
+}
+
+class Item {
+    id: string="";
+    checked: boolean = false;
+    title: string="";
 }
 
 /**
@@ -85,7 +92,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
                    target: this.props.target,                                           
-                   closeModal: this.props.closeModal
+                   closeModal: this.props.closeModal,
+                   localAnnotations: null
                  };
             
     this.openModal = this.openModal.bind(this);
@@ -98,7 +106,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ()");
-      this.setState({sourceData: newProps.sourceData,modalIsOpen: newProps ["modalIsOpen"], target: newProps.target});
+      this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], target: newProps.target});
   }
    
   /**
@@ -115,6 +123,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       return;
     }  
       
+    /*
     var newData = [];       
       
     // First reset everything so that we don't have to keep
@@ -137,7 +146,36 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        }
     }
       
-    this.setState({sourceData: newData});     
+    this.setState({sourceData: newData});
+    */
+      
+    var newData: Array <Item>=new Array ();
+      
+    // First reset everything so that we don't have to keep
+    // checking and comparing, we can just set it checked if
+    // we encounter the item
+    this.state.sourceData.forEach(function(resetItem) {
+       let newItem:Item=new Item ();
+       newItem.id=resetItem.id;
+       newItem.checked=false;
+       newItem.title=resetItem.title;
+        
+       newData.push(resetItem);        
+    });
+      
+    for (var i=0;i<this.state.target.annotations.length;i++) {    
+       let item=this.state.target.annotations [i];  
+       console.log ("Checking item: " + item); 
+        
+       for (var j=0;j<newData.length;j++) {
+         let sourceItem=newData [j];  
+         if (sourceItem.id==item.id) {
+            sourceItem.checked=true;
+         }
+       }
+    }      
+  
+    this.setState({sourceData: newData});
   }    
     
   /**
@@ -166,10 +204,14 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       
     this.setState({modalIsOpen: false});
       
+    /*
     var newData = [];
     this.state.sourceData.forEach(function(item) {
       if (item.checked ==true) {
-       newData.push(item.id);
+       //newData.push(item.id);
+       let newLink:Linkable=new Linkable ();
+       newLink.id=item.id;
+       newData.push (newLink);
       }    
     });
       
@@ -179,6 +221,23 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       console.log ("Lo now: " +  JSON.stringify (this.state.target));
       this.state.closeModal ();  
     });
+    */     
+          
+    var newData = [];
+    this.state.sourceData.forEach(function(item) {
+      if (item.checked ==true) {
+       let newLink:Linkable=new Linkable ();
+       newLink.id=item.id;
+       newData.push (newLink);
+      }    
+    });
+      
+    lo.annotations=newData;  
+
+    this.setState ({target : lo}, function (){
+      console.log ("Lo now: " +  JSON.stringify (this.state.target));
+      this.state.closeModal ();  
+    });          
   }
     
   /**
@@ -199,7 +258,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
 
     this.state.sourceData.forEach(function(item) {
   
-       if(item.value === e.target.value) {
+       if(item.id === e.target.id) {
          item.checked = e.target.checked;
        }
 

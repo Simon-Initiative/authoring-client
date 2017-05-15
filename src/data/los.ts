@@ -63,20 +63,7 @@ export class LearningObjective extends Linkable {
     ephemeral ["@expanded"]=this.expanded;
     ephemeral ["#text"]=this.title;
     ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);
-      
-    // Add all the annotations of type skill to the skill list. Currently
-    // we do not define a type on annotations so for now we will assume
-    // that all annotations are skills      
-      
-    /*  
-    ephemeral ["#skills"]=new Array<string>();
-      
-    for (var i=0;i<this.annotations.length;i++) {
-      
-      ephemeral ["#skills"].push (this.annotations [i]);
-    }
-    */
-      
+
     return (ephemeral);
   }  
 }

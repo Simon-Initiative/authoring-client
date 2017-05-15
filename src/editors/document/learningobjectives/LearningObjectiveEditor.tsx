@@ -82,13 +82,12 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
             let loDocId=loObject.get (0);
            
             persistence.retrieveDocument(loDocId).then(doc => {
-              //this.setState ({treeData: this.processData (skillsDoc ["model"]["los"])});
               this.setState ({treeData: doc ["model"]["los"],document: doc});
-            }); 
-            
-            let skillObject=course ["model"]["skills"];                                    
+            });
+
+            let skillObject=course ["model"]["skills"];
             let skillDocId=skillObject.get (0);
-           
+
             persistence.retrieveDocument(skillDocId).then(skillDoc => {
               this.setState ({skills: skillDoc ["model"]["skills"]});
             });              
