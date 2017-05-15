@@ -74,7 +74,7 @@ export type CourseModelParams = {
     guid?: string,
     id?: string,
     version?: string,
-    title?: string,
+    title?: contentTypes.Title,
     type?: string,
     description?: string,
     metadata?: MetaData,
@@ -90,8 +90,8 @@ const defaultCourseModel = {
     guid: '',
     id: '',
     version: '',
-    type: '',
-    title: '',
+    type: 'x-oli-package',
+    title: new contentTypes.Title(),
     description: '',
     metadata: new MetaData(),
     options: '',
@@ -108,7 +108,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     guid: string;
     id: string;
     version: string;
-    title: string;
+    title: contentTypes.Title;
     type: string;
     description: string;
     metadata: MetaData;
@@ -132,7 +132,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         model = model.with({guid: c.guid});
         model = model.with({id: c.id});
         model = model.with({version: c.version});
-        model = model.with({title: c.title});
+        model = model.with({title: contentTypes.Title.fromPersistence(c.title, guid())});
         model = model.with({type: c.type});
         model = model.with({description: c.description});
         model = model.with({options: JSON.stringify(c.options)});
@@ -164,7 +164,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
             guid: this.guid,
             id: this.id,
             version: this.version,
-            title: this.title,
+            title: this.title.toPersistence(),
             type: this.type,
             description: this.description,
             metadata: this.metadata.toPersistence(),
@@ -179,6 +179,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
 
 export type WorkbookPageModelParams = {
     resource?: Resource,
+    type?: string;
     head?: contentTypes.Head,
     body?: contentTypes.Html,
     lock?: contentTypes.Lock
@@ -187,6 +188,7 @@ export type WorkbookPageModelParams = {
 const defaultWorkbookPageModelParams = {
     modelType: 'WorkbookPageModel',
     resource: new Resource(),
+    type: 'x-oli-workbook_page',
     head: new contentTypes.Head(),
     body: new contentTypes.Html(),
     lock: new contentTypes.Lock()
@@ -196,6 +198,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
     modelType: 'WorkbookPageModel';
     resource: Resource;
+    type: string;
     head: contentTypes.Head;
     body: contentTypes.Html;
     lock: contentTypes.Lock;
@@ -213,7 +216,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
         let wb = (json as any);
         model = model.with({resource: Resource.fromPersistence(wb)});
-
+        model = model.with({type: wb.type});
         if (wb.lock !== undefined && wb.lock !== null) {
             model = model.with({lock: contentTypes.Lock.fromPersistence(wb.lock)});
         }
@@ -258,12 +261,14 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
 export type AssessmentModelParams = {
     resource?: Resource,
+    type?: string;
     lock?: contentTypes.Lock,
     title?: contentTypes.Title,
     nodes?: Immutable.OrderedMap<string, Node>
 };
 const defaultAssessmentModelParams = {
     modelType: 'AssessmentModel',
+    type: '',
     resource: new Resource(),
     lock: new contentTypes.Lock(),
     title: new contentTypes.Title(),
@@ -277,6 +282,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
     modelType: 'AssessmentModel';
     resource: Resource;
+    type: string;
     lock: contentTypes.Lock;
     title: contentTypes.Title;
     nodes: Immutable.OrderedMap<string, Node>;
@@ -295,7 +301,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
         let a = (json as any);
         model = model.with({resource: Resource.fromPersistence(a)});
-
+        model = model.with({type: a.type});
+        model = model.with({title: contentTypes.Title.fromPersistence(a.title, guid())})
         if (a.lock !== undefined && a.lock !== null) {
             model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
         }
@@ -306,9 +313,6 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
             const id = guid();
 
             switch (key) {
-                case 'title':
-                    model = model.with({title: contentTypes.Title.fromPersistence(item, id)})
-                    break;
                 case 'question':
                     model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
                     break;
@@ -345,6 +349,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
 export type OrganizationModelParams = {
     resource?: Resource,
+    type?: string;
     title?: contentTypes.Title,
     lock?: contentTypes.Lock
 };
@@ -352,6 +357,7 @@ export type OrganizationModelParams = {
 const defaultOrganizationModel = {
     modelType: 'OrganizationModel',
     resource: new Resource(),
+    type: 'x-oli-organization',
     title: new contentTypes.Title(),
     lock: new contentTypes.Lock()
 }
@@ -359,6 +365,7 @@ const defaultOrganizationModel = {
 export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {
     modelType: 'OrganizationModel';
     resource: Resource;
+    type: string;
     title: contentTypes.Title;
     lock: contentTypes.Lock;
 
@@ -375,6 +382,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         const id = guid();
         let a = (json as any);
         model = model.with({resource: Resource.fromPersistence(a)});
+        model = model.with({type: a.type});
         let title = model.resource.title;
         model = model.with({title: contentTypes.Title.fromPersistence(title, id)});
 
