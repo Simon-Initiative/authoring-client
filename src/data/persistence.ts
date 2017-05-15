@@ -47,7 +47,7 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
     }
 }
 
-export function getEditablePackages() {
+export function getEditablePackages() : Promise<models.CourseModel[]> {
     return new Promise(function (resolve, reject) {
         fetch(`${configuration.baseUrl}/packages/editable`, {
             method: 'GET',
