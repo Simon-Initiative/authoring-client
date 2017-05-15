@@ -9,7 +9,7 @@ import guid from '../utils/guid';
 const Keycloak = require("keycloak-js");
 
 const keycloakConfig = {
-  url: 'http://raffmac.local/auth',
+  url: 'http://dev.local/auth',
   realm: 'oli_security',
   clientId: 'content_client'
 } 
@@ -68,7 +68,7 @@ export module user {
           // Also, request asynchronously the user's profile from keycloak
           kc.loadUserProfile().success(function(profile) {
 
-            const logoutUrl = kc.createLogoutUrl({redirectUri: 'http:/raffmac.local'});
+            const logoutUrl = kc.createLogoutUrl({redirectUri: 'http:/dev.local'});
             const accountManagementUrl = kc.createAccountUrl();
 
             dispatch(loginSuccess(profile.username, profile.id, profile, logoutUrl, accountManagementUrl));
@@ -78,9 +78,9 @@ export module user {
           });
           
         } else {
-          // Requires inserting "http://raffmac.local/*" in the Valid Redirect URIs entry
+          // Requires inserting "http://dev.local/*" in the Valid Redirect URIs entry
           // of the Content_client settings in the KeyCloak admin UI
-          kc.login({redirectUri: 'http:/raffmac.local'});
+          kc.login({redirectUri: 'http:/dev.local'});
         }
       });
 

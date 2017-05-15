@@ -1,5 +1,5 @@
 const protocol = 'http://';
-const hostname = 'raffmac.local';
+const hostname = 'dev.local';
 const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
