@@ -401,19 +401,22 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 //>------------------------------------------------------------------
 
 export type LearningObjectiveModelParams = {
-    courseId?: types.DocumentId,
+    resource?: Resource,
+    type?: string,
     title?: contentTypes.Title
 };
 
 const defaultLearningObjectiveModel = {
     modelType: 'LearningObjectiveModel',
-    courseId: '',
+    resource: new Resource(),
+    type: 'x-oli-learning_objectives',
     title: new contentTypes.Title(),
 }
 
 export class LearningObjectiveModel extends Immutable.Record(defaultLearningObjectiveModel) {
     modelType: 'LearningObjectiveModel';
-    courseId: types.DocumentId;
+    resource: Resource;
+    type: string;
     title: contentTypes.Title;
 
     constructor(params?: LearningObjectiveModelParams) {
@@ -425,7 +428,10 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     }
 
     static fromPersistence(json: Object): LearningObjectiveModel {
-        return new LearningObjectiveModel();
+        let a = (json as any);
+        let model = new LearningObjectiveModel();
+        model = model.with({type: a.type});
+        return model;
     }
 
     toPersistence(): Object {
@@ -436,14 +442,16 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 //>------------------------------------------------------------------
 
 export type SkillModelParams = {
-    courseId?: types.DocumentId,
+    resource?: Resource,
+    type?: string,
     title?: contentTypes.Title,
     skills?: any
 };
 
 const defaultSkillModel = {
     modelType: 'SkillModel',
-    courseId: '',
+    resource: new Resource(),
+    type: 'x-oli-skills',
     title: new contentTypes.Title(),
     skillDefaults: Skill,
     skills: []
@@ -451,7 +459,8 @@ const defaultSkillModel = {
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {
     modelType: 'SkillModel';
-    courseId: types.DocumentId;
+    resource: Resource;
+    type: string;
     title: contentTypes.Title;
     skillDefaults: Skill;
     skills: Array<Skill>;
@@ -510,48 +519,49 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     }
 }
 
-export type CoursePermissionModelParams = {
-    userId: types.UserId,
-    courseId: types.DocumentId
-};
-const defaultCoursePermissionModelParams = {
-    modelType: 'CoursePermissionModel',
-    userId: '',
-    courseId: ''
-}
-
-export class CoursePermissionModel extends Immutable.Record(defaultCoursePermissionModelParams) {
-
-    modelType: 'CoursePermissionModel';
-
-    userId: types.UserId;
-    courseId: types.DocumentId;
-
-    constructor(params?: CoursePermissionModelParams) {
-        params ? super(params) : super();
-    }
-
-    with(values: CoursePermissionModelParams) {
-        return this.merge(values) as this;
-    }
-
-    static fromPersistence(json: Object): CoursePermissionModel {
-        const model = new CoursePermissionModel();
-        const p = json as any;
-        return model.with({userId: p.userId, courseId: p.courseId});
-    }
-
-    toPersistence(): Object {
-        return {
-            modelType: 'CoursePermissionModel',
-            userId: this.userId,
-            courseId: this.courseId
-        };
-    }
-}
+// export type CoursePermissionModelParams = {
+//     userId: types.UserId,
+//     courseId: types.DocumentId
+// };
+// const defaultCoursePermissionModelParams = {
+//     modelType: 'CoursePermissionModel',
+//     userId: '',
+//     courseId: ''
+// }
+//
+// export class CoursePermissionModel extends Immutable.Record(defaultCoursePermissionModelParams) {
+//
+//     modelType: 'CoursePermissionModel';
+//
+//     userId: types.UserId;
+//     courseId: types.DocumentId;
+//
+//     constructor(params?: CoursePermissionModelParams) {
+//         params ? super(params) : super();
+//     }
+//
+//     with(values: CoursePermissionModelParams) {
+//         return this.merge(values) as this;
+//     }
+//
+//     static fromPersistence(json: Object): CoursePermissionModel {
+//         const model = new CoursePermissionModel();
+//         const p = json as any;
+//         return model.with({userId: p.userId, courseId: p.courseId});
+//     }
+//
+//     toPersistence(): Object {
+//         return {
+//             modelType: 'CoursePermissionModel',
+//             userId: this.userId,
+//             courseId: this.courseId
+//         };
+//     }
+// }
 
 export type MediaModelParams = {
     webContent?: WebContent,
+    type?: string
     name?: string,
     _attachments?: any,
     referencingDocuments?: Immutable.List<types.DocumentId>
@@ -559,6 +569,7 @@ export type MediaModelParams = {
 const defaultMediaModelParams = {
     modelType: 'MediaModel',
     webContent: new WebContent(),
+    type: 'x-oli-webcontent',
     name: '',
     _attachments: {},
     referencingDocuments: Immutable.List<types.DocumentId>()
@@ -568,6 +579,7 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
 
     modelType: 'MediaModel';
     webContent: WebContent;
+    type: string;
     name: string;
     _attachments: any;
     referencingDocuments: Immutable.List<types.DocumentId>
@@ -601,10 +613,10 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
     }
 }
 
+//CoursePermissionModel |
 export type ContentModel =
     AssessmentModel |
     CourseModel |
-    CoursePermissionModel |
     MediaModel |
     WorkbookPageModel |
     OrganizationModel |

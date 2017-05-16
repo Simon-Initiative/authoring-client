@@ -169,11 +169,13 @@ export function listenToDocument(doc: Document): Promise<Document> {
 
 export function createDocument(courseId: CourseId, content: models.ContentModel): Promise<Document> {
     console.log("createDocument ()");
-    // :TODO: add resource type
-    let url = `${configuration.baseUrl}/${courseId}/resources/`;
-    if (isNullOrUndefined(courseId)) {
+    let url = null;
+    if (content.type === 'x-oli-package') {
         url = `${configuration.baseUrl}/packages/`;
+    }else {
+        url = `${configuration.baseUrl}/${courseId}/resources?resourceType=${content.type}`;
     }
+
     return new Promise(function (resolve, reject) {
         fetch(url, {
             method: 'POST',
@@ -187,9 +189,9 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
                 return response.json();
             })
             .then(json => {
-                let cId = isNullOrUndefined(courseId)?json.guid:courseId;
+                let packageGuid = content.type === 'x-oli-package'?json.guid:courseId;
                 resolve(new Document({
-                    _courseId: cId,
+                    _courseId: packageGuid,
                     _id: json.guid,
                     _rev: json.rev,
                     model: content
