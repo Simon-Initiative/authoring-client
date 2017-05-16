@@ -79,21 +79,28 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     componentDidMount() {
       console.log ("componentDidMount ()");
-        persistence.retrieveDocument(this.state.context.courseId).then(course => {
-            let loObject=course ["model"]["learningobjectives"];
-            let loDocId=loObject.get (0);
-
-            persistence.retrieveDocument(loDocId).then(doc => {
-              this.setState ({treeData: doc ["model"]["los"],document: doc});
-            });
-
-            let skillObject=course ["model"]["skills"];
-            let skillDocId=skillObject.get (0);
-
-            persistence.retrieveDocument(skillDocId).then(skillDoc => {
-              this.setState ({skills: skillDoc ["model"]["skills"]});
-            });
+        let docu = new persistence.Document({
+            _courseId: this.props.context.courseId,
+            _id: this.props.model.guid,
+            model: this.props.model
         });
+        this.setState ({treeData: this.props.model["los"],document: docu});
+
+        // persistence.retrieveDocument(this.state.context.courseId).then(course => {
+        //     let loObject=course ["model"]["learningobjectives"];
+        //     let loDocId=loObject.get (0);
+        //
+        //     persistence.retrieveDocument(loDocId).then(doc => {
+        //       this.setState ({treeData: doc ["model"]["los"],document: doc});
+        //     });
+        //
+        //     let skillObject=course ["model"]["skills"];
+        //     let skillDocId=skillObject.get (0);
+        //
+        //     persistence.retrieveDocument(skillDocId).then(skillDoc => {
+        //       this.setState ({skills: skillDoc ["model"]["skills"]});
+        //     });
+        // });
     }
 
     /**
@@ -101,11 +108,16 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
-
-        persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
-            return (doc);
+        const docu = new persistence.Document({
+            _courseId: this.props.context.courseId,
+            _id: this.props.model.guid,
+            model: this.props.model
         });
+        this.setState ({treeData: this.props.model["los"],document: docu});
+        // persistence.retrieveDocument(anID).then(doc => {
+        //     this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
+        //     return (doc);
+        // });
 
        return (null);
     }

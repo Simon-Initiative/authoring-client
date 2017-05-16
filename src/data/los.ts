@@ -1,3 +1,4 @@
+
 import * as Immutable from 'immutable';
 import * as types from './types';
 import Linkable from './linkable';

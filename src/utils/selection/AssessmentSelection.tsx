@@ -65,7 +65,7 @@ class AssessmentSelection extends React.PureComponent<AssessmentSelectionProps, 
         e.preventDefault();
 
         const title = (this.refs['title'] as any).value;
-        // :TODO: get a real id value from user
+        // :TODO: get a real id value from user input
         const resource = {id: "sample", type: "x-oli-assessment", title: title};
         let res = Resource.fromPersistence(resource);
         const assessment = new models.AssessmentModel({

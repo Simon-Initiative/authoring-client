@@ -1,5 +1,6 @@
 
 export type DocumentId = string;
+export type CourseId = string;
 export type UserId = string;
 
 /**
