@@ -280,8 +280,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                 this.props.course.model.guid,
                 'Learning Objectives',
                 (resource) => resource.type === 'x-oli-learning_objectives',
-                (title, courseId) => new models.LearningObjectiveModel({
-                    courseId,
+                (title, resource) => new models.LearningObjectiveModel({
+                    resource,
                     title: new contentTypes.Title({text: title})
                 })
             );
@@ -291,8 +291,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
                 this.props.course.model.guid,
                 'Skills',
                 (resource) => resource.type === 'x-oli-skill_models',
-                (title, courseId) => new models.SkillModel({
-                    courseId,
+                (title, resource) => new models.SkillModel({
+                    resource,
                     title: new contentTypes.Title({text: title})
                 })
             );

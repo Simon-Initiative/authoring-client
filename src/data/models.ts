@@ -74,7 +74,7 @@ export type CourseModelParams = {
     guid?: string,
     id?: string,
     version?: string,
-    title?: contentTypes.Title,
+    title?: string,
     type?: string,
     description?: string,
     metadata?: MetaData,
@@ -91,7 +91,7 @@ const defaultCourseModel = {
     id: '',
     version: '',
     type: 'x-oli-package',
-    title: new contentTypes.Title(),
+    title: '',
     description: '',
     metadata: new MetaData(),
     options: '',
@@ -108,7 +108,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     guid: string;
     id: string;
     version: string;
-    title: contentTypes.Title;
+    title: string;
     type: string;
     description: string;
     metadata: MetaData;
@@ -132,7 +132,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         model = model.with({guid: c.guid});
         model = model.with({id: c.id});
         model = model.with({version: c.version});
-        model = model.with({title: contentTypes.Title.fromPersistence(c.title, guid())});
+        model = model.with({title: c.title});
         model = model.with({type: c.type});
         model = model.with({description: c.description});
         model = model.with({options: JSON.stringify(c.options)});
@@ -158,13 +158,22 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     }
 
     toPersistence(): Object {
+        // let doc = [{
+        //     "package": {
+        //         "@id": this.resource.id,
+        //         "#array": [
+        //             this.head.toPersistence(),
+        //             {body: this.body.toPersistence()}
+        //         ]
+        //     }
+        // }];
         const values = {
             modelType: 'CourseModel',
             rev: this.rev,
             guid: this.guid,
             id: this.id,
             version: this.version,
-            title: this.title.toPersistence(),
+            title: this.title,
             type: this.type,
             description: this.description,
             metadata: this.metadata.toPersistence(),
