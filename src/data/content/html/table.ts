@@ -10,7 +10,7 @@ export type TableParams = {
   summary?: string,
   rowstyle?: string,
   rows?: Immutable.OrderedMap<string, Row>,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -18,8 +18,8 @@ const defaultContent = {
   summary: '',
   rowstyle: 'plain',
   rows: Immutable.OrderedMap<string, Row>(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Table extends Immutable.Record(defaultContent) {
   
@@ -39,25 +39,25 @@ export class Table extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Table {
 
-    let t = (root as any).table;
+    const t = (root as any).table;
 
     let model = new Table({ guid });
     
     if (t['@summary'] !== undefined) {
-      model = model.with({ summary: t['@summary']});
+      model = model.with({ summary: t['@summary'] });
     }
     if (t['@rowstyle'] !== undefined) {
-      model = model.with({ rowstyle: t['@rowstyle']});
+      model = model.with({ rowstyle: t['@rowstyle'] });
     }
     
-    getChildren(t).forEach(item => {
+    getChildren(t).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'tr':
-          model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id))});
+          model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id)) });
           break;
         default:
           
@@ -70,11 +70,11 @@ export class Table extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      'table': {
+      table: {
         '@summary': this.summary,
         '@rowstyle': this.rowstyle,
-        '#array': this.rows.toArray().map(p => p.toPersistence())
-      } 
+        '#array': this.rows.toArray().map(p => p.toPersistence()),
+      }, 
     };
   }
 }

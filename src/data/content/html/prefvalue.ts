@@ -6,14 +6,14 @@ import { getKey } from '../../common';
 
 export type PrefValueParams = {
   preference?: string,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'PrefValue',
   preference: '',
-  guid: ''
-}
+  guid: '',
+};
 
 export class PrefValue extends Immutable.Record(defaultContent) {
   
@@ -31,12 +31,12 @@ export class PrefValue extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : PrefValue {
 
-    let p = (root as any)['pref:value'];
+    const p = (root as any)['pref:value'];
 
     let model = new PrefValue({ guid });
     
     if (p['@preference'] !== undefined) {
-      model = model.with({ preference: p['@preference']});
+      model = model.with({ preference: p['@preference'] });
     }
     
     return model;
@@ -45,8 +45,8 @@ export class PrefValue extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       'pref:value': {
-        '@preference': this.preference
-      }
-    }
+        '@preference': this.preference,
+      },
+    };
   }
 }
