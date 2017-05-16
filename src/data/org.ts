@@ -18,9 +18,7 @@ export class IDRef {
 }
 
 export class OrgItem extends Linkable {
-  orgType:OrgContentTypes=OrgContentTypes.Item;  
-  title:string="unassigned";
-  id:string=guid ();    
+  orgType:OrgContentTypes=OrgContentTypes.Item;        
   scoringMode : string ="default";
   children:Array<OrgItem>;
   resourceRef : IDRef;    

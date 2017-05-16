@@ -203,26 +203,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     let lo:Linkable=this.state.target as Linkable;
       
     this.setState({modalIsOpen: false});
-      
-    /*
-    var newData = [];
-    this.state.sourceData.forEach(function(item) {
-      if (item.checked ==true) {
-       //newData.push(item.id);
-       let newLink:Linkable=new Linkable ();
-       newLink.id=item.id;
-       newData.push (newLink);
-      }    
-    });
-      
-    lo.annotations=newData;  
 
-    this.setState ({target : lo}, function (){
-      console.log ("Lo now: " +  JSON.stringify (this.state.target));
-      this.state.closeModal ();  
-    });
-    */     
-          
     var newData = [];
     this.state.sourceData.forEach(function(item) {
       if (item.checked ==true) {

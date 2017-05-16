@@ -19,7 +19,6 @@ export type LOTypes = keyof typeof LOTypes;
  */
 export class LearningObjective extends Linkable {
   orgType:LOTypes=LOTypes.LO;  
-  title:string="unassigned";    
   category:string="unassigned";
   parent:string="unassigned"; // a link to an LO parent so that we can go back and forth between a tree and a list
   children:Array<LearningObjective>;
