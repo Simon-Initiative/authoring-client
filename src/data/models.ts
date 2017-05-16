@@ -158,29 +158,26 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     }
 
     toPersistence(): Object {
-        // let doc = [{
-        //     "package": {
-        //         "@id": this.resource.id,
-        //         "#array": [
-        //             this.head.toPersistence(),
-        //             {body: this.body.toPersistence()}
-        //         ]
-        //     }
-        // }];
+        let doc = [{
+            "package": {
+                "@id": this.id,
+                "icon": this.icon.toPersistence(),
+                "title": this.title,
+                "@version": this.version,
+                "metadata": this.metadata.toPersistence(),
+                "description": this.description,
+                "preferences": this.options
+            }
+        }];
         const values = {
             modelType: 'CourseModel',
-            rev: this.rev,
             guid: this.guid,
             id: this.id,
             version: this.version,
             title: this.title,
             type: this.type,
             description: this.description,
-            metadata: this.metadata.toPersistence(),
-            options: this.options,
-            icon: this.icon.toPersistence(),
-            resources: [...this.resources.toArray().map(resource => resource.toPersistence())],
-            webContents: [...this.webContents.toArray().map(webContent => webContent.toPersistence())]
+            "doc": doc
         }
         return Object.assign({}, values);
     }
