@@ -38,9 +38,9 @@ export class SkillModelBKT extends SkillModel {
   }  
     
   // BKT probabilities
-  pGuess:number=0.5;
+  pGuess:number=0.25;
   pKnown:number=0.25;
-  pSlip:number=0.5;
+  pSlip:number=0.25;
   pMastery:number=0.95;
     
   /**
