@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 
-import { ContentState, CharacterMetadata, ContentBlock, EntityMap, convertToRaw, convertFromRaw} from 'draft-js';
+import { ContentState, CharacterMetadata, ContentBlock, 
+  EntityMap, convertToRaw, convertFromRaw } from 'draft-js';
 
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
