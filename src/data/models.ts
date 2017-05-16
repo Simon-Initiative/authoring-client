@@ -843,10 +843,10 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     var newLO:LearningObjective=new LearningObjective ();
         
     newLO.id=anObjective ["@id"];
+    newLO.title=anObjective ["#text"];      
     newLO.category=anObjective ["@category"];
     newLO.parent=anObjective ["@parent"];
     newLO.expanded=anObjective ["@expanded"];
-    newLO.title=anObjective ["#text"];
     if (anObjective ["#annotations"]) {  
       newLO.annotations=Linkable.fromJSON (anObjective ["#annotations"]);
     }    

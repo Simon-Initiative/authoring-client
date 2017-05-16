@@ -6,6 +6,7 @@ import Modal from 'react-modal';
 import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
+import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, OrgOrganization} from '../../../data/org';
 
 import '../../../stylesheets/sortabletree.scss';
 
@@ -110,6 +111,13 @@ const styles = {
     "backgroundSize" : "44px 44px",
     "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAA4klEQVR4nGP8//8/AymAiSTVDAwMLJt37i+rqvn7n4GRkRGPuv///zMyMvS0tTDqWLuIioqzs7MTNPvnzx8f379jiggLZ2VnZWJhIohYOFiDgoIZ/5Pia0YGBhYIRTxg2bL7YFl17f//BDX+Z2Jg6GxrZjSw95SQlGLj5CRo9q9v39+9ecUUHhrKysHOysRMELGxs/sHBzL+IzGmWUjyMQMDA8uW3YcqGpqIVN3RUMdo5hYgLS/PzsnNhDeU/jH8//nt26tnTxi7Ziw6f/EaMyc7/mT4j4Hh7/efhvrajKQmbwBQa0jTnL7HxQAAAABJRU5ErkJggg==') no-repeat center",
   },  
+  wpage: {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAhFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9KDLhAAAAK3RSTlMAUCiI+Ni4oAjAMEgEq3Bo+SpXSk5BgakBWnjzlwLedzr+px2QqBMGFcofUTCwHgAABL5JREFUeF7s1cFKAlEYQOF/BomKCxGUBNW0CYLe/23aCSHoRmQQFVDXbmZAHBjv/c4zfHAiiyRJkiRJkiRJkiRJkiRJUhXX6XkdRTWdA3BW9RtltVxEFtVxUXr9+CwagJ72qWgAeqlS0QDUjFcAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQMAkBuy/jXz66RUwSy0AZ60PkU33EQMIsAAXAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIGCkArboF5A5Ax79uAZkDUFv3CMgcgLZ9AgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACDgRgAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAwicvT+y4G6Pi1eewQMEvtSACo/o5BuovoFlDyAtRUqWgAaqZvRQPQQzq1d8cqDUNhGIZ/RHWwCUUHEcEURMH7vxepRRQxg2BUMIJLBUdHiTUmOed5pqyBF77lJ8k7APaqvANgtsg7AO4FgAAQAAJAAAgAASAABIAAEAAC4O9OwqhWMZTjYvgAuI7B1JcmAAEgAASAABAAAkAACAABbEwACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAB/Dz9sIx3FswC6Wp9HOmoTQNYBIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAHgJGznNtKxL4DOmkjIhwlg2gEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAALAdwLPHmP0qisB9KZZxOg9mIAfIQAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAm8Cjuxi90zcB9GYV47c0AWQSAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAHwn8KCNdBQvAujq8yLSUZsAsg4AASAABIAAEAACQAAIAAEgAASAABAAAkAACAAnYbs3kY5SAJ09xe94GROAABAAAkAACAABIAAEgAAQAAJAAAgAASAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAA29Gj8j02x2yyAZzE9JgABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgJvA+TL+E/PX72cAAAAAAAAAAACAL8LL6aEKzsebAAAAAElFTkSuQmCC') no-repeat center",      
+  },
   orgloadingHandle : {
     "height": "42px",
     "width": "45px",
@@ -372,15 +380,28 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.editNodeTitle=editNodeTitle;        
         this.deleteNodeFunction=deleteNode;
 
-        canDrag=true;
+        // Currently a safety feature to make sure we can't drag workbook pages
+        // to different levels but only keep them as leaf nodes.
+        if (node.orgType!=OrgContentTypes.Item) {
+         canDrag=true;
+        }    
         
         let hStyle:any=styles.backupHamburger;
+        let workbookPageStyle:any=styles.wpage;
 
-        handle = connectDragSource((
-          <div style={styles.orgloadingHandle}>
-            <div id="handle" style={hStyle}></div>
-          </div>
-        ), { dropEffect: 'copy' });
+        if (node.orgType!=OrgContentTypes.Item) {
+          handle = connectDragSource((
+            <div style={styles.orgloadingHandle}>
+              <div id="handle" style={hStyle}></div>
+            </div>
+          ), { dropEffect: 'copy' });
+        } else {
+          handle = connectDragSource((
+            <div style={styles.orgloadingHandle}>
+              <div id="handle" style={workbookPageStyle}></div>
+            </div>
+          ), { dropEffect: 'copy' });            
+        }    
 
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;

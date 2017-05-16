@@ -1,14 +1,19 @@
 import guid from '../utils/guid';
 
+export class TResource {
+  id:string=guid();
+  title:string="unassigned";    
+}
+
 /** 
  * Base class for any resources that can function as an annotation. It it also
  * the class that can store annotations. That means you can build annotation
  * trees if we have to. 
  */
-export default class Linkable {
-
+export default class Linkable {      
+  //resource:TResource=new TResource ();
   id:string=guid();
-  title:string="unassigned";        
+  title:string="unassigned";       
   expanded:boolean=false;
   annotations:Array <Linkable>=new Array ();  
     
