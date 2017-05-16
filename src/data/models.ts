@@ -13,7 +13,6 @@ export const EmptyModel: EmptyModel = 'EmptyModel';
 
 export const ModelTypes = types.strEnum([
     'CourseModel',
-    'CoursePermissionModel',
     'WorkbookPageModel',
     'AssessmentModel',
     'MediaModel',
@@ -49,24 +48,6 @@ export function createModel(object: any): ContentModel {
         case 'x-oli-webcontent':
             return MediaModel.fromPersistence(object);
     }
-    // switch (object.modelType) {
-    //   case ModelTypes.CourseModel:
-    //     return CourseModel.fromPersistence(object);
-    //   case ModelTypes.WorkbookPageModel:
-    //     return WorkbookPageModel.fromPersistence(object);
-    //   case ModelTypes.CoursePermissionModel:
-    //     return CoursePermissionModel.fromPersistence(object);
-    //   case ModelTypes.AssessmentModel:
-    //     return AssessmentModel.fromPersistence(object);
-    //   case ModelTypes.MediaModel:
-    //     return MediaModel.fromPersistence(object);
-    //   case ModelTypes.OrganizationModel:
-    //     return OrganizationModel.fromPersistence(object);
-    //   case ModelTypes.LearningObjectiveModel:
-    //     return LearningObjectiveModel.fromPersistence(object);
-    //   case ModelTypes.SkillModel:
-    //     return SkillModel.fromPersistence(object);
-    // }
 }
 
 export type CourseModelParams = {
@@ -101,7 +82,6 @@ const defaultCourseModel = {
 }
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
-
     modelType: 'CourseModel';
 
     rev: number;
