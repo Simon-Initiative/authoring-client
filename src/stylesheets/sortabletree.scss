@@ -7,6 +7,8 @@
 @import 'abstracts/variables';
 @import '../editors/content/common/draft/DraftWrapper';
 
+/* ------------------------------------------------------------- */
+
 .rst__node {
     min-width: 100%;
     white-space: nowrap;
@@ -21,14 +23,31 @@
     /*border: 1px solid red;*/
 }
 
+/**
+* The CSS below is used by the Org node renderer to display the drop-
+* down menu Nick designed. It should really go into its own file but
+* I'm keeping it here to have all node renderer settings together
+* for now.
+*/
+/* ------------------------------------------------------------- */
+
 .onclick-menu {
     position: relative;
     display: inline-block;
     border: 0px solid red;
+    outline: none;
+}
+
+.onclick-menu:before {
+    font-family: FontAwesome;
+    content: "\f078";
+    outline: none;
 }
 
 .onclick-menu:focus .onclick-menu-content {
     display: block;
+    visibility: visible;
+    outline: none;
 }
 
 .onclick-menu-content {
@@ -41,24 +60,29 @@
     border-radius: 5px;
     border: 1px solid grey;
     
-    display: none;
+    /* disable visibility by default, delay to enable clicks */
+    visibility: hidden;
+    transition: visibility 0.5s;
     
+    /*
     -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);    
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    */    
+    
+    outline: none;
 }
 
-.onclick-menu-content-shown {
-    position: absolute;
-    left: -160px;
-    z-index: 1;
-    padding: 4px;
-        
-    background: #ffffff; 
-    border-radius: 5px;
-    border: 1px solid grey;
-    
-    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);    
+/*
+.onclick-menu-content a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
 }
+
+.onclick-menu-content a:hover {
+    background-color: #555;
+    color: white;
+}
+*/

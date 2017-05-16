@@ -275,6 +275,42 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
 
         this.saveToDB (immutableHelper);    
     }
+    
+    /**
+     * 
+     */    
+    addPage (aNode:any): void {
+        console.log ("LearningObjectiveEditor:addPage ()");
+                
+        let immutableHelper = this.state.treeData.slice();
+                
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
+        if (immutableHelper==null) {
+            console.log ("Bump");
+            return;
+        }
+        
+        if (parentArray!=null) {
+            console.log ("We have an object, performing edit ...");
+        }
+        else {
+           console.log ("Internal error: node not found in tree");
+        }
+                    
+        for (var i=0;i<parentArray.length;i++) {
+            let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+            if (testNode.id==aNode.id) {
+                var newNode:OrgItem=new OrgItem ();
+                newNode.title=("Title " + this.state.titleIndex);
+                testNode.children.push (newNode);
+                break;
+            }
+        }
+            
+        this.saveToDB (immutableHelper);         
+    }    
         
     /**
      * 
@@ -361,7 +397,8 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
         optionalProps ["linkAnnotation"]=this.linkLO.bind (this);
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
-
+        optionalProps ["addPage"]=this.addPage.bind (this);
+        
         return (optionalProps);
     }
     
