@@ -22,16 +22,18 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.destroyed = false;
   }
 
-  setWriteLock(doc: persistence.Document, requestTime: number, userId: string) : Promise<persistence.Document> {
+  setWriteLock(doc: persistence.Document, 
+               requestTime: number, userId: string) : Promise<persistence.Document> {
 
     return this.setWriteLockHelper(doc, userId, requestTime, 3, undefined, undefined);
   }
 
   setWriteLockHelper(doc: persistence.Document, userId: string,
-    requestTime: number, 
-    remainingRetries: number, initialResolve, initialReject) : Promise<persistence.Document> {
+                     requestTime: number, 
+                     remainingRetries: number, 
+                     initialResolve, initialReject) : Promise<persistence.Document> {
 
-    let lock : contentTypes.Lock = (doc.model as any).lock;
+    const lock : contentTypes.Lock = (doc.model as any).lock;
     if (lock.lockedAt > requestTime) {
       // Do nothing, since another, async operation that was initiated after
       // this lock mutation has completed. 
@@ -39,36 +41,36 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     }
 
     return new Promise((resolve, reject) => {
-
         
-        let updatedLock = lock.with({
-          lockedBy: userId,
-          lockedAt: (new Date()).getTime()
-        });
-        
-        let lockedDocument = doc.with({ model: (doc.model as any).with({ lock: updatedLock})});
-        
-        persistence.persistDocument(lockedDocument)
-          .then(result => {
-            initialResolve !== undefined ? initialResolve(result) : resolve(result);
-          })
-          .catch(err => {
-            if (remainingRetries === 0) {
-              initialReject !== undefined ? initialReject(err) : reject(err);
-            } else {
-              persistence.retrieveDocument(doc._id)
-                .then(doc => {
-                  this.setWriteLockHelper(doc, userId, requestTime, --remainingRetries,
-                    initialResolve === undefined ? resolve : initialResolve,
-                    initialReject === undefined ? reject : initialReject);
-                })
-                .catch(err => {
-                  initialReject !== undefined ? initialReject(err) : reject(err);
-                })
-            }
-            
-          });
+      const updatedLock = lock.with({
+        lockedBy: userId,
+        lockedAt: (new Date()).getTime(),
       });
+      
+      const lockedDocument = doc.with({ model: (doc.model as any).with({ lock: updatedLock }) });
+      
+      persistence.persistDocument(lockedDocument)
+        .then((result) => {
+          initialResolve !== undefined ? initialResolve(result) : resolve(result);
+        })
+        .catch((err) => {
+          if (remainingRetries === 0) {
+            initialReject !== undefined ? initialReject(err) : reject(err);
+          } else {
+            persistence.retrieveDocument(doc._id)
+              .then((doc) => {
+                const remaining = remainingRetries - 1;
+                this.setWriteLockHelper(doc, userId, requestTime, remaining,
+                  initialResolve === undefined ? resolve : initialResolve,
+                  initialReject === undefined ? reject : initialReject);
+              })
+              .catch((err) => {
+                initialReject !== undefined ? initialReject(err) : reject(err);
+              });
+          }
+          
+        });
+    });
   }
 
   releaseLock(when: number) {
@@ -85,22 +87,21 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   }
 
 
-
   /**
    * This strategy requires the user to acquire the write lock before
    * editing.
    */
   initialize(doc: persistence.Document, userId: string,
-    onSuccess: onSaveCompletedCallback, 
-    onFailure: onFailureCallback) : Promise<boolean> {
+             onSuccess: onSaveCompletedCallback, 
+             onFailure: onFailureCallback) : Promise<boolean> {
 
     this.successCallback = onSuccess;
     this.failureCallback = onFailure;
 
     if (models.isLockable(doc.model)) {
-      let lock : contentTypes.Lock = (doc.model as any).lock;
+      const lock : contentTypes.Lock = (doc.model as any).lock;
       
-      let alreadyLocked = lock.lockedBy !== userId
+      const alreadyLocked = lock.lockedBy !== userId
         && lock.lockedBy !== ''; 
 
       if (alreadyLocked) {
@@ -110,14 +111,14 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
         return new Promise((resolve, reject) => {
           
           this.setWriteLock(doc, new Date().getTime(), userId)
-            .then(lockedDocument => {
+            .then((lockedDocument) => {
               this.writeLockedDocumentId = lockedDocument._id;
               onSuccess(lockedDocument);
-              resolve(true)
+              resolve(true);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
-              reject(err)
+              reject(err);
             });
         });
       }
@@ -141,7 +142,7 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   destroy() : Promise<{}> {
     const now = new Date().getTime();
     return this.doDestroy()
-      .then(r => this.releaseLock(now))
+      .then(r => this.releaseLock(now));
 
-  };
+  }
 }

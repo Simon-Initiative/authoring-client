@@ -8,22 +8,22 @@ let needsProcess = false;
  * @param {DOMNode}  script
  * @param {Function} callback
  */
-export function process(MathJax, script, callback) {
+export function process(mathJax, script, callback) {
   pendingScripts.push(script);
   pendingCallbacks.push(callback);
   if (!needsProcess) {
     needsProcess = true;
-    setTimeout(() => doProcess(MathJax), 0);
+    setTimeout(() => doProcess(mathJax), 0);
   }
 }
 
-function doProcess(MathJax) {
-  MathJax.Hub.Queue(function() {
-    const oldElementScripts = MathJax.Hub.elementScripts;
-    MathJax.Hub.elementScripts = (element) => pendingScripts;
+function doProcess(mathJax) {
+  mathJax.Hub.Queue(() => {
+    const oldElementScripts = mathJax.Hub.elementScripts;
+    mathJax.Hub.elementScripts = element => pendingScripts;
 
     try {
-      return MathJax.Hub.Process(null, () => {
+      return mathJax.Hub.Process(null, () => {
         // Trigger all of the pending callbacks before clearing them
         // out.
         for (const callback of pendingCallbacks) {
@@ -38,7 +38,7 @@ function doProcess(MathJax) {
       // IE8 requires `catch` in order to use `finally`
       throw e;
     } finally {
-      MathJax.Hub.elementScripts = oldElementScripts;
+      mathJax.Hub.elementScripts = oldElementScripts;
     }
   });
 }
