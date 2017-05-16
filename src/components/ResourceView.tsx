@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
@@ -36,7 +34,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     super(props);
 
     this.state = {
-      resources: []
+      resources: [],
     };
 
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
@@ -49,8 +47,8 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   fetchTitles(id: string) {
     fetchCourseResources(id)
-      .then(resources => {
-        this.setState({resources: resources.filter(this.props.filterFn)});
+      .then((resources) => {
+        this.setState({ resources: resources.filter(this.props.filterFn) });
       });
   }
 
@@ -77,14 +75,14 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderResources() {
 
-    let link = (id, title) => 
+    const link = (id, title) => 
       <button onClick={this.clickResource.bind(this, id)} 
         className="btn btn-link">{title}</button>;
 
-    let rows = this.state.resources.map(r => 
+    const rows = this.state.resources.map(r => 
       <tr key={r._id}>
           <td>{link(r._id, r.title)}</td>
-      </tr>)
+      </tr>);
 
     return (
       <div className="">
@@ -106,8 +104,11 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     return (
       <div className="input-group col-12">
         <form className="form-inline">
-          <input type="text" ref='title' className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Title"></input>
-          <button onClick={this.createResource.bind(this)} className="btn btn-primary">Create</button>
+          <input type="text" ref="title" 
+            className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" 
+            placeholder="Title"></input>
+          <button onClick={this.createResource.bind(this)} 
+            className="btn btn-primary">Create</button>
         </form>
       </div>);
   }

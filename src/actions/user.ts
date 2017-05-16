@@ -1,4 +1,4 @@
-var fetch = (window as any).fetch;
+const fetch = (window as any).fetch;
 
 import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
@@ -20,31 +20,33 @@ export module user {
     type: LOGIN_SUCCESS,
     username: string,
     userId: string,
-    profile: Object
-  }
+    profile: Object,
+  };
 
   export type loginFailureAction = {
-    type: LOGIN_FAILURE
-  }
+    type: LOGIN_FAILURE,
+  };
 
-  export function loginSuccess(username: string, userId: string,
+  export function loginSuccess(
+    username: string, userId: string,
     profile: Object) : loginSuccessAction {
+
     return {
       type: LOGIN_SUCCESS,
       username,
       userId,
-      profile
-    }
+      profile,
+    };
   }
 
   export function loginFailure() : loginFailureAction {
     return {
-      type: LOGIN_FAILURE
-    }
+      type: LOGIN_FAILURE,
+    };
   }
 
   export function login(user: string, password: string) {
-    return function(dispatch) {
+    return function (dispatch) {
 
       const requestId = guid();
       dispatch(requestActions.startRequest(requestId, 'Logging In'));
@@ -54,9 +56,9 @@ export module user {
 
       fetch(`${configuration.baseUrl}/_users/org.couchdb.user:${user}`, {
         method: 'GET',
-        headers: getHeaders({ user, password})
+        headers: getHeaders({ user, password }),
       })
-      .then(response => {
+      .then((response) => {
 
         dispatch(requestActions.endRequest(requestId));
 
@@ -65,7 +67,7 @@ export module user {
         }
         return response.json();
       })
-      .then(json => {
+      .then((json) => {
         
         userId = json._id;
         username = json.name;
@@ -76,11 +78,11 @@ export module user {
         dispatch(loginSuccess(username, userId, {}));
 
       })
-      .catch(err => {
+      .catch((err) => {
         dispatch(requestActions.endRequest(requestId));
         dispatch(loginFailure());
       });  
-    }
+    };
   }
 
 }
