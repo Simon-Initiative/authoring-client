@@ -70,23 +70,12 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     this.setState({resources: model.resources.toArray().filter(filterFn)});
   }
 
-  // fetchTitles(id: string) {
-  //     this.setState({resources: this.props.course.model.resources.filter(this.props.filterFn)});
-  //     // fetchCourseResources(id)
-  //     //     .then(resources => {
-  //     //         this.setState({resources: resources.filter(this.props.filterFn)});
-  //     //     });
-  // }
-
   componentWillReceiveProps(nextProps) {
     console.log("ResourceView componentWillReceiveProps");
     if ((typeof nextProps.course !== 'undefined') && nextProps.course) {
       console.log("ResourceView componentWillReceiveProps 2");
       this.fetchTitles(nextProps.course.model, nextProps.filterFn);
     }
-    // if (this.props.courseId !== nextProps.courseId || this.props.title !== nextProps.title) {
-    //     this.fetchTitles(nextProps.courseId);
-    // }
   }
 
   clickResource(id) {
@@ -128,6 +117,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     let rows = this.state.resources.map(r =>
       <tr key={r.guid}>
         <td>{link(r.guid, r.title)}</td>
+        <td>{r.id}</td>
       </tr>)
 
     return (
@@ -137,6 +127,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
           <thead>
           <tr>
             <th>Title</th>
+            <th>Id</th>
           </tr>
           </thead>
           <tbody>
