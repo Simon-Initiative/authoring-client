@@ -4,12 +4,12 @@ import guid from '../../utils/guid';
 
 type GeneratedIds = {
   mathEditor: string,
-  preview: string
-}
+  preview: string,
+};
 
 export interface MathEditor {
-  ids: GeneratedIds
-  _onChange: any
+  ids: GeneratedIds;
+  _onChange: any;
 }
 
 export interface MathEditorProps {
@@ -27,26 +27,27 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
     super(props);
     this.ids = {
       mathEditor: guid(),
-      preview: guid()
-    }
+      preview: guid(),
+    };
 
     this.state = {
-      content: this.props.content
-    }
+      content: this.props.content,
+    };
 
     this._onChange = this.onChange.bind(this);
   }
 
   onChange(e) {
     const content = e.target.value;
-    this.setState({content}, () => this.props.onChange(content));
+    this.setState({ content }, () => this.props.onChange(content));
   } 
 
   render() {
     return (
       <form>
         <div className="form-group">
-          <textarea onChange={this._onChange} className="form-control" id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
+          <textarea onChange={this._onChange} className="form-control" 
+            id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
         </div>
         <div className="form-group mathPreview">
           <label className="preview" htmlFor={this.ids.preview}>Preview</label>
@@ -54,7 +55,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
         </div>
         
       </form>
-    )
+    );
   }
 }
 

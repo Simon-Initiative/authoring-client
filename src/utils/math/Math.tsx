@@ -26,7 +26,7 @@ export class Math extends React.Component<MathProps, any> {
      * Update the jax, force update if the display mode changed
      */
   componentDidUpdate(prevProps) {
-    const forceUpdate = prevProps.inline != this.props.inline;
+    const forceUpdate = prevProps.inline !== this.props.inline;
     this.typeset(forceUpdate);
   }
 
@@ -35,9 +35,9 @@ export class Math extends React.Component<MathProps, any> {
    */
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return (
-        nextProps.children != this.props.children
-        || nextProps.inline != this.props.inline
-        || nextContext.MathJax != this.context.MathJax
+        nextProps.children !== this.props.children
+        || nextProps.inline !== this.props.inline
+        || nextContext.MathJax !== this.context.MathJax
     );
   }
 
@@ -53,12 +53,12 @@ export class Math extends React.Component<MathProps, any> {
    */
   clear() {
     if (!this.script || !MathJax) {
-        return;
+      return;
     }
 
     const jax = MathJax.Hub.getJaxFor(this.script);
     if (jax) {
-        jax.Remove();
+      jax.Remove();
     }
   }
 
@@ -76,15 +76,16 @@ export class Math extends React.Component<MathProps, any> {
     const text = children;
 
     if (forceUpdate) {
-        this.clear();
+      this.clear();
     }
 
     if (!forceUpdate && this.script) {
       MathJax.Hub.Queue(() => {
         const jax = MathJax.Hub.getJaxFor(this.script);
 
-        if (jax) jax.Text(text, () => {});
-        else {
+        if (jax) {
+          jax.Text(text, () => {});
+        } else {
           const script = this.setScriptText(text);
           process(MathJax, script, () => {});
         }
@@ -106,23 +107,23 @@ export class Math extends React.Component<MathProps, any> {
     const { inline } = this.props;
 
     if (!this.script) {
-        this.script = document.createElement('script');
-        this.script.type = 'math/mml; ' + (inline ? '' : 'mode=display');
-        (this.node as any).appendChild(this.script);
+      this.script = document.createElement('script');
+      this.script.type = 'math/mml; ' + (inline ? '' : 'mode=display');
+      (this.node as any).appendChild(this.script);
     }
 
     if ('text' in this.script) {
         // IE8, etc
-        this.script.text = text;
+      this.script.text = text;
     } else {
-        this.script.textContent = text;
+      this.script.textContent = text;
     }
 
     return this.script;
   }
 
   render() {
-    return <span ref={(n) => this.node = n} />;
+    return <span ref={ n => this.node = n} />;
   }
 }
 

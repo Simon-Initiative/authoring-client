@@ -27,8 +27,10 @@ export class ModalMathEditor extends React.PureComponent<ModalMathEditorProps, a
 
   render() {
     return (
-      <ModalSelection title="Edit Math Expression" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.currentContent)}>
-        <MathEditor content={this.props.content} onChange={(content) => this.currentContent = content} />
+      <ModalSelection title="Edit Math Expression" 
+        onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.currentContent)}>
+        <MathEditor content={this.props.content} 
+          onChange={content => this.currentContent = content} />
       </ModalSelection>    
     );
   }

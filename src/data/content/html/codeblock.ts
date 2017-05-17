@@ -10,7 +10,7 @@ export type CodeBlockParams = {
   number?: boolean,
   start?: string,
   highlight?: string,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -20,8 +20,8 @@ const defaultContent = {
   number: false,
   start: '',
   highlight: '',
-  guid: ''
-}
+  guid: '',
+};
 
 export class CodeBlock extends Immutable.Record(defaultContent) {
   
@@ -43,24 +43,24 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : CodeBlock {
 
-    let cb = (root as any).codeblock;
+    const cb = (root as any).codeblock;
 
     let model = new CodeBlock({ guid });
     
     if (cb['@syntax'] !== undefined) {
-      model = model.with({ syntax: cb['@syntax']});
+      model = model.with({ syntax: cb['@syntax'] });
     }
     if (cb['@highlight'] !== undefined) {
-      model = model.with({ highlight: cb['@highlight']});
+      model = model.with({ highlight: cb['@highlight'] });
     }
     if (cb['@number'] !== undefined) {
-      model = model.with({ number: cb['@number'] === 'true'});
+      model = model.with({ number: cb['@number'] === 'true' });
     }
     if (cb['@start'] !== undefined) {
-      model = model.with({ start: cb['@start']});
+      model = model.with({ start: cb['@start'] });
     }
     if (cb['#text'] !== undefined) {
-      model = model.with({ source: cb['#text']});
+      model = model.with({ source: cb['#text'] });
     }
     
     return model;
@@ -73,8 +73,8 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
         '@highlight': this.highlight,
         '@number': this.number ? 'true' : 'false',
         '@start': this.start,
-        '#text': this.source
-      } 
+        '#text': this.source,
+      },
     };
   }
 }

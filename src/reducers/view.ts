@@ -18,30 +18,30 @@ export type CurrentView =
   DocumentView;
 
 export type LoginView = {
-  type: 'LoginView'
+  type: 'LoginView',
 };
 export type DocumentView = 
 {
   type: 'DocumentView',
-  documentId: string
+  documentId: string,
 };
 export type CreateCourseView = {
-  type: 'CreateCourseView'
-}
+  type: 'CreateCourseView',
+};
 export type AllCoursesView = {
-  type: 'AllCoursesView'
-}
+  type: 'AllCoursesView',
+};
 export type ResourcesView = {
   type: 'ResourcesView',
   courseId: string,
   title: string,
   filterFn: (resource: CourseResource) => boolean,
-  createResourceFn: (title: string, courseId: string) => models.ContentModel
-}
+  createResourceFn: (title: string, courseId: string) => models.ContentModel,
+};
 
 const defaultView : LoginView = {
-  type: 'LoginView'
-}
+  type: 'LoginView',
+};
 
 type ViewAction = 
   viewActions.viewDocumentAction |
@@ -49,22 +49,21 @@ type ViewAction =
   viewActions.viewCreateCourseAction |
   viewActions.viewResourcesAction |
   userActions.loginSuccessAction | 
-
-  OtherAction
+  OtherAction;
 
 export function view(state : CurrentView = defaultView, action: ViewAction): CurrentView {
   switch (action.type) {
     case viewActions.VIEW_DOCUMENT:
-      const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
+      const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId };
       return nextView;
     case viewActions.VIEW_RESOURCES:
       return { type: 'ResourcesView', courseId: action.courseId, title: action.title, 
         filterFn: action.filterFn, createResourceFn: action.createResourceFn};
     case viewActions.VIEW_CREATE_COURSE:
-      return { type: 'CreateCourseView'};
+      return { type: 'CreateCourseView' };
     case viewActions.VIEW_ALL_COURSES: // Deliberate fall through
     case userActions.LOGIN_SUCCESS:
-      return { type: 'AllCoursesView'}; 
+      return { type: 'AllCoursesView' }; 
     default:
       return state;
   }

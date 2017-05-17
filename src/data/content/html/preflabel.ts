@@ -6,14 +6,14 @@ import { getKey } from '../../common';
 
 export type PrefLabelParams = {
   preference?: string,
-  guid?: string
+  guid?: string;
 };
 
 const defaultContent = {
   contentType: 'PrefLabel',
   preference: '',
-  guid: ''
-}
+  guid: '',
+};
 
 export class PrefLabel extends Immutable.Record(defaultContent) {
   
@@ -31,12 +31,12 @@ export class PrefLabel extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : PrefLabel {
 
-    let p = (root as any)['pref:label'];
+    const p = (root as any)['pref:label'];
 
     let model = new PrefLabel({ guid });
     
     if (p['@preference'] !== undefined) {
-      model = model.with({ preference: p['@preference']});
+      model = model.with({ preference: p['@preference'] });
     }
     
     return model;
@@ -45,8 +45,8 @@ export class PrefLabel extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       'pref:label': {
-        '@preference': this.preference
-      }
-    }
+        '@preference': this.preference,
+      },
+    };
   }
 }

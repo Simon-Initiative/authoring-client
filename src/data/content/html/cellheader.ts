@@ -17,7 +17,7 @@ export type CellHeaderParams = {
   colspan?: string,
   rowspan?: string,
   content?: ContentState,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -26,8 +26,8 @@ const defaultContent = {
   colspan: '1',
   rowspan: '1',
   content: emptyContent,
-  guid: ''
-}
+  guid: '',
+};
 
 export class CellHeader extends Immutable.Record(defaultContent) {
   
@@ -48,33 +48,33 @@ export class CellHeader extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : CellHeader {
 
-    let t = (root as any).th;
+    const t = (root as any).th;
 
     let model = new CellHeader({ guid });
     
     if (t['@colspan'] !== undefined) {
-      model = model.with({ colspan: t['@colspan']});
+      model = model.with({ colspan: t['@colspan'] });
     }
     if (t['@rowspan'] !== undefined) {
-      model = model.with({ rowspan: t['@rowspan']});
+      model = model.with({ rowspan: t['@rowspan'] });
     }
     if (t['@align'] !== undefined) {
-      model = model.with({ align: t['@align']});
+      model = model.with({ align: t['@align'] });
     }
     
-    model = model.with({content: toDraft(getChildren(t))});
+    model = model.with({ content: toDraft(getChildren(t)) });
     
     return model;
   }
 
   toPersistence() : Object {
     return {
-      'th': {
+      th: {
         '@colspan': this.colspan,
         '@rowspan': this.rowspan,
         '@align': this.align,
-        '#array': toPersistence(this.content)
-      } 
+        '#array': toPersistence(this.content),
+      }, 
     };
   }
 }

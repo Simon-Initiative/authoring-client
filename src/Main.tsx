@@ -20,14 +20,14 @@ function mapStateToProps(state: any) {
   const {
     user,
     modal,
-    view
+    view,
   } = state;
 
   return {
     user, 
     modal,
-    view
-  }
+    view,
+  };
 }
 
 interface Main {
@@ -36,7 +36,7 @@ interface Main {
 }
 
 interface MainOwnProps {
-  username: string
+  username: string;
 }
 
 const stateGeneric = returnType(mapStateToProps);  
@@ -53,26 +53,27 @@ class Main extends React.Component<MainProps, {}> {
   }
 
   componentDidMount() {  
-    let user = this.props.username;
+    const user = this.props.username;
     this.props.dispatch(userActions.login(user, user));
   }
 
   getView(view: CurrentView): JSX.Element {
-    console.log ("getView: " + JSON.stringify (this.props));  
+    
     switch (view.type) {
       case 'LoginView':
-        return <LoginView dispatch={this.props.dispatch} />
+        return <LoginView dispatch={this.props.dispatch} />;
       case 'ResourcesView':
-        return <ResourceView {...view} dispatch={this.props.dispatch}/>
+        return <ResourceView {...view} dispatch={this.props.dispatch}/>;
       case 'DocumentView':
         return <DocumentView 
                 dispatch={this.props.dispatch}
                 userId={this.props.user.userId} 
                 documentId={view.documentId}/>;
       case 'CreateCourseView':
-        return <CreateCourseView dispatch={this.props.dispatch} />
+        return <CreateCourseView dispatch={this.props.dispatch} />;
       case 'AllCoursesView':
-        return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;         
+        return <CoursesView dispatch={this.props.dispatch} 
+          userId={this.props.user.userId}/>;         
     }
     
   }
@@ -91,9 +92,9 @@ class Main extends React.Component<MainProps, {}> {
 
         <Footer dispatch={this.props.dispatch}/>
       </div>
-    )
+    );
   }
 
-};
+}
 
 export default connect<MainReduxProps, {}, MainOwnProps>(mapStateToProps)(Main);

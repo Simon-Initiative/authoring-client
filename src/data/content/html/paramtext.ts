@@ -6,14 +6,14 @@ import { getKey } from '../../common';
 
 export type ParamTextParams = {
   text?: string,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'ParamText',
   text: '',
-  guid: ''
-}
+  guid: '',
+};
 
 export class ParamText extends Immutable.Record(defaultContent) {
   
@@ -31,12 +31,12 @@ export class ParamText extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : ParamText {
 
-    let p = (root as any);
+    const p = (root as any);
 
     let model = new ParamText({ guid });
     
     if (p['#text'] !== undefined) {
-      model = model.with({ text: p['#text']});
+      model = model.with({ text: p['#text'] });
     }
     
     return model;
@@ -44,7 +44,7 @@ export class ParamText extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      '#text': this.text
+      '#text': this.text,
     };
   }
 }

@@ -15,8 +15,8 @@ const defaultContent = {
   contentType: 'Hint',
   targets: '',
   body: new Html(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Hint extends Immutable.Record(defaultContent) {
   
@@ -35,13 +35,13 @@ export class Hint extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Hint {
 
-    let hint = (root as any).hint;
+    const hint = (root as any).hint;
 
     let model = new Hint({ guid });
-    model = model.with({ body: Html.fromPersistence(hint, '')});
+    model = model.with({ body: Html.fromPersistence(hint, '') });
     
     if (hint['@targets'] !== undefined) {
-      model = model.with({ targets: hint['@targets']});
+      model = model.with({ targets: hint['@targets'] });
     }
     
     return model;
