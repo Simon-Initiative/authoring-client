@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 
-import { IFrame }  from '../../../data/content/html/IFrame';
+import { IFrame }  from '../../../data/content/html/iframe';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';

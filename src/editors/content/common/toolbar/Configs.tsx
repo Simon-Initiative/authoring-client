@@ -68,7 +68,7 @@ export function flowBlock() {
       tooltip="Insert YouTube Video" icon="youtube"/>,
     <Button key="iframe" 
       command={insertBlock(EntityTypes.iframe, 'IMMUTABLE', { iframe: new IFrame() })} 
-      tooltip="Insert page in iframe" icon="youtube"/>,
+      tooltip="Insert page in iframe" icon="html5"/>,
   ];
 }
 
