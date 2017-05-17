@@ -35,9 +35,10 @@ export type AllCoursesView = {
 export type ResourcesView = {
   type: 'ResourcesView',
   courseId: string,
+  resourceType: string,
   title: string,
   filterFn: (resource: Resource) => boolean,
-  createResourceFn: (title: string, courseId: string) => models.ContentModel
+  createResourceFn: (type: string, title: string) => models.ContentModel
 }
 
 const defaultView : LoginView = {
@@ -59,7 +60,7 @@ export function view(state : CurrentView = defaultView, action: ViewAction): Cur
       const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
       return nextView;
     case viewActions.VIEW_RESOURCES:
-      return { type: 'ResourcesView', courseId: action.courseId, title: action.title, 
+      return { type: 'ResourcesView', courseId: action.courseId, resourceType:action.resourceType, title: action.title, 
         filterFn: action.filterFn, createResourceFn: action.createResourceFn};
     case viewActions.VIEW_CREATE_COURSE:
       return { type: 'CreateCourseView'};
