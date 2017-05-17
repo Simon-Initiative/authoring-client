@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IFrame as IFrameType } from '../../../../../data/content/html/IFrame';
+import { IFrame as IFrameType } from '../../../../../data/content/html/iframe';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState} from './InteractiveRenderer';
 import { BlockProps } from './properties';
