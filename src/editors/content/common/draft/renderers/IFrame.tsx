@@ -1,32 +1,32 @@
 import * as React from 'react';
-import { YouTube as YouTubeType } from '../../../../../data/content/html/youtube';
+import { IFrame as IFrameType } from '../../../../../data/content/html/IFrame';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState} from './InteractiveRenderer';
 import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { YouTubeEditor } from '../../../media/YouTubeEditor';
+import { IFrameEditor } from '../../../media/IFrameEditor';
 
 import './markers.scss';
 
 type Data = {
-  youtube: YouTubeType;
+  iframe: IFrameType;
 };
 
-export interface YouTubeProps extends InteractiveRendererProps {
+export interface IFrameProps extends InteractiveRendererProps {
   data: Data;
 }
 
-export interface YouTubeState extends InteractiveRendererState {
+export interface IFrameState extends InteractiveRendererState {
   
 }
 
-export interface YouTubeProps {
+export interface IFrameProps {
   
 }
 
 
-class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
+class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
 
   constructor(props) {
     super(props, {});
@@ -42,15 +42,15 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
         context={b.context}
         services={b.services}
 
-        model={this.props.data.youtube}
+        model={this.props.data.iframe}
         onCancel={() => this.props.blockProps.services.dismissModal()} 
-        onInsert={(youtube) => {
+        onInsert={(iframe) => {
           this.props.blockProps.services.dismissModal();
-          this.props.blockProps.onEdit({ youtube });
+          this.props.blockProps.onEdit({ iframe });
         }
       }>
-        <YouTubeEditor 
-          model={this.props.data.youtube}
+        <IFrameEditor 
+          model={this.props.data.iframe}
           context={b.context}
           services={b.services}
           editMode={true}
@@ -61,9 +61,8 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
 
   render() : JSX.Element {
 
-    const { src, height, width } = this.props.data.youtube;
-    const fullSrc = 'https://www.youtube.com/embed/' 
-      + (src === '' ? 'C0DPdy98e4c' : src);
+    const { src, height, width } = this.props.data.iframe;
+    const fullSrc = src === '' ? 'http://www.google.com' : src;
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
@@ -75,4 +74,4 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
   }
 }
 
-export default YouTube;
+export default IFrame;

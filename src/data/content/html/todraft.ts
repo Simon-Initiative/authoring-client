@@ -46,6 +46,7 @@ const blockHandlers = {
   codeblock,
   table,
   audio,
+  iframe,
   video,
   youtube,
   '#text': pureTextBlockHandler.bind(undefined, common.TEXT),

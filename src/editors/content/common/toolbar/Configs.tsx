@@ -6,6 +6,7 @@ import { EntityTypes } from '../../../../data/content/html/common';
 import { CodeBlock } from '../../../../data/content/html/codeblock';
 import { Table } from '../../../../data/content/html/table';
 import { YouTube } from '../../../../data/content/html/youtube';
+import { IFrame } from '../../../../data/content/html/iframe';
 
 
 import * as commands from '../draft/commands';
@@ -65,6 +66,9 @@ export function flowBlock() {
     <Button key="youtube" 
       command={insertBlock(EntityTypes.youtube, 'IMMUTABLE', { youtube: new YouTube() })} 
       tooltip="Insert YouTube Video" icon="youtube"/>,
+    <Button key="iframe" 
+      command={insertBlock(EntityTypes.iframe, 'IMMUTABLE', { iframe: new IFrame() })} 
+      tooltip="Insert page in iframe" icon="youtube"/>,
   ];
 }
 

@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 
-import { YouTube }  from '../../../data/content/html/youtube';
+import { IFrame }  from '../../../data/content/html/IFrame';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
@@ -16,23 +16,23 @@ import { InputLabel } from '../common/InputLabel';
 import '../common/editor.scss';
 
 
-export interface YouTubeEditor {
+export interface IFrameEditor {
   
 }
 
-export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
+export interface IFrameEditorProps extends AbstractContentEditorProps<IFrame> {
   
 }
 
-export interface YouTubeEditorState {
+export interface IFrameEditorState {
   
 }
 
 /**
  * The content editor for Table.
  */
-export class YouTubeEditor 
-  extends AbstractContentEditor<YouTube, YouTubeEditorProps, YouTubeEditorState> {
+export class IFrameEditor 
+  extends AbstractContentEditor<IFrame, IFrameEditorProps, IFrameEditorState> {
     
   constructor(props) {
     super(props);
@@ -60,7 +60,7 @@ export class YouTubeEditor
     this.props.onEdit(updated);
   }
 
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
@@ -100,12 +100,13 @@ export class YouTubeEditor
           onEdit={this.onLabeledEdit}
           />
 
-        <RichTextEditor
-          label="Popout"
-          {...this.props}
-          onEdit={this.onPopoutEdit}
-          model={popout.content}
-        />
+        <InputLabel label="Popout">
+          <TextInput width="100%" label="Popout content" 
+            value={popout.content} 
+            type="text"
+            onEdit={this.onPopoutEdit}
+          />
+        </InputLabel>
 
         <RichTextEditor
           label="Alternate"
