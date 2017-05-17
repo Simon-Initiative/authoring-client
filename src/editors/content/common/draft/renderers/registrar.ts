@@ -1,8 +1,8 @@
 
 import { Audio } from './Audio';
 import { Image } from './Image';
-import { Video } from './Video';
-import { YouTube } from './YouTube';
+import Video from './Video';
+import YouTube from './YouTube';
 import CodeBlock from './CodeBlock';
 import Unsupported from './Unsupported';
 import { PulloutBegin } from './PulloutBegin';

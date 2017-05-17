@@ -4,7 +4,7 @@ export type ButtonProps = {
   children?: any;
   onClick: () => void;
   type?: string;
-}
+};
 
 export const Button = (props: ButtonProps) => {
   const type = props.type === undefined ? 'primary' : props.type;
@@ -16,5 +16,5 @@ export const Button = (props: ButtonProps) => {
       className={classes}>
         {props.children}
     </button>
-  )
+  );
 }; 

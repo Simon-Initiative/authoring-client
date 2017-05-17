@@ -48,14 +48,14 @@ export class TableEditor
     return false;
   }
 
-  onCellEdit(rowGuid: string, cellGuid: string, content ) {
+  onCellEdit(rowGuid: string, cellGuid: string, content) {
     let model = this.props.model;
     let row = this.props.model.rows.get(rowGuid);
     let cell = row.cells.get(cellGuid);
 
-    cell = cell.with({content: content.contentState});
-    row = row.with({cells: row.cells.set(cellGuid, cell)});
-    model = model.with({rows: model.rows.set(rowGuid, row)});
+    cell = cell.with({ content: content.contentState });
+    row = row.with({ cells: row.cells.set(cellGuid, cell) });
+    model = model.with({ rows: model.rows.set(rowGuid, row) });
 
     this.props.onEdit(model);
   }
@@ -64,24 +64,24 @@ export class TableEditor
   onRowAdd() {
     const colCount = this.props.model.rows.size === 0 ? 1 : this.props.model.rows.last().cells.size;
     let cells = Immutable.OrderedMap<string, Cell>();
-    for (let i = 0; i < colCount; i++) {
+    for (let i = 0; i < colCount; i += 1) {
       const cell = new CellData();
       cells = cells.set(cell.guid, cell);
     }
     
-    const newRow = new Row({cells});
+    const newRow = new Row({ cells });
     const rows = this.props.model.rows.set(newRow.guid, newRow);
 
-    this.props.onEdit(this.props.model.with({rows}));
+    this.props.onEdit(this.props.model.with({ rows }));
   }
 
   onRowRemove(rowGuid: string) {
     const rows = this.props.model.rows.delete(rowGuid);
-    this.props.onEdit(this.props.model.with({rows}));
+    this.props.onEdit(this.props.model.with({ rows }));
   }
 
   onColAdd() {
-    let model = this.props.model;
+    const model = this.props.model;
     let rows = model.rows;
 
     rows = rows.map((row) => {
@@ -92,14 +92,14 @@ export class TableEditor
       } else {
         newCell = new CellHeader();
       }
-      return row.with({cells: row.cells.set(newCell.guid, newCell)})
+      return row.with({ cells: row.cells.set(newCell.guid, newCell) });
     }).toOrderedMap();
 
-    this.props.onEdit(model.with({rows}));
+    this.props.onEdit(model.with({ rows }));
   }
 
   onColRemove(index: number) {
-    let model = this.props.model;
+    const model = this.props.model;
     let rows = model.rows;
 
     rows = rows.map((row) => {
@@ -108,14 +108,15 @@ export class TableEditor
       const after = row.cells.toSeq().slice(index + 1);
       const cells = before.concat(after).toOrderedMap();
 
-      return row.with({cells});
+      return row.with({ cells });
 
     }).toOrderedMap();
 
-    this.props.onEdit(model.with({rows}));
+    this.props.onEdit(model.with({ rows }));
   }
 
-  renderCell(rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, totalCells: number) {
+  renderCell(
+    rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, totalCells: number) {
 
     const width = ((1 / totalCells) * 100) + '%';
     const verticalAlign = 'top';
@@ -123,21 +124,21 @@ export class TableEditor
       minHeight: '20px',
       borderStyle: 'none',
       borderWith: 1,
-      borderColor: '#AAAAAA'
-    }
+      borderColor: '#AAAAAA',
+    };
     const editor = <HtmlContentEditor 
       showBorder={false}
       editorStyles={bodyStyle}
       inlineToolbar={inlineToolbar}
       blockToolbar={blockToolbar}
       {...this.props}
-      model={new Html({contentState: cell.content})}
+      model={new Html({ contentState: cell.content })}
       onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)} 
-      />
+      />;
     if (cell.contentType === 'CellData') {
-      return <td style={{width, verticalAlign}} key={cell.guid}>{editor}</td>;
+      return <td style={ { width, verticalAlign } } key={cell.guid}>{editor}</td>;
     } else {
-      return <th style={{width, verticalAlign}} key={cell.guid}>{editor}</th>;
+      return <th style={ { width, verticalAlign } } key={cell.guid}>{editor}</th>;
     }
   }
 
@@ -145,8 +146,11 @@ export class TableEditor
     const rows = this.props.model.rows.toArray();
     if (rows.length > 0) {  
       const tds = [];
-      for (let i = 0; i < this.props.model.rows.first().cells.size; i++) {
-        tds.push(<td key={i}><span className="closebtn input-group-addon" onClick={this.onColRemove.bind(this, i)}>&times;</span></td>);
+      for (let i = 0; i < this.props.model.rows.first().cells.size; i += 1) {
+        tds.push(<td key={i}>
+          <span className="closebtn input-group-addon" 
+            onClick={this.onColRemove.bind(this, i)}>&times;</span>
+          </td>);
       }
       return <tr>{tds}</tr>;
     } else {
@@ -157,10 +161,12 @@ export class TableEditor
   renderRow(row: Row, inlineToolbar: any, blockToolbar: any) {
     return (
       <tr key={row.guid}>
-        {row.cells.toArray().map(c => this.renderCell(row.guid, c, inlineToolbar, blockToolbar, row.cells.size))}
-        <td><span className="closebtn input-group-addon" onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
+        {row.cells.toArray().map(
+          c => this.renderCell(row.guid, c, inlineToolbar, blockToolbar, row.cells.size))}
+        <td><span className="closebtn input-group-addon" 
+          onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
       </tr>
-    )
+    );
   }
 
   render() : JSX.Element {
@@ -172,14 +178,16 @@ export class TableEditor
     const blockToolbar = <BlockToolbar/>;
 
     return (
-      <div className='itemWrapper'>
+      <div className="itemWrapper">
         <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
           <div className="btn-group mr-2" role="group" aria-label="First group">
-            <button onClick={this.onRowAdd} type="button" className="btn btn-secondary btn-sm">Add Row</button>
-            <button onClick={this.onColAdd} type="button" className="btn btn-secondary btn-sm">Add Column</button>
+            <button onClick={this.onRowAdd} type="button" 
+              className="btn btn-secondary btn-sm">Add Row</button>
+            <button onClick={this.onColAdd} type="button" 
+              className="btn btn-secondary btn-sm">Add Column</button>
           </div>
         </div>
-        <table className='table table-bordered' style={{width: '100%'}}>
+        <table className="table table-bordered" style={ { width: '100%' } }>
           <tbody>
           {this.renderDeleteColumn()}
           {rows.map(row => this.renderRow(row, inlineToolbar, blockToolbar))}

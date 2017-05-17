@@ -1,29 +1,28 @@
 import * as React from 'react';
 
 import * as contentTypes from '../../../data/contentTypes';
-import { TableEditor } from './TableEditor';
 import ModalSelection from '../../../utils/selection/ModalSelection';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 
-interface ModalTableEditor {
+interface ModalMediaEditor {
   
 }
 
-export interface ModalTableEditorProps {
+export interface ModalMediaEditorProps {
   onInsert: (model: contentTypes.Table) => void;
   onCancel: () => void;
-  model: contentTypes.Table;
+  model: any;
   context: AppContext;
   services: AppServices;
   editMode: boolean;
 }
 
-export interface ModalTableEditorState {
-  model: contentTypes.Table;
+export interface ModalMediaEditorState {
+  model: any;
 }
 
-class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalTableEditorState> {
+class ModalMediaEditor extends React.PureComponent<ModalMediaEditorProps, ModalMediaEditorState> {
 
   constructor(props) {
     super(props);
@@ -35,29 +34,36 @@ class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalT
     this.onEdit = this.onEdit.bind(this);
   }
 
-  onEdit(model: contentTypes.Table) {
+  onEdit(model: any) {
     this.setState({ model });
+  }
+
+  renderChildren() {
+    const additionalProps = {
+      model: this.state.model,
+      onEdit: this.onEdit,
+    };
+    return React.Children.map(
+      this.props.children,
+      (c) => {
+        return React.cloneElement(c as any, additionalProps);
+      });
   }
 
   render() {
 
     return (
-      <ModalSelection title="Edit Table" 
+      <ModalSelection title="Edit" 
         okLabel="Done" cancelLabel="Cancel"
         onCancel={this.props.onCancel} 
         onInsert={() => this.props.onInsert(this.state.model)}>
         
-        <TableEditor
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          model={this.state.model}
-          onEdit={this.onEdit}
-        />
+        {this.renderChildren()}
+        
       </ModalSelection>    
     );
   }
 
 }
 
-export default ModalTableEditor;
+export default ModalMediaEditor;

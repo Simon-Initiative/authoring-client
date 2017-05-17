@@ -20,11 +20,11 @@ export type AudioParams = {
   controls?: boolean,
   sources?: Immutable.OrderedMap<string, Source>,
   tracks?: Immutable.OrderedMap<string, Track>,
-  popout?: Immutable.OrderedMap<string, Popout>,
-  alternate?: Immutable.OrderedMap<string, Alternate>,
-  titleContent?: Immutable.OrderedMap<string, Title>,
-  caption?: Immutable.OrderedMap<string, Caption>,
-  cite?: Immutable.OrderedMap<string, Cite>,
+  popout?: Popout,
+  alternate?: Alternate,
+  titleContent?: Title,
+  caption?: Caption,
+  cite?: Cite,
   guid?: string,
 };
 
@@ -37,11 +37,11 @@ const defaultContent = {
   controls: true,
   sources: Immutable.OrderedMap<string, Source>(),
   tracks: Immutable.OrderedMap<string, Track>(),
-  popout: Immutable.OrderedMap<string, Popout>(),
-  alternate: Immutable.OrderedMap<string, Alternate>(),
-  titleContent: Immutable.OrderedMap<string, Title>(),
-  caption: Immutable.OrderedMap<string, Caption>(),
-  cite: Immutable.OrderedMap<string, Cite>(),
+  popout: new Popout(),
+  alternate: new Alternate(),
+  titleContent: new Title(),
+  caption: new Caption(),
+  cite: new Cite(),
   guid: '',
 };
 
@@ -55,11 +55,11 @@ export class Audio extends Immutable.Record(defaultContent) {
   controls: boolean;
   sources: Immutable.OrderedMap<string, Source>;
   tracks: Immutable.OrderedMap<string, Track>;
-  popout: Immutable.OrderedMap<string, Popout>;
-  alternate: Immutable.OrderedMap<string, Alternate>;
-  titleContent: Immutable.OrderedMap<string, Title>;
-  caption: Immutable.OrderedMap<string, Caption>;
-  cite: Immutable.OrderedMap<string, Cite>;
+  popout: Popout;
+  alternate: Alternate;
+  titleContent: Title;
+  caption: Caption;
+  cite: Cite;
   guid: string;
   
   constructor(params?: AudioParams) {
@@ -105,21 +105,21 @@ export class Audio extends Immutable.Record(defaultContent) {
           model = model.with({ tracks: model.tracks.set(id, Track.fromPersistence(item, id)) });
           break;
         case 'popout':
-          model = model.with({ popout: model.popout.set(id, Popout.fromPersistence(item, id)) });
+          model = model.with({ popout: Popout.fromPersistence(item, id) });
           break;
         case 'alternate':
           model = model.with(
-            { alternate: model.alternate.set(id, Alternate.fromPersistence(item, id)) });
+            { alternate: Alternate.fromPersistence(item, id) });
           break;
         case 'title':
           model = model.with(
-            { titleContent: model.titleContent.set(id, Title.fromPersistence(item, id)) });
+            { titleContent: Title.fromPersistence(item, id) });
           break;
         case 'caption':
-          model = model.with({ caption: model.caption.set(id, Caption.fromPersistence(item, id)) });
+          model = model.with({ caption: Caption.fromPersistence(item, id) });
           break;
         case 'cite':
-          model = model.with({ cite: model.cite.set(id, Cite.fromPersistence(item, id)) });
+          model = model.with({ cite: Cite.fromPersistence(item, id) });
           break;
         default:
           
@@ -132,11 +132,11 @@ export class Audio extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const children = [
-      ...this.titleContent.toArray().map(p => p.toPersistence()),
-      ...this.caption.toArray().map(p => p.toPersistence()),
-      ...this.cite.toArray().map(p => p.toPersistence()),
-      ...this.popout.toArray().map(p => p.toPersistence()),
-      ...this.alternate.toArray().map(p => p.toPersistence()),
+      this.titleContent.toPersistence(),
+      this.cite.toPersistence(),
+      this.caption.toPersistence(),
+      this.popout.toPersistence(),
+      this.alternate.toPersistence(),
       ...this.sources.toArray().map(p => p.toPersistence()),
       ...this.tracks.toArray().map(p => p.toPersistence()),
     ];

@@ -5,6 +5,10 @@ import * as common from './common';
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
 import { Table } from './table';
+import { Audio } from './audio';
+import { IFrame } from './iframe';
+import { Video } from './video';
+import { YouTube } from './youtube';
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -28,10 +32,6 @@ type InlineHandler = (
 
 const ol = listHandler.bind(undefined, 'ordered-list-item');
 const ul = listHandler.bind(undefined, 'unordered-list-item');
-const audio = addAtomicBlock.bind(undefined, common.EntityTypes.audio);
-const video = addAtomicBlock.bind(undefined, common.EntityTypes.video);
-const youtube = addAtomicBlock.bind(undefined, common.EntityTypes.youtube);
-
 
 const blockHandlers = {
   objref,
@@ -140,6 +140,30 @@ function codeblock(item: Object, context: ParsingContext) {
 
   const codeblock = CodeBlock.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.codeblock, { codeblock }, context);
+}
+
+function audio(item: Object, context: ParsingContext) {
+
+  const audio = Audio.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.audio, { audio }, context);
+}
+
+function video(item: Object, context: ParsingContext) {
+
+  const video = Video.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.video, { video }, context);
+}
+
+function iframe(item: Object, context: ParsingContext) {
+
+  const iframe = IFrame.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.iframe, { iframe }, context);
+}
+
+function youtube(item: Object, context: ParsingContext) {
+
+  const youtube = YouTube.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.youtube, { youtube }, context);
 }
 
 function table(item: Object, context: ParsingContext) {
