@@ -28,6 +28,8 @@
 * down menu Nick designed. It should really go into its own file but
 * I'm keeping it here to have all node renderer settings together
 * for now.
+* 
+* Per: http://koen.kivits.com/articles/pure-css-menu/
 */
 /* ------------------------------------------------------------- */
 
@@ -36,6 +38,8 @@
     display: inline-block;
     border: 0px solid red;
     outline: none;
+    margin-top: 7px;
+    margin-right: 5px;
 }
 
 .onclick-menu:before {
@@ -44,9 +48,19 @@
     outline: none;
 }
 
+.onclick-menu:focus {
+    /* clicking on label should toggle the menu */
+    pointer-events: none;
+}
+
 .onclick-menu:focus .onclick-menu-content {
-    display: block;
+    /*  opacity is 1 in opened state (see below) */
+    opacity: 1;
     visibility: visible;
+
+    /* don't let pointer-events affect descendant elements */
+    pointer-events: auto;
+    
     outline: none;
 }
 
@@ -60,7 +74,8 @@
     border-radius: 5px;
     border: 1px solid grey;
     
-    /* disable visibility by default, delay to enable clicks */
+    /* use opacity to fake immediate toggle */
+    opacity: 0;
     visibility: hidden;
     transition: visibility 0.5s;
     
