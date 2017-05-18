@@ -49,7 +49,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   titleIndex:number;    
 }
 
-export interface OrganizationEditorProps extends AbstractEditorProps<models.CourseModel>
+export interface OrganizationEditorProps extends AbstractEditorProps<models.OrganizationModel>
 {
   dispatch: any;
   documentId: string;
@@ -61,7 +61,7 @@ export interface OrganizationEditorProps extends AbstractEditorProps<models.Cour
 /**
 *
 */
-class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationEditorProps, OrganizationEditorState> 
+class OrganizationEditor extends AbstractEditor<models.OrganizationModel,OrganizationEditorProps, OrganizationEditorState>
 {    
     /**
      * 
@@ -86,24 +86,32 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-        persistence.retrieveDocument(this.state.context.courseId).then(course => {
-            console.log ("course: " + JSON.stringify (course));            
-            let orgObject=course ["model"]["organizations"];                                    
-            let orgDocId=orgObject.get (0);
-           
-            persistence.retrieveDocument(orgDocId).then(doc => {              
-              //console.log ("Org data: " + JSON.stringify (doc ["model"]));
-                
-              this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
-            }); 
-            
-            let loObject=course ["model"]["learningobjectives"];                                    
-            let logDocId=loObject.get (0);
-           
-            persistence.retrieveDocument(logDocId).then(loDoc => {
-              this.setState ({los: loDoc ["model"]["los"]});
-            });              
-        });        
+      console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
+      console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
+      let docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
+      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
+      //       console.log ("course: " + JSON.stringify (course));
+      //       let orgObject=course ["model"]["organizations"];
+      //       let orgDocId=orgObject.get (0);
+      //
+      //       persistence.retrieveDocument(orgDocId).then(doc => {
+      //         //console.log ("Org data: " + JSON.stringify (doc ["model"]));
+      //
+      //         this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
+      //       });
+      //
+      //       let loObject=course ["model"]["learningobjectives"];
+      //       let logDocId=loObject.get (0);
+      //
+      //       persistence.retrieveDocument(logDocId).then(loDoc => {
+      //         this.setState ({los: loDoc ["model"]["los"]});
+      //       });
+      //   });
     }
     
     /**
@@ -111,16 +119,21 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
      */            
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
-
-        persistence.retrieveDocument(anID).then(doc => {
-            
-            console.log ("Loaded doc: " + JSON.stringify (doc));
-            
-            this.setState ({modalIsOpen: false, treeData: doc.model ["organization"],document: doc});
-            return (doc);
-        });
-
-       return (null);         
+      let docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+      this.setState({modalIsOpen: false, treeData: this.props.model.organization, document: docu});
+      //   persistence.retrieveDocument(anID).then(doc => {
+      //
+      //       console.log ("Loaded doc: " + JSON.stringify (doc));
+      //
+      //       this.setState ({modalIsOpen: false, treeData: doc.model ["organization"],document: doc});
+      //       return (doc);
+      //   });
+      //
+      //  return (null);
     }
     
     /**
@@ -430,7 +443,7 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
     render() 
     {      
       const lolinker=this.createLinkerDialog ();  
-        
+        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
       return (
               <div>
                   <div>
@@ -443,7 +456,6 @@ class OrganizationEditor extends AbstractEditor<models.CourseModel,OrganizationE
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}
-                      //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
                       generateNodeProps={this.genProps.bind(this)} 
