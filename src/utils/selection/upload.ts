@@ -6,19 +6,21 @@ import * as Immutable from 'immutable';
 
 // Persists a file attachment, asynchronously.  Returns a promise that
 // will resolve the relative URL of the attachment 
-export function createAttachment(name: string, data: any, content_type: string, 
+export function createAttachment(
+  name: string, data: any, contentType: string, 
   referencingDocumentId: DocumentId) : Promise<string> {
   
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
 
     // Construct a media model to store the attachment 
-    const _attachments = {};
-    _attachments[name] = {
-      content_type,
-      data
+    const attachments = {};
+    attachments[name] = {
+      content_type: contentType,
+      data,
     };
     const referencingDocuments = Immutable.List.of<string>(referencingDocumentId);
-    const mediaModel = new models.MediaModel({ name, _attachments, referencingDocuments });
+    const mediaModel 
+      = new models.MediaModel({ name, _attachments: attachments, referencingDocuments });
     
     createDocument(this.props.courseId, mediaModel)
       .then((doc: Document) => {

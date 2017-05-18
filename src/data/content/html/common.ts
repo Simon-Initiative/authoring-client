@@ -2,20 +2,20 @@ import * as types from '../../types';
 
 export type PurposeType = {
   value: string,
-  label: string
-}
+  label: string,
+};
 
 export const PurposeTypes : PurposeType[] = [
-  { value: 'checkpoint', label: 'Checkpoint'},
-  { value: 'lab', label: 'Lab'},
-  { value: 'learnbydoing', label: 'Learn by doing'},
-  { value: 'learnmore', label: 'Learn more'},
-  { value: 'manystudentswonder', label: 'Many students wonder'},
-  { value: 'myresponse', label: 'My response'},
-  { value: 'quiz', label: 'Quiz'},
-  { value: 'simulation', label: 'Simulation'},
-  { value: 'walkthrough', label: 'Walkthrough'},
-  { value: 'didigetthis', label: 'Did I get this?'}
+  { value: 'checkpoint', label: 'Checkpoint' },
+  { value: 'lab', label: 'Lab' },
+  { value: 'learnbydoing', label: 'Learn by doing' },
+  { value: 'learnmore', label: 'Learn more' },
+  { value: 'manystudentswonder', label: 'Many students wonder' },
+  { value: 'myresponse', label: 'My response' },
+  { value: 'quiz', label: 'Quiz' },
+  { value: 'simulation', label: 'Simulation' },
+  { value: 'walkthrough', label: 'Walkthrough' },
+  { value: 'didigetthis', label: 'Did I get this?' },
 ];
 
 export const EntityTypes = types.strEnum([
@@ -51,12 +51,14 @@ export const EntityTypes = types.strEnum([
   'audio',
   'video',
   'youtube',
-  'unsupported'
-])
+  'unsupported',
+  'iframe',
+]);
 
 export type EntityTypes = keyof typeof EntityTypes;
 
-export type BlockData = PulloutBegin | PulloutEnd | SectionBegin | SectionEnd | ExampleBegin | ExampleEnd | Title | Empty;
+export type BlockData = PulloutBegin | PulloutEnd | SectionBegin 
+  | SectionEnd | ExampleBegin | ExampleEnd | Title | Empty;
 
 export interface PulloutBegin {
   type: 'pullout_begin';
@@ -95,21 +97,21 @@ export interface Title {
 }
 
 export interface Empty {
-  type: ''
+  type: '';
 }
 
 
 export type RawInlineStyle = {
   offset: number,
   length: number,
-  style: string 
+  style: string,
 };
 
 export type RawEntityRange = {
   offset: number,
   length: number,
-  key: string
-}
+  key: string,
+};
 
 export type RawContentBlock = {
   key: string,
@@ -118,13 +120,13 @@ export type RawContentBlock = {
   depth: number,
   inlineStyleRanges: RawInlineStyle[],
   entityRanges: RawEntityRange[],
-  data: any
+  data: any,
 };
 
 export type RawEntity = {
   type: string,
   mutability: string,
-  data: Object
+  data: Object,
 };
 
 export function getKey(item) {
@@ -147,7 +149,7 @@ export type RawEntityMap = Object;
 
 export type RawDraft = {
   entityMap : RawEntityMap,
-  blocks: RawContentBlock[]
+  blocks: RawContentBlock[],
 };
 
 export const ARRAY = '#array';
@@ -160,7 +162,7 @@ export const styleMap = {};
 const addStyle = (oliStyle, draftStyle) => {
   styleMap[oliStyle] = draftStyle;
   styleMap[draftStyle] = oliStyle;
-}
+};
 
 
 addStyle('bold', 'BOLD');
@@ -176,8 +178,8 @@ addStyle('sup', 'SUPERSCRIPT');
 
 export const emStyles = {
   bold: true,
-  italic: true
-}
+  italic: true,
+};
 
 
 export const sectionBlockStyles = {
@@ -186,7 +188,7 @@ export const sectionBlockStyles = {
   3: 'header-three',
   4: 'header-four',
   5: 'header-five',
-  6: 'header-six'
+  6: 'header-six',
 };
 
 export const blockStylesMap = {
@@ -196,4 +198,4 @@ export const blockStylesMap = {
   'header-four': 4,
   'header-five': 5,
   'header-six': 6,
-}
+};

@@ -11,7 +11,7 @@ const reducers = combineReducers({
   course,         // Information about current course, null if no current course
   view,           // The current view
   modal,          // modal display state
-  requests        // the current pending async requests
+  requests,        // the current pending async requests
 });
 
 export default reducers;

@@ -14,15 +14,15 @@ type ParamContent = ParamText | PrefValue | PrefLabel;
 export type ParamParams = {
   name?: string,
   content?: Immutable.OrderedMap<string, ParamContent>,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Param',
   name: '',
   content: Immutable.OrderedMap<string, ParamContent>(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Param extends Immutable.Record(defaultContent) {
   
@@ -41,28 +41,34 @@ export class Param extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Param {
 
-    let param = (root as any).param;
+    const param = (root as any).param;
 
     let model = new Param({ guid });
     
     if (param['@name'] !== undefined) {
-      model = model.with({ name: param['@name']});
+      model = model.with({ name: param['@name'] });
     }
     
-    getChildren(param).forEach(item => {
+    getChildren(param).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case '#text':
-          model = model.with({ content: model.content.set(id, ParamText.fromPersistence(item, id))});
+          model = model.with({ 
+            content: model.content.set(id, ParamText.fromPersistence(item, id)),
+          });
           break;
         case 'pref:label':
-          model = model.with({ content: model.content.set(id, PrefLabel.fromPersistence(item, id))});
+          model = model.with({ 
+            content: model.content.set(id, PrefLabel.fromPersistence(item, id)),
+          });
           break;
         case 'pref:value':
-          model = model.with({ content: model.content.set(id, PrefValue.fromPersistence(item, id))});
+          model = model.with({ 
+            content: model.content.set(id, PrefValue.fromPersistence(item, id)),
+          });
           break;
         default:
           
@@ -81,8 +87,8 @@ export class Param extends Immutable.Record(defaultContent) {
     return {
       param: {
         '@name': this.name,
-        '#array': children
-      } 
+        '#array': children,
+      },
     };
   }
 }

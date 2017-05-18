@@ -29,32 +29,35 @@ class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalT
     super(props);
 
     this.state = {
-      model: props.model
+      model: props.model,
     };
 
     this.onEdit = this.onEdit.bind(this);
   }
 
   onEdit(model: contentTypes.Table) {
-    this.setState({model});
+    this.setState({ model });
   }
 
   render() {
+
     return (
-      <ModalSelection title="Edit Table" okLabel='Done' cancelLabel='Cancel' 
-        onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.model)}>
+      <ModalSelection title="Edit Table" 
+        okLabel="Done" cancelLabel="Cancel"
+        onCancel={this.props.onCancel} 
+        onInsert={() => this.props.onInsert(this.state.model)}>
+        
         <TableEditor
-          {...this.props}
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
           model={this.state.model}
           onEdit={this.onEdit}
         />
       </ModalSelection>    
-      );
+    );
   }
 
 }
 
 export default ModalTableEditor;
-
-
-

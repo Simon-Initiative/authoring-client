@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from '../common/AbstractEditor';
+import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar  from './InlineToolbar';
@@ -40,7 +40,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     let model; 
 
     if (property === 'title') {
-      const head = this.props.model.head.with({ title: content});
+      const head = this.props.model.head.with({ title: content });
       model = this.props.model.with({ head });
         
     } else {
@@ -62,7 +62,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.head.title}
-            onEdit={(c) => this.onEdit('title', c)} 
+            onEdit={c => this.onEdit('title', c)} 
             />
           
           <HtmlContentEditor 
@@ -72,10 +72,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               services={this.props.services}
               context={this.props.context}
               model={this.props.model.body}
-              onEdit={(c) => this.onEdit('body', c)} 
+              onEdit={c => this.onEdit('body', c)} 
               />
       </div>
-    )
+    );
   }
 
 }

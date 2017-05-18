@@ -14,9 +14,9 @@ export interface PersistenceStrategy {
    * that editing is not allowed.
    */
   initialize: (doc: persistence.Document, 
-    userId: string,
-    onSuccess: onSaveCompletedCallback, 
-    onFailure: onFailureCallback ) => Promise<boolean>; 
+               userId: string,
+               onSuccess: onSaveCompletedCallback, 
+               onFailure: onFailureCallback) => Promise<boolean>; 
 
   /**
    * Method called to request that the persistence strategy saves the document.

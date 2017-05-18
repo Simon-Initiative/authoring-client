@@ -5,8 +5,8 @@ import * as common from './common';
 
 export type Block = {
   rawBlock: common.RawContentBlock,
-  block : ContentBlock
-}
+  block : ContentBlock,
+};
 
 export interface BlockIterator {
   next() : Block;
@@ -36,9 +36,9 @@ export class BlockProvider implements BlockIterator {
 
     const block = { 
       rawBlock: this.blocks[this.index], 
-      block: this.state.getBlockForKey(this.blocks[this.index].key)
+      block: this.state.getBlockForKey(this.blocks[this.index].key),
     };
-    this.index++;
+    this.index += 1;
     return block;
   }
 
@@ -50,12 +50,12 @@ export class BlockProvider implements BlockIterator {
     
     const block = { 
       rawBlock: this.blocks[this.index], 
-      block: this.state.getBlockForKey(this.blocks[this.index].key)
+      block: this.state.getBlockForKey(this.blocks[this.index].key),
     };
     return block;
   }
 
   hasNext() : boolean {
-    return this.index < this.blocks.length
+    return this.index < this.blocks.length;
   }
 }

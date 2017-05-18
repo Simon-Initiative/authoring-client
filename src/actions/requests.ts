@@ -17,29 +17,28 @@ export module requestActions {
     type: START_REQUEST,
     id: string,
     description: string,
-    timestamp: Date
-  }
+    timestamp: Date,
+  };
 
   export function startRequest(id: string, description: string) : startRequestAction {
     return {
       type: START_REQUEST,
       id,
       description,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    };
   }
 
   export type endRequestAction = {
     type: END_REQUEST,
-    id: string
-  }
+    id: string,
+  };
 
   export function endRequest(id: string) : endRequestAction {
     return {
       type: END_REQUEST,
-      id
-    }
+      id,
+    };
   }
-
 
 }

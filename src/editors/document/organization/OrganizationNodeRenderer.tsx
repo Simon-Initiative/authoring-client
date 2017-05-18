@@ -11,345 +11,327 @@ import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, Org
 import '../../../stylesheets/sortabletree.scss';
 
 const styles = {
-
-    orgrowWrapper : {
-        "padding": "10px 10px 10px 0",
-        "height": "100%",
-        "boxSizing": "border-box"
+    
+  orgrowWrapper : {
+    "padding": "10px 10px 10px 0",
+    "height": "100%",
+    "boxSizing": "border-box"
+  },
+  orgrow : {
+    "border" : '0px solid green',  
+    "height": "100%",
+    "flexDirection" : "row",  
+    "display": "flex",    
+    "justifyContent": "space-between",
+    "background": "#ffffff",  
+  },     
+  orgrowLandingPad : {
+    "border": "none !important",
+    "boxShadow": "none !important",
+    "outline": "none !important",
+    "*" : {
+      "opacity": "0 !important"
     },
-    orgrow : {
-        "border" : '0px solid green',
-        "height": "100%",
-        "flexDirection" : "row",
-        "display": "flex",
-        "justifyContent": "space-between",
-        "background": "#ffffff",
-    },
-    orgrowLandingPad : {
-        "border": "none !important",
-        "boxShadow": "none !important",
-        "outline": "none !important",
-        "*" : {
-            "opacity": "0 !important"
-        },
-        "&::before" : {
-            "backgroundColor": "lightblue",
-            "border": "3px dashed white",
-            "content": "",
-            "position": "absolute",
-            "top": "0",
-            "right": "0",
-            "bottom": "0",
-            "left": "0",
-            "zIndex": -1
-        }
-    },
-    orgrowCancelPad : {
-        "border": "none !important",
-        "boxShadow": "none !important",
-        "outline": "none !important",
-        "*" : {
-            "opacity": "0 !important"
-        },
-        "&::before" : {
-            "backgroundColor": "#E6A8AD",
-            "border": "3px dashed white",
-            "content": "",
-            "position": "absolute",
-            "top": "0",
-            "right": "0",
-            "bottom": "0",
-            "left": "0",
-            "zIndex": -1
-        }
-    },
-    orgrowSearchMatch : {
-        "outline": "solid 3px #0080ff"
-    },
-    orgrowSearchFocus : {
-        "outline": "solid 3px #fc6421"
-    },
-    orgrowItem : {
-        "display": "inline-block",
-        "verticalAlign": "middle"
-    },
-    orgrowContents : {
-        "position": "relative",
-        "height": "100%",
-        "border": "solid #bbb 0px",
-        "borderLeft": "none",
-        "boxShadow": "0 2px 2px -2px",
-        "padding": "0 5px 0 10px",
-        "borderRadius": "2px",
-        "minWidth": "230px",
-        //"maxWidth": "500px",
-        "alignItems": "left",
-        "verticalAlign": "middle",
-        "backgroundColor": "white"
-    },
-    orgrowContentsDragDisabled : {
-        "borderLeft": "solid #bbb 1px"
-    },
-    orgmoveHandle : {
-        //@extend %orgrowItem;
-        "display": "inline-block",
-        "verticalAlign": "middle",
-
-        "height": "100%",
-        "width": "44px",
-        "background": "#d9d9d9 url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsi0miigagvpz2h0psi0mii+pgcgc3ryb2tlpsijrkzgiibzdhjva2utd2lkdgg9ijiuosigpjxwyxroigq9ik0xncaxns43ade0ljqilz48cgf0acbkpsjnmtqgmjeunggxnc40ii8+phbhdgggzd0itte0idi3ljfomtquncivpjwvzz4kpc9zdmc+') no-repeat center",
-        "border": "solid #aaa 1px",
-        "boxShadow": "0 2px 2px -2px",
-        "cursor": "move",
-        "borderRadius": "1px",
-        "zIndex": 1,
-    },
-    backupHamburger : {
-        "margin" : "auto",
-        "width" : "16px",
-        "height" : "16px",
-        "backgroundSize" : "44px 44px",
-        "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAA4klEQVR4nGP8//8/AymAiSTVDAwMLJt37i+rqvn7n4GRkRGPuv///zMyMvS0tTDqWLuIioqzs7MTNPvnzx8f379jiggLZ2VnZWJhIohYOFiDgoIZ/5Pia0YGBhYIRTxg2bL7YFl17f//BDX+Z2Jg6GxrZjSw95SQlGLj5CRo9q9v39+9ecUUHhrKysHOysRMELGxs/sHBzL+IzGmWUjyMQMDA8uW3YcqGpqIVN3RUMdo5hYgLS/PzsnNhDeU/jH8//nt26tnTxi7Ziw6f/EaMyc7/mT4j4Hh7/efhvrajKQmbwBQa0jTnL7HxQAAAABJRU5ErkJggg==') no-repeat center",
-    },
-    wpage: {
-        "margin" : "auto",
-        "width" : "16px",
-        "height" : "16px",
-        "backgroundSize" : "44px 44px",
-        "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAhFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9KDLhAAAAK3RSTlMAUCiI+Ni4oAjAMEgEq3Bo+SpXSk5BgakBWnjzlwLedzr+px2QqBMGFcofUTCwHgAABL5JREFUeF7s1cFKAlEYQOF/BomKCxGUBNW0CYLe/23aCSHoRmQQFVDXbmZAHBjv/c4zfHAiiyRJkiRJkiRJkiRJkiRJUhXX6XkdRTWdA3BW9RtltVxEFtVxUXr9+CwagJ72qWgAeqlS0QDUjFcAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQMAkBuy/jXz66RUwSy0AZ60PkU33EQMIsAAXAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIGCkArboF5A5Ax79uAZkDUFv3CMgcgLZ9AgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACDgRgAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAwicvT+y4G6Pi1eewQMEvtSACo/o5BuovoFlDyAtRUqWgAaqZvRQPQQzq1d8cqDUNhGIZ/RHWwCUUHEcEURMH7vxepRRQxg2BUMIJLBUdHiTUmOed5pqyBF77lJ8k7APaqvANgtsg7AO4FgAAQAAJAAAgAASAABIAAEAAC4O9OwqhWMZTjYvgAuI7B1JcmAAEgAASAABAAAkAACAABbEwACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAB/Dz9sIx3FswC6Wp9HOmoTQNYBIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAHgJGznNtKxL4DOmkjIhwlg2gEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAALAdwLPHmP0qisB9KZZxOg9mIAfIQAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAm8Cjuxi90zcB9GYV47c0AWQSAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAHwn8KCNdBQvAujq8yLSUZsAsg4AASAABIAAEAACQAAIAAEgAASAABAAAkAACAAnYbs3kY5SAJ09xe94GROAABAAAkAACAABIAAEgAAQAAJAAAgAASAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAA29Gj8j02x2yyAZzE9JgABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgJvA+TL+E/PX72cAAAAAAAAAAACAL8LL6aEKzsebAAAAAElFTkSuQmCC') no-repeat center",
-    },
-    orgloadingHandle : {
-        "height": "42px",
-        "width": "45px",
-        "border": "0px solid green",
-        "borderRadius": "1px",
-        "zIndex": 1,
-        "cursor": "pointer",
-        "background": "#ffffff",
-        "verticalAlign" : "middle",
-        "textAlign": "center",
-        "display": "flex",
-        "alignItems": "center"
-    },
-    orgloadingCircle : {
-        "width": "80%",
-        "height": "80%",
-        "margin": "10%",
-        "position": "relative",
-        "border" : "1px solid green"
-    },
-    orgloadingCirclePoint : {
-        "width": "100%",
-        "height": "100%",
+    "&::before" : {
+        "backgroundColor": "lightblue",
+        "border": "3px dashed white",
+        "content": "",
         "position": "absolute",
-        "left": "0",
         "top": "0",
+        "right": "0",
+        "bottom": "0",
+        "left": "0",
+        "zIndex": -1
+    }    
+  },
+  orgrowCancelPad : {
+    "border": "none !important",
+    "boxShadow": "none !important",
+    "outline": "none !important",
+    "*" : {
+      "opacity": "0 !important"
+    },
+    "&::before" : {
+        "backgroundColor": "#E6A8AD",
+        "border": "3px dashed white",
+        "content": "",
+        "position": "absolute",
+        "top": "0",
+        "right": "0",
+        "bottom": "0",
+        "left": "0",
+        "zIndex": -1
+    }
+  },
+  orgrowSearchMatch : {
+    "outline": "solid 3px #0080ff"
+  },
+  orgrowSearchFocus : {
+    "outline": "solid 3px #fc6421"
+  },
+  orgrowItem : {
+    "display": "inline-block",
+    "verticalAlign": "middle"
+  },
+  orgrowContents : {          
+    "position": "relative",
+    "height": "100%",
+    "border": "solid #bbb 0px",
+    "borderLeft": "none",
+    "boxShadow": "0 2px 2px -2px",
+    "padding": "0 5px 0 10px",
+    "borderRadius": "2px",
+    "minWidth": "230px",
+    //"maxWidth": "500px",
+    "alignItems": "left",
+    "verticalAlign": "middle",
+    "backgroundColor": "white"
+  },
+  orgrowContentsDragDisabled : {
+    "borderLeft": "solid #bbb 1px"
+  },
+  orgmoveHandle : {
+    //@extend %orgrowItem;
+    "display": "inline-block",
+    "verticalAlign": "middle",
+          
+    "height": "100%",
+    "width": "44px",
+    "background": "#d9d9d9 url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsi0miigagvpz2h0psi0mii+pgcgc3ryb2tlpsijrkzgiibzdhjva2utd2lkdgg9ijiuosigpjxwyxroigq9ik0xncaxns43ade0ljqilz48cgf0acbkpsjnmtqgmjeunggxnc40ii8+phbhdgggzd0itte0idi3ljfomtquncivpjwvzz4kpc9zdmc+') no-repeat center",
+    "border": "solid #aaa 1px",
+    "boxShadow": "0 2px 2px -2px",
+    "cursor": "move",
+    "borderRadius": "1px",
+    "zIndex": 1,
+  },
+  backupHamburger : {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAA4klEQVR4nGP8//8/AymAiSTVDAwMLJt37i+rqvn7n4GRkRGPuv///zMyMvS0tTDqWLuIioqzs7MTNPvnzx8f379jiggLZ2VnZWJhIohYOFiDgoIZ/5Pia0YGBhYIRTxg2bL7YFl17f//BDX+Z2Jg6GxrZjSw95SQlGLj5CRo9q9v39+9ecUUHhrKysHOysRMELGxs/sHBzL+IzGmWUjyMQMDA8uW3YcqGpqIVN3RUMdo5hYgLS/PzsnNhDeU/jH8//nt26tnTxi7Ziw6f/EaMyc7/mT4j4Hh7/efhvrajKQmbwBQa0jTnL7HxQAAAABJRU5ErkJggg==') no-repeat center",
+  },  
+  wpage: {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAhFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9KDLhAAAAK3RSTlMAUCiI+Ni4oAjAMEgEq3Bo+SpXSk5BgakBWnjzlwLedzr+px2QqBMGFcofUTCwHgAABL5JREFUeF7s1cFKAlEYQOF/BomKCxGUBNW0CYLe/23aCSHoRmQQFVDXbmZAHBjv/c4zfHAiiyRJkiRJkiRJkiRJkiRJUhXX6XkdRTWdA3BW9RtltVxEFtVxUXr9+CwagJ72qWgAeqlS0QDUjFcAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQMAkBuy/jXz66RUwSy0AZ60PkU33EQMIsAAXAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIGCkArboF5A5Ax79uAZkDUFv3CMgcgLZ9AgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACDgRgAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAwicvT+y4G6Pi1eewQMEvtSACo/o5BuovoFlDyAtRUqWgAaqZvRQPQQzq1d8cqDUNhGIZ/RHWwCUUHEcEURMH7vxepRRQxg2BUMIJLBUdHiTUmOed5pqyBF77lJ8k7APaqvANgtsg7AO4FgAAQAAJAAAgAASAABIAAEAAC4O9OwqhWMZTjYvgAuI7B1JcmAAEgAASAABAAAkAACAABbEwACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAB/Dz9sIx3FswC6Wp9HOmoTQNYBIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAHgJGznNtKxL4DOmkjIhwlg2gEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAALAdwLPHmP0qisB9KZZxOg9mIAfIQAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAm8Cjuxi90zcB9GYV47c0AWQSAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAHwn8KCNdBQvAujq8yLSUZsAsg4AASAABIAAEAACQAAIAAEgAASAABAAAkAACAAnYbs3kY5SAJ09xe94GROAABAAAkAACAABIAAEgAAQAAJAAAgAASAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAA29Gj8j02x2yyAZzE9JgABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgJvA+TL+E/PX72cAAAAAAAAAAACAL8LL6aEKzsebAAAAAElFTkSuQmCC') no-repeat center",      
+  },
+  orgloadingHandle : {
+    "height": "42px",
+    "width": "45px",
+    "border": "0px solid green",
+    "borderRadius": "1px",
+    "zIndex": 1,                  
+    "cursor": "pointer",
+    "background": "#ffffff",
+    "verticalAlign" : "middle",
+    "textAlign": "center",  
+    "display": "flex",
+    "alignItems": "center" 
+  },
+  orgloadingCircle : {
+    "width": "80%",
+    "height": "80%",
+    "margin": "10%",
+    "position": "relative",
+    "border" : "1px solid green"
+  },
+  orgloadingCirclePoint : {
+    "width": "100%",
+    "height": "100%",
+    "position": "absolute",
+    "left": "0",
+    "top": "0",
+    
+    "border" : "1px solid blue",
+    
+    "pointcount": "12",
+    "spinAnimationTime": "800ms",
 
-        "border" : "1px solid blue",
+    "&:before" : {
+        "content": '',
+        "display": "block",
+        "margin": "0 auto",
+        "width": "11%",
+        "height": "30%",        
+        "backgroundColor": "#FFF",
+        "borderRadius" : "30%",
+        "animation": "pointFade 800ms infinite ease-in-out both"
+    },
 
-        "pointcount": "12",
-        "spinAnimationTime": "800ms",
-
-        "&:before" : {
-            "content": '',
-            "display": "block",
-            "margin": "0 auto",
-            "width": "11%",
-            "height": "30%",
-            "backgroundColor": "#FFF",
-            "borderRadius" : "30%",
-            "animation": "pointFade 800ms infinite ease-in-out both"
+    "@for $i from 1 through (($point-count + 1) / 2)" : {
+        "&:nth-of-type(#{$i})" : {
+            "transform": "rotate(360deg / $point-count * ($i - 1))"
         },
 
-        "@for $i from 1 through (($point-count + 1) / 2)" : {
-            "&:nth-of-type(#{$i})" : {
-                "transform": "rotate(360deg / $point-count * ($i - 1))"
-            },
+        "&:nth-of-type(#{$i + $point-count / 2})" : {
+            "transform": "rotate(180deg + 360deg / $point-count * ($i - 1))"
+        },
 
-            "&:nth-of-type(#{$i + $point-count / 2})" : {
-                "transform": "rotate(180deg + 360deg / $point-count * ($i - 1))"
-            },
-
-            "&:nth-of-type(#{$i}), &:nth-of-type(#{$i + $point-count / 2})" : {
-                "&:before" : {
-                    "animationDelay" : "- $spin-animation-time + ($spin-animation-time / $point-count * 2 * ($i - 1))"
-                }
+        "&:nth-of-type(#{$i}), &:nth-of-type(#{$i + $point-count / 2})" : {
+            "&:before" : {
+                "animationDelay" : "- $spin-animation-time + ($spin-animation-time / $point-count * 2 * ($i - 1))"
             }
         }
+    }    
+  },
+  orgtoolbarButton : {
+    //@extend %orgrowItem;
+    "display": "inline-block",
+    "verticalAlign": "middle",          
+  },
+  orgrowTitle : {    
+    "border": "0px solid red",
+    "display": "inline-block",
+    "width": "inherited",
+    "height": "100%",    
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "marginRight": "auto", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
+  },
+  orgrowControl : {    
+    "border": "1px solid red",
+    "width": "26px",
+    "height": "42px",    
+    "overflowY": "hidden",
+    "overflowX": "hidden", 
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "lineHeight": "42px"
+  },  
+  orgrowTitleWithSubtitle : {
+    "fontSize": "85%",
+    "display": "block",
+    "height": "0.8rem"
+  },
+  orgrowSubtitle : {
+    "fontSize": "70%",
+    "lineHeight": "1"
+  },
+  orgcollapseButton : {
+    "appearance": "none",
+    "border": "none",
+    "position": "absolute",
+    "borderRadius": "100%",
+    "boxShadow": "0 0 0 1px #000",
+    "width": "16px",
+    "height": "16px",
+    "top": "50%",
+    "transform": "translate(-50%, -50%)",
+    "cursor": "pointer",
+    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48l2c+cjwvc3znpg==') no-repeat center",
+    
+    "&:focus" : {
+        "outline": "none",
+        "boxShadow": "0 0 0 1px #000, 0 0 1px 3px #83BEF9"
     },
-    orgtoolbarButton : {
-        //@extend %orgrowItem;
-        "display": "inline-block",
-        "verticalAlign": "middle",
-    },
-    orgrowTitle : {
-        "border": "0px solid red",
-        "display": "inline-block",
-        "width": "inherited",
-        "height": "100%",
-        "overflowY": "hidden",
-        "overflowX": "hidden",
-        "marginRight": "auto",
-        "fontFamily" : "'Roboto Slab', serif",
-        "verticalAlign": "middle",
-        "lineHeight": "42px"
-    },
-    orgrowControl : {
-        "border": "1px solid red",
-        "width": "26px",
-        "height": "42px",
-        "overflowY": "hidden",
-        "overflowX": "hidden",
-        "fontFamily" : "'Roboto Slab', serif",
-        "verticalAlign": "middle",
-        "lineHeight": "42px"
-    },
-    orgrowTitleWithSubtitle : {
-        "fontSize": "85%",
-        "display": "block",
-        "height": "0.8rem"
-    },
-    orgrowSubtitle : {
-        "fontSize": "70%",
-        "lineHeight": "1"
-    },
-    orgcollapseButton : {
-        "appearance": "none",
-        "border": "none",
-        "position": "absolute",
-        "borderRadius": "100%",
-        "boxShadow": "0 0 0 1px #000",
-        "width": "16px",
-        "height": "16px",
-        "top": "50%",
-        "transform": "translate(-50%, -50%)",
-        "cursor": "pointer",
-        "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48l2c+cjwvc3znpg==') no-repeat center",
 
-        "&:focus" : {
-            "outline": "none",
-            "boxShadow": "0 0 0 1px #000, 0 0 1px 3px #83BEF9"
-        },
-
-        "&:hover:not(:active)" : {
-            "backgroundSize" : "24px",
-            "height": "20px",
-            "width": "20px"
-        }
-    },
-    orgexpandButton : {
-        "appearance": "none",
-        "border": "none",
-        "position": "absolute",
-        "borderRadius": "100%",
-        "boxShadow": "0 0 0 1px #000",
-        "width": "16px",
-        "height": "16px",
-        "top": "50%",
-        "transform": "translate(-50%, -50%)",
-        "cursor": "pointer",
-        "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48cgf0acbkpsjnosa0ljv2osivpjwvzz4kpc9zdmc+') no-repeat center",
-
-        "&:focus" : {
-            "outline": "none",
-            "boxShadow": "0 0 0 1px #000, 0 0 1px 3px #83BEF9"
-        },
-
-        "&:hover:not(:active)" : {
-            "backgroundSize" : "24px",
-            "height": "20px",
-            "width": "20px"
-        }
-    },
-    orglineChildren : {
-        "height": "100%",
-        "display": "inline-block",
-        "position": "absolute",
-
-        "&::after" : {
-            "content": "",
-            "position": "absolute",
-            "backgroundColor": "black",
-            "width": "1px",
-            "left": "50%",
-            "bottom": "0",
-            "height": "10px"
-        }
-    },
-    loTitleRenderer : {
-        'border' : '0px solid black',
-        "overflowY": "hidden",
-        "overflowX": "hidden",
-        "minWidth": "300px",
-        "maxWidth": "340px",
-        'height' : '42px'
+    "&:hover:not(:active)" : {
+        "backgroundSize" : "24px",
+        "height": "20px",
+        "width": "20px"
     }
+  },
+  orgexpandButton : {
+    "appearance": "none",
+    "border": "none",
+    "position": "absolute",
+    "borderRadius": "100%",
+    "boxShadow": "0 0 0 1px #000",
+    "width": "16px",
+    "height": "16px",
+    "top": "50%",
+    "transform": "translate(-50%, -50%)",
+    "cursor": "pointer",
+    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48cgf0acbkpsjnosa0ljv2osivpjwvzz4kpc9zdmc+') no-repeat center",
+    
+    "&:focus" : {
+        "outline": "none",
+        "boxShadow": "0 0 0 1px #000, 0 0 1px 3px #83BEF9"
+    },
+
+    "&:hover:not(:active)" : {
+        "backgroundSize" : "24px",
+        "height": "20px",
+        "width": "20px"
+    }    
+  },
+  orglineChildren : {
+    "height": "100%",
+    "display": "inline-block",
+    "position": "absolute",
+    
+    "&::after" : {
+        "content": "",
+        "position": "absolute",
+        "backgroundColor": "black",
+        "width": "1px",
+        "left": "50%",
+        "bottom": "0",
+        "height": "10px"
+    }    
+  },
+  loTitleRenderer : {
+      'border' : '0px solid black',
+      "overflowY": "hidden",
+      "overflowX": "hidden",
+      "minWidth": "300px",      
+      "maxWidth": "340px",
+      'height' : '42px'
+  } 
 };
 
 /**
- *
+ * 
  */
 class OrganizationNodeRenderer extends Component <any,any>
 {
-    shown:boolean=false;
     deleteNodeFunction:any=null;
     editNodeTitle:any=null;
     linkAnnotation:any=null;
-
+    addPage:any=null;
+          
     /**
-     *
-     */
-    popMenu (aNode:any) {
-        console.log ("popMenu ()");
-
-        if (this.shown==true) {
-            this.shown=false;
-        } else {
-            this.shown=true;
-        }
-
-        this.forceUpdate();
-    }
-
-    /**
-     *
+     * 
      */
     generatePopDown (node) {
-        console.log ("generatePopDown ("+this.shown+")");
-
-        let bStyle:any=styles.orgrowTitle;
-        bStyle ["marginLeft"]="10px";
-
-        let menuStyle:string="nav nav-pills flex-column onclick-menu-content-shown";
-
-        if (this.shown==false) {
-            menuStyle="nav nav-pills flex-column onclick-menu-content";
-        }
-
-        return (
-            <div ref='clickarea'>
-                <a style={bStyle} href="#" onClick={(e) => this.popMenu (node)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
-                <div tabIndex={0} className="onclick-menu">
-                    <ul className={menuStyle}>
-                        <h2 className="btn btn-secondary">Content</h2>
-                        <li className="nav-item"><a className="nav-link">Learning Objective</a></li>
-                        <li className="nav-item"><a className="nav-link">Page</a></li>
-                        <li className="nav-item"><a className="nav-link">Activity</a></li>
-                        <h2 className="btn btn-secondary">Assets</h2>
-                        <li className="nav-item"><a className="nav-link">Add-On</a></li>
-                    </ul>
-                </div>
-            </div>);
+      //console.log ("generatePopDown ()");
+          
+      let bStyle:any=styles.orgrowTitle;
+      bStyle ["marginLeft"]="10px";
+        
+      let menuStyle:string="flex-column onclick-menu-content list-group";
+                 
+      return (
+        <div ref='clickarea'>
+          <div tabIndex={0} className="onclick-menu">
+            <ul className={menuStyle}>
+              Content
+              <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+              <li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>
+              <li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>
+              <li className="list-group-item"><a href="#" >Activity</a></li>
+              Assets
+              <li className="list-group-item"><a href="#" >Add-On</a></li>              
+            </ul>
+          </div>
+        </div>);        
     }
 
-    render() {
-        console.log ("render ()");
-
+    render() {        
+        //console.log ("render ()");
+        
         var {
             editNodeTitle,
+            addPage,
             deleteNode,
             treeData,
-            linkAnnotation,
+            linkAnnotation,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -377,31 +359,32 @@ class OrganizationNodeRenderer extends Component <any,any>
         let handle;
 
         this.linkAnnotation=linkAnnotation;
-        this.editNodeTitle=editNodeTitle;
+        this.editNodeTitle=editNodeTitle;        
         this.deleteNodeFunction=deleteNode;
+        this.addPage=addPage;
 
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
         if (node.orgType!=OrgContentTypes.Item) {
-            canDrag=true;
-        }
-
+         canDrag=true;
+        }    
+        
         let hStyle:any=styles.backupHamburger;
         let workbookPageStyle:any=styles.wpage;
 
         if (node.orgType!=OrgContentTypes.Item) {
-            handle = connectDragSource((
-                <div style={styles.orgloadingHandle}>
-                    <div id="handle" style={hStyle}></div>
-                </div>
-            ), { dropEffect: 'copy' });
+          handle = connectDragSource((
+            <div style={styles.orgloadingHandle}>
+              <div id="handle" style={hStyle}></div>
+            </div>
+          ), { dropEffect: 'copy' });
         } else {
-            handle = connectDragSource((
-                <div style={styles.orgloadingHandle}>
-                    <div id="handle" style={workbookPageStyle}></div>
-                </div>
-            ), { dropEffect: 'copy' });
-        }
+          handle = connectDragSource((
+            <div style={styles.orgloadingHandle}>
+              <div id="handle" style={workbookPageStyle}></div>
+            </div>
+          ), { dropEffect: 'copy' });            
+        }    
 
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
         const isLandingPadActive  = !didDrop && isDragging;
@@ -412,9 +395,9 @@ class OrganizationNodeRenderer extends Component <any,any>
         styles.orgcollapseButton ["left"]= -0.5 * scaffoldBlockPxWidth;
         styles.orgexpandButton ["left"]= -0.5 * scaffoldBlockPxWidth;
 
-        if (node.expanded==true) {
+        if (node.expanded==true) {            
             handleStyle=styles.orgcollapseButton;
-        }
+        }    
         else {
             handleStyle=styles.orgexpandButton;
         }
@@ -427,18 +410,18 @@ class OrganizationNodeRenderer extends Component <any,any>
         //>--------------------------------------------------------------------
 
         /*
-         className={styles.row +
-         (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
-         (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
-         (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
-         (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
-         (className ? ` ${className}` : '')
-         }
-         style={{
-         opacity: isDraggedDescendant ? 0.5 : 1,
-         ...style,
-         }}
-         */
+        className={styles.row +
+            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
+            (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
+            (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
+            (className ? ` ${className}` : '')
+        }
+        style={{
+            opacity: isDraggedDescendant ? 0.5 : 1,
+            ...style,
+        }}
+        */
 
         let gStyle:any=styles.orgrow;
         gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
@@ -477,54 +460,54 @@ class OrganizationNodeRenderer extends Component <any,any>
         //>--------------------------------------------------------------------
 
         /*
-         return (
-         <div
-         style={{ height: '100%' }}
-         {...otherProps}
-         >
-         {toggleChildrenVisibility && node.children && node.children.length > 0 && (
-         <div>
-         <button
-         type="button"
-         aria-label={node.expanded ? 'Collapse' : 'Expand'}
-         style={handleStyle}
-         onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
-         />
+        return (
+            <div
+                style={{ height: '100%' }}
+                {...otherProps}
+            >
+                {toggleChildrenVisibility && node.children && node.children.length > 0 && (
+                    <div>
+                        <button
+                            type="button"
+                            aria-label={node.expanded ? 'Collapse' : 'Expand'}
+                            style={handleStyle}
+                            onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
+                        />
 
-         {node.expanded && !isDragging &&
-         <div
-         style={nStyle}
-         />
-         }
-         </div>
-         )}
+                        {node.expanded && !isDragging &&
+                            <div
+                                style={nStyle}
+                            />
+                        }
+                    </div>
+                )}
 
-         <div style={styles.orgrowWrapper as any}>
-         {}
-         {connectDragPreview(
-         <div style={gStyle}>
+                <div style={styles.orgrowWrapper as any}>
+                    {}
+                    {connectDragPreview(
+                        <div style={gStyle}>
 
-         {handle}
-
-         <div id="outter" style={dStyle as any}>
-         <div id="inner" style={tStyle}>
-         <TitleContentEditor
-         services={services}
-         editMode={true}
-         model={titleObj}
-         context={{userId: null, documentId: null, courseId: null}}
-         onEdit={(content) => this.editNodeTitle(node,content)}
-         />
-         </div>
-         <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-         <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>
-         </div>
-         </div>
-         )}
-         </div>
-         </div>
-         );
-         */
+                            {handle}
+            
+                            <div id="outter" style={dStyle as any}>
+                               <div id="inner" style={tStyle}>
+                                 <TitleContentEditor 
+                                   services={services}
+                                   editMode={true}
+                                   model={titleObj}
+                                   context={{userId: null, documentId: null, courseId: null}}
+                                   onEdit={(content) => this.editNodeTitle(node,content)} 
+                                    />
+                               </div>
+                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
+                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>  
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+        */
 
         let popDown=this.generatePopDown (node);
 
@@ -533,13 +516,13 @@ class OrganizationNodeRenderer extends Component <any,any>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
                     <div>
                         <button
-                            type="button"
+                            type="button"                            
                             style={handleStyle}
                             onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
                         />
 
                         {node.expanded && !isDragging &&
-                        <div style={nStyle} />
+                            <div style={nStyle} />
                         }
                     </div>
                 )}
@@ -549,22 +532,19 @@ class OrganizationNodeRenderer extends Component <any,any>
                     {connectDragPreview(
                         <div style={gStyle}>
 
-                            {handle}
-
-                            <TitleContentEditor
-                                services={services}
-                                editMode={true}
-                                model={titleObj}
-                                context={context}
-                                styles={styles.loTitleRenderer}
-                                onEdit={(content) => this.editNodeTitle(node,content)}
-                            />
-
-                            <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                            <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>
-
-                            {popDown}
-
+                          {handle}
+            
+                           <TitleContentEditor 
+                             services={services}
+                             editMode={true}
+                             model={titleObj}
+                             context={context}
+                             styles={styles.loTitleRenderer}
+                             onEdit={(content) => this.editNodeTitle(node,content)} 
+                           />
+            
+                           {popDown}
+                               
                         </div>
                     )}
                 </div>
@@ -576,4 +556,4 @@ class OrganizationNodeRenderer extends Component <any,any>
 }
 
 export default OrganizationNodeRenderer;
-
+ 

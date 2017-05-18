@@ -145,7 +145,7 @@ var createLearningObjectives = function(input) {
     var data = { 
       modelType: 'LearningObjectiveModel',
       title: {text: 'Sample Learning Objective Model'},
-      lobjectives: []
+      learningobjectives: []
     }
     request('POST', '/editor', data)
       .then(result => { LODocID=result.id; resolve(input)});
@@ -156,7 +156,7 @@ var createOrganization = function() {
   var data = { 
     modelType: 'OrganizationModel',
     title: {text: 'Sample Organization'},
-    skills: []
+    organization: {}
   }
   return request('POST', '/editor', data);
 }

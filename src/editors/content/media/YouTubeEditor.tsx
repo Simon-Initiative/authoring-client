@@ -1,0 +1,142 @@
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import * as contentTypes from '../../../data/contentTypes';
+import { ContentState } from 'draft-js';
+
+import { YouTube }  from '../../../data/content/html/youtube';
+import { AppServices } from '../../common/AppServices';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import guid from '../../../utils/guid';
+
+import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
+import { RichTextEditor } from '../common/RichTextEditor';
+import { TextInput } from '../common/TextInput';
+import { InputLabel } from '../common/InputLabel';
+
+import '../common/editor.scss';
+
+
+export interface YouTubeEditor {
+  
+}
+
+export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
+  
+}
+
+export interface YouTubeEditorState {
+  
+}
+
+/**
+ * The content editor for Table.
+ */
+export class YouTubeEditor 
+  extends AbstractContentEditor<YouTube, YouTubeEditorProps, YouTubeEditorState> {
+    
+  constructor(props) {
+    super(props);
+    
+    this.onLabeledEdit = this.onLabeledEdit.bind(this);
+    this.onSrcEdit = this.onSrcEdit.bind(this);
+    this.onHeightEdit = this.onHeightEdit.bind(this);
+    this.onWidthEdit = this.onWidthEdit.bind(this);
+    this.onPopoutEdit = this.onPopoutEdit.bind(this);
+    this.onAlternateEdit = this.onAlternateEdit.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    return false;
+  }
+
+  onLabeledEdit(model: LabeledType) {
+
+    const { titleContent, cite, caption } = model;
+    const updated = this.props.model.with({ titleContent, cite, caption });
+   
+    this.props.onEdit(updated);
+  }
+
+  onPopoutEdit(content: ContentState) {
+    const popout = this.props.model.popout.with({ content });
+    this.props.onEdit(this.props.model.with({ popout }));
+  }
+
+  onAlternateEdit(content: ContentState) {
+    const alternate = this.props.model.alternate.with({ content });
+    this.props.onEdit(this.props.model.with({ alternate }));
+  }
+
+  onSrcEdit(src: string) {
+    this.props.onEdit(this.props.model.with({ src }));
+  }
+
+  onHeightEdit(height: string) {
+    this.props.onEdit(this.props.model.with({ height }));
+  }
+
+  onWidthEdit(width: string) {
+    this.props.onEdit(this.props.model.with({ width }));
+  }
+
+  render() : JSX.Element {
+
+    const { titleContent, caption, cite, popout, alternate } = this.props.model;
+
+    const labeled : LabeledType = {
+      titleContent,
+      caption,
+      cite,
+    };
+
+    return (
+      <div className="itemWrapper">
+        <LabeledEditor 
+          {...this.props}
+          model={labeled} 
+          onEdit={this.onLabeledEdit}
+          />
+
+        <RichTextEditor
+          label="Popout"
+          {...this.props}
+          onEdit={this.onPopoutEdit}
+          model={popout.content}
+        />
+
+        <RichTextEditor
+          label="Alternate"
+          {...this.props}
+          onEdit={this.onAlternateEdit}
+          model={alternate.content}
+        />
+
+        <InputLabel label="Source">
+          <TextInput width="75px" label="Source" 
+            value={this.props.model.src} 
+            type="text"
+            onEdit={this.onSrcEdit}
+          />
+        </InputLabel>
+        <InputLabel label="Height">
+          <TextInput width="75px" label="Height in pixels" 
+            value={this.props.model.height} 
+            type="text"
+            onEdit={this.onHeightEdit}
+          />
+        </InputLabel>
+        <InputLabel label="Width">
+          <TextInput width="75px" label="Width in pixels" 
+            value={this.props.model.width} 
+            type="text"
+            onEdit={this.onWidthEdit}
+          />
+        </InputLabel>
+      </div>);
+  }
+
+}
+

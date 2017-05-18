@@ -134,13 +134,20 @@ gulp.task('enableCors', function(cb) {
     });
 });
 
+gulp.task('tslint', function(cb) {
+  return exec("./node_modules/tslint/bin/tslint -c tslint.json 'src/**/*.ts*'",(error, stdout, stderr) => {
+    console.log(stdout);
+    cb();
+  });
+});
+
 
 gulp.task('dev', function(cb) {
-  runSequence('prelude', 'clean:dev', 'setupDev', 'serve', cb);
+  runSequence('prelude', 'clean:dev', 'setupDev', 'tslint', 'serve', cb);
 });
 
 gulp.task('dist', function(cb) {
-  runSequence('prelude', 'clean', 'setupDist', 'build', 'postdist', cb);
+  runSequence('prelude', 'clean', 'setupDist', 'tslint', 'build', 'postdist', cb);
 });
 
 

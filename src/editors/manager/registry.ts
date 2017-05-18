@@ -2,7 +2,7 @@
 import { PersistenceStrategy } from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 
-export const EditorRegistry = {};
+export const REGISTRY = {};
 
 export type RegisteredEditor = {
   name: string;
@@ -10,15 +10,14 @@ export type RegisteredEditor = {
   persistenceStrategy: PersistenceStrategy;
   listeningApproach: ListeningApproach;
   protected: boolean;
-}
+};
 
 export function register(registration: RegisteredEditor) {
-    EditorRegistry[registration.name] = registration
+  REGISTRY[registration.name] = registration;
 }
 
 export function lookUpByName(name: string) : RegisteredEditor {
-    console.log ("lookUpByName ("+name+")");  
-    return EditorRegistry[name];
+  return REGISTRY[name];
 }
 
 

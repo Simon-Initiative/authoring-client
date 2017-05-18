@@ -19,41 +19,41 @@ export default function initEditorRegistry() {
     component: WorkbookPageEditor, 
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true
+    protected: true,
   });
   register({
     name: ModelTypes.CourseModel, 
     component: CourseEditor,
     persistenceStrategy: new ImmediatePersistenceStrategy(),
     listeningApproach: ListeningApproach.Never,
-    protected: false
+    protected: false,
   });
   register({
     name: ModelTypes.AssessmentModel, 
     component: AssessmentEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true
+    protected: true,
   });  
   register({
     name: ModelTypes.OrganizationModel, 
     component: OrganizationEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true
+    protected: true,
   });
   register({
     name: ModelTypes.LearningObjectiveModel, 
     component: LearningObjectiveEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true
+    protected: true,
   });
   register({
     name: ModelTypes.SkillModel, 
     component: SkillEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
-    protected: true
+    protected: true,
   });
 }

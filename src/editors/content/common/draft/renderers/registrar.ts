@@ -1,8 +1,9 @@
 
 import { Audio } from './Audio';
 import { Image } from './Image';
-import { Video } from './Video';
-import { YouTube } from './YouTube';
+import Video from './Video';
+import YouTube from './YouTube';
+import IFrame from './IFrame';
 import CodeBlock from './CodeBlock';
 import Unsupported from './Unsupported';
 import { PulloutBegin } from './PulloutBegin';
@@ -13,6 +14,7 @@ import { ExampleBegin } from './ExampleBegin';
 import { ExampleEnd } from './ExampleEnd';
 import { WbInline } from './WbInline';
 import { Table } from './Table';
+
  
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
@@ -33,4 +35,5 @@ export default function init() {
   register(EntityTypes.example_end, ExampleEnd, undefined);  
   register(EntityTypes.wb_inline, WbInline, undefined);  
   register(EntityTypes.table, Table, undefined);
+  register(EntityTypes.iframe, IFrame, undefined);
 }

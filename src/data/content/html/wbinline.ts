@@ -12,7 +12,7 @@ export type WbInlineParams = {
   height?: string,
   purpose?: string,
   params?: Immutable.OrderedMap<string, Param>,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -23,8 +23,8 @@ const defaultContent = {
   height: '',
   purpose: 'learnbydoing',
   params: Immutable.OrderedMap<string, Param>(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class WbInline extends Immutable.Record(defaultContent) {
   
@@ -47,34 +47,34 @@ export class WbInline extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : WbInline {
 
-    let wb = (root as any)['wb:inline'];
+    const wb = (root as any)['wb:inline'];
 
     let model = new WbInline({ guid });
     
     if (wb['@idref'] !== undefined) {
-      model = model.with({ idRef: wb['@idref']});
+      model = model.with({ idRef: wb['@idref'] });
     }
     if (wb['@src'] !== undefined) {
-      model = model.with({ src: wb['@src']});
+      model = model.with({ src: wb['@src'] });
     }
     if (wb['@height'] !== undefined) {
-      model = model.with({ height: wb['@height']});
+      model = model.with({ height: wb['@height'] });
     }
     if (wb['@width'] !== undefined) {
-      model = model.with({ width: wb['@width']});
+      model = model.with({ width: wb['@width'] });
     }
     if (wb['@purpose'] !== undefined) {
-      model = model.with({ purpose: wb['@purpose']});
+      model = model.with({ purpose: wb['@purpose'] });
     }
 
-    getChildren(wb).forEach(item => {
+    getChildren(wb).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'param':
-          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id))});
+          model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
           break;
         default:
           
@@ -93,8 +93,8 @@ export class WbInline extends Immutable.Record(defaultContent) {
         '@height': this.height,
         '@width': this.width,
         '@purpose': this.purpose,
-        '#array': this.params.toArray().map(p => p.toPersistence())
-      } 
+        '#array': this.params.toArray().map(p => p.toPersistence()),
+      },
     };
   }
 }

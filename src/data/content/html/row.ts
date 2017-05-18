@@ -12,14 +12,14 @@ export type Cell = CellData | CellHeader;
 
 export type RowParams = {
   cells?: Immutable.OrderedMap<string, Cell>,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Row',
   cells: Immutable.OrderedMap<string, Cell>(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Row extends Immutable.Record(defaultContent) {
   
@@ -37,21 +37,21 @@ export class Row extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Row {
 
-    let t = (root as any).tr;
+    const t = (root as any).tr;
 
     let model = new Row({ guid });
     
-    getChildren(t).forEach(item => {
+    getChildren(t).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'td':
-          model = model.with({ cells: model.cells.set(id, CellData.fromPersistence(item, id))});
+          model = model.with({ cells: model.cells.set(id, CellData.fromPersistence(item, id)) });
           break;
         case 'th':
-          model = model.with({ cells: model.cells.set(id, CellHeader.fromPersistence(item, id))});
+          model = model.with({ cells: model.cells.set(id, CellHeader.fromPersistence(item, id)) });
           break;
         default:
           
@@ -64,9 +64,9 @@ export class Row extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      'tr': {
-        '#array': this.cells.toArray().map(p => p.toPersistence())
-      } 
+      tr: {
+        '#array': this.cells.toArray().map(p => p.toPersistence()),
+      },
     };
   }
 }

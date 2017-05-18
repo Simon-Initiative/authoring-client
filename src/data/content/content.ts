@@ -6,16 +6,16 @@ import { getKey } from '../common';
 
 export type ContentParams = {
   availability?: string,
-  body?: Html
-  guid?: string
+  body?: Html,
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Content',
   availability: 'always',
   body: new Html(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Content extends Immutable.Record(defaultContent) {
   
@@ -34,13 +34,13 @@ export class Content extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Content {
 
-    let content = (root as any).content;
+    const content = (root as any).content;
 
     let model = new Content({ guid });
-    model = model.with({ body: Html.fromPersistence(content, '')});
+    model = model.with({ body: Html.fromPersistence(content, '') });
     
     if (content['@availability'] !== undefined) {
-      model = model.with({ availability: content['@availability']});
+      model = model.with({ availability: content['@availability'] });
     }
     
     return model;

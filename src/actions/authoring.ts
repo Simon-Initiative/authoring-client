@@ -4,7 +4,7 @@ export type AuthoringActions =
   toggleInlineStyleAction |
   insertAtomicBlockAction |
   toggleBlockTypeAction | 
-  insertInlineEntityAction
+  insertInlineEntityAction;
 
 export interface AuthoringActionsHandler {
   handleAction(action: AuthoringActions);
@@ -25,57 +25,56 @@ export const INSERT_INLINE_ENTITY : INSERT_INLINE_ENTITY = 'INSERT_INLINE_ENTITY
 
 export type toggleBlockTypeAction = {
   type: TOGGLE_BLOCK_TYPE,
-  blockType: string 
-}
+  blockType: string,
+};
 
 export type toggleInlineStyleAction = {
   type: TOGGLE_INLINE_STYLE,
-  style: string
+  style: string,
 };
 
 export type insertAtomicBlockAction = {
   type: INSERT_ATOMIC_BLOCK,
   entityType: EntityTypes,
-  data: Object
+  data: Object,
 };
 
 export type insertInlineEntityAction = {
   type: INSERT_INLINE_ENTITY,
   entityType: string,
   mutability: string,
-  data: Object
-}
+  data: Object,
+};
 
 export function insertAtomicBlock(entityType: EntityTypes, data: Object) : insertAtomicBlockAction {
   return {
     type: INSERT_ATOMIC_BLOCK,
     entityType,
-    data
-  }
+    data,
+  };
 }
 
-export function insertInlineEntity(entityType: string, mutability: string, data: Object) : insertInlineEntityAction {
+export function insertInlineEntity(
+  entityType: string, mutability: string, 
+  data: Object) : insertInlineEntityAction {
   return {
     type: INSERT_INLINE_ENTITY,
     entityType,
     mutability,
-    data
-  }
+    data,
+  };
 }
 
 export function toggleInlineStyle(style: string) : toggleInlineStyleAction {
   return {
     type: TOGGLE_INLINE_STYLE,
-    style
-  }
+    style,
+  };
 }
 
 export function toggleBlockType(blockType: string) : toggleBlockTypeAction {
   return {
     type: TOGGLE_BLOCK_TYPE,
-    blockType
-  }
+    blockType,
+  };
 }
-
-
-

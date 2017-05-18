@@ -16,12 +16,12 @@ const styles = {
     "boxSizing": "border-box"
   },
   orgrow : {
-    "border" : '0px solid green',
+    "border" : '0px solid green',  
     "height": "100%",
-    "flexDirection" : "row",
-    "display": "flex",
+    "flexDirection" : "row",  
+    "display": "flex",    
     "justifyContent": "space-between",
-    "background": "#ffffff",
+    "background": "#ffffff",  
   },     
   orgrowLandingPad : {
     "border": "none !important",
@@ -185,16 +185,16 @@ const styles = {
     "verticalAlign": "middle",
     "lineHeight": "42px"
   },
-  orgrowControl : {
+  orgrowControl : {    
     "border": "1px solid red",
     "width": "26px",
-    "height": "42px",
+    "height": "42px",    
     "overflowY": "hidden",
-    "overflowX": "hidden",
+    "overflowX": "hidden", 
     "fontFamily" : "'Roboto Slab', serif",
     "verticalAlign": "middle",
     "lineHeight": "42px"
-  },
+  },  
   orgrowTitleWithSubtitle : {
     "fontSize": "85%",
     "display": "block",
@@ -271,10 +271,10 @@ const styles = {
       'border' : '0px solid black',
       "overflowY": "hidden",
       "overflowX": "hidden",
-      "minWidth": "300px",
+      "minWidth": "300px",      
       "maxWidth": "340px",
       'height' : '42px'
-  }
+  }  
 };
 
 /**
@@ -321,7 +321,7 @@ class LONodeRenderer extends Component <any, any>
             editNodeTitle,
             deleteNode,
             treeData,
-            linkAnnotation,
+            linkAnnotation,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -447,16 +447,16 @@ class LONodeRenderer extends Component <any, any>
                     {connectDragPreview(
                      <div style={gStyle}>
                        {handle}
-                       <TitleContentEditor
+                       <TitleContentEditor 
                         services={services}
                         editMode={true}
                         model={titleObj}
                         context={context}
                         styles={styles.loTitleRenderer}
-                        onEdit={(content) => this.editNodeTitle(node,content)}
-                       />
+                        onEdit={(content) => this.editNodeTitle(node,content)} 
+                       />            
                        <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                       <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>
+                       <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>                     
                      </div>
                     )}
                 </div>
