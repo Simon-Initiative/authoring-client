@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import {Skill} from '../../../data/skills';
-import { CourseResource, fetchCourseResources } from '../common/resources';
+import { CourseResource, fetchCourseResources } from '../../../data/persistence';
 
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';

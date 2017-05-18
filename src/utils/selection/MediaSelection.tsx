@@ -4,8 +4,8 @@ import ModalSelection from './ModalSelection';
 
 type GeneratedIds = {
   input: string,
-  help: string 
-}
+  help: string, 
+};
 
 interface MediaSelection {
   file: Object;
@@ -26,8 +26,8 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
     super(props);
     this.ids = {
       input: guid(),
-      help: guid()
-    }
+      help: guid(),
+    };
     this.file = null;
     this._onChange = this.onChange.bind(this);
   }
@@ -38,7 +38,9 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
 
   render() {
     return (
-      <ModalSelection title="Select File" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.props.type, this.file)}>
+      <ModalSelection title="Select File" 
+        onCancel={this.props.onCancel} 
+        onInsert={() => this.props.onInsert(this.props.type, this.file)}>
         <form>
           <div className="form-group">
             <label htmlFor={this.ids.input}>Choose a file</label>
@@ -49,11 +51,12 @@ class MediaSelection extends React.PureComponent<MediaSelectionProps, {}> {
               className="form-control" 
               id={this.ids.input} 
               aria-describedby={this.ids.help} />
-            <small id={this.ids.help} className="form-text text-muted">Select a file to upload</small>
+            <small id={this.ids.help} 
+              className="form-text text-muted">Select a file to upload</small>
           </div>
         </form>
       </ModalSelection>    
-      );
+    );
   }
 
 }

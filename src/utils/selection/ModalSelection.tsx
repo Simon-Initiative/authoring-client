@@ -33,8 +33,12 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
                 {this.props.children}
             </div>
             <div className="modal-footer">
-                <button onClick={this.props.onCancel} type="button" data-dismiss="modal" className="btn btn-secondary">{cancelLabel}</button>
-                <button onClick={this.props.onInsert} type="button" data-dismiss="modal" className="btn btn-primary">{okLabel}</button>
+                <button onClick={this.props.onCancel} 
+                  type="button" data-dismiss="modal" 
+                  className="btn btn-secondary">{cancelLabel}</button>
+                <button onClick={this.props.onInsert} 
+                  type="button" data-dismiss="modal" 
+                  className="btn btn-primary">{okLabel}</button>
             </div>
             </div>
         </div>

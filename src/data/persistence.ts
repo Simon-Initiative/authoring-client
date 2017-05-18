@@ -4,6 +4,7 @@ import * as models from './models';
 import * as Immutable from 'immutable';
 import { credentials, getHeaders } from '../actions/utils/credentials';
 import { configuration } from '../actions/utils/config';
+import { Resource } from './resource';
 
 const fetch = (window as any).fetch;
 
@@ -233,25 +234,24 @@ export function persistDocument(doc: Document): Promise<Document> {
   });
 }
 
-export function queryDocuments(query: Object): Promise<Document[]> {
-  
+export type CourseResource = {
+  _id: string,
+  title: string,
+  type: string,
+};
+
+export function fetchCourseResources(courseId: string) : Promise<CourseResource[]> {
   return new Promise((resolve, reject) => {
-    fetch(`${configuration.baseUrl}/${configuration.database}/_find`, {
-      method: 'POST',
-      headers: getHeaders(credentials),
-      body: JSON.stringify(query),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
+    retrieveCoursePackage(courseId)
+    .then((doc) => {
+      switch (doc.model.modelType) {
+        case 'CourseModel':
+          return doc.model.resources.toArray().map(
+            (r : Resource) => ({ _id: r.id, title: r.title, type: r.type }));
+        default:
       }
-      return response.json();
-    })
-    .then((json) => {
-      resolve(json.docs as Document[]);
     })
     .catch(err => reject(err));
   });
+  
 }
-
-

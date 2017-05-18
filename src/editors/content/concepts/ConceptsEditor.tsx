@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
@@ -16,7 +14,7 @@ export interface ConceptsEditor {
 
 export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
   conceptType: string;
-
+  courseId: string;
   title: string;
 }
 
@@ -24,14 +22,15 @@ export interface ConceptstEditorState {
 
 }
 
-
-const Spacer = (props) => <span>&nbsp;&nbsp;</span>; // There is probably a better way...
-
+/* tslint:disable */
+const Spacer = props => <span>&nbsp;&nbsp;</span>; // There is probably a better way...
+/* tslint:enable */
 
 /**
  * Concepts editor 
  */
-export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>, ConceptsEditorProps, ConceptstEditorState> {
+export class ConceptsEditor 
+  extends AbstractContentEditor<Immutable.List<string>, ConceptsEditorProps, ConceptstEditorState> {
 
   constructor(props) {
     super(props);
@@ -41,7 +40,7 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
   }
 
   onRemove(id: string, type: string) {
-    return this.props.onEdit(this.props.model.filter((v) => v !== id).toList());
+    return this.props.onEdit(this.props.model.filter(v => v !== id).toList());
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -53,7 +52,10 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
 
   renderConcepts() {
     return this.props.model.toArray()
-      .map(c => <Concept key={'concept' + c} titleOracle={this.props.services.titleOracle} conceptId={c} conceptType={this.props.conceptType} onRemove={this.onRemove}/>)
+      .map(c => <Concept key={'concept' + c} 
+         titleOracle={this.props.services.titleOracle} 
+         conceptId={c} conceptType={this.props.conceptType} 
+         onRemove={this.onRemove}/>)
       .map((c, i) => [c, <Spacer key={i}/>])
       .reduce((p, c) => p.concat(c), []);
   }
@@ -61,11 +63,11 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
   render() : JSX.Element {
 
     const expanded = 
-        <Button type='link' onClick={this.onAddConcept}>Add Skill</Button>;
+        <Button type="link" onClick={this.onAddConcept}>Add Skill</Button>;
 
     return (
-      <Collapse caption='Skills' expanded={expanded}>
-        <div className='ConceptWell'>
+      <Collapse caption="Skills" expanded={expanded}>
+        <div className="ConceptWell">
           {this.renderConcepts()}
         </div>
       </Collapse>);
@@ -75,13 +77,14 @@ export class ConceptsEditor extends AbstractContentEditor<Immutable.List<string>
   onAddConcept() {
     this.props.services.displayModal(
         <SkillSelection
+          courseId={this.props.courseId}
           onInsert={(item) => {
             this.props.services.dismissModal();
             return this.props.onEdit(this.props.model.push(item.id));   
           }} 
           onCancel={() => {
             this.props.services.dismissModal();  
-          }}/>
+          }}/>,
     );
   }
 
