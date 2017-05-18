@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Video as VideoType } from '../../../../../data/content/html/video';
-import PreformattedText from './PreformattedText';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState} from './InteractiveRenderer';
 import { BlockProps } from './properties';
-import { Select } from '../../Select';
+import { Button } from '../../Button';
+import ModalMediaEditor from '../../../media/ModalMediaEditor';
+import { VideoEditor } from '../../../media/VideoEditor';
 
 import './markers.scss';
 
@@ -12,39 +13,68 @@ type Data = {
   video: VideoType;
 };
 
-export interface CodeBlockProps extends InteractiveRendererProps {
+export interface VideoProps extends InteractiveRendererProps {
   data: Data;
 }
 
-export interface CodeBlockState extends InteractiveRendererState {
+export interface VideoState extends InteractiveRendererState {
   
 }
 
-export interface CodeBlockProps {
+export interface VideoProps {
   
 }
 
 
-class Video extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
+class Video extends InteractiveRenderer<VideoProps, VideoState> {
 
   constructor(props) {
     super(props, {});
 
-    this.onSourceEdit = this.onSourceEdit.bind(this);
-    this.onSyntaxChange = this.onSyntaxChange.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
-  onSourceEdit(source) {
-    // this.props.blockProps.onEdit({ video: this.props.data.video.with({ source }) });
-  }
+  onClick() {
+    const b = this.props.blockProps;
+    this.props.blockProps.services.displayModal(
+      <ModalMediaEditor
+        editMode={true}
+        context={b.context}
+        services={b.services}
 
-  onSyntaxChange(syntax) {
-    // this.props.blockProps.onEdit({ video: this.props.data.video.with({ syntax }) });
+        model={this.props.data.video}
+        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onInsert={(video) => {
+          this.props.blockProps.services.dismissModal();
+          this.props.blockProps.onEdit({ video });
+        }
+      }>
+        <VideoEditor 
+          model={this.props.data.video}
+          context={b.context}
+          services={b.services}
+          editMode={true}
+          onEdit={c => true}/>
+      </ModalMediaEditor>,
+    );
   }
 
   render() : JSX.Element {
 
-    return <span>Test</span>;
+    const { sources, controls } = this.props.data.video;
+
+    let src = '';
+    if (sources.size > 0) {
+      src = sources.first().src;
+    }
+    
+    return (
+      <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
+        <div>
+          <video src={src} controls={controls}/>
+        </div>
+        <Button onClick={this.onClick}>Edit</Button>
+      </div>);
   }
 }
 
