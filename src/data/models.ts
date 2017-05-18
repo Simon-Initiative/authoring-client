@@ -340,8 +340,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
-
-    a.doc.assessment['#array'].forEach(item => {
+    let assessment = null;
+    if(isArray(a.doc)){
+      assessment = a.doc[0].assessment;
+    }else{
+      assessment = a.doc.assessment;
+    }
+    assessment['#array'].forEach(item => {
 
       const key = getKey(item);
       const id = guid();
