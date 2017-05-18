@@ -2,7 +2,7 @@
 import { CourseId, DocumentId } from './types';
 import * as models from './models';
 import * as Immutable from 'immutable';
-import { credentials, getHeaders } from '../actions/utils/credentials';
+import { credentials, getHeaders, getFormHeaders } from '../actions/utils/credentials';
 import { configuration } from '../actions/utils/config';
 import { Resource } from './resource';
 
@@ -229,6 +229,39 @@ export function persistDocument(doc: Document): Promise<Document> {
       });
 
       resolve(newDocument);
+    })
+    .catch(err => reject(err));
+  });
+}
+
+/**
+ * Uploads a file, receives a promise to deliver path on server 
+ * that the file is being stored as. Rejects if the file name conflicts
+ * with another file.
+ */
+export function createWebContent(
+  courseId: string, file) : Promise<string> {
+  
+  return new Promise((resolve, reject) => {
+
+    const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch(url, {
+      method: 'POST',
+      headers: getFormHeaders(credentials),
+      body: formData,
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      resolve(json.path);
     })
     .catch(err => reject(err));
   });

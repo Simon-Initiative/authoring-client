@@ -228,14 +228,14 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
             return null;
         } else {
 
-            let courseId = (this.state.document.model as any).courseId === undefined ? null : (this.state.document.model as any).courseId;
+            const courseId = (this.props.course.model as models.CourseModel).guid;
 
             const childProps: AbstractEditorProps<any> = {
                 model: this.state.document.model,
                 context: {
                     documentId: this.props.documentId,
                     userId: this.props.userId,
-                    courseId: courseId
+                    courseId,
                 },
                 onEdit: this._onEdit,
                 services: this.props.services,

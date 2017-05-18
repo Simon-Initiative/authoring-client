@@ -4,7 +4,6 @@ const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
 // These will go away during content-service transition
-//const database = 'editor';
 const database = 'packages';
 const attachmentDatabase = 'attachments';
 

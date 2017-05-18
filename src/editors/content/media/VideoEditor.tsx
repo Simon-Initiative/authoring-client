@@ -112,12 +112,16 @@ export class VideoEditor
 
         <Sources
           {...this.props}
+          mediaType="video"
+          accept="video/*"
           model={sources}
           onEdit={this.onSourcesEdit}
         />
 
         <Tracks
           {...this.props}
+          mediaType="video"
+          accept="video/*"
           model={tracks}
           onEdit={this.onTracksEdit}
         />
@@ -130,6 +134,7 @@ export class VideoEditor
 
         <InputLabel label="Controls">
           <label className="form-check-label">
+            &nbsp;&nbsp;&nbsp;
             <input type="checkbox" 
               onClick={this.onControlEdit}
               className="form-check-input" 

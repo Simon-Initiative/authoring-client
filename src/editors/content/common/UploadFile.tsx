@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import * as persistence from '../../../data/persistence';
 import { EntityTypes } from '../../../data/content/html/common';
 
 import { AppServices } from '../../common/AppServices';
@@ -13,9 +13,8 @@ function onInsert(context, services, resolve, reject, type, file) {
    
   services.dismissModal();
 
-  fileToBase64(file)
-  .then(base64data => createAttachment(file.name, base64data, file.type, context.documentId))
-  .then(src => resolve(file.name))
+  persistence.createWebContent(context.courseId, file)
+  .then(src => resolve(src))
   .catch(err => reject(err));
 }
 
@@ -26,8 +25,8 @@ export function uploadFile(
   return new Promise((resolve, reject) => {
     services.displayModal(
       <MediaSelection
-        accept={this.accept}
-        type={this.mediaType}
+        accept={accept}
+        type={mediaType}
         onInsert={onInsert.bind(undefined, context, services, resolve, reject)} 
         onCancel={() => services.dismissModal()}/>);
   });

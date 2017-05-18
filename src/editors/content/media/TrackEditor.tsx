@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
+import * as persistence from '../../../data/persistence';
 
 import { Track }  from '../../../data/content/html/track';
 import { AppServices } from '../../common/AppServices';
+import { uploadFile } from '../common/UploadFile';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
@@ -21,6 +23,8 @@ export interface TrackEditor {
 
 export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
   onRemove: (guid: string) => void;
+  mediaType: string;
+  accept: string;
 }
 
 export interface TrackEditorState {
@@ -41,6 +45,7 @@ export class TrackEditor
     this.onDefaultEdit = this.onDefaultEdit.bind(this);
     this.onLabelEdit = this.onLabelEdit.bind(this);
     this.onLangEdit = this.onLangEdit.bind(this); 
+    this.onFileChange = this.onFileChange.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -51,7 +56,11 @@ export class TrackEditor
   }
 
   onSrcClick() {
-    // TODO, allow uploading of a file
+    uploadFile(
+      this.props.mediaType, this.props.accept, 
+      this.props.context, this.props.services)
+    .then(src => this.props.onEdit(this.props.model.with({ src })))
+    .catch(err => console.log(err));
   }
 
   onKindEdit(kind: string) {
@@ -70,15 +79,37 @@ export class TrackEditor
     this.props.onEdit(this.props.model.with({ default: def }));
   }
 
+  onFileChange(e) {
+    const file = e.target.files[0];
+    
+    persistence.createWebContent(this.props.context.courseId, file)
+    .then((src) => {
+      this.props.onEdit(this.props.model.with({ src }));
+    })
+    .catch(err => console.log(err));
+  }
+
+  openFileDialog(id) {
+    (window as any).$('#' + id).trigger('click');
+  }
+
   render() : JSX.Element {
 
-    const { src, kind, label, srclang, guid } = this.props.model;
+    const { src, kind, label, srclang } = this.props.model;
     const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    const id : string = guid();
 
     return (
       <tr>
         <td>    
-          <Button onClick={this.onSrcClick}>Set</Button>
+          <input 
+            id={id}
+            style={ { display: 'none' } }
+            accept={this.props.accept}
+            onChange={this.onFileChange} 
+            type="file" 
+          />
+          <Button onClick={this.openFileDialog.bind(this, id)}>Set</Button>
         </td>
         <td>
           <b>{srcDisplay}</b>
@@ -106,7 +137,7 @@ export class TrackEditor
         <td>
           <span 
             className="closebtn input-group-addon" 
-            onClick={() => this.props.onRemove(guid)}>
+            onClick={() => this.props.onRemove(this.props.model.guid)}>
             &times;
           </span>
         </td>

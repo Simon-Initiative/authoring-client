@@ -21,7 +21,8 @@ export interface Tracks {
 
 export interface TracksProps 
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Track>> {
-  
+  mediaType: string;
+  accept: string;
 }
 
 export interface TracksState {
@@ -63,6 +64,7 @@ export class Tracks
   renderRows() {
     return this.props.model.toArray().map(track =>
       <TrackEditor
+        key={track.guid}
         {...this.props}
         onRemove={this.onRemove}
         model={track}

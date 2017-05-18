@@ -21,7 +21,8 @@ export interface Sources {
 
 export interface SourcesProps 
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Source>> {
-  
+  mediaType: string;
+  accept: string;
 }
 
 export interface SourcesState {
@@ -63,6 +64,7 @@ export class Sources
   renderRows() {
     return this.props.model.toArray().map(source =>
       <SourceEditor
+        key={source.guid}
         {...this.props}
         onRemove={this.onRemove}
         model={source}
