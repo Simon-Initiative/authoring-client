@@ -1,48 +1,51 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
+
 import { ContentState } from 'draft-js';
 
-import { YouTube }  from '../../../data/content/html/youtube';
+import { Video }  from '../../../data/content/html/Video';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
+import { extractFileName } from './utils';
 
 import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
+import { Button } from '../common/Button';
 
 import '../common/editor.scss';
 
 
-export interface YouTubeEditor {
+export interface VideoEditor {
   
 }
 
-export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
+export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
   
 }
 
-export interface YouTubeEditorState {
+export interface VideoEditorState {
   
 }
 
 /**
  * The content editor for Table.
  */
-export class YouTubeEditor 
-  extends AbstractContentEditor<YouTube, YouTubeEditorProps, YouTubeEditorState> {
+export class VideoEditor 
+  extends AbstractContentEditor<Video, VideoEditorProps, VideoEditorState> {
     
   constructor(props) {
     super(props);
     
     this.onLabeledEdit = this.onLabeledEdit.bind(this);
-    this.onSrcEdit = this.onSrcEdit.bind(this);
-    this.onHeightEdit = this.onHeightEdit.bind(this);
-    this.onWidthEdit = this.onWidthEdit.bind(this);
+    this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
+    this.onTypeEdit = this.onTypeEdit.bind(this);
+    this.onControlEdit = this.onControlEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -70,22 +73,24 @@ export class YouTubeEditor
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onSrcEdit(src: string) {
-    this.props.onEdit(this.props.model.with({ src }));
+  onTypeEdit(type: string) {
+    this.props.onEdit(this.props.model.with({ type }));
   }
 
-  onHeightEdit(height: string) {
-    this.props.onEdit(this.props.model.with({ height }));
+  onControlEdit(e) {
+    const controls = e.checked;
+    this.props.onEdit(this.props.model.with({ controls }));
   }
 
-  onWidthEdit(width: string) {
-    this.props.onEdit(this.props.model.with({ width }));
+  onSetClick() {
+    // TODO 
   }
 
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, popout, alternate } = this.props.model;
-
+    const { titleContent, caption, cite, src, type, popout, alternate } = this.props.model;
+    const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    
     const labeled : LabeledType = {
       titleContent,
       caption,
@@ -94,6 +99,20 @@ export class YouTubeEditor
 
     return (
       <div className="itemWrapper">
+
+        
+
+        <InputLabel label="Controls">
+          <label className="form-check-label">
+            <input type="checkbox" 
+              onClick={this.onControlEdit}
+              className="form-check-input" 
+              checked={this.props.model.controls}
+              value="option1"/>
+            Display video controls
+          </label>
+        </InputLabel>
+
         <LabeledEditor 
           {...this.props}
           model={labeled} 
@@ -114,28 +133,7 @@ export class YouTubeEditor
           onEdit={this.onAlternateEdit}
           model={alternate.content}
         />
-
-        <InputLabel label="Source">
-          <TextInput width="75px" label="Source" 
-            value={this.props.model.src} 
-            type="text"
-            onEdit={this.onSrcEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Height">
-          <TextInput width="75px" label="Height in pixels" 
-            value={this.props.model.height} 
-            type="text"
-            onEdit={this.onHeightEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Width">
-          <TextInput width="75px" label="Width in pixels" 
-            value={this.props.model.width} 
-            type="text"
-            onEdit={this.onWidthEdit}
-          />
-        </InputLabel>
+        
       </div>);
   }
 
