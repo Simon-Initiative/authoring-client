@@ -217,9 +217,9 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     }
 
     let workbook = null;
-    if(isArray(wb.doc)){
+    if (isArray(wb.doc)) {
       workbook = wb.doc[0].workbook_page;
-    }else{
+    } else {
       workbook = wb.doc.workbook_page;
     }
     workbook['#array'].forEach(item => {
@@ -251,7 +251,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         const title = this.head.title.text;
         const id = title.split(" ")[0] + guid();
         this.resource = new Resource({id: id, title: title});
-      } catch (err){
+      } catch (err) {
         return null;
       }
       doc = [{
@@ -341,16 +341,16 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
     let assessment = null;
-    if(isArray(a.doc)){
+    if (isArray(a.doc)) {
       assessment = a.doc[0].assessment;
-    }else{
+    } else {
       assessment = a.doc.assessment;
     }
     assessment['#array'].forEach(item => {
 
       const key = getKey(item);
       const id = guid();
-console.log("Testing " + JSON.stringify(item));
+      console.log("Testing " + JSON.stringify(item));
       switch (key) {
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
@@ -367,8 +367,8 @@ console.log("Testing " + JSON.stringify(item));
   }
 
   toPersistence(): Object {
+    //this.title.toPersistence(),
     const children = [
-      this.title.toPersistence(),
       ...this.nodes.toArray().map(node => node.toPersistence()),
     ]
     let doc = null;
@@ -378,7 +378,7 @@ console.log("Testing " + JSON.stringify(item));
       try {
         const id = assessment.assessment['@id'];
         this.resource = new Resource({id: id, title: this.title.text});
-      } catch (err){
+      } catch (err) {
         return null;
       }
       doc = [
@@ -1081,7 +1081,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     lObjectiveTest.forEach(function (item: any) {
       if (!isNullOrUndefined(item.objective)) {
         newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
-        console.log("New DAta " +JSON.stringify(newData));
+        console.log("New DAta " + JSON.stringify(newData));
       }
     });
 
