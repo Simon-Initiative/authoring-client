@@ -4,7 +4,7 @@ import * as contentTypes from '../../../data/contentTypes';
 
 import { ContentState } from 'draft-js';
 
-import { Video }  from '../../../data/content/html/Video';
+import { Video }  from '../../../data/content/html/video';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
@@ -100,7 +100,7 @@ export class VideoEditor
     return (
       <div className="itemWrapper">
 
-        
+
 
         <InputLabel label="Controls">
           <label className="form-check-label">
