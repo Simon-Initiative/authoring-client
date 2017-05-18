@@ -350,7 +350,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
       const key = getKey(item);
       const id = guid();
-
+console.log("Testing " + JSON.stringify(item));
       switch (key) {
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
