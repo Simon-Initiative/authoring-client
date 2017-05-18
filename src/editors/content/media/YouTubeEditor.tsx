@@ -100,12 +100,13 @@ export class YouTubeEditor
           onEdit={this.onLabeledEdit}
           />
 
-        <RichTextEditor
-          label="Popout"
-          {...this.props}
-          onEdit={this.onPopoutEdit}
-          model={popout.content}
-        />
+        <InputLabel label="Popout">
+          <TextInput width="100%" label="Popout content" 
+            value={popout.content} 
+            type="text"
+            onEdit={this.onPopoutEdit}
+          />
+        </InputLabel>
 
         <RichTextEditor
           label="Alternate"
