@@ -2,15 +2,15 @@ import 'babel-polyfill';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import reduxThunk from 'redux-thunk';
+import thunkMiddleware from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import 'whatwg-fetch';
 
-const Provider = (require('react-redux') as RR).Provider;
-const createLogger = require('redux-logger');
+var Provider = (require('react-redux') as RR).Provider;
+var createLogger = require('redux-logger');
 
 import { getUserName } from './utils/params';
-import reducers from './reducers';
+import rootReducer from './reducers';
 import Main from './Main';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
@@ -20,7 +20,7 @@ import './stylesheets/main.scss';
 import './stylesheets/sortabletree.scss';
 
 interface RR {
-  Provider: any;
+    Provider: any;
 }
 
 function initStore() {
@@ -28,11 +28,11 @@ function initStore() {
   const loggerMiddleware = (createLogger as any)();
 
   const createStoreWithMiddleware = applyMiddleware(
-    reduxThunk, // lets us dispatch async actions
-    loggerMiddleware, // middleware that logs actions
+    thunkMiddleware, // lets us dispatch async actions
+    loggerMiddleware // middleware that logs actions
   )(createStore);
 
-  return createStoreWithMiddleware(reducers);
+  return createStoreWithMiddleware(rootReducer);
 }
 
 function main() {
@@ -41,18 +41,14 @@ function main() {
   initRegistry();
   initEditorRegistry();
 
-  // Extract the user name from the query parameters
-  const userName = getUserName();
-
   // Create the redux store
   const store = initStore();
 
   // Now do the initial rendering
   ReactDOM.render(
       <Provider store={store}>
-        <Main username={userName}/>
-      </Provider>, 
-      document.getElementById('app')); 
+        <Main/>
+      </Provider>, document.getElementById('app')); 
 }
 
 main();

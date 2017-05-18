@@ -1,16 +1,17 @@
 const protocol = 'http://';
-const hostname = 'localhost';
-const port = '8888';
-const prefix = 'api';
-const baseUrl = protocol + hostname + ':' + port + '/' + prefix;
-const database = 'editor';
+const hostname = 'dev.local';
+const prefix = 'content-service/api/v1';
+const baseUrl = protocol + hostname + '/' + prefix;
+
+// These will go away during content-service transition
+//const database = 'editor';
+const database = 'packages';
 const attachmentDatabase = 'attachments';
 
 export type Configuration = {
   protocol: string,
   baseUrl: string,
   hostname: string,
-  port: string,
   database: string,
   attachmentDatabase: string,
   prefix: string,
@@ -20,7 +21,6 @@ export const configuration : Configuration = {
   protocol,
   baseUrl,
   hostname,
-  port,
   database,
   attachmentDatabase,
   prefix,

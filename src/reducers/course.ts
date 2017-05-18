@@ -1,29 +1,22 @@
-import * as courseActions from '../actions/course';
-import { OtherAction } from './utils';
+import * as courseActions from "../actions/course";
+import * as models from '../data/models';
+import {OtherAction} from "./utils";
 
-type CourseActions = 
-  courseActions.courseChangedAction |
-  OtherAction;
+type CourseActions =
+    courseActions.courseChangedAction |
+    OtherAction
 
 type CurrentCourse = {
-  courseId: string,
-  title: string,
-  organizationId: string,
-  LOId: string,
-  skillsId: string,
-};
+    model: models.CourseModel
+}
 
 export function course(state = null, action: CourseActions): CurrentCourse {
-  switch (action.type) {
-    case courseActions.COURSE_CHANGED:
-      return { 
-        courseId: action.courseId,
-        title: action.title,
-        organizationId: action.organizationId,
-        LOId: action.LOId,
-        skillsId: action.skillsId,
-      };
-    default:
-      return state;
-  }
+    switch (action.type) {
+        case courseActions.COURSE_CHANGED:
+            return {
+                model: action.model
+            };
+        default:
+            return state;
+    }
 }

@@ -1,4 +1,4 @@
-const fetch = (window as any).fetch;
+var fetch = (window as any).fetch;
 
 import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
@@ -6,7 +6,15 @@ import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
 import { coursesQuery } from '../data/domain';
 import guid from '../utils/guid';
+const Keycloak = require("keycloak-js");
 
+const keycloakConfig = {
+  url: 'http://dev.local/auth',
+  realm: 'oli_security',
+  clientId: 'content_client'
+} 
+
+const kc = Keycloak(keycloakConfig);
 
 export module user {
   
@@ -21,68 +29,77 @@ export module user {
     username: string,
     userId: string,
     profile: Object,
-  };
+    logoutUrl: string,
+    accountManagementUrl: string
+  }
 
   export type loginFailureAction = {
-    type: LOGIN_FAILURE,
-  };
+    type: LOGIN_FAILURE
+  }
 
-  export function loginSuccess(
-    username: string, userId: string,
-    profile: Object) : loginSuccessAction {
-
+  export function loginSuccess(username: string, userId: string,
+    profile: Object, logoutUrl: string, accountManagementUrl: string) : loginSuccessAction {
     return {
       type: LOGIN_SUCCESS,
       username,
       userId,
       profile,
-    };
+      logoutUrl,
+      accountManagementUrl
+    }
   }
 
   export function loginFailure() : loginFailureAction {
     return {
-      type: LOGIN_FAILURE,
-    };
+      type: LOGIN_FAILURE
+    }
   }
 
-  export function login(user: string, password: string) {
-    return function (dispatch) {
+  export function initAuthenticationProvider() {
+    return function(dispatch) {
 
-      const requestId = guid();
-      dispatch(requestActions.startRequest(requestId, 'Logging In'));
+      kc.init({onLoad: 'login-required', checkLoginIframe: false}).success(authenticated => {
+        if (authenticated) {
 
-      let userId = null;
-      let username = null;
+          // Once we are authenticationed, store the token so that it can 
+          // be injected into the headers of outgoing API HTTP requests
+          credentials.token = kc.token;
 
-      fetch(`${configuration.baseUrl}/_users/org.couchdb.user:${user}`, {
-        method: 'GET',
-        headers: getHeaders({ user, password }),
-      })
-      .then((response) => {
+          // Also, request asynchronously the user's profile from keycloak
+          kc.loadUserProfile().success(function(profile) {
 
-        dispatch(requestActions.endRequest(requestId));
+            const logoutUrl = kc.createLogoutUrl({redirectUri: 'http:/dev.local'});
+            const accountManagementUrl = kc.createAccountUrl();
 
-        if (!response.ok) {
-          throw new Error('login failed');
+            dispatch(loginSuccess(profile.username, profile.id, profile, logoutUrl, accountManagementUrl));
+          
+          }).error(function() {
+            dispatch(loginFailure());
+          });
+          
+        } else {
+          // Requires inserting "http://dev.local/*" in the Valid Redirect URIs entry
+          // of the Content_client settings in the KeyCloak admin UI
+          kc.login({redirectUri: 'http:/dev.local'});
         }
-        return response.json();
-      })
-      .then((json) => {
-        
-        userId = json._id;
-        username = json.name;
+      });
 
-        credentials.user = user;
-        credentials.password = password;
+      // Listen for token expiration and update said token when it does expire
+      kc.onTokenExpired = () => {
+        kc.updateToken(5).success(function(refreshed) {
 
-        dispatch(loginSuccess(username, userId, {}));
+          if (refreshed) {
+            credentials.token = kc.token;
+            console.log('Token was successfully refreshed');
+          } else {
+            console.log('Token is still valid');
+          }
+        }).error(function() {
+            console.log('Failed to refresh the token, or the session has expired');
+        });
+      };
 
-      })
-      .catch((err) => {
-        dispatch(requestActions.endRequest(requestId));
-        dispatch(loginFailure());
-      });  
-    };
+    }
   }
 
 }

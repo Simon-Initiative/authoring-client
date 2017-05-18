@@ -2,7 +2,7 @@ var http = require('http');
 var proc = require('child_process');
 
 var protocol = 'http://';
-var hostname = 'localhost';
+var hostname = 'dev.local';
 var port = 5984;
 var user = 'su';
 var password = 'su';

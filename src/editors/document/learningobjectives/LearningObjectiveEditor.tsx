@@ -42,7 +42,7 @@ export interface LearningObjectiveEditorState extends AbstractEditorState {
   titleIndex:number; 
 }
 
-export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.CourseModel> {
+export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.LearningObjectiveModel> {
   dispatch: any;
   documentId: string;
   document: any;
@@ -53,7 +53,7 @@ export interface LearningObjectiveEditorProps extends AbstractEditorProps<models
 /**
 *
 */
-class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,LearningObjectiveEditorProps, LearningObjectiveEditorState> {
+class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveModel,LearningObjectiveEditorProps, LearningObjectiveEditorState> {
 
     /**
      * 
@@ -79,21 +79,28 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-        persistence.retrieveDocument(this.state.context.courseId).then(course => {            
-            let loObject=course ["model"]["learningobjectives"];                                    
-            let loDocId=loObject.get (0);
-           
-            persistence.retrieveDocument(loDocId).then(doc => {
-              this.setState ({treeData: doc ["model"]["los"],document: doc});
-            });
-
-            let skillObject=course ["model"]["skills"];
-            let skillDocId=skillObject.get (0);
-
-            persistence.retrieveDocument(skillDocId).then(skillDoc => {
-              this.setState ({skills: skillDoc ["model"]["skills"]});
-            });              
-        });        
+      let docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+      console.log(JSON.stringify(this.props.model.los));
+      this.setState({treeData: this.props.model.los, document: docu});
+      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
+      //       let loObject=course ["model"]["learningobjectives"];
+      //       let loDocId=loObject.get (0);
+      //
+      //       persistence.retrieveDocument(loDocId).then(doc => {
+      //         this.setState ({treeData: doc ["model"]["los"],document: doc});
+      //       });
+      //
+      //       let skillObject=course ["model"]["skills"];
+      //       let skillDocId=skillObject.get (0);
+      //
+      //       persistence.retrieveDocument(skillDocId).then(skillDoc => {
+      //         this.setState ({skills: skillDoc ["model"]["skills"]});
+      //       });
+      //   });
     }              
 
     /**
@@ -101,13 +108,19 @@ class LearningObjectiveEditor extends AbstractEditor<models.CourseModel,Learning
      */            
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
+      console.log("loadDocument (" + anID + ")");
+      const docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+      this.setState({treeData: this.props.model.los, document: docu});
+      //   persistence.retrieveDocument(anID).then(doc => {
+      //       this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
+      //       return (doc);
+      //   });
 
-        persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
-            return (doc);
-        });
-
-       return (null);         
+       return (docu);
     }             
 
     /**

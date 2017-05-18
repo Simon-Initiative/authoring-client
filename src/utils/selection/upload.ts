@@ -22,7 +22,7 @@ export function createAttachment(
     const mediaModel 
       = new models.MediaModel({ name, _attachments: attachments, referencingDocuments });
     
-    createDocument(mediaModel, configuration.attachmentDatabase)
+    createDocument(this.props.courseId, mediaModel)
       .then((doc: Document) => {
         resolve(relativeToAbsolute(`${doc._id}/${name}`, configuration.attachmentDatabase));
       })

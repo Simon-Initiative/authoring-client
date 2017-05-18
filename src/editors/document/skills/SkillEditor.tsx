@@ -234,11 +234,16 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      */
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
-
-        persistence.retrieveDocument(anID).then(doc => {
-            this.setState ({treeData: doc.model ["skills"],document: doc});
-            return (doc);
-        });
+      const docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+      this.setState ({treeData: this.props.model["los"],document: docu});
+      //   persistence.retrieveDocument(anID).then(doc => {
+      //       this.setState ({treeData: doc.model ["skills"],document: doc});
+      //       return (doc);
+      //   });
 
        return (null); 
     }    
