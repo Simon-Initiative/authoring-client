@@ -1,85 +1,93 @@
 {
-  "assessment": {
-    "@id": "tutortest",
-    "#array": [
-      {
-        "title": {
-          "#text": "Tutor"
-        }
-      },
-      {
-        "content": {
-          "#text": "This is the content"
-        }
-      },
-      {
-        "question": {
-          "@id": "multiple_choice",
-          "#array": [
-            {
-              "body": {
-                "p": {
-                  "#text": "This is a multiple choice question"
+  "rev": 1,
+  "guid": "2c9b80865c1b77b4015c1b7c06f1045b",
+  "id": "tutortest",
+  "type": "x-oli-inline-assessment",
+  "title": "Tutor",
+  "shortTitle": null,
+  "doc": {
+    "assessment": {
+      "@id": "tutortest",
+      "#array": [
+        {
+          "title": {
+            "#text": "Tutor"
+          }
+        },
+        {
+          "content": {
+            "#text": "This is the content"
+          }
+        },
+        {
+          "question": {
+            "@id": "multiple_choice",
+            "#array": [
+              {
+                "body": {
+                  "p": {
+                    "#text": "This is a multiple choice question"
+                  }
+                }
+              },
+              {
+                "multiple_choice": {
+                  "@shuffle": "true",
+                  "#array": [
+                    {
+                      "choice": {
+                        "@value": "correct",
+                        "#text": "This is the correct choice"
+                      }
+                    },
+                    {
+                      "choice": {
+                        "@value": "incorrect",
+                        "#text": "This is an incorrect choice"
+                      }
+                    },
+                    {
+                      "choice": {
+                        "@value": "incorrect2",
+                        "#text": "This is also an incorrect choice"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "part": {
+                  "#array": [
+                    {
+                      "response": {
+                        "@match": "correct",
+                        "@score": "10",
+                        "feedback": {
+                          "#text": "This is feedback for a correct choice"
+                        }
+                      }
+                    },
+                    {
+                      "response": {
+                        "@match": "*",
+                        "@score": "0",
+                        "feedback": {
+                          "#text": "This is feedback for an incorrect choice"
+                        }
+                      }
+                    },
+                    {
+                      "hint": {
+                        "#text": "This is a hint"
+                      }
+                    }
+                  ]
                 }
               }
-            },
-            {
-              "multiple_choice": {
-                "@shuffle": "true",
-                "#array": [
-                  {
-                    "choice": {
-                      "@value": "correct",
-                      "#text": "This is the correct choice"
-                    }
-                  },
-                  {
-                    "choice": {
-                      "@value": "incorrect",
-                      "#text": "This is an incorrect choice"
-                    }
-                  },
-                  {
-                    "choice": {
-                      "@value": "incorrect2",
-                      "#text": "This is also an incorrect choice"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "part": {
-                "#array": [
-                  {
-                    "response": {
-                      "@match": "correct",
-                      "@score": "10",
-                      "feedback": {
-                        "#text": "This is feedback for a correct choice"
-                      }
-                    }
-                  },
-                  {
-                    "response": {
-                      "@match": "*",
-                      "@score": "0",
-                      "feedback": {
-                        "#text": "This is feedback for an incorrect choice"
-                      }
-                    }
-                  },
-                  {
-                    "hint": {
-                      "#text": "This is a hint"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
+            ]
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
