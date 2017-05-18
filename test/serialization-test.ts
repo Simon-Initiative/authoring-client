@@ -36,7 +36,7 @@ it('AssessmentModel', () => {
   expect(model.title.text).toBe('Tutor');
   expect(model.nodes.size).toBe(3);
 
-  const node : models.Node = model.nodes.toArray()[1];
+  const node : models.Node = model.nodes.toArray()[2];
   expect(node.contentType).toBe('Question');
 
   const question : contentTypes.Question = (node as contentTypes.Question);
