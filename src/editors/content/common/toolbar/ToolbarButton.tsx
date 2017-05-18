@@ -23,6 +23,10 @@ export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonPr
     (window as any).$(this.buttonRef).tooltip();
   }
 
+  componentWillUnmount() {
+    (window as any).$(this.buttonRef).tooltip('hide');
+  }
+
   onClick() {
     this.props.processor.process(this.props.command);
   }
