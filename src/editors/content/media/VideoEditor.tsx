@@ -100,21 +100,7 @@ export class VideoEditor
     return (
       <div className="itemWrapper">
 
-        <div className="input-group">
-          <span className="input-group-addon">Source</span>
-            {srcDisplay}
-          <span className="input-group-addon">
-            <Button onClick={this.onSetClick}>Set</Button>
-          </span>
-        </div>
-
-        <InputLabel label="Type">
-          <TextInput width="100%" label="Source type" 
-            value={type} 
-            type="text"
-            onEdit={this.onTypeEdit}
-          />
-        </InputLabel>
+        
 
         <InputLabel label="Controls">
           <label className="form-check-label">
