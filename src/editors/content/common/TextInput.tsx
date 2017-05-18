@@ -25,14 +25,14 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
     this.id = guid();
 
     this.state = {
-      value: this.props.value
-    }
+      value: this.props.value,
+    };
 
     this.onChange = this.onChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({value: nextProps.value});
+    this.setState({ value: nextProps.value });
   }
 
   onChange(e) {
@@ -43,7 +43,7 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
   render() {
     return (
       <input 
-        style={{width: this.props.width}}
+        style={ { width: this.props.width } }
         placeholder={this.props.label}
         onChange={this.onChange}
         className="form-control form-control-sm" 
