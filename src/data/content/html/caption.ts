@@ -49,7 +49,7 @@ export class Caption extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       caption: {
-        '#array': toPersistence(this.content),
+        '#array': toPersistence(this.content)['#array'],
       },
     };
   }

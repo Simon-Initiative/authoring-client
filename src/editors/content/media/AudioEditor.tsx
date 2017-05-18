@@ -8,7 +8,8 @@ import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
-
+import { Sources } from './Sources';
+import { Tracks } from './Tracks';
 import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
@@ -43,8 +44,9 @@ export class AudioEditor
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
-    this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
+    this.onSourcesEdit = this.onSourcesEdit.bind(this);
+    this.onTracksEdit = this.onTracksEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -72,13 +74,17 @@ export class AudioEditor
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onTypeEdit(type: string) {
-    this.props.onEdit(this.props.model.with({ type }));
-  }
-
   onControlEdit(e) {
     const controls = e.checked;
     this.props.onEdit(this.props.model.with({ controls }));
+  }
+
+  onSourcesEdit(sources) {
+    this.props.onEdit(this.props.model.with({ sources }));
+  }
+
+  onTracksEdit(tracks) {
+    this.props.onEdit(this.props.model.with({ tracks }));
   }
 
   onSetClick() {
@@ -87,8 +93,7 @@ export class AudioEditor
 
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, src, type, popout, alternate } = this.props.model;
-    const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    const { titleContent, caption, cite, sources, tracks, popout, alternate } = this.props.model;
     
     const labeled : LabeledType = {
       titleContent,
@@ -99,21 +104,23 @@ export class AudioEditor
     return (
       <div className="itemWrapper">
 
-        <div className="input-group">
-          <span className="input-group-addon">Source</span>
-            {srcDisplay}
-          <span className="input-group-addon">
-            <Button onClick={this.onSetClick}>Set</Button>
-          </span>
-        </div>
+        <Sources
+          {...this.props}
+          model={sources}
+          onEdit={this.onSourcesEdit}
+        />
 
-        <InputLabel label="Type">
-          <TextInput width="100%" label="Source type" 
-            value={type} 
-            type="text"
-            onEdit={this.onTypeEdit}
+        <Tracks
+          {...this.props}
+          model={tracks}
+          onEdit={this.onTracksEdit}
+        />
+
+        <LabeledEditor 
+          {...this.props}
+          model={labeled} 
+          onEdit={this.onLabeledEdit}
           />
-        </InputLabel>
 
         <InputLabel label="Controls">
           <label className="form-check-label">
@@ -125,12 +132,6 @@ export class AudioEditor
             Display audio controls
           </label>
         </InputLabel>
-
-        <LabeledEditor 
-          {...this.props}
-          model={labeled} 
-          onEdit={this.onLabeledEdit}
-          />
 
         <InputLabel label="Popout">
           <TextInput width="100%" label="Popout content" 

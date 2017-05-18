@@ -1,5 +1,5 @@
 
-import { Audio } from './Audio';
+import Audio from './Audio';
 import { Image } from './Image';
 import Video from './Video';
 import YouTube from './YouTube';

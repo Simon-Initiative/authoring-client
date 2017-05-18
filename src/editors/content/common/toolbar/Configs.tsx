@@ -6,6 +6,8 @@ import { EntityTypes } from '../../../../data/content/html/common';
 import { CodeBlock } from '../../../../data/content/html/codeblock';
 import { Table } from '../../../../data/content/html/table';
 import { YouTube } from '../../../../data/content/html/youtube';
+import { Audio } from '../../../../data/content/html/audio';
+import { Video } from '../../../../data/content/html/video';
 import { IFrame } from '../../../../data/content/html/iframe';
 
 
@@ -63,6 +65,12 @@ export function flowBlock() {
     <Button key="image" 
       command={new commands.InsertMediaCommand(EntityTypes.image, 'image', 'image/*')} 
       tooltip="Insert image" icon="image"/>,
+    <Button key="audio" 
+      command={insertBlock(EntityTypes.audio, 'IMMUTABLE', { audio: new Audio() })} 
+      tooltip="Insert audio clip" icon="music"/>,
+    <Button key="video" 
+      command={insertBlock(EntityTypes.video, 'IMMUTABLE', { video: new Video() })} 
+      tooltip="Insert video clip" icon="video-camera"/>,
     <Button key="youtube" 
       command={insertBlock(EntityTypes.youtube, 'IMMUTABLE', { youtube: new YouTube() })} 
       tooltip="Insert YouTube Video" icon="youtube"/>,

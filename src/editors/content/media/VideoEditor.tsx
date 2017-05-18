@@ -9,7 +9,8 @@ import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
-
+import { Sources } from './Sources';
+import { Tracks } from './Tracks';
 import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
@@ -46,6 +47,8 @@ export class VideoEditor
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
+    this.onSourcesEdit = this.onSourcesEdit.bind(this);
+    this.onTracksEdit = this.onTracksEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -86,10 +89,17 @@ export class VideoEditor
     // TODO 
   }
 
+  onSourcesEdit(sources) {
+    this.props.onEdit(this.props.model.with({ sources }));
+  }
+
+  onTracksEdit(tracks) {
+    this.props.onEdit(this.props.model.with({ tracks }));
+  }
+
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, src, type, popout, alternate } = this.props.model;
-    const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    const { titleContent, caption, cite, sources, tracks, popout, alternate } = this.props.model;
     
     const labeled : LabeledType = {
       titleContent,
@@ -100,7 +110,23 @@ export class VideoEditor
     return (
       <div className="itemWrapper">
 
+        <Sources
+          {...this.props}
+          model={sources}
+          onEdit={this.onSourcesEdit}
+        />
 
+        <Tracks
+          {...this.props}
+          model={tracks}
+          onEdit={this.onTracksEdit}
+        />
+
+        <LabeledEditor 
+          {...this.props}
+          model={labeled} 
+          onEdit={this.onLabeledEdit}
+          />
 
         <InputLabel label="Controls">
           <label className="form-check-label">
@@ -112,12 +138,6 @@ export class VideoEditor
             Display video controls
           </label>
         </InputLabel>
-
-        <LabeledEditor 
-          {...this.props}
-          model={labeled} 
-          onEdit={this.onLabeledEdit}
-          />
 
         <InputLabel label="Popout">
           <TextInput width="100%" label="Popout content" 

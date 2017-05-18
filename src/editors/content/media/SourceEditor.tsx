@@ -57,16 +57,13 @@ export class SourceEditor
 
     return (
       <tr>
-        <td>    
+        <td style={ { width: '75px' } }>    
           <Button onClick={this.onSrcClick}>Set</Button>
         </td>
         <td>
           <b>{srcDisplay}</b>
         </td>
-        <td>
-          {type}
-        </td>
-        <td>
+        <td style={ { width: '50px' } }>
           <span 
             className="closebtn input-group-addon" 
             onClick={() => this.props.onRemove(guid)}>
