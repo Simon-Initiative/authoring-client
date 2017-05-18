@@ -242,7 +242,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   }
 
   toPersistence(): Object {
-
+    let resource: any = this.resource.toPersistence();
     let doc = null
     if (isNullOrUndefined(this.guid) || this.guid === '') {
       //Assume new document if guid is null
@@ -250,13 +250,14 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       try {
         const title = this.head.title.text;
         const id = title.split(" ")[0] + guid();
-        this.resource = new Resource({id: id, title: title});
+        resource = new Resource({id: id, title: title});
       } catch (err) {
+        console.log(err);
         return null;
       }
       doc = [{
         "workbook_page": {
-          "@id": this.resource.id,
+          "@id": resource.id,
           "#array": [
             this.head.toPersistence(),
             {
@@ -272,7 +273,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     } else {
       doc = [{
         "workbook_page": {
-          "@id": this.resource.id,
+          "@id": resource.id,
           "#array": [
             this.head.toPersistence(),
             {body: this.body.toPersistence()}
@@ -283,7 +284,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     const root = {
       "doc": doc
     };
-    let resource = this.resource.toPersistence();
+    
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
@@ -371,14 +372,16 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const children = [
       ...this.nodes.toArray().map(node => node.toPersistence()),
     ]
+    let resource = this.resource.toPersistence();
     let doc = null;
     //Assume new document if guid is null
     if (isNullOrUndefined(this.guid) || this.guid === '') {
       const assessment = assessmentTemplate(this.title.text);
       try {
         const id = assessment.assessment['@id'];
-        this.resource = new Resource({id: id, title: this.title.text});
+        resource = new Resource({id: id, title: this.title.text});
       } catch (err) {
+        console.log(err);
         return null;
       }
       doc = [
@@ -396,7 +399,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const root = {
       "doc": doc
     };
-    let resource = this.resource.toPersistence();
+    
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 }
