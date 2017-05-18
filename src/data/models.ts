@@ -881,6 +881,8 @@ const defaultLearningObjectiveModel = {
   resource: new Resource(),
   guid: '',
   type: 'x-oli-learning_objectives',
+  id: '',
+  title: '',
   modelType: 'LearningObjectiveModel',
   los: [],
   lock: new contentTypes.Lock()
@@ -1036,38 +1038,45 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     console.log("LearningObjectiveModel.fromPersistence: " + JSON.stringify(json));
     let a = (json as any);
     //var obData=a.doc.objectives;
-    let loObject: Array<Object> = a.doc ["learningobjectives"];
+    let loObject: Array<Object> = a.doc ["objectives"];
 
     let newData: Array<LearningObjective> = new Array();
     let newTitle: string = "";
     let newId: string = loObject ["@id"];
 
-    for (var i in loObject) {
-      if (i == "title") {
-        newTitle = loObject ["title"]["#text"];
+    //for (var i in loObject) {
+    //   if (i == "title") {
+    //     newTitle = loObject ["title"]["#text"];
+    //   }
+
+    //if (i == "objectives") {
+    //console.log("Found objectives, parsing ...");
+    // let loRoot = loObject [i];
+
+    //for (var j = 0; j < loRoot ["#array"].length; j++) {
+    let lObjectiveTest = loObject ["#array"];//[j];
+    lObjectiveTest.forEach(function (item: any) {
+      if (!isNullOrUndefined(item.objective)) {
+        newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
+        console.log("New DAta " +JSON.stringify(newData));
       }
+    });
 
-      if (i == "objectives") {
-        console.log("Found objectives, parsing ...");
-        let loRoot = loObject [i];
-
-        for (var j = 0; j < loRoot ["#array"].length; j++) {
-          let lObjectiveTest = loRoot ["#array"][j];
-
-          for (var k in lObjectiveTest) {
-            if (k == "objective") {
-              newData.push(LearningObjectiveModel.parseLearningObjective(lObjectiveTest [k]));
-            }
-          }
-        }
-      }
-    }
-    let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent(newData)});
+    // for (var k in lObjectiveTest) {
+    //   if (k == "objective") {
+    //     newData.push(LearningObjectiveModel.parseLearningObjective(lObjectiveTest [k]));
+    //   }
+    //}
+    //}
+    //}
+    //}LearningObjectiveModel.reparent(newData)
+    let model = new LearningObjectiveModel({'los': newData});
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
+    model = model.with({id: a.id});
     model = model.with({title: a.title})
-    if (a.lock !== undefined && a.lock !== null) {
+    if (!isNullOrUndefined(a.lock)) {
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
     return model

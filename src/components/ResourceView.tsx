@@ -10,6 +10,7 @@ import * as models from "../data/models";
 import * as viewActions from "../actions/view";
 import {Resource} from "../data/resource";
 import * as courseActions from "../actions/course";
+import {isNullOrUndefined} from "util";
 
 interface ResourceView {
   viewActions: any;
@@ -72,7 +73,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   componentWillReceiveProps(nextProps) {
     console.log("ResourceView componentWillReceiveProps");
-    if ((typeof nextProps.course !== 'undefined') && nextProps.course) {
+    if (!isNullOrUndefined(nextProps.course)) {
       console.log("ResourceView componentWillReceiveProps 2");
       this.fetchTitles(nextProps.course.model, nextProps.filterFn);
     }
@@ -118,6 +119,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <tr key={r.guid}>
         <td>{link(r.guid, r.title)}</td>
         <td>{r.id}</td>
+        <td>{r.type}</td>
       </tr>)
 
     return (
@@ -128,6 +130,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
           <tr>
             <th>Title</th>
             <th>Id</th>
+            <th>Type</th>
           </tr>
           </thead>
           <tbody>

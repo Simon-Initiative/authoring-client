@@ -246,6 +246,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
         'Organizations',
+        'x-oli-organization',
         (resource) => resource.type === 'x-oli-organization',
         (title, type) => new models.OrganizationModel({
           type: type,
