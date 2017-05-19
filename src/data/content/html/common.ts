@@ -29,6 +29,16 @@ export const EntityTypes = types.strEnum([
   'figure_end',
   'section_begin',
   'section_end',
+  'title_begin',
+  'title_end',
+  'definition_begin',
+  'definition_end',
+  'pronunciation_begin',
+  'pronunciation_end',
+  'translation_begin',
+  'translation_end',
+  'meaning_begin',
+  'meaning_end',
 
   // Inline entities
   'activity_link',
@@ -57,8 +67,59 @@ export const EntityTypes = types.strEnum([
 
 export type EntityTypes = keyof typeof EntityTypes;
 
-export type BlockData = PulloutBegin | PulloutEnd | SectionBegin 
-  | SectionEnd | ExampleBegin | ExampleEnd | Title | Empty;
+export type BlockData = 
+  PulloutBegin | PulloutEnd | 
+  SectionBegin | SectionEnd | 
+  ExampleBegin | ExampleEnd |
+  DefinitionBegin | DefinitionEnd |
+  TitleBegin | TitleEnd |
+  PronunciationBegin | PronunciationEnd |
+  TranslationBegin | TranslationEnd |
+  MeaningBegin | MeaningEnd |
+  Title | Empty;
+
+export interface DefinitionBegin {
+  type: 'definition_begin';
+  term: string;
+}
+
+export interface DefinitionEnd {
+  type: 'definition_end';
+}
+
+export interface TitleBegin {
+  type: 'title_begin';
+}
+
+export interface TitleEnd {
+  type: 'title_end';
+}
+
+export interface PronunciationBegin {
+  type: 'pronunciation_begin';
+  src: string;
+  srcType: string;
+}
+
+export interface PronunciationEnd {
+  type: 'pronunciation_end';
+}
+
+export interface TranslationBegin {
+  type: 'translation_begin';
+}
+
+export interface TranslationEnd {
+  type: 'translation_end';
+}
+
+export interface MeaningBegin {
+  type: 'meaning_begin';
+}
+
+export interface MeaningEnd {
+  type: 'meaning_end';
+}
 
 export interface PulloutBegin {
   type: 'pullout_begin';

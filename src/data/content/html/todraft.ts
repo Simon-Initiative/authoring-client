@@ -38,6 +38,11 @@ const blockHandlers = {
   'wb:inline': wb_inline,
   pullout,
   example,
+  definition,
+  pronunciation,
+  translation,
+  meaning,
+  title,
   p: paragraph,
   section,
   body,
@@ -430,6 +435,125 @@ function pullout(item: Object, context: ParsingContext) {
     beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.pullout_end, endData, context);
+
+}
+
+function definition(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  const terms = getChildren(item).filter(c => common.getKey(c) === 'term');
+  const term = terms.length === 0 ? 'unknown term ' : terms[0][common.TEXT];
+
+  // Create the beginning block
+  const beginData : common.DefinitionBegin = {
+    type: 'definition_begin',
+    term,
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.definition_begin, beginData, context);
+
+  // Handle the children, excluding 'term'
+  const children = getChildren(item, 'term');
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.DefinitionEnd = {
+    type: 'definition_end',
+  };
+  addAtomicBlock(common.EntityTypes.definition_end, endData, context);
+
+}
+
+function pronunciation(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  const src = item[key]['@src'];
+  const srcType = item[key]['@type'];
+
+  // Create the beginning block
+  const beginData : common.PronunciationBegin = {
+    type: 'pronunciation_begin',
+    src,
+    srcType,
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.pronunciation_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.PronunciationEnd = {
+    type: 'pronunciation_end',
+  };
+  addAtomicBlock(common.EntityTypes.pronunciation_end, endData, context);
+
+}
+
+function translation(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  // Create the beginning block
+  const beginData : common.TranslationBegin = {
+    type: 'translation_begin',
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.translation_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.TranslationEnd = {
+    type: 'translation_end',
+  };
+  addAtomicBlock(common.EntityTypes.translation_end, endData, context);
+
+}
+
+function meaning(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  // Create the beginning block
+  const beginData : common.MeaningBegin = {
+    type: 'meaning_begin',
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.meaning_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.MeaningEnd = {
+    type: 'meaning_end',
+  };
+  addAtomicBlock(common.EntityTypes.meaning_end, endData, context);
+
+}
+
+function title(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  // Create the beginning block
+  const beginData : common.TitleBegin = {
+    type: 'title_begin',
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.title_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.TitleEnd = {
+    type: 'title_end',
+  };
+  addAtomicBlock(common.EntityTypes.title_end, endData, context);
 
 }
 

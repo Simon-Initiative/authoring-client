@@ -79,7 +79,7 @@ export function getEditablePackages() : Promise<models.CourseModel[]> {
 export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
 
   return new Promise((resolve, reject) => {
-    fetch(`${configuration.baseUrl}/packages/${courseId}`, {
+    fetch(`${configuration.baseUrl}/packages/${courseId}/details`, {
       method: 'GET',
       headers: getHeaders(credentials),
     })
@@ -204,7 +204,7 @@ export function persistDocument(doc: Document): Promise<Document> {
     let url = null;
     if (doc.model.type === 'x-oli-package') {
       url = `${configuration.baseUrl}/packages/${doc._courseId}`;
-    }else{
+    } else {
       url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
     }
     
