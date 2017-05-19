@@ -201,13 +201,14 @@ export function createDocument(
 export function persistDocument(doc: Document): Promise<Document> {
     
   return new Promise((resolve, reject) => {
-
-    const toPersist = doc.model.toPersistence();
-
-    let url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
-    if (doc._courseId === doc._id) {
+    let url = null;
+    if (doc.model.type === 'x-oli-package') {
       url = `${configuration.baseUrl}/packages/${doc._courseId}`;
+    }else{
+      url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
     }
+    
+    const toPersist = doc.model.toPersistence();
     fetch(url, {
       method: 'PUT',
       headers: getHeaders(credentials),
