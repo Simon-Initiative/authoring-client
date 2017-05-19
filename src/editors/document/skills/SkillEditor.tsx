@@ -616,7 +616,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                              editMode={true}
                              model={titleObj}
                              styles={styles.skillTitleEditorFolded}
-                             context={{userId: null, documentId: null, courseId: null}}
+                             context={{userId: null, documentId: null, courseId: null, webContentUrl: null}}
                              onEdit={(content) => this.editTitle(item,content)}
                             />
                          </div>
@@ -639,7 +639,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                              editMode={true}
                              model={titleObj}
                              styles={styles.skillTitleEditorUnfolded}
-                             context={{userId: null, documentId: null, courseId: null}}
+                             context={{userId: null, documentId: null, courseId: null, webContentUrl: null}}
                              onEdit={(content) => this.editTitle(item,content)}
                             />
                          </div>

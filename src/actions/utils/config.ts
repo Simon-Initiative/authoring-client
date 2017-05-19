@@ -14,6 +14,7 @@ export type Configuration = {
   database: string,
   attachmentDatabase: string,
   prefix: string,
+  webContentUrlBase: string,
 };
 
 export const configuration : Configuration = {
@@ -23,6 +24,7 @@ export const configuration : Configuration = {
   database,
   attachmentDatabase,
   prefix,
+  webContentUrlBase: protocol + hostname + '/content-service',
 };
 
 export function relativeToAbsolute(relativeURL: string, database: string) : string {

@@ -435,7 +435,7 @@ class SkillNodeRenderer extends Component <any, any>
                                    services={services}
                                    editMode={true}
                                    model={titleObj}
-                                   context={{userId: null, documentId: null, courseId: null}}
+                                   context={{userId: null, documentId: null, courseId: null, webContentUrl: null}}
                                    onEdit={(content) => this.editNodeTitle(node,content)} 
                                     />
                                </div>
