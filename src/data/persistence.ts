@@ -250,21 +250,27 @@ export function createWebContent(
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch(url, {
-      method: 'POST',
-      headers: getFormHeaders(credentials),
-      body: formData,
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      resolve(json.path);
-    })
-    .catch(err => reject(err));
+    try {
+
+      fetch(url, {
+        method: 'POST',
+        headers: getFormHeaders(credentials),
+        body: formData,
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        resolve(json.path);
+      })
+      .catch(err => reject(err));
+      
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 

@@ -28,7 +28,7 @@ export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
 }
 
 export interface TrackEditorState {
-  
+  failure: boolean;
 }
 
 /**
@@ -40,27 +40,24 @@ export class TrackEditor
   constructor(props) {
     super(props);
     
-    this.onSrcClick = this.onSrcClick.bind(this);
     this.onKindEdit = this.onKindEdit.bind(this);
     this.onDefaultEdit = this.onDefaultEdit.bind(this);
     this.onLabelEdit = this.onLabelEdit.bind(this);
     this.onLangEdit = this.onLangEdit.bind(this); 
     this.onFileChange = this.onFileChange.bind(this);
+
+    this.state = {
+      failure: false,
+    };
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState: TrackEditorState) {
     if (nextProps.model !== this.props.model) {
+      return true;
+    } else if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;
-  }
-
-  onSrcClick() {
-    uploadFile(
-      this.props.mediaType, this.props.accept, 
-      this.props.context, this.props.services)
-    .then(src => this.props.onEdit(this.props.model.with({ src })))
-    .catch(err => console.log(err));
   }
 
   onKindEdit(kind: string) {
@@ -83,10 +80,14 @@ export class TrackEditor
     const file = e.target.files[0];
     
     persistence.createWebContent(this.props.context.courseId, file)
-    .then((src) => {
-      this.props.onEdit(this.props.model.with({ src }));
+    .then((result) => {
+      this.setState(
+        { failure: false }, 
+        () => this.props.onEdit(this.props.model.with({ src: file.name })));
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      this.setState({ failure: true });
+    });
   }
 
   openFileDialog(id) {
@@ -96,7 +97,15 @@ export class TrackEditor
   render() : JSX.Element {
 
     const { src, kind, label, srclang } = this.props.model;
-    const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    let srcDisplay;
+    if (!this.state.failure) {
+      srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    } else {
+      srcDisplay = 
+        <div className="alert alert-danger" role="alert">
+          <strong>Failed</strong> Rename the file and try again
+        </div>;
+    }
     const id : string = guid();
 
     return (

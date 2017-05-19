@@ -17,8 +17,6 @@ export function getHeaders(credentials: Credentials) {
 
 export function getFormHeaders(credentials: Credentials) {
   return {
-    'Content-Type': 'multipart/form-data',
-    Accept: 'application/json',
     Authorization: 'Bearer ' + credentials.token,
   };
 }
