@@ -245,7 +245,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     let resource: any = this.resource.toPersistence();
     let doc = null
     if (isNullOrUndefined(this.guid) || this.guid === '') {
-      //Assume new document if guid is null
+      // Assume new workbook page created if guid is null
       // Generate artificial id from title
       try {
         const title = this.head.title.text;
@@ -368,14 +368,14 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 
   toPersistence(): Object {
-    //this.title.toPersistence(),
     const children = [
       ...this.nodes.toArray().map(node => node.toPersistence()),
     ]
     let resource = this.resource.toPersistence();
     let doc = null;
-    //Assume new document if guid is null
+    
     if (isNullOrUndefined(this.guid) || this.guid === '') {
+      // Assume new assessment created if guid is null
       const assessment = assessmentTemplate(this.title.text);
       try {
         const id = assessment.assessment['@id'];

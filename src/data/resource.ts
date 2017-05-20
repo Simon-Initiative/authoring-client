@@ -13,7 +13,8 @@ export type ResourceParams = {
   fileNode?: FileNode,
 };
 
-export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '', dateCreated: new Date(), dateUpdated: new Date()}) {
+export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
+  dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
   
   contentType: 'Resource';
   rev: number;
