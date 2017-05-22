@@ -146,7 +146,7 @@ export class DefinitionBegin
     this.onAddTitle = this.onAddTitle.bind(this);
     this.onAddPronunciation = this.onAddPronunciation.bind(this);
     this.onAddTranslation = this.onAddTranslation.bind(this);
-
+    this.onTermEdit = this.onTermEdit.bind(this);
   }
 
   onAddTitle() {
@@ -200,6 +200,10 @@ export class DefinitionBegin
     }
   }
 
+  onTermEdit(term) {
+    this.props.blockProps.onEdit({ term });
+  }
+
   onAddTranslation() {
     const insertionKey = findKeyOfLast(
       this.props.block.key, 
@@ -222,7 +226,7 @@ export class DefinitionBegin
         className="DefinitionSentinel" onFocus={this.onFocus} onBlur={this.onBlur}>
         Definition&nbsp;
         <TextInput width="150px" label="Term" value={this.props.data.term} type="text"
-          onEdit={term => this.props.blockProps.onEdit({ term })}
+          onEdit={this.onTermEdit}
         />
         <span className="SentinelUI"> 
           <DefinitionToolbar 

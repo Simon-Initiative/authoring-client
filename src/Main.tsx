@@ -63,7 +63,7 @@ class Main extends React.Component<MainProps, {}> {
     switch (view.type) {
       case 'ResourcesView':
         return <ResourceView 
-          courseId={this.props.course.courseId}
+          courseId={this.props.course.model.guid}
           title={view.title}
           resourceType={view.resourceType}
           filterFn={view.filterFn}

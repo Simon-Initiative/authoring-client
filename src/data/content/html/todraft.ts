@@ -443,7 +443,7 @@ function definition(item: Object, context: ParsingContext) {
   const key = common.getKey(item);
 
   const terms = getChildren(item).filter(c => common.getKey(c) === 'term');
-  const term = terms.length === 0 ? 'unknown term ' : terms[0][common.TEXT];
+  const term = terms.length === 0 ? 'unknown term ' : (terms[0] as any).term[common.TEXT];
 
   // Create the beginning block
   const beginData : common.DefinitionBegin = {
