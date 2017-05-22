@@ -128,7 +128,6 @@ export interface PulloutBegin {
 
 export interface PulloutEnd {
   type: 'pullout_end';
-  beginBlockKey: string;
   subType: string;
 }
 
@@ -139,7 +138,6 @@ export interface SectionBegin {
 
 export interface SectionEnd {
   type: 'section_end';
-  beginBlockKey: string;
   purpose: string;
 }
 
@@ -149,12 +147,10 @@ export interface ExampleBegin {
 
 export interface ExampleEnd {
   type: 'example_end';
-  beginBlockKey: string;
 }
 
 export interface Title {
   type: 'title';
-  beginBlockKey: string;
 }
 
 export interface Empty {

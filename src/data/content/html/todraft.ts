@@ -405,7 +405,6 @@ function section(item: Object, context: ParsingContext) {
   const endData : common.SectionEnd = {
     type: 'section_end',
     purpose: extractAttrs(item)['@purpose'],
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.section_end, endData, context);
 }
@@ -432,7 +431,6 @@ function pullout(item: Object, context: ParsingContext) {
   const endData : common.PulloutEnd = {
     type: 'pullout_end',
     subType: item[key]['@type'],
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.pullout_end, endData, context);
 
@@ -596,7 +594,6 @@ function example(item: Object, context: ParsingContext) {
   // Create the ending block 
   const endData : common.ExampleEnd = {
     type: 'example_end',
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.example_end, endData, context);
 

@@ -11,20 +11,16 @@ export default function handle(
   // Handle backspacing at the beginning of a block to 
   // account for removing sentinel blocks
   if (start === 0) {
-    console.log('beginning');
     return handleBackspaceAtBeginning(editorState, onChange);
   } 
 
   // Handle backspacing to delete an immutable entity
   const entityBefore = getEntityBefore(start - 1, editorState);
   if (entityBefore !== null) {
-    console.log('entity');
     return handleBackspaceAtEntity(editorState, onChange);
   }
   
-  console.log('not-handled');
   return 'not-handled';
-  
 }
 
 function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorState) => void) {
@@ -96,56 +92,63 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
   if (blockBefore !== undefined && blockBefore !== null && blockBefore.getType() === 'atomic') {
     
     const key = blockBefore.getEntityAt(0);
+    const blockKey = blockBefore.key;
     const entity = currentContent.getEntity(key);
 
     const data : common.BlockData = entity.getData();
 
-    let startKey = null;
+    let oppositeSentinel;
+    let direction;
+    let start;
+    let end;
 
-    switch (data.type) {
-      case 'pullout_end': // Intentional fall through
-      case 'section_end': // Intentional fall through
-      case 'example_end': // Intentional fall through
-        startKey = data.beginBlockKey;
-        break;
-      case 'pullout_begin': // Intentional fall through
-      case 'section_begin': // Intentional fall through
-      case 'example_begin': // Intentional fall through
-        startKey = blockBefore.getKey();
-        break;
-      default:
-        return 'not-handled';
+    if (data.type.endsWith('_begin')) {
+      oppositeSentinel = data.type.substr(0, data.type.indexOf('_') + 1) + 'end';
+      direction = 1;
+      start = 0;
+      end = currentContent.getBlocksAsArray().length;
+
+    } else if (data.type.endsWith('_end')) {
+      oppositeSentinel = data.type.substr(0, data.type.indexOf('_') + 1) + 'begin';
+      direction = -1;
+      start = currentContent.getBlocksAsArray().length - 1;
+      end = -1;
+
+    } else {
+      return 'not-handled';
+    }
+  
+    // Go ahead and remove the two sentinel blocks and all blocks in between
+    const arr = currentContent.getBlocksAsArray();
+    let newArr = [];
+    let inside = false;
+    for (let i = start; i !== end; i += direction) {
+      const block = arr[i];
+
+      if (!inside) {
+        if (block.key === blockKey && !inside) {
+          inside = true;
+        } else {
+          newArr.push(block);
+        }
+      } else {
+        if (block.type === 'atomic') {
+          const type = currentContent.getEntity(block.getEntityAt(0)).data.type;
+          if (type === oppositeSentinel) {
+            inside = false;
+          }
+        }
+      }
     }
 
-    // Go ahead and remove the two sentinel blocks:
+    if (direction === -1) {
+      newArr = newArr.reverse();
+    }
 
-    const blockMap = currentContent.getBlockMap();
-    const newBlocks = blockMap
-      .toSeq()
-      .filter((block, k) => {
-        if (block.getKey() === startKey) {
-          return false;
-        }
-        if (block.getType() === 'atomic') {
-          const key = block.getEntityAt(0);
-          const entity = currentContent.getEntity(key);
-          const thisBeginBlockKey = entity.getData().beginBlockKey;
 
-          if (thisBeginBlockKey !== undefined && thisBeginBlockKey === startKey) {
-            return false;
-          }
-        } else if (block.getData() !== undefined) {
-          const data = block.getData();
-          if (data.get('beginBlockKey') === startKey) {
-            return false;
-          }
-        }
-        
-        return true;
-      });
 
     const updatedContent = currentContent.merge({
-      blockMap: Immutable.OrderedMap<string, ContentBlock>(newBlocks),
+      blockMap: Immutable.OrderedMap<string, ContentBlock>(newArr.map(b => [b.key, b])),
       selectionBefore: ss,
       selectionAfter: ss,
     });
