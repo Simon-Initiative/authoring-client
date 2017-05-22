@@ -93,6 +93,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         _id: this.props.model.guid,
         model: this.props.model
       });
+        
+      console.log ("Tree data: " + JSON.stringify (this.props.model.organization));  
+        
       this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
       //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
       //       console.log ("course: " + JSON.stringify (course));
