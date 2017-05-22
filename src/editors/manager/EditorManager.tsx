@@ -37,6 +37,8 @@ export interface EditorManagerProps {
 
     userId: string;
 
+    userName: string;
+
     services: AppServices;
 
     course: any;
@@ -93,7 +95,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         this.persistenceStrategy = lookUpByName(document.model.modelType).persistenceStrategy;
 
         this.persistenceStrategy.initialize(
-            document, this.props.userId,
+            document, this.props.userName,
             this.onSaveCompleted, this.onSaveFailure)
             .then(editingAllowed => {
 

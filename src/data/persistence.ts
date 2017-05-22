@@ -280,6 +280,72 @@ export type CourseResource = {
   type: string,
 };
 
+export function acquireLock(courseId: CourseId, id: DocumentId): Promise<Object> {
+  if (courseId === null) {
+    throw 'courseId cannot be null';
+  }
+  const url = `${configuration.baseUrl}/${courseId}/locks?action=AQUIRE&resourceId=${id}`;
+    
+  return new Promise((resolve, reject) => {
+    
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: getHeaders(credentials),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        resolve(json);
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+export function releaseLock(courseId: CourseId, id: DocumentId): Promise<Object> {
+  return lock(courseId, id, 'RELEASE');
+}
+
+export function statusLock(courseId: CourseId, id: DocumentId): Promise<Object> {
+  return lock(courseId, id, 'STATUS');
+}
+
+function lock(courseId: CourseId, id: DocumentId, action: string): Promise<Object> {
+  if (courseId === null) {
+    throw 'courseId cannot be null';
+  }
+  const url = `${configuration.baseUrl}/${courseId}/locks?action=${action}&resourceId=${id}`;
+    
+  return new Promise((resolve, reject) => {
+    
+    try {
+      fetch(url, {
+        method: 'GET',
+        headers: getHeaders(credentials),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.text();
+      })
+      .then((json) => {
+        resolve(json);
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 export function fetchCourseResources(courseId: string) : Promise<CourseResource[]> {
   return new Promise((resolve, reject) => {
     retrieveCoursePackage(courseId)
