@@ -39,12 +39,12 @@ export function flowInline() {
       tooltip="Term" icon="book"/>,
     <Button key="foreign" command={style('FOREIGN')} 
       tooltip="Foreign" icon="globe"/>,
-    <Separator/>,
+    <Separator key="sep2"/>,
     <Button key="ordered" command={block('ordered-list-item')} 
       tooltip="Ordered list" icon="list-ol"/>,
     <Button key="undordered" command={block('unordered-list-item')} 
       tooltip="Unordered list" icon="list-ul"/>,
-    <Separator/>,
+    <Separator key="sep3"/>,
     <Button key="math" 
       command={insertInline(EntityTypes.formula, 'IMMUTABLE', defaultFormula)} 
       tooltip="Math expression" icon="etsy"/>,
@@ -86,9 +86,11 @@ export function bodyBlock() {
       tooltip="Insert pullout" icon="external-link-square"/>,
     <Button key="example" command={new commands.InsertExampleCommand()} 
       tooltip="Insert example" icon="bar-chart"/>,
+    <Button key="definition" command={new commands.InsertDefinitionCommand()} 
+      tooltip="Insert definition" icon="book"/>,
     <Button key="section" command={new commands.InsertSectionCommand()} 
       tooltip="Insert section" icon="list-alt"/>,
-    <Separator/>,
+    <Separator key="sep1"/>,
     <Button key="wbinline" command={new commands.InsertAssessmentCommand()} 
       tooltip="Insert inline assessment" icon="flask"/>,
   ]; 

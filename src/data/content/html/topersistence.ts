@@ -140,8 +140,20 @@ function handleSentinelTransition(
   } else if (type === common.EntityTypes.example_begin) {
     translateExample(iterator, rawBlock, entityMap, context);
 
-  } else if (type === common.EntityTypes.figure_begin) {
-    // translateFigure(iterator, entityMap, context);
+  } else if (type === common.EntityTypes.definition_begin) {
+    translateDefinition(iterator, rawBlock, entityMap, context);
+
+  } else if (type === common.EntityTypes.title_begin) {
+    translateTitle(iterator, rawBlock, entityMap, context);
+
+  } else if (type === common.EntityTypes.pronunciation_begin) {
+    translatePronunciation(iterator, rawBlock, entityMap, context);
+
+  } else if (type === common.EntityTypes.translation_begin) {
+    translateTranslation(iterator, rawBlock, entityMap, context);
+
+  } else if (type === common.EntityTypes.meaning_begin) {
+    translateMeaning(iterator, rawBlock, entityMap, context);
 
   } 
 
@@ -351,6 +363,101 @@ function translatePullout(
 
   top(context).push(p);
   context.push(p.pullout['#array']);
+
+}
+
+function translateDefinition(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const term = entityMap[rawBlock.entityRanges[0].key].data.term;
+  const arr = [{
+    term: {
+      '#text': term,
+    },
+  }];
+
+  const p = {
+    definition: {
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.definition['#array']);
+
+}
+
+function translateTitle(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const arr = [];
+
+  const p = {
+    title: {
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.title['#array']);
+
+}
+
+function translatePronunciation(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const src = entityMap[rawBlock.entityRanges[0].key].data.type;
+  const type = entityMap[rawBlock.entityRanges[0].key].data.srcType;
+  
+  const arr = [];
+
+  const p = {
+    pronunciation: {
+      '@src': src,
+      '@type': type,
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.pronunciation['#array']);
+
+}
+
+function translateTranslation(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const arr = [];
+
+  const p = {
+    translation: {
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.translation['#array']);
+
+}
+
+function translateMeaning(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const arr = [];
+
+  const p = {
+    meaning: {
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.meaning['#array']);
 
 }
 

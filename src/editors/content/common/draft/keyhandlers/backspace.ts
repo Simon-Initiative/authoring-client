@@ -2,7 +2,8 @@ import { EditorState, Modifier, ContentState, SelectionState, ContentBlock } fro
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
 
-export default function handle(editorState: EditorState, onChange: (e: EditorState) => void) : string {
+export default function handle(
+  editorState: EditorState, onChange: (e: EditorState) => void) : string {
   
   const ss = editorState.getSelection();
   const start = ss.getStartOffset();
@@ -40,13 +41,13 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
     focusKey: key,
     focusOffset: start - 1,
     isBackwards: false,
-    hasFocus: false
+    hasFocus: false,
   });
 
   const updatedContent = Modifier.removeRange(
     editorState.getCurrentContent(),
     rangeToRemove,
-    'forward'
+    'forward',
   );
 
   const newSelection = new SelectionState({
@@ -55,7 +56,7 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
     focusKey: key,
     focusOffset: start - 2,
     isBackwards: false,
-    hasFocus: false
+    hasFocus: false,
   });
 
   onChange(
@@ -118,8 +119,8 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
 
     // Go ahead and remove the two sentinel blocks:
 
-    var blockMap = currentContent.getBlockMap();
-    var newBlocks = blockMap
+    const blockMap = currentContent.getBlockMap();
+    const newBlocks = blockMap
       .toSeq()
       .filter((block, k) => {
         if (block.getKey() === startKey) {
@@ -141,7 +142,7 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
         }
         
         return true;
-      })
+      });
 
     const updatedContent = currentContent.merge({
       blockMap: Immutable.OrderedMap<string, ContentBlock>(newBlocks),

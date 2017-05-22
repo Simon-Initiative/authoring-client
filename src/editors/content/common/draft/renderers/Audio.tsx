@@ -61,6 +61,8 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
 
   render() : JSX.Element {
 
+    console.log(this.props);
+
     const { sources, controls } = this.props.data.audio;
 
     let src = '';

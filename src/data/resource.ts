@@ -1,4 +1,6 @@
 import * as Immutable from 'immutable';
+import {FileNode} from "./file_node";
+import {isNullOrUndefined} from "util";
 
 export type ResourceParams = {
   rev?: number,
@@ -7,10 +9,12 @@ export type ResourceParams = {
   type?: string,
   title?: string,
   dateCreated?: Date,
-  dateUpdated?: Date
+  dateUpdated?: Date,
+  fileNode?: FileNode,
 };
 
-export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '', dateCreated: new Date(), dateUpdated: new Date()}) {
+export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
+  dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
   
   contentType: 'Resource';
   rev: number;
@@ -20,6 +24,7 @@ export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, g
   title: string;
   dateCreated: Date;
   dateUpdated: Date;
+  fileNode: FileNode;
   
   constructor(params?: ResourceParams) {
     params ? super(params) : super();
@@ -32,11 +37,14 @@ export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, g
   static fromPersistence(root: Object) : Resource {
     let a = (root as any);
     let model = new Resource({rev: a.rev, guid: a.guid, id: a.id, type: a.type, title: a.title});
-    if(a.dateCreated){
+    if(!isNullOrUndefined(a.dateCreated)){
       model = model.with({dateCreated : new Date(a.dateCreated)});
     }
-    if(a.dateUpdated){
+    if(!isNullOrUndefined(a.dateUpdated)){
       model = model.with({dateUpdated: new Date(a.dateUpdated)});
+    }
+    if(!isNullOrUndefined(a.fileNode)){
+      model = model.with({fileNode: FileNode.fromPersistence(a.fileNode)});
     }
     
     return model;

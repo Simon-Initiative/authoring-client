@@ -7,19 +7,19 @@ import { BlockProps } from './properties';
 import { Select } from '../../Select';
 import './markers.scss';
 
-export interface ExampleBeginProps extends InteractiveRendererProps {
+export interface MeaningBeginProps extends InteractiveRendererProps {
   
 }
 
-export interface ExampleBeginState extends InteractiveRendererState {
+export interface MeaningBeginState extends InteractiveRendererState {
   
 }
 
-export interface ExampleBegin {
+export interface MeaningBegin {
   
 }
 
-export class ExampleBegin extends InteractiveRenderer<ExampleBeginProps, ExampleBeginState> {
+export class MeaningBegin extends InteractiveRenderer<MeaningBeginProps, MeaningBeginState> {
 
   constructor(props) {
     super(props, {});
@@ -28,8 +28,8 @@ export class ExampleBegin extends InteractiveRenderer<ExampleBeginProps, Example
   render() {
     
     return (
-      <span ref={c => this.focusComponent = c} className="ExampleSentinel">
-        Example&nbsp;
+      <span ref={c => this.focusComponent = c} className="MeaningSentinel">
+        Meaning&nbsp;
       </span>);
   }
 }

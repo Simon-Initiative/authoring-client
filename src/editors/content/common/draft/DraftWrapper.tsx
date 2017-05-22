@@ -429,6 +429,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         component: BlockRendererFactory,
         editable: false,
         props: {
+          onContentChange: (contentState: ContentState) => {
+            this.forceContentChange(contentState, 'apply-entity');
+          },
           onLockChange: (locked) => {
             this.setState({ lockedByBlockRenderer: locked });
           },
