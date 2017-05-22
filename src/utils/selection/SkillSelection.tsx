@@ -13,12 +13,13 @@ export interface SkillSelection {
 export interface SkillSelectionProps {
   onInsert: (item: Skill) => void;
   onCancel: () => void;
+  courseId: string;
 }
 
 export type Skill = {
   id: types.DocumentId,
-  title: string
-}
+  title: string,
+};
 
 export interface SkillSelectionState {
   resources: Skill[];
@@ -32,58 +33,46 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
 
     this.state = {
       resources: [],
-      selected: { id: '', title: ''}
-    }
+      selected: { id: '', title: '' },
+    };
   }
 
   componentDidMount() {
-    let query = {
-      // TODO, fill in query to retrieve skill ids and titles
-    }
-
-    // TODO, replace setState with call to fetchResources
-    this.setState({
-      resources: [
-        { id: '1', title: 'Skill 1'},
-        { id: '2', title: 'Skill 2'},
-        { id: '3', title: 'Skill 3'},
-        { id: '4', title: 'Skill 4'},
-        { id: '5', title: 'Skill 5'},
-      ]
-    })
-
-    //this.fetchResources(query);
+    this.fetchResources();
   }
 
-  fetchResources(query: Object) {
-    persistence.queryDocuments(query)
-      .then(docs => {
-        this.setState({
-          resources: docs.map(d => ({ id: d._id, title: (d as any).title}))
-        })
+  fetchResources() {
+    persistence.fetchCourseResources(this.props.courseId)
+    .then(resources => resources.filter(r => r.type === 'x-oli-skill_model'))
+    .then((skills) => {
+      this.setState({
+        resources: skills.map(s => ({ id: s._id, title: s.title })),
       });
+    });
   }
 
   clickResource(selected) {
-    this.setState({selected});
+    this.setState({ selected });
   }
 
   renderRows() {
-    let link = (r: Skill) => 
+    const link = (r: Skill) => 
       <button onClick={this.clickResource.bind(this, r)} 
         className="btn btn-link">{r.title}</button>;
 
-    return this.state.resources.map(r => {
-        const active = r.id === this.state.selected.id ? 'table-active' : '';
-        return <tr key={r.id} className={active}>
-          <td>{link(r)}</td>
-        </tr>
-      })
+    return this.state.resources.map((r) => {
+      const active = r.id === this.state.selected.id ? 'table-active' : '';
+      return <tr key={r.id} className={active}>
+        <td>{link(r)}</td>
+      </tr>;
+    });
   }
 
   render() {
     return (
-      <ModalSelection title="Select Skill" onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.selected)}>
+      <ModalSelection title="Select Skill" 
+        onCancel={this.props.onCancel} 
+        onInsert={() => this.props.onInsert(this.state.selected)}>
         <table className="table table-hover table-sm">
           <thead>
               <tr>
@@ -95,7 +84,7 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
           </tbody>
         </table>
       </ModalSelection>    
-      );
+    );
   }
 
 }

@@ -106,12 +106,16 @@ export class AudioEditor
 
         <Sources
           {...this.props}
+          mediaType="audio"
+          accept="audio/*"
           model={sources}
           onEdit={this.onSourcesEdit}
         />
 
         <Tracks
           {...this.props}
+          mediaType="audio"
+          accept="audio/*"
           model={tracks}
           onEdit={this.onTracksEdit}
         />
@@ -124,6 +128,7 @@ export class AudioEditor
 
         <InputLabel label="Controls">
           <label className="form-check-label">
+            &nbsp;&nbsp;&nbsp;
             <input type="checkbox" 
               onClick={this.onControlEdit}
               className="form-check-input"

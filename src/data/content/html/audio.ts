@@ -125,6 +125,15 @@ export class Audio extends Immutable.Record(defaultContent) {
           
       }
     });
+
+    // Adjust the model to move the contents of the 'src' attribute 
+    // into a 'source' element. This allows us to access legacy audio elements data
+    // through the proper channel. 
+    if (model.src !== '' && model.sources.size === 0) {
+      const source = new Source({ src: model.src });
+      const sources = model.sources.set(source.guid, source);
+      model = model.with({ sources });
+    }
     
     return model;
   }

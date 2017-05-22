@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
+import * as persistence from '../../../data/persistence';
 
 import { Track }  from '../../../data/content/html/track';
 import { AppServices } from '../../common/AppServices';
+import { uploadFile } from '../common/UploadFile';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
@@ -21,10 +23,12 @@ export interface TrackEditor {
 
 export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
   onRemove: (guid: string) => void;
+  mediaType: string;
+  accept: string;
 }
 
 export interface TrackEditorState {
-  
+  failure: boolean;
 }
 
 /**
@@ -36,22 +40,24 @@ export class TrackEditor
   constructor(props) {
     super(props);
     
-    this.onSrcClick = this.onSrcClick.bind(this);
     this.onKindEdit = this.onKindEdit.bind(this);
     this.onDefaultEdit = this.onDefaultEdit.bind(this);
     this.onLabelEdit = this.onLabelEdit.bind(this);
     this.onLangEdit = this.onLangEdit.bind(this); 
+    this.onFileChange = this.onFileChange.bind(this);
+
+    this.state = {
+      failure: false,
+    };
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState: TrackEditorState) {
     if (nextProps.model !== this.props.model) {
+      return true;
+    } else if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;
-  }
-
-  onSrcClick() {
-    // TODO, allow uploading of a file
   }
 
   onKindEdit(kind: string) {
@@ -70,15 +76,49 @@ export class TrackEditor
     this.props.onEdit(this.props.model.with({ default: def }));
   }
 
+  onFileChange(e) {
+    const file = e.target.files[0];
+    
+    persistence.createWebContent(this.props.context.courseId, file)
+    .then((result) => {
+      this.setState(
+        { failure: false }, 
+        () => this.props.onEdit(this.props.model.with({ src: file.name })));
+    })
+    .catch((err) => {
+      this.setState({ failure: true });
+    });
+  }
+
+  openFileDialog(id) {
+    (window as any).$('#' + id).trigger('click');
+  }
+
   render() : JSX.Element {
 
-    const { src, kind, label, srclang, guid } = this.props.model;
-    const srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    const { src, kind, label, srclang } = this.props.model;
+    let srcDisplay;
+    if (!this.state.failure) {
+      srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+    } else {
+      srcDisplay = 
+        <div className="alert alert-danger" role="alert">
+          <strong>Failed</strong> Rename the file and try again
+        </div>;
+    }
+    const id : string = guid();
 
     return (
       <tr>
         <td>    
-          <Button onClick={this.onSrcClick}>Set</Button>
+          <input 
+            id={id}
+            style={ { display: 'none' } }
+            accept={this.props.accept}
+            onChange={this.onFileChange} 
+            type="file" 
+          />
+          <Button onClick={this.openFileDialog.bind(this, id)}>Set</Button>
         </td>
         <td>
           <b>{srcDisplay}</b>
@@ -106,7 +146,7 @@ export class TrackEditor
         <td>
           <span 
             className="closebtn input-group-addon" 
-            onClick={() => this.props.onRemove(guid)}>
+            onClick={() => this.props.onRemove(this.props.model.guid)}>
             &times;
           </span>
         </td>

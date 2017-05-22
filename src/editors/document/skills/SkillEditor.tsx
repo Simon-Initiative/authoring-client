@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import {Skill} from '../../../data/skills';
-import { CourseResource, fetchCourseResources } from '../common/resources';
+import { CourseResource, fetchCourseResources } from '../../../data/persistence';
 
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
@@ -616,7 +616,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                              editMode={true}
                              model={titleObj}
                              styles={styles.skillTitleEditorFolded}
-                             context={{userId: null, documentId: null, courseId: null}}
+                             context={{userId: null, documentId: null, courseId: null, webContentUrl: null}}
                              onEdit={(content) => this.editTitle(item,content)}
                             />
                          </div>
@@ -639,7 +639,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                              editMode={true}
                              model={titleObj}
                              styles={styles.skillTitleEditorUnfolded}
-                             context={{userId: null, documentId: null, courseId: null}}
+                             context={{userId: null, documentId: null, courseId: null, webContentUrl: null}}
                              onEdit={(content) => this.editTitle(item,content)}
                             />
                          </div>

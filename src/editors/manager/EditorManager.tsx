@@ -1,15 +1,16 @@
-import * as React from "react";
+import * as React from 'react';
 
-import {bindActionCreators} from "redux";
+import { bindActionCreators } from 'redux';
 
-import * as persistence from "../../data/persistence";
-import * as models from "../../data/models";
-import * as courseActions from "../../actions/course";
-import {AbstractEditorProps} from "../document/common/AbstractEditor";
-import {AppServices} from "../common/AppServices";
-import {onFailureCallback, onSaveCompletedCallback, PersistenceStrategy} from "./persistence/PersistenceStrategy";
-import {ListeningApproach} from "./ListeningApproach";
-import {lookUpByName} from "./registry";
+import * as persistence from '../../data/persistence';
+import * as models from '../../data/models';
+import * as courseActions from '../../actions/course';
+import { configuration } from '../../actions/utils/config';
+import { AbstractEditorProps } from "../document/common/AbstractEditor";
+import { AppServices } from "../common/AppServices";
+import { onFailureCallback, onSaveCompletedCallback, PersistenceStrategy} from "./persistence/PersistenceStrategy";
+import { ListeningApproach } from "./ListeningApproach";
+import { lookUpByName } from "./registry";
 
 interface EditorManager {
 
@@ -228,19 +229,23 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
             return null;
         } else {
 
-            let courseId = (this.state.document.model as any).courseId === undefined ? null : (this.state.document.model as any).courseId;
+            const courseId = (this.props.course.model as models.CourseModel).guid;
+            const courseLabel = (this.props.course.model as models.CourseModel).id;
+            const version = (this.props.course.model as models.CourseModel).version;
 
             const childProps: AbstractEditorProps<any> = {
                 model: this.state.document.model,
                 context: {
                     documentId: this.props.documentId,
                     userId: this.props.userId,
-                    courseId: courseId
+                    courseId,
+                    webContentUrl: configuration.webContentUrlBase 
+                      + '/' + courseLabel + '_' + version,
                 },
                 onEdit: this._onEdit,
                 services: this.props.services,
-                editMode: this.state.editMode
-            }
+                editMode: this.state.editMode,
+            };
 
             const registeredEditor = lookUpByName(this.state.document.model.modelType);
             const editor = React.createElement((registeredEditor.component as any), childProps);

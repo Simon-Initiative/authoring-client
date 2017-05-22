@@ -47,7 +47,7 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
             </div>
         </div>
       </div>
-    )
+    );
   }
   
 }

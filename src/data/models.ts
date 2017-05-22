@@ -245,7 +245,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     let resource: any = this.resource.toPersistence();
     let doc = null
     if (isNullOrUndefined(this.guid) || this.guid === '') {
-      //Assume new document if guid is null
+      // Assume new workbook page created if guid is null
       // Generate artificial id from title
       try {
         const title = this.head.title.text;
@@ -368,14 +368,14 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 
   toPersistence(): Object {
-    //this.title.toPersistence(),
     const children = [
       ...this.nodes.toArray().map(node => node.toPersistence()),
     ]
     let resource = this.resource.toPersistence();
     let doc = null;
-    //Assume new document if guid is null
+    
     if (isNullOrUndefined(this.guid) || this.guid === '') {
+      // Assume new assessment created if guid is null
       const assessment = assessmentTemplate(this.title.text);
       try {
         const id = assessment.assessment['@id'];
@@ -689,16 +689,22 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     if (oList) {
       for (var k = 0; k < oList.length; k++) {
+          
         var obj = oList [k];
-        if (!isNullOrUndefined(obj.sequences)) {
-          //for (var j in obj) {
-          var destNode = obj.sequences;// [j];
-          if (isArray(destNode)) {
+
+        if (!isNullOrUndefined(obj ["sequences"])) {  
+
+          var destNode = obj ["sequences"]; // [j];
+                        
+          var seqList = destNode["#array"];  
+            
+          if (destNode["#array"]) {
             //if (j == 'sequences') {
             //for (var sequenceObject in destNode) {
-            for (let w = 0; w < destNode.length; w++) {
-              let seqObj = destNode [w];
+            for (let w = 0; w < seqList.length; w++) {
+              let seqObj = seqList [w];
               if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
+                console.log ("Parsing sequence ...");
                 let newSequence: OrgSequence = new OrgSequence();
                 let seqReference = seqObj ["sequence"];
                 newData.push(newSequence);
@@ -761,13 +767,12 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
               }
             }
           }
-          //}
         }
-        //}
+        else {
+          console.log ("Error: unable to find sequence data");      
+        }          
       }
     }
-    //}
-    //}
 
     console.log("toplevel: " + JSON.stringify(newTopLevel));
     console.log("newData: " + JSON.stringify(newData));
@@ -806,7 +811,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     orgRoot ["organization"]["#array"].push(seqRoot);
 
     let sequences: Array<Object> = new Array();
-    seqRoot ["sequences"] = sequences;
+    seqRoot ["sequences"] = new Object ();
+    seqRoot ["sequences"]["#array"]=new Array ();
+    seqRoot ["sequences"]["#array"]=sequences;
 
     // We can point directly to .children because we ensure in the constructor that
     // this object always exists
@@ -883,10 +890,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       }
     }
 
-    var formattedOrganization = JSON.stringify(orgRoot);
+    //var formattedOrganization = JSON.stringify(orgRoot);
+    var formattedOrganization = JSON.stringify(orgRoot ["organization"]);    
     console.log("To: " + formattedOrganization);
 
-    return orgRoot;
+    return orgRoot ["organization"];
   }
 
 }

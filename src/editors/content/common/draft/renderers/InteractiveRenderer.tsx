@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { BlockProps } from './properties';
+import { ContentState, ContentBlock } from 'draft-js';
 
 export interface InteractiveRendererProps {
   blockProps: BlockProps;
+  contentState: ContentState;
+  block: ContentBlock;
 }
 
 export interface InteractiveRendererState {

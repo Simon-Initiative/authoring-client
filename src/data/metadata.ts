@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import {isNullOrUndefined} from "util";
 
 export type MetaDataParams = {
   authors?: any,
@@ -26,16 +27,16 @@ export class MetaData extends Immutable.Record({contentType: 'MetaData',authors:
   static fromPersistence(root: Object) : MetaData {
     let a = (root as any);
     let model = new MetaData();
-    if(a.authors){
+    if(!isNullOrUndefined(a.authors)){
       model = model.with({authors: a.authors});
     }
-    if(a.license){
+    if(!isNullOrUndefined(a.license)){
       model = model.with({license: a.license});
     }
-    if(a.copyright){
+    if(!isNullOrUndefined(a.copyright)){
       model = model.with({copyright: a.copyright});
     }
-    if(a.keywords){
+    if(!isNullOrUndefined(a.keywords)){
       model = model.with({keywords: a.keywords});
     }
     return model;

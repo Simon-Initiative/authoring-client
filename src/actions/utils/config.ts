@@ -4,7 +4,6 @@ const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
 // These will go away during content-service transition
-//const database = 'editor';
 const database = 'packages';
 const attachmentDatabase = 'attachments';
 
@@ -15,6 +14,7 @@ export type Configuration = {
   database: string,
   attachmentDatabase: string,
   prefix: string,
+  webContentUrlBase: string,
 };
 
 export const configuration : Configuration = {
@@ -24,6 +24,7 @@ export const configuration : Configuration = {
   database,
   attachmentDatabase,
   prefix,
+  webContentUrlBase: protocol + hostname + '/content-service',
 };
 
 export function relativeToAbsolute(relativeURL: string, database: string) : string {
