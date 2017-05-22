@@ -106,15 +106,17 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const nodeEditors = this.props.model.nodes.toArray().map(n => this.renderNode(n));
     return (
       <div>
-        <Toolbar 
-          undoEnabled={this.state.undoStackSize > 0}
-          redoEnabled={this.state.redoStackSize > 0}
-          onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
-          onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
-        {titleEditor}
+        <div className="docHead">
+          <Toolbar 
+            undoEnabled={this.state.undoStackSize > 0}
+            redoEnabled={this.state.redoStackSize > 0}
+            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
+            onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
+          {titleEditor}
+          <button type="button" className="btn btn-secondary" onClick={this.onAddContent}>Add Content</button>
+          <button type="button" className="btn btn-secondary" onClick={this.onAddQuestion}>Add Question</button>
+        </div>
         {nodeEditors}
-        <hr/>
-        
       </div>);
     
   }

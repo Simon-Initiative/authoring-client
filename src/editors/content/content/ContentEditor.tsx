@@ -89,7 +89,7 @@ export class ContentEditor
     )
 
     return (
-      <div className='componentWrapper'>
+      <div className='componentWrapper content'>
         <Collapse 
           caption='Content' 
           details={getHtmlDetails(this.props.model.body)}

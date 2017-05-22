@@ -7,7 +7,7 @@ export type ItemLabelProps = {
 
 export const ItemLabel = (props: ItemLabelProps) => {
   return (
-    <div style={{float: 'right'}}>
+    <div className="itemType">
       <span>
         {props.label}
       </span>

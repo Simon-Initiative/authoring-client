@@ -361,7 +361,7 @@ export abstract class QuestionEditor
 
     return (
     
-      <div className='componentWrapper'>
+      <div className='componentWrapper question'>
 
         <Collapse caption='Question' 
           details={getHtmlDetails(this.props.model.body)}

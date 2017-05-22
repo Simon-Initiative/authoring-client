@@ -32,7 +32,7 @@ export interface FillInTheBlankState {
 
 const ChoiceFeedback = (props) => {
   return (
-    <div className='ChoiceFeedback'>
+    <div className='ChoiceFeedback clearfix'>
       {props.children}
     </div>
   )

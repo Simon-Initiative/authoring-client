@@ -81,9 +81,12 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
                 <img src="assets/ph-courseView.png" className="img-fluid" alt=""/>
                 <div className="content container">
                     <div className="row">
+
+                        {/* 
                         <div className="information col-3">
                             <span className="title">{id + '_' + version}</span>
                         </div>
+                        */}  
                         <div className="information col-3">
                             <span className="title">{title}</span>
                             <span className="name">Instructor Name</span>

@@ -43,11 +43,14 @@ export class Toolbar extends React.PureComponent<ToolbarProps, {}> {
 
   render() {
     return (
-      <div style={{float: 'right'}}>
-        <div className="btn-group btn-group-sm" role="group" aria-label="Assessment Toolbar">
+      <div>
+        <div className="btn-group btn-group-sm asxToolbar" role="group" aria-label="Assessment Toolbar">
           
+          {/*
           {this.button('file-text-o', this.props.onAddContent, true)}
           {this.button('question', this.props.onAddQuestion, true)}
+          */}
+
           {this.button('undo', this.props.onUndo, this.props.undoEnabled)}
           {this.button('repeat', this.props.onRedo, this.props.redoEnabled)}
           

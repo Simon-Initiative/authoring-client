@@ -14,7 +14,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 .document {
 
 	h2 {
-		color: $d_blue;
+		color: $color-black;
 		margin-bottom: 42px !important;
 
 		&.organize {
@@ -126,7 +126,57 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 
 	h2 {
 		font-family: $serif-font;
-		margin: 0em auto 1em auto;
+		margin: 0em 1em 1em auto;
+		display: inline-block;
+	}
+
+	.docHead {
+		.btn {
+			padding: 5px 20px;
+			position: relative;
+			top: -6px;
+
+			&:hover {
+				background-color:transparent;
+				border: 2px solid $color-blue;
+				color: $color-blue;
+			}
+		}
+	}
+
+	.btn {
+		border-radius: 0px;
+		cursor: pointer;
+		background-color: transparent;
+		border: solid 2px transparent;
+		transition: none;
+		// border-bottom: 1px dotted $color-blue;
+		font-weight: 600;
+		padding-left: 0px;
+		color: $color-blue;
+
+		&.btn-primary {
+			background-color: $color-blue;
+		}
+
+		&.outline {
+			background-color: transparent;
+			border: 2px solid $color-white;
+		}
+
+		&.serif {
+			font-family: $serif-font;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
+
+		&:active {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
 	}
 }
 
@@ -193,7 +243,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 		}
 
 		input:focus + label{
-		  top: 30px;
+		  top: 12px;
 		  margin-top: 0px;
 		  margin-left: 2rem;
 		  color: #000;
@@ -259,6 +309,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 				padding: 1.4em 1em;
 				font-weight:600;
 				cursor: pointer;
+				color: $color-white;	
 			}
 
     	}
@@ -268,7 +319,7 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 
 //footer
 .footer {
-    position: relative;
+    position: fixed;
     bottom: 0;
     width: 100%;
     height: 124px;
@@ -285,6 +336,21 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
     .ccLicense {
 	    float: left;
 	    margin-right: 2.5rem;
+	}
+}
+
+// Organization
+.rst__node {
+
+	.rst__nodeContent {
+
+		h2 {
+			color: #000;
+			margin-bottom: 0px !important;
+			font-family: $sans-font;
+			font-size: 1em;
+			font-weight: 600;
+		}
 	}
 }
 
@@ -353,4 +419,175 @@ h1 {
 .public-DraftStyleDefault-ul, .public-DraftStyleDefault-ol {
     margin-top: 1.5rem;
 	margin-bottom: 1.5rem;
+}
+
+// Assessetment Toolbar
+.asxToolbar { 
+	position: absolute;
+	right:0px;
+}
+
+//Skills Editor
+.skillEditor {
+
+	.form-inline {
+		display:inline-block;
+	}
+
+	.skillRows {
+
+		h2 {
+			margin:15px;
+			margin-bottom: 0px !important;
+			font-family: $sans-font !important;
+			font-size: 16px;
+			font-weight: 600;
+		}
+	}
+}
+
+//Resources Applied to the table resources
+.resources {
+
+	a.source {
+		font-weight: 600;
+		color: $color-blue;
+		cursor: pointer;
+
+		&:hover {
+			color: $color-blue;
+			border-bottom: 1px dotted $color-blue;
+		}
+	}
+
+}
+
+//Learning Objectives
+.rst__nodeContent {
+
+}
+.rst__node .rst__nodeContent h2 {
+	color: $color-blue;
+	margin-top: 10px;
+}
+
+.componentWrapper {
+
+	&.content {
+		border-color: transparent;
+		background-color: $color-white;
+		border-radius: 4px;
+
+		.form-control {
+			border-color: transparent;
+
+			&:hover {
+				border-color: $color-grey;
+			}
+		}
+	}
+
+	&.question {
+		border-color: transparent;
+		background-color: $color-white;
+		border-radius: 4px;
+
+		.form-control {
+
+			&:first-child {
+				border-color: $color-grey;
+			}
+
+			&:hover {
+				border-color: $color-grey;
+			}
+		}
+		.ChoiceFeedback {
+
+			border: 2px solid $color-blue;
+
+			.input-group {
+
+				.input-group-addon {
+					border-radius: 0px;
+					background-color: $color-blue;
+					color: $color-white;
+					border: none;
+				}
+				.InputLabel-default {
+					font-size: 0.9rem;
+				}
+			}
+		}
+		.input-group-addon.InputLabel-default {
+			border-radius: 0px;
+			background-color: $color-blue;
+			color: $color-white;
+			border: none;
+			font-size: 0.9rem;
+		}
+		.closebtn.input-group-addon {
+			border-radius: 0px;
+			background-color: $color-blue;
+			color: $color-white;
+			border: none;
+		}
+		.itemWrapper {
+			border: 2px solid $color-blue;
+		}
+	}
+}
+
+.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show>.btn-secondary.dropdown-toggle {
+	color: $color-blue;
+	font-weight: 500;
+	font-size: 0.9rem;
+	background-color: transparent;
+	border: none;
+}
+.itemPart {
+	background-color: transparent;
+	margin: 10px;
+	border: 2px solid $color-blue;
+	padding: 15px;
+	border-radius: 4px;
+}
+// .ChoiceFeedback {
+// 	.input-group {
+// 		margin-bottom: 5px;
+// 	}
+// }
+.form-check-label.btn {
+	font-size: 0.9rem;
+	margin-left: 25px;
+
+	.form-check-input {
+		margin-right: 5px;
+	}
+}
+.itemType {
+	float:right;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	color: $color-grey;
+
+	span {
+		margin-right: 10px;
+	}
+}
+.form-inline.InputForm-right {
+	margin-bottom: 0px;
+}
+.chip {
+	background-color: $color-blue;
+	text-transform: uppercase;
+	margin-bottom: 15px;
+	color: $color-white;
+	padding: 10px;
+	height: 45px;
+	font-weight: 600;
+
+	.closebtn {
+		color: $color-white;
+	}
 }
