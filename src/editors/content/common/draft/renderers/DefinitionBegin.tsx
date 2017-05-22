@@ -55,7 +55,7 @@ function findKeyOfLast(
 
       if (block.type === 'atomic') {
 
-        const entity = Entity.get(block.getEntityAt(0));
+        const entity = contentState.getEntity(block.getEntityAt(0));
         
         if (stopTypes.indexOf(entity.data.type) !== -1) {
           return key;
@@ -84,7 +84,7 @@ function within(
     } else if (inside) {
 
       if (block.type === 'atomic') {
-        const entity = Entity.get(block.getEntityAt(0));
+        const entity = contentState.getEntity(block.getEntityAt(0));
         if (entity.data.type === endBlockType) {
           return false;
         }

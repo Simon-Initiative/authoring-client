@@ -41,7 +41,7 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
     focusKey: key,
     focusOffset: start - 1,
     isBackwards: false,
-    hasFocus: false
+    hasFocus: false,
   });
 
   const updatedContent = Modifier.removeRange(
