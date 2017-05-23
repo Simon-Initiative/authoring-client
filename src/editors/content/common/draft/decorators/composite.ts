@@ -6,7 +6,7 @@ import cite from './Cite';
 import formula from './Formula';
 import inputRef from './InputRef';
 import activityLink from './ActivityLink';
-import xref from './xref';
+import xref from './Xref';
 
 const decorators = [
   unsupported,
