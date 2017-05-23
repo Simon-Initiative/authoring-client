@@ -7,6 +7,7 @@ import { CodeBlock } from '../../../../data/content/html/codeblock';
 import { Table } from '../../../../data/content/html/table';
 import { YouTube } from '../../../../data/content/html/youtube';
 import { Audio } from '../../../../data/content/html/audio';
+import { Image as ImageData } from '../../../../data/content/html/image';
 import { Video } from '../../../../data/content/html/video';
 import { IFrame } from '../../../../data/content/html/iframe';
 
@@ -63,7 +64,7 @@ export function flowBlock() {
       command={insertBlock(EntityTypes.table, 'IMMUTABLE', { table: new Table() })} 
       tooltip="Insert table" icon="table"/>,
     <Button key="image" 
-      command={new commands.InsertMediaCommand(EntityTypes.image, 'image', 'image/*')} 
+      command={insertBlock(EntityTypes.image, 'IMMUTABLE', { image: new ImageData() })} 
       tooltip="Insert image" icon="image"/>,
     <Button key="audio" 
       command={insertBlock(EntityTypes.audio, 'IMMUTABLE', { audio: new Audio() })} 

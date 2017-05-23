@@ -1,6 +1,6 @@
 
 import Audio from './Audio';
-import { Image } from './Image';
+import Image from './Image';
 import Video from './Video';
 import YouTube from './YouTube';
 import IFrame from './IFrame';
