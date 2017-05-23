@@ -1092,7 +1092,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     lObjectiveTest.forEach(function (item: any) {
       if (!isNullOrUndefined(item.objective)) {
         newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
-        console.log("New DAta " + JSON.stringify(newData));
+        //console.log("New Data " + JSON.stringify(newData));
       }
     });
 

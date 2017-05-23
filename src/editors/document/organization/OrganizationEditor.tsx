@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
@@ -86,40 +87,23 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-      //console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
-      //console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
+
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
         _id: this.props.model.guid,
         model: this.props.model
       });
-        
-      console.log ("Tree data: " + JSON.stringify (this.props.model.organization));  
-        
+                
       this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
-      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
-      //       console.log ("course: " + JSON.stringify (course));
-      //       let orgObject=course ["model"]["organizations"];
-      //       let orgDocId=orgObject.get (0);
-      //
-      //       persistence.retrieveDocument(orgDocId).then(doc => {
-      //         //console.log ("Org data: " + JSON.stringify (doc ["model"]));
-      //
-      //         this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
-      //       });
-      //
-      //       let loObject=course ["model"]["learningobjectives"];
-      //       let logDocId=loObject.get (0);
-      //
-      //       persistence.retrieveDocument(logDocId).then(loDoc => {
-      //         this.setState ({los: loDoc ["model"]["los"]});
-      //       });
-      //   });
         
-      this.loadLearningObjectives ();  
+      this.loadLearningObjectives ();
+        
       this.loadActivities ();
     }
     
+    /**
+     * 
+     */
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
             
@@ -139,18 +123,19 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       })  
     }    
     
+    /**
+     * 
+     */
     loadActivities () : void {
       console.log ("loadActivities ()");
             
       let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
   
       resourceList.map((value, id) => {        
-        if (value.type=="x-oli-learning_objectives") {
+        if (value.type=="x-oli-inline-assessment") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
           {
-            //console.log ("LO document: " + JSON.stringify (loDocument));
-            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.los});
+
           });
         }          
       })  
