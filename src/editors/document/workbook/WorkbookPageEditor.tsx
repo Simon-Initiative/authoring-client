@@ -9,6 +9,11 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
 
+import * as persistence from '../../../data/persistence';
+import {Resource} from "../../../data/resource";
+
+import LearningObjectiveLinker from '../../../components/LinkerDialog';
+
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
 import * as models from '../../../data/models';
@@ -23,7 +28,8 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
-  
+  modalIsOpen : boolean;
+  los: any;  
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -31,9 +37,31 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorState> {
     
   constructor(props) {
-    super(props, {});
+    super(props, {modalIsOpen: false, los: new Array()});
   }
 
+  componentDidMount() {                    
+      console.log ("componentDidMount ()");
+      
+      this.loadLearningObjectives ();
+  }        
+    
+  loadLearningObjectives () : void {
+    console.log ("loadLearningObjectives ()");
+            
+    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+    resourceList.map((value, id) => {        
+      if (value.type=="x-oli-learning_objectives") {
+        persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+        {
+          //console.log ("LO document: " + JSON.stringify (loDocument));
+          let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+          this.setState ({los: loModel.los});
+        });
+      }          
+    })  
+  }  
 
   onEdit(property : string, content : any) {
 
@@ -49,11 +77,44 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       
     this.props.onEdit(model);
   }
+    
+  /**
+   * 
+   */
+  closeModal () {
+    console.log ("closeModal ()");
+        
+    //this.saveToDB ();
+  }     
 
+  /**
+   * 
+   */
+  linkLO() {        
+    console.log ("linkLO ()");
+    console.log ("course id: " +  this.props.context.courseId);  
+                 
+    this.setState ({modalIsOpen: true});
+  }
+        
+  /**
+   * 
+   */
+  createLinkerDialog () {           
+    if (this.state.los!=null) {            
+      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.state.los} modalIsOpen={this.state.modalIsOpen} target={new Object()} />);
+    } else {
+      console.log ("Internal error: learning objectives object can be empty but not null");
+    }
+                   
+    return (<div></div>);           
+  }    
+    
   render() {
 
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const lolinker = this.createLinkerDialog ();    
 
     return (
       <div>
@@ -64,6 +125,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             model={this.props.model.head.title}
             onEdit={c => this.onEdit('title', c)} 
             />
+                
+          <a className="btn btn-secondary" href="#" onClick={e => this.linkLO ()}>+ Learning Objective</a>
+
+          {lolinker}              
           
           <HtmlContentEditor 
               inlineToolbar={inlineToolbar}

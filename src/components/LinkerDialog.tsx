@@ -56,7 +56,8 @@ export interface LearningObjectiveLinkerProps {
   sourceData : any;
   modalIsOpen : boolean;    
   target: any;
-  closeModal: any;  
+  closeModal: any;
+  title?:string;  
 }
 
 export interface LearningObjectiveLinkerState {
@@ -78,6 +79,10 @@ class Item {
 */
 class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerProps, LearningObjectiveLinkerState> 
 {    
+  public static defaultProps: Partial<LearningObjectiveLinkerProps> = {
+    title: "Available Sources"
+  };
+        
   /**
    * 
    */    
@@ -321,7 +326,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
              contentLabel="Linker Dialog"
              style={customStyles}>
                <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                 <p className="h2" style={tempnavstyle.h2}>Available Skills</p>
+                 <p className="h2" style={tempnavstyle.h2}>{this.props.title}</p>
                  <a className="nav-link" href="#" onClick={e => this.checkAll ()}>Check All</a>
                  <a className="nav-link" href="#" onClick={e => this.reset ()}>Check None</a>
                  <a className="nav-link" href="#" onClick={e => this.checkInvert ()}>Check Invert</a>

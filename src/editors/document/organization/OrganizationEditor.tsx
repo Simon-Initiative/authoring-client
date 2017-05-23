@@ -86,8 +86,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-      console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
-      console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
+      //console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
+      //console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
         _id: this.props.model.guid,
@@ -115,7 +115,46 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       //         this.setState ({los: loDoc ["model"]["los"]});
       //       });
       //   });
+        
+      this.loadLearningObjectives ();  
+      this.loadActivities ();
     }
+    
+    loadLearningObjectives () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      console.log ("Resources: " + JSON.stringify (resourceList));  
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            //console.log ("LO document: " + JSON.stringify (loDocument));
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.los});
+          });
+        }          
+      })  
+    }    
+    
+    loadActivities () : void {
+      console.log ("loadActivities ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            //console.log ("LO document: " + JSON.stringify (loDocument));
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.los});
+          });
+        }          
+      })  
+    }     
     
     /**
      *
@@ -432,9 +471,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
       } else {
-        console.log ("Internal error: no skills object can be empty but not null");
+        console.log ("Internal error: learning objectives object can be empty but not null");
       }
                    
       return (<div></div>);           
