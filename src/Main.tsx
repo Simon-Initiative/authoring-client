@@ -94,10 +94,12 @@ class Main extends React.Component<MainProps, {}> {
     const modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
     const currentView = this.getView(this.props.view);
 
+    const logoutUrl = this.props.user !== null ? this.props.user.logoutUrl : '';
+
     return (
         <div>
             {modalDisplay}
-            <Header dispatch={this.props.dispatch}/>
+            <Header dispatch={this.props.dispatch} logoutUrl={logoutUrl}/>
 
             {currentView}
 
