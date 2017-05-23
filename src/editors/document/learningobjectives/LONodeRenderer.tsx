@@ -271,9 +271,10 @@ const styles = {
       'border' : '0px solid black',
       "overflowY": "hidden",
       "overflowX": "hidden",
-      "minWidth": "300px",      
-      "maxWidth": "340px",
-      'height' : '42px'
+      "minWidth": "350px",      
+      "maxWidth": "400px",
+      'height': '42px',
+      'line-height': '42px'
   }  
 };
 

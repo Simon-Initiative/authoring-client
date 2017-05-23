@@ -43,7 +43,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   modalIsOpen : boolean;
   model: any;
   context: AppContext;
-  los: any;
+  los: models.LearningObjectiveModel;
   orgTarget : any;
   document: any;
   documentId: string;
@@ -115,9 +115,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
           {
-            //console.log ("LO document: " + JSON.stringify (loDocument));
             let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.los});
+            this.setState ({los: loModel.with (this.state.los)});
           });
         }          
       })  
@@ -398,10 +397,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                 
         this.setState ({modalIsOpen: true, orgTarget: aNode});
     }    
-    
+
     /**
-     * 
-     */
+    * We need to move this to a utility class because there are different instances
+    * of it 
+    */
     toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
       console.log ("toFlat ()");
         
@@ -456,7 +456,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
       } else {
         console.log ("Internal error: learning objectives object can be empty but not null");
       }
