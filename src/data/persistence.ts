@@ -56,48 +56,60 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 
 export function getEditablePackages() : Promise<models.CourseModel[]> {
   return new Promise((resolve, reject) => {
-    fetch(`${configuration.baseUrl}/packages/editable`, {
-      method: 'GET',
-      headers: getHeaders(credentials),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      const courseModels: models.CourseModel[] = json.map((d) => {
-        return models.createModel(d);
-      });
-      resolve(courseModels as models.CourseModel[]);
-    })
-    .catch(err => reject(err));
+    
+    try {
+    
+      fetch(`${configuration.baseUrl}/packages/editable`, {
+        method: 'GET',
+        headers: getHeaders(credentials),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        const courseModels: models.CourseModel[] = json.map((d) => {
+          return models.createModel(d);
+        });
+        resolve(courseModels as models.CourseModel[]);
+      })
+      .catch(err => reject(err));
+
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
 export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
 
   return new Promise((resolve, reject) => {
-    fetch(`${configuration.baseUrl}/packages/${courseId}/details`, {
-      method: 'GET',
-      headers: getHeaders(credentials),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      resolve(new Document({
-        _courseId: courseId,
-        _id: json.guid,
-        _rev: json.rev,
-        model: models.createModel(json),
-      }));
-    })
-    .catch(err => reject(err));
+
+    try {
+      fetch(`${configuration.baseUrl}/packages/${courseId}/details`, {
+        method: 'GET',
+        headers: getHeaders(credentials),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        resolve(new Document({
+          _courseId: courseId,
+          _id: json.guid,
+          _rev: json.rev,
+          model: models.createModel(json),
+        }));
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
@@ -106,60 +118,67 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
     throw 'courseId cannot be null';
   }
   return new Promise((resolve, reject) => {
-    fetch(`${configuration.baseUrl}/${courseId}/resources/${documentId}`, {
-      method: 'GET',
-      headers: getHeaders(credentials),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      json.courseId = courseId;
-      resolve(new Document({
-        _courseId: courseId,
-        _id: json.guid,
-        _rev: json.rev,
-        model: models.createModel(json),
-      }));
-    })
-    .catch(err => reject(err));
+    try {
+      fetch(`${configuration.baseUrl}/${courseId}/resources/${documentId}`, {
+        method: 'GET',
+        headers: getHeaders(credentials),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        json.courseId = courseId;
+        resolve(new Document({
+          _courseId: courseId,
+          _id: json.guid,
+          _rev: json.rev,
+          model: models.createModel(json),
+        }));
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
 export function listenToDocument(doc: Document): Promise<Document> {
   
   return new Promise((resolve, reject) => {
-
-    const params = {
-      doc_ids: [doc._id],
-    };
-    fetch(`${configuration.baseUrl}/polls?timeout=30000&include_docs=true&filter=_doc_ids`, {
-      method: 'POST',
-      headers: getHeaders(credentials),
-      body: JSON.stringify(params),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      if (json.payload !== undefined && json.payload) {
-        resolve(new Document({
-          _courseId: doc._courseId,
-          _id: json.payload.guid,
-          _rev: json.payload.rev,
-          model: models.createModel(json.payload.doc),
-        }));
-      } else {
-        reject('empty');
-      }
-    })
-    .catch(err => reject(err));
+    try {
+      const params = {
+        doc_ids: [doc._id],
+      };
+      fetch(`${configuration.baseUrl}/polls?timeout=30000&include_docs=true&filter=_doc_ids`, {
+        method: 'POST',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(params),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        if (json.payload !== undefined && json.payload) {
+          resolve(new Document({
+            _courseId: doc._courseId,
+            _id: json.payload.guid,
+            _rev: json.payload.rev,
+            model: models.createModel(json.payload.doc),
+          }));
+        } else {
+          reject('empty');
+        }
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
@@ -174,64 +193,74 @@ export function createDocument(
   }
 
   return new Promise((resolve, reject) => {
-    fetch(url, {
-      method: 'POST',
-      headers: getHeaders(credentials),
-      body: JSON.stringify(content.toPersistence()),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then((json) => {
-      const packageGuid = content.type === 'x-oli-package' ? json.guid : courseId;
-      resolve(new Document({
-        _courseId: packageGuid,
-        _id: json.guid,
-        _rev: json.rev,
-        model: content,
-      }));
-    })
-    .catch(err => reject(err));
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(content.toPersistence()),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        const packageGuid = content.type === 'x-oli-package' ? json.guid : courseId;
+        resolve(new Document({
+          _courseId: packageGuid,
+          _id: json.guid,
+          _rev: json.rev,
+          model: content,
+        }));
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
 export function persistDocument(doc: Document): Promise<Document> {
     
   return new Promise((resolve, reject) => {
-    let url = null;
-    if (doc.model.type === 'x-oli-package') {
-      url = `${configuration.baseUrl}/packages/${doc._courseId}`;
-    } else {
-      url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
-    }
-    
-    const toPersist = doc.model.toPersistence();
-    fetch(url, {
-      method: 'PUT',
-      headers: getHeaders(credentials),
-      body: JSON.stringify(toPersist),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error(response.statusText);
+
+    try {
+
+      let url = null;
+      if (doc.model.type === 'x-oli-package') {
+        url = `${configuration.baseUrl}/packages/${doc._courseId}`;
+      } else {
+        url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
       }
-      return response.json();
-    })
-    .then((json) => {
+      
+      const toPersist = doc.model.toPersistence();
+      fetch(url, {
+        method: 'PUT',
+        headers: getHeaders(credentials),
+        body: JSON.stringify(toPersist),
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((json) => {
 
-      const newDocument = new Document({
-        _courseId: doc._courseId,
-        _id: json.guid,
-        _rev: json.rev,
-        model: doc.model,
-      });
+        const newDocument = new Document({
+          _courseId: doc._courseId,
+          _id: json.guid,
+          _rev: json.rev,
+          model: doc.model,
+        });
 
-      resolve(newDocument);
-    })
-    .catch(err => reject(err));
+        resolve(newDocument);
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
 }
 
@@ -244,30 +273,33 @@ export function createWebContent(
   courseId: string, file) : Promise<string> {
   
   return new Promise((resolve, reject) => {
-
-    const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
-    
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-
-      fetch(url, {
-        method: 'POST',
-        headers: getFormHeaders(credentials),
-        body: formData,
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        }
-        return response.json();
-      })
-      .then((json) => {
-        resolve(json.path);
-      })
-      .catch(err => reject(err));
+      const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
       
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+
+        fetch(url, {
+          method: 'POST',
+          headers: getFormHeaders(credentials),
+          body: formData,
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          return response.json();
+        })
+        .then((json) => {
+          resolve(json.path);
+        })
+        .catch(err => reject(err));
+        
+      } catch (err) {
+        reject(err);
+      }
     } catch (err) {
       reject(err);
     }
@@ -348,16 +380,22 @@ function lock(courseId: CourseId, id: DocumentId, action: string): Promise<Objec
 
 export function fetchCourseResources(courseId: string) : Promise<CourseResource[]> {
   return new Promise((resolve, reject) => {
-    retrieveCoursePackage(courseId)
-    .then((doc) => {
-      switch (doc.model.modelType) {
-        case 'CourseModel':
-          return doc.model.resources.toArray().map(
-            (r : Resource) => ({ _id: r.id, title: r.title, type: r.type }));
-        default:
-      }
-    })
-    .catch(err => reject(err));
+    
+    try {
+    
+      retrieveCoursePackage(courseId)
+      .then((doc) => {
+        switch (doc.model.modelType) {
+          case 'CourseModel':
+            return doc.model.resources.toArray().map(
+              (r : Resource) => ({ _id: r.id, title: r.title, type: r.type }));
+          default:
+        }
+      })
+      .catch(err => reject(err));
+    } catch (err) {
+      reject(err);
+    }
   });
   
 }
