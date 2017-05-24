@@ -165,6 +165,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
+    /*
     saveToDB (newData?:any): void {
       console.log ("saveToDB ()");
         
@@ -191,7 +192,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           });
         });
       }      
-    }      
+    } 
+    */  
+    
+    onEdit(newData?:any) {
+        
+      let newModel  
+
+      if (newData) {
+        newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
+      } else {
+        newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+      }  
+              
+      this.props.onEdit(newModel);
+    }    
 
     /**
      * This method is called by the tree component and even though we could access
@@ -201,7 +216,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
                     
-      this.saveToDB (newData ["treeData"]);      
+      this.onEdit (newData ["treeData"]);      
     }    
 
     /**
@@ -252,7 +267,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         this.setState ({titleIndex: this.state.titleIndex+1});
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }    
 
     /**
@@ -312,7 +327,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }
     
     /**
@@ -348,7 +363,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.saveToDB (immutableHelper);         
+        this.onEdit (immutableHelper);         
     }    
         
     /**
@@ -385,7 +400,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.saveToDB (immutableHelper);   
+        this.onEdit (immutableHelper);   
     }
     
     /**
@@ -448,7 +463,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     closeModal () {
       console.log ("LearningObjectiveEditor: closeModal ()");
         
-      this.saveToDB ();
+      this.onEdit ();
     }    
     
     /**
