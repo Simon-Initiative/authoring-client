@@ -1078,21 +1078,10 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     let newTitle: string = "";
     let newId: string = loObject ["@id"];
 
-    //for (var i in loObject) {
-    //   if (i == "title") {
-    //     newTitle = loObject ["title"]["#text"];
-    //   }
-
-    //if (i == "objectives") {
-    //console.log("Found objectives, parsing ...");
-    // let loRoot = loObject [i];
-
-    //for (var j = 0; j < loRoot ["#array"].length; j++) {
     let lObjectiveTest = loObject ["#array"];//[j];
     lObjectiveTest.forEach(function (item: any) {
       if (!isNullOrUndefined(item.objective)) {
         newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
-        //console.log("New Data " + JSON.stringify(newData));
       }
     });
 
@@ -1104,7 +1093,8 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     //}
     //}
     //}LearningObjectiveModel.reparent(newData)
-    let model = new LearningObjectiveModel({'los': newData});
+    //let model = new LearningObjectiveModel({'los': newData});
+    let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent (newData)});
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
