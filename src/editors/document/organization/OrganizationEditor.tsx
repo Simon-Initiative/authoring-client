@@ -200,9 +200,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       let newModel  
 
       if (newData) {
-        newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
+        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,newData);
       } else {
-        newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
       }  
               
       this.props.onEdit(newModel);
