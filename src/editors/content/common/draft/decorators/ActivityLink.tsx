@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Decorator, byType } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 
-class Link extends React.PureComponent<any, any> {
+class ActivityLink extends React.PureComponent<any, any> {
 
   a: any;
 
@@ -16,12 +16,14 @@ class Link extends React.PureComponent<any, any> {
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const href = data['@href'];
+    const idref = data['@idref'];
+    const jumpto = data['@jumpto'];
+    const purpose = data['@purpose'];
     const target = data['@target'] === 'new' ? '_blank' : '_self';
     return (
       <a data-offset-key={this.props.offsetKey} 
         ref={a => this.a = a} data-toggle="tooltip" 
-        data-placement="top" title={href} target={target} href={href}>
+        data-placement="top" title={purpose} target={target} href={idref}>
         {this.props.children}
       </a>
     );
@@ -31,7 +33,7 @@ class Link extends React.PureComponent<any, any> {
 export default function (props: Object) : Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.link),
-    component: Link,
+    component: ActivityLink,
     props,
   };
 }

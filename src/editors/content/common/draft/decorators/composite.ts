@@ -5,13 +5,17 @@ import link from './Link';
 import cite from './Cite';
 import formula from './Formula';
 import inputRef from './InputRef';
+import activityLink from './ActivityLink';
+import xref from './Xref';
 
 const decorators = [
   unsupported,
   link,
   cite,
   formula, 
-  inputRef
+  inputRef,
+  activityLink,
+  xref,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

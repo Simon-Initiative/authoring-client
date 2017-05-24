@@ -42,6 +42,8 @@ type EntityHandler = (
   s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) => Object;
 
 const entityHandlers = {
+  activity_link,
+  xref,
   link,
   formula,
   input_ref,
@@ -856,6 +858,30 @@ function translateInlineStyle(
 
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+
+  data['#array'] = [];
+  
+  const item = {};
+  item[type] = data;
+  
+  return item;
+}
+
+function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+
+  data['#array'] = [];
+  
+  const item = {};
+  item[type] = data;
+  
+  return item;
+}
+
+function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data, type } = entityMap[s.key];
 

@@ -6,6 +6,7 @@ import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
 import { Table } from './table';
 import { Audio } from './audio';
+import { Image } from './image';
 import { IFrame } from './iframe';
 import { Video } from './video';
 import { YouTube } from './youtube';
@@ -51,6 +52,7 @@ const blockHandlers = {
   codeblock,
   table,
   audio,
+  image: imageBlock,
   iframe,
   video,
   youtube,
@@ -63,7 +65,6 @@ const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
   activity_link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.activity_link),
   xref: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.xref),
-  wb_manual: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.wb_manual),
   link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.link),
   cite: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.cite),
   em,
@@ -73,7 +74,7 @@ const inlineHandlers = {
   sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
-  image: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.image),
+  image: imageInline,
   math: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.formula),
   quote: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
@@ -137,6 +138,23 @@ function insertEntity(
   };
 }
 
+function imageInline(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+
+  const image = Image.fromPersistence(item, '');
+  
+  context.draft.entityMap[key] = {
+    type: common.EntityTypes.image,
+    mutability: 'IMMUTABLE',
+    data: { image },
+  };
+}
+
 function wb_inline(item: Object, context: ParsingContext) {
   const wb = WbInline.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
@@ -152,6 +170,12 @@ function audio(item: Object, context: ParsingContext) {
 
   const audio = Audio.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.audio, { audio }, context);
+}
+
+function imageBlock(item: Object, context: ParsingContext) {
+
+  const image = Image.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.image, { image }, context);
 }
 
 function video(item: Object, context: ParsingContext) {
