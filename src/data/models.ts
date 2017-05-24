@@ -12,6 +12,7 @@ import {LearningObjective} from "./los";
 import {OrgContentTypes, OrgItem, OrgModule, OrgOrganization, OrgSection, OrgSequence} from "./org";
 import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
+import {UserInfo} from "./user_info";
 
 
 export type EmptyModel = 'EmptyModel';
@@ -68,7 +69,8 @@ export type CourseModelParams = {
   options?: string,
   icon?: WebContent,
   resources?: Immutable.OrderedMap<string, Resource>,
-  webContents?: Immutable.OrderedMap<string, WebContent>
+  webContents?: Immutable.OrderedMap<string, WebContent>,
+  userInfos?: Immutable.OrderedMap<string, UserInfo>
 };
 
 const defaultCourseModel = {
@@ -84,7 +86,8 @@ const defaultCourseModel = {
   options: '',
   icon: new WebContent(),
   resources: Immutable.OrderedMap<string, Resource>(),
-  webContents: Immutable.OrderedMap<string, WebContent>()
+  webContents: Immutable.OrderedMap<string, WebContent>(),
+  userInfos: Immutable.OrderedMap<string, UserInfo>()
 }
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
@@ -101,6 +104,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   icon: WebContent;
   resources: Immutable.OrderedMap<string, Resource>;
   webContents: Immutable.OrderedMap<string, WebContent>;
+  userInfos: Immutable.OrderedMap<string, UserInfo>;
 
   constructor(params?: CourseModelParams) {
     params ? super(params) : super();
@@ -121,22 +125,28 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     model = model.with({type: c.type});
     model = model.with({description: c.description});
     model = model.with({options: JSON.stringify(c.options)});
-    if (c.metadata.jsonObject) {
+    if (!isNullOrUndefined(c.metadata.jsonObject)) {
       model = model.with({metadata: MetaData.fromPersistence(c.metadata.jsonObject)});
     }
-    if (c.icon) {
+    if (!isNullOrUndefined(c.icon)) {
       model = model.with({icon: WebContent.fromPersistence(c.icon)});
     }
-    if (c.resources) {
+    if (!isNullOrUndefined(c.resources)) {
       c.resources.forEach(item => {
         const id = item.guid;
         model = model.with({resources: model.resources.set(id, Resource.fromPersistence(item))});
       });
     }
-    if (c.webContents) {
+    if (!isNullOrUndefined(c.webContents)) {
       c.webContents.forEach(item => {
         const id = item.guid;
         model = model.with({webContents: model.webContents.set(id, WebContent.fromPersistence(item))});
+      });
+    }
+    if(!isNullOrUndefined(c.developers)){
+      c.developers.forEach(item => {
+        const userName = item.userName;
+        model = model.with({userInfos: model.userInfos.set(userName, UserInfo.fromPersistence(item))});
       });
     }
     return model;
