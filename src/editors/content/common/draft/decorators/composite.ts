@@ -3,7 +3,7 @@ import { CompositeDecorator } from 'draft-js';
 import unsupported from './Unsupported';
 import link from './Link';
 import cite from './Cite';
-import formula from './Formula';
+import math from './Math';
 import inputRef from './InputRef';
 import activityLink from './ActivityLink';
 import xref from './Xref';
@@ -13,7 +13,7 @@ const decorators = [
   unsupported,
   link,
   cite,
-  formula, 
+  math, 
   inputRef,
   activityLink,
   xref,

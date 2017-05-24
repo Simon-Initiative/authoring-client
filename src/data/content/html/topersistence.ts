@@ -45,7 +45,7 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
-  formula,
+  math,
   input_ref,
   cite,
   quote,
@@ -938,10 +938,10 @@ function quote(s : common.RawEntityRange, text : string, entityMap : common.RawE
   return item;
 }
 
-function formula(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  return { math: { '#cdata': data['#cdata'] } };
+  return { 'm:math': { '#cdata': data['#cdata'] } };
 }
 
 function translateInlineEntity(

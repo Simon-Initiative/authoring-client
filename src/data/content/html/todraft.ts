@@ -91,7 +91,7 @@ const inlineHandlers = {
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
   image: imageInline,
-  math: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.formula),
+  'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
   quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
 };

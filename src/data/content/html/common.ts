@@ -44,6 +44,7 @@ export const EntityTypes = types.strEnum([
   'activity_link',
   'code',
   'formula',
+  'math',
   'quote',
   'bdo',
   'link',

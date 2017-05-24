@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { Decorator, byType } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
-import { Math } from '../../../../../utils/math/Math';
+import { Math as MathRenderer } from '../../../../../utils/math/Math';
 import { ContentState, Entity } from 'draft-js';
 
 import { AppServices } from '../../../../common/AppServices';
 
 import { ModalMathEditor } from '../../../../../utils/math/ModalMathEditor';
 
-interface Formula {
+interface Math {
   _onClick: any;
 }
 
-interface FormulaProps {
+interface MathProps {
   
   services: AppServices;
   offsetKey: string;
@@ -21,7 +21,7 @@ interface FormulaProps {
   onEdit: () => void;
 }
 
-class Formula extends React.PureComponent<FormulaProps, any> {
+class Math extends React.PureComponent<MathProps, any> {
 
   constructor(props) {
     super(props);
@@ -48,18 +48,18 @@ class Formula extends React.PureComponent<FormulaProps, any> {
 
         this.props.services.dismissModal();
 
-      }}/>
+      }}/>;
 
     this.props.services.displayModal(editor);
   }
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const math = data["#cdata"];
+    const math = data['#cdata'];
 
     return (
       <span onClick={this._onClick} data-offset-key={this.props.offsetKey}>
-        <Math inline>{math}</Math>
+        <MathRenderer inline>{math}</MathRenderer>
       </span>
     );
   }
@@ -68,8 +68,8 @@ class Formula extends React.PureComponent<FormulaProps, any> {
 
 export default function(props: Object) : Decorator {
   return {
-    strategy: byType.bind(undefined, EntityTypes.formula),
-    component: Formula,
-    props
+    strategy: byType.bind(undefined, EntityTypes.math),
+    component: Math,
+    props,
   };
 };
