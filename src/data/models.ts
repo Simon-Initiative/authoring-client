@@ -608,10 +608,17 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   /**
    *
    */
-  static updateModel(newTopLevel: OrgOrganization, newOrgModel: any): OrganizationModel {
+  static updateModel(oldModel: OrganizationModel, newTopLevel: OrgOrganization, newOrgModel: any): OrganizationModel {
     console.log("updateModel ()");
-    var newModel = new OrganizationModel({'toplevel': newTopLevel, 'organization': newOrgModel});
-    return newModel;
+    var model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newOrgModel});
+    model = model.with({resource: oldModel.resource});
+    model = model.with({guid: oldModel.guid});
+    model = model.with({type: oldModel.type});
+    model = model.with({title: oldModel.title});
+    if (oldModel.lock !== undefined && oldModel.lock !== null) {
+      model = model.with({lock: oldModel.lock});
+    }
+    return model;
   }
 
   /**
@@ -777,7 +784,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     console.log("toplevel: " + JSON.stringify(newTopLevel));
     console.log("newData: " + JSON.stringify(newData));
 
-    let model = (OrganizationModel.updateModel(newTopLevel, newData));
+    let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});//(OrganizationModel.updateModel(newTopLevel, newData));
 
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
@@ -894,8 +901,10 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     var formattedOrganization = JSON.stringify(orgRoot ["organization"]);    
     console.log("To: " + formattedOrganization);
       
-    let resource = this.resource.toPersistence();      
-    let doc = [{orgRoot: ["organization"]}];
+    let resource = this.resource.toPersistence();
+    let doc = [{
+      "organization":orgRoot["organization"]
+    }];
 
     const root = {
       "doc": doc
