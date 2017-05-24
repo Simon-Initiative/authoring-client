@@ -112,6 +112,8 @@ function translateBlock(
     translateCodeBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isQuoteBlock(rawBlock)) {
     translateQuoteBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isBasicCodeBlock(rawBlock)) {
+    translateBasicCodeBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isFormulaBlock(rawBlock)) {
     translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
@@ -195,6 +197,11 @@ function isQuoteBlock(block : common.RawContentBlock) : boolean {
 function isFormulaBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (type === 'formula');
+}
+
+function isBasicCodeBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type === 'code');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
@@ -558,6 +565,20 @@ function translateFormulaBlock(
     const p = { formula: { '#array': [] } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.formula['#array']);
+  }
+
+}
+
+function translateBasicCodeBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    top(context).push({ code: { '#text': rawBlock.text } });
+  } else {
+    const p = { code: { '#array': [] } };
+    top(context).push(p);
+    translateTextBlock(rawBlock, block, entityMap, p.code['#array']);
   }
 
 }

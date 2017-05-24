@@ -60,7 +60,7 @@ const blockHandlers = {
   image: imageBlock,
   formula: formulaBlock,
   quote: quoteBlock,
-  // code: codeBlock,
+  code: codeBlock,
   iframe,
   video,
   youtube,
@@ -91,6 +91,7 @@ const inlineHandlers = {
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
   image: imageInline,
+  formula: formulaInline,
   'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
   quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
@@ -187,6 +188,14 @@ function imageInline(
   };
 }
 
+function formulaInline(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  // Do nothing for now, this effectively strips out the inline
+  // formula tag on save
+}
+
 function wb_inline(item: Object, context: ParsingContext) {
   const wb = WbInline.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
@@ -235,6 +244,26 @@ function formulaBlock(item: Object, context: ParsingContext) {
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
     type: 'formula',
+  });
+}
+
+function codeBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'code',
   });
 }
 

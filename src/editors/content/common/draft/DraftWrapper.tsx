@@ -122,7 +122,7 @@ const blockRenderMap = Immutable.Map({
   'header-five': { element: 'h5' },
   'header-six': { element: 'h6' },
   'blockquote': { element: 'blockquote' },
-  'code-block': { element: 'pre' },
+  'code': { element: 'pre' },
   'atomic': { element: 'div' },
   'unordered-list-item': { element: 'li' },
   'ordered-list-item': { element: 'li' },
@@ -611,6 +611,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const type = contentBlock.getType();
     if (type === 'formula') {
       return 'formulaDiv';
+    } else if (type === 'code') {
+      return 'codeDiv';
     }
   }
 
