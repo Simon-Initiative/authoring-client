@@ -1,6 +1,7 @@
 'use strict'
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
@@ -10,8 +11,11 @@ import { ContentEditor } from '../../content/content/ContentEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { Toolbar } from './Toolbar';
 import * as models from '../../../data/models';
+import {Resource} from "../../../data/resource";
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
+import * as persistence from '../../../data/persistence';
+import LearningObjectiveLinker from '../../../components/LinkerDialog';
 
 interface AssessmentEditor {
   
@@ -22,7 +26,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-  
+  modalIsOpen : boolean;
+  skillModel: models.SkillModel;
 }
 
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
@@ -30,13 +35,35 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   constructor(props) {
-    super(props, ({} as AssessmentEditorState));
+    super(props, ({modalIsOpen: false, skillModel: new models.SkillModel} as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
     this.onAddQuestion = this.onAddQuestion.bind(this);
   }
 
+  componentDidMount() {                    
+      console.log ("componentDidMount ()");
+      
+      this.loadSkills ();
+  }     
+    
+  loadSkills () : void {
+    console.log ("loadSkills ()");
+            
+    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+    resourceList.map((value, id) => {        
+      if (value.type=="x-oli-skills") {
+        persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
+        {
+          let aSkillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
+          this.setState ({skillModel: aSkillModel.with (this.state.skillModel)});
+        });
+      }          
+    })  
+  }     
+    
   onEdit(guid : string, content : models.Node) {
     const nodes = this.props.model.nodes.set(guid, content);
     this.handleEdit(this.props.model.with({nodes}));
@@ -100,10 +127,43 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
   }
 
+  /**
+   * 
+   */
+  closeModal () {
+    console.log ("closeModal ()");
+        
+    //this.saveToDB ();
+  }     
+
+  /**
+   * 
+   */
+  onAddSkills() {        
+    console.log ("onAddSkills ()");
+                 
+    this.setState ({modalIsOpen: true});
+  }
+
+  /**
+   * 
+   */
+  createLinkerDialog () {           
+    if (this.state.skillModel!=null) {            
+      return (<LearningObjectiveLinker title="Available Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skillModel.skills} modalIsOpen={this.state.modalIsOpen} target={new Object()} />);
+    } else {
+      console.log ("Internal error: skill model object can be empty but not null");
+    }
+                   
+    return (<div></div>);           
+  }  
+
   render() {
 
     const titleEditor = this.renderTitle();
     const nodeEditors = this.props.model.nodes.toArray().map(n => this.renderNode(n));
+    const skilllinker = this.createLinkerDialog ();    
+    
     return (
       <div>
         <div className="docHead">
@@ -115,7 +175,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           {titleEditor}
           <button type="button" className="btn btn-secondary" onClick={this.onAddContent}>Add Content</button>
           <button type="button" className="btn btn-secondary" onClick={this.onAddQuestion}>Add Question</button>
+          <button type="button" className="btn btn-secondary" onClick={this.onAddSkills}>Add Skills</button>
         </div>
+        {skilllinker} 
         {nodeEditors}
       </div>);
     

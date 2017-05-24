@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
@@ -42,7 +43,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   modalIsOpen : boolean;
   model: any;
   context: AppContext;
-  los: any;
+  los: models.LearningObjectiveModel;
   orgTarget : any;
   document: any;
   documentId: string;
@@ -86,36 +87,58 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-      console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
-      console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
+
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
         _id: this.props.model.guid,
         model: this.props.model
       });
-        
-      console.log ("Tree data: " + JSON.stringify (this.props.model.organization));  
-        
+                
       this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
-      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
-      //       console.log ("course: " + JSON.stringify (course));
-      //       let orgObject=course ["model"]["organizations"];
-      //       let orgDocId=orgObject.get (0);
-      //
-      //       persistence.retrieveDocument(orgDocId).then(doc => {
-      //         //console.log ("Org data: " + JSON.stringify (doc ["model"]));
-      //
-      //         this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
-      //       });
-      //
-      //       let loObject=course ["model"]["learningobjectives"];
-      //       let logDocId=loObject.get (0);
-      //
-      //       persistence.retrieveDocument(logDocId).then(loDoc => {
-      //         this.setState ({los: loDoc ["model"]["los"]});
-      //       });
-      //   });
+        
+      this.loadLearningObjectives ();
+        
+      this.loadActivities ();
     }
+    
+    /**
+     * 
+     */
+    loadLearningObjectives () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      console.log ("Resources: " + JSON.stringify (resourceList));  
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.with (this.state.los)});
+          });
+        }          
+      })  
+    }    
+    
+    /**
+     * 
+     */
+    loadActivities () : void {
+      console.log ("loadActivities ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-inline-assessment") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+
+          });
+        }          
+      })  
+    }     
     
     /**
      *
@@ -142,6 +165,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
+    /*
     saveToDB (newData?:any): void {
       console.log ("saveToDB ()");
         
@@ -168,7 +192,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           });
         });
       }      
-    }      
+    } 
+    */  
+    
+    onEdit(newData?:any) {
+        
+      let newModel  
+
+      if (newData) {
+        newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
+      } else {
+        newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
+      }  
+              
+      this.props.onEdit(newModel);
+    }    
 
     /**
      * This method is called by the tree component and even though we could access
@@ -178,7 +216,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
                     
-      this.saveToDB (newData ["treeData"]);      
+      this.onEdit (newData ["treeData"]);      
     }    
 
     /**
@@ -229,7 +267,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         this.setState ({titleIndex: this.state.titleIndex+1});
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }    
 
     /**
@@ -289,7 +327,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }
     
     /**
@@ -325,7 +363,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.saveToDB (immutableHelper);         
+        this.onEdit (immutableHelper);         
     }    
         
     /**
@@ -362,7 +400,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.saveToDB (immutableHelper);   
+        this.onEdit (immutableHelper);   
     }
     
     /**
@@ -374,10 +412,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                 
         this.setState ({modalIsOpen: true, orgTarget: aNode});
     }    
-    
+
     /**
-     * 
-     */
+    * We need to move this to a utility class because there are different instances
+    * of it 
+    */
     toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
       console.log ("toFlat ()");
         
@@ -424,7 +463,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     closeModal () {
       console.log ("LearningObjectiveEditor: closeModal ()");
         
-      this.saveToDB ();
+      this.onEdit ();
     }    
     
     /**
@@ -432,9 +471,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
       } else {
-        console.log ("Internal error: no skills object can be empty but not null");
+        console.log ("Internal error: learning objectives object can be empty but not null");
       }
                    
       return (<div></div>);           
