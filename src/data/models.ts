@@ -895,7 +895,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     console.log("To: " + formattedOrganization);
       
     let resource = this.resource.toPersistence();      
-    let doc = [{orgRoot ["organization"]}];
+    let doc = [{orgRoot: ["organization"]}];
 
     const root = {
       "doc": doc

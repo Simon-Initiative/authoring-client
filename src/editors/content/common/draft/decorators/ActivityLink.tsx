@@ -57,7 +57,9 @@ class ActivityLink extends React.PureComponent<any, any> {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const purpose = data['@purpose'];
     return (
-      <a data-offset-key={this.props.offsetKey} 
+      <a
+        className="editor-link" 
+        data-offset-key={this.props.offsetKey} 
         ref={a => this.a = a} data-toggle="tooltip" 
         data-placement="top" title={purpose} onClick={this.onClick}>
         {this.props.children}

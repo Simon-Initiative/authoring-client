@@ -130,6 +130,14 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 		display: inline-block;
 	}
 
+  .editor-link {
+		color: $color-blue !important;
+		cursor: pointer;
+		&.active {
+			color: $color-blue !important;
+		}
+	}
+
 	.docHead {
 		.btn {
 			padding: 5px 20px;
