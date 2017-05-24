@@ -8,7 +8,7 @@ import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
-
+import { UndoRedoToolbar } from './UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
@@ -77,7 +77,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       model = this.props.model.with({ body: content });
     }
       
-    this.props.onEdit(model);
+    this.handleEdit(model);
   }
     
   /**
@@ -146,6 +146,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     return (
       <div>
+          <UndoRedoToolbar 
+            undoEnabled={this.state.undoStackSize > 0}
+            redoEnabled={this.state.redoStackSize > 0}
+            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
           <TitleContentEditor 
             services={this.props.services}
             context={this.props.context}
