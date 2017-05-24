@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import {FileNode} from "./fileNode";
+import {FileNode} from "./file_node";
 
 export type WebContentParams = {
   rev: number,
