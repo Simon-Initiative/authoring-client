@@ -305,6 +305,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   render () {      
+    console.log ("Source data: " + JSON.stringify (this.state.sourceData)); 
+      
     var options = this.state.sourceData.map(function(item, index) {
                 
     return (

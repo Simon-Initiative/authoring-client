@@ -206,6 +206,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       }  
               
       this.props.onEdit(newModel);
+        
+      //this.setState ({treeData: newData}); 
     }    
 
     /**
@@ -218,6 +220,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                     
       this.onEdit (newData ["treeData"]);      
     }    
+    
+    /**
+     * 
+     */
+    componentWillReceiveProps (newProps:OrganizationEditorProps) {
+      this.setState({treeData: this.props.model.organization});  
+    }
 
     /**
      * 

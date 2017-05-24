@@ -56,10 +56,16 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       if (value.type=="x-oli-learning_objectives") {
         persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
         {
-          //console.log ("LO document: " + JSON.stringify (loDocument));
+          console.log ("LO document: " + JSON.stringify (loDocument));
           let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-          //this.setState ({los: loModel.los});
-          this.setState ({los: loModel.with (this.state.los)});
+          this.setState ({los: loModel}, function () {
+            console.log ("Verify: " + JSON.stringify (this.state.los));    
+          });
+          /*  
+          this.setState ({los: loModel.with (this.state.los)},function () {
+            console.log ("Verify: " + JSON.stringify (this.state.los));    
+          });
+          */
         });
       }          
     })  

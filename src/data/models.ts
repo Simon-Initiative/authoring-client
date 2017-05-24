@@ -1002,21 +1002,26 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       let testLO: LearningObjective = fromSet [i];
 
       // This LO has a parent, reparent ...
-      if ((testLO.parent != "") && (testLO.parent != "unassigned")) {
-        console.log("We have an LO with a parent: " + testLO.parent);
+      if (testLO.parent) {  
+        if ((testLO.parent != "") && (testLO.parent != "unassigned")) {
+          console.log("We have an LO with a parent: " + testLO.parent);
 
-        // this should be valid since we essentially have a clean fromSet
-        for (let j = 0; j < fromSet.length; j++) {
-          let tempLO: LearningObjective = fromSet [j];
+          // this should be valid since we essentially have a clean fromSet
+          for (let j = 0; j < fromSet.length; j++) {
+            let tempLO: LearningObjective = fromSet [j];
 
-          if (tempLO.id == testLO.parent) {
-            tempLO.children.push(testLO);
+            if (tempLO.id == testLO.parent) {
+              tempLO.children.push(testLO);
+            }
           }
+        } // This LO doesn't have a parent, just add it to the top-level array
+        else {
+          toSet.push(testLO);
         }
-      } // This LO doesn't have a parent, just add it to the top-level array
+      }  
       else {
         toSet.push(testLO);
-      }
+      }          
     }
 
     return (toSet);
@@ -1086,6 +1091,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   static fromPersistence(json: Object): LearningObjectiveModel {
 
     console.log("LearningObjectiveModel.fromPersistence: " + JSON.stringify(json));
+      
     let a = (json as any);
     //var obData=a.doc.objectives;
     let loObject: Array<Object> = a.doc ["objectives"];
@@ -1101,15 +1107,8 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       }
     });
 
-    // for (var k in lObjectiveTest) {
-    //   if (k == "objective") {
-    //     newData.push(LearningObjectiveModel.parseLearningObjective(lObjectiveTest [k]));
-    //   }
-    //}
-    //}
-    //}
-    //}LearningObjectiveModel.reparent(newData)
-    //let model = new LearningObjectiveModel({'los': newData});
+    console.log ("New data LO: " + JSON.stringify (newData));  
+      
     let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent (newData)});
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
