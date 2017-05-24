@@ -57,6 +57,9 @@ const blockHandlers = {
   table,
   audio,
   image: imageBlock,
+  // formula: formulaBlock,
+  quote: quoteBlock,
+  // code: codeBlock,
   iframe,
   video,
   youtube,
@@ -86,7 +89,7 @@ const inlineHandlers = {
   var: applyStyle.bind(undefined, 'ITALIC'),
   image: imageInline,
   math: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.formula),
-  quote: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.quote),
+  quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
 };
 
@@ -95,7 +98,6 @@ function applyStyle(
   context: ParsingContext, workingBlock: WorkingBlock) {
   workingBlock.markups.push({ offset, length, style });
 }
-
 
 function em(
   offset: number, length: number, item: Object, 
@@ -191,6 +193,26 @@ function codeblock(item: Object, context: ParsingContext) {
 
   const codeblock = CodeBlock.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.codeblock, { codeblock }, context);
+}
+
+function quoteBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'blockquote',
+  });
 }
 
 function audio(item: Object, context: ParsingContext) {
@@ -340,6 +362,7 @@ function processInline(
     
     const offset = blockContext.fullText.length;
 
+    // TODO fix this in a more general way 
     if (key === 'math' || key === 'input_ref') {
       blockContext.fullText += ' ';
 

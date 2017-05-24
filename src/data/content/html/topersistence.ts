@@ -47,6 +47,7 @@ const entityHandlers = {
   link,
   formula,
   input_ref,
+  quote,
 };
 
 // Converts the draft ContentState object to the HtmlContent format
@@ -108,6 +109,8 @@ function translateBlock(
     translateTable(rawBlock, draftBlock, entityMap, context);
   } else if (isCodeBlock(rawBlock, entityMap)) {
     translateCodeBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isQuoteBlock(rawBlock)) {
+    translateQuoteBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
     translateWbInline(rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('audio', rawBlock, entityMap)) {
@@ -179,6 +182,11 @@ function getSentinelType(
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (type === 'unstyled');
+}
+
+function isQuoteBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type === 'blockquote');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
@@ -514,6 +522,20 @@ function translateParagraph(
     const p = { p: { '#array': [] } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.p['#array']);
+  }
+
+}
+
+function translateQuoteBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    top(context).push({ quote: { '#text': rawBlock.text } });
+  } else {
+    const p = { quote: { '#array': [] } };
+    top(context).push(p);
+    translateTextBlock(rawBlock, block, entityMap, p.quote['#array']);
   }
 
 }
@@ -887,6 +909,16 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+
+  const item = {};
+  item[type] = data;
+  
+  return item;
+}
+
+function quote(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data, type } = entityMap[s.key];
 

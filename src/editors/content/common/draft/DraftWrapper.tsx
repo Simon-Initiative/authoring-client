@@ -100,6 +100,9 @@ const styleMap = {
   TERM: {
     textDecoration: 'underline'
   },
+  QUOTE: {
+    fontStyle: 'italic'
+  },
   IPA: {
     // TODO
   },

@@ -232,6 +232,7 @@ addStyle('foreign', 'FOREIGN');
 addStyle('var', 'CODE');
 addStyle('sub', 'SUBSCRIPT');
 addStyle('sup', 'SUPERSCRIPT');
+addStyle('quote', 'QUOTE');
 
 export const emStyles = {
   bold: true,

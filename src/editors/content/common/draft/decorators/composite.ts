@@ -7,6 +7,7 @@ import formula from './Formula';
 import inputRef from './InputRef';
 import activityLink from './ActivityLink';
 import xref from './Xref';
+import quote from './Quote';
 
 const decorators = [
   unsupported,
@@ -16,6 +17,7 @@ const decorators = [
   inputRef,
   activityLink,
   xref,
+  quote,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

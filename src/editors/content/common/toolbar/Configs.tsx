@@ -44,6 +44,9 @@ export function flowInline() {
       tooltip="Term" icon="book"/>,
     <Button key="foreign" command={style('FOREIGN')} 
       tooltip="Foreign" icon="globe"/>,
+    <Button key="quote"
+      command={insertInline(EntityTypes.quote, 'MUTABLE', {})} 
+      tooltip="Quotation" icon="quote-right"/>,
     
     <Separator key="sep5"/>,
     
@@ -80,6 +83,9 @@ export function flowBlock() {
           EntityTypes.codeblock, 'IMMUTABLE', 
           { codeblock: new CodeBlock({ source: 'Your code here...' }) })} 
       tooltip="Code block" icon="code"/>,
+    <Button key="quoteblock" 
+      command={new commands.SetBlockTypeCommand('blockquote')} 
+      tooltip="Insert block quote" icon="quote-right"/>,
     <Button key="table" 
       command={insertBlock(EntityTypes.table, 'IMMUTABLE', { table: new Table() })} 
       tooltip="Insert table" icon="table"/>,
