@@ -58,7 +58,7 @@ const blockHandlers = {
   table,
   audio,
   image: imageBlock,
-  // formula: formulaBlock,
+  formula: formulaBlock,
   quote: quoteBlock,
   // code: codeBlock,
   iframe,
@@ -215,6 +215,26 @@ function quoteBlock(item: Object, context: ParsingContext) {
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
     type: 'blockquote',
+  });
+}
+
+function formulaBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'formula',
   });
 }
 

@@ -90,6 +90,9 @@ export function flowBlock() {
     <Button key="quoteblock" 
       command={new commands.SetBlockTypeCommand('blockquote')} 
       tooltip="Insert block quote" icon="quote-right"/>,
+    <Button key="formulablock" 
+      command={new commands.SetBlockTypeCommand('formula')} 
+      tooltip="Insert block formula" icon="plus"/>,
     <Button key="table" 
       command={insertBlock(EntityTypes.table, 'IMMUTABLE', { table: new Table() })} 
       tooltip="Insert table" icon="table"/>,
