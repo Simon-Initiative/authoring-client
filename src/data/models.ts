@@ -11,7 +11,7 @@ import {Skill} from "./skills";
 import {LearningObjective} from "./los";
 import {OrgContentTypes, OrgItem, OrgModule, OrgOrganization, OrgSection, OrgSequence} from "./org";
 import {isArray, isNullOrUndefined} from "util";
-import {assessmentTemplate} from "./activity_templates";
+import {assessmentTemplate} from "./activityTemplates";
 
 
 export type EmptyModel = 'EmptyModel';
