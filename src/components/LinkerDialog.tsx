@@ -127,33 +127,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       console.log ("No LO target given yet, bump");  
       return;
     }  
-      
-    /*
-    var newData = [];       
-      
-    // First reset everything so that we don't have to keep
-    // checking and comparing, we can just set it checked if
-    // we encounter the item
-    this.state.sourceData.forEach(function(resetItem) {
-       resetItem.checked=false; 
-       newData.push(resetItem);         
-    });      
-            
-    for (var i=0;i<this.state.target.annotations.length;i++) {    
-       let item=this.state.target.annotations [i];  
-       console.log ("Checking item: " + item); 
-        
-       for (var j=0;j<newData.length;j++) {
-         let sourceItem=newData [j];  
-         if (sourceItem.id==item) {
-            sourceItem.checked=true;
-         }
-       }
-    }
-      
-    this.setState({sourceData: newData});
-    */
-      
+
     var newData: Array <Item>=new Array ();
       
     // First reset everything so that we don't have to keep

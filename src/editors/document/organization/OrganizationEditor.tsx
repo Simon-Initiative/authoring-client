@@ -39,11 +39,13 @@ interface OrganizationEditor
 export interface OrganizationEditorState extends AbstractEditorState 
 {    
   treeData : any;  
-  orgData: OrgOrganization;  
-  modalIsOpen : boolean;
+  orgData: OrgOrganization;
+  loModalIsOpen : boolean;
+  pagesModalIsOpen : boolean;
   model: any;
   context: AppContext;
   los: models.LearningObjectiveModel;
+  pages: any;
   orgTarget : any;
   document: any;
   documentId: string;
@@ -73,11 +75,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         orgData: [],
         context: props.context,
         los: null,
+        pages: null,
         orgTarget: null,
         documentId: props.context.documentId,
         model: props.model,
         document: {},                
-        modalIsOpen: false,
+        loModalIsOpen: false,
+        pagesModalIsOpen: false, 
         titleIndex: 0
       });  
     }
@@ -97,6 +101,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
         
       this.loadLearningObjectives ();
+      
+      this.loadPages ();  
         
       this.loadActivities ();
     }
@@ -109,7 +115,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
       let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
   
-      console.log ("Resources: " + JSON.stringify (resourceList));  
+      //console.log ("Resources: " + JSON.stringify (resourceList));  
         
       resourceList.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
@@ -120,6 +126,28 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           });
         }          
       })  
+    }    
+
+    /**
+     * 
+     */
+    loadPages () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+
+      let pageList:Array<Linkable>=new Array <Linkable>();  
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-workbook_page") {
+          let pageLink:Linkable=new Linkable ();
+          pageLink.id=value.guid;
+          pageLink.title=value.title;
+          pageList.push (pageLink);             
+        }          
+      })  
+        
+      this.setState ({pages: pageList});  
     }    
     
     /**
@@ -150,12 +178,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         _id: this.props.model.guid,
         model: this.props.model
       });
-      this.setState({modalIsOpen: false, treeData: this.props.model.organization, document: docu});
+      this.setState({loModalIsOpen: false, treeData: this.props.model.organization, document: docu});
       //   persistence.retrieveDocument(anID).then(doc => {
       //
       //       console.log ("Loaded doc: " + JSON.stringify (doc));
       //
-      //       this.setState ({modalIsOpen: false, treeData: doc.model ["organization"],document: doc});
+      //       this.setState ({loModalIsOpen: false, treeData: doc.model ["organization"],document: doc});
       //       return (doc);
       //   });
       //
@@ -174,7 +202,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                      
         let updatedDocument=this.state.document.set ('model',newModel);
           
-        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {           
+        this.setState ({loModalIsOpen: false, 'document' : updatedDocument },function () {           
           persistence.persistDocument(this.state.document)
             .then(result => {                
               this.loadDocument (this.state.documentId);
@@ -185,7 +213,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                      
         let updatedDocument=this.state.document.set ('model',newModel);
 
-        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {         
+        this.setState ({loModalIsOpen: false, 'document' : updatedDocument },function () {         
           persistence.persistDocument(this.state.document)
             .then(result => {                
               this.loadDocument (this.state.documentId);
@@ -344,35 +372,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */    
     addPage (aNode:any): void {
         console.log ("LearningObjectiveEditor:addPage ()");
-                
-        let immutableHelper = this.state.treeData.slice();
-                
-        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
-        if (immutableHelper==null) {
-            console.log ("Bump");
-            return;
-        }
-        
-        if (parentArray!=null) {
-            console.log ("We have an object, performing edit ...");
-        }
-        else {
-           console.log ("Internal error: node not found in tree");
-        }
-                    
-        for (var i=0;i<parentArray.length;i++) {
-            let testNode:OrgItem=parentArray [i] as OrgItem;
-            
-            if (testNode.id==aNode.id) {
-                var newNode:OrgItem=new OrgItem ();
-                newNode.title=("Title " + this.state.titleIndex);
-                testNode.children.push (newNode);
-                break;
-            }
-        }
-            
-        this.onEdit (immutableHelper);         
+        this.linkPage (aNode);                         
     }    
         
     /**
@@ -415,11 +416,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
+    linkPage(aNode:any) {        
+        console.log ("OrganizationEditor:linkPage ()");
+        //console.log ("aNode: " + JSON.stringify (aNode));
+                
+        this.setState ({pagesModalIsOpen: true, orgTarget: aNode});
+    }     
+    
+    /**
+     * 
+     */
     linkLO(aNode:any) {        
         console.log ("OrganizationEditor:linkLO ()");
         //console.log ("aNode: " + JSON.stringify (aNode));
                 
-        this.setState ({modalIsOpen: true, orgTarget: aNode});
+        this.setState ({loModalIsOpen: true, orgTarget: aNode});
     }    
 
     /**
@@ -458,7 +469,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
-        optionalProps ["linkAnnotation"]=this.linkLO.bind (this);
+        optionalProps ["linkAnnotation"]=this.linkLO.bind (this);        
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
         optionalProps ["addPage"]=this.addPage.bind (this);
@@ -469,10 +480,47 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    closeModal () {
-      console.log ("LearningObjectiveEditor: closeModal ()");
+    closeLOModal () {
+      console.log ("LearningObjectiveEditor: closeLOModal ()");
         
       this.onEdit ();
+    }
+    
+    /**
+     * 
+     */
+    closePagesModal () {
+      console.log ("LearningObjectiveEditor: closePagesModal ()");
+        
+      let immutableHelper = this.state.treeData.slice();
+                
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
+        
+      if (immutableHelper==null) {
+        console.log ("Bump");
+        return;
+      }
+        
+      if (parentArray!=null) {
+        console.log ("We have an object, performing edit ...");
+      } else {
+        console.log ("Internal error: node not found in tree");
+      }
+                    
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==this.state.orgTarget.id) {
+          var newNode:OrgItem=new OrgItem ();
+          newNode.title=("Title " + this.state.titleIndex);
+          testNode.children.push (newNode);
+          break;
+        }
+      }
+            
+      this.onEdit (immutableHelper);        
+        
+      //this.onEdit ();
     }    
     
     /**
@@ -480,13 +528,26 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createLinkerDialog () {           
       if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closePagesModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.pagesModalIsOpen} target={this.state.orgTarget} />);
       } else {
         console.log ("Internal error: learning objectives object can be empty but not null");
       }
                    
       return (<div></div>);           
     }
+    
+    /**
+     * 
+     */
+    createPageLinkerDialog () {           
+      if (this.state.pages!=null) {            
+        return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closeLOModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.loModalIsOpen} target={this.state.orgTarget} />);
+      } else {
+        console.log ("Internal error: pages array object can be empty but not null");
+      }
+                   
+      return (<div></div>);           
+    }    
             
     /**
      * 
@@ -494,7 +555,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     render() 
     {      
       const lolinker=this.createLinkerDialog ();  
-        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
+      const pagelinker=this.createPageLinkerDialog ();
+      
       return (
               <div>
                   <div>
@@ -504,6 +566,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                   </div>
                   {lolinker}
+                  {pagelinker}
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}
