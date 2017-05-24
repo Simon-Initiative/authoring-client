@@ -13,6 +13,7 @@ import { YouTube } from './youtube';
 import { Link } from './link';
 import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
+import { Cite } from './cite';
 
 
 // Translation routines to convert from persistence model to draft model 
@@ -79,7 +80,9 @@ const inlineHandlers = {
   link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
     common.EntityTypes.link, 'link', Link),
-  cite: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.cite),
+  cite: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.cite, 'cite', Cite),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),

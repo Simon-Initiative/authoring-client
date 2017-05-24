@@ -47,6 +47,7 @@ const entityHandlers = {
   link,
   formula,
   input_ref,
+  cite,
   quote,
 };
 
@@ -898,6 +899,15 @@ function activity_link(s : common.RawEntityRange, text : string, entityMap : com
   const { data } = entityMap[s.key];
   
   return data.activity_link.toPersistence();
+  
+}
+
+
+function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  
+  return data.cite.toPersistence();
   
 }
 

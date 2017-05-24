@@ -13,6 +13,7 @@ import { IFrame } from '../../../../data/content/html/iframe';
 import { Link } from '../../../../data/content/html/link';
 import { ActivityLink } from '../../../../data/content/html/activity_link';
 import { Xref } from '../../../../data/content/html/xref';
+import { Cite } from '../../../../data/content/html/cite';
 
 
 
@@ -47,6 +48,9 @@ export function flowInline() {
     <Button key="quote"
       command={insertInline(EntityTypes.quote, 'MUTABLE', {})} 
       tooltip="Quotation" icon="quote-right"/>,
+    <Button key="cite"
+      command={insertInline(EntityTypes.cite, 'MUTABLE', { cite: new Cite() })} 
+      tooltip="Citation" icon="external-link"/>,
     
     <Separator key="sep5"/>,
     
