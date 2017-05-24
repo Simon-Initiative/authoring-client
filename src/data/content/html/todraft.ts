@@ -386,7 +386,7 @@ function processInline(
     const offset = blockContext.fullText.length;
 
     // TODO fix this in a more general way 
-    if (key === 'math' || key === 'input_ref') {
+    if (key === 'm:math' || key === 'input_ref') {
       blockContext.fullText += ' ';
 
     } else {

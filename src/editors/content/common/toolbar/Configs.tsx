@@ -18,9 +18,9 @@ import { Cite } from '../../../../data/content/html/cite';
 
 
 import * as commands from '../draft/commands';
-const formula 
+const math 
   = '<math xmlns=\'http://www.w3.org/1998/Math/MathML\' display=\'inline\'><mo>&sum;</mo></math>';
-const defaultFormula = { '#cdata': formula };
+const defaultMathML = { '#cdata': math };
 
 const style = style => new commands.ToggleStyleCommand(style);
 const block = type => new commands.ToggleBlockTypeCommand(type);
@@ -74,7 +74,7 @@ export function flowInline() {
     <Separator key="sep3"/>,
 
     <Button key="math" 
-      command={insertInline(EntityTypes.formula, 'IMMUTABLE', defaultFormula)} 
+      command={insertInline(EntityTypes.math, 'IMMUTABLE', defaultMathML)} 
       tooltip="Math expression" icon="etsy"/>,
   ];
 }
