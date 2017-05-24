@@ -387,8 +387,9 @@ export function fetchCourseResources(courseId: string) : Promise<CourseResource[
       .then((doc) => {
         switch (doc.model.modelType) {
           case 'CourseModel':
-            return doc.model.resources.toArray().map(
-              (r : Resource) => ({ _id: r.id, title: r.title, type: r.type }));
+            resolve(doc.model.resources.toArray().map(
+              (r : Resource) => ({ _id: r.id, title: r.title, type: r.type })));
+            return;
           default:
         }
       })

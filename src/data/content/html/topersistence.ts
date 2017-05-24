@@ -72,6 +72,9 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
   while (iterator.hasNext()) {
     translateBlock(iterator, content.entityMap, context);
   }
+
+  console.log(JSON.stringify(root.body));
+
   return root.body;
 }
 
@@ -641,7 +644,6 @@ function isLinkRange(er: common.RawEntity) : boolean {
     case common.EntityTypes.activity_link:
     case common.EntityTypes.link:
     case common.EntityTypes.xref:
-    case common.EntityTypes.wb_manual:
       return true;
     default: 
       return false;
@@ -836,7 +838,12 @@ function translateInline(
     return translateInlineStyle(s, text, entityMap);
   } else {
     const { offset, length } = s;
-    return translateInlineEntity(s, text, entityMap);
+    const obj = translateInlineEntity(s, text, entityMap);
+
+    const sub = text.substr(s.offset, s.length);
+    obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+
+    return obj;
   }
 
 }
@@ -859,38 +866,24 @@ function translateInlineStyle(
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
-  const { data, type } = entityMap[s.key];
+  const { data } = entityMap[s.key];
 
-  data['#array'] = [];
-  
-  const item = {};
-  item[type] = data;
-  
-  return item;
+  return data.link.toPersistence();
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
-  const { data, type } = entityMap[s.key];
-
-  data['#array'] = [];
+  const { data } = entityMap[s.key];
   
-  const item = {};
-  item[type] = data;
+  return data.activity_link.toPersistence();
   
-  return item;
 }
 
 function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
-  const { data, type } = entityMap[s.key];
-
-  data['#array'] = [];
+  const { data } = entityMap[s.key];
   
-  const item = {};
-  item[type] = data;
-  
-  return item;
+  return data.xref.toPersistence();
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -914,7 +907,8 @@ function translateInlineEntity(
 
   const { data, type } = entityMap[s.key];
   if (entityHandlers[type] !== undefined) {
-    return entityHandlers[type](s, text, entityMap);
+    const obj = entityHandlers[type](s, text, entityMap);
+    return obj;
   } else {
     return data;
   }
@@ -963,8 +957,10 @@ function translateTextBlock(
   const intervals = combineIntervals(rawBlock);
 
   if (hasOverlappingIntervals(intervals)) {
+    console.log('has overlapping');
     translateOverlapping(rawBlock, block, entityMap, container);
   } else {
+    console.log('does not have overlapping');
     translateNonOverlapping(rawBlock, block, intervals, entityMap, container);
   }
 }

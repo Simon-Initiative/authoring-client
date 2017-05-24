@@ -145,7 +145,7 @@ export class Image extends Immutable.Record(defaultContent) {
     ];
 
     return {
-      audio: {
+      image: {
         '@id': this.id,
         '@title': this.title,
         '@src': this.src,

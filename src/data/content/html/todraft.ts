@@ -10,6 +10,10 @@ import { Image } from './image';
 import { IFrame } from './iframe';
 import { Video } from './video';
 import { YouTube } from './youtube';
+import { Link } from './link';
+import { Xref } from './xref';
+import { ActivityLink } from './activity_link';
+
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -63,9 +67,15 @@ const blockHandlers = {
 
 const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
-  activity_link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.activity_link),
-  xref: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.xref),
-  link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.link),
+  activity_link: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.activity_link, 'activity_link', ActivityLink),
+  xref: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.xref, 'xref', Xref),
+  link: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.link, 'link', Link),
   cite: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.cite),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -117,6 +127,23 @@ function extractAttrs(item: Object) : Object {
       {});
 }
 
+function insertDataDrivenEntity(
+  mutability: string, type: string, label, ctor, offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+  
+  const data = {};
+  data[label] = ctor.fromPersistence(item);
+
+  context.draft.entityMap[key] = {
+    type,
+    mutability,
+    data,
+  };
+}
 
 
 function insertEntity(

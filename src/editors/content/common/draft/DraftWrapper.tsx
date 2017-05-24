@@ -224,10 +224,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const contentState = props.content.contentState;
     this.lastContent = contentState;
 
-    const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-    const es = EditorState.createWithContent(contentState, compositeDecorator);
+    const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
 
     this.state = {
@@ -486,10 +483,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         const selection = this.state.editorState.getSelection();
 
-        const onDecoratorEdit = () => this.onChange(this.state.editorState);
-        const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-        const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
+        const es = EditorState.createWithContent(nextProps.content.contentState, this.getCompositeDecorator());
         const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
 
         this.setState({
@@ -561,14 +555,23 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return command.precondition(this.state.editorState, this.props.context);
   }
 
+  getCompositeDecorator() {
+    const onDecoratorEdit = (contentState: ContentState) => {
+      this.forceContentChange(contentState, 'apply-entity');
+    };
+    const compositeDecorator = buildCompositeDecorator({ 
+      activeItemId: this.props.activeItemId, services: this.props.services, 
+      context: this.props.context, onEdit: onDecoratorEdit, 
+    });
+    return compositeDecorator;
+  }
+
   forceRender() {
 
     const editorState = this.state.editorState;
     const content = editorState.getCurrentContent();
-    const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-    const es = EditorState.createWithContent(content, compositeDecorator);
+    
+    const es = EditorState.createWithContent(content, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({editorState: newEditorState});
   }

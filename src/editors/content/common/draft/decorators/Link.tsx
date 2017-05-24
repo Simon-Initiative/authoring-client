@@ -1,27 +1,55 @@
 import * as React from 'react';
 import { Decorator, byType } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
+import { LinkEditor } from '../../../links/LinkEditor';
+import ModalMediaEditor from '../../../media/ModalMediaEditor';
 
 class Link extends React.PureComponent<any, any> {
 
   a: any;
 
-  componentDidMount() {
-    (window as any).$(this.a).tooltip();
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
   }
 
-  componentWillUnmount() {
-    (window as any).$(this.a).tooltip('hide');
+  onClick() {
+    const key = this.props.entityKey;
+    const data = this.props.contentState.getEntity(key).getData();
+    const b = this.props;
+    this.props.services.displayModal(
+      <ModalMediaEditor
+        editMode={true}
+        context={b.context}
+        services={b.services}
+
+        model={data.link}
+        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onInsert={(link) => {
+          this.props.services.dismissModal();
+          const data = {
+            link,
+          };
+          const contentState = this.props.contentState.replaceEntityData(key, data);
+
+          this.props.onEdit(contentState);
+        }
+      }>
+        <LinkEditor 
+          model={data.link}
+          context={b.context}
+          services={b.services}
+          editMode={true}
+          onEdit={c => true}/>
+      </ModalMediaEditor>,
+    );
   }
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const href = data['@href'];
-    const target = data['@target'] === 'new' ? '_blank' : '_self';
     return (
       <a data-offset-key={this.props.offsetKey} 
-        ref={a => this.a = a} data-toggle="tooltip" 
-        data-placement="top" title={href} target={target} href={href}>
+        ref={a => this.a = a} onClick={this.onClick}>
         {this.props.children}
       </a>
     );
