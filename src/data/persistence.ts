@@ -164,7 +164,7 @@ export function registration(courseId: CourseId, userNames: string[], action: st
           return response.json();
         })
         .then((json) => {
-          let userInfos = Immutable.List<UserInfo>();
+          let userInfos : Array<UserInfo> = new Array();
           if (isArray(json)) {
             json.forEach(function (item) {
               userInfos.push(UserInfo.fromPersistence(item));
@@ -172,7 +172,7 @@ export function registration(courseId: CourseId, userNames: string[], action: st
           } else {
             userInfos.push(UserInfo.fromPersistence(json));
           }
-          resolve([...userInfos.toArray().map(t => {return t})]);
+          resolve([...userInfos.map(t => {return t})]);
         })
         .catch(err => reject(err));
     } catch (err) {
