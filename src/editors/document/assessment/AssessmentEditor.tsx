@@ -101,6 +101,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               context={this.props.context}
               model={n}
               onEdit={c => this.onEdit(n.guid, c)} 
+              onRemove={this.onNodeRemove.bind(this)}
               />;
     } else if (n.contentType === 'Selection') {
       return <SelectionEditor
