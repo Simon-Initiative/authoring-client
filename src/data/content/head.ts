@@ -47,7 +47,7 @@ export class Head extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'objref':
-          tAnnotations.push (head ["objref"]["@idref"]);          
+          tAnnotations.push (new Linkable (head ["objref"]["@idref"]));        
           break;  
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id)});
@@ -60,13 +60,19 @@ export class Head extends Immutable.Record(defaultContent) {
       
     return model;
   }
-
+  
   toPersistence() : Object {
+    let tempArray:Array<Object>=new Array <Object>();        
+        
+    tempArray.push (this.title.toPersistence());    
+        
+    for (let i=0;i<this.annotations.length;i++) {
+      tempArray.push ({"objref": { "@idref": this.annotations [i].id}});
+    }    
+        
     return {
       "head": {
-        "#array": [
-          this.title.toPersistence()
-        ]
+        "#array": tempArray
       }
     }
   }

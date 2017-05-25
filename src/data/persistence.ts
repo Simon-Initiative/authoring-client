@@ -146,7 +146,7 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
   });
 }
 
-export function registration(courseId: CourseId, userNames: string[], action: string): Promise<UserInfo[]> {
+export function developerRegistration(courseId: CourseId, userNames: string[], action: string): Promise<UserInfo[]> {
 
   const url = `${configuration.baseUrl}/${courseId}/developers?action=${action}`;
 
@@ -246,7 +246,8 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
             _courseId: packageGuid,
             _id: json.guid,
             _rev: json.rev,
-            model: content,
+            model: models.createModel(json),
+            //model: content,
           }));
         })
         .catch(err => reject(err));

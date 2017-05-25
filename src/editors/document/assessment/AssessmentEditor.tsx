@@ -55,8 +55,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   
     resourceList.map((value, id) => {        
       if (value.type === 'x-oli-skills') {
-        persistence.retrieveDocument(this.props.context.courseId,id)
+        console.log ('Found skills document, loading ...');  
+        persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {
+          console.log ('Loaded skill document, assinging ...');  
           const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
           this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
         });
