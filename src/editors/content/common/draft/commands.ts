@@ -6,4 +6,5 @@ export { InsertBlockEntityCommand, InsertInlineEntityCommand } from './commands/
 export { ToggleStyleCommand, ToggleBlockTypeCommand } from './commands/toggle';
 export { InsertAssessmentCommand } from './commands/wbinline';
 export { InsertDefinitionCommand } from './commands/definition';
+export { SetBlockTypeCommand } from './commands/blocktype';
 

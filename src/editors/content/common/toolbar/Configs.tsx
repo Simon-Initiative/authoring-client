@@ -13,13 +13,14 @@ import { IFrame } from '../../../../data/content/html/iframe';
 import { Link } from '../../../../data/content/html/link';
 import { ActivityLink } from '../../../../data/content/html/activity_link';
 import { Xref } from '../../../../data/content/html/xref';
+import { Cite } from '../../../../data/content/html/cite';
 
 
 
 import * as commands from '../draft/commands';
-const formula 
+const math 
   = '<math xmlns=\'http://www.w3.org/1998/Math/MathML\' display=\'inline\'><mo>&sum;</mo></math>';
-const defaultFormula = { '#cdata': formula };
+const defaultMathML = { '#cdata': math };
 
 const style = style => new commands.ToggleStyleCommand(style);
 const block = type => new commands.ToggleBlockTypeCommand(type);
@@ -44,6 +45,12 @@ export function flowInline() {
       tooltip="Term" icon="book"/>,
     <Button key="foreign" command={style('FOREIGN')} 
       tooltip="Foreign" icon="globe"/>,
+    <Button key="quote"
+      command={insertInline(EntityTypes.quote, 'MUTABLE', {})} 
+      tooltip="Quotation" icon="quote-right"/>,
+    <Button key="cite"
+      command={insertInline(EntityTypes.cite, 'MUTABLE', { cite: new Cite() })} 
+      tooltip="Citation" icon="external-link"/>,
     
     <Separator key="sep5"/>,
     
@@ -67,7 +74,7 @@ export function flowInline() {
     <Separator key="sep3"/>,
 
     <Button key="math" 
-      command={insertInline(EntityTypes.formula, 'IMMUTABLE', defaultFormula)} 
+      command={insertInline(EntityTypes.math, 'IMMUTABLE', defaultMathML)} 
       tooltip="Math expression" icon="etsy"/>,
   ];
 }
@@ -80,6 +87,12 @@ export function flowBlock() {
           EntityTypes.codeblock, 'IMMUTABLE', 
           { codeblock: new CodeBlock({ source: 'Your code here...' }) })} 
       tooltip="Code block" icon="code"/>,
+    <Button key="quoteblock" 
+      command={new commands.SetBlockTypeCommand('blockquote')} 
+      tooltip="Insert block quote" icon="quote-right"/>,
+    <Button key="formulablock" 
+      command={new commands.SetBlockTypeCommand('formula')} 
+      tooltip="Insert block formula" icon="plus"/>,
     <Button key="table" 
       command={insertBlock(EntityTypes.table, 'IMMUTABLE', { table: new Table() })} 
       tooltip="Insert table" icon="table"/>,

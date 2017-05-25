@@ -45,8 +45,10 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
-  formula,
+  math,
   input_ref,
+  cite,
+  quote,
 };
 
 // Converts the draft ContentState object to the HtmlContent format
@@ -108,6 +110,12 @@ function translateBlock(
     translateTable(rawBlock, draftBlock, entityMap, context);
   } else if (isCodeBlock(rawBlock, entityMap)) {
     translateCodeBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isQuoteBlock(rawBlock)) {
+    translateQuoteBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isBasicCodeBlock(rawBlock)) {
+    translateBasicCodeBlock(rawBlock, draftBlock, entityMap, context);
+  } else if (isFormulaBlock(rawBlock)) {
+    translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
     translateWbInline(rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('audio', rawBlock, entityMap)) {
@@ -179,6 +187,21 @@ function getSentinelType(
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (type === 'unstyled');
+}
+
+function isQuoteBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type === 'blockquote');
+}
+
+function isFormulaBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type === 'formula');
+}
+
+function isBasicCodeBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type === 'code');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
@@ -514,6 +537,48 @@ function translateParagraph(
     const p = { p: { '#array': [] } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.p['#array']);
+  }
+
+}
+
+function translateQuoteBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    top(context).push({ quote: { '#text': rawBlock.text } });
+  } else {
+    const p = { quote: { '#array': [] } };
+    top(context).push(p);
+    translateTextBlock(rawBlock, block, entityMap, p.quote['#array']);
+  }
+
+}
+
+function translateFormulaBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    top(context).push({ formula: { '#text': rawBlock.text } });
+  } else {
+    const p = { formula: { '#array': [] } };
+    top(context).push(p);
+    translateTextBlock(rawBlock, block, entityMap, p.formula['#array']);
+  }
+
+}
+
+function translateBasicCodeBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
+    top(context).push({ code: { '#text': rawBlock.text } });
+  } else {
+    const p = { code: { '#array': [] } };
+    top(context).push(p);
+    translateTextBlock(rawBlock, block, entityMap, p.code['#array']);
   }
 
 }
@@ -879,6 +944,15 @@ function activity_link(s : common.RawEntityRange, text : string, entityMap : com
   
 }
 
+
+function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  
+  return data.cite.toPersistence();
+  
+}
+
 function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
@@ -896,10 +970,20 @@ function input_ref(s : common.RawEntityRange, text : string, entityMap : common.
   return item;
 }
 
-function formula(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+function quote(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data, type } = entityMap[s.key];
+
+  const item = {};
+  item[type] = data;
+  
+  return item;
+}
+
+function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  return { math: { '#cdata': data['#cdata'] } };
+  return { 'm:math': { '#cdata': data['#cdata'] } };
 }
 
 function translateInlineEntity(

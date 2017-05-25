@@ -17,8 +17,13 @@ export { Text } from './content/text';
 export { ShortAnswer } from './content/short_answer';
 export { Ordering } from './content/ordering';
 export { Table } from './content/html/table';
+export { Pool } from './content/pool';
+export { PoolRef } from './content/pool_ref';
+export { Selection, SelectionSource } from './content/selection';
+export { ObjRef } from './content/objref';
 
-import { Ordering} from './content/ordering';
+
+import { Ordering } from './content/ordering';
 import { ShortAnswer } from './content/short_answer';
 import { FillInTheBlank } from './content/fill_in_the_blank';
 import { Text } from './content/text';
@@ -26,4 +31,11 @@ import { MultipleChoice } from './content/multiple_choice';
 import { Numeric } from './content/numeric';
 import { Unsupported } from './content/unsupported';
 
-export type Item = MultipleChoice | FillInTheBlank | Ordering | Numeric | ShortAnswer | Text | Unsupported;
+export type Item = 
+  MultipleChoice | 
+  FillInTheBlank | 
+  Ordering | 
+  Numeric | 
+  ShortAnswer | 
+  Text | 
+  Unsupported;

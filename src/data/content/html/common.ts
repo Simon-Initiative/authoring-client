@@ -44,6 +44,7 @@ export const EntityTypes = types.strEnum([
   'activity_link',
   'code',
   'formula',
+  'math',
   'quote',
   'bdo',
   'link',
@@ -232,6 +233,7 @@ addStyle('foreign', 'FOREIGN');
 addStyle('var', 'CODE');
 addStyle('sub', 'SUBSCRIPT');
 addStyle('sup', 'SUPERSCRIPT');
+addStyle('quote', 'QUOTE');
 
 export const emStyles = {
   bold: true,

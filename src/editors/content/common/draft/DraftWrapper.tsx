@@ -100,6 +100,9 @@ const styleMap = {
   TERM: {
     textDecoration: 'underline'
   },
+  QUOTE: {
+    fontStyle: 'italic'
+  },
   IPA: {
     // TODO
   },
@@ -119,11 +122,12 @@ const blockRenderMap = Immutable.Map({
   'header-five': { element: 'h5' },
   'header-six': { element: 'h6' },
   'blockquote': { element: 'blockquote' },
-  'code-block': { element: 'pre' },
+  'code': { element: 'pre' },
   'atomic': { element: 'div' },
   'unordered-list-item': { element: 'li' },
   'ordered-list-item': { element: 'li' },
-  'unstyled': { element: 'div' }
+  'unstyled': { element: 'div' },
+  'formula': { element: 'div' },
 });
 
 
@@ -603,6 +607,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   }
 
+  blockStyleFn(contentBlock: ContentBlock) {
+    const type = contentBlock.getType();
+    if (type === 'formula') {
+      return 'formulaDiv';
+    } else if (type === 'code') {
+      return 'codeDiv';
+    }
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
@@ -622,7 +635,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}
+          blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
+          blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.lockedByBlockRenderer || this.props.locked}
           onChange={this.onChange} />

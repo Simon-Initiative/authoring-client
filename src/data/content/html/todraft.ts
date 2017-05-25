@@ -13,6 +13,7 @@ import { YouTube } from './youtube';
 import { Link } from './link';
 import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
+import { Cite } from './cite';
 
 
 // Translation routines to convert from persistence model to draft model 
@@ -57,6 +58,9 @@ const blockHandlers = {
   table,
   audio,
   image: imageBlock,
+  formula: formulaBlock,
+  quote: quoteBlock,
+  code: codeBlock,
   iframe,
   video,
   youtube,
@@ -76,7 +80,9 @@ const inlineHandlers = {
   link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
     common.EntityTypes.link, 'link', Link),
-  cite: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.cite),
+  cite: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.cite, 'cite', Cite),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -85,8 +91,9 @@ const inlineHandlers = {
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
   image: imageInline,
-  math: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.formula),
-  quote: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.quote),
+  formula: formulaInline,
+  'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
+  quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
 };
 
@@ -95,7 +102,6 @@ function applyStyle(
   context: ParsingContext, workingBlock: WorkingBlock) {
   workingBlock.markups.push({ offset, length, style });
 }
-
 
 function em(
   offset: number, length: number, item: Object, 
@@ -182,6 +188,14 @@ function imageInline(
   };
 }
 
+function formulaInline(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  // Do nothing for now, this effectively strips out the inline
+  // formula tag on save
+}
+
 function wb_inline(item: Object, context: ParsingContext) {
   const wb = WbInline.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
@@ -191,6 +205,66 @@ function codeblock(item: Object, context: ParsingContext) {
 
   const codeblock = CodeBlock.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.codeblock, { codeblock }, context);
+}
+
+function quoteBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'blockquote',
+  });
+}
+
+function formulaBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'formula',
+  });
+}
+
+function codeBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'code',
+  });
 }
 
 function audio(item: Object, context: ParsingContext) {
@@ -340,7 +414,8 @@ function processInline(
     
     const offset = blockContext.fullText.length;
 
-    if (key === 'math' || key === 'input_ref') {
+    // TODO fix this in a more general way 
+    if (key === 'm:math' || key === 'input_ref') {
       blockContext.fullText += ' ';
 
     } else {
