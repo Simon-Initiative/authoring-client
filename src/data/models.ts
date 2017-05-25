@@ -49,7 +49,7 @@ export function createModel(object: any): ContentModel {
       return OrganizationModel.fromPersistence(object);
     case 'x-oli-learning_objectives':
       return LearningObjectiveModel.fromPersistence(object);
-    case 'x-oli-skill_model':
+    case 'x-oli-skills':
       return SkillModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
