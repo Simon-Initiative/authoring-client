@@ -246,7 +246,8 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
             _courseId: packageGuid,
             _id: json.guid,
             _rev: json.rev,
-            model: content,
+            model: models.createModel(json),
+            //model: content,
           }));
         })
         .catch(err => reject(err));
