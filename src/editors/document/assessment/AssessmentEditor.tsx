@@ -75,6 +75,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({ title: content }));
   }
 
+  onNodeRemove(guid: string) {
+    this.handleEdit(this.props.model.with(
+      { nodes: this.props.model.nodes.delete(guid) },
+    ));
+  }
+
   renderNode(n : models.Node) {
     if (n.contentType === 'Question') {
       return <QuestionEditor
@@ -84,6 +90,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               context={this.props.context}
               model={n}
               onEdit={c => this.onEdit(n.guid, c)} 
+              onRemove={this.onNodeRemove.bind(this)}
               />;
               
     } else if (n.contentType === 'Content') {
@@ -103,6 +110,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               context={this.props.context}
               model={n}
               onEdit={c => this.onEdit(n.guid, c)} 
+              onRemove={this.onNodeRemove.bind(this)}
               />;
     } else {
       /*

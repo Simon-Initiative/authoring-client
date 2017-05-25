@@ -6,7 +6,7 @@ import { AbstractContentEditor,
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { describePool } from './details';
-
+import { RemovableContent } from '../common/RemovableContent';
 import '../common/editor.scss';
 
 
@@ -15,7 +15,7 @@ export interface PoolRefEditor {
 }
 
 export interface PoolRefProps extends AbstractContentEditorProps<contentTypes.PoolRef> {
-
+  onRemove: (guid: string) => void;
 }
 
 export interface PoolRefState {
@@ -59,7 +59,7 @@ export class PoolRefEditor
     }
     
     return (
-      <div className="componentWrapper poolref">
+      <div>
         <div className="input-group">
           <input type="text" className="form-control" disabled/>
           <span className="input-group-btn">

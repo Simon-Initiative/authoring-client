@@ -8,6 +8,7 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import guid from '../../../utils/guid';
 import { PoolEditor } from './PoolEditor';
 import { PoolRefEditor } from './PoolRefEditor';
+import { RemovableContent } from '../common/RemovableContent';
 
 import '../common/editor.scss';
 
@@ -17,7 +18,7 @@ export interface SelectionEditor {
 }
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
-
+  onRemove: (guid: string) => void;
 }
 
 export interface SelectionState {
@@ -39,6 +40,7 @@ export class SelectionEditor
     this.onScopeChange = this.onScopeChange.bind(this);
     this.onCountEdit = this.onCountEdit.bind(this);
     this.onSourceEdit = this.onSourceEdit.bind(this);
+    this.onAddQuestion = this.onAddQuestion.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -71,21 +73,42 @@ export class SelectionEditor
                {...this.props}
                model={this.props.model.source}
                onEdit={this.onSourceEdit}
+               onRemove={() => this.props.onRemove(this.props.model.guid)}
              />;
     } else {
       return <PoolRefEditor
                {...this.props}
                model={this.props.model.source}
                onEdit={this.onSourceEdit}
+               onRemove={() => this.props.onRemove(this.props.model.guid)}
              />;
+    }
+  }
+
+  onAddQuestion() {
+    if (this.props.model.source.contentType === 'Pool') {
+      const q = new contentTypes.Question();
+      const source = this.props.model.source.with( 
+        { questions: this.props.model.source.questions.set(q.guid, q) });
+      const updated = this.props.model.with({ source });
+      this.props.onEdit(updated);
+    }
+  }
+
+  renderAddQuestion() {
+    if (this.props.model.source.contentType === 'Pool') {
+      return <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddQuestion}>Add Question</button>;
+    } else {
+      return null;
     }
   }
 
   render() : JSX.Element {
     
     const controls = (
-      <div style={ { display: 'inline' } }>
-        
+      <form className="form-inline">
+        {this.renderAddQuestion()}
         <Select label="Strategy" value={this.props.model.strategy} 
           onChange={this.onStrategyChange}>
           <option value="random">Random</option>
@@ -104,7 +127,7 @@ export class SelectionEditor
           <option value="resource">Resource</option>
         </Select>
 
-        Selection:&nbsp;&nbsp;&nbsp;
+        Count:&nbsp;&nbsp;&nbsp;
         <TextInput
           width="75px"
           label="Count"
@@ -112,7 +135,7 @@ export class SelectionEditor
           type="number"
           onEdit={this.onCountEdit}
         />
-      </div>);
+      </form>);
 
     const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
 
@@ -123,7 +146,9 @@ export class SelectionEditor
     } 
 
     return (
-      <div className="componentWrapper selection">
+      <RemovableContent 
+        onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
+        associatedClasses="selection">
 
         <Collapse caption={caption}
           details={details}
@@ -133,7 +158,7 @@ export class SelectionEditor
 
         </Collapse>
 
-      </div>
+      </RemovableContent>
     );
   }
 
