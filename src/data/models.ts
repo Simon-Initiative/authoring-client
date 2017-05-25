@@ -319,7 +319,11 @@ const defaultAssessmentModelParams = {
 }
 
 
-export type Node = contentTypes.Question | contentTypes.Content | contentTypes.Unsupported;
+export type Node = 
+  contentTypes.Question | 
+  contentTypes.Content | 
+  contentTypes.Selection |
+  contentTypes.Unsupported;
 
 export class AssessmentModel extends Immutable.Record(defaultAssessmentModelParams) {
 
@@ -361,13 +365,16 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
       const key = getKey(item);
       const id = guid();
-      console.log("Testing " + JSON.stringify(item));
+      
       switch (key) {
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
           break;
         case 'content':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id))})
+          break;
+        case 'selection':
+          model = model.with({nodes: model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id))})
           break;
         default:
           model = model.with({nodes: model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id))})

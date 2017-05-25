@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
@@ -8,10 +6,11 @@ import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { QuestionEditor } from '../../content/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
+import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { Toolbar } from './Toolbar';
 import * as models from '../../../data/models';
-import {Resource} from "../../../data/resource";
+import { Resource } from '../../../data/resource';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
@@ -35,42 +34,43 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   constructor(props) {
-    super(props, ({modalIsOpen: false, skillModel: new models.SkillModel} as AssessmentEditorState));
+    super(props, ({modalIsOpen: false, 
+      skillModel: new models.SkillModel} as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
     this.onAddQuestion = this.onAddQuestion.bind(this);
+    this.onAddPool = this.onAddPool.bind(this);
+    this.onAddPoolRef = this.onAddPoolRef.bind(this);
   }
 
   componentDidMount() {                    
-      console.log ("componentDidMount ()");
-      
-      this.loadSkills ();
+    this.loadSkills();
   }     
     
   loadSkills () : void {
-    console.log ("loadSkills ()");
             
-    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+    const resourceList:Immutable.OrderedMap<string, Resource>
+     = this.props.courseDoc ['model']['resources'] as Immutable.OrderedMap<string, Resource>;
   
     resourceList.map((value, id) => {        
-      if (value.type=="x-oli-skills") {
-        persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
-        {
-          let aSkillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
-          this.setState ({skillModel: aSkillModel.with (this.state.skillModel)});
+      if (value.type === 'x-oli-skills') {
+        persistence.retrieveDocument(this.props.context.courseId,id)
+        .then((skillDocument) => {
+          const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
+          this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
         });
       }          
-    })  
+    });
   }     
     
   onEdit(guid : string, content : models.Node) {
     const nodes = this.props.model.nodes.set(guid, content);
-    this.handleEdit(this.props.model.with({nodes}));
+    this.handleEdit(this.props.model.with({ nodes }));
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    this.handleEdit(this.props.model.with({title: content}));
+    this.handleEdit(this.props.model.with({ title: content }));
   }
 
   renderNode(n : models.Node) {
@@ -81,8 +81,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={(c) => this.onEdit(n.guid, c)} 
-              />
+              onEdit={c => this.onEdit(n.guid, c)} 
+              />;
               
     } else if (n.contentType === 'Content') {
       return <ContentEditor
@@ -91,68 +91,98 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={(c) => this.onEdit(n.guid, c)} 
-              />
+              onEdit={c => this.onEdit(n.guid, c)} 
+              />;
+    } else if (n.contentType === 'Selection') {
+      return <SelectionEditor
+              key={n.guid}
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={n}
+              onEdit={c => this.onEdit(n.guid, c)} 
+              />;
     } else {
+      /*
       return <UnsupportedEditor
               key={n.guid}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={(c) => this.onEdit(n.guid, c)} 
-              />
+              onEdit={c => this.onEdit(n.guid, c)} 
+              />; */
     }
   }
 
   renderTitle() {
-      return <TitleContentEditor 
+    return <TitleContentEditor 
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.title}
             onEdit={this.onTitleEdit} 
-            />
+            />;
   }
 
   onAddContent() {
     let content = new contentTypes.Content();
-    content = content.with({guid: guid()});
-    this.handleEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
+    content = content.with({ guid: guid() });
+    this.handleEdit(this.props.model.with(
+      { nodes: this.props.model.nodes.set(content.guid, content) }));
   }
 
   onAddQuestion() {
     let content = new contentTypes.Question();
-    content = content.with({guid: guid()});
-    this.handleEdit(this.props.model.with({nodes: this.props.model.nodes.set(content.guid, content) }));
+    content = content.with({ guid: guid() });
+    this.handleEdit(this.props.model.with(
+      { nodes: this.props.model.nodes.set(content.guid, content) }));
+  }
+
+  onAddPool() {
+    const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
+
+    this.handleEdit(this.props.model.with(
+      { nodes: this.props.model.nodes.set(pool.guid, pool) }));
+  }
+
+  onAddPoolRef() {
+    const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
+
+    this.handleEdit(this.props.model.with(
+      { nodes: this.props.model.nodes.set(pool.guid, pool) }));
   }
 
   /**
    * 
    */
   closeModal () {
-    console.log ("closeModal ()");
-        
-    //this.saveToDB ();
+    console.log ('closeModal ()');  
+    // this.saveToDB ();
   }     
 
   /**
    * 
    */
   onAddSkills() {        
-    console.log ("onAddSkills ()");
+    console.log ('onAddSkills ()');
                  
-    this.setState ({modalIsOpen: true});
+    this.setState({ modalIsOpen: true });
   }
 
   /**
    * 
    */
   createLinkerDialog () {           
-    if (this.state.skillModel!=null) {            
-      return (<LearningObjectiveLinker title="Available Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skillModel.skills} modalIsOpen={this.state.modalIsOpen} target={new Object()} />);
+    if (this.state.skillModel !== null) {            
+      return (<LearningObjectiveLinker 
+        title="Available Skills" 
+        closeModal={this.closeModal.bind (this)} 
+        sourceData={this.state.skillModel.skills} 
+        modalIsOpen={this.state.modalIsOpen} 
+        target={new Object()} />);
     } else {
-      console.log ("Internal error: skill model object can be empty but not null");
+      console.log ('Internal error: skill model object can be empty but not null');
     }
                    
     return (<div></div>);           
@@ -173,9 +203,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
             onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
           {titleEditor}
-          <button type="button" className="btn btn-secondary" onClick={this.onAddContent}>Add Content</button>
-          <button type="button" className="btn btn-secondary" onClick={this.onAddQuestion}>Add Question</button>
-          <button type="button" className="btn btn-secondary" onClick={this.onAddSkills}>Add Skills</button>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddContent}>Add Content</button>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddQuestion}>Add Question</button>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddPool}>Add Pool</button>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddPoolRef}>Add Pool Reference</button>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddSkills}>Add Skills</button>
         </div>
         {skilllinker} 
         {nodeEditors}

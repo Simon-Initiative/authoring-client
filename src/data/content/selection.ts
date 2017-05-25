@@ -11,7 +11,7 @@ export type SelectionSource = Pool | PoolRef;
 
 export type SelectionParams = {
   id?: string;
-  selectionCount?: number;
+  selectionCount?: string;
   strategy?: string;
   exhaustion?: string;
   scope?: string;
@@ -22,7 +22,7 @@ export type SelectionParams = {
 const defaultSelectionParams = {
   contentType: 'Selection',
   id: '',
-  selectionCount: 1,
+  selectionCount: '1',
   strategy: 'random',
   exhaustion: 'reuse',
   scope: 'resource',
@@ -34,7 +34,7 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
 
   contentType: 'Selection';
   id: string;
-  selectionCount: number;
+  selectionCount: string;
   strategy: string;
   exhaustion: string;
   scope: string;
