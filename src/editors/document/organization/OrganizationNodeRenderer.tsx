@@ -296,6 +296,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     editNodeTitle:any=null;
     linkAnnotation:any=null;
     addPage:any=null;
+    addActivity:any=null;
           
     /**
      * 
@@ -316,7 +317,7 @@ class OrganizationNodeRenderer extends Component <any,any>
               <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
               <li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>
               <li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>
-              <li className="list-group-item"><a href="#" >Activity</a></li>
+              <li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
               Assets
               <li className="list-group-item"><a href="#" >Add-On</a></li>              
             </ul>
@@ -332,7 +333,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             addPage,
             deleteNode,
             treeData,
-            linkAnnotation,     
+            linkAnnotation,
+            addActivity,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -363,6 +365,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.editNodeTitle=editNodeTitle;        
         this.deleteNodeFunction=deleteNode;
         this.addPage=addPage;
+        this.addActivity=addActivity;
 
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.

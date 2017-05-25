@@ -12,14 +12,21 @@ import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../data/
 import * as viewActions from '../actions/view';
 import Modal from 'react-modal';
 
-const tempnavstyle= {
-    h2: {
-       marginRight: '10px'
-    },
+const tempnavstyle= {   
+  h2: {
+    marginRight: '10px'
+  },
+    
+  modalContainer: {
+    "display" : "flex", 
+    "flexDirection" : 'column',
+    "justifyContent": "space-between"  
+  },
         
-    objectContainer: {
-       marginTop: '10px'
-    }    
+  objectContainer: {
+    marginTop: '10px',
+    overflow: "auto"    
+  }    
 };
 
 const customStyles = {
@@ -44,7 +51,9 @@ const customStyles = {
     WebkitOverflowScrolling: 'touch',
     borderRadius: '4px',
     outline: 'none',
-    padding: '20px'
+    padding: '20px',
+    display : "flex", 
+    flexDirection : 'column'  
   }    
 };
 
@@ -110,7 +119,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
-      console.log ("componentWillReceiveProps ()");
+      console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
       this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], target: newProps.target});
   }
    
@@ -294,6 +303,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       </div>
       );
     }.bind(this));      
+
+    //let tStyle:any=tempnavstyle.modalContainer;
       
     return (<Modal
              isOpen={this.state.modalIsOpen}
@@ -301,16 +312,16 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
              onRequestClose={this.closeModal}
              contentLabel="Linker Dialog"
              style={customStyles}>
-               <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                 <p className="h2" style={tempnavstyle.h2}>{this.props.title}</p>
-                 <a className="nav-link" href="#" onClick={e => this.checkAll ()}>Check All</a>
-                 <a className="nav-link" href="#" onClick={e => this.reset ()}>Check None</a>
-                 <a className="nav-link" href="#" onClick={e => this.checkInvert ()}>Check Invert</a>
-                 <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
-               </nav>
-               <div style={tempnavstyle.objectContainer}>
-                {options}
-               </div>             
+                 <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+                   <p className="h2" style={tempnavstyle.h2}>{this.props.title}</p>
+                   <a className="nav-link" href="#" onClick={e => this.checkAll ()}>Check All</a>
+                   <a className="nav-link" href="#" onClick={e => this.reset ()}>Check None</a>
+                   <a className="nav-link" href="#" onClick={e => this.checkInvert ()}>Check Invert</a>
+                   <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
+                 </nav>
+                 <div style={tempnavstyle.objectContainer}>
+                  {options}
+                 </div>
              </Modal>);
   }
 }
