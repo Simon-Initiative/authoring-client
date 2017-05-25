@@ -1,25 +1,20 @@
-'use strict'
-
 import * as React from 'react';
 
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
-
 import '../common/editor.scss';
 
-export interface TitleContentEditor {
+export interface PoolTitleEditor {
   _onChange: (e: any) => void;
 }
 
-export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
+export interface PoolTitleEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
 
 }
 
-/**
- * The abstract content editor. 
- */
-export class TitleContentEditor extends AbstractContentEditor<contentTypes.Title, TitleContentEditorProps, { text }> {
+export class PoolTitleEditor 
+  extends AbstractContentEditor<contentTypes.Title, PoolTitleEditorProps, { text }> {
 
   constructor(props) {
     super(props);
@@ -32,6 +27,7 @@ export class TitleContentEditor extends AbstractContentEditor<contentTypes.Title
   }
 
   onChange() {
+
     const text = ((this.refs as any).text as any).innerHTML;
     this.setState(
       { text }, 
@@ -55,15 +51,16 @@ export class TitleContentEditor extends AbstractContentEditor<contentTypes.Title
 
   renderEdit(): JSX.Element {
     const html = { __html: this.state.text };
-          
-    if (this.props.styles) {
-      return <h2 style={this.props.styles} ref='text' 
-      onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
-    }     
-          
-    return <h2 ref='text' 
-      onInput={this._onChange} 
-      contentEditable dangerouslySetInnerHTML={html}></h2>;
+    const styles = {
+      backgroundColor: '#FFFFFF',
+      padding: '10px',
+      fontSize: '12pt',
+    };
+    return <h5 
+        ref="text" onInput={this._onChange} 
+        style={ styles }
+        contentEditable dangerouslySetInnerHTML={html}>
+      </h5>;
   }
 
   render() : JSX.Element {

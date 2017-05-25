@@ -3,7 +3,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, 
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { PoolTitleEditor } from './PoolTitleEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { PoolEditor } from './PoolEditor';
@@ -41,6 +41,7 @@ export class SelectionEditor
     this.onCountEdit = this.onCountEdit.bind(this);
     this.onSourceEdit = this.onSourceEdit.bind(this);
     this.onAddQuestion = this.onAddQuestion.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -104,6 +105,13 @@ export class SelectionEditor
     }
   }
 
+  onTitleEdit(title) {
+    if (this.props.model.source.contentType === 'Pool') {
+      const source = this.props.model.source.with({ title });
+      this.props.onEdit(this.props.model.with({ source }));
+    }
+  }
+
   render() : JSX.Element {
     
     const controls = (
@@ -140,9 +148,21 @@ export class SelectionEditor
     const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
 
     let details = '';
+    let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
       const count = this.props.model.source.questions.size;
       details = count + ' question' + (count !== 1 ? 's' : '');
+
+      titleEditor = 
+        <Collapse caption="Title" details={this.props.model.source.title.text}>
+            <PoolTitleEditor 
+              services={this.props.services}
+              context={this.props.context}
+              editMode={this.props.editMode}
+              model={this.props.model.source.title}
+              onEdit={this.onTitleEdit} 
+            />
+        </Collapse>;
     } 
 
     return (
@@ -151,8 +171,11 @@ export class SelectionEditor
         associatedClasses="selection">
 
         <Collapse caption={caption}
-          details={details}
-          expanded={controls}>
+          details={details}>
+
+          {controls}
+
+          {titleEditor}
 
           {this.renderSource()}
 

@@ -5,7 +5,7 @@ import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { QuestionEditor } from '../question/QuestionEditor';
 import { ContentEditor } from '../content/ContentEditor';
-import { TitleContentEditor } from '../title/TitleContentEditor';
+
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
@@ -38,7 +38,7 @@ export class PoolEditor
     this.onRemoveQuestion = this.onRemoveQuestion.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
+    
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -59,9 +59,7 @@ export class PoolEditor
     this.props.onEdit(this.props.model.with({ content }));
   }
 
-  onTitleEdit(title) {
-    this.props.onEdit(this.props.model.with({ title }));
-  }
+  
 
 
   renderQuestion(question: contentTypes.Question) {
