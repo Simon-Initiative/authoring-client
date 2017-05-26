@@ -8,6 +8,7 @@ import { QuestionEditor } from '../../content/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
+import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/resource';
@@ -27,6 +28,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 interface AssessmentEditorState extends AbstractEditorState {
   modalIsOpen : boolean;
   skillModel: models.SkillModel;
+  current: string;
 }
 
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
@@ -34,14 +36,22 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   constructor(props) {
-    super(props, ({modalIsOpen: false, 
-      skillModel: new models.SkillModel} as AssessmentEditorState));
+    super(props, ({
+      modalIsOpen: false, 
+      skillModel: new models.SkillModel,
+      current: props.model.pages.first().guid,
+    } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
     this.onAddQuestion = this.onAddQuestion.bind(this);
     this.onAddPool = this.onAddPool.bind(this);
     this.onAddPoolRef = this.onAddPoolRef.bind(this);
+    this.onPageEdit = this.onPageEdit.bind(this);
+
+    this.onAddPage = this.onAddPage.bind(this);
+    this.onRemovePage = this.onRemovePage.bind(this);
+    
   }
 
   componentDidMount() {                    
@@ -66,6 +76,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     });
   }     
     
+  onPageEdit(page: contentTypes.Page) {
+    const pages = this.props.model.pages.set(page.guid, page);
+    this.handleEdit(this.props.model.with({ pages }));
+  }
+
   onEdit(guid : string, content : models.Node) {
     const nodes = this.props.model.nodes.set(guid, content);
     this.handleEdit(this.props.model.with({ nodes }));
@@ -139,29 +154,60 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddContent() {
     let content = new contentTypes.Content();
     content = content.with({ guid: guid() });
-    this.handleEdit(this.props.model.with(
-      { nodes: this.props.model.nodes.set(content.guid, content) }));
+    this.addNode(content);
   }
 
   onAddQuestion() {
     let content = new contentTypes.Question();
     content = content.with({ guid: guid() });
-    this.handleEdit(this.props.model.with(
-      { nodes: this.props.model.nodes.set(content.guid, content) }));
+    this.addNode(content);
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
+    this.addNode(pool);
+  }
 
+  addNode(node) {
+    let page = this.props.model.pages.get(this.state.current);
+    page = page.with({ nodes: page.nodes.set(node.guid, node) });
+
+    const pages = this.props.model.pages.set(page.guid, page);
+
+    this.handleEdit(this.props.model.with({ pages }));
+  }
+
+  onAddPage() {
+    const text = 'Page ' + (this.props.model.pages.size + 1);
+    const page = new contentTypes.Page()
+      .with({ title: new contentTypes.Title().with({ text }) });
+    
     this.handleEdit(this.props.model.with(
-      { nodes: this.props.model.nodes.set(pool.guid, pool) }));
+      { pages: this.props.model.pages.set(page.guid, page) }));
+  }
+
+  onRemovePage() {
+    if (this.props.model.pages.size > 1) {
+
+      const guid = this.state.current;
+
+      let newCurrent = this.props.model.pages.first().guid;
+      if (guid === newCurrent) {
+        newCurrent = this.props.model.pages.last().guid;
+      }
+
+      this.setState(
+        { current: newCurrent },
+        () => {
+          this.handleEdit(this.props.model.with(
+            { pages: this.props.model.pages.delete(guid) }));
+        });
+    }
   }
 
   onAddPoolRef() {
     const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
-
-    this.handleEdit(this.props.model.with(
-      { nodes: this.props.model.nodes.set(pool.guid, pool) }));
+    this.addNode(pool);
   }
 
   /**
@@ -202,7 +248,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const titleEditor = this.renderTitle();
-    const nodeEditors = this.props.model.nodes.toArray().map(n => this.renderNode(n));
+    const page = this.props.model.pages.get(this.state.current);
+    const nodeEditors = page.nodes.toArray().map(n => this.renderNode(n));
     const skilllinker = this.createLinkerDialog ();    
     
     return (
@@ -213,20 +260,44 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
             onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
-          {titleEditor}
-          <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddContent}>Add Content</button>
-          <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddQuestion}>Add Question</button>
-          <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddPool}>Add Pool</button>
-          <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddPoolRef}>Add Pool Reference</button>
-          <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddSkills}>Add Skills</button>
+          
+          <div className="container">
+            <div className="row">
+              <div className="col">
+                {titleEditor}
+              </div>
+              <div className="col">
+                <PageSelection 
+                  pages={this.props.model.pages} 
+                  current={this.props.model.pages.get(this.state.current)}
+                  onChangeCurrent={current => this.setState({ current })}
+                  onEdit={this.onPageEdit}/>
+                <button type="button" className="btn btn-secondary" 
+                  onClick={this.onAddPage}>Add Page</button>
+                <button type="button" className="btn btn-secondary" 
+                  onClick={this.onRemovePage}>Remove Page</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button type="button" className="btn btn-secondary" 
+              onClick={this.onAddContent}>Add Content</button>
+            <button type="button" className="btn btn-secondary" 
+              onClick={this.onAddQuestion}>Add Question</button>
+            <button type="button" className="btn btn-secondary" 
+              onClick={this.onAddPool}>Add Pool</button>
+            <button type="button" className="btn btn-secondary" 
+              onClick={this.onAddPoolRef}>Add Pool Reference</button>
+            <button type="button" className="btn btn-secondary" 
+              onClick={this.onAddSkills}>Add Skills</button>
+          </div>
+          
+          
+          {skilllinker} 
+          {nodeEditors}
+
         </div>
-        {skilllinker} 
-        {nodeEditors}
       </div>);
     
   }

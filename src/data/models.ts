@@ -14,6 +14,9 @@ import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
 import { PoolModel } from './models/pool';
+import { Node } from './content/node';
+ 
+export { Node } from './content/node';
 
 export { PoolModel } from './models/pool';
 
@@ -311,7 +314,8 @@ export type AssessmentModelParams = {
   type?: string;
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  nodes?: Immutable.OrderedMap<string, Node>
+  nodes?: Immutable.OrderedMap<string, Node>,
+  pages?: Immutable.OrderedMap<string, contentTypes.Page>,
 };
 const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
@@ -320,15 +324,31 @@ const defaultAssessmentModelParams = {
   guid: '',
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
-  nodes: Immutable.OrderedMap<string, Node>()
+  nodes: Immutable.OrderedMap<string, Node>(),
+  pages: Immutable.OrderedMap<string, contentTypes.Page>(),
 }
 
+function migrateNodesToPage(model: AssessmentModel) {
+  let updated = model;
 
-export type Node = 
-  contentTypes.Question | 
-  contentTypes.Content | 
-  contentTypes.Selection |
-  contentTypes.Unsupported;
+  // Ensure that we have at least one page
+  if (updated.pages.size === 0) {
+    let newPage = new contentTypes.Page();
+    newPage = newPage.with({ title: new contentTypes.Title( { text: 'Page 1'}) });
+    updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
+  }
+
+  // Now move any root nodes to the first page
+  if (updated.nodes.size > 0) {
+    let page = updated.pages.first();
+    updated.nodes.toArray().forEach(
+      node => page = page.with({ nodes: page.nodes.set(node.guid, node)}));
+    updated = updated.with({ pages: updated.pages.set(page.guid, page)});
+    updated = updated.with({ nodes: Immutable.OrderedMap<string, Node>()});
+  }
+
+  return updated;
+}
 
 export class AssessmentModel extends Immutable.Record(defaultAssessmentModelParams) {
 
@@ -339,6 +359,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   nodes: Immutable.OrderedMap<string, Node>;
+  pages: Immutable.OrderedMap<string, contentTypes.Page>;
 
   constructor(params?: AssessmentModelParams) {
     params ? super(params) : super();
@@ -372,6 +393,10 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       const id = guid();
 
       switch (key) {
+        case 'page':
+          model = model.with(
+            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id)) });
+          break;
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
           break;
@@ -386,12 +411,15 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       }
     });
 
+    // Adjust models to ensure that we never have a page-less assessment
+    model = migrateNodesToPage(model);
+
     return model;
   }
 
   toPersistence(): Object {
     const children = [
-      ...this.nodes.toArray().map(node => node.toPersistence()),
+      ...this.pages.toArray().map(page => page.toPersistence()),
     ]
     let resource = this.resource.toPersistence();
     let doc = null;

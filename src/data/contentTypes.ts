@@ -21,7 +21,8 @@ export { Pool } from './content/pool';
 export { PoolRef } from './content/pool_ref';
 export { Selection, SelectionSource } from './content/selection';
 export { ObjRef } from './content/objref';
-
+export { Page } from './content/page';
+export { Node } from './content/node';
 
 import { Ordering } from './content/ordering';
 import { ShortAnswer } from './content/short_answer';
