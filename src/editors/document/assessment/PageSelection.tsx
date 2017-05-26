@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 
+import { TextInput } from '../../content/common/TextInput';
+
 export interface PageSelectionProps {  
   onChangeCurrent: (guid: string) => void;
   onEdit: (page: contentTypes.Page) => void;
@@ -50,23 +52,26 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, { tex
   render() {
     return (
       <div className="input-group">
-        <input 
+        <TextInput
           value={this.props.current.title.text}
-          onChange={this.onTitleEdit}
+          onEdit={this.onTitleEdit}
           type="text"
-          style={ { width: '300px', maxWidth: '300px' } }
-          className="form-control" 
-          aria-label="Text input with dropdown button"/>
-        <div className="input-group-btn">
-          <button type="button" className="btn btn-secondary dropdown-toggle" 
+          width="300px"
+          label=""
+          />
+        
+        <div className="dropdown">
+          <button className="btn btn-secondary dropdown-toggle" 
+            type="button" id="dropdownMenuButton" 
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Select
           </button>
-          <div className="dropdown-menu dropdown-menu-right">
+
+          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
             {this.props.pages.map(p => this.renderPage(p))}
           </div>
-          
         </div>
+          
       </div>
     );
   }

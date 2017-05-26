@@ -263,10 +263,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           
           <div className="container">
             <div className="row">
-              <div className="col">
+              <div className="col-4">
                 {titleEditor}
               </div>
-              <div className="col">
+              <div className="col-8">
+                <form className="form-inline">
                 <PageSelection 
                   pages={this.props.model.pages} 
                   current={this.props.model.pages.get(this.state.current)}
@@ -276,6 +277,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onClick={this.onAddPage}>Add</button>
                 <button type="button" className="btn btn-secondary" 
                   onClick={this.onRemovePage}>Remove</button>
+                </form>
               </div>
             </div>
           </div>
