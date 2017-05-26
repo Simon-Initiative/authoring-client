@@ -39,6 +39,7 @@ export class ShortAnswer
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
+    this.onSizeChange = this.onSizeChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
   }
 

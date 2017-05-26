@@ -12,6 +12,7 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
+import { Essay } from '../items/Essay';
 import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
@@ -317,6 +318,19 @@ export abstract class QuestionEditor
           />;
     } else if (item.contentType === 'Ordering') {
       return <Ordering
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />;
+    } else if (item.contentType === 'Essay') {
+      return <Essay
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}

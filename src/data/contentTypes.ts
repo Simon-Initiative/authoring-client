@@ -23,7 +23,9 @@ export { Selection, SelectionSource } from './content/selection';
 export { ObjRef } from './content/objref';
 export { Page } from './content/page';
 export { Node } from './content/node';
+export { Essay } from './content/essay';
 
+import { Essay } from './content/essay';
 import { Ordering } from './content/ordering';
 import { ShortAnswer } from './content/short_answer';
 import { FillInTheBlank } from './content/fill_in_the_blank';
@@ -33,6 +35,7 @@ import { Numeric } from './content/numeric';
 import { Unsupported } from './content/unsupported';
 
 export type Item = 
+  Essay |
   MultipleChoice | 
   FillInTheBlank | 
   Ordering | 

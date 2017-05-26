@@ -9,6 +9,7 @@ import { FillInTheBlank } from './fill_in_the_blank';
 import { Ordering } from './ordering';
 import { Text } from './text';
 import { ShortAnswer } from './short_answer';
+import { Essay } from './essay';
 import { Numeric } from './numeric';
 import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
@@ -17,7 +18,7 @@ import { getChildren, augment } from './common';
 import { getEntities } from './html/changes';
 import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | FillInTheBlank | Ordering 
+export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay |
   | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
@@ -126,6 +127,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
         case 'ordering':
           model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          break;
+        case 'essay':
+          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
           break;
         
         // We do not yet support image_hotspot:
