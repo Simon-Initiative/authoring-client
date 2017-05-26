@@ -419,6 +419,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
   toPersistence(): Object {
     const children = [
+      this.title.toPersistence(),
       ...this.pages.toArray().map(page => page.toPersistence()),
     ]
     let resource = this.resource.toPersistence();
