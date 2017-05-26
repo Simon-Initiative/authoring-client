@@ -53,7 +53,6 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
 
     const p = (json as any);
     model = model.with({ resource: Resource.fromPersistence(p) });
-    model = model.with({ guid: p.guid });
     model = model.with({ type: p.type });
     if (p.lock !== undefined && p.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(p.lock) });
