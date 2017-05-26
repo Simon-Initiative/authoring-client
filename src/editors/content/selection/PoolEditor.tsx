@@ -5,8 +5,9 @@ import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { QuestionEditor } from '../question/QuestionEditor';
 import { ContentEditor } from '../content/ContentEditor';
-import { TitleContentEditor } from '../title/TitleContentEditor';
+
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
+import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
 import '../common/editor.scss';
@@ -17,7 +18,7 @@ export interface PoolEditor {
 }
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
-
+  onRemove: (guid: string) => void;
 }
 
 export interface PoolState {
@@ -34,21 +35,14 @@ export class PoolEditor
   constructor(props) {
     super(props);
     
-    this.onAddQuestion = this.onAddQuestion.bind(this);
     this.onRemoveQuestion = this.onRemoveQuestion.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
+    
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return (nextProps.model !== this.props.model);
-  }
-
-  onAddQuestion() {
-    const question = new contentTypes.Question();
-    this.props.onEdit(this.props.model.with(
-      { questions: this.props.model.questions.set(question.guid, question) }));
   }
 
   onRemoveQuestion(guid) {
@@ -65,9 +59,7 @@ export class PoolEditor
     this.props.onEdit(this.props.model.with({ content }));
   }
 
-  onTitleEdit(title) {
-    this.props.onEdit(this.props.model.with({ title }));
-  }
+  
 
 
   renderQuestion(question: contentTypes.Question) {
@@ -75,20 +67,15 @@ export class PoolEditor
              {...this.props}
              model={question}
              onEdit={this.onEditQuestion}
+             onRemove={this.onRemoveQuestion}
            />;
   }
 
   render() : JSX.Element {
     
     return (
-      <div className="componentWrapper pool">
-
-        <div style={ { float: 'right' } }>
-          <Button onClick={this.onAddQuestion}>Add Question</Button>
-        </div>
-
-        {this.props.model.questions.map(q => this.renderQuestion(q))};
-
+      <div>
+        {this.props.model.questions.map(q => this.renderQuestion(q))}
       </div>
     );
   }

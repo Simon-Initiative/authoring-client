@@ -148,7 +148,13 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
       },
       activities: {
         label: "Activities",
-        icon: "O",
+        icon: "A",
+        staticContent: false,
+        onclick: this.placeholderMenuHandler
+      },
+      pools: {
+        label: "Pools",
+        icon: "P",
         staticContent: false,
         onclick: this.placeholderMenuHandler
       },
@@ -302,13 +308,27 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         })
       );
 
+    const viewPools = () =>
+      this.props.viewActions.viewResources(
+        this.props.course.model.guid,
+        'Pools',
+        'x-oli-pool',
+        (resource) => resource.type === 'x-oli-pool',
+        (title, type) => new models.PoolModel({
+          type,
+          pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),
+        }),
+      );
 
+    
     this.opts.get('package').onclick = () => this.props.viewActions.viewDocument(this.props.course.model.guid);
     this.opts.get('organizations').onclick = viewOrganizations;
     this.opts.get('workBookPages').onclick = viewWorkbookPages;
     this.opts.get('activities').onclick = viewActivities;
     this.opts.get('objectives').onclick = viewLearningObjectives;
     this.opts.get('skills').onclick = viewSkills;
+    this.opts.get('pools').onclick = viewPools;
+    
     // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
     // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
 

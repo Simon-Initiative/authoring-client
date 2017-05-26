@@ -32,6 +32,7 @@ import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
+import { RemovableContent } from '../common/RemovableContent';
 
 type Ids = {
   id: string,
@@ -48,7 +49,7 @@ export interface QuestionEditor {
 }
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
-
+  onRemove: (guid: string) => void;
 }
 
 export interface QuestionEditorState {
@@ -389,7 +390,9 @@ export abstract class QuestionEditor
 
     return (
     
-      <div className='componentWrapper question'>
+      <RemovableContent 
+        onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
+        associatedClasses="question">
 
         <Collapse caption="Question" 
           details={getHtmlDetails(this.props.model.body)}
@@ -397,7 +400,9 @@ export abstract class QuestionEditor
 
           <HtmlContentEditor 
                 ref={c => this.htmlEditor = c}
-                {...this.props}
+                editMode={this.props.editMode}
+                services={this.props.services}
+                context={this.props.context}
                 activeItemId={this.state.activeItemId}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
@@ -407,7 +412,9 @@ export abstract class QuestionEditor
                 />
 
           <ConceptsEditor 
-            {...this.props}
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
             courseId={this.props.context.courseId}
             model={this.props.model.concepts}
             onEdit={this.onConceptsEdit} 
@@ -418,7 +425,7 @@ export abstract class QuestionEditor
           {this.renderItemsAndParts()}
 
         </Collapse>
-      </div>);
+      </RemovableContent>);
   }
 
 }

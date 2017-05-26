@@ -13,7 +13,9 @@ import {OrgContentTypes, OrgItem, OrgModule, OrgOrganization, OrgSection, OrgSeq
 import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
+import { PoolModel } from './models/pool';
 
+export { PoolModel } from './models/pool';
 
 export type EmptyModel = 'EmptyModel';
 export const EmptyModel: EmptyModel = 'EmptyModel';
@@ -25,7 +27,8 @@ export const ModelTypes = types.strEnum([
   'MediaModel',
   'OrganizationModel',
   'LearningObjectiveModel',
-  'SkillModel'
+  'SkillModel',
+  'PoolModel'
 ])
 
 // Create an actual type
@@ -54,6 +57,8 @@ export function createModel(object: any): ContentModel {
       return SkillModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
+    case 'x-oli-pool':
+      return PoolModel.fromPersistence(object);
   }
 }
 
@@ -1291,7 +1296,8 @@ export type ContentModel =
   WorkbookPageModel |
   OrganizationModel |
   LearningObjectiveModel |
-  SkillModel;
+  SkillModel |
+  PoolModel;
 
 // A pure function that takes a content model as
 // input and returns a changed content model

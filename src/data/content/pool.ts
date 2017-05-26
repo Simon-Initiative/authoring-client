@@ -24,7 +24,7 @@ const defaultPoolParams = {
   contentType: 'Pool',
   id: '',
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
-  title: new Title(),
+  title: new Title({ text: 'Pool Title' }),
   content: new Content(),
   sections: Immutable.OrderedMap<string, Unsupported>(),
   questions: Immutable.OrderedMap<string, Question>(),

@@ -5,6 +5,7 @@ import CourseEditor from '../document/course/CourseEditor';
 import OrganizationEditor from '../document/organization/OrganizationEditor';
 import LearningObjectiveEditor from '../document/learningobjectives/LearningObjectiveEditor';
 import SkillEditor from '../document/skills/SkillEditor';
+import PoolEditor from '../document/pool/PoolEditor';
 
 import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
 import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';
@@ -45,6 +46,13 @@ export default function initEditorRegistry() {
   register({
     name: ModelTypes.LearningObjectiveModel, 
     component: LearningObjectiveEditor,
+    persistenceStrategy: new DeferredPersistenceStrategy(),
+    listeningApproach: ListeningApproach.WhenReadOnly,
+    protected: true,
+  });
+  register({
+    name: ModelTypes.PoolModel, 
+    component: PoolEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,

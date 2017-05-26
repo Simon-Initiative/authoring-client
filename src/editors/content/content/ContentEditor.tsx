@@ -14,6 +14,7 @@ import BlockToolbar from '../html/BlockToolbar';
 import { TextInput, InlineForm, Button, Checkbox, Select } from '../common/controls';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
+import { RemovableContent } from '../common/RemovableContent';
 
 import '../common/editor.scss';
 
@@ -26,7 +27,7 @@ export interface ContentEditor {
 }
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
-
+  onRemove: (guid: string) => void;
 }
 
 export interface ContentEditorState {
@@ -89,7 +90,8 @@ export class ContentEditor
     )
 
     return (
-      <div className='componentWrapper content'>
+      <RemovableContent onRemove={() => this.props.onRemove(this.props.model.guid)} 
+        associatedClasses="content">
         <Collapse 
           caption='Content' 
           details={getHtmlDetails(this.props.model.body)}
@@ -104,7 +106,7 @@ export class ContentEditor
                 onEdit={this.onBodyEdit} 
                 />
         </Collapse>
-      </div>);
+      </RemovableContent>);
   }
 
 }
