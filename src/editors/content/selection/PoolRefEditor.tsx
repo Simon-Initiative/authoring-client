@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
+import * as persistence from '../../../data/persistence';
+import * as models from '../../../data/models';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, 
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -7,6 +9,7 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import guid from '../../../utils/guid';
 import { describePool } from './details';
 import { RemovableContent } from '../common/RemovableContent';
+import ResourceSelection from '../../../utils/selection/ResourceSelection';
 import '../common/editor.scss';
 
 
@@ -32,7 +35,9 @@ export class PoolRefEditor
   constructor(props) {
     super(props);
     
-    this.onEditRef = this.onEditRef.bind(this);
+    this.onInsert = this.onInsert.bind(this);
+    this.onCancel = this.onCancel.bind(this);
+    this.onClick = this.onClick.bind(this);
 
     this.state = {
       pool: null,
@@ -43,8 +48,29 @@ export class PoolRefEditor
     return (nextProps.model !== this.props.model);
   }
 
-  onEditRef(idref: string) {
-    this.props.onEdit(this.props.model.with({ idref }));
+  onCancel() {
+    this.props.services.dismissModal();
+  }
+
+  onInsert(resource) {
+    this.props.services.dismissModal();
+
+    this.props.onEdit(this.props.model.with({ idref: resource.id }));
+  }
+
+  onClick() {
+
+    const predicate =
+      (res: persistence.CourseResource) : boolean => {
+        return res.type === 'x-oli-pool';
+      };
+
+    this.props.services.displayModal(
+        <ResourceSelection
+          filterPredicate={predicate}
+          courseId={this.props.context.courseId}
+          onInsert={this.onInsert} 
+          onCancel={this.onCancel}/>);
   }
 
   render() : JSX.Element {

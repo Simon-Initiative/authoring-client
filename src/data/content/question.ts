@@ -13,12 +13,12 @@ import { Numeric } from './numeric';
 import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
-import { getChildren } from './common';
-import { augment } from './common';
+import { getChildren, augment } from './common';
 import { getEntities } from './html/changes';
 import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | FillInTheBlank | Ordering | ShortAnswer | Numeric | Text | Unsupported;
+export type Item = MultipleChoice | FillInTheBlank | Ordering 
+  | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
@@ -38,25 +38,27 @@ const defaultQuestionParams = {
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
-  guid: ''
+  guid: '',
 };
 
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
 function tagInputRefsWithType(model: Question) {
   
-  const byId = model.items.toArray().reduce((p, c) => {
-    if ((c as any).id !== undefined) {
-      p[(c as any).id] = c;
-      return p;
-    }
-  }, {});
+  const byId = model.items.toArray().reduce(
+    (p, c) => {
+      if ((c as any).id !== undefined) {
+        p[(c as any).id] = c;
+        return p;
+      }
+    }, 
+    {});
 
   const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
     .reduce((contentState, info) => {
       console.log(info);
       const type = byId[info.entity.data['@input']].contentType;
-      return contentState.mergeEntityData(info.entityKey, { '$type':  type});
+      return contentState.mergeEntityData(info.entityKey, { $type: type });
     }, model.body.contentState);
 
   const body = model.body.with({contentState});

@@ -8,7 +8,7 @@ import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
-import { UndoRedoToolbar } from './UndoRedoToolbar';
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
