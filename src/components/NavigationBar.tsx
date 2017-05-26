@@ -147,7 +147,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         onclick: this.placeholderMenuHandler
       },
       activities: {
-        label: "Activities",
+        label: "Assessments",
         icon: "A",
         staticContent: false,
         onclick: this.placeholderMenuHandler
@@ -263,7 +263,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     const viewActivities = () =>
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
-        'Activities',
+        'Assessments',
         'x-oli-assessment',
         (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
         (title, type) => new models.AssessmentModel({
