@@ -276,14 +276,34 @@ const styles = {
         "height": "10px"
     }    
   },
+  titleContainer: {
+    "display" : "flex", 
+    "flexDirection" : 'column',
+    "justifyContent": "space-between",
+    'padding': '0px'
+  },
+  titleDivider : {
+    'border' : '0px solid red',
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "minWidth": "370px",      
+    "maxWidth": "370px",
+    'height': '14px',
+    'line-height': '14px',
+    'margin': '0px',
+    'padding': '0px',
+    'font-size': '10px'
+  },
   loTitleRenderer : {
-      'border' : '0px solid black',
-      "overflowY": "hidden",
-      "overflowX": "hidden",
-      "minWidth": "370px",      
-      "maxWidth": "400px",
-      'height': '42px',
-      'line-height': '42px'
+    'border' : '0px solid black',
+    "overflowY": "hidden",
+    "overflowX": "hidden",      
+    "minWidth": "370px",      
+    "maxWidth": "370px",
+    'height': '26px',
+    'line-height': '26px',
+    'margin-top': '0px',
+    'margin-bottom': '2px'
   } 
 };
 
@@ -454,6 +474,9 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         let bStyle:any=styles.orgrowTitle;
         bStyle ["marginLeft"]="10px";
+ 
+        let titleDivider:any=styles.titleDivider;
+        let titleContainer:any=styles.titleContainer;
 
         //>--------------------------------------------------------------------
 
@@ -537,15 +560,19 @@ class OrganizationNodeRenderer extends Component <any,any>
                         <div style={gStyle}>
 
                           {handle}
-            
-                           <TitleContentEditor 
-                             services={services}
-                             editMode={true}
-                             model={titleObj}
-                             context={context}
-                             styles={styles.loTitleRenderer}
-                             onEdit={(content) => this.editNodeTitle(node,content)} 
-                           />
+                           <div style={titleContainer}>
+                             <TitleContentEditor 
+                               services={services}
+                               editMode={true}
+                               model={titleObj}
+                               context={context}
+                               styles={styles.loTitleRenderer}
+                               onEdit={(content) => this.editNodeTitle(node,content)} 
+                             />
+                             <div style={titleDivider}>
+                             {node.orgType}
+                             </div>                             
+                           </div>
             
                            {popDown}
                                

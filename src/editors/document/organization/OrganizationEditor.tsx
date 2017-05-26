@@ -231,7 +231,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     componentWillReceiveProps (newProps:OrganizationEditorProps) {
-      this.setState({treeData: this.props.model.organization});  
+      console.log ("componentWillReceiveProps ()");  
+      this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: this.props.model.organization});  
     }
 
     /**
@@ -239,7 +240,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     expand(expanded) {
         this.setState({
-            treeData: toggleExpandedForAll({
+            treeData: toggleExpandedForAll({               
                 treeData: this.state.treeData,
                 expanded,
             }),
