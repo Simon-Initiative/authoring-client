@@ -275,6 +275,77 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     }    
 
     /**
+     * 
+     */
+    evaluateTree (aTree:Array<OrgItem>):Array <OrgItem> {
+      console.log ("evaluateTree ()");
+        
+      for (let i=0;i<aTree.length;i++) {
+
+        let evalSequence:OrgItem=aTree [i];
+          
+        for (let j=0;j<evalSequence.children.length;j++) {
+          let evalModule:OrgItem=evalSequence.children [j];
+            
+          for (let k=0;k<evalModule.children.length;k++) {
+            let evalSection:OrgItem=evalModule.children [k];
+              
+            if (evalSection.orgType!=OrgContentTypes.Section) {
+              console.log ("Changing " + evalSection.orgType + " to section ...");
+                        
+              evalModule.children [k]=new OrgSection ();
+              evalModule.children [k].id=evalSection.id;
+              evalModule.children [k].expanded=evalSection.expanded;
+              evalModule.children [k].annotations=evalSection.annotations;  
+              evalModule.children [k].title=evalSection.title;
+              evalModule.children [k].resourceRef=evalSection.resourceRef;  
+              evalModule.children [k].children=evalSection.children;
+              
+              // At this point the evalSection variable should be orphaned but it's 
+              // member variables should be re-assigned. Investigate this however!                     
+            }              
+          }  
+            
+          if (evalModule.orgType!=OrgContentTypes.Module) {
+            console.log ("Changing " + evalModule.orgType + " to module ...");
+                        
+            evalSequence.children [j]=new OrgModule ();
+            evalSequence.children [j].id=evalModule.id;
+            evalSequence.children [j].expanded=evalModule.expanded;
+            evalSequence.children [j].annotations=evalModule.annotations;  
+            evalSequence.children [j].title=evalModule.title;
+            evalSequence.children [j].resourceRef=evalModule.resourceRef;  
+            evalSequence.children [j].children=evalModule.children;
+              
+            // At this point the evalModule variable should be orphaned but it's 
+            // member variables should be re-assigned. Investigate this however!                     
+          }  
+        }  
+
+        //>-----------------------------------------------------------------------  
+
+        if (evalSequence.orgType!=OrgContentTypes.Sequence) {
+          console.log ("Changing " + aTree [i].orgType + " to sequence ...");
+                       
+          aTree [i]=new OrgSequence ();
+          aTree [i].id=evalSequence.id;
+          aTree [i].expanded=evalSequence.expanded;
+          aTree [i].annotations=evalSequence.annotations;  
+          aTree [i].title=evalSequence.title;
+          aTree [i].resourceRef=evalSequence.resourceRef;  
+          aTree [i].children=evalSequence.children;
+
+          // At this point the evalSequence variable should be orphaned but it's 
+          // member variables should be re-assigned. Investigate this however!            
+        }
+          
+        //>-----------------------------------------------------------------------          
+      }
+        
+      return (aTree);
+    }
+    
+    /**
      * This method is called by the tree component and even though we could access
      * the state directly we're going to assume that the tree component made some
      * changes that haven't been reflected in the global component state yet.
@@ -282,7 +353,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
                     
-      this.onEdit (newData ["treeData"]);      
+      let fixedData:Array <OrgItem>=this.evaluateTree (newData ["treeData"]);  
+        
+      this.onEdit (fixedData);      
     }    
     
     /**

@@ -184,7 +184,6 @@ export class OrgOrganization extends OrgSequence {
       ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("title",this.title));
       ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("description",this.description));
       ephemeral ["organization"]["#array"].push (OrgItem.addTextObject ("audience",this.audience));
-      //ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);
       ephemeral ["organization"]["#annotations"]=Linkable.toJSON (this.annotations);     
     }          
     return (ephemeral);

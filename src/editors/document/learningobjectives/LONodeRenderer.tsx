@@ -274,7 +274,8 @@ const styles = {
       "minWidth": "350px",      
       "maxWidth": "400px",
       'height': '42px',
-      'line-height': '42px'
+      'line-height': '42px',
+      'margin-top': '0px'
   }  
 };
 
