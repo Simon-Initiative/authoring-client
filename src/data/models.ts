@@ -608,12 +608,13 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
+      console.log ("typeSwitch: " + typeSwitch);  
+        
       if (typeSwitch == "title") {
-        //console.log ("Found module title: " + this.getTextFromNode (mdl ["title"]));
         moduleNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
       }
 
-      if (typeSwitch == "item") {
+      if (typeSwitch == "item") {  
         moduleNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
       }
 
@@ -621,8 +622,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         moduleNode.addNode(OrganizationModel.parseSection(mdl ["section"]));
       }
     }
-
-    //console.log ("Result " + JSON.stringify (moduleNode));
 
     return (moduleNode);
   }

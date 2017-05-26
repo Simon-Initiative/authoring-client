@@ -57,6 +57,12 @@ const customStyles = {
   }    
 };
 
+class Item {
+    id: string="";
+    checked: boolean = false;
+    title: string="";
+}
+
 interface LearningObjectiveLinker {
 
 }
@@ -72,15 +78,9 @@ export interface LearningObjectiveLinkerProps {
 export interface LearningObjectiveLinkerState {
   sourceData: any;
   localAnnotations: Array<Item>;     
-  modalIsOpen : boolean;    
+  modalIsOpen : boolean;
   target: any;
   closeModal: any;
-}
-
-class Item {
-    id: string="";
-    checked: boolean = false;
-    title: string="";
 }
 
 /**
@@ -100,14 +100,15 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         
     super(props);
       
-    console.log ("Linking target: " + JSON.stringify (this.props.target));   
-      
+    console.log ("Linking target: " + JSON.stringify (this.props.target.annotations));
+    console.log ("Linking sourceData: " + JSON.stringify (this.props.sourceData));
+     
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
                    target: this.props.target,                                           
                    closeModal: this.props.closeModal,
-                   localAnnotations: null
+                   localAnnotations: new Array<Item> ()
                  };
             
     this.openModal = this.openModal.bind(this);
@@ -133,10 +134,11 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     console.log ("resolveAnnotations ()");
     
     if (this.state.target==null) {
-      console.log ("No LO target given yet, bump");  
+      console.log ("No link target given yet, bump");  
       return;
     }  
 
+    // This will become local annotations
     var newData: Array <Item>=new Array ();
       
     // First reset everything so that we don't have to keep
@@ -153,7 +155,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       
     for (var i=0;i<this.state.target.annotations.length;i++) {    
        let item=this.state.target.annotations [i];  
-       console.log ("Checking item: " + item); 
+       console.log ("Checking item: " + item);
         
        for (var j=0;j<newData.length;j++) {
          let sourceItem=newData [j];  
@@ -163,7 +165,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        }
     }      
   
-    this.setState({sourceData: newData});
+    this.setState({localAnnotations: newData});
   }    
     
   /**
@@ -193,7 +195,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     this.setState({modalIsOpen: false});
 
     var newData = [];
-    this.state.sourceData.forEach(function(item) {
+    this.state.localAnnotations.forEach(function(item) {
       if (item.checked ==true) {
        let newLink:Linkable=new Linkable ();
        newLink.id=item.id;
@@ -220,25 +222,21 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
 
   /**
    * 
-   */    
+   */       
   handleItemChange (e) {
-    var selectedValues = [];
+    console.log ("handleItemChange ()");
+
     var newData = [];
 
-    this.state.sourceData.forEach(function(item) {
-  
-       if(item.id === e.target.id) {
-         item.checked = e.target.checked;
-       }
+    this.state.localAnnotations.forEach(function(item) {    
+      if(item.id === e.target.id) {  
+        item.checked = e.target.checked;
+      }
 
-       if(item.checked) {
-         selectedValues.push(item.value);
-       }
+      newData.push(item);
+    });
 
-       newData.push(item);
-     });
-
-     this.setState({sourceData: newData});      
+    this.setState({localAnnotations: newData});      
   }
 
   /**
@@ -251,7 +249,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       newData.push(item);
     });
 
-    this.setState({sourceData: newData});
+    this.setState({localAnnotations: newData});
   }
     
   /**
@@ -264,7 +262,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(item);
      });
 
-    this.setState({sourceData: newData});
+    this.setState({localAnnotations: newData});
   }
     
   /**
@@ -281,23 +279,24 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(item);
      });
 
-    this.setState({sourceData: newData});
+    this.setState({localAnnotations: newData});
   }      
     
   /**
    * 
    */    
   render () {      
-    console.log ("Source data: " + JSON.stringify (this.state.sourceData)); 
+    //console.log ("Source data: " + JSON.stringify (this.state.sourceData)); 
       
-    var options = this.state.sourceData.map(function(item, index) {
+    var options = this.state.localAnnotations.map(function(item, index) {
                 
     return (
       <div key={'chk-' + index} className="checkbox">
         <label>
           <input type="checkbox"
+            id={item.id}
             value={item.title}
-            onChange={this.handleItemChange}
+            onChange={this.handleItemChange.bind(this)}
             checked={item.checked ? true : false} /> {item.title}
         </label>
       </div>

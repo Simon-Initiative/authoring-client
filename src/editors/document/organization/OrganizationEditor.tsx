@@ -102,13 +102,77 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         model: this.props.model
       });
                 
-      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
+      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu}, function () {
+        this.assignItemTypes ();    
+      });
         
       this.loadLearningObjectives ();
       
       this.loadPages ();  
         
       this.loadActivities ();
+    }
+    
+    /**
+     * 
+     */
+    componentWillReceiveProps (newProps:OrganizationEditorProps) {
+      console.log ("componentWillReceiveProps ()");
+
+      this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: this.props.model.organization});  
+    }
+    
+    /**
+     * 
+     */
+    assignItemTypes () : void {
+      console.log ("assignItemTypes ()");
+        
+      let immutableHelper = this.state.treeData.slice();
+                
+      this.assignType (immutableHelper);  
+
+      this.onEdit (immutableHelper);          
+    }
+    
+    /**
+     * 
+     */
+    assignType (aNode:Array <OrgItem>): void
+    {
+      console.log ("assignType ()");
+        
+      for (let i=0;i<aNode.length;i++) {
+        let targetObject:OrgItem=aNode [i] as OrgItem;
+          
+        console.log ("Examining node with type: " + targetObject.orgType);  
+        
+        if (targetObject.orgType==OrgContentTypes.Item) {
+           console.log ("found an item, searching for type content ..."); 
+           targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
+        }
+          
+        this.assignType (targetObject.children);  
+      }          
+    }      
+    
+    /**
+     * 
+     */
+    findType (anId:string) : string {
+      console.log ("findType ("+anId+")");
+     
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      let activityList:Array<Linkable>=new Array <Linkable>();        
+        
+      resourceList.map((value, id) => {        
+        if (value.id==anId) {
+          return (value.type);    
+        }          
+      })
+        
+      return ("undefined");  
     }
     
     /**
@@ -183,24 +247,20 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      *
      */            
     loadDocument (anID:string):any {
-        console.log ("loadDocument ("+anID+")");
+      console.log ("loadDocument ("+anID+")");
+        
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
         _id: this.props.model.guid,
         model: this.props.model
       });
+        
       this.setState({loModalIsOpen: false, treeData: this.props.model.organization, document: docu});
-      //   persistence.retrieveDocument(anID).then(doc => {
-      //
-      //       console.log ("Loaded doc: " + JSON.stringify (doc));
-      //
-      //       this.setState ({loModalIsOpen: false, treeData: doc.model ["organization"],document: doc});
-      //       return (doc);
-      //   });
-      //
-      //  return (null);
     }
         
+    /**
+     * 
+     */
     onEdit(newData?:any) {
         
       let newModel  
@@ -211,9 +271,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
       }  
               
-      this.props.onEdit(newModel);
-        
-      //this.setState ({treeData: newData}); 
+      this.props.onEdit(newModel); 
     }    
 
     /**
@@ -227,14 +285,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       this.onEdit (newData ["treeData"]);      
     }    
     
-    /**
-     * 
-     */
-    componentWillReceiveProps (newProps:OrganizationEditorProps) {
-      console.log ("componentWillReceiveProps ()");  
-      this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: this.props.model.organization});  
-    }
-
     /**
      * 
      */
@@ -263,8 +313,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     collapseAll() {
         this.expand(false);
     }
-    
-    
 
     /**
      * 
@@ -369,9 +417,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     closeLOModal () {
       console.log ("LearningObjectiveEditor: closeLOModal ()");
         
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false});  
-        
-      this.onEdit ();
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
+        this.onEdit ();
+      });                
     }    
     
     /**
@@ -579,9 +627,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }
             
-      this.onEdit (immutableHelper);        
-        
-      //this.onEdit ();
+      this.onEdit (immutableHelper);
     }    
     
     /**
@@ -630,7 +676,16 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       }    
                    
       return (<div></div>);           
-    }    
+    }
+    
+    /**
+     * 
+     */
+    canDrop (aNode) {
+      console.log ("canDrop ()");  
+        
+      return (true);
+    }
             
     /**
      * 
@@ -653,11 +708,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                   {pagelinker}
                   {activitylinker}
                   <SortableTree
-                      maxDepth={5}
+                      maxDepth={3}
                       treeData={this.state.treeData}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
                       generateNodeProps={this.genProps.bind(this)} 
+                      canDrop={this.canDrop.bind(this)} 
                   />
               </div>
       );

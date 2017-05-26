@@ -13,7 +13,8 @@ export class TResource {
 export default class Linkable {      
   //resource:TResource=new TResource ();
   id:string=guid();
-  title:string="unassigned";       
+  title:string="unassigned";
+  typeDescription:string="x-oli-workbook_page"; // This variable is only used for internal bookkeeping.
   expanded:boolean=false;
   annotations:Array <Linkable>=new Array ();  
     

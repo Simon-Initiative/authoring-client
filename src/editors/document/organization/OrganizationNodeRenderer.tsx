@@ -116,8 +116,15 @@ const styles = {
     "width" : "16px",
     "height" : "16px",
     "backgroundSize" : "44px 44px",
-    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAhFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC9KDLhAAAAK3RSTlMAUCiI+Ni4oAjAMEgEq3Bo+SpXSk5BgakBWnjzlwLedzr+px2QqBMGFcofUTCwHgAABL5JREFUeF7s1cFKAlEYQOF/BomKCxGUBNW0CYLe/23aCSHoRmQQFVDXbmZAHBjv/c4zfHAiiyRJkiRJkiRJkiRJkiRJUhXX6XkdRTWdA3BW9RtltVxEFtVxUXr9+CwagJ72qWgAeqlS0QDUjFcAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQMAkBuy/jXz66RUwSy0AZ60PkU33EQMIsAAXAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIGCkArboF5A5Ax79uAZkDUFv3CMgcgLZ9AgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACAAAAIAIAAAAgAgAAACACDgRgAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAAAAEAEAAAAQAQAAABABAwicvT+y4G6Pi1eewQMEvtSACo/o5BuovoFlDyAtRUqWgAaqZvRQPQQzq1d8cqDUNhGIZ/RHWwCUUHEcEURMH7vxepRRQxg2BUMIJLBUdHiTUmOed5pqyBF77lJ8k7APaqvANgtsg7AO4FgAAQAAJAAAgAASAABIAAEAAC4O9OwqhWMZTjYvgAuI7B1JcmAAEgAASAABAAAkAACAABbEwACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAB/Dz9sIx3FswC6Wp9HOmoTQNYBIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAHgJGznNtKxL4DOmkjIhwlg2gEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAALAdwLPHmP0qisB9KZZxOg9mIAfIQAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAm8Cjuxi90zcB9GYV47c0AWQSAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAHwn8KCNdBQvAujq8yLSUZsAsg4AASAABIAAEAACQAAIAAEgAASAABAAAkAACAAnYbs3kY5SAJ09xe94GROAABAAAkAACAABIAAEgAAQAAJAAAgAASAAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAA29Gj8j02x2yyAZzE9JgABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgJvA+TL+E/PX72cAAAAAAAAAAACAL8LL6aEKzsebAAAAAElFTkSuQmCC') no-repeat center",      
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAKMSURBVDhPXVNLT1NREP7u7e0LAwrdeLFRm1RdkKgLqUseCV3ZB60JbixoIIGwlLUJj59RIcACcaOCLCCGda3ijpg0lTRtMFFopTxa+qDHM9PemvBtZua7M3PO+WauIiTmZmfw+88BVFWFDKEoCgiGf5kjXG1rxczsHJSpqVfCopnxenoax/k8rFYrKpWKLFChaSacn5/DZrOhWq1yoaZpUOW3+fk32Pm+A4yNjcqmQsiEpr24uGBfFrOl+DJHGI48F6pm0nB6egaTycQnkKWnFAoFvg2BTieOYHDlcqWeS4HNakH++BhtrVfg6GhHNBpFS0sLJicnMBgMwGKxYHt7Gw5HB+w2K1KplOTM3AgT4+Pi5OSEr7S1uSk83Y/YJzx8cF/cvnWzEQkxMhwRCwsL7JdKZfHyxYhQBQQLQxjwehH/+o19ulHh7AwulwvJZJK59bU1eL0DqNVqMJvrNWp9OECpVGLraL+GRCKBT+trCIef4onPh7crK/wt+/cInZ03muOmgbIGJJIhji8QwOetLbxbXcVgOAS/P4CPH94jHo+jr7eHcyhfTgV0uGygyOuYmSAEg0FsbGxgb+8nurs9cLvdODg8xPLyEkKhMOfQUlGNkFY2ELw4Bjyex/gSj+HO3XsNBujp7cWqfEZffz/HNL5yqQy5xpAi1reLyGKxCF3Xkcsd8U0MhOXJB9kcurq6OCa9NDnGpgYEIu12O4uzv/8LkcgwNyT4/H5kMhn2mwvW+Ce4AalKpCGO3qk3G9LzaGxOp5Mb0oJRrMgaGqFalQmxWIy70VOMnTCmQmIZa04NCXTgj91dfqqSy2bF0LMh6Nd1qS5JakDOWSjM/Yf8KjnVpCKdTmNxcQn/AC+cYPqO5VjgAAAAAElFTkSuQmCC') no-repeat center",      
   },
+  apage: {
+    "margin" : "auto",
+    "width" : "16px",
+    "height" : "16px",
+    "backgroundSize" : "44px 44px",
+    "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAEOSURBVDhPrZOxjYUwDIZ/rqCmRdCxAHSA6GECBDuwBAUbwAJ0bABbsAMUjIBE8e7ZlzxCDj2d9O6TrMR2Yjm/HOPxBB9wW2BdV7Rti3me2fd9H1VVwXVd9i9QAZUoiqjgrVFO59KBYRhi9x7lCr7EijiOxe6kaRrUdS28k8tZ6mBZlkur0iR3ObpDcAckmE6SJNj3ndsNw1BET7qu45U1yLIM0zRxQDIMA7Ztg2masCwLZVmKzA9pmmIcx1MDnTzP4TgObNtGURQieiIF5wJBELAj8TyP1+M4+BmEjEloNhh6gi5i3/cUfvkExdQzUsSX1O8GSDd1oP5vkAhKPKsL7zeUUy8TH3+m2wJ/B/gGDaPth4EM8IcAAAAASUVORK5CYII=') no-repeat center",      
+  },  
   orgloadingHandle : {
     "height": "42px",
     "width": "45px",
@@ -131,6 +138,18 @@ const styles = {
     "display": "flex",
     "alignItems": "center" 
   },
+  orgpageHandle : {
+    "height": "42px",
+    "width": "45px",
+    "border": "0px solid green",
+    "borderRadius": "1px",
+    "zIndex": 1,                  
+    "background": "#ffffff",
+    "verticalAlign" : "middle",
+    "textAlign": "center",  
+    "display": "flex",
+    "alignItems": "center" 
+  },  
   orgloadingCircle : {
     "width": "80%",
     "height": "80%",
@@ -324,7 +343,7 @@ class OrganizationNodeRenderer extends Component <any,any>
      * 
      */
     generatePopDown (node) {
-      console.log ("generatePopDown ("+node.orgType+")");
+      //console.log ("generatePopDown ("+node.orgType+")");
           
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
@@ -405,6 +424,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             ...otherProps,
         } = this.props;
 
+        //console.log ("Rendering node: " + JSON.stringify (node));
+
         let handle;
 
         this.linkAnnotation=linkAnnotation;
@@ -423,6 +444,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         
         let hStyle:any=styles.backupHamburger;
         let workbookPageStyle:any=styles.wpage;
+        let activityPageStyle:any=styles.apage;
 
         if (node.orgType!=OrgContentTypes.Item) {
           handle = connectDragSource((
@@ -431,11 +453,13 @@ class OrganizationNodeRenderer extends Component <any,any>
             </div>
           ), { dropEffect: 'copy' });
         } else {
-          handle = connectDragSource((
-            <div style={styles.orgloadingHandle}>
-              <div id="handle" style={workbookPageStyle}></div>
-            </div>
-          ), { dropEffect: 'copy' });            
+          if (node.typeDescription=="x-oli-workbook_page") {  
+            handle = <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>;
+          }
+            
+          if (node.typeDescription=="x-oli-inline-assessment") {  
+            handle = <div style={styles.orgpageHandle}><div id="handle" style={activityPageStyle}></div></div>;
+          }            
         }    
 
         const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
@@ -609,8 +633,6 @@ class OrganizationNodeRenderer extends Component <any,any>
                 </div>
             </div>
         );
-
-
     }
 }
 
