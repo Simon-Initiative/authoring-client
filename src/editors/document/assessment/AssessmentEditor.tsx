@@ -83,8 +83,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onEdit(guid : string, content : models.Node) {
-    const nodes = this.props.model.nodes.set(guid, content);
-    this.handleEdit(this.props.model.with({ nodes }));
+    this.addNode(content);
   }
 
   onTitleEdit(content: contentTypes.Title) {
@@ -92,9 +91,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onNodeRemove(guid: string) {
-    this.handleEdit(this.props.model.with(
-      { nodes: this.props.model.nodes.delete(guid) },
-    ));
+
+    let page = this.props.model.pages.get(this.state.current);
+    page = page.with({ nodes: page.nodes.delete(guid) });
+
+    const pages = this.props.model.pages.set(page.guid, page);
+
+    this.handleEdit(this.props.model.with({ pages }));
   }
 
   renderNode(n : models.Node) {
