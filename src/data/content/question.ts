@@ -18,7 +18,7 @@ import { getChildren, augment } from './common';
 import { getEntities } from './html/changes';
 import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay |
+export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
