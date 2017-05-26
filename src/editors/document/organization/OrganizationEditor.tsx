@@ -240,7 +240,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     expand(expanded) {
         this.setState({
-            treeData: toggleExpandedForAll({               
+            treeData: toggleExpandedForAll({              
+                pagesModalIsOpen: false, 
+                loModalIsOpen: false, 
+                activitiesModalIsOpen : false, 
                 treeData: this.state.treeData,
                 expanded,
             }),
@@ -261,30 +264,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         this.expand(false);
     }
     
-    /**
-     * Note that this manual method of adding a new node does not generate an
-     * onChange event. That's why we call extractData manually as the very
-     * last function call.
-     */
-    addNode (anEvent) {
-        console.log ("addNode ()");
-        
-        var immutableHelper = this.state.treeData.slice()
-        
-        if (immutableHelper==null)
-        {
-            console.log ("Bump");
-            return;
-        }
-        
-        var newNode:OrgSequence=new OrgSequence ();
-        newNode.title=("Title " + this.state.titleIndex);
-        immutableHelper.push (newNode);
-        
-        this.setState ({titleIndex: this.state.titleIndex+1});
-
-        this.onEdit (immutableHelper);    
-    }    
+    
 
     /**
      * 
@@ -402,7 +382,102 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                 
         this.setState ({pagesModalIsOpen: false, loModalIsOpen: true, activitiesModalIsOpen : false, orgTarget: aNode});
     }    
+
+    /**
+     * Note that this manual method of adding a new node does not generate an
+     * onChange event. That's why we call extractData manually as the very
+     * last function call.
+     */
+    addNode (anEvent) {
+        console.log ("addNode ()");
         
+        var immutableHelper = this.state.treeData.slice()
+        
+        if (immutableHelper==null)
+        {
+            console.log ("Bump");
+            return;
+        }
+        
+        var newNode:OrgSequence=new OrgSequence ();
+        newNode.title=("Title " + this.state.titleIndex);
+        immutableHelper.push (newNode);
+        
+        this.setState ({titleIndex: this.state.titleIndex+1});
+
+        this.onEdit (immutableHelper);    
+    }   
+    
+    /**
+     *
+     */
+    addModule (aNode:any) {
+      console.log ("addModule ()");
+             
+      let immutableHelper = this.state.treeData.slice();
+                
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
+      if (immutableHelper==null) {
+        console.log ("Bump");
+        return;
+      }
+        
+      if (parentArray!=null) {
+        console.log ("We have an object, performing edit ...");
+      } else {
+        console.log ("Internal error: node not found in tree");
+      }        
+                        
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==aNode.id) {
+          let newModule:OrgModule=new OrgModule ();
+          newModule.title=("Module " + this.state.titleIndex);
+          testNode.children.push (newModule);
+          break;
+        }
+      }
+
+      this.onEdit (immutableHelper);           
+    }
+    
+    /**
+     *
+     */
+    addSection (aNode:any) {
+      console.log ("addSection ()");
+             
+      let immutableHelper = this.state.treeData.slice();
+                
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
+      if (immutableHelper==null) {
+        console.log ("Bump");
+        return;
+      }
+        
+      if (parentArray!=null) {
+        console.log ("We have an object, performing edit ...");
+      } else {
+        console.log ("Internal error: node not found in tree");
+      }        
+                        
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==aNode.id) {
+          let newSection:OrgSection=new OrgSection ();
+          newSection.title=("Section " + this.state.titleIndex);
+          testNode.children.push (newSection);
+          break;
+        }
+      }
+
+      this.onEdit (immutableHelper);         
+    }    
+    
     /**
      * 
      */    
@@ -464,6 +539,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         optionalProps ["treeData"]=this.state.treeData;
         optionalProps ["addPage"]=this.addPage.bind (this);
         optionalProps ["addActivity"]=this.addActivity.bind (this);
+        optionalProps ["addModule"]=this.addModule.bind (this);
+        optionalProps ["addSection"]=this.addSection.bind (this);
         
         return (optionalProps);
     }
@@ -568,7 +645,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
               <div>
                   <div>
                       <h2 className="h2 organize" style={tempnavstyle.h2}>Course Content</h2>
-                      <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
+                      <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                   </div>

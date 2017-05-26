@@ -317,32 +317,56 @@ class OrganizationNodeRenderer extends Component <any,any>
     linkAnnotation:any=null;
     addPage:any=null;
     addActivity:any=null;
+    addModule:any=null;
+    addSection:any=null;
           
     /**
      * 
      */
     generatePopDown (node) {
-      //console.log ("generatePopDown ()");
+      console.log ("generatePopDown ("+node.orgType+")");
           
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
         
       let menuStyle:string="flex-column onclick-menu-content list-group";
+        
+      let loLink=<li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>;
+      let pageLink=<li className="list-group-item">Page</li>;
+      let activityLink=<li className="list-group-item">Activity</li>;
+      let assetLink=<li className="list-group-item"><a href="#" >Add-On</a></li>;
+      let sectionLink;
+      let moduleLink;
+        
+      if (node.orgType==OrgContentTypes.Module) {
+        sectionLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addSection (node)}>Section</a></li>
+      }
+
+      if (node.orgType==OrgContentTypes.Sequence) {
+        moduleLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addModule (node)}>Module</a></li>
+      }
+
+      if (node.orgType==OrgContentTypes.Section) {
+        pageLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>;
+        activityLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
+      }
                  
       return (
-        <div ref='clickarea'>
-          <div tabIndex={0} className="onclick-menu">
-            <ul className={menuStyle}>
-              Content
-              <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
-              <li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>
-              <li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>
-              <li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
-              Assets
-              <li className="list-group-item"><a href="#" >Add-On</a></li>              
-            </ul>
-          </div>
-        </div>);        
+          <div ref='clickarea'>
+            <div tabIndex={0} className="onclick-menu">
+              <ul className={menuStyle}>
+                Content
+                {moduleLink}
+                {sectionLink}
+                <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+                {loLink}
+                {pageLink}
+                {activityLink}
+                Assets
+                {assetLink}
+              </ul>
+            </div>
+          </div>);
     }
 
     render() {        
@@ -354,7 +378,9 @@ class OrganizationNodeRenderer extends Component <any,any>
             deleteNode,
             treeData,
             linkAnnotation,
-            addActivity,     
+            addActivity,  
+            addModule,
+            addSection,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -386,6 +412,8 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.deleteNodeFunction=deleteNode;
         this.addPage=addPage;
         this.addActivity=addActivity;
+        this.addModule=addModule;
+        this.addSection=addSection;
 
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
