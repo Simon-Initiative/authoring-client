@@ -10,6 +10,7 @@ import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
+import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/resource';
 import * as contentTypes from '../../../data/contentTypes';
@@ -297,6 +298,32 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           
           
           {skilllinker} 
+
+          <div className="componentWrapper">
+            <form className="form-inline">
+              <label>Recommended attempts</label>
+              <TextInput
+                width="50px"
+                label=""
+                type="number"
+                value={this.props.model.recommendedAttempts}
+                onEdit={
+                  recommendedAttempts => this.handleEdit(
+                    this.props.model.with({ recommendedAttempts }))}
+              />&nbsp;&nbsp;&nbsp;&nbsp;
+              <label>Max attempts</label>
+              <TextInput
+                width="50px"
+                label=""
+                type="number"
+                value={this.props.model.maxAttempts}
+                onEdit={
+                  maxAttempts => this.handleEdit(
+                    this.props.model.with({ maxAttempts }))}
+              />
+            </form>
+          </div>
+
           {nodeEditors}
 
         </div>

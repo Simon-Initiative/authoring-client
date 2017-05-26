@@ -312,6 +312,8 @@ export type AssessmentModelParams = {
   resource?: Resource,
   guid?: string,
   type?: string;
+  recommendedAttempts?: string;
+  maxAttempts?: string;
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
   nodes?: Immutable.OrderedMap<string, Node>,
@@ -322,6 +324,8 @@ const defaultAssessmentModelParams = {
   type: '',
   resource: new Resource(),
   guid: '',
+  recommendedAttempts: '1',
+  maxAttempts: '1',
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   nodes: Immutable.OrderedMap<string, Node>(),
@@ -356,6 +360,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   resource: Resource;
   guid: string;
   type: string;
+  recommendedAttempts: string;
+  maxAttempts: string;
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   nodes: Immutable.OrderedMap<string, Node>;
@@ -378,6 +384,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
     model = model.with({title: new contentTypes.Title({guid: guid(), text: a.title})});
+
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
@@ -387,6 +394,14 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     } else {
       assessment = a.doc.assessment;
     }
+
+    if (assessment['@recommendedAttempts'] !== undefined) {
+      model = model.with({ recommendedAttempts: assessment['@recommendedAttempts']});
+    }
+    if (assessment['@maxAttempts'] !== undefined) {
+      model = model.with({ maxAttempts: assessment['@maxAttempts']});
+    }
+
     assessment['#array'].forEach(item => {
 
       const key = getKey(item);
@@ -442,7 +457,9 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     } else {
       doc = [{
         "assessment": {
-          "@id": "id",
+          "@id": this.resource.id,
+          '@recommendedAttempts': this.recommendedAttempts,
+          '@maxAttempts': this.maxAttempts,
           "#array": children
         }
       }];
