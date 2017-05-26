@@ -273,9 +273,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onChangeCurrent={current => this.setState({ current })}
                   onEdit={this.onPageEdit}/>
                 <button type="button" className="btn btn-secondary" 
-                  onClick={this.onAddPage}>Add Page</button>
+                  onClick={this.onAddPage}>Add</button>
                 <button type="button" className="btn btn-secondary" 
-                  onClick={this.onRemovePage}>Remove Page</button>
+                  onClick={this.onRemovePage}>Remove</button>
               </div>
             </div>
           </div>
