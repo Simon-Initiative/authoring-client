@@ -153,7 +153,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         onclick: this.placeholderMenuHandler
       },
       pools: {
-        label: "Pools",
+        label: "Question Pools",
         icon: "P",
         staticContent: false,
         onclick: this.placeholderMenuHandler
@@ -311,9 +311,9 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     const viewPools = () =>
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
-        'Pools',
-        'x-oli-pool',
-        (resource) => resource.type === 'x-oli-pool',
+        'Question Pools',
+        'x-oli-assessment2-pool',
+        (resource) => resource.type === 'x-oli-assessment2-pool',
         (title, type) => new models.PoolModel({
           type,
           pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),

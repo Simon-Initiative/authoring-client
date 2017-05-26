@@ -57,7 +57,7 @@ export function createModel(object: any): ContentModel {
       return SkillModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
-    case 'x-oli-pool':
+    case 'x-oli-assessment2-pool':
       return PoolModel.fromPersistence(object);
   }
 }

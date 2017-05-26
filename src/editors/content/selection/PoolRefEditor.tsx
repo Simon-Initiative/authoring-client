@@ -62,7 +62,7 @@ export class PoolRefEditor
 
     const predicate =
       (res: persistence.CourseResource) : boolean => {
-        return res.type === 'x-oli-pool';
+        return res.type === 'x-oli-assessment2-pool';
       };
 
     this.props.services.displayModal(

@@ -20,13 +20,13 @@ export type PoolModelParams = {
 
 const defaultPoolModel = {
   modelType: 'PoolModel',
-  rev: 0,
+  resource: new Resource(),
   guid: '',
   id: '',
-  type: 'x-oli-pool',
+  type: 'x-oli-assessment2-pool',
   icon: new WebContent(),
   lock: new contentTypes.Lock(),
-  pool: new contentTypes.Pool(),
+  pool: new contentTypes.Pool({ id: guid() }),
 };
 
 export class PoolModel extends Immutable.Record(defaultPoolModel) {
@@ -72,10 +72,11 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
   }
 
   toPersistence(): Object {
+
     const doc = [this.pool.toPersistence()];
     const values = {
       modelType: 'PoolModel',
-      id: this.id,
+      id: this.pool.id,
       title: this.pool.title.text,
       type: this.type,
       doc,
