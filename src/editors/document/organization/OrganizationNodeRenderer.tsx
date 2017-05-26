@@ -342,9 +342,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     /**
      * 
      */
-    generatePopDown (node) {
-      //console.log ("generatePopDown ("+node.orgType+")");
-          
+    generatePopDown (node) {         
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
         
@@ -371,7 +369,6 @@ class OrganizationNodeRenderer extends Component <any,any>
       }
                  
       return (
-          <div ref='clickarea'>
             <div tabIndex={0} className="onclick-menu">
               <ul className={menuStyle}>
                 Content
@@ -384,8 +381,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                 Assets
                 {assetLink}
               </ul>
-            </div>
-          </div>);
+            </div>);
     }
 
     render() {        

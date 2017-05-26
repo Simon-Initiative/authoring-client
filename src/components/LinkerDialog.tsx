@@ -136,7 +136,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     if (this.state.target==null) {
       console.log ("No link target given yet, bump");  
       return;
-    }  
+    }
 
     // This will become local annotations
     var newData: Array <Item>=new Array ();

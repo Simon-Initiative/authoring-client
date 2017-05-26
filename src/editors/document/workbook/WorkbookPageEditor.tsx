@@ -59,13 +59,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
           console.log ("LO document: " + JSON.stringify (loDocument));
           let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
           this.setState ({los: loModel}, function () {
-            console.log ("Verify: " + JSON.stringify (this.state.los));    
+            //console.log ("Verify: " + JSON.stringify (this.state.los));    
           });
-          /*  
-          this.setState ({los: loModel.with (this.state.los)},function () {
-            console.log ("Verify: " + JSON.stringify (this.state.los));    
-          });
-          */
         });
       }          
     })  
@@ -136,7 +131,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
    */
   createLinkerDialog () {           
     if (this.state.los!=null) {            
-      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.props.model.head.annotations} />);
+      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.props.model.head} />);
     } else {
       console.log ("Internal error: learning objectives object can be empty but not null");
     }

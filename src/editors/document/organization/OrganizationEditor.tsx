@@ -483,18 +483,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
         this.onEdit (immutableHelper);   
     }
-     
-    /**
-     * 
-     */
-    closeLOModal () {
-      console.log ("LearningObjectiveEditor: closeLOModal ()");
-        
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
-        this.onEdit ();
-      });                
-    }    
-    
+
     /**
      * 
      */
@@ -665,6 +654,17 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         return (optionalProps);
     }
+    
+    /**
+     * 
+     */
+    closeLOModal () {
+      console.log ("LearningObjectiveEditor: closeLOModal ()");
+        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
+        this.onEdit ();
+      });                
+    }        
         
     /**
      * 
@@ -672,7 +672,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     closePagesModal () {
       console.log ("LearningObjectiveEditor: closePagesModal ()");
         
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false});        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false});        
         
       let immutableHelper = this.state.treeData.slice();
                 
@@ -695,6 +695,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (testNode.id==this.state.orgTarget.id) {
           var newNode:OrgItem=new OrgItem ();
           newNode.title=("Title " + this.state.titleIndex);
+          newNode.typeDescription="x-oli-workbook_page";  
           testNode.children.push (newNode);
           break;
         }
@@ -706,11 +707,49 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    createLinkerDialog () {                
+    closeActivtiesModal () {
+      console.log ("LearningObjectiveEditor: closeActivtiesModal ()");
+        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
+        let immutableHelper = this.state.treeData.slice();
+                
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
+        
+        if (immutableHelper==null) {
+          console.log ("Bump");
+          return;
+        }
+
+        if (parentArray!=null) {
+          console.log ("We have an object, performing edit ...");
+        } else {
+          console.log ("Internal error: node not found in tree");
+        }
+                    
+        for (var i=0;i<parentArray.length;i++) {
+          let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+          if (testNode.id==this.state.orgTarget.id) {
+            var newNode:OrgItem=new OrgItem ();
+            newNode.title=("Title " + this.state.titleIndex);
+            newNode.typeDescription="x-oli-inline-assessment";
+            testNode.children.push (newNode);
+            break;
+          }
+        }
+            
+        this.onEdit (immutableHelper);          
+      });                
+    }     
+    
+    /**
+     * 
+     */
+    createLOLinkerDialog () {                
       if (this.state.loModalIsOpen==true) {  
         if (this.state.los!=null) {
-          console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closePagesModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} target={this.state.orgTarget} />);
+          console.log ("createLOLinkerDialog ()");              
+          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} target={this.state.orgTarget} />);
         } else {
           console.log ("Internal error: learning objectives object can be empty but not null");
         }
@@ -726,7 +765,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.activitiesModalIsOpen==true) {  
         if (this.state.activities!=null) {
           console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closePagesModal.bind (this)} sourceData={this.toFlat (this.state.activities,new Array<Linkable>())} modalIsOpen={this.state.activitiesModalIsOpen} target={this.state.orgTarget} />);
+          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} target={this.state.orgTarget} />);
         } else {
           console.log ("Internal error: activities object can be empty but not null");
         }
@@ -742,7 +781,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.pagesModalIsOpen==true) {
         if (this.state.pages!=null) {
           console.log ("createPageLinkerDialog ()");
-          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closeLOModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.state.orgTarget} />);
+          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.state.orgTarget} />);
         } else {
           console.log ("Internal error: pages array object can be empty but not null");
         }
@@ -765,7 +804,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     render() 
     {      
-      const lolinker=this.createLinkerDialog ();  
+      const lolinker=this.createLOLinkerDialog ();  
       const pagelinker=this.createPageLinkerDialog ();
       const activitylinker=this.createActivityLinkerDialog ();
       
