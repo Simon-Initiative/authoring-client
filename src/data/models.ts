@@ -1160,12 +1160,6 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
-    // const root = {
-    //   "modelType": "LearningObjectiveModel",
-    //   "learningobjectives": newData
-    // };
-
-    //return (root);
   }
 
   static fromPersistence(json: Object): LearningObjectiveModel {
@@ -1280,7 +1274,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     let a = (json as any);
     var replacementSkills: Array<Skill> = new Array<Skill>();
 
-    let skillData: Array<Skill> = a.doc ["skills"];
+    let skillData: Array<Skill> = a.doc.skills_model["skills"];
 
     for (let i = 0; i < skillData.length; i++) {
       let newSkill: Skill = new Skill();
