@@ -273,13 +273,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <div className="col-8">
                 <form className="form-inline">
                 <PageSelection 
+                  editMode={this.props.editMode}
                   pages={this.props.model.pages} 
                   current={this.props.model.pages.get(this.state.current)}
                   onChangeCurrent={current => this.setState({ current })}
                   onEdit={this.onPageEdit}/>
-                <button type="button" className="btn btn-secondary" 
+                <button disabled={!this.props.editMode} 
+                  type="button" className="btn btn-secondary" 
                   onClick={this.onAddPage}>Add</button>
-                <button type="button" className="btn btn-secondary" 
+                <button disabled={!this.props.editMode} 
+                  type="button" className="btn btn-secondary" 
                   onClick={this.onRemovePage}>Remove</button>
                 </form>
               </div>
@@ -287,15 +290,20 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           </div>
 
           <div>
-            <button type="button" className="btn btn-secondary" 
+            <button disabled={!this.props.editMode} 
+              type="button" className="btn btn-secondary" 
               onClick={this.onAddContent}>Add Content</button>
-            <button type="button" className="btn btn-secondary" 
+            <button disabled={!this.props.editMode} 
+              type="button" className="btn btn-secondary" 
               onClick={this.onAddQuestion}>Add Question</button>
-            <button type="button" className="btn btn-secondary" 
+            <button disabled={!this.props.editMode} 
+              type="button" className="btn btn-secondary" 
               onClick={this.onAddPool}>Add Pool</button>
-            <button type="button" className="btn btn-secondary" 
+            <button disabled={!this.props.editMode} 
+              type="button" className="btn btn-secondary" 
               onClick={this.onAddPoolRef}>Add Pool Reference</button>
-            <button type="button" className="btn btn-secondary" 
+            <button disabled={!this.props.editMode} 
+              type="button" className="btn btn-secondary" 
               onClick={this.onAddSkills}>Add Skills</button>
           </div>
           
@@ -306,6 +314,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             <form className="form-inline">
               <label>Recommended attempts</label>
               <TextInput
+                editMode={this.props.editMode}
                 width="50px"
                 label=""
                 type="number"
@@ -316,6 +325,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               />&nbsp;&nbsp;&nbsp;&nbsp;
               <label>Max attempts</label>
               <TextInput
+                editMode={this.props.editMode}
                 width="50px"
                 label=""
                 type="number"

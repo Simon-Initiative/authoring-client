@@ -7,6 +7,7 @@ import { TextInput } from '../../content/common/TextInput';
 export interface PageSelectionProps {  
   onChangeCurrent: (guid: string) => void;
   onEdit: (page: contentTypes.Page) => void;
+  editMode: boolean;
   pages: Immutable.OrderedMap<string, contentTypes.Page>;
   current: contentTypes.Page;
 }
@@ -53,6 +54,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, { tex
     return (
       <div className="input-group">
         <TextInput
+          editMode={this.props.editMode}
           value={this.props.current.title.text}
           onEdit={this.onTitleEdit}
           type="text"
@@ -62,6 +64,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, { tex
         
         <div className="dropdown">
           <button className="btn btn-secondary dropdown-toggle" 
+            disabled={!this.props.editMode}
             type="button" id="dropdownMenuButton" 
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Select

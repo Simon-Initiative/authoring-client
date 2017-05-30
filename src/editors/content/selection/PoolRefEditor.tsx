@@ -100,7 +100,7 @@ export class PoolRefEditor
         <div className="input-group">
           <input type="text" className="form-control" value={details} disabled/>
           <span className="input-group-btn">
-            <button onClick={this.onClick} 
+            <button disabled={!this.props.editMode} onClick={this.onClick} 
               className="btn btn-primary" type="button">Select</button>
           </span>
         </div>

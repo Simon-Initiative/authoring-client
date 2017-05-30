@@ -420,7 +420,8 @@ export abstract class QuestionEditor
     const expanded = (
       <form className="inline">
       <div className="dropdown" style={ { display: 'inline' } }>
-        <button className="btn btn-secondary btn-link dropdown-toggle" 
+        <button disabled={!this.props.editMode} 
+          className="btn btn-secondary btn-link dropdown-toggle" 
           type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Add Item
         </button>
@@ -437,7 +438,8 @@ export abstract class QuestionEditor
             className="dropdown-item" href="#">Fill in the Blank</a>
         </div>
         </div>
-        <Select label="Grading" value={this.props.model.grading} 
+        <Select editMode={this.props.editMode} 
+          label="Grading" value={this.props.model.grading} 
           onChange={this.onGradingChange}>
           <option value="automatic">Automatic</option>
           <option value="instructor">Instructor</option>
@@ -447,12 +449,13 @@ export abstract class QuestionEditor
 
     const expandedCriteria =
       <form className="form-inline">
-        <Button onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
       </form>;
 
     return (
     
-      <RemovableContent 
+      <RemovableContent editMode={this.props.editMode} 
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
         associatedClasses="question">
 

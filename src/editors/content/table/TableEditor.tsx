@@ -49,6 +49,7 @@ export class TableEditor
   }
 
   onCellEdit(rowGuid: string, cellGuid: string, content) {
+
     let model = this.props.model;
     let row = this.props.model.rows.get(rowGuid);
     let cell = row.cells.get(cellGuid);
@@ -76,6 +77,9 @@ export class TableEditor
   }
 
   onRowRemove(rowGuid: string) {
+
+    if (!this.props.editMode) return;
+
     const rows = this.props.model.rows.delete(rowGuid);
     this.props.onEdit(this.props.model.with({ rows }));
   }
@@ -99,6 +103,9 @@ export class TableEditor
   }
 
   onColRemove(index: number) {
+
+    if (!this.props.editMode) return;
+    
     const model = this.props.model;
     let rows = model.rows;
 
@@ -181,9 +188,9 @@ export class TableEditor
       <div className="itemWrapper">
         <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
           <div className="btn-group mr-2" role="group" aria-label="First group">
-            <button onClick={this.onRowAdd} type="button" 
+            <button disabled={!this.props.editMode} onClick={this.onRowAdd} type="button" 
               className="btn btn-secondary btn-sm">Add Row</button>
-            <button onClick={this.onColAdd} type="button" 
+            <button disabled={!this.props.editMode} onClick={this.onColAdd} type="button" 
               className="btn btn-secondary btn-sm">Add Column</button>
           </div>
         </div>

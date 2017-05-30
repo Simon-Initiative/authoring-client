@@ -13,6 +13,8 @@ export interface Concept {
 
 export interface ConceptProps {
 
+  editMode: boolean;
+
   conceptId: string;
 
   conceptType: string;
@@ -46,7 +48,9 @@ export class Concept extends React.PureComponent<ConceptProps, ConceptState> {
   }
 
   onClick() {
-    this.props.onRemove(this.props.conceptId, this.props.conceptType);
+    if (this.props.editMode) {
+      this.props.onRemove(this.props.conceptId, this.props.conceptType);
+    }
   }
 
   render() : JSX.Element {

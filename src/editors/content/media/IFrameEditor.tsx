@@ -101,7 +101,8 @@ export class IFrameEditor
           />
 
         <InputLabel label="Popout">
-          <TextInput width="100%" label="Popout content" 
+          <TextInput width="100%" label="Popout content"
+            editMode={this.props.editMode} 
             value={popout.content} 
             type="text"
             onEdit={this.onPopoutEdit}
@@ -117,6 +118,7 @@ export class IFrameEditor
 
         <InputLabel label="Source">
           <TextInput width="75px" label="Source" 
+            editMode={this.props.editMode}
             value={this.props.model.src} 
             type="text"
             onEdit={this.onSrcEdit}
@@ -124,6 +126,7 @@ export class IFrameEditor
         </InputLabel>
         <InputLabel label="Height">
           <TextInput width="75px" label="Height in pixels" 
+            editMode={this.props.editMode}
             value={this.props.model.height} 
             type="text"
             onEdit={this.onHeightEdit}
@@ -131,6 +134,7 @@ export class IFrameEditor
         </InputLabel>
         <InputLabel label="Width">
           <TextInput width="75px" label="Width in pixels" 
+            editMode={this.props.editMode}
             value={this.props.model.width} 
             type="text"
             onEdit={this.onWidthEdit}

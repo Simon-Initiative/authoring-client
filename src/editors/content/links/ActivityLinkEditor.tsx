@@ -83,6 +83,7 @@ export class ActivityLinkEditor
 
         <InputLabel label="Activity">
           <Select
+            editMode={this.props.editMode}
             label=""
             value={idref}
             onChange={this.onIdrefEdit}>
@@ -92,6 +93,7 @@ export class ActivityLinkEditor
 
         <InputLabel label="Target">
           <Select
+            editMode={this.props.editMode}
             label=""
             value={target}
             onChange={this.onTargetEdit}>
@@ -102,6 +104,7 @@ export class ActivityLinkEditor
 
         <InputLabel label="Purpose">
           <Select
+            editMode={this.props.editMode}
             label=""
             value={purpose}
             onChange={this.onPurposeEdit}>

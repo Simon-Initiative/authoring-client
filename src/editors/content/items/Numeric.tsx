@@ -65,12 +65,14 @@ export class Numeric
     
     const controls = (
       <div style={{display: 'inline'}}>
-        <Select label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+        <Select editMode={this.props.editMode} 
+          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
           <option value="small">Small</option>
           <option value="medium">Medium</option>
           <option value="large">Large</option>
         </Select>
-        <Select label='Notation' value={this.props.itemModel.notation} onChange={this.onNotationChange}>
+        <Select editMode={this.props.editMode}
+          label='Notation' value={this.props.itemModel.notation} onChange={this.onNotationChange}>
           <option value="automatic">Automatic</option>
           <option value="decimal">Decimal</option>
           <option value="scientific">Scientific</option>
@@ -82,7 +84,7 @@ export class Numeric
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Numeric' 
+        <ItemLabel label='Numeric' editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
         {controls}

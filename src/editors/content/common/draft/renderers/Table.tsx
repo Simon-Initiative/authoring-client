@@ -76,7 +76,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
             {renderedRows}
           </tbody>
         </table>
-        <Button onClick={this.onClick}>Edit Table</Button> 
+        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit Table</Button> 
       </div>);
   }
 }

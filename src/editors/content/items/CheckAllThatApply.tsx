@@ -130,8 +130,11 @@ export class CheckAllThatApply
 
     const expanded = (
       <div style={{display: 'inline'}}>
-        <Button type='link' onClick={this.onAddChoice}>Add Choice</Button>
-        <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+        <Button editMode={this.props.editMode} 
+          type='link' onClick={this.onAddChoice}>Add Choice</Button>
+        <Checkbox editMode={this.props.editMode} 
+          label='Shuffle' value={this.props.itemModel.shuffle} 
+          onEdit={this.onShuffleEdit}/>
       </div>);
 
     return (
@@ -139,7 +142,7 @@ export class CheckAllThatApply
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Check all that apply' 
+        <ItemLabel label='Check all that apply' editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
         <Collapse caption='Choices' expanded={expanded}>

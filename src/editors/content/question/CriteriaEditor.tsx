@@ -84,6 +84,7 @@ export class CriteriaEditor
       <form className="form-inline">
         Score:&nbsp;&nbsp;&nbsp;
         <TextInput
+          editMode={this.props.editMode} 
           width="75px"
           label=""
           value={this.props.model.score}
@@ -92,7 +93,7 @@ export class CriteriaEditor
         />
       </form>);
 
-    return <RemovableContent 
+    return <RemovableContent editMode={this.props.editMode} 
       onRemove={() => this.props.onRemove(this.props.model.guid)} associatedClasses="content">
         
         {controls}
@@ -106,7 +107,7 @@ export class CriteriaEditor
           editMode={this.props.editMode}
           model={this.props.model.body}
           onEdit={this.onBodyEdit}/>
-          
+
       </RemovableContent>;
   
   }

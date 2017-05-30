@@ -68,7 +68,7 @@ export class Choice
     const label = this.props.label === undefined ? 'Choice' : this.props.label;
 
     return (
-      <InputLabel label={label} style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+      <InputLabel editMode={this.props.editMode} label={label} style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
         <HtmlContentEditor 
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}

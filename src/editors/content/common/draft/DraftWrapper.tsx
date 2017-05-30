@@ -442,6 +442,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           onEdit: (data) => {
             this.processBlockEdit(block, data);
           },
+          editMode: !this.props.locked,
           services: this.props.services,
           context: this.props.context
         }

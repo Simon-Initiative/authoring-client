@@ -164,8 +164,9 @@ export class MultipleChoice
           {this.renderChoice(c, responses[i])}
           {renderedFeedback}
           <InlineForm position='right'>
-            <TextInput label='Score' value={responses[i].score} type='number' width='75px'
-                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
+            <TextInput editMode={this.props.editMode}
+              label='Score' value={responses[i].score} type='number' width='75px'
+              onEdit={this.onScoreEdit.bind(this, responses[i])}/>
           </InlineForm>
         </ChoiceFeedback>);
     }
@@ -184,8 +185,10 @@ export class MultipleChoice
 
     const expanded = (
       <div style={{display: 'inline'}}>
-        <Button type='link' onClick={this.onAddChoice}>Add Choice</Button>
-        <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+        <Button editMode={this.props.editMode}
+          type='link' onClick={this.onAddChoice}>Add Choice</Button>
+        <Checkbox editMode={this.props.editMode} 
+          label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
       </div>);
 
     return (
@@ -193,7 +196,7 @@ export class MultipleChoice
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Multiple Choice' 
+        <ItemLabel label='Multiple Choice' editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
         <Collapse caption='Choices' expanded={expanded}>

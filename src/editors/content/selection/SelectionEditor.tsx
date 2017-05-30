@@ -117,19 +117,22 @@ export class SelectionEditor
     const controls = (
       <form className="form-inline">
         {this.renderAddQuestion()}
-        <Select label="Strategy" value={this.props.model.strategy} 
+        <Select editMode={this.props.editMode} 
+          label="Strategy" value={this.props.model.strategy} 
           onChange={this.onStrategyChange}>
           <option value="random">Random</option>
           <option value="random_with_replace">Random with replace</option>
           <option value="ordered">Ordered</option>
         </Select>
-        <Select label="Exhaustion" value={this.props.model.exhaustion} 
+        <Select editMode={this.props.editMode} 
+          label="Exhaustion" value={this.props.model.exhaustion} 
           onChange={this.onExhaustionChange}>
           <option value="reuse">Reuse</option>
           <option value="skip">Skip</option>
           <option value="fail">Fail</option>
         </Select>
-        <Select label="Scope" value={this.props.model.scope} 
+        <Select editMode={this.props.editMode} 
+          label="Scope" value={this.props.model.scope} 
           onChange={this.onScopeChange}>
           <option value="section">Section</option>
           <option value="resource">Resource</option>
@@ -137,6 +140,7 @@ export class SelectionEditor
 
         Count:&nbsp;&nbsp;&nbsp;
         <TextInput
+          editMode={this.props.editMode} 
           width="75px"
           label="Count"
           value={this.props.model.selectionCount}
@@ -166,7 +170,7 @@ export class SelectionEditor
     } 
 
     return (
-      <RemovableContent 
+      <RemovableContent editMode={this.props.editMode} 
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
         associatedClasses="selection">
 

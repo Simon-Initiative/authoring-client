@@ -57,7 +57,8 @@ export class Essay
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Essay' 
+        <ItemLabel label='Essay'
+          editMode={this.props.editMode} 
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
         <Hints
