@@ -43,7 +43,7 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
 
   fetchResources() {
     persistence.fetchCourseResources(this.props.courseId)
-    .then(resources => resources.filter(r => r.type === 'x-oli-skills'))
+    .then(resources => resources.filter(r => r.type === 'x-oli-skills_model'))
     .then((skills) => {
       this.setState({
         resources: skills.map(s => ({ id: s._id, title: s.title })),

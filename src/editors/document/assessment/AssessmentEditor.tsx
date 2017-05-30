@@ -65,7 +65,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
      = this.props.courseDoc ['model']['resources'] as Immutable.OrderedMap<string, Resource>;
   
     resourceList.map((value, id) => {        
-      if (value.type === 'x-oli-skills') {
+      if (value.type === 'x-oli-skills_model') {
         console.log ('Found skills document, loading ...');  
         persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {

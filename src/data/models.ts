@@ -13,12 +13,12 @@ import {OrgContentTypes, OrgItem, OrgModule, OrgOrganization, OrgSection, OrgSeq
 import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
-import { PoolModel } from './models/pool';
-import { Node } from './content/node';
- 
-export { Node } from './content/node';
+import {PoolModel} from './models/pool';
+import {Node} from './content/node';
 
-export { PoolModel } from './models/pool';
+export {Node} from './content/node';
+
+export {PoolModel} from './models/pool';
 
 export type EmptyModel = 'EmptyModel';
 export const EmptyModel: EmptyModel = 'EmptyModel';
@@ -56,7 +56,7 @@ export function createModel(object: any): ContentModel {
       return OrganizationModel.fromPersistence(object);
     case 'x-oli-learning_objectives':
       return LearningObjectiveModel.fromPersistence(object);
-    case 'x-oli-skills':
+    case 'x-oli-skills_model':
       return SkillModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
@@ -151,7 +151,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         model = model.with({webContents: model.webContents.set(id, WebContent.fromPersistence(item))});
       });
     }
-    if(!isNullOrUndefined(c.developers)){
+    if (!isNullOrUndefined(c.developers)) {
       c.developers.forEach(item => {
         const userName = item.userName;
         model = model.with({userInfos: model.userInfos.set(userName, UserInfo.fromPersistence(item))});
@@ -302,7 +302,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     const root = {
       "doc": doc
     };
-    
+
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
@@ -338,17 +338,17 @@ function migrateNodesToPage(model: AssessmentModel) {
   // Ensure that we have at least one page
   if (updated.pages.size === 0) {
     let newPage = new contentTypes.Page();
-    newPage = newPage.with({ title: new contentTypes.Title( { text: 'Page 1'}) });
-    updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
+    newPage = newPage.with({title: new contentTypes.Title({text: 'Page 1'})});
+    updated = updated.with({pages: updated.pages.set(newPage.guid, newPage)});
   }
 
   // Now move any root nodes to the first page
   if (updated.nodes.size > 0) {
     let page = updated.pages.first();
     updated.nodes.toArray().forEach(
-      node => page = page.with({ nodes: page.nodes.set(node.guid, node)}));
-    updated = updated.with({ pages: updated.pages.set(page.guid, page)});
-    updated = updated.with({ nodes: Immutable.OrderedMap<string, Node>()});
+      node => page = page.with({nodes: page.nodes.set(node.guid, node)}));
+    updated = updated.with({pages: updated.pages.set(page.guid, page)});
+    updated = updated.with({nodes: Immutable.OrderedMap<string, Node>()});
   }
 
   return updated;
@@ -396,10 +396,10 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     }
 
     if (assessment['@recommendedAttempts'] !== undefined) {
-      model = model.with({ recommendedAttempts: assessment['@recommendedAttempts']});
+      model = model.with({recommendedAttempts: assessment['@recommendedAttempts']});
     }
     if (assessment['@maxAttempts'] !== undefined) {
-      model = model.with({ maxAttempts: assessment['@maxAttempts']});
+      model = model.with({maxAttempts: assessment['@maxAttempts']});
     }
 
     assessment['#array'].forEach(item => {
@@ -410,7 +410,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       switch (key) {
         case 'page':
           model = model.with(
-            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id)) });
+            {pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id))});
           break;
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
@@ -439,7 +439,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     ]
     let resource = this.resource.toPersistence();
     let doc = null;
-    
+
     if (isNullOrUndefined(this.guid) || this.guid === '') {
       // Assume new assessment created if guid is null
       const assessment = assessmentTemplate(this.title.text);
@@ -467,7 +467,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const root = {
       "doc": doc
     };
-    
+
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 }
@@ -764,22 +764,22 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     if (oList) {
       for (var k = 0; k < oList.length; k++) {
-          
+
         var obj = oList [k];
 
-        if (!isNullOrUndefined(obj ["sequences"])) {  
+        if (!isNullOrUndefined(obj ["sequences"])) {
 
           var destNode = obj ["sequences"]; // [j];
-                        
-          var seqList = destNode["#array"];  
-            
+
+          var seqList = destNode["#array"];
+
           if (destNode["#array"]) {
             //if (j == 'sequences') {
             //for (var sequenceObject in destNode) {
             for (let w = 0; w < seqList.length; w++) {
               let seqObj = seqList [w];
               if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
-                console.log ("Parsing sequence ...");
+                console.log("Parsing sequence ...");
                 let newSequence: OrgSequence = new OrgSequence();
                 let seqReference = seqObj ["sequence"];
                 newData.push(newSequence);
@@ -844,8 +844,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           }
         }
         else {
-          console.log ("Error: unable to find sequence data");      
-        }          
+          console.log("Error: unable to find sequence data");
+        }
       }
     }
 
@@ -886,9 +886,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     orgRoot ["organization"]["#array"].push(seqRoot);
 
     let sequences: Array<Object> = new Array();
-    seqRoot ["sequences"] = new Object ();
-    seqRoot ["sequences"]["#array"]=new Array ();
-    seqRoot ["sequences"]["#array"]=sequences;
+    seqRoot ["sequences"] = new Object();
+    seqRoot ["sequences"]["#array"] = new Array();
+    seqRoot ["sequences"]["#array"] = sequences;
 
     // We can point directly to .children because we ensure in the constructor that
     // this object always exists
@@ -966,19 +966,19 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     }
 
     //var formattedOrganization = JSON.stringify(orgRoot);
-    var formattedOrganization = JSON.stringify(orgRoot ["organization"]);    
+    var formattedOrganization = JSON.stringify(orgRoot ["organization"]);
     console.log("To: " + formattedOrganization);
-      
+
     let resource = this.resource.toPersistence();
     let doc = [{
-      "organization":orgRoot["organization"]
+      "organization": orgRoot["organization"]
     }];
 
     const root = {
       "doc": doc
     };
-    
-    return Object.assign({}, resource, root, this.lock.toPersistence());      
+
+    return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
 }
@@ -1070,7 +1070,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       let testLO: LearningObjective = fromSet [i];
 
       // This LO has a parent, reparent ...
-      if (testLO.parent) {  
+      if (testLO.parent) {
         if ((testLO.parent != "") && (testLO.parent != "unassigned")) {
           console.log("We have an LO with a parent: " + testLO.parent);
 
@@ -1086,10 +1086,10 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
         else {
           toSet.push(testLO);
         }
-      }  
+      }
       else {
         toSet.push(testLO);
-      }          
+      }
     }
 
     return (toSet);
@@ -1159,7 +1159,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   static fromPersistence(json: Object): LearningObjectiveModel {
 
     console.log("LearningObjectiveModel.fromPersistence: " + JSON.stringify(json));
-      
+
     let a = (json as any);
     //var obData=a.doc.objectives;
     let loObject: Array<Object> = a.doc ["objectives"];
@@ -1175,9 +1175,9 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       }
     });
 
-    console.log ("New data LO: " + JSON.stringify (newData));  
-      
-    let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent (newData)});
+    console.log("New data LO: " + JSON.stringify(newData));
+
+    let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent(newData)});
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
@@ -1205,7 +1205,7 @@ const defaultSkillModel = {
   modelType: 'SkillModel',
   resource: new Resource(),
   guid: '',
-  type: 'x-oli-skills',
+  type: 'x-oli-skills_model',
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   skillDefaults: Skill,
@@ -1242,13 +1242,19 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
   toPersistence(): Object {
     console.log("toPersistence ()");
+    let resource: any = this.resource.toPersistence();
+    const doc = [{
+        "skills_model": {
+          "@id": this.resource.id,
+          "title": this.title,
+          "skills": this.skills
+        }
+      }];
     const root = {
-      "modelType": "SkillModel",
-      "title": this.title,
-      "skills": this.skills
+      "doc": doc
     };
 
-    return (root);
+    return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
   static fromPersistence(json: Object): SkillModel {
