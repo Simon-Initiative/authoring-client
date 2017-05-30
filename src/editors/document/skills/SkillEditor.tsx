@@ -527,6 +527,15 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
+    tryout (item:Skill):void {
+      console.log ("tryout ()");    
+       
+      this.setState ({modalIsOpen:true, tryoutTarget:item});
+    }
+    
+    /**
+     * 
+     */
     createAdvancedPanel ():any {
       let dStyle:any=styles.settingsPreviewContainer;
       if (this.state.advanced==true) {    
@@ -658,6 +667,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          <div style={styles.toolContainer}>
                            <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
                            <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.tryout (item)}><i className="fa fa-check-circle-o">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBarHidden}>
@@ -681,6 +691,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          <div style={styles.toolContainer}>
                            <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
                            <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.tryout (item)}><i className="fa fa-check-circle-o">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBar}>

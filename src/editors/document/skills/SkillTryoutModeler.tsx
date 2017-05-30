@@ -136,7 +136,9 @@ class SkillTryoutModeler extends React.Component<SkillTryoutModelerProps, SkillT
                    <p className="h2" style={tempnavstyle.h2}>Skill Tryout Modeler</p>
                  </nav>
                  <div style={tempnavstyle.objectContainer}>
-
+                  <svg>
+                   <circle cx={50} cy={50} r={10} fill="red" />
+                  </svg>
                  </div>
              </Modal>);
   }

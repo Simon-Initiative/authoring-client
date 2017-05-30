@@ -694,7 +694,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
         if (testNode.id==this.state.orgTarget.id) {
           var newNode:OrgItem=new OrgItem ();
-          newNode.title=("Title " + this.state.titleIndex);
+          newNode.title=testNode.title;
           newNode.typeDescription="x-oli-workbook_page";  
           testNode.children.push (newNode);
           break;
@@ -731,7 +731,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
           if (testNode.id==this.state.orgTarget.id) {
             var newNode:OrgItem=new OrgItem ();
-            newNode.title=("Title " + this.state.titleIndex);
+            newNode.title=testNode.title;
             newNode.typeDescription="x-oli-inline-assessment";
             testNode.children.push (newNode);
             break;
@@ -807,7 +807,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             ephemeral.id=testItem.id;  
             actList.push (ephemeral);
           }
-      }  
+      }
         
       return (actList);  
     }

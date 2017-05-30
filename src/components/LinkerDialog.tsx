@@ -57,10 +57,8 @@ const customStyles = {
   }    
 };
 
-class Item {
-    id: string="";
+class Item extends Linkable {
     checked: boolean = false;
-    title: string="";
 }
 
 interface LearningObjectiveLinker {
@@ -121,6 +119,10 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
+      
+      console.log ("componentWillReceiveProps, Linking targetAnnotations: " + JSON.stringify (this.props.targetAnnotations));
+      console.log ("componentWillReceiveProps, Linking sourceData: " + JSON.stringify (this.props.sourceData));      
+      
       this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], targetAnnotations: newProps.targetAnnotations});
   }
    
@@ -148,6 +150,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        let newItem:Item=new Item ();
        newItem.id=resetItem.id;
        newItem.checked=false;
+       newItem.typeDescription=resetItem.typeDescription; 
        newItem.title=resetItem.title;
         
        newData.push(resetItem);        
@@ -189,23 +192,23 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   closeModal() {
     console.log ("closeModal ()");  
-      
-    let list:Array<Linkable>=new Array <Linkable>();
-      
+            
     this.setState({modalIsOpen: false});
 
-    var newData = [];
+    var newData:Array<Linkable>=new Array <Linkable>();
     this.state.localAnnotations.forEach(function(item) {
       if (item.checked ==true) {
        let newLink:Linkable=new Linkable ();
        newLink.id=item.id;
+       newLink.title=item.title;
+       newLink.typeDescription=item.typeDescription;
        newData.push (newLink);
       }    
     });
       
-    list=newData;  
-
-    this.setState ({targetAnnotations : list}, function (){
+    console.log ("Assigning new list data:" + JSON.stringify (newData));  
+      
+    this.setState ({targetAnnotations : newData}, function (){
       console.log ("Linkable list now: " +  JSON.stringify (this.state.targetAnnotations));
       this.state.closeModal ();  
     });          
