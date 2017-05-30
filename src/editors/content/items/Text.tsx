@@ -11,7 +11,7 @@ import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
-
+import { ResponseMultEditor } from './ResponseMult';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
@@ -65,8 +65,35 @@ export class Text
     this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
   }
 
+  onEditMult(mult) {
+    const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
+    const partModel = this.props.partModel.with({ responseMult });
+    this.props.onEdit(this.props.itemModel, partModel);
+  }
+
   render() : JSX.Element {
     
+    let feedback;
+
+    if (this.props.partModel.responses.size > 0) {
+      feedback = <TabularFeedback
+            {...this.props}
+            model={this.props.partModel}
+            onEdit={this.onPartEdit}
+          />;
+    } else if (this.props.partModel.responseMult.size > 0) {
+
+      feedback = this.props.partModel.responseMult
+        .toArray().map(m => <ResponseMultEditor
+          editMode={this.props.editMode}
+          services={this.props.services}
+          context={this.props.context}
+          model={m}
+          onEdit={this.onEditMult.bind(this)}
+        />);
+    }
+
+
     const controls = (
       <div style={{display: 'inline'}}>
         <Select editMode={this.props.editMode}
@@ -101,11 +128,9 @@ export class Text
             model={this.props.partModel}
             onEdit={this.onPartEdit}
           />
-        <TabularFeedback
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
+        
+        {feedback}
+
         <ExplanationEditor
             {...this.props}
             model={this.props.partModel.explanation}
