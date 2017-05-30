@@ -1234,9 +1234,16 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   }
 
 
-  static updateModel(newSkillModel: any): SkillModel {
+  static updateModel(oldSkillModel: SkillModel, newSkillModel: any): SkillModel {
     console.log("updateModel ()");
     var newModel = new SkillModel({'skills': newSkillModel});
+    newModel = newModel.with({resource: oldSkillModel.resource});
+    newModel = newModel.with({guid: oldSkillModel.guid});
+    newModel = newModel.with({type: oldSkillModel.type});
+    newModel = newModel.with({title: oldSkillModel.title})
+    if (oldSkillModel.lock !== undefined && oldSkillModel.lock !== null) {
+      newModel = newModel.with({lock: contentTypes.Lock.fromPersistence(oldSkillModel.lock)});
+    }
     return newModel;
   }
 
@@ -1270,7 +1277,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       replacementSkills.push(newSkill);
     }
 
-    let model = (SkillModel.updateModel(replacementSkills));
+    let model = new SkillModel({'skills': replacementSkills});
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
