@@ -70,12 +70,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     let model; 
 
-    if (property === 'title') {
-      const head = this.props.model.head.with({ title: content });
+    if (property === 'annotations') {
+      const head = this.props.model.head.with({ annotations: content });
       model = this.props.model.with({ head });
         
-    } else {
-      model = this.props.model.with({ body: content });
+    } else {      
+      if (property === 'title') {
+        const head = this.props.model.head.with({ title: content });
+        model = this.props.model.with({ head });
+        
+      } else {
+        model = this.props.model.with({ body: content });
+      }
     }
       
     this.handleEdit(model);
@@ -86,8 +92,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
    */
   closeModal () {
     console.log ("closeModal ()");
-        
-    //this.saveToDB ();
+              
+    //this.props.model.head.annotations
+      
+    console.log ("New annotations: " + JSON.stringify (this.props.model.head.annotations));      
+          
+    //this.onEdit ("annotations",this.state.targetAnnotations);  
   }     
 
   /**
@@ -98,40 +108,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
                  
     this.setState ({modalIsOpen: true});
   }
-       
-  /**
-   * We need to move this to a utility class because there are different instances
-   * of it 
-   */
-  toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
-    console.log ("toFlat ()");
-       
-    if (!aTree) {
-      return [];
-    }  
-        
-    for (let i=0;i<aTree.length;i++) {
-      let newObj:Linkable=new Linkable ();
-      newObj.id=aTree [i].id;
-      newObj.title=aTree [i].title;
-      aToList.push (newObj);
-          
-      if (aTree [i]["children"]) {
-        console.log ("Lo has children, processing ...");  
-        let tList=aTree [i]["children"];
-        this.toFlat (tList,aToList);
-      }
-    }
-        
-    return (aToList);  
-  }    
-    
+
   /**
    * 
    */
   createLinkerDialog () {           
     if (this.state.los!=null) {            
-      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);
+      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);
     } else {
       console.log ("Internal error: learning objectives object can be empty but not null");
     }

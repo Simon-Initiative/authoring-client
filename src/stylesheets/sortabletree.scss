@@ -56,8 +56,9 @@
 .onclick-menu:focus .onclick-menu-content {
     /*  opacity is 1 in opened state (see below) */
     opacity: 1;
+    
     visibility: visible;
-    /*display: block;*/
+    display: block;
 
     /* don't let pointer-events affect descendant elements */
     pointer-events: auto;
@@ -77,8 +78,11 @@
     
     /* use opacity to fake immediate toggle */
     opacity: 0;
+    
     visibility: hidden;
-    /*display: none;*/
+    display: none;
+    
+    transition: display 0.6s;
     transition: visibility 0.5s;
     
     /*

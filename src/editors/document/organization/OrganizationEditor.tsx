@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import { LOTypes, LearningObjective } from '../../../data/los';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
@@ -19,6 +20,7 @@ import NodeRendererDefault from 'react-sortable-tree';
 
 import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
+
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 
 import { AppContext } from '../../common/AppContext';
@@ -607,33 +609,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         //this.linkPage (aNode);
         this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
     }     
-
-    /**
-    * We need to move this to a utility class because there are different instances
-    * of it 
-    */
-    toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
-      //console.log ("toFlat ()");
-        
-      if (!aTree) {
-        return [];
-      }  
-        
-      for (let i=0;i<aTree.length;i++) {
-        let newObj:Linkable=new Linkable ();
-        newObj.id=aTree [i].id;
-        newObj.title=aTree [i].title;
-        aToList.push (newObj);
-          
-        if (aTree [i]["children"]) {
-          //console.log ("Lo has children, processing ...");  
-          let tList=aTree [i]["children"];
-          this.toFlat (tList,aToList);
-        }
-      }
-        
-      return (aToList);  
-    }
     
     /**
      * 
@@ -749,7 +724,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.loModalIsOpen==true) {  
         if (this.state.los!=null) {
           console.log ("createLOLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
+          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
         } else {
           console.log ("Internal error: learning objectives object can be empty but not null");
         }

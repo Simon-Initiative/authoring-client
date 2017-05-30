@@ -8,13 +8,14 @@ export const OrgContentTypes = types.strEnum([
   'Section',
   'Sequence',
   'Module',
+  'Unit',
   'Organization'
 ]);
 
 export type OrgContentTypes = keyof typeof OrgContentTypes;
 
 export class IDRef {
-  idRef:string="null";    
+  idRef:string="null";
 }
 
 export class OrgItem extends Linkable {
@@ -113,6 +114,34 @@ export class OrgModule extends OrgItem {
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);     
     } else {  
       ephemeral ["@id"]=this.id;
+      ephemeral ["@expanded"]=this.expanded;
+      ephemeral ["#array"]=new Array ();
+      ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);  
+    }          
+    return (ephemeral);
+  }     
+}
+
+export class OrgUnit extends OrgItem {
+
+  duration : string ="forever";
+    
+  constructor() {
+    super ();
+    this.orgType=OrgContentTypes.Unit;
+  } 
+    
+  toJSONObject (anObject?:OrgUnit): Object {
+    let ephemeral:Object=new Object ();
+    if (anObject) {
+      ephemeral ["@id"]=anObject.id;
+      ephemeral ["@duration"]=anObject.duration;
+      ephemeral ["@expanded"]=anObject.expanded;
+      ephemeral ["#array"]=new Array ();     
+      ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);     
+    } else {  
+      ephemeral ["@id"]=this.id;
+      ephemeral ["@duration"]=this.duration;
       ephemeral ["@expanded"]=this.expanded;
       ephemeral ["#array"]=new Array ();
       ephemeral ["#annotations"]=Linkable.toJSON (this.annotations);  

@@ -421,7 +421,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     linkSkill(aNode:any) {        
         console.log ("linkSkill ()");
-        console.log ("aNode: " + JSON.stringify (aNode));
+        //console.log ("aNode: " + JSON.stringify (aNode));
                 
         this.setState ({modalIsOpen: true, target: aNode});
     }

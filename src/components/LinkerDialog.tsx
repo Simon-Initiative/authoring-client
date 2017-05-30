@@ -98,8 +98,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         
     super(props);
       
-    console.log ("Linking target: " + JSON.stringify (this.props.targetAnnotations));
-    console.log ("Linking sourceData: " + JSON.stringify (this.props.sourceData));
+    //console.log ("Linking target: " + JSON.stringify (this.props.targetAnnotations));
+    //console.log ("Linking sourceData: " + JSON.stringify (this.props.sourceData));
      
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
@@ -120,8 +120,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
       
-      console.log ("componentWillReceiveProps, Linking targetAnnotations: " + JSON.stringify (this.props.targetAnnotations));
-      console.log ("componentWillReceiveProps, Linking sourceData: " + JSON.stringify (this.props.sourceData));      
+      //console.log ("componentWillReceiveProps, Linking targetAnnotations: " + JSON.stringify (this.props.targetAnnotations));
+      //console.log ("componentWillReceiveProps, Linking sourceData: " + JSON.stringify (this.props.sourceData));      
       
       this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], targetAnnotations: newProps.targetAnnotations});
   }
@@ -206,7 +206,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       }    
     });
       
-    console.log ("Assigning new list data:" + JSON.stringify (newData));  
+    //console.log ("Assigning new list data:" + JSON.stringify (newData));  
       
     this.setState ({targetAnnotations : newData}, function (){
       console.log ("Linkable list now: " +  JSON.stringify (this.state.targetAnnotations));

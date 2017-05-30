@@ -9,7 +9,7 @@ import {Resource} from "./resource";
 import Linkable from "./linkable";
 import {Skill} from "./skills";
 import {LearningObjective} from "./los";
-import {OrgContentTypes, OrgItem, OrgModule, OrgOrganization, OrgSection, OrgSequence} from "./org";
+import {OrgContentTypes, OrgItem, OrgModule, OrgUnit, OrgOrganization, OrgSection, OrgSequence} from "./org";
 import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
@@ -671,6 +671,43 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     return (moduleNode);
   }
+    
+  /**
+   *
+   */
+  static parseUnit(aUnit: any): OrgItem {
+    console.log("parseUnit ()");
+
+    let unitNode: OrgUnit = new OrgUnit();
+    unitNode.id = aUnit ["@id"];
+    unitNode.expanded = aUnit ["@expanded"];
+    unitNode.duration = aUnit ["@duration"];
+    if (aUnit ["#annotations"]) {
+      unitNode.annotations = Linkable.fromJSON(aUnit ["#annotations"]);
+    }
+
+    for (var t = 0; t < aUnit ["#array"].length; t++) {
+      var mdl = aUnit ["#array"] [t];
+
+      var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
+
+      console.log ("typeSwitch: " + typeSwitch);  
+        
+      if (typeSwitch == "title") {
+        unitNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
+      }
+
+      if (typeSwitch == "item") {  
+        unitNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
+      }
+
+      if (typeSwitch == "module") {
+        unitNode.addNode(OrganizationModel.parseModule(mdl ["module"]));
+      }
+    }
+
+    return (unitNode);
+  }    
 
   /**
    *
@@ -838,6 +875,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                   let newModule = OrganizationModel.parseModule(mdl);
                   newSequence.children.push(newModule);
                 }
+                  
+                if (s == "unit") {
+                  let newUnit = OrganizationModel.parseUnit(mdl);
+                  newSequence.children.push(newUnit);
+                }                  
               }
             }
           }
@@ -1189,6 +1231,33 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     }
     return model
   }
+    
+  /**
+   * We need to move this to a utility class because there are different instances
+   * of it 
+   */
+  static toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
+    //console.log ("toFlat ()");
+       
+    if (!aTree) {
+      return [];
+    }  
+        
+    for (let i=0;i<aTree.length;i++) {
+      let newObj:Linkable=new Linkable ();
+      newObj.id=aTree [i].id;
+      newObj.title=aTree [i].title;
+      aToList.push (newObj);
+          
+      if (aTree [i]["children"]) {
+        //console.log ("Lo has children, processing ...");  
+        let tList=aTree [i]["children"];
+        this.toFlat (tList,aToList);
+      }
+    }
+        
+    return (aToList);  
+  }      
 }
 
 //>------------------------------------------------------------------

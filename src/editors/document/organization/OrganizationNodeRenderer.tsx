@@ -7,8 +7,10 @@ import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, OrgOrganization} from '../../../data/org';
+import DropdownMenu from 'react-dd-menu';
 
 import '../../../stylesheets/sortabletree.scss';
+//import '../../../stylesheets/sortabletree.scss';
 
 const styles = {
     
@@ -243,7 +245,7 @@ const styles = {
     "top": "50%",
     "transform": "translate(-50%, -50%)",
     "cursor": "pointer",
-    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48l2c+cjwvc3znpg==') no-repeat center",
+    "background": "#fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==') no-repeat center",
     
     "&:focus" : {
         "outline": "none",
@@ -267,7 +269,7 @@ const styles = {
     "top": "50%",
     "transform": "translate(-50%, -50%)",
     "cursor": "pointer",
-    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48cgf0acbkpsjnosa0ljv2osivpjwvzz4kpc9zdmc+') no-repeat center",
+    "background": "#fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+') no-repeat center",
     
     "&:focus" : {
         "outline": "none",
@@ -323,7 +325,11 @@ const styles = {
     'line-height': '26px',
     'margin-top': '0px',
     'margin-bottom': '2px'
-  } 
+  }, 
+  popupAddedStyle : {
+    "zIndex": -1,
+    "border": "1px solid red"
+  }
 };
 
 /**
@@ -338,7 +344,26 @@ class OrganizationNodeRenderer extends Component <any,any>
     addActivity:any=null;
     addModule:any=null;
     addSection:any=null;
+    
+    constructor() {
+      super ();  
+      this.state = {
+        isMenuOpen: false
+      };
+    }    
           
+    toggle = () => {
+      this.setState({ isMenuOpen: !this.state.isMenuOpen });
+    };
+
+    close = () => {
+      this.setState({ isMenuOpen: false });
+    };
+
+    click = () => {
+      console.log('You clicked an item');
+    };    
+    
     /**
      * 
      */
@@ -382,6 +407,29 @@ class OrganizationNodeRenderer extends Component <any,any>
                 {assetLink}
               </ul>
             </div>);
+
+      /*
+      let menuOptions = {
+        isOpen: this.state.isMenuOpen,
+        close: this.close.bind(this),
+        className: "popupAddedStyle",
+        toggle: <a onClick={this.toggle.bind(this)}><i className="fa fa-chevron-down">&nbsp;</i></a>,
+        align: 'right',
+      };
+
+      return (<DropdownMenu {...menuOptions}>
+                Content
+                {moduleLink}
+                {sectionLink}
+                <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+                {loLink}
+                {pageLink}
+                {activityLink}
+                Assets
+                {assetLink}
+              </DropdownMenu>);
+
+       */
     }
 
     render() {        
@@ -481,20 +529,6 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
-        /*
-        className={styles.row +
-            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
-            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
-            (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
-            (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
-            (className ? ` ${className}` : '')
-        }
-        style={{
-            opacity: isDraggedDescendant ? 0.5 : 1,
-            ...style,
-        }}
-        */
-
         let gStyle:any=styles.orgrow;
         gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
 
@@ -534,56 +568,6 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
-        /*
-        return (
-            <div
-                style={{ height: '100%' }}
-                {...otherProps}
-            >
-                {toggleChildrenVisibility && node.children && node.children.length > 0 && (
-                    <div>
-                        <button
-                            type="button"
-                            aria-label={node.expanded ? 'Collapse' : 'Expand'}
-                            style={handleStyle}
-                            onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
-                        />
-
-                        {node.expanded && !isDragging &&
-                            <div
-                                style={nStyle}
-                            />
-                        }
-                    </div>
-                )}
-
-                <div style={styles.orgrowWrapper as any}>
-                    {}
-                    {connectDragPreview(
-                        <div style={gStyle}>
-
-                            {handle}
-            
-                            <div id="outter" style={dStyle as any}>
-                               <div id="inner" style={tStyle}>
-                                 <TitleContentEditor 
-                                   services={services}
-                                   editMode={true}
-                                   model={titleObj}
-                                   context={{userId: null, documentId: null, courseId: null}}
-                                   onEdit={(content) => this.editNodeTitle(node,content)} 
-                                    />
-                               </div>
-                               <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
-                               <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>  
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-        */
-
         let popDown=this.generatePopDown (node);
 
         return (
@@ -595,10 +579,8 @@ class OrganizationNodeRenderer extends Component <any,any>
                             style={handleStyle}
                             onClick={() => toggleChildrenVisibility({node, path, treeIndex})}
                         />
-
-                        {node.expanded && !isDragging &&
-                            <div style={nStyle} />
-                        }
+                    
+                        { node.expanded && !isDragging &&  <div style={nStyle} /> }
                     </div>
                 )}
 
@@ -606,7 +588,6 @@ class OrganizationNodeRenderer extends Component <any,any>
                     {/* Set the row preview to be used during drag and drop */}
                     {connectDragPreview(
                         <div style={gStyle}>
-
                           {handle}
                            <div style={titleContainer}>
                              <TitleContentEditor 

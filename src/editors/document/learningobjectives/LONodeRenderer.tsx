@@ -215,7 +215,7 @@ const styles = {
     "top": "50%",
     "transform": "translate(-50%, -50%)",
     "cursor": "pointer",
-    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48l2c+cjwvc3znpg==') no-repeat center",
+    "background": "#fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==') no-repeat center",
     
     "&:focus" : {
         "outline": "none",
@@ -239,7 +239,7 @@ const styles = {
     "top": "50%",
     "transform": "translate(-50%, -50%)",
     "cursor": "pointer",
-    "background": "#fff url('data:image/svg+xml;base64,phn2zyb4bwxucz0iahr0cdovl3d3dy53my5vcmcvmjawmc9zdmciihdpzhropsixocigagvpz2h0psixoci+pgnpcmnszsbjed0iosigy3k9ijkiihi9ijgiigzpbgw9iingrkyilz48zybzdhjva2u9iim5odk4otgiihn0cm9rzs13awr0ad0ims45iia+phbhdgggzd0ittqunsa5adkilz48cgf0acbkpsjnosa0ljv2osivpjwvzz4kpc9zdmc+') no-repeat center",
+    "background": "#fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+') no-repeat center",
     
     "&:focus" : {
         "outline": "none",
@@ -285,36 +285,8 @@ const styles = {
 class LONodeRenderer extends Component <any, any> 
 {       
     deleteNodeFunction:any=null;
-    //parentTreeData:any=null;
     editNodeTitle:any=null;
     linkAnnotation:any=null;
-        
-    /* 
-    static propTypes = {
-      node: PropTypes.object.isRequired,
-      path: PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])).isRequired,
-      treeIndex: PropTypes.number.isRequired,
-      isSearchMatch: PropTypes.bool,
-      isSearchFocus: PropTypes.bool,
-      canDrag: PropTypes.bool,
-      scaffoldBlockPxWidth: PropTypes.number.isRequired,
-      toggleChildrenVisibility: PropTypes.func,
-      buttons: PropTypes.arrayOf(PropTypes.node),
-      className: PropTypes.string,
-      style: PropTypes.object,
-      connectDragPreview: PropTypes.func.isRequired,
-      connectDragSource:  PropTypes.func.isRequired,
-      parentNode:         PropTypes.object,          // Needed for drag-and-drop utils
-      startDrag:          PropTypes.func.isRequired, // Needed for drag-and-drop utils
-      endDrag:            PropTypes.func.isRequired, // Needed for drag-and-drop utils
-      isDragging:         PropTypes.bool.isRequired,
-      didDrop:            PropTypes.bool.isRequired,
-      draggedNode:        PropTypes.object,
-      // Drop target
-      isOver:  PropTypes.bool.isRequired,
-      canDrop: PropTypes.bool,
-    };
-    */    
     
     render() {
        //console.log ("Props: " + JSON.stringify (this.props));
@@ -387,20 +359,6 @@ class LONodeRenderer extends Component <any, any>
         nStyle ["width"]=scaffoldBlockPxWidth;
 
         //>--------------------------------------------------------------------
-
-        /*
-        className={styles.row +
-            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
-            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
-            (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
-            (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
-            (className ? ` ${className}` : '')
-        }
-        style={{
-            opacity: isDraggedDescendant ? 0.5 : 1,
-            ...style,
-        }}
-        */
 
         let gStyle:any=styles.orgrow;
         gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
