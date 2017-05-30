@@ -70,7 +70,7 @@ interface LearningObjectiveLinker {
 export interface LearningObjectiveLinkerProps {        
   sourceData : any;
   modalIsOpen : boolean;    
-  target: any;
+  targetAnnotations: Array<Linkable>;
   closeModal: any;
   title?:string;  
 }
@@ -79,7 +79,7 @@ export interface LearningObjectiveLinkerState {
   sourceData: any;
   localAnnotations: Array<Item>;     
   modalIsOpen : boolean;
-  target: any;
+  targetAnnotations: Array<Linkable>;
   closeModal: any;
 }
 
@@ -100,13 +100,13 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         
     super(props);
       
-    console.log ("Linking target: " + JSON.stringify (this.props.target.annotations));
+    console.log ("Linking target: " + JSON.stringify (this.props.targetAnnotations));
     console.log ("Linking sourceData: " + JSON.stringify (this.props.sourceData));
      
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
-                   target: this.props.target,                                           
+                   targetAnnotations: this.props.targetAnnotations,                                           
                    closeModal: this.props.closeModal,
                    localAnnotations: new Array<Item> ()
                  };
@@ -121,7 +121,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
-      this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], target: newProps.target});
+      this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], targetAnnotations: newProps.targetAnnotations});
   }
    
   /**
@@ -133,7 +133,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   resolveAnnotations () {
     console.log ("resolveAnnotations ()");
     
-    if (this.state.target==null) {
+    if (this.state.targetAnnotations==null) {
       console.log ("No link target given yet, bump");  
       return;
     }
@@ -153,8 +153,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(resetItem);        
     });
       
-    for (var i=0;i<this.state.target.annotations.length;i++) {    
-       let item=this.state.target.annotations [i];  
+    for (var i=0;i<this.state.targetAnnotations.length;i++) {    
+       let item=this.state.targetAnnotations [i];  
        console.log ("Checking item: " + item);
         
        for (var j=0;j<newData.length;j++) {
@@ -190,7 +190,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   closeModal() {
     console.log ("closeModal ()");  
       
-    let lo:Linkable=this.state.target as Linkable;
+    let list:Array<Linkable>=new Array <Linkable>();
       
     this.setState({modalIsOpen: false});
 
@@ -203,10 +203,10 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       }    
     });
       
-    lo.annotations=newData;  
+    list=newData;  
 
-    this.setState ({target : lo}, function (){
-      console.log ("Lo now: " +  JSON.stringify (this.state.target));
+    this.setState ({targetAnnotations : list}, function (){
+      console.log ("Linkable list now: " +  JSON.stringify (this.state.targetAnnotations));
       this.state.closeModal ();  
     });          
   }

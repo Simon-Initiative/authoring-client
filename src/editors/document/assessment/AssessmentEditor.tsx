@@ -11,6 +11,7 @@ import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
 import { TextInput } from '../../content/common/TextInput';
+import Linkable from '../../../data/linkable';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/resource';
 import * as contentTypes from '../../../data/contentTypes';
@@ -241,7 +242,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         closeModal={this.closeModal.bind (this)} 
         sourceData={this.state.skillModel.skills} 
         modalIsOpen={this.state.modalIsOpen} 
-        target={new Object()} />);
+        targetAnnotations={new Array<Linkable>()} />);
     } else {
       console.log ('Internal error: skill model object can be empty but not null');
     }

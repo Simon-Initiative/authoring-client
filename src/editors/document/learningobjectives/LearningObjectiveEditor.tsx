@@ -227,6 +227,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     saveToDB (newData?:any): void {
         console.log ("saveToDB ()");
+        
+        this.onEdit (newData);
+        
+        /*
         if (newData) {
             
           this.setState({
@@ -260,8 +264,28 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                 this.loadDocument (this.state.documentId);
               });
            });
-       }        
+       }  
+       */      
     }    
+    
+    /**
+     * 
+     */
+    onEdit(newData?:any) {
+      console.log ("onEdit ()");  
+        
+      let newModel  
+
+      if (newData) {
+        newModel=models.LearningObjectiveModel.updateModel (newData);
+      } else {
+        newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+      }  
+      
+      console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
+        
+      this.props.onEdit(newModel); 
+    }     
         
     /**
      * Note that this manual method of adding a new node does not generate an
@@ -432,7 +456,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     createLinkerDialog () {           
       if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} target={this.state.target} />);
+        return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);
       } else {
         console.log ("Internal error: skills object can be empty but not null");
       }

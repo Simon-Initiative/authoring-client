@@ -288,8 +288,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
      *
      */
     saveToDB (): void {
-        //console.log ("saveToDB ()");
+        console.log ("saveToDB ()");
         
+        this.onEdit ();
+        
+        /*
         let immutableDocument = this.state.document;
         
         if (immutableDocument==null)
@@ -318,8 +321,28 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                 console.log ("Document saved, loading to get new revision ... ");                
                 this.loadDocument (this.state.documentId);
             });
-        }); 
+        });
+        */ 
     }
+    
+    /**
+     * 
+     */
+    onEdit() {
+      console.log ("onEdit ()");  
+
+      var extractedData:any=this.extractData (this.state.treeData);        
+        
+      // Keep in mind that extractData creates a skills object, but in our
+      // model we already have one so we need to extract the contents from
+      // inside that object. Bit confusing prehaps but we'll clean it up
+      // later.
+      let newModel=models.SkillModel.updateModel (extractedData.skills);
+        
+      console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
+        
+      this.props.onEdit(newModel); 
+    }       
             
     /**
      * This method goes from external format to the format used by the tree renderer

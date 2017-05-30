@@ -1098,7 +1098,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    *
    */
   pushLO(anLO: LearningObjective, anArray: Array<Object>): void {
-    console.log("pushLO ()");
+    //console.log("pushLO ()");
 
     // First add the object we're given directly to the array ...
 
@@ -1121,7 +1121,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
     // Then we add any children this LO might have ...
 
-    console.log("Adding " + anLO.children.length + " children ...");
+    //console.log("Adding " + anLO.children.length + " children ...");
 
     for (let j = 0; j < anLO.children.length; j++) {
       this.pushLO(anLO.children [j], anArray);
@@ -1151,6 +1151,8 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       "modelType": "LearningObjectiveModel",
       "learningobjectives": newData
     };
+      
+    console.log ("Persisting LO model as: " + JSON.stringify (root));  
 
     return (root);
   }
@@ -1246,6 +1248,8 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       "title": this.title,
       "skills": this.skills
     };
+      
+    console.log ("SkillModel: " + JSON.stringify (root));  
 
     return (root);
   }

@@ -749,7 +749,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.loModalIsOpen==true) {  
         if (this.state.los!=null) {
           console.log ("createLOLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} target={this.state.orgTarget} />);
+          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
         } else {
           console.log ("Internal error: learning objectives object can be empty but not null");
         }
@@ -765,7 +765,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.activitiesModalIsOpen==true) {  
         if (this.state.activities!=null) {
           console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} target={this.toActivityList (this.state.orgTarget)} />);
+          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toActivityList (this.state.orgTarget)} />);
         } else {
           console.log ("Internal error: activities object can be empty but not null");
         }
@@ -781,7 +781,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.pagesModalIsOpen==true) {
         if (this.state.pages!=null) {
           console.log ("createPageLinkerDialog ()");
-          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.toPageList (this.state.orgTarget)} />);
+          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toPageList (this.state.orgTarget)} />);
         } else {
           console.log ("Internal error: pages array object can be empty but not null");
         }
