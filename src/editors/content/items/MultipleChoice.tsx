@@ -151,11 +151,18 @@ export class MultipleChoice
       let c = choices[i];
 
       let renderedFeedback = null;
+      let renderedScore = null;
 
       if (responses.length > i) {
         if (responses[i].feedback.size > 0) {
           let f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(c, responses[i], f)
+          renderedFeedback = this.renderFeedback(c, responses[i], f);
+
+          renderedScore = <InlineForm position='right'>
+              <TextInput editMode={this.props.editMode}
+                label='Score' value={responses[i].score} type='number' width='75px'
+                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
+            </InlineForm>;
         }
       }
       
@@ -163,11 +170,7 @@ export class MultipleChoice
         <ChoiceFeedback key={c.guid}>
           {this.renderChoice(c, responses[i])}
           {renderedFeedback}
-          <InlineForm position='right'>
-            <TextInput editMode={this.props.editMode}
-              label='Score' value={responses[i].score} type='number' width='75px'
-              onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-          </InlineForm>
+          {renderedScore}
         </ChoiceFeedback>);
     }
 
