@@ -1,7 +1,7 @@
 @import 'abstracts/variables';
 @import '../editors/content/common/draft/DraftWrapper';
 
-body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
+body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale; font-family: $sans-font; outline: none;}
 #app { margin: 0px; padding: 0px; width: 100%; height: 100%;}
 .sidebar .nav-link { border-radius: 0px; }
@@ -99,10 +99,11 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	background-color: $color-blue;
 	color: $color-white;
 	font-size: 16px;
+	font-weight: 600;
 	h1 {
 		margin: 0px;
-	    font-size: 17px;
-	    padding: 30px 1.3em 0.4em 0.9em;
+	    font-size: 1.5em;
+	    padding: 30px 1.3em 0.4em 0.7em;
 	    font-family: $serif-font;
 	    color: $color-white;
 	}
@@ -111,12 +112,16 @@ body { background: $color-offwhite; width: 100%; height: 100%; padding-top: 50px
 	    font-size: 12px;
 	    text-transform: uppercase;
 	    padding: 30px 1.3em 0.4em 1.3em;
-	    font-weight: 700;
+	    font-weight: 600;
 	    color: $color-lblue;
 	}
 	a {
 		cursor: pointer;
 		padding: .1em 1em;
+
+		&:hover {
+    		text-decoration: underline !important;
+    	}
 	}
 }
 
@@ -589,5 +594,80 @@ h1 {
 
 	.closebtn {
 		color: $color-white;
+	}
+}
+
+// Admin
+.admin {
+
+	.info {
+
+		.row {
+
+			[class*="col-"] {
+			    padding-top: 1rem;
+			    padding-bottom: 1rem;
+			    background-color: #fff;
+			    border-bottom: 1px solid rgba(86,61,124,.2);
+
+			    .btn-primary {
+			    	padding-left: 15px;
+			    	color: #fff;
+			    }
+			}
+		}
+	}
+}
+.users {
+
+	.user {
+		background-color: #fff;
+	    border-bottom: 1px solid rgba(86,61,124,.2);
+	    padding-top: 1rem;
+	    padding-bottom: 1rem;
+
+	    .profile {
+	    	display:inline-block;
+	    	height: 60px;
+	    	width: 60px;
+	    	float: left;
+	    	margin-right: 25px;
+	    	background-color: #eaeaea;
+	    	border-radius:45px;
+	    }
+	    .name {
+	    	font-weight: 700;
+	    	font-size: 1.1em;
+	    	display:block;
+	    }
+	    .inst {
+	    	font-size: 0.9em;
+	    	display:block;
+	    	line-height: 1.2em;
+	    }
+	    .email {
+	    	font-size: 0.9em;
+	    	display:block;
+	    	line-height: 1.2em;
+	    }
+	    .btn {
+    	    color: #fff;
+    		padding-left: 15px;
+    		margin-top: 10px;
+    		width: 100%;
+	    }
+	    .btn-success {
+	    	color: #fff;
+	    	float:right;
+		    background-color: #da3232;
+		    border-color: #da3232;
+	    }
+	    .btn-secondary {
+	    	color: #fff;
+	    	float:right;
+		    background-color: #0067cb;
+		    border: transparent;
+	    }
+
 	}
 }

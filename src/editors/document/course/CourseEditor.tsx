@@ -136,7 +136,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
 
     // renderCreation() {
     //     return (
-    //         <div className="input-group col-12">
+    //         <div className="input-group col-9">
     //             <form className="form-inline">
     //                 <select ref="type" className="custom-select mb-2 mr-sm-2 mb-sm-0" id="inlineFormCustomSelect">
     //                     <option value="workbook">Workbook</option>
@@ -144,7 +144,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     //                 </select>
     //                 <input type="text" ref='title' className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
     //                        placeholder="Title"></input>
-    //                 <button onClick={this.createResource.bind(this)} className="btn btn-primary">Create</button>
+    //                 <button onClick={this.createResource.bind(this)} className="btn btn-secondary">Create</button>
     //             </form>
     //         </div>);
     // }
@@ -162,33 +162,96 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
         // )
         let model = this.props.model;
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-md-12">
-                        <h1>{model.title}</h1>
-                        <p>{model.description}</p>
+            <div className="admin">
+                <div className="row info">
+                    <div className="col-md-9">
+                        <h2>Content Package</h2>
+                        <div className="infoContain">
+                        <div className="row">
+                            <div className="col-3">Title</div>
+                            <div className="col-9">{model.title}</div>
+                        </div>
+                        <div className="row">
+                            <div className="col-3">Description</div>
+                            <div className="col-9">{model.description}</div>
+                        </div>
+                        <div className="row">
+                            <div className="col-3">Id</div>
+                            <div className="col-9">{model.id}</div>
+                        </div>
+                        <div className="row">
+                            <div className="col-3">Version</div>
+                            <div className="col-9">{model.version}</div>
+                        </div>
+                        <div className="row">
+                            <div className="col-3">Type</div>
+                            <div className="col-9">{model.type}</div>
+                        </div>
+                        <div className="row">
+                            <div className="col-3">Thumbnail<br/><br/><button type="button" className="btn btn-primary">Upload</button></div>
+                            <div className="col-9">
+                                <img src="assets/ph-courseView.png" className="img-fluid" alt=""></img>
+
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br/><br/>
+                <div className="row users">
+                    <div className="col-md-9">
+                        <h2>Team Members</h2>
+                        <div className="userContain">
+                            <div className="row user">
+                                <div className="col-10">
+                                    <span className="profile"></span>
+                                    <span className="name">Nick Leaf</span>
+                                    <span className="inst">Carnegie Mellon University</span>
+                                    <span className="email">example@email.com</span>
+                                </div>
+                                <div className="col-2">
+                                    <button type="button" className="btn btn-secondary">Add</button>
+                                </div>
+                            </div>
+                            <div className="row user">
+                                <div className="col-10">
+                                    <span className="profile"></span>
+                                    <span className="name">Nick Leaf</span>
+                                    <span className="inst">Carnegie Mellon University</span>
+                                    <span className="email">example@email.com</span>
+                                </div>
+                                <div className="col-2">
+                                    <button type="button" className="btn btn-success">Remove</button>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+                {/* 
                 <div className="row">
-                    <div className="col-md-12">
-                        <p>Id: {model.id}</p>
-                        <p>Version: {model.version}</p>
-                        <p>Type: {model.type}</p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-9">
                         <p>Metadata: {JSON.stringify(model.metadata)}</p>
                         <p>Icon: {JSON.stringify(model.icon)}</p>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-9">
                         <p>Options: {model.options}</p>
                     </div>
                 </div>
+                <div className="row team">
+                    <div className="col-md-9">
+                        <h2>Team Members</h2>
+                        <p>Options: {model.options}</p>
+                    </div>
+                </div>
+                */}  
+                {/* 
                 {this.renderResources()}
                 {this.renderWebContent()}
+                */}  
             </div>
         );
     }
