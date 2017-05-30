@@ -53,6 +53,7 @@ export class ConceptsEditor
   renderConcepts() {
     return this.props.model.toArray()
       .map(c => <Concept key={'concept' + c} 
+         editMode={this.props.editMode}
          titleOracle={this.props.services.titleOracle} 
          conceptId={c} conceptType={this.props.conceptType} 
          onRemove={this.onRemove}/>)
@@ -63,7 +64,8 @@ export class ConceptsEditor
   render() : JSX.Element {
 
     const expanded = 
-        <Button type="link" onClick={this.onAddConcept}>Add Skill</Button>;
+        <Button editMode={this.props.editMode} 
+          type="link" onClick={this.onAddConcept}>Add Skill</Button>;
 
     return (
       <Collapse caption="Skills" expanded={expanded}>

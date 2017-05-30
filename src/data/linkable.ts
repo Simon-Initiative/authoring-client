@@ -17,9 +17,9 @@ export default class Linkable {
   expanded:boolean=false;
   annotations:Array <Linkable>=new Array ();  
     
-  constructor () 
+  constructor (anId?:string) 
   {
-
+    this.id=anId;
   }
     
   reset () {

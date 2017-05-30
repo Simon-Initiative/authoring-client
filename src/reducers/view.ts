@@ -2,8 +2,7 @@ import * as viewActions from '../actions/view';
 import { user as userActions } from '../actions/user';
 import { OtherAction } from './utils';
 import * as models from '../data/models';
-//import { CourseResource } from '../editors/document/common/resources';
-import {Resource} from "../data/resource";
+import { Resource } from '../data/resource';
 
 
 // The current view of the application can be either the
@@ -19,31 +18,31 @@ export type CurrentView =
   DocumentView;
 
 export type LoginView = {
-  type: 'LoginView'
+  type: 'LoginView',
 };
 export type DocumentView = 
 {
   type: 'DocumentView',
-  documentId: string
+  documentId: string,
 };
 export type CreateCourseView = {
-  type: 'CreateCourseView'
-}
+  type: 'CreateCourseView',
+};
 export type AllCoursesView = {
-  type: 'AllCoursesView'
-}
+  type: 'AllCoursesView',
+};
 export type ResourcesView = {
   type: 'ResourcesView',
   courseId: string,
   resourceType: string,
   title: string,
   filterFn: (resource: Resource) => boolean,
-  createResourceFn: (type: string, title: string) => models.ContentModel
-}
+  createResourceFn: (type: string, title: string) => models.ContentModel,
+};
 
 const defaultView : LoginView = {
-  type: 'LoginView'
-}
+  type: 'LoginView',
+};
 
 type ViewAction = 
   viewActions.viewDocumentAction |
@@ -51,22 +50,22 @@ type ViewAction =
   viewActions.viewCreateCourseAction |
   viewActions.viewResourcesAction |
   userActions.loginSuccessAction | 
-
-  OtherAction
+  OtherAction;
 
 export function view(state : CurrentView = defaultView, action: ViewAction): CurrentView {
   switch (action.type) {
     case viewActions.VIEW_DOCUMENT:
-      const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId }
+      const nextView : DocumentView = { type: 'DocumentView', documentId: action.documentId };
       return nextView;
     case viewActions.VIEW_RESOURCES:
-      return { type: 'ResourcesView', courseId: action.courseId, resourceType:action.resourceType, title: action.title, 
+      return { type: 'ResourcesView', courseId: action.courseId, 
+        resourceType:action.resourceType, title: action.title, 
         filterFn: action.filterFn, createResourceFn: action.createResourceFn};
     case viewActions.VIEW_CREATE_COURSE:
-      return { type: 'CreateCourseView'};
+      return { type: 'CreateCourseView' };
     case viewActions.VIEW_ALL_COURSES: // Deliberate fall through
     case userActions.LOGIN_SUCCESS:
-      return { type: 'AllCoursesView'}; 
+      return { type: 'AllCoursesView' }; 
     default:
       return state;
   }

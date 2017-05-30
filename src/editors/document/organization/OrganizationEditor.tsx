@@ -6,6 +6,7 @@ import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
@@ -38,11 +39,15 @@ interface OrganizationEditor
 export interface OrganizationEditorState extends AbstractEditorState 
 {    
   treeData : any;  
-  orgData: OrgOrganization;  
-  modalIsOpen : boolean;
+  orgData: OrgOrganization;
+  loModalIsOpen : boolean;
+  pagesModalIsOpen : boolean;
+  activitiesModalIsOpen : boolean;
   model: any;
   context: AppContext;
-  los: any;
+  los: models.LearningObjectiveModel;
+  pages: any;
+  activities: any;
   orgTarget : any;
   document: any;
   documentId: string;
@@ -72,11 +77,15 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         orgData: [],
         context: props.context,
         los: null,
+        pages: null,
+        activities: null,
         orgTarget: null,
         documentId: props.context.documentId,
         model: props.model,
         document: {},                
-        modalIsOpen: false,
+        loModalIsOpen: false,
+        pagesModalIsOpen: false,
+        activitiesModalIsOpen : false, 
         titleIndex: 0
       });  
     }
@@ -86,36 +95,89 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */    
     componentDidMount() {                    
       console.log ("componentDidMount ()");
-      console.log("componentDidMount () " + JSON.stringify(this.props.model.toplevel));
-      console.log("componentDidMount2 () " + JSON.stringify(this.props.model.organization));
+
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
         _id: this.props.model.guid,
         model: this.props.model
       });
-        
-      console.log ("Tree data: " + JSON.stringify (this.props.model.organization));  
-        
+                
       this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
-      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
-      //       console.log ("course: " + JSON.stringify (course));
-      //       let orgObject=course ["model"]["organizations"];
-      //       let orgDocId=orgObject.get (0);
-      //
-      //       persistence.retrieveDocument(orgDocId).then(doc => {
-      //         //console.log ("Org data: " + JSON.stringify (doc ["model"]));
-      //
-      //         this.setState ({orgData:doc ["model"]["toplevel"], treeData: doc ["model"]["organization"],document: doc});
-      //       });
-      //
-      //       let loObject=course ["model"]["learningobjectives"];
-      //       let logDocId=loObject.get (0);
-      //
-      //       persistence.retrieveDocument(logDocId).then(loDoc => {
-      //         this.setState ({los: loDoc ["model"]["los"]});
-      //       });
-      //   });
+        
+      this.loadLearningObjectives ();
+      
+      this.loadPages ();  
+        
+      this.loadActivities ();
     }
+    
+    /**
+     * 
+     */
+    loadLearningObjectives () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      //console.log ("Resources: " + JSON.stringify (resourceList));  
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.with (this.state.los)});
+          });
+        }          
+      })  
+    }    
+
+    /**
+     * We don't need to load anything from the database, everything is already contained the
+     * course document we have access to by default. So all we have to do is transform
+     * whichever workbook page reference we find into a Linkable and add it to the internal
+     * list of Linkables.
+     */
+    loadPages () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+
+      let pageList:Array<Linkable>=new Array <Linkable>();  
+        
+      resourceList.map((value, id) => {
+        if (value.type=="x-oli-workbook_page") {
+          let pageLink:Linkable=new Linkable ();
+          pageLink.id=value.guid;
+          pageLink.title=value.title;
+          pageList.push (pageLink);             
+        }          
+      })  
+        
+      this.setState ({pages: pageList});  
+    }    
+    
+    /**
+     * 
+     */
+    loadActivities () : void {
+      console.log ("loadActivities ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      let activityList:Array<Linkable>=new Array <Linkable>();        
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-inline-assessment") {
+          let activityLink:Linkable=new Linkable ();
+          activityLink.id=value.guid;
+          activityLink.title=value.title;
+          activityList.push (activityLink);    
+        }          
+      })  
+        
+      this.setState ({activities: activityList});    
+    }     
     
     /**
      *
@@ -127,48 +189,32 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         _id: this.props.model.guid,
         model: this.props.model
       });
-      this.setState({modalIsOpen: false, treeData: this.props.model.organization, document: docu});
+      this.setState({loModalIsOpen: false, treeData: this.props.model.organization, document: docu});
       //   persistence.retrieveDocument(anID).then(doc => {
       //
       //       console.log ("Loaded doc: " + JSON.stringify (doc));
       //
-      //       this.setState ({modalIsOpen: false, treeData: doc.model ["organization"],document: doc});
+      //       this.setState ({loModalIsOpen: false, treeData: doc.model ["organization"],document: doc});
       //       return (doc);
       //   });
       //
       //  return (null);
     }
-    
-    /**
-     * 
-     */
-    saveToDB (newData?:any): void {
-      console.log ("saveToDB ()");
         
-      if (newData) {  
-        let newModel=models.OrganizationModel.updateModel (this.state.orgData,newData);
-                     
-        let updatedDocument=this.state.document.set ('model',newModel);
-          
-        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {           
-          persistence.persistDocument(this.state.document)
-            .then(result => {                
-              this.loadDocument (this.state.documentId);
-          });
-        });         
-      } else {         
-        let newModel=models.OrganizationModel.updateModel (this.state.orgData,this.state.treeData);
-                     
-        let updatedDocument=this.state.document.set ('model',newModel);
+    onEdit(newData?:any) {
+        
+      let newModel  
 
-        this.setState ({modalIsOpen: false, 'document' : updatedDocument },function () {         
-          persistence.persistDocument(this.state.document)
-            .then(result => {                
-              this.loadDocument (this.state.documentId);
-          });
-        });
-      }      
-    }      
+      if (newData) {
+        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,newData);
+      } else {
+        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
+      }  
+              
+      this.props.onEdit(newModel);
+        
+      //this.setState ({treeData: newData}); 
+    }    
 
     /**
      * This method is called by the tree component and even though we could access
@@ -178,8 +224,15 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
                     
-      this.saveToDB (newData ["treeData"]);      
+      this.onEdit (newData ["treeData"]);      
     }    
+    
+    /**
+     * 
+     */
+    componentWillReceiveProps (newProps:OrganizationEditorProps) {
+      this.setState({treeData: this.props.model.organization});  
+    }
 
     /**
      * 
@@ -229,7 +282,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         this.setState ({titleIndex: this.state.titleIndex+1});
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }    
 
     /**
@@ -289,45 +342,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
 
-        this.saveToDB (immutableHelper);    
+        this.onEdit (immutableHelper);    
     }
-    
-    /**
-     * 
-     */    
-    addPage (aNode:any): void {
-        console.log ("LearningObjectiveEditor:addPage ()");
-                
-        let immutableHelper = this.state.treeData.slice();
-                
-        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
-        
-        if (immutableHelper==null) {
-            console.log ("Bump");
-            return;
-        }
-        
-        if (parentArray!=null) {
-            console.log ("We have an object, performing edit ...");
-        }
-        else {
-           console.log ("Internal error: node not found in tree");
-        }
-                    
-        for (var i=0;i<parentArray.length;i++) {
-            let testNode:OrgItem=parentArray [i] as OrgItem;
             
-            if (testNode.id==aNode.id) {
-                var newNode:OrgItem=new OrgItem ();
-                newNode.title=("Title " + this.state.titleIndex);
-                testNode.children.push (newNode);
-                break;
-            }
-        }
-            
-        this.saveToDB (immutableHelper);         
-    }    
-        
     /**
      * 
      */    
@@ -362,24 +379,55 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.saveToDB (immutableHelper);   
+        this.onEdit (immutableHelper);   
     }
+     
+    /**
+     * 
+     */
+    closeLOModal () {
+      console.log ("LearningObjectiveEditor: closeLOModal ()");
+        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false});  
+        
+      this.onEdit ();
+    }    
     
     /**
      * 
      */
     linkLO(aNode:any) {        
         console.log ("OrganizationEditor:linkLO ()");
-        //console.log ("aNode: " + JSON.stringify (aNode));
                 
-        this.setState ({modalIsOpen: true, orgTarget: aNode});
+        this.setState ({pagesModalIsOpen: false, loModalIsOpen: true, activitiesModalIsOpen : false, orgTarget: aNode});
     }    
+        
+    /**
+     * 
+     */    
+    addPage (aNode:any): void {
+        console.log ("LearningObjectiveEditor:addPage ()");
+        
+        //this.linkPage (aNode);
+        this.setState ({pagesModalIsOpen: true, loModalIsOpen: false, activitiesModalIsOpen : false, orgTarget: aNode});                         
+    }     
     
     /**
      * 
-     */
+     */    
+    addActivity (aNode:any): void {
+        console.log ("LearningObjectiveEditor:addActivity ()");
+        
+        //this.linkPage (aNode);
+        this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
+    }     
+
+    /**
+    * We need to move this to a utility class because there are different instances
+    * of it 
+    */
     toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
-      console.log ("toFlat ()");
+      //console.log ("toFlat ()");
         
       if (!aTree) {
         return [];
@@ -392,7 +440,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         aToList.push (newObj);
           
         if (aTree [i]["children"]) {
-          console.log ("Lo has children, processing ...");  
+          //console.log ("Lo has children, processing ...");  
           let tList=aTree [i]["children"];
           this.toFlat (tList,aToList);
         }
@@ -410,35 +458,101 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
-        optionalProps ["linkAnnotation"]=this.linkLO.bind (this);
+        optionalProps ["linkAnnotation"]=this.linkLO.bind (this);        
         optionalProps ["deleteNode"]=this.deleteNode.bind (this);
         optionalProps ["treeData"]=this.state.treeData;
         optionalProps ["addPage"]=this.addPage.bind (this);
+        optionalProps ["addActivity"]=this.addActivity.bind (this);
         
         return (optionalProps);
     }
-    
+        
     /**
      * 
      */
-    closeModal () {
-      console.log ("LearningObjectiveEditor: closeModal ()");
+    closePagesModal () {
+      console.log ("LearningObjectiveEditor: closePagesModal ()");
         
-      this.saveToDB ();
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false});        
+        
+      let immutableHelper = this.state.treeData.slice();
+                
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
+        
+      if (immutableHelper==null) {
+        console.log ("Bump");
+        return;
+      }
+        
+      if (parentArray!=null) {
+        console.log ("We have an object, performing edit ...");
+      } else {
+        console.log ("Internal error: node not found in tree");
+      }
+                    
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==this.state.orgTarget.id) {
+          var newNode:OrgItem=new OrgItem ();
+          newNode.title=("Title " + this.state.titleIndex);
+          testNode.children.push (newNode);
+          break;
+        }
+      }
+            
+      this.onEdit (immutableHelper);        
+        
+      //this.onEdit ();
     }    
     
     /**
      * 
      */
-    createLinkerDialog () {           
-      if (this.state.los!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} target={this.state.orgTarget} />);
-      } else {
-        console.log ("Internal error: no skills object can be empty but not null");
-      }
+    createLinkerDialog () {                
+      if (this.state.loModalIsOpen==true) {  
+        if (this.state.los!=null) {
+          console.log ("createLinkerDialog ()");              
+          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closePagesModal.bind (this)} sourceData={this.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} target={this.state.orgTarget} />);
+        } else {
+          console.log ("Internal error: learning objectives object can be empty but not null");
+        }
+      }    
                    
       return (<div></div>);           
     }
+    
+    /**
+     * 
+     */
+    createActivityLinkerDialog () {                
+      if (this.state.activitiesModalIsOpen==true) {  
+        if (this.state.activities!=null) {
+          console.log ("createLinkerDialog ()");              
+          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closePagesModal.bind (this)} sourceData={this.toFlat (this.state.activities,new Array<Linkable>())} modalIsOpen={this.state.activitiesModalIsOpen} target={this.state.orgTarget} />);
+        } else {
+          console.log ("Internal error: activities object can be empty but not null");
+        }
+      }    
+                   
+      return (<div></div>);           
+    }    
+    
+    /**
+     * 
+     */
+    createPageLinkerDialog () {      
+      if (this.state.pagesModalIsOpen==true) {
+        if (this.state.pages!=null) {
+          console.log ("createPageLinkerDialog ()");
+          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closeLOModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.state.orgTarget} />);
+        } else {
+          console.log ("Internal error: pages array object can be empty but not null");
+        }
+      }    
+                   
+      return (<div></div>);           
+    }    
             
     /**
      * 
@@ -446,7 +560,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     render() 
     {      
       const lolinker=this.createLinkerDialog ();  
-        //generateNodeProps={rowInfo => ({ onClick: () => console.log("rowInfo onClick ()") })}
+      const pagelinker=this.createPageLinkerDialog ();
+      const activitylinker=this.createActivityLinkerDialog ();
+      
       return (
               <div>
                   <div>
@@ -456,6 +572,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                   </div>
                   {lolinker}
+                  {pagelinker}
+                  {activitylinker}
                   <SortableTree
                       maxDepth={5}
                       treeData={this.state.treeData}

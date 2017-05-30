@@ -27,6 +27,8 @@ export interface AbstractEditorProps<ModelType> {
   
   editMode: boolean;
 
+  courseDoc: persistence.Document;
+
 }
 
 export interface AbstractEditorState {

@@ -280,9 +280,10 @@ const styles = {
       'border' : '0px solid black',
       "overflowY": "hidden",
       "overflowX": "hidden",
-      "minWidth": "300px",      
-      "maxWidth": "340px",
-      'height' : '42px'
+      "minWidth": "370px",      
+      "maxWidth": "400px",
+      'height': '42px',
+      'line-height': '42px'
   } 
 };
 
@@ -295,6 +296,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     editNodeTitle:any=null;
     linkAnnotation:any=null;
     addPage:any=null;
+    addActivity:any=null;
           
     /**
      * 
@@ -315,7 +317,7 @@ class OrganizationNodeRenderer extends Component <any,any>
               <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
               <li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>
               <li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>
-              <li className="list-group-item"><a href="#" >Activity</a></li>
+              <li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
               Assets
               <li className="list-group-item"><a href="#" >Add-On</a></li>              
             </ul>
@@ -331,7 +333,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             addPage,
             deleteNode,
             treeData,
-            linkAnnotation,     
+            linkAnnotation,
+            addActivity,     
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -362,6 +365,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.editNodeTitle=editNodeTitle;        
         this.deleteNodeFunction=deleteNode;
         this.addPage=addPage;
+        this.addActivity=addActivity;
 
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
@@ -455,7 +459,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
-        const context = { userId: null, documentId: null, courseId: null, webContentUrl: null};
+        const context = { userId: null, documentId: null, courseId: null, baseUrl: null};
 
         //>--------------------------------------------------------------------
 

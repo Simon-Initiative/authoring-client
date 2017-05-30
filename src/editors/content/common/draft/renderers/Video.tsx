@@ -65,7 +65,9 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
 
     let src = '';
     if (sources.size > 0) {
-      src = this.props.blockProps.context.webContentUrl + '/' + sources.first().src;
+      src = this.props.blockProps.context.baseUrl 
+        + '/' + this.props.blockProps.context.courseId
+        + '/webcontents/' + sources.first().src;
     }
     
     return (
@@ -73,7 +75,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         <div>
           <video src={src} controls={controls}/>
         </div>
-        <Button onClick={this.onClick}>Edit</Button>
+        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
   }
 }

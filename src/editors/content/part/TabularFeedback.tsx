@@ -67,7 +67,8 @@ export abstract class TabularFeedback
   render() : JSX.Element {
     
     const expanded = 
-        <Button type='link' onClick={this.onAdd}>Add Feedback</Button>;
+        <Button editMode={this.props.editMode} 
+          type='link' onClick={this.onAdd}>Add Feedback</Button>;
     
     const rows = this.renderRows();
 

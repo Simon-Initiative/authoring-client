@@ -271,9 +271,10 @@ const styles = {
       'border' : '0px solid black',
       "overflowY": "hidden",
       "overflowX": "hidden",
-      "minWidth": "300px",      
-      "maxWidth": "340px",
-      'height' : '42px'
+      "minWidth": "350px",      
+      "maxWidth": "400px",
+      'height': '42px',
+      'line-height': '42px'
   }  
 };
 
@@ -424,7 +425,7 @@ class LONodeRenderer extends Component <any, any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
-        const context = { userId: null, documentId: null, courseId: null, webContentUrl: null};
+        const context = { userId: null, documentId: null, courseId: null, baseUrl: null};
 
         return (
             <div style={{ height: '100%', width: '450px' }} {...otherProps}>

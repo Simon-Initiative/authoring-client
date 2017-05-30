@@ -87,7 +87,8 @@ export class HintEditor
     return (
       <div className='itemWrapper'>
 
-      <InputLabel label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
+      <InputLabel editMode={this.props.editMode} 
+        label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
           <HtmlContentEditor 
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}

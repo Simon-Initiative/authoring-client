@@ -1,16 +1,14 @@
-'use strict'
-
-import * as React from "react";
-import {returnType} from "../utils/types";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import NavigationBar from "./NavigationBar";
-import * as persistence from "../data/persistence";
-import * as models from "../data/models";
-import * as viewActions from "../actions/view";
-import {Resource} from "../data/resource";
-import * as courseActions from "../actions/course";
-import {isNullOrUndefined} from "util";
+import * as React from 'react';
+import { returnType } from '../utils/types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import NavigationBar from './NavigationBar';
+import * as persistence from '../data/persistence';
+import * as models from '../data/models';
+import * as viewActions from '../actions/view';
+import { Resource } from '../data/resource';
+import * as courseActions from '../actions/course';
+import { isNullOrUndefined } from 'util';
 
 interface ResourceView {
   viewActions: any;
@@ -33,12 +31,12 @@ interface ResourceViewState {
 function mapStateToProps(state: any) {
 
   const {
-    course
+    course,
   } = state;
 
   return {
-    course
-  }
+    course,
+  };
 }
 
 const stateGeneric = returnType(mapStateToProps);
@@ -51,7 +49,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     super(props);
 
     this.state = {
-      resources: []
+      resources: [],
     };
 
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
@@ -59,24 +57,18 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   componentDidMount() {
     // Fetch the titles of all current course resources
-    console.log("ResourceView componentDidMount");
-    if (this.props.course) {
-      console.log("ResourceView componentDidMount 2");
-      this.fetchTitles(this.props.course.model, this.props.filterFn);
-    }
-
+    this.fetchTitles(this.props.course.model, this.props.filterFn);
   }
 
   fetchTitles(model: models.CourseModel, filterFn: any) {
-    this.setState({resources: model.resources.toArray().filter(filterFn)});
+    const resources = model.resources.toArray().filter(filterFn);
+    console.log('resources length: ' + resources.length);
+    this.setState({ resources });
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("ResourceView componentWillReceiveProps");
-    if (!isNullOrUndefined(nextProps.course)) {
-      console.log("ResourceView componentWillReceiveProps 2");
-      this.fetchTitles(nextProps.course.model, nextProps.filterFn);
-    }
+    console.log('received new props');
+    this.fetchTitles(nextProps.course.model, nextProps.filterFn);
   }
 
   clickResource(id) {
@@ -84,9 +76,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   createResource(e) {
-
     e.preventDefault();
-
     const title = (this.refs['title'] as any).value;
     let type = this.props.resourceType;
     if (this.props.resourceType === 'x-oli-assessment') {
@@ -100,7 +90,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   refreshCoursePackage(courseId: string) {
     persistence.retrieveCoursePackage(courseId)
-      .then(document => {
+      .then((document) => {
         // Get an updated course content package payload
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(courseActions.courseChanged(document.model));
@@ -111,16 +101,16 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderResources() {
 
-    let link = (id, title) =>
+    const link = (id, title) =>
       <button onClick={this.clickResource.bind(this, id)}
               className="btn btn-link">{title}</button>;
 
-    let rows = this.state.resources.map(r =>
+    const rows = this.state.resources.map(r =>
       <tr key={r.guid}>
         <td>{link(r.guid, r.title)}</td>
         <td>{r.id}</td>
         <td>{r.type}</td>
-      </tr>)
+      </tr>);
 
     return (
       <div className="">
@@ -144,9 +134,11 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     return (
       <div className="input-group col-12">
         <form className="form-inline">
-          <input type="text" ref='title' className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-                 placeholder="Title"></input>
-          <button onClick={this.createResource.bind(this)} className="btn btn-primary">Create</button>
+          <input type="text" ref="title"
+            className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
+            placeholder="Title"></input>
+          <button onClick={this.createResource.bind(this)} 
+            className="btn btn-primary">Create</button>
         </form>
       </div>);
   }
@@ -172,4 +164,6 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
 }
-export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>(mapStateToProps)(ResourceView);
+
+export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>
+  (mapStateToProps)(ResourceView);

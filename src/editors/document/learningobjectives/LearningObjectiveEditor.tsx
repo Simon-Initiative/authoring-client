@@ -234,7 +234,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             treeData: this.assignParents (newData)
           },function (){          
               console.log ("Parented: " + JSON.stringify (this.state.treeData));
-              var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+              var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
                      
               var updatedDocument=this.state.document.set ('model',newModel);
                            
@@ -249,7 +249,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             
         } else {            
           console.log ("Parented: " + JSON.stringify (this.state.treeData));
-          var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+          var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
                      
           var updatedDocument=this.state.document.set ('model',newModel);
                            
@@ -432,9 +432,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     createLinkerDialog () {           
       if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} target={this.state.target} />);
+        return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} target={this.state.target} />);
       } else {
-        console.log ("Internal error: no skills object can be empty but not null");
+        console.log ("Internal error: skills object can be empty but not null");
       }
                    
       return (<div></div>);           

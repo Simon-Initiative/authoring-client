@@ -6,9 +6,15 @@ import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
 import { Table } from './table';
 import { Audio } from './audio';
+import { Image } from './image';
 import { IFrame } from './iframe';
 import { Video } from './video';
 import { YouTube } from './youtube';
+import { Link } from './link';
+import { Xref } from './xref';
+import { ActivityLink } from './activity_link';
+import { Cite } from './cite';
+
 
 // Translation routines to convert from persistence model to draft model 
 
@@ -51,6 +57,10 @@ const blockHandlers = {
   codeblock,
   table,
   audio,
+  image: imageBlock,
+  formula: formulaBlock,
+  quote: quoteBlock,
+  code: codeBlock,
   iframe,
   video,
   youtube,
@@ -61,11 +71,18 @@ const blockHandlers = {
 
 const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
-  activity_link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.activity_link),
-  xref: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.xref),
-  wb_manual: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.wb_manual),
-  link: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.link),
-  cite: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.cite),
+  activity_link: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.activity_link, 'activity_link', ActivityLink),
+  xref: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.xref, 'xref', Xref),
+  link: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.link, 'link', Link),
+  cite: insertDataDrivenEntity.bind(
+    undefined, 'MUTABLE', 
+    common.EntityTypes.cite, 'cite', Cite),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -73,9 +90,10 @@ const inlineHandlers = {
   sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
   term: applyStyle.bind(undefined, 'BOLD'),
   var: applyStyle.bind(undefined, 'ITALIC'),
-  image: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.image),
-  math: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.formula),
-  quote: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.quote),
+  image: imageInline,
+  formula: formulaInline,
+  'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
+  quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
 };
 
@@ -84,7 +102,6 @@ function applyStyle(
   context: ParsingContext, workingBlock: WorkingBlock) {
   workingBlock.markups.push({ offset, length, style });
 }
-
 
 function em(
   offset: number, length: number, item: Object, 
@@ -116,6 +133,23 @@ function extractAttrs(item: Object) : Object {
       {});
 }
 
+function insertDataDrivenEntity(
+  mutability: string, type: string, label, ctor, offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+  
+  const data = {};
+  data[label] = ctor.fromPersistence(item);
+
+  context.draft.entityMap[key] = {
+    type,
+    mutability,
+    data,
+  };
+}
 
 
 function insertEntity(
@@ -137,6 +171,31 @@ function insertEntity(
   };
 }
 
+function imageInline(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+
+  const image = Image.fromPersistence(item, '');
+  
+  context.draft.entityMap[key] = {
+    type: common.EntityTypes.image,
+    mutability: 'IMMUTABLE',
+    data: { image },
+  };
+}
+
+function formulaInline(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  // Do nothing for now, this effectively strips out the inline
+  // formula tag on save
+}
+
 function wb_inline(item: Object, context: ParsingContext) {
   const wb = WbInline.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
@@ -148,10 +207,76 @@ function codeblock(item: Object, context: ParsingContext) {
   addAtomicBlock(common.EntityTypes.codeblock, { codeblock }, context);
 }
 
+function quoteBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'blockquote',
+  });
+}
+
+function formulaBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'formula',
+  });
+}
+
+function codeBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  children.forEach(subItem => processInline(subItem, context, blockContext));
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'code',
+  });
+}
+
 function audio(item: Object, context: ParsingContext) {
 
   const audio = Audio.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.audio, { audio }, context);
+}
+
+function imageBlock(item: Object, context: ParsingContext) {
+
+  const image = Image.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.image, { image }, context);
 }
 
 function video(item: Object, context: ParsingContext) {
@@ -289,7 +414,8 @@ function processInline(
     
     const offset = blockContext.fullText.length;
 
-    if (key === 'math' || key === 'input_ref') {
+    // TODO fix this in a more general way 
+    if (key === 'm:math' || key === 'input_ref') {
       blockContext.fullText += ' ';
 
     } else {
@@ -405,7 +531,6 @@ function section(item: Object, context: ParsingContext) {
   const endData : common.SectionEnd = {
     type: 'section_end',
     purpose: extractAttrs(item)['@purpose'],
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.section_end, endData, context);
 }
@@ -432,7 +557,6 @@ function pullout(item: Object, context: ParsingContext) {
   const endData : common.PulloutEnd = {
     type: 'pullout_end',
     subType: item[key]['@type'],
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.pullout_end, endData, context);
 
@@ -443,7 +567,7 @@ function definition(item: Object, context: ParsingContext) {
   const key = common.getKey(item);
 
   const terms = getChildren(item).filter(c => common.getKey(c) === 'term');
-  const term = terms.length === 0 ? 'unknown term ' : terms[0][common.TEXT];
+  const term = terms.length === 0 ? 'unknown term ' : (terms[0] as any).term[common.TEXT];
 
   // Create the beginning block
   const beginData : common.DefinitionBegin = {
@@ -596,7 +720,6 @@ function example(item: Object, context: ParsingContext) {
   // Create the ending block 
   const endData : common.ExampleEnd = {
     type: 'example_end',
-    beginBlockKey: beginBlock.key,
   };
   addAtomicBlock(common.EntityTypes.example_end, endData, context);
 

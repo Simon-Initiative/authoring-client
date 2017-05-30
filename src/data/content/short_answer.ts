@@ -20,8 +20,8 @@ const defaultContent = {
   whitespace: 'trim',
   inputSize: 'medium',
   guid: '',
-  contentType: 'ShortAnswer'
-}
+  contentType: 'ShortAnswer',
+};
 
 export class ShortAnswer extends Immutable.Record(defaultContent) {
   

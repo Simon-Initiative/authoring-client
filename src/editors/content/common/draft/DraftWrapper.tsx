@@ -100,6 +100,9 @@ const styleMap = {
   TERM: {
     textDecoration: 'underline'
   },
+  QUOTE: {
+    fontStyle: 'italic'
+  },
   IPA: {
     // TODO
   },
@@ -119,11 +122,12 @@ const blockRenderMap = Immutable.Map({
   'header-five': { element: 'h5' },
   'header-six': { element: 'h6' },
   'blockquote': { element: 'blockquote' },
-  'code-block': { element: 'pre' },
+  'code': { element: 'pre' },
   'atomic': { element: 'div' },
   'unordered-list-item': { element: 'li' },
   'ordered-list-item': { element: 'li' },
-  'unstyled': { element: 'div' }
+  'unstyled': { element: 'div' },
+  'formula': { element: 'div' },
 });
 
 
@@ -224,10 +228,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const contentState = props.content.contentState;
     this.lastContent = contentState;
 
-    const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-    const es = EditorState.createWithContent(contentState, compositeDecorator);
+    const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
 
     this.state = {
@@ -441,6 +442,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           onEdit: (data) => {
             this.processBlockEdit(block, data);
           },
+          editMode: !this.props.locked,
           services: this.props.services,
           context: this.props.context
         }
@@ -486,10 +488,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         const selection = this.state.editorState.getSelection();
 
-        const onDecoratorEdit = () => this.onChange(this.state.editorState);
-        const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-        const es = EditorState.createWithContent(nextProps.content.contentState, compositeDecorator);
+        const es = EditorState.createWithContent(nextProps.content.contentState, this.getCompositeDecorator());
         const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
 
         this.setState({
@@ -561,14 +560,23 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return command.precondition(this.state.editorState, this.props.context);
   }
 
+  getCompositeDecorator() {
+    const onDecoratorEdit = (contentState: ContentState) => {
+      this.forceContentChange(contentState, 'apply-entity');
+    };
+    const compositeDecorator = buildCompositeDecorator({ 
+      activeItemId: this.props.activeItemId, services: this.props.services, 
+      context: this.props.context, onEdit: onDecoratorEdit, 
+    });
+    return compositeDecorator;
+  }
+
   forceRender() {
 
     const editorState = this.state.editorState;
     const content = editorState.getCurrentContent();
-    const onDecoratorEdit = () => this.onChange(this.state.editorState);
-    const compositeDecorator = buildCompositeDecorator({ activeItemId: this.props.activeItemId, services: this.props.services, onEdit: onDecoratorEdit });
-
-    const es = EditorState.createWithContent(content, compositeDecorator);
+    
+    const es = EditorState.createWithContent(content, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({editorState: newEditorState});
   }
@@ -600,6 +608,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   }
 
+  blockStyleFn(contentBlock: ContentBlock) {
+    const type = contentBlock.getType();
+    if (type === 'formula') {
+      return 'formulaDiv';
+    } else if (type === 'code') {
+      return 'codeDiv';
+    }
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
@@ -619,7 +636,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}
+          blockRenderMap={blockRenderMap}
           blockRendererFn={this.blockRenderer.bind(this)}
+          blockStyleFn={this.blockStyleFn.bind(this)}
           editorState={this.state.editorState} 
           readOnly={this.state.lockedByBlockRenderer || this.props.locked}
           onChange={this.onChange} />

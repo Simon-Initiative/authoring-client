@@ -19,18 +19,30 @@ export interface TitleContentEditorProps extends AbstractContentEditorProps<cont
 /**
  * The abstract content editor. 
  */
-export abstract class TitleContentEditor extends AbstractContentEditor<contentTypes.Title, TitleContentEditorProps, {}> {
+export class TitleContentEditor extends AbstractContentEditor<contentTypes.Title, TitleContentEditorProps, { text }> {
 
   constructor(props) {
     super(props);
 
     this._onChange = this.onChange.bind(this);
+
+    this.state = {
+      text: this.props.model.text,
+    };
   }
 
   onChange() {
     const text = ((this.refs as any).text as any).innerHTML;
-    const updatedContent : contentTypes.Title = this.props.model.with({ text });
-    this.props.onEdit(updatedContent);
+    this.setState(
+      { text }, 
+      () => {
+        const updatedContent : contentTypes.Title = this.props.model.with({ text });
+        this.props.onEdit(updatedContent);
+      });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.model.text !== this.state.text;
   }
 
   renderView(): JSX.Element {
@@ -42,13 +54,16 @@ export abstract class TitleContentEditor extends AbstractContentEditor<contentTy
   }
 
   renderEdit(): JSX.Element {
-    const html = { __html: this.props.model.text };
+    const html = { __html: this.state.text };
           
     if (this.props.styles) {
-      return <h2 style={this.props.styles} ref='text' onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
+      return <h2 style={this.props.styles} ref='text' 
+      onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
     }     
           
-    return <h2 ref='text' onInput={this._onChange} contentEditable dangerouslySetInnerHTML={html}></h2>;
+    return <h2 ref='text' 
+      onInput={this._onChange} 
+      contentEditable dangerouslySetInnerHTML={html}></h2>;
   }
 
   render() : JSX.Element {

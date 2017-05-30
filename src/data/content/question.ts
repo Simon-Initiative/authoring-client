@@ -9,21 +9,25 @@ import { FillInTheBlank } from './fill_in_the_blank';
 import { Ordering } from './ordering';
 import { Text } from './text';
 import { ShortAnswer } from './short_answer';
+import { GradingCriteria } from './criteria';
+import { Essay } from './essay';
 import { Numeric } from './numeric';
 import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
-import { getChildren } from './common';
-import { augment } from './common';
+import { getChildren, augment } from './common';
 import { getEntities } from './html/changes';
 import { EntityTypes } from './html/common';
 
-export type Item = MultipleChoice | FillInTheBlank | Ordering | ShortAnswer | Numeric | Text | Unsupported;
+export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
+  | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
   body?: Html;
   concepts?: Immutable.List<string>;
+  grading?: string;
+  criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
   explanation?: Html;
@@ -35,28 +39,32 @@ const defaultQuestionParams = {
   id: '',
   body: new Html(),
   concepts: Immutable.List<string>(),
+  grading: 'automatic',
+  criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
-  guid: ''
+  guid: '',
 };
 
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
 function tagInputRefsWithType(model: Question) {
   
-  const byId = model.items.toArray().reduce((p, c) => {
-    if ((c as any).id !== undefined) {
-      p[(c as any).id] = c;
-      return p;
-    }
-  }, {});
+  const byId = model.items.toArray().reduce(
+    (p, c) => {
+      if ((c as any).id !== undefined) {
+        p[(c as any).id] = c;
+        return p;
+      }
+    }, 
+    {});
 
   const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
     .reduce((contentState, info) => {
       console.log(info);
       const type = byId[info.entity.data['@input']].contentType;
-      return contentState.mergeEntityData(info.entityKey, { '$type':  type});
+      return contentState.mergeEntityData(info.entityKey, { $type: type });
     }, model.body.contentState);
 
   const body = model.body.with({contentState});
@@ -69,6 +77,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   id: string;
   body: Html;
   concepts: Immutable.List<string>;
+  criteria: Immutable.OrderedMap<string, GradingCriteria>;
+  grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
   explanation: Html;
@@ -86,10 +96,13 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
     let model = new Question({ guid });
 
-    let question = json.question;
+    const question = json.question;
 
     if (question['@id'] !== undefined) {
-      model = model.with({ id: question['@id']});
+      model = model.with({ id: question['@id'] });
+    }
+    if (question['@grading'] !== undefined) {
+      model = model.with({ grading: question['@grading'] });
     }
 
     getChildren(question).forEach(item => {
@@ -100,6 +113,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       switch (key) {
         case 'concept':
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text'])});
+          break;
+        case 'grading_criteria':
+          model = model.with(
+            { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
         case 'body':
           model = model.with({ body: Html.fromPersistence(item, id) });
@@ -124,6 +141,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
         case 'ordering':
           model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          break;
+        case 'essay':
+          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
           break;
         
         // We do not yet support image_hotspot:
@@ -151,6 +171,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         .toArray()
         .map(concept => ({concept: { '#text': concept}})),
 
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
+ 
       ...this.items
         .toArray()
         .map(item => item.toPersistence()),
@@ -165,6 +189,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     return {
       "question": {
         "@id": this.id,
+        "@grading": this.grading,
         "#array": children
       }
     }

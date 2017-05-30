@@ -147,8 +147,14 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         onclick: this.placeholderMenuHandler
       },
       activities: {
-        label: "Activities",
-        icon: "O",
+        label: "Assessments",
+        icon: "A",
+        staticContent: false,
+        onclick: this.placeholderMenuHandler
+      },
+      pools: {
+        label: "Question Pools",
+        icon: "P",
         staticContent: false,
         onclick: this.placeholderMenuHandler
       },
@@ -257,7 +263,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     const viewActivities = () =>
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
-        'Activities',
+        'Assessments',
         'x-oli-assessment',
         (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
         (title, type) => new models.AssessmentModel({
@@ -294,21 +300,35 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
         'Skills',
-        'x-oli-skill_model',
-        (resource) => resource.type === 'x-oli-skill_models',
+        'x-oli-skills_model',
+        (resource) => resource.type === 'x-oli-skills_model',
         (title, type) => new models.SkillModel({
           type: type,
           title: new contentTypes.Title({text: title})
         })
       );
 
+    const viewPools = () =>
+      this.props.viewActions.viewResources(
+        this.props.course.model.guid,
+        'Question Pools',
+        'x-oli-assessment2-pool',
+        (resource) => resource.type === 'x-oli-assessment2-pool',
+        (title, type) => new models.PoolModel({
+          type,
+          pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),
+        }),
+      );
 
+    
     this.opts.get('package').onclick = () => this.props.viewActions.viewDocument(this.props.course.model.guid);
     this.opts.get('organizations').onclick = viewOrganizations;
     this.opts.get('workBookPages').onclick = viewWorkbookPages;
     this.opts.get('activities').onclick = viewActivities;
     this.opts.get('objectives').onclick = viewLearningObjectives;
     this.opts.get('skills').onclick = viewSkills;
+    this.opts.get('pools').onclick = viewPools;
+    
     // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
     // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
 

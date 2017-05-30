@@ -8,6 +8,7 @@ interface Header {
 
 export interface HeaderProps {
   dispatch: any;
+  logoutUrl: string;
 }
 
 class Header extends React.PureComponent<HeaderProps, {}> {
@@ -30,17 +31,21 @@ class Header extends React.PureComponent<HeaderProps, {}> {
   render() {
     return (
       <nav className="navbar navbar-toggleable-md navbar-light fixed-top">
-      <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button className="navbar-toggler navbar-toggler-right" 
+        type="button" data-toggle="collapse" 
+        data-target="#navbarSupportedContent" 
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span className="navbar-toggler-icon"></span>
       </button>
         <a className="navbar-brand" onClick={this._onClickHome}>
-          <img src="assets/oli-icon.png" width="30" height="30" className="d-inline-block align-top" alt=""/>
+          <img src="assets/oli-icon.png" width="30" height="30" 
+            className="d-inline-block align-top" alt=""/>
           Open Learning Initiative
         </a>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link active" href="#">Register <span className="sr-only">(current)</span></a>
+              <a className="nav-link active" href={this.props.logoutUrl}>Logout</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" onClick={this._onClickCreate}>Create a Course</a>
@@ -54,5 +59,3 @@ class Header extends React.PureComponent<HeaderProps, {}> {
 }
 
 export default Header;
-
-

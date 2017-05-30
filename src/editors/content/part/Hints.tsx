@@ -59,14 +59,15 @@ export abstract class Hints
               model={i}
               onEdit={this.onHintEdit} 
               onRemove={this.onRemove}
-              />
+              />;
     });
   }
 
   render() : JSX.Element {
 
     const expanded = 
-        <Button type='link' onClick={this.onAddHint}>Add Hint</Button>;
+        <Button editMode={this.props.editMode} 
+          type='link' onClick={this.onAddHint}>Add Hint</Button>;
       
     return (
       <Collapse 
