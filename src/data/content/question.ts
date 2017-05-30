@@ -9,6 +9,7 @@ import { FillInTheBlank } from './fill_in_the_blank';
 import { Ordering } from './ordering';
 import { Text } from './text';
 import { ShortAnswer } from './short_answer';
+import { GradingCriteria } from './criteria';
 import { Essay } from './essay';
 import { Numeric } from './numeric';
 import { Unsupported } from './unsupported';
@@ -25,6 +26,8 @@ export type QuestionParams = {
   id?: string;
   body?: Html;
   concepts?: Immutable.List<string>;
+  grading?: string;
+  criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
   explanation?: Html;
@@ -36,6 +39,8 @@ const defaultQuestionParams = {
   id: '',
   body: new Html(),
   concepts: Immutable.List<string>(),
+  grading: 'automatic',
+  criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
@@ -72,6 +77,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   id: string;
   body: Html;
   concepts: Immutable.List<string>;
+  criteria: Immutable.OrderedMap<string, GradingCriteria>;
+  grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
   explanation: Html;
@@ -89,10 +96,13 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
     let model = new Question({ guid });
 
-    let question = json.question;
+    const question = json.question;
 
     if (question['@id'] !== undefined) {
-      model = model.with({ id: question['@id']});
+      model = model.with({ id: question['@id'] });
+    }
+    if (question['@grading'] !== undefined) {
+      model = model.with({ grading: question['@grading'] });
     }
 
     getChildren(question).forEach(item => {
@@ -103,6 +113,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       switch (key) {
         case 'concept':
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text'])});
+          break;
+        case 'grading_criteria':
+          model = model.with(
+            { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
         case 'body':
           model = model.with({ body: Html.fromPersistence(item, id) });
@@ -157,6 +171,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         .toArray()
         .map(concept => ({concept: { '#text': concept}})),
 
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
+ 
       ...this.items
         .toArray()
         .map(item => item.toPersistence()),
@@ -171,6 +189,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     return {
       "question": {
         "@id": this.id,
+        "@grading": this.grading,
         "#array": children
       }
     }

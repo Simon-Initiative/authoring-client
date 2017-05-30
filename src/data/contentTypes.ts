@@ -24,6 +24,7 @@ export { ObjRef } from './content/objref';
 export { Page } from './content/page';
 export { Node } from './content/node';
 export { Essay } from './content/essay';
+export { GradingCriteria } from './content/criteria';
 
 import { Essay } from './content/essay';
 import { Ordering } from './content/ordering';
