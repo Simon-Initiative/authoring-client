@@ -16,13 +16,10 @@ import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../com
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 
-import SortableTree from 'react-sortable-tree';
-import { toggleExpandedForAll } from 'react-sortable-tree';
-
-import NodeRendererDefault from 'react-sortable-tree';
 import Knob from 'react-canvas-knob';
 
 import SkillNodeRenderer from './SkillNodeRenderer';
+import SkillTryoutModeler from './SkillTryoutModeler';
 
 // From: https://www.npmjs.com/package/rc-slider
 import Slider from 'rc-slider';
@@ -186,6 +183,8 @@ export interface SkillEditorState extends AbstractEditorState {
   documentId: string;
   document: any;
   advanced: boolean;
+  modalIsOpen:boolean;
+  tryoutTarget: Skill;
 }
 
 export interface SkillEditorProps extends AbstractEditorProps<models.SkillModel> {
@@ -209,7 +208,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         treeData: [],
                         documentId: props.context.documentId,
                         model: props.model,
-                        document: {}
+                        document: {},
+                        modalIsOpen: false,
+                        tryoutTarget: null
                     });            
     }
     
@@ -614,6 +615,15 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
+    createTryoutControls ():any {
+      console.log ("createTryoutControls ()");
+    
+      return (<SkillTryoutModeler modalIsOpen={this.state.modalIsOpen} source={this.state.tryoutTarget}></SkillTryoutModeler>);
+    }
+
+    /**
+     * 
+     */
     render() {  
         //console.log ("SkillEditor:render ()");
                 
@@ -621,6 +631,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         const services = ({} as AppServices);
         
         var advancedcontrols=this.createAdvancedPanel ();
+    
+        var tryoutcontrols=this.createTryoutControls ();
         
         /**
          * This will go into it's own renderer once the basic version is complete.
@@ -714,9 +726,10 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <button type="button" className="btn btn-secondary" onClick={e => this.toggleAdvanced (e)}>Advanced</button>
                     </nav>
-                    {advancedcontrols}        
+                    {advancedcontrols}
+                    {tryoutcontrols}
                     <div style={styles.skillContainer}>
-                    {options}
+                    {options}                        
                     </div>        
                 </div>
         );
