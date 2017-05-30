@@ -1156,7 +1156,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
     //console.log ("To: " + JSON.stringify (newData));
     const root = {
-      "doc": newData
+      "doc": [newData]
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());

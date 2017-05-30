@@ -294,7 +294,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         (resource) => resource.type === 'x-oli-learning_objectives',
         (title, type) => new models.LearningObjectiveModel({
           type: type,
-          title: title
+          title: title,
+          id:title.split(" ")[0]+guid()
         })
       );
 
