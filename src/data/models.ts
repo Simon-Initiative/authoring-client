@@ -683,7 +683,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     model = model.with({guid: oldModel.guid});
     model = model.with({type: oldModel.type});
     model = model.with({title: oldModel.title});
-    if (oldModel.lock !== undefined && oldModel.lock !== null) {
+    if (!isNullOrUndefined(oldModel.lock)) {
       model = model.with({lock: oldModel.lock});
     }
     return model;
@@ -1044,10 +1044,18 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     return (newLO);
   }
 
-  static updateModel(treeData: any): LearningObjectiveModel {
+  static updateModel(oldLDModel: LearningObjectiveModel, treeData: any): LearningObjectiveModel {
     console.log("updateModel ()");
-    var newModel = new LearningObjectiveModel({'los': treeData});
-    return newModel;
+    var model = new LearningObjectiveModel({'los': treeData});
+    model = model.with({resource: oldLDModel.resource});
+    model = model.with({guid: oldLDModel.guid});
+    model = model.with({type: oldLDModel.type});
+    model = model.with({id: oldLDModel.id});
+    model = model.with({title: oldLDModel.title})
+    if (!isNullOrUndefined(oldLDModel.lock)) {
+      model = model.with({lock: oldLDModel.lock});
+    }
+    return model;
   }
 
   static addTextObject(aText, aValue) {
@@ -1131,7 +1139,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
   toPersistence(): Object {
     console.log("toPersistence ()");
-
+    let resource: any = this.resource.toPersistence();
     let flatLOs: Array<Object> = new Array();
 
     var newData: Object = new Object();
@@ -1147,13 +1155,17 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     }
 
     //console.log ("To: " + JSON.stringify (newData));
-
     const root = {
-      "modelType": "LearningObjectiveModel",
-      "learningobjectives": newData
+      "doc": newData
     };
 
-    return (root);
+    return Object.assign({}, resource, root, this.lock.toPersistence());
+    // const root = {
+    //   "modelType": "LearningObjectiveModel",
+    //   "learningobjectives": newData
+    // };
+
+    //return (root);
   }
 
   static fromPersistence(json: Object): LearningObjectiveModel {
@@ -1241,8 +1253,8 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     newModel = newModel.with({guid: oldSkillModel.guid});
     newModel = newModel.with({type: oldSkillModel.type});
     newModel = newModel.with({title: oldSkillModel.title})
-    if (oldSkillModel.lock !== undefined && oldSkillModel.lock !== null) {
-      newModel = newModel.with({lock: contentTypes.Lock.fromPersistence(oldSkillModel.lock)});
+    if (!isNullOrUndefined(oldSkillModel.lock)) {
+      newModel = newModel.with({lock: oldSkillModel.lock});
     }
     return newModel;
   }
@@ -1282,7 +1294,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
     model = model.with({title: a.title})
-    if (a.lock !== undefined && a.lock !== null) {
+    if (!isNullOrUndefined(a.lock)) {
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
     return model;
