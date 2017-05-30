@@ -60,6 +60,7 @@ export class LinkEditor
 
         <InputLabel label="href">
           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
             value={href} 
             type="text"
             onEdit={this.onHrefEdit}
@@ -68,6 +69,7 @@ export class LinkEditor
 
         <InputLabel label="target">
           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
             value={target} 
             type="text"
             onEdit={this.onTargetEdit}

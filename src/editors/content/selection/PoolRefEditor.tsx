@@ -44,8 +44,19 @@ export class PoolRefEditor
     };
   }
 
+  componentDidMount() {
+    if (this.props.model.idref !== '') {
+      persistence.retrieveDocument(this.props.context.courseId, this.props.model.idref)
+      .then((document) => {
+        if (document.model.modelType === 'PoolModel') {
+          this.setState({ pool: document.model.pool });
+        }
+      });
+    }
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model);
+    return (nextProps.model !== this.props.model || nextState.pool !== this.state.pool);
   }
 
   onCancel() {
@@ -62,7 +73,7 @@ export class PoolRefEditor
 
     const predicate =
       (res: persistence.CourseResource) : boolean => {
-        return res.type === 'x-oli-pool';
+        return res.type === 'x-oli-assessment2-pool';
       };
 
     this.props.services.displayModal(
@@ -87,9 +98,10 @@ export class PoolRefEditor
     return (
       <div>
         <div className="input-group">
-          <input type="text" className="form-control" disabled/>
+          <input type="text" className="form-control" value={details} disabled/>
           <span className="input-group-btn">
-            <button className="btn btn-primary" type="button">Select</button>
+            <button disabled={!this.props.editMode} onClick={this.onClick} 
+              className="btn btn-primary" type="button">Select</button>
           </span>
         </div>
       </div>

@@ -39,7 +39,8 @@ export class PulloutBegin extends InteractiveRenderer<PulloutBeginProps, Pullout
         className="PulloutSentinel" onFocus={this.onFocus} onBlur={this.onBlur}>
         Pullout&nbsp;
         <span className="SentinelUI">
-          <Select  label="Type" value={this.props.data.subType} onChange={onClick}>
+          <Select editMode={this.props.blockProps.editMode} 
+            label="Type" value={this.props.data.subType} onChange={onClick}>
             <option value="note">Note</option>
             <option value="notation">Notation</option>
             <option value="observation">Observation</option>

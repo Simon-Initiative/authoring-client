@@ -12,10 +12,12 @@ import '../common/editor.scss';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
+import { Essay } from '../items/Essay';
 import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
+import { CriteriaEditor } from './CriteriaEditor';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { CommandProcessor, Command } from '../common/command';
@@ -29,7 +31,7 @@ import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
 import { ConceptsEditor } from '../concepts/ConceptsEditor';
-import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
+import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
@@ -94,6 +96,10 @@ export abstract class QuestionEditor
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
 
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
+    this.onGradingChange = this.onGradingChange.bind(this);
     this.lastBody = this.props.model.body;
   }
 
@@ -119,6 +125,20 @@ export abstract class QuestionEditor
 
   onFocusChange(activeItemId: string) {
     this.setState({ activeItemId });
+  }
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.model.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.model.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.model.criteria.delete(guid);
+    this.props.onEdit(this.props.model.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.model.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.model.with({ criteria }));
   }
 
   onBodyEdit(body) {
@@ -209,6 +229,10 @@ export abstract class QuestionEditor
     
     const model = this.props.model.with({ items, parts, body });
     this.props.onEdit(model);
+  }
+
+  onGradingChange(grading) {
+    this.props.onEdit(this.props.model.with({ grading }));
   }
 
   onAddShortAnswer() {
@@ -328,7 +352,32 @@ export abstract class QuestionEditor
           partModel={part}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} 
           />;
+    } else if (item.contentType === 'Essay') {
+      return <Essay
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} 
+          />;
     }
+  }
+
+  renderCriteria() {
+    return this.props.model.criteria.toArray()
+      .map(c => <CriteriaEditor
+        onRemove={this.onCriteriaRemove}
+        model={c}
+        onEdit={this.onCriteriaEdit}
+        context={this.props.context}
+        services={this.props.services}
+        editMode={this.props.editMode}
+        />);
   }
 
   renderItemsAndParts() {
@@ -369,28 +418,44 @@ export abstract class QuestionEditor
     };
 
     const expanded = (
-    <div className="dropdown" style={ { display: 'inline' } }>
-      <button className="btn btn-secondary btn-link dropdown-toggle" 
-        type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Add Item
-      </button>
-      <div className="dropdown-menu">
-        <a onClick={() => this.onAddMultipleChoice('single')} 
-          className="dropdown-item" href="#">Multiple choice</a>
-        <a onClick={() => this.onAddMultipleChoice('multiple')} 
-          className="dropdown-item" href="#">Check all that apply</a>
-        <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
-        <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
-        <a onClick={this.onInsertNumeric} className="dropdown-item" href="#">Numeric</a>
-        <a onClick={this.onInsertText} className="dropdown-item" href="#">Text</a>
-        <a onClick={this.onInsertFillInTheBlank} 
-          className="dropdown-item" href="#">Fill in the Blank</a>
-      </div>
-    </div>);
+      <form className="inline">
+      <div className="dropdown" style={ { display: 'inline' } }>
+        <button disabled={!this.props.editMode} 
+          className="btn btn-secondary btn-link dropdown-toggle" 
+          type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Add Item
+        </button>
+        <div className="dropdown-menu">
+          <a onClick={() => this.onAddMultipleChoice('single')} 
+            className="dropdown-item" href="#">Multiple choice</a>
+          <a onClick={() => this.onAddMultipleChoice('multiple')} 
+            className="dropdown-item" href="#">Check all that apply</a>
+          <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
+          <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
+          <a onClick={this.onInsertNumeric} className="dropdown-item" href="#">Numeric</a>
+          <a onClick={this.onInsertText} className="dropdown-item" href="#">Text</a>
+          <a onClick={this.onInsertFillInTheBlank} 
+            className="dropdown-item" href="#">Fill in the Blank</a>
+        </div>
+        </div>
+        <Select editMode={this.props.editMode} 
+          label="Grading" value={this.props.model.grading} 
+          onChange={this.onGradingChange}>
+          <option value="automatic">Automatic</option>
+          <option value="instructor">Instructor</option>
+          <option value="hybrid">Hybrid</option>
+        </Select>
+      </form>);
+
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
 
     return (
     
-      <RemovableContent 
+      <RemovableContent editMode={this.props.editMode} 
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
         associatedClasses="question">
 
@@ -410,6 +475,15 @@ export abstract class QuestionEditor
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
                 />
+
+          <Collapse caption="Grading Criteria" 
+            details=""
+            expanded={expandedCriteria}>
+
+            {this.renderCriteria()}
+
+          </Collapse>
+
 
           <ConceptsEditor 
             editMode={this.props.editMode}

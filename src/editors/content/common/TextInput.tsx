@@ -6,6 +6,7 @@ export interface TextInput {
 }
 
 export interface TextInputProps {
+  editMode: boolean;
   width: string;
   label: string;
   value: string;
@@ -43,6 +44,7 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
   render() {
     return (
       <input 
+        disabled={!this.props.editMode}
         style={ { width: this.props.width } }
         placeholder={this.props.label}
         onChange={this.onChange}

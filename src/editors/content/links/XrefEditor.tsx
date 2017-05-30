@@ -73,6 +73,7 @@ export class XrefEditor
 
         <InputLabel label="Activity">
           <Select
+            editMode={this.props.editMode}
             label=""
             value={idref}
             onChange={this.onIdrefEdit}>
@@ -82,6 +83,7 @@ export class XrefEditor
 
         <InputLabel label="Target">
           <Select
+            editMode={this.props.editMode}
             label=""
             value={target}
             onChange={this.onTargetEdit}>

@@ -20,6 +20,8 @@ export type BlockProps = {
 
   services: AppServices;
 
+  editMode: boolean;
+
   context: AppContext;
 
 };

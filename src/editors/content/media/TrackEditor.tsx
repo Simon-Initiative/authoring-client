@@ -118,28 +118,33 @@ export class TrackEditor
             onChange={this.onFileChange} 
             type="file" 
           />
-          <Button onClick={this.openFileDialog.bind(this, id)}>Set</Button>
+          <Button editMode={this.props.editMode}
+            onClick={this.openFileDialog.bind(this, id)}>Set</Button>
         </td>
         <td>
           <b>{srcDisplay}</b>
         </td>
         <td>
           <TextInput width="75px" label="" 
+            editMode={this.props.editMode}
             onEdit={this.onKindEdit}
             value={kind} type="text"/>
         </td>
         <td>
           <TextInput width="75px" label="" 
+            editMode={this.props.editMode}
             onEdit={this.onLabelEdit}
             value={label} type="text"/>
         </td>
         <td>
           <TextInput width="75px" label="" 
+            editMode={this.props.editMode}
             onEdit={this.onLangEdit}
             value={srclang} type="text"/>
         </td>
         <td>
           <TextInput width="75px" label="" 
+            editMode={this.props.editMode}
             onEdit={this.onDefaultEdit}
             value={this.props.model.default} type="text"/>
         </td>

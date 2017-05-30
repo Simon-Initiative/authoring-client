@@ -34,9 +34,10 @@ it('AssessmentModel', () => {
   // Now verify that all the pieces and parts are present:
 
   expect(model.title.text).toBe('Tutor');
-  expect(model.nodes.size).toBe(3);
+  expect(model.nodes.size).toBe(0);
+  expect(model.pages.size).toBe(1);
 
-  const node : models.Node = model.nodes.toArray()[2];
+  const node : models.Node = model.pages.first().nodes.toArray()[2];
   expect(node.contentType).toBe('Question');
 
   const question : contentTypes.Question = (node as contentTypes.Question);

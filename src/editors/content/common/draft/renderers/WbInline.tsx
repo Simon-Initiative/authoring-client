@@ -49,7 +49,8 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     return (
       <div className='wbinline' ref={(c) => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <button onClick={this.onClick} type="button" className="btn btn-link">{this.state.title}</button>
-        <Select label='Purpose' value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
+        <Select editMode={this.props.blockProps.editMode} 
+          label='Purpose' value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
           {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </Select>
       </div>);

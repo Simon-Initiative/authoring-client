@@ -39,6 +39,7 @@ export class ShortAnswer
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
+    this.onSizeChange = this.onSizeChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
   }
 
@@ -67,18 +68,21 @@ export class ShortAnswer
     
     const controls = (
       <div style={{display: 'inline'}}>
-        <Select label='Whitespace' value={this.props.itemModel.whitespace} onChange={this.onWhitespaceChange}>
+        <Select editMode={this.props.editMode}
+          label='Whitespace' value={this.props.itemModel.whitespace} onChange={this.onWhitespaceChange}>
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
         </Select>
-        <Select label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+        <Select editMode={this.props.editMode}
+          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
           <option value="small">small</option>
           <option value="medium">medium</option>
           <option value="large">large</option>
         </Select>
         
-        <Checkbox label='Case Sensitive' value={this.props.itemModel.caseSensitive} onEdit={this.onCaseSensitive}/>
+        <Checkbox editMode={this.props.editMode}
+          label='Case Sensitive' value={this.props.itemModel.caseSensitive} onEdit={this.onCaseSensitive}/>
       </div>);
 
     return (
@@ -86,7 +90,7 @@ export class ShortAnswer
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Short Answer' 
+        <ItemLabel label='Short Answer' editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
         {controls}

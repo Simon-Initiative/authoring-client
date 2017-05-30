@@ -146,6 +146,7 @@ export class VideoEditor
 
         <InputLabel label="Popout">
           <TextInput width="100%" label="Popout content" 
+            editMode={this.props.editMode}
             value={popout.content} 
             type="text"
             onEdit={this.onPopoutEdit}

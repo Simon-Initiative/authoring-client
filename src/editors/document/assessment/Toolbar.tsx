@@ -3,7 +3,8 @@
 import * as React from 'react';
 
 import { AppServices } from '../../common/AppServices';
-import { toggleInlineStyle, toggleBlockType, insertInlineEntity, AuthoringActionsHandler } from '../../../actions/authoring';
+import { toggleInlineStyle, toggleBlockType, 
+  insertInlineEntity, AuthoringActionsHandler } from '../../../actions/authoring';
 import { EntityTypes } from '../../../data/content/html/common';
 
 export interface ToolbarProps {  

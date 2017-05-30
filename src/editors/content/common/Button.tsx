@@ -4,6 +4,7 @@ export type ButtonProps = {
   children?: any;
   onClick: () => void;
   type?: string;
+  editMode: boolean;
 };
 
 export const Button = (props: ButtonProps) => {
@@ -11,6 +12,7 @@ export const Button = (props: ButtonProps) => {
   const classes = 'btn btn-sm btn-' + type;
   return (
     <button 
+      disabled={!props.editMode} 
       onClick={props.onClick} 
       type="button" 
       className={classes}>

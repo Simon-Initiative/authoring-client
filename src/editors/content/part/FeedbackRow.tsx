@@ -61,6 +61,7 @@ export abstract class FeedbackRow
   renderMatch(response: contentTypes.Response) {
     return (
       <input 
+        disabled={!this.props.editMode}
         style={{width:'65px', outline: 'none', display: 'inline'}}
         onChange={this.onMatch.bind(this)}
         value={this.state.match}/>);
@@ -69,6 +70,7 @@ export abstract class FeedbackRow
   renderScore(response: contentTypes.Response) {
     return (
       <input 
+        disabled={!this.props.editMode}
         style={{width:'65px', outline: 'none', display: 'inline'}}
         type='number'
         onChange={this.onScore.bind(this)}

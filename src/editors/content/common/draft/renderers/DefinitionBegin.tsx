@@ -225,7 +225,8 @@ export class DefinitionBegin
       <span ref={c => this.focusComponent = c} 
         className="DefinitionSentinel" onFocus={this.onFocus} onBlur={this.onBlur}>
         Definition&nbsp;
-        <TextInput width="150px" label="Term" value={this.props.data.term} type="text"
+        <TextInput editMode={this.props.blockProps.editMode} 
+          width="150px" label="Term" value={this.props.data.term} type="text"
           onEdit={this.onTermEdit}
         />
         <span className="SentinelUI"> 

@@ -1,9 +1,8 @@
-'use strict'
-
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import { AbstractItemPartEditor, 
+  AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
@@ -16,15 +15,15 @@ import '../common/editor.scss';
 import './MultipleChoice.scss';
 
 
-export interface Numeric {
+export interface Essay {
   
 }
 
-export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
+export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {
 
 }
 
-export interface NumericState {
+export interface EssayState {
 
 }
 
@@ -32,15 +31,13 @@ export interface NumericState {
 /**
  * The content editor for HtmlContent.
  */
-export class Numeric 
-  extends AbstractItemPartEditor<contentTypes.Numeric, NumericProps, NumericState> {
+export class Essay 
+  extends AbstractItemPartEditor<contentTypes.Essay, EssayProps, EssayState> {
     
   constructor(props) {
     super(props);
     
     this.onPartEdit = this.onPartEdit.bind(this);
-    this.onSizeChange = this.onSizeChange.bind(this);
-    this.onNotationChange = this.onNotationChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
   }
 
@@ -53,48 +50,18 @@ export class Numeric
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  onSizeChange(inputSize) {
-    this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
-  }
-
-  onNotationChange(notation) {
-    this.props.onEdit(this.props.itemModel.with({ notation }), this.props.partModel);
-  }
-
   render() : JSX.Element {
     
-    const controls = (
-      <div style={{display: 'inline'}}>
-        <Select editMode={this.props.editMode} 
-          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
-          <option value="small">Small</option>
-          <option value="medium">Medium</option>
-          <option value="large">Large</option>
-        </Select>
-        <Select editMode={this.props.editMode}
-          label='Notation' value={this.props.itemModel.notation} onChange={this.onNotationChange}>
-          <option value="automatic">Automatic</option>
-          <option value="decimal">Decimal</option>
-          <option value="scientific">Scientific</option>
-        </Select>
-      </div>);
-
     return (
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Numeric' editMode={this.props.editMode}
+        <ItemLabel label='Essay'
+          editMode={this.props.editMode} 
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
-        {controls}
-
         <Hints
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
-        <TabularFeedback
             {...this.props}
             model={this.props.partModel}
             onEdit={this.onPartEdit}

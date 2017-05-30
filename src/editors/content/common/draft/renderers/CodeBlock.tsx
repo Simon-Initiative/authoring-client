@@ -48,7 +48,8 @@ class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <Select label="Syntax" value={syntax} onChange={this.onSyntaxChange}>
+        <Select editMode={this.state.editMode} 
+          label="Syntax" value={syntax} onChange={this.onSyntaxChange}>
             <option value="actionscript3">ActionScript</option>
             <option value="bash">Bash</option>
             <option value="c">C</option>

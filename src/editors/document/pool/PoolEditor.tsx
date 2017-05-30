@@ -6,6 +6,7 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { PoolEditor as PoolContentEditor } from '../../content/selection/PoolEditor';
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 
 interface PoolEditor {
   
@@ -27,10 +28,26 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     super(props, {});
 
     this.onEdit = this.onEdit.bind(this);
+    this.onAddQuestion = this.onAddQuestion.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
     
   onEdit(pool: contentTypes.Pool) {
     this.handleEdit(this.props.model.with({ pool }));
+  }
+
+  onAddQuestion() {
+    const q = new contentTypes.Question();
+    const pool = this.props.model.pool.with( 
+      { questions: this.props.model.pool.questions.set(q.guid, q) });
+    const updated = this.props.model.with({ pool });
+    this.handleEdit(updated);
+  }
+
+  onTitleEdit(title) {
+    const pool = this.props.model.pool.with({ title });
+    const updated = this.props.model.with({ pool });
+    this.handleEdit(updated);
   }
 
   render() {
@@ -40,14 +57,25 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
+        <TitleContentEditor 
+            services={this.props.services}
+            context={this.props.context}
+            editMode={this.props.editMode}
+            model={this.props.model.pool.title}
+            onEdit={this.onTitleEdit} 
+            />
+        <div>
+          <button type="button" className="btn btn-secondary" 
+            onClick={this.onAddQuestion}>Add Question</button>
+        </div>
         <PoolContentEditor
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={() => null}
           model={this.props.model.pool}
-          onEdit={this.onEdit}
-        />
+          onEdit={this.onEdit}/>
+        
       </div>
     );    
   }

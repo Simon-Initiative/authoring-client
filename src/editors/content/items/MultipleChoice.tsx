@@ -151,11 +151,18 @@ export class MultipleChoice
       let c = choices[i];
 
       let renderedFeedback = null;
+      let renderedScore = null;
 
       if (responses.length > i) {
         if (responses[i].feedback.size > 0) {
           let f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(c, responses[i], f)
+          renderedFeedback = this.renderFeedback(c, responses[i], f);
+
+          renderedScore = <InlineForm position='right'>
+              <TextInput editMode={this.props.editMode}
+                label='Score' value={responses[i].score} type='number' width='75px'
+                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
+            </InlineForm>;
         }
       }
       
@@ -163,10 +170,7 @@ export class MultipleChoice
         <ChoiceFeedback key={c.guid}>
           {this.renderChoice(c, responses[i])}
           {renderedFeedback}
-          <InlineForm position='right'>
-            <TextInput label='Score' value={responses[i].score} type='number' width='75px'
-                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-          </InlineForm>
+          {renderedScore}
         </ChoiceFeedback>);
     }
 
@@ -184,8 +188,10 @@ export class MultipleChoice
 
     const expanded = (
       <div style={{display: 'inline'}}>
-        <Button type='link' onClick={this.onAddChoice}>Add Choice</Button>
-        <Checkbox label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+        <Button editMode={this.props.editMode}
+          type='link' onClick={this.onAddChoice}>Add Choice</Button>
+        <Checkbox editMode={this.props.editMode} 
+          label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
       </div>);
 
     return (
@@ -193,7 +199,7 @@ export class MultipleChoice
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Multiple Choice' 
+        <ItemLabel label='Multiple Choice' editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
         <Collapse caption='Choices' expanded={expanded}>

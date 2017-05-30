@@ -58,6 +58,7 @@ export class CiteEditor
 
         <InputLabel label="Entry">
           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
             value={entry} 
             type="text"
             onEdit={this.onEntryEdit}

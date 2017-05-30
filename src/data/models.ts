@@ -14,6 +14,9 @@ import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
 import { PoolModel } from './models/pool';
+import { Node } from './content/node';
+ 
+export { Node } from './content/node';
 
 export { PoolModel } from './models/pool';
 
@@ -57,7 +60,7 @@ export function createModel(object: any): ContentModel {
       return SkillModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
-    case 'x-oli-pool':
+    case 'x-oli-assessment2-pool':
       return PoolModel.fromPersistence(object);
   }
 }
@@ -309,26 +312,47 @@ export type AssessmentModelParams = {
   resource?: Resource,
   guid?: string,
   type?: string;
+  recommendedAttempts?: string;
+  maxAttempts?: string;
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  nodes?: Immutable.OrderedMap<string, Node>
+  nodes?: Immutable.OrderedMap<string, Node>,
+  pages?: Immutable.OrderedMap<string, contentTypes.Page>,
 };
 const defaultAssessmentModelParams = {
   modelType: 'AssessmentModel',
   type: '',
   resource: new Resource(),
   guid: '',
+  recommendedAttempts: '1',
+  maxAttempts: '1',
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
-  nodes: Immutable.OrderedMap<string, Node>()
+  nodes: Immutable.OrderedMap<string, Node>(),
+  pages: Immutable.OrderedMap<string, contentTypes.Page>(),
 }
 
+function migrateNodesToPage(model: AssessmentModel) {
+  let updated = model;
 
-export type Node = 
-  contentTypes.Question | 
-  contentTypes.Content | 
-  contentTypes.Selection |
-  contentTypes.Unsupported;
+  // Ensure that we have at least one page
+  if (updated.pages.size === 0) {
+    let newPage = new contentTypes.Page();
+    newPage = newPage.with({ title: new contentTypes.Title( { text: 'Page 1'}) });
+    updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
+  }
+
+  // Now move any root nodes to the first page
+  if (updated.nodes.size > 0) {
+    let page = updated.pages.first();
+    updated.nodes.toArray().forEach(
+      node => page = page.with({ nodes: page.nodes.set(node.guid, node)}));
+    updated = updated.with({ pages: updated.pages.set(page.guid, page)});
+    updated = updated.with({ nodes: Immutable.OrderedMap<string, Node>()});
+  }
+
+  return updated;
+}
 
 export class AssessmentModel extends Immutable.Record(defaultAssessmentModelParams) {
 
@@ -336,9 +360,12 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   resource: Resource;
   guid: string;
   type: string;
+  recommendedAttempts: string;
+  maxAttempts: string;
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   nodes: Immutable.OrderedMap<string, Node>;
+  pages: Immutable.OrderedMap<string, contentTypes.Page>;
 
   constructor(params?: AssessmentModelParams) {
     params ? super(params) : super();
@@ -357,6 +384,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = model.with({guid: a.guid});
     model = model.with({type: a.type});
     model = model.with({title: new contentTypes.Title({guid: guid(), text: a.title})});
+
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
     }
@@ -366,12 +394,24 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     } else {
       assessment = a.doc.assessment;
     }
+
+    if (assessment['@recommendedAttempts'] !== undefined) {
+      model = model.with({ recommendedAttempts: assessment['@recommendedAttempts']});
+    }
+    if (assessment['@maxAttempts'] !== undefined) {
+      model = model.with({ maxAttempts: assessment['@maxAttempts']});
+    }
+
     assessment['#array'].forEach(item => {
 
       const key = getKey(item);
       const id = guid();
 
       switch (key) {
+        case 'page':
+          model = model.with(
+            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id)) });
+          break;
         case 'question':
           model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
           break;
@@ -386,12 +426,16 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       }
     });
 
+    // Adjust models to ensure that we never have a page-less assessment
+    model = migrateNodesToPage(model);
+
     return model;
   }
 
   toPersistence(): Object {
     const children = [
-      ...this.nodes.toArray().map(node => node.toPersistence()),
+      this.title.toPersistence(),
+      ...this.pages.toArray().map(page => page.toPersistence()),
     ]
     let resource = this.resource.toPersistence();
     let doc = null;
@@ -413,7 +457,9 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     } else {
       doc = [{
         "assessment": {
-          "@id": "id",
+          "@id": this.resource.id,
+          '@recommendedAttempts': this.recommendedAttempts,
+          '@maxAttempts': this.maxAttempts,
           "#array": children
         }
       }];

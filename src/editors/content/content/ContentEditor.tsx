@@ -80,7 +80,9 @@ export class ContentEditor
 
     const expanded = (
       <InlineForm position='right'>
-        <Select onChange={this.onAvailability} label='Availability' value={this.props.model.availability}>
+        <Select onChange={this.onAvailability} label='Availability' 
+          editMode={this.props.editMode}
+          value={this.props.model.availability}>
           <option value="always">Always</option>
           <option value="instructor_only">Instructor Only</option>
           <option value="feedback_only">Feedback Only</option>
@@ -90,7 +92,9 @@ export class ContentEditor
     )
 
     return (
-      <RemovableContent onRemove={() => this.props.onRemove(this.props.model.guid)} 
+      <RemovableContent 
+        editMode={this.props.editMode}
+        onRemove={() => this.props.onRemove(this.props.model.guid)} 
         associatedClasses="content">
         <Collapse 
           caption='Content' 

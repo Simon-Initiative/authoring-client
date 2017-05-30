@@ -151,12 +151,14 @@ export class ImageEditor
             onChange={this.onFileChange} 
             type="file" 
           />
-          <Button onClick={this.openFileDialog.bind(this, id)}>Set</Button>
+          <Button editMode={this.props.editMode}
+            onClick={this.openFileDialog.bind(this, id)}>Set</Button>
           {srcDisplay}
         </InputLabel>
 
         <InputLabel label="Width">
           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
             value={width} 
             type="text"
             onEdit={this.onWidthEdit}
@@ -165,6 +167,7 @@ export class ImageEditor
 
         <InputLabel label="Height">
           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
             value={height} 
             type="text"
             onEdit={this.onHeightEdit}
@@ -173,6 +176,7 @@ export class ImageEditor
 
         <InputLabel label="Alt">
           <TextInput width="100%" label="Popout content" 
+            editMode={this.props.editMode}
             value={alt} 
             type="text"
             onEdit={this.onAltEdit}
@@ -181,6 +185,7 @@ export class ImageEditor
 
         <InputLabel label="VAlign">
           <TextInput width="100%" label="Popout content" 
+            editMode={this.props.editMode}
             value={valign} 
             type="text"
             onEdit={this.onValignEdit}
@@ -196,6 +201,7 @@ export class ImageEditor
 
         <InputLabel label="Popout">
           <TextInput width="100%" label="Popout content" 
+            editMode={this.props.editMode}
             value={popout.content} 
             type="text"
             onEdit={this.onPopoutEdit}
