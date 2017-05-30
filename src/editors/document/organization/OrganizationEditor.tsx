@@ -765,7 +765,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.activitiesModalIsOpen==true) {  
         if (this.state.activities!=null) {
           console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} target={this.state.orgTarget} />);
+          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} target={this.toActivityList (this.state.orgTarget)} />);
         } else {
           console.log ("Internal error: activities object can be empty but not null");
         }
@@ -781,7 +781,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.pagesModalIsOpen==true) {
         if (this.state.pages!=null) {
           console.log ("createPageLinkerDialog ()");
-          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.state.orgTarget} />);
+          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} target={this.toPageList (this.state.orgTarget)} />);
         } else {
           console.log ("Internal error: pages array object can be empty but not null");
         }
@@ -789,6 +789,50 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                    
       return (<div></div>);           
     }
+    
+    /**
+     * 
+     */
+    toActivityList (aNode) : Array <Linkable> {
+      console.log ("toActivityList ()");
+        
+      var actList:Array<Linkable>=new Array ();  
+        
+      for (let i=0;i<aNode.children.length;i++) {
+          let testItem:OrgItem=aNode.children [i];
+          
+          if (testItem.typeDescription=="x-oli-inline-assessment") {
+            let ephemeral:Linkable=new Linkable ();
+            ephemeral.title=testItem.title;
+            ephemeral.id=testItem.id;  
+            actList.push (ephemeral);
+          }
+      }  
+        
+      return (actList);  
+    }
+    
+    /**
+     * 
+     */
+    toPageList (aNode) : Array <Linkable> {
+      console.log ("toPageList ()");
+
+      var actList:Array<Linkable>=new Array ();  
+        
+      for (let i=0;i<aNode.children.length;i++) {
+          let testItem:OrgItem=aNode.children [i];
+          
+          if (testItem.typeDescription=="x-oli-workbook_page") {
+            let ephemeral:Linkable=new Linkable ();
+            ephemeral.title=testItem.title;
+            ephemeral.id=testItem.id;  
+            actList.push (ephemeral);
+          }
+      }  
+        
+      return (actList);         
+    }    
     
     /**
      * 
