@@ -304,9 +304,9 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                 
         // Keep in mind that extractData creates a skills object, but in our
         // model we already have one so we need to extract the contents from
-        // inside that object. Bit confusing prehaps but we'll clean it up
+        // inside that object. Bit confusing prehaps but we'll clean it upgit
         // later.
-        var newModel=models.SkillModel.updateModel (extractedData.skills);
+        var newModel=models.SkillModel.updateModel (this.props.model, extractedData.skills);
                  
         var updatedDocument=this.state.document.set ('model',newModel);
         
