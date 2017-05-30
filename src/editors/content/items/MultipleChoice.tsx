@@ -183,11 +183,11 @@ export class MultipleChoice
       minHeight: '75px',
       borderStyle: 'solid',
       borderWith: 1,
-      borderColor: '#AAAAAA'
-    }
+      borderColor: '#AAAAAA',
+    };
 
     const expanded = (
-      <div style={{display: 'inline'}}>
+      <div style={ { display: 'inline' } }>
         <Button editMode={this.props.editMode}
           type='link' onClick={this.onAddChoice}>Add Choice</Button>
         <Checkbox editMode={this.props.editMode} 

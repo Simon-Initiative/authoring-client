@@ -5,7 +5,7 @@ import { InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState
 import { BlockProps } from './properties';
 import { Select } from '../../Select';
 import { PurposeTypes } from '../../../../../data/content/html/common';
-
+import { handleInsertion } from './common';
 import './wbinline.scss';
 
 type Data = {
@@ -47,8 +47,11 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   render() : JSX.Element {
     return (
-      <div className='wbinline' ref={(c) => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <button onClick={this.onClick} type="button" className="btn btn-link">{this.state.title}</button>
+      <div className='wbinline' 
+        ref={(c) => this.focusComponent = c} onFocus={this.onFocus} 
+        onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
+        <button onClick={this.onClick} type="button" 
+          className="btn btn-link">{this.state.title}</button>
         <Select editMode={this.props.blockProps.editMode} 
           label='Purpose' value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
           {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}

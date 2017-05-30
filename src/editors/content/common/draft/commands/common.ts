@@ -87,6 +87,37 @@ export function insertAtomicBlockWithEntity(editorState: EditorState, type: Enti
       ' ');
 }
 
+export function isAtomic(contentBlock: ContentBlock) : boolean {
+  return contentBlock.type === 'atomic';
+}
+
+// Determines if we should insert an empty block after the block specified
+// by blockKey.  We do this for two cases:
+// 1) There are two atomic blocks in a row
+// 2) The last block is an atomic block
+export function shouldInsertBlock(contentState: ContentState, blockKey: string) : boolean {
+  
+  const block = contentState.getBlockForKey(blockKey);
+
+  if (block !== null && isAtomic(block)) {
+
+    const nextBlockKey = contentState.getKeyAfter(blockKey);
+    if (nextBlockKey !== null) {
+
+      const nextBlock = contentState.getBlockForKey(nextBlockKey);
+      return isAtomic(nextBlock); // Case 1
+
+    } else {
+      return true;  // Case 2
+    }
+
+  } else {
+    return false;
+  }
+}
+
+
+
 // Insert an array of blocks after a particular block referenced by blockKey
 export function insertBlocksAfter(contentState: ContentState, blockKey: string, 
   blocks: ContentBlock[]) : ContentState {
