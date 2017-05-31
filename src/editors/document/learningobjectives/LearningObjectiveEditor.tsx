@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
+import {Resource} from "../../../data/resource";
 import { LOTypes, LearningObjective } from '../../../data/los';
 import * as types from '../../../data/types';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
@@ -85,12 +86,27 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         model: this.props.model
       });
                 
-      this.setState({treeData: this.props.model.los, document: docu});
+      this.setState({treeData: this.props.model.los, document: docu}, function (){
+        let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+        //console.log ("Resources: " + JSON.stringify (resourceList));  
+        
+        resourceList.map((value, id) => {          
+          if (value.type=="x-oli-skills_model") {
+            persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
+            {
+              let skillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
+              this.setState ({skills: skillModel.skills});                  
+            });
+          }          
+        })            
+      });
     }              
 
     /**
      *
      */            
+    /*
     loadDocument (anID:string):any {
         console.log ("loadDocument ("+anID+")");
       console.log("loadDocument (" + anID + ")");
@@ -100,13 +116,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         model: this.props.model
       });
       this.setState({treeData: this.props.model.los, document: docu});
-      //   persistence.retrieveDocument(anID).then(doc => {
-      //       this.setState ({modalIsOpen: false, treeData: doc.model ["los"],document: doc});
-      //       return (doc);
-      //   });
 
-       return (docu);
-    }             
+      return (docu);
+    } 
+    */            
 
     /**
      * This method is called by the tree component and even though we could access

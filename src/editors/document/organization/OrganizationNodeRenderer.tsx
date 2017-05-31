@@ -7,10 +7,8 @@ import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, OrgOrganization} from '../../../data/org';
-//import DropdownMenu from 'react-dd-menu';
 
 import '../../../stylesheets/sortabletree.scss';
-//import '../../../stylesheets/sortabletree.scss';
 
 const styles = {
     

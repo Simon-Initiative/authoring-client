@@ -265,15 +265,16 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
+    /*
     processDataChange (newData: any) {
         console.log ("processDataChange ()");
         
-        /*
-        this.extractData (newData);        
+        //this.extractData (newData);        
         
-        this.setState (newData);
-        */       
+        //this.setState (newData);
+               
     }
+    */
     
     /**
      * Here we go from visual data to database-ready data. We walk the tree
