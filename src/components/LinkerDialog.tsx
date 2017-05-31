@@ -160,7 +160,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       
     for (var i=0;i<this.state.targetAnnotations.length;i++) {    
        let item=this.state.targetAnnotations [i];  
-       console.log ("Checking item: " + item);
+       //console.log ("Checking item: " + item);
         
        for (var j=0;j<newData.length;j++) {
          let sourceItem=newData [j];  
@@ -184,7 +184,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   afterOpenModal() {
-    console.log ("afterOpenModal ()");
+    //console.log ("afterOpenModal ()");
     
     this.resolveAnnotations ();
   }
@@ -193,7 +193,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   closeModal() {
-    console.log ("closeModal ()");
+    //console.log ("closeModal ()");
                   
     this.setState({modalIsOpen: false});
 
@@ -211,7 +211,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     //console.log ("Assigning new list data:" + JSON.stringify (newData));  
       
     this.setState ({targetAnnotations : newData}, function (){
-      console.log ("Linkable list now: " +  JSON.stringify (this.state.targetAnnotations));
+      //console.log ("Linkable list now: " +  JSON.stringify (this.state.targetAnnotations));
       this.state.closeModal (this.state.targetAnnotations);  
     });          
   }
@@ -220,8 +220,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   cancelModal() {
-    console.log ("cancelModal ()");  
-      
+    //console.log ("cancelModal ()");        
     this.setState({modalIsOpen: false});      
   }
 
@@ -229,7 +228,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */       
   handleItemChange (e) {
-    console.log ("handleItemChange ()");
+    //console.log ("handleItemChange ()");
 
     var newData = [];
 
@@ -242,7 +241,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     });
 
     this.setState({localAnnotations: newData}, function () {
-      console.log ("Internal check:" + JSON.stringify (this.state.sourceData));
+      //console.log ("Internal check:" + JSON.stringify (this.state.sourceData));
     });      
   }
 

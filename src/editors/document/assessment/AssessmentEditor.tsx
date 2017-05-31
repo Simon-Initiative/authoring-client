@@ -40,7 +40,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   constructor(props) {
     super(props, ({
       modalIsOpen: false, 
-      skillModel: new models.SkillModel,
+      skillModel: null,
       current: props.model.pages.first().guid,
     } as AssessmentEditorState));
 
@@ -57,9 +57,20 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentDidMount() {                    
-    this.loadSkills();
+    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+          
+    resourceList.map((value, id) => {          
+      if (value.type=="x-oli-skills_model") {
+        persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => {
+          let sModel:models.SkillModel=skillDocument.model as models.SkillModel;
+          //console.log ("Loaded skill model: " + JSON.stringify (sModel));  
+          this.setState ({skillModel: sModel});                  
+        });
+      }          
+    })
   }     
     
+  /*
   loadSkills () : void {
             
     const resourceList:Immutable.OrderedMap<string, Resource>
@@ -67,16 +78,17 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   
     resourceList.map((value, id) => {        
       if (value.type === 'x-oli-skills_model') {
-        console.log ('Found skills document, loading ...');  
+        //console.log ('Found skills document, loading ...');  
         persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {
-          console.log ('Loaded skill document, assinging ...');  
+          console.log ('Loaded skill document, assigning ...');  
           const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
-          this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
+          this.setState ({ skillModel: aSkillModel });
         });
       }          
     });
-  }     
+  } 
+  */    
     
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
@@ -218,16 +230,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   /**
    * 
    */
-  closeModal () {
+  closeModal (newAnnotations:any) {
     console.log ('closeModal ()');  
-    // this.saveToDB ();
+    
   }     
 
   /**
    * 
    */
-  onAddSkills() {        
-    console.log ('onAddSkills ()');
+  linkSkills (e:any) {        
+    console.log ('linkSkills ()');
                  
     this.setState({ modalIsOpen: true });
   }
@@ -236,7 +248,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
    * 
    */
   createLinkerDialog () {           
-    if (this.state.skillModel !== null) {            
+    if (this.state.skillModel) {            
       return (<LearningObjectiveLinker 
         title="Available Skills" 
         closeModal={this.closeModal.bind (this)} 
@@ -305,7 +317,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               onClick={this.onAddPoolRef}>Add Pool Reference</button>
             <button disabled={!this.props.editMode} 
               type="button" className="btn btn-secondary" 
-              onClick={this.onAddSkills}>Add Skills</button>
+              onClick={e => this.linkSkills (e)}>Add Skills</button>
           </div>
           
           

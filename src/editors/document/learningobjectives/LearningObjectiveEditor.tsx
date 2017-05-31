@@ -88,9 +88,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                 
       this.setState({treeData: this.props.model.los, document: docu}, function (){
         let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-        //console.log ("Resources: " + JSON.stringify (resourceList));  
-        
+          
         resourceList.map((value, id) => {          
           if (value.type=="x-oli-skills_model") {
             persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
@@ -432,8 +430,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <a className="nav-link" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
-                        <a className="nav-link" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                        <a className="nav-link" style={{"outline": "none"}} href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
+                        <a className="nav-link" style={{"outline": "none"}} href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
                     </nav>
                    {skilllinker}
                     <SortableTree

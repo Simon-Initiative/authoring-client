@@ -83,6 +83,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         model = this.props.model.with({ body: content });
       }
     }
+     
+    console.log ("New model: " + JSON.stringify (model));  
       
     this.handleEdit(model);
   }
@@ -90,14 +92,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   /**
    * 
    */
-  closeModal () {
+  closeModal (newAnnotations:any) {
     console.log ("closeModal ()");
-              
-    //this.props.model.head.annotations
-      
-    console.log ("New annotations: " + JSON.stringify (this.props.model.head.annotations));      
-          
-    //this.onEdit ("annotations",this.state.targetAnnotations);  
+
+    this.setState ({modalIsOpen: false},function () {
+      this.onEdit ("annotations",newAnnotations);
+    });      
   }     
 
   /**
