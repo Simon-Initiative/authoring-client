@@ -1307,7 +1307,6 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   constructor(params?: SkillModelParams) {
     console.log("constructor ()");
     params ? super(params) : super();
-    //super();
   }
 
 
@@ -1326,6 +1325,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     if (!isNullOrUndefined(oldSkillModel.lock)) {
       newModel = newModel.with({lock: oldSkillModel.lock});
     }
+    console.log("updateModel () done");
     return newModel;
   }
 

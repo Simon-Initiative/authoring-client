@@ -214,11 +214,27 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                     });            
     }
     
+    /*
     componentDidMount () {
         console.log ("componentDidMount ("+this.state.documentId+")");
         
         this.loadDocument(this.state.documentId);
     }
+    */
+    
+    /**
+     *
+     */    
+    componentDidMount() {                    
+      console.log ("componentDidMount ()");
+      let docu = new persistence.Document({
+        _courseId: this.props.context.courseId,
+        _id: this.props.model.guid,
+        model: this.props.model
+      });
+                
+      this.setState({treeData: this.props.model.skills, document: docu});
+    }     
 
     /**
      * Just as a reference the Skills document should look something like
@@ -241,10 +257,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         model: this.props.model
       });
       this.setState ({treeData: this.props.model["los"],document: docu});
-      //   persistence.retrieveDocument(anID).then(doc => {
-      //       this.setState ({treeData: doc.model ["skills"],document: doc});
-      //       return (doc);
-      //   });
+
 
        return (null); 
     }    
@@ -472,17 +485,19 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
+    /*
     testCode (e):void {
         console.log ("testCode ()");
         
         this.loadDocument (this.state.documentId);
     }
+    */
     
     /**
      * 
      */
     toggleAdvanced (e):void {
-        console.log ("testCode ()");
+        console.log ("toggleAdvanced ()");
         
         if (this.state.advanced==true) {
             this.setState ({advanced : false});

@@ -84,23 +84,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         _id: this.props.model.guid,
         model: this.props.model
       });
-      console.log(JSON.stringify(this.props.model.los));
+                
       this.setState({treeData: this.props.model.los, document: docu});
-      //   persistence.retrieveDocument(this.state.context.courseId).then(course => {
-      //       let loObject=course ["model"]["learningobjectives"];
-      //       let loDocId=loObject.get (0);
-      //
-      //       persistence.retrieveDocument(loDocId).then(doc => {
-      //         this.setState ({treeData: doc ["model"]["los"],document: doc});
-      //       });
-      //
-      //       let skillObject=course ["model"]["skills"];
-      //       let skillDocId=skillObject.get (0);
-      //
-      //       persistence.retrieveDocument(skillDocId).then(skillDoc => {
-      //         this.setState ({skills: skillDoc ["model"]["skills"]});
-      //       });
-      //   });
     }              
 
     /**
@@ -275,12 +260,21 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       console.log ("onEdit ()");  
         
       let newModel  
-
+  
       if (newData) {
         newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
       } else {
         newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
       }  
+
+      /*        
+      if (newData) {
+        newModel=this.state.model.with ({'los': newData});
+      }    
+      else {
+        newModel=this.state.model.with ({'los': this.state.treeData});
+      } 
+      */   
       
       console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
         

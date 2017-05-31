@@ -12,15 +12,22 @@ export class TResource {
  */
 export default class Linkable {      
   //resource:TResource=new TResource ();
-  id:string=guid();
+  id:string="";
   title:string="unassigned";
   typeDescription:string="x-oli-workbook_page"; // This variable is only used for internal bookkeeping.
   expanded:boolean=false;
-  annotations:Array <Linkable>=new Array ();  
+  annotations:Array <Linkable>=null;  
     
   constructor (anId?:string) 
   {
-    this.id=anId;
+    if (anId) {  
+     this.id=anId;
+    }
+    else {
+     this.id=guid();
+    }  
+      
+    this.annotations=new Array ();  
   }
     
   reset () {
@@ -33,18 +40,19 @@ export default class Linkable {
   static toJSON (toAnnotations:any): Object {
       
     console.log ("Linkable.toJSON ()");
-    console.log ("annotations: " + JSON.stringify (toAnnotations));  
+    //console.log ("annotations: " + JSON.stringify (toAnnotations));  
       
     let ephemeral=new Array <String> ();    
       
-    for (var i=0;i<toAnnotations.length;i++) {
-      
-      if (toAnnotations [i].id) {  
-        ephemeral.push (toAnnotations [i].id);
-      } else {
-        ephemeral.push (toAnnotations [i]);          
-      }    
-    }
+    if (toAnnotations) {  
+      for (var i=0;i<toAnnotations.length;i++) {      
+        if (toAnnotations [i].id) {  
+          ephemeral.push (toAnnotations [i].id);
+        } else {
+          ephemeral.push (toAnnotations [i]);          
+        }    
+      }
+    }    
       
     return (ephemeral);  
   }
