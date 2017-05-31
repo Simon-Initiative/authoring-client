@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import { Html } from './html';
 import { Title } from './title';
 import { Response } from './response';
+import { ResponseMult } from './response_mult';
 import { Hint } from './hint';
 import { getChildren } from './common';
 import { augment } from './common';
@@ -17,6 +18,7 @@ export type PartParams = {
   title?: Title;
   concepts?: Immutable.List<string>;
   responses?: Immutable.OrderedMap<string, Response>;
+  responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   hints?: Immutable.OrderedMap<string, Hint>;
   explanation?: Html;
   guid?: string;
@@ -31,9 +33,10 @@ const defaultPartParams = {
   title: new Title(),
   concepts: Immutable.List<string>(),
   responses: Immutable.OrderedMap<string, Response>(),
+  responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
   explanation: new Html(),
-  guid: ''
+  guid: '',
 };
 
 export class Part extends Immutable.Record(defaultPartParams) {
@@ -46,6 +49,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   title: Title;
   concepts: Immutable.List<string>;
   responses: Immutable.OrderedMap<string, Response>;
+  responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
   explanation: Html;
   guid: string;
@@ -62,7 +66,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
     let model = new Part({ guid });
 
-    let part = json.part;
+    const part = json.part;
 
     if (part['@id'] !== undefined) {
       model = model.with({ id: part['@id']});
@@ -77,7 +81,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
       model = model.with({ targets: part['@targets']});
     }
 
-    getChildren(part).forEach(item => {
+    getChildren(part).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
@@ -90,7 +94,12 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text'])});
           break;
         case 'response':
-          model = model.with({ responses: model.responses.set(id, Response.fromPersistence(item, id)) });
+          model = model.with(
+            { responses: model.responses.set(id, Response.fromPersistence(item, id)) });
+          break;
+        case 'response_mult':
+          model = model.with(
+            { responseMult: model.responseMult.set(id, ResponseMult.fromPersistence(item, id)) });
           break;
         case 'hint':
           model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
@@ -119,6 +128,10 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .map(concept => ({concept: { '#text': concept}})),
 
       ...this.responses
+        .toArray()
+        .map(response => response.toPersistence()),
+
+      ...this.responseMult
         .toArray()
         .map(response => response.toPersistence()),
 

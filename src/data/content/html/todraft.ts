@@ -18,6 +18,10 @@ import { Cite } from './cite';
 
 // Translation routines to convert from persistence model to draft model 
 
+const inlineTerminalTags = {};
+inlineTerminalTags['m:math'] = true;
+inlineTerminalTags['input_ref'] = true;
+inlineTerminalTags['image'] = true;
 
 
 type ParsingContext = {
@@ -366,7 +370,10 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
 
 function listHandler(listBlockType, item: Object, context: ParsingContext) {
   const key = common.getKey(item);
-  item[key][common.ARRAY].forEach((listItem) => {
+
+  const children = getChildren(item);
+
+  children.forEach((listItem) => {
 
     const children = getChildren(listItem);
   
@@ -389,6 +396,12 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
 
 function getChildren(item: Object, ignore = null) : Object[] {
   const key = common.getKey(item);
+
+  // Handle a case where there is no key
+  if (key === undefined) {
+    return [];
+  }
+
   if (item[key][common.ARRAY] !== undefined) {
     return item[key][common.ARRAY].filter(c => common.getKey(c) !== ignore);
   } else if (item[key][common.TEXT] !== undefined) {
@@ -404,6 +417,9 @@ function processInline(
   item: Object, 
   context: ParsingContext, blockContext: WorkingBlock) {
   
+  console.log('processInline:');
+  console.log(item);
+  
   const key = common.getKey(item);
 
   if (key === common.CDATA || key === common.TEXT) {
@@ -414,8 +430,9 @@ function processInline(
     
     const offset = blockContext.fullText.length;
 
-    // TODO fix this in a more general way 
-    if (key === 'm:math' || key === 'input_ref') {
+    // Handle elements that do not have children, but
+    // do require a specialized entity renderer
+    if (inlineTerminalTags[key]) {
       blockContext.fullText += ' ';
 
     } else {
@@ -472,31 +489,6 @@ function arrayHandler(item: Object, context: ParsingContext) {
   item['#array'].forEach(item => parse(item, context));
 }
 
-function createRichTitle(
-  item: Object, context: ParsingContext, blockType: string, beginBlockKey: string) {
-  
-  const children = getChildren(item);
-  
-  const blockContext = {
-    fullText: '',
-    markups : [],
-    entities : [],
-  };
-
-  children.forEach(subItem => processInline(subItem, context, blockContext));
-
-  addNewBlock(context.draft, { 
-    type: blockType,
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    data: { type: 'title', beginBlockKey },
-  });
-
-}
-
-
-
 function createSimpleTitle(
   title: string, context: ParsingContext, type: string, beginBlockKey: string) {
 
@@ -519,8 +511,8 @@ function section(item: Object, context: ParsingContext) {
   
   const beginBlock = addAtomicBlock(common.EntityTypes.section_begin, beginData, context);
 
-   // Create a content block displaying the title text
-  processTitle(item, context, getBlockStyleForDepth(context.depth + 1), beginBlock.key);
+  // Create a content block displaying the title text
+  processTitle(item, context);
 
   // parse the body 
   context.depth += 1;
@@ -547,7 +539,7 @@ function pullout(item: Object, context: ParsingContext) {
   const beginBlock = addAtomicBlock(common.EntityTypes.pullout_begin, beginData, context);
 
   // Process the title
-  processTitle(item, context, 'header-three', beginBlock.key);
+  processTitle(item, context);
   
   // Handle the children, excluding 'title'
   const children = getChildren(item, 'title');
@@ -682,7 +674,7 @@ function title(item: Object, context: ParsingContext) {
 }
 
 function processTitle(
-  item: Object, context: ParsingContext, titleStyle: string, beginBlockKey: string) {
+  item: Object, context: ParsingContext) {
 
   const key = common.getKey(item);
 
@@ -694,10 +686,12 @@ function processTitle(
   const titleElements = getChildren(item).filter(c => common.getKey(c) === 'title');
 
   if (titleElements.length === 1) {
-    createRichTitle(titleElements[0], context, titleStyle, beginBlockKey);
+    title(titleElements[0], context); // case 1
   } else if (titleAttribute !== undefined && titleAttribute !== '') {
-    createSimpleTitle(titleAttribute, context, titleStyle, beginBlockKey);
-  } 
+    title({ title: { '#text': titleAttribute } }, context); // case 2
+  } else {
+    title({ title: { '#text': ' ' } }, context); // case 3
+  }
 }
 
 function example(item: Object, context: ParsingContext) {
@@ -711,7 +705,7 @@ function example(item: Object, context: ParsingContext) {
   const beginBlock = addAtomicBlock(common.EntityTypes.example_begin, beginData, context);
 
   // Process the title
-  processTitle(item, context, 'header-three', beginBlock.key);
+  processTitle(item, context);
 
   // Handle the children, ignoring 'title'
   const children = getChildren(item, 'title');

@@ -4,8 +4,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
-  ContentBlock, convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
+  ContentBlock, CharacterMetadata, 
+  convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
 import { CommandProcessor, Command } from '../command';
+import { generateRandomKey } from '../../../../data/content/html/common';
+
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType } from './utils';
@@ -21,7 +24,7 @@ import { buildCompositeDecorator } from './decorators/composite';
 import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/content/html/changes';
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
-
+import { insertBlocksAfter } from './commands/common';
 
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
@@ -269,7 +272,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
+  forceContentChangeWithSelection(contentState, changeType, selection) {
+    this.lastContent = contentState;
+    const es = EditorState.push(this.state.editorState, contentState, changeType);
+    const editorState = EditorState.forceSelection(
+      EditorState.set(es, { allowUndo: false }), selection);
 
+    this.setState({ editorState }, () => {
+      this.props.onEdit(new Html({ contentState }));
+      this.forceRender();
+    });
+  }
 
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
@@ -397,6 +410,36 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   }
 
+  insertEmptyBlockAfter(key) {
+
+    const emptyCharList = Immutable.List().push(new CharacterMetadata());
+  
+    const blocks = [
+      new ContentBlock({ 
+        type: 'unstyled',  
+        text: ' ', 
+        key: generateRandomKey(),
+        characterList: emptyCharList,
+      }),
+    ];
+
+    const contentState = insertBlocksAfter(
+      this.state.editorState.getCurrentContent(),
+      key, blocks);
+
+    const newKey = blocks[0].key;
+
+    const selection = new SelectionState({
+      anchorKey: newKey,
+      focusKey: newKey,
+      anchorOffset: 0,
+      focusOffset: 0,
+    });
+
+    this.forceContentChangeWithSelection(
+      contentState, 'insert-fragment', selection);
+  }
+
   cloneDuplicatedEntities(contentState: ContentState) : ContentState {
     
     const entities = getAllEntities(contentState);
@@ -441,6 +484,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           onEdit: (data) => {
             this.processBlockEdit(block, data);
+          },
+          onInsertBlock: (key) => {
+            this.insertEmptyBlockAfter(key);
           },
           editMode: !this.props.locked,
           services: this.props.services,

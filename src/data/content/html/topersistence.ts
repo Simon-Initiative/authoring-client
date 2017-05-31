@@ -343,9 +343,27 @@ function translateSection(
 
   let block = iterator.peek();
   let title;
-  if (block !== null && isTitleBlock(block.rawBlock)) {
+  if (block !== null 
+    && block.rawBlock.type === 'atomic' 
+    && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_begin) {
+    
+    // Move past the title start
     block = iterator.next();
+
+    // Get the title
+    block = iterator.next();
+
+    // Process the title content
     title = processTitle(block.rawBlock, block.block, entityMap);
+
+    block = iterator.peek();
+    while (block !== null 
+      && block.rawBlock.type === 'atomic' 
+      && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
+
+      block = iterator.next();
+    }
+
   } else {
     title = {
       title: {
@@ -375,13 +393,8 @@ function translatePullout(
   iterator: BlockIterator, 
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
-  let block = iterator.peek();
   const arr = [];
-  if (block !== null && isTitleBlock(block.rawBlock)) {
-    block = iterator.next();
-    arr.push(processTitle(block.rawBlock, block.block, entityMap));
-  }
-
+  
   const p = {
     pullout: {
       '@type': entityMap[rawBlock.entityRanges[0].key].data.subType,
@@ -504,13 +517,7 @@ function translateExample(
   iterator: BlockIterator, 
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
-  let block = iterator.peek();
   const arr = [];
-  if (block !== null && isTitleBlock(block.rawBlock)) {
-    block = iterator.next();
-    arr.push(processTitle(block.rawBlock, block.block, entityMap));
-  }
-
   const e = {
     example: {
       '#array': arr,
@@ -522,10 +529,6 @@ function translateExample(
 
 }
 
-function isTitleBlock(block: common.RawContentBlock) {
-  const data : common.BlockData = block.data;
-  return data.type === 'title';
-}
 
 function translateParagraph(
   rawBlock : common.RawContentBlock, 

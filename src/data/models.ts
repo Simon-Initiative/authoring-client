@@ -1156,7 +1156,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
     //console.log ("To: " + JSON.stringify (newData));
     const root = {
-      "doc": newData
+      "doc": [newData]
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -1259,7 +1259,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     const doc = [{
         "skills_model": {
           "@id": this.resource.id,
-          "title": this.title,
+          "title": this.title.text,
           "skills": this.skills
         }
       }];
