@@ -226,7 +226,7 @@ export class DefinitionBegin
         className="DefinitionSentinel" onFocus={this.onFocus} onBlur={this.onBlur}>
         Definition&nbsp;
         <TextInput editMode={this.props.blockProps.editMode} 
-          width="150px" label="Term" value={this.props.data.term} type="text"
+          width="300px" label="Term" value={this.props.data.term} type="text"
           onEdit={this.onTermEdit}
         />
         <span className="SentinelUI"> 

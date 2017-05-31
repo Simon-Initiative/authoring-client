@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
-import { insertBlocksAfter, stateFromKey, containerPrecondition } from './common';
+import { insertBlocksAfter, createTitle, stateFromKey, containerPrecondition } from './common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { AbstractCommand } from '../../command';
-import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
-
+import { EditorState, RichUtils, SelectionState, 
+  ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
 
 
 export class InsertSectionCommand extends AbstractCommand<EditorState> {
@@ -35,8 +35,12 @@ export class InsertSectionCommand extends AbstractCommand<EditorState> {
     const emptyCharList = Immutable.List().push(new CharacterMetadata());
     const endCharList = Immutable.List().push(new CharacterMetadata({entity: endKey}));
 
+    const titleBlocks = [];
+    content = createTitle(content, titleBlocks);
+
     const blocks = [
       new ContentBlock({type: 'atomic', key: beginBlockKey, text: ' ', characterList: beginCharList}),
+      ...titleBlocks,
       new ContentBlock({type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList}),
       new ContentBlock({type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList}),
       new ContentBlock({type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList})
