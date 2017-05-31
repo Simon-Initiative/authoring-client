@@ -78,7 +78,7 @@ export type CourseModelParams = {
   icon?: WebContent,
   resources?: Immutable.OrderedMap<string, Resource>,
   webContents?: Immutable.OrderedMap<string, WebContent>,
-  userInfos?: Immutable.OrderedMap<string, UserInfo>
+  developers?: Immutable.OrderedMap<string, UserInfo>
 };
 
 const defaultCourseModel = {
@@ -95,7 +95,7 @@ const defaultCourseModel = {
   icon: new WebContent(),
   resources: Immutable.OrderedMap<string, Resource>(),
   webContents: Immutable.OrderedMap<string, WebContent>(),
-  userInfos: Immutable.OrderedMap<string, UserInfo>()
+  developers: Immutable.OrderedMap<string, UserInfo>()
 }
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
@@ -112,7 +112,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   icon: WebContent;
   resources: Immutable.OrderedMap<string, Resource>;
   webContents: Immutable.OrderedMap<string, WebContent>;
-  userInfos: Immutable.OrderedMap<string, UserInfo>;
+  developers: Immutable.OrderedMap<string, UserInfo>;
 
   constructor(params?: CourseModelParams) {
     params ? super(params) : super();
@@ -154,7 +154,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     if (!isNullOrUndefined(c.developers)) {
       c.developers.forEach(item => {
         const userName = item.userName;
-        model = model.with({userInfos: model.userInfos.set(userName, UserInfo.fromPersistence(item))});
+        model = model.with({developers: model.developers.set(userName, UserInfo.fromPersistence(item))});
       });
     }
     return model;
@@ -1156,7 +1156,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
     //console.log ("To: " + JSON.stringify (newData));
     const root = {
-      "doc": [newData]
+      "doc": newData
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -1259,7 +1259,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     const doc = [{
         "skills_model": {
           "@id": this.resource.id,
-          "title": this.title.text,
+          "title": this.title,
           "skills": this.skills
         }
       }];
