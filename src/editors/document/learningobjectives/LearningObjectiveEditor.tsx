@@ -103,31 +103,14 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       });
     }              
 
-    /**
-     *
-     */            
-    /*
-    loadDocument (anID:string):any {
-        console.log ("loadDocument ("+anID+")");
-      console.log("loadDocument (" + anID + ")");
-      const docu = new persistence.Document({
-        _courseId: this.props.context.courseId,
-        _id: this.props.model.guid,
-        model: this.props.model
-      });
-      this.setState({treeData: this.props.model.los, document: docu});
-
-      return (docu);
-    } 
-    */            
-
-    /**
+     /**
      * This method is called by the tree component and even though we could access
      * the state directly we're going to assume that the tree component made some
      * changes that haven't been reflected in the global component state yet.
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
+      console.log ("New data: " + JSON.stringify (newData));
                     
       this.saveToDB (newData);      
     }
@@ -226,44 +209,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     saveToDB (newData?:any): void {
         console.log ("saveToDB ()");
         
-        this.onEdit (newData);
-        
-        /*
-        if (newData) {
-            
-          this.setState({
-            modalIsOpen : false, 
-            treeData: this.assignParents (newData)
-          },function (){          
-              console.log ("Parented: " + JSON.stringify (this.state.treeData));
-              var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
-                     
-              var updatedDocument=this.state.document.set ('model',newModel);
-                           
-              this.setState ({'document' : updatedDocument },function () {         
-                persistence.persistDocument(this.state.document)
-                  .then(result => {
-                      console.log ("Document saved, loading to get new revision ... ");                
-                      this.loadDocument (this.state.documentId);
-                  });
-              });
-          });            
-            
-        } else {            
-          console.log ("Parented: " + JSON.stringify (this.state.treeData));
-          var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
-                     
-          var updatedDocument=this.state.document.set ('model',newModel);
-                           
-          this.setState ({'document' : updatedDocument },function () {         
-            persistence.persistDocument(this.state.document)
-              .then(result => {
-                console.log ("Document saved, loading to get new revision ... ");                
-                this.loadDocument (this.state.documentId);
-              });
-           });
-       }  
-       */      
+        this.onEdit (newData);     
     }    
     
     /**
@@ -275,7 +221,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       let newModel  
   
       if (newData) {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
+        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData.treeData);
       } else {
         newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
       }  
@@ -291,7 +237,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       
       console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
         
-      this.props.onEdit(newModel); 
+      //this.props.onEdit(newModel); 
+        
+      this.setState ({modalIsOpen: false, treeData: newModel.los});  
     }     
         
     /**
@@ -365,17 +313,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             console.log ("Bump");
             return;
         }
-                
-        /*
-        for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:LearningObjective=immutableHelper [i];
-            
-            if (testNode.id==aNode.id) {
-                immutableHelper.splice (i,1);
-                break;
-            }
-        }
-        */
         
         for (var i=0;i<parentArray.length;i++) {
             let testNode:OrgItem=parentArray [i] as OrgItem;
@@ -386,10 +323,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             }
         }
         
-        //console.log ("New Tree: " + JSON.stringify (immutableHelper));
-                
-        //this.setState({modalIsOpen: false,treeData: immutableHelper});
-        
         this.saveToDB (immutableHelper);
     }
     
@@ -398,8 +331,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */    
     editTitle (aNode:any, aTitle:any):void {
         console.log ("LearningObjectiveEditor:editTitle ()");
-        
-        //let newTitle=aTitle.title.get ("#text");
+
         let newTitle=aTitle.text;
             
         var immutableHelper = this.state.treeData.slice();
@@ -418,8 +350,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             }
         }
         
-        //this.setState({modalIsOpen: false,treeData: immutableHelper});
-        
         this.saveToDB (immutableHelper);
     }
     
@@ -428,7 +358,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     linkSkill(aNode:any) {        
         console.log ("linkSkill ()");
-        //console.log ("aNode: " + JSON.stringify (aNode));
                 
         this.setState ({modalIsOpen: true, target: aNode});
     }
@@ -436,9 +365,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     /**
      * 
      */    
-    genProps () {
-        //console.log ("LearningObjectiveEditor:genProps ()");
-        
+    genProps () {        
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
@@ -452,21 +379,44 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     /**
      * 
      */
-    closeModal () {
-      console.log ("LearningObjectiveEditor: closeModal ()");
+    closeModal (newAnnotations:any) {
         
-      this.saveToDB ();  
+      var immutableHelper = this.state.treeData.slice();
+        
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.target);
+        
+      if (immutableHelper==null) {
+        console.log ("Bump");
+        return;
+      }
+       
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==this.state.target.id) {
+          testNode.annotations=newAnnotations;      
+          break;
+        }
+      }
+        
+      this.setState ({modalIsOpen: false, treeData: immutableHelper},function (){
+        this.saveToDB ();    
+      });
     }
     
     /**
      * 
      */
-    createLinkerDialog () {           
-      if (this.state.skills!=null) {            
-        return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);
+    createLinkerDialog () {
+      if (this.state.target) {             
+        if (this.state.skills){            
+          return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);
+        } else {
+          console.log ("Internal error: skills object can be empty but not null");
+        }
       } else {
-        console.log ("Internal error: skills object can be empty but not null");
-      }
+        console.log ("No target yet.");
+      }    
                    
       return (<div></div>);           
     }

@@ -1213,7 +1213,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
 
   static fromPersistence(json: Object): LearningObjectiveModel {
 
-    console.log("LearningObjectiveModel.fromPersistence: " + JSON.stringify(json));
+    console.log("fromPersistence ()");
 
     let a = (json as any);
     //var obData=a.doc.objectives;
@@ -1230,7 +1230,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       }
     });
 
-    console.log("New data LO: " + JSON.stringify(newData));
+    //console.log("New data LO: " + JSON.stringify(newData));
 
     let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent(newData)});
     model = model.with({resource: Resource.fromPersistence(a)});
