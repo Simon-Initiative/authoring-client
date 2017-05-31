@@ -37,17 +37,17 @@ export class Head extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Head {
     let model = new Head().with({ guid });
-    let tAnnotations = new Array ();
+    const tAnnotations = [];
     const head = (root as any).head;
 
-    getChildren(head).forEach(item => {
+    getChildren(head).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'objref':
-          tAnnotations.push (new Linkable (head ["objref"]["@idref"]));        
+          tAnnotations.push(new Linkable ((item as any).objref['@idref']));        
           break;  
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id)});
