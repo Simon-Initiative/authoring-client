@@ -62,34 +62,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     resourceList.map((value, id) => {          
       if (value.type=="x-oli-skills_model") {
         persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => {
-          let sModel:models.SkillModel=skillDocument.model as models.SkillModel;
-          //console.log ("Loaded skill model: " + JSON.stringify (sModel));  
+          let sModel:models.SkillModel=skillDocument.model as models.SkillModel;  
           this.setState ({skillModel: sModel});                  
         });
       }          
     })
   }     
-    
-  /*
-  loadSkills () : void {
-            
-    const resourceList:Immutable.OrderedMap<string, Resource>
-     = this.props.courseDoc ['model']['resources'] as Immutable.OrderedMap<string, Resource>;
-  
-    resourceList.map((value, id) => {        
-      if (value.type === 'x-oli-skills_model') {
-        //console.log ('Found skills document, loading ...');  
-        persistence.retrieveDocument (this.props.context.courseId,id)
-        .then((skillDocument) => {
-          console.log ('Loaded skill document, assigning ...');  
-          const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
-          this.setState ({ skillModel: aSkillModel });
-        });
-      }          
-    });
-  } 
-  */    
-    
+        
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
     this.handleEdit(this.props.model.with({ pages }));
@@ -233,6 +212,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   closeModal (newAnnotations:any) {
     console.log ('closeModal ()');  
     
+    //this.handleEdit(this.props.model.with({ annotations: newAnnotations }));      
   }     
 
   /**

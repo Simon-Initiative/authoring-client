@@ -289,18 +289,17 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     onEdit(newData?:any) {
-        
-      /*  
+          
       let newModel
 
       if (newData) {
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,newData);
+        this.setState ({treeData: newData});
       } else {
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
       }  
               
-      this.props.onEdit(newModel);
-      */   
+      //this.props.onEdit(newModel);       
     }    
 
     /**
@@ -319,7 +318,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           for (let k=0;k<evalModule.children.length;k++) {
             let evalSection:OrgItem=evalModule.children [k];
               
-            if (evalSection.orgType!=OrgContentTypes.Section) {
+            if ((evalSection.orgType!=OrgContentTypes.Section) && (evalSection.orgType!=OrgContentTypes.Item)) {
               console.log ("Changing " + evalSection.orgType + " to section ...");
                         
               evalModule.children [k]=new OrgSection ();
@@ -335,7 +334,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }              
           }  
             
-          if (evalModule.orgType!=OrgContentTypes.Module) {
+          if ((evalModule.orgType!=OrgContentTypes.Module) && (evalModule.orgType!=OrgContentTypes.Item)) {
             console.log ("Changing " + evalModule.orgType + " to module ...");
                         
             evalSequence.children [j]=new OrgModule ();
@@ -353,7 +352,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
 
         //>-----------------------------------------------------------------------  
 
-        if (evalSequence.orgType!=OrgContentTypes.Sequence) {
+        if ((evalSequence.orgType!=OrgContentTypes.Sequence) && (evalSequence.orgType!=OrgContentTypes.Item)) {
           console.log ("Changing " + aTree [i].orgType + " to sequence ...");
                        
           aTree [i]=new OrgSequence ();
