@@ -18,6 +18,10 @@ import { Cite } from './cite';
 
 // Translation routines to convert from persistence model to draft model 
 
+const inlineTerminalTags = {};
+inlineTerminalTags['m:math'] = true;
+inlineTerminalTags['input_ref'] = true;
+inlineTerminalTags['image'] = true;
 
 
 type ParsingContext = {
@@ -366,7 +370,10 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
 
 function listHandler(listBlockType, item: Object, context: ParsingContext) {
   const key = common.getKey(item);
-  item[key][common.ARRAY].forEach((listItem) => {
+
+  const children = getChildren(item);
+
+  children.forEach((listItem) => {
 
     const children = getChildren(listItem);
   
@@ -389,6 +396,12 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
 
 function getChildren(item: Object, ignore = null) : Object[] {
   const key = common.getKey(item);
+
+  // Handle a case where there is no key
+  if (key === undefined) {
+    return [];
+  }
+
   if (item[key][common.ARRAY] !== undefined) {
     return item[key][common.ARRAY].filter(c => common.getKey(c) !== ignore);
   } else if (item[key][common.TEXT] !== undefined) {
@@ -404,6 +417,9 @@ function processInline(
   item: Object, 
   context: ParsingContext, blockContext: WorkingBlock) {
   
+  console.log('processInline:');
+  console.log(item);
+  
   const key = common.getKey(item);
 
   if (key === common.CDATA || key === common.TEXT) {
@@ -414,8 +430,9 @@ function processInline(
     
     const offset = blockContext.fullText.length;
 
-    // TODO fix this in a more general way 
-    if (key === 'm:math' || key === 'input_ref') {
+    // Handle elements that do not have children, but
+    // do require a specialized entity renderer
+    if (inlineTerminalTags[key]) {
       blockContext.fullText += ' ';
 
     } else {
