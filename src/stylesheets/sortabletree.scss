@@ -42,30 +42,6 @@
     margin-right: 5px;
 }
 
-.onclick-menu:before {
-    font-family: FontAwesome;
-    content: "\f078";
-    outline: none;
-}
-
-.onclick-menu:focus {
-    /* clicking on label should toggle the menu */
-    pointer-events: none;
-}
-
-.onclick-menu:focus .onclick-menu-content {
-    /*  opacity is 1 in opened state (see below) */
-    opacity: 1;
-    
-    visibility: visible;
-    display: block;
-
-    /* don't let pointer-events affect descendant elements */
-    pointer-events: auto;
-    
-    outline: none;
-}
-
 .onclick-menu-content {
     position: absolute;
     left: -160px;
@@ -77,10 +53,10 @@
     border: 1px solid grey;
     
     /* use opacity to fake immediate toggle */
-    opacity: 0;
+    opacity: 1;
     
-    visibility: hidden;
-    display: none;
+    visibility: visible;
+    display: block;
     
     transition: display 0.6s;
     transition: visibility 0.5s;

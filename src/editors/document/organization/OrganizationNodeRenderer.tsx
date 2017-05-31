@@ -7,7 +7,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 import {OrgContentTypes, IDRef, OrgItem, OrgSection, OrgModule, OrgSequence, OrgOrganization} from '../../../data/org';
-import DropdownMenu from 'react-dd-menu';
+//import DropdownMenu from 'react-dd-menu';
 
 import '../../../stylesheets/sortabletree.scss';
 //import '../../../stylesheets/sortabletree.scss';
@@ -351,18 +351,23 @@ class OrganizationNodeRenderer extends Component <any,any>
         isMenuOpen: false
       };
     }    
-          
-    toggle = () => {
-      this.setState({ isMenuOpen: !this.state.isMenuOpen });
-    };
-
-    close = () => {
-      this.setState({ isMenuOpen: false });
-    };
-
-    click = () => {
-      console.log('You clicked an item');
-    };    
+    
+    popupToggle (e) : void {
+      console.log ("popup ()");
+        
+      if (this.state.isMenuOpen==true) {
+        this.setState ({isMenuOpen: false});    
+      }
+      else {
+        this.setState ({isMenuOpen: true});
+      }  
+    }
+    
+    popupClose (e) : void {
+      console.log ("popupClose ()");
+        
+      this.setState ({isMenuOpen: false});  
+    }    
     
     /**
      * 
@@ -370,6 +375,13 @@ class OrganizationNodeRenderer extends Component <any,any>
     generatePopDown (node) {         
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
+        
+      const chevron=<div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a></div>;  
+        
+      if (this.state.isMenuOpen==false)
+      {
+          return (<div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a></div>);
+      }  
         
       let menuStyle:string="flex-column onclick-menu-content list-group";
         
@@ -394,6 +406,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       }
                  
       return (
+            <div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
             <div tabIndex={0} className="onclick-menu">
               <ul className={menuStyle}>
                 Content
@@ -406,30 +419,8 @@ class OrganizationNodeRenderer extends Component <any,any>
                 Assets
                 {assetLink}
               </ul>
+            </div>
             </div>);
-
-      /*
-      let menuOptions = {
-        isOpen: this.state.isMenuOpen,
-        close: this.close.bind(this),
-        className: "popupAddedStyle",
-        toggle: <a onClick={this.toggle.bind(this)}><i className="fa fa-chevron-down">&nbsp;</i></a>,
-        align: 'right',
-      };
-
-      return (<DropdownMenu {...menuOptions}>
-                Content
-                {moduleLink}
-                {sectionLink}
-                <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
-                {loLink}
-                {pageLink}
-                {activityLink}
-                Assets
-                {assetLink}
-              </DropdownMenu>);
-
-       */
     }
 
     render() {        
@@ -461,7 +452,7 @@ class OrganizationNodeRenderer extends Component <any,any>
             className,
             style = {},
             didDrop,
-            isOver:     _isOver,     // Not needed, but preserved for other renderers
+            isOver,
             parentNode: _parentNode, // Needed for drag-and-drop utils
             endDrag:    _endDrag,    // Needed for drag-and-drop utils
             startDrag:  _startDrag,  // Needed for drag-and-drop utils
@@ -501,7 +492,7 @@ class OrganizationNodeRenderer extends Component <any,any>
             handle = <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>;
           }
             
-          if (node.typeDescription=="x-oli-inline-assessment") {  
+          if ((node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")){  
             handle = <div style={styles.orgpageHandle}><div id="handle" style={activityPageStyle}></div></div>;
           }            
         }    
@@ -530,6 +521,55 @@ class OrganizationNodeRenderer extends Component <any,any>
         //>--------------------------------------------------------------------
 
         let gStyle:any=styles.orgrow;
+
+        if (isDragging && isOver) {
+          gStyle ["border"]= "none !important";
+          gStyle ["boxShadow"]= "none !important";
+          gStyle ["outline"]= "none !important";
+          gStyle ["*" ]= {
+            "opacity": "0 !important"
+          };
+          gStyle ["&::before" ]= {
+            "backgroundColor": "lightblue",
+            "border": "3px dashed white",
+            "content": "",
+            "position": "absolute",
+            "top": "0",
+            "right": "0",
+            "bottom": "0",
+            "left": "0",
+            "zIndex": -1
+          };           
+        }
+
+        if (isDragging && !isOver && canDrop) {
+          gStyle ["border"]= "none !important";
+          gStyle ["boxShadow"]= "none !important";
+          gStyle ["outline"]= "none !important";
+          gStyle ["*"]= {
+            "opacity": "0 !important"
+          };
+          gStyle ["&::before"]= {
+            "backgroundColor": "#E6A8AD",
+            "border": "3px dashed white",
+            "content": "",
+            "position": "absolute",
+            "top": "0",
+            "right": "0",
+            "bottom": "0",
+            "left": "0",
+            "zIndex": -1
+          };
+        }
+
+        if (isSearchMatch) {
+          gStyle ["outline"]="solid 3px #0080ff"
+        }
+
+        if (isSearchFocus) {
+          gStyle ["outline"]="solid 3px #fc6421"
+        }
+
         gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
 
         //>--------------------------------------------------------------------
@@ -556,6 +596,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         let bStyle:any=styles.orgrowTitle;
         bStyle ["marginLeft"]="10px";
+        bStyle ["textDecoration"]="none";
  
         let titleDivider:any=styles.titleDivider;
         let titleContainer:any=styles.titleContainer;

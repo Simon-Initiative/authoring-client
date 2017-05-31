@@ -54,6 +54,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   document: any;
   documentId: string;
   titleIndex:number;    
+  loadState:number;  
 }
 
 export interface OrganizationEditorProps extends AbstractEditorProps<models.OrganizationModel>
@@ -88,7 +89,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         loModalIsOpen: false,
         pagesModalIsOpen: false,
         activitiesModalIsOpen : false, 
-        titleIndex: 0
+        titleIndex: 0,
+        loadState: 0
       });  
     }
         
@@ -104,9 +106,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         model: this.props.model
       });
                 
-      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu}, function () {
-        this.assignItemTypes ();    
-      });
+      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
         
       this.loadLearningObjectives ();
       
@@ -122,6 +122,94 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       console.log ("componentWillReceiveProps ()");
 
       this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: this.props.model.organization});  
+    }
+        
+    /**
+     * 
+     */
+    loadLearningObjectives () : void {
+      console.log ("loadLearningObjectives ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      //console.log ("Resources: " + JSON.stringify (resourceList));  
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.with (this.state.los)},function () {
+              this.resolveReferences ();
+            });
+          });
+        }          
+      })  
+    }    
+
+    /**
+     * We don't need to load anything from the database, everything is already contained the
+     * course document we have access to by default. So all we have to do is transform
+     * whichever workbook page reference we find into a Linkable and add it to the internal
+     * list of Linkables.
+     */
+    loadPages () : void {
+      console.log ("loadPages ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+
+      let pageList:Array<Linkable>=new Array <Linkable>();  
+        
+      resourceList.map((value, id) => {
+        if (value.type=="x-oli-workbook_page") {
+          let pageLink:Linkable=new Linkable ();
+          pageLink.id=value.guid;
+          pageLink.title=value.title;
+          pageList.push (pageLink);             
+        }          
+      })  
+        
+      this.setState ({pages: pageList},function () {
+          this.resolveReferences ();
+      });  
+    }    
+    
+    /**
+     * 
+     */
+    loadActivities () : void {
+      console.log ("loadActivities ()");
+            
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
+  
+      let activityList:Array<Linkable>=new Array <Linkable>();        
+        
+      resourceList.map((value, id) => {        
+        if (value.type=="x-oli-inline-assessment") {
+          let activityLink:Linkable=new Linkable ();
+          activityLink.id=value.guid;
+          activityLink.title=value.title;
+          activityList.push (activityLink);    
+        }          
+      })  
+        
+      this.setState ({activities: activityList},function () {
+          this.resolveReferences ();
+      });    
+    }
+    
+    /**
+     * 
+     */
+    resolveReferences () : void {
+       console.log ("resolveReferences ("+this.state.loadState+")");
+        
+       this.setState ({loadState : (this.state.loadState + 1)}, function () {
+         if (this.state.loadState>1) {
+           console.log ("Kicking in model validation ...");
+           this.assignItemTypes ();  
+         }
+       }); 
     }
     
     /**
@@ -153,97 +241,34 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
            console.log ("found an item, searching for type content ..."); 
            targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
         }
-          
-        this.assignType (targetObject.children);  
+                   
+        if (targetObject.children.length>0) {  
+          this.assignType (targetObject.children);
+        }      
       }          
     }      
     
     /**
-     * 
+     * This is currently highly inefficient since we can't break out of the map routine
+     * by using 'return'. Should be changed when possible because this can become a
+     * time sink.
      */
     findType (anId:string) : string {
-      console.log ("findType ("+anId+")");
+      //console.log ("findType ("+anId+")");
      
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-      let activityList:Array<Linkable>=new Array <Linkable>();        
-        
-      resourceList.map((value, id) => {        
+      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;  
+      let activityList:Array<Linkable>=new Array <Linkable>();                
+      let result:string="undefined";  
+                
+      resourceList.map((value, id) => {          
         if (value.id==anId) {
-          return (value.type);    
+          //console.log ("Found type: " + value.type);  
+          result=value.type;  
         }          
       })
-        
-      return ("undefined");  
-    }
-    
-    /**
-     * 
-     */
-    loadLearningObjectives () : void {
-      console.log ("loadLearningObjectives ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-      //console.log ("Resources: " + JSON.stringify (resourceList));  
-        
-      resourceList.map((value, id) => {        
-        if (value.type=="x-oli-learning_objectives") {
-          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
-          {
-            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.with (this.state.los)});
-          });
-        }          
-      })  
+                  
+      return (result);  
     }    
-
-    /**
-     * We don't need to load anything from the database, everything is already contained the
-     * course document we have access to by default. So all we have to do is transform
-     * whichever workbook page reference we find into a Linkable and add it to the internal
-     * list of Linkables.
-     */
-    loadPages () : void {
-      console.log ("loadLearningObjectives ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-
-      let pageList:Array<Linkable>=new Array <Linkable>();  
-        
-      resourceList.map((value, id) => {
-        if (value.type=="x-oli-workbook_page") {
-          let pageLink:Linkable=new Linkable ();
-          pageLink.id=value.guid;
-          pageLink.title=value.title;
-          pageList.push (pageLink);             
-        }          
-      })  
-        
-      this.setState ({pages: pageList});  
-    }    
-    
-    /**
-     * 
-     */
-    loadActivities () : void {
-      console.log ("loadActivities ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-      let activityList:Array<Linkable>=new Array <Linkable>();        
-        
-      resourceList.map((value, id) => {        
-        if (value.type=="x-oli-inline-assessment") {
-          let activityLink:Linkable=new Linkable ();
-          activityLink.id=value.guid;
-          activityLink.title=value.title;
-          activityList.push (activityLink);    
-        }          
-      })  
-        
-      this.setState ({activities: activityList});    
-    }     
     
     /**
      *
@@ -265,7 +290,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     onEdit(newData?:any) {
         
-      let newModel  
+      /*  
+      let newModel
 
       if (newData) {
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,newData);
@@ -273,7 +299,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
       }  
               
-      this.props.onEdit(newModel); 
+      this.props.onEdit(newModel);
+      */   
     }    
 
     /**
@@ -354,8 +381,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
+        
+      console.log ("Changed tree data: " + JSON.stringify (newData));  
                     
-      let fixedData:Array <OrgItem>=this.evaluateTree (newData ["treeData"]);  
+      let fixedData:Array <OrgItem>=this.evaluateTree (newData ["treeData"]);
+        
+      console.log ("Fixed tree data: " + JSON.stringify (fixedData));
         
       this.onEdit (fixedData);      
     }    

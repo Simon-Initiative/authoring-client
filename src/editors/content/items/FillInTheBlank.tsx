@@ -10,7 +10,7 @@ import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
-
+import { ResponseMultEditor } from './ResponseMult';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
@@ -137,9 +137,16 @@ export class FillInTheBlank
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
+  onEditMult(mult) {
+    const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
+    const partModel = this.props.partModel.with({ responseMult });
+    this.props.onEdit(this.props.itemModel, partModel);
+  }
+
   renderChoices() {
 
     const responses = this.props.partModel.responses.toArray();
+    const mult = this.props.partModel.responseMult.toArray();
     const choices = this.props.itemModel.choices.toArray();
 
     const rendered = [];
@@ -154,6 +161,15 @@ export class FillInTheBlank
           let f = responses[i].feedback.first();
           renderedFeedback = this.renderFeedback(c, responses[i], f)
         }
+      } else if (mult.length > 0) {
+
+        renderedFeedback = mult.map(m => <ResponseMultEditor
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
+            model={m}
+            onEdit={this.onEditMult.bind(this)}
+          />);
       }
       
       rendered.push(

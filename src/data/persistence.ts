@@ -146,7 +146,7 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
   });
 }
 
-export function developerRegistration(courseId: CourseId, userNames: string[], action: string): Promise<UserInfo[]> {
+export function developerRegistration(courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
 
   const url = `${configuration.baseUrl}/${courseId}/developers?action=${action}`;
 

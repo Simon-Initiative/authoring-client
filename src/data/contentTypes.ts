@@ -25,6 +25,8 @@ export { Page } from './content/page';
 export { Node } from './content/node';
 export { Essay } from './content/essay';
 export { GradingCriteria } from './content/criteria';
+export { ResponseMult } from './content/response_mult';
+export { Match } from './content/match';
 
 import { Essay } from './content/essay';
 import { Ordering } from './content/ordering';

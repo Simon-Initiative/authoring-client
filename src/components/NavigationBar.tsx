@@ -4,6 +4,8 @@ import {returnType} from "../utils/types";
 import {connect} from "react-redux";
 import * as models from "../data/models";
 import * as contentTypes from "../data/contentTypes";
+import {Resource} from "../data/resource";
+import guid from "../utils/guid";
 
 /**
  *
@@ -292,7 +294,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         (resource) => resource.type === 'x-oli-learning_objectives',
         (title, type) => new models.LearningObjectiveModel({
           type: type,
-          title: title
+          title: title,
+          id:title.split(" ")[0]+guid()
         })
       );
 
@@ -300,11 +303,12 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
       this.props.viewActions.viewResources(
         this.props.course.model.guid,
         'Skills',
-        'x-oli-skill_model',
-        (resource) => resource.type === 'x-oli-skill_models',
+        'x-oli-skills_model',
+        (resource) => resource.type === 'x-oli-skills_model',
         (title, type) => new models.SkillModel({
           type: type,
-          title: new contentTypes.Title({text: title})
+          title: new contentTypes.Title({text: title}),
+          resource: new Resource({id:title.split(" ")[0]+guid(), title:title})
         })
       );
 

@@ -238,7 +238,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             treeData: this.assignParents (newData)
           },function (){          
               console.log ("Parented: " + JSON.stringify (this.state.treeData));
-              var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+              var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
                      
               var updatedDocument=this.state.document.set ('model',newModel);
                            
@@ -253,7 +253,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             
         } else {            
           console.log ("Parented: " + JSON.stringify (this.state.treeData));
-          var newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+          var newModel=models.LearningObjectiveModel.updateModel (this.props.model,this.state.treeData);
                      
           var updatedDocument=this.state.document.set ('model',newModel);
                            
@@ -277,9 +277,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       let newModel  
 
       if (newData) {
-        newModel=models.LearningObjectiveModel.updateModel (newData);
+        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
       } else {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.treeData);
+        newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
       }  
       
       console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  

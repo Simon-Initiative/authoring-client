@@ -292,38 +292,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         console.log ("saveToDB ()");
         
         this.onEdit ();
-        
-        /*
-        let immutableDocument = this.state.document;
-        
-        if (immutableDocument==null)
-        {
-            console.log ("immutableDocument is null, bump");
-            return;
-        }
-
-        var extractedData:any=this.extractData (this.state.treeData);
-        
-        //console.log ("extractedData: " + JSON.stringify (extractedData));
-                
-        // Keep in mind that extractData creates a skills object, but in our
-        // model we already have one so we need to extract the contents from
-        // inside that object. Bit confusing prehaps but we'll clean it up
-        // later.
-        var newModel=models.SkillModel.updateModel (extractedData.skills);
-                 
-        var updatedDocument=this.state.document.set ('model',newModel);
-        
-        //console.log ("updatedDocument: " + JSON.stringify (updatedDocument));
-               
-        this.setState ({'document' : updatedDocument },function () {         
-          persistence.persistDocument(this.state.document)
-            .then(result => {
-                console.log ("Document saved, loading to get new revision ... ");                
-                this.loadDocument (this.state.documentId);
-            });
-        });
-        */ 
     }
     
     /**
@@ -338,7 +306,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
       // model we already have one so we need to extract the contents from
       // inside that object. Bit confusing prehaps but we'll clean it up
       // later.
-      let newModel=models.SkillModel.updateModel (extractedData.skills);
+      let newModel=models.SkillModel.updateModel (this.state.model,extractedData.skills);
         
       console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
         
@@ -527,15 +495,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
-    tryout (item:Skill):void {
-      console.log ("tryout ()");    
-       
-      this.setState ({modalIsOpen:true, tryoutTarget:item});
-    }
-    
-    /**
-     * 
-     */
     createAdvancedPanel ():any {
       let dStyle:any=styles.settingsPreviewContainer;
       if (this.state.advanced==true) {    
@@ -667,7 +626,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          <div style={styles.toolContainer}>
                            <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
                            <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.tryout (item)}><i className="fa fa-check-circle-o">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBarHidden}>
@@ -691,7 +649,6 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                          <div style={styles.toolContainer}>
                            <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
                            <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.tryout (item)}><i className="fa fa-check-circle-o">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBar}>
