@@ -43,7 +43,8 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
     this.onSelectActivity = this.onSelectActivity.bind(this);
-
+    this.onInsert = this.onInsert.bind(this);
+    this.onCancel = this.onCancel.bind(this);
     
   }
 
@@ -65,9 +66,19 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
   }
 
   onInsert(resource) {
-    this.props.blockProps.services.dismissModal();
-    this.props.blockProps.onEdit(
-      { activity: this.props.data.activity.with({ idref: resource.id }) });
+
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const found = resources.find(r => r.guid === resource.id);
+
+    if (found !== undefined) {
+      this.props.blockProps.services.dismissModal();
+      this.props.blockProps.onEdit(
+        { activity: this.props.data.activity.with({ idref: found.id }) });
+    }
+
+    
   }
 
   onSelectActivity() {
@@ -90,7 +101,7 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
     const resources = this.props.blockProps
       .context.courseModel.resources.toArray();
 
-    const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
+    const resource = resources.find(resource => resource.id === this.props.data.activity.idref);
 
     if (resource === undefined) {
       this.title = 'Not set';

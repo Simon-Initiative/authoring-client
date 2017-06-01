@@ -43,6 +43,9 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.onSelectActivity = this.onSelectActivity.bind(this);
+    this.onInsert = this.onInsert.bind(this);
+    this.onCancel = this.onCancel.bind(this);
 
     this.findTitleId();
   }
