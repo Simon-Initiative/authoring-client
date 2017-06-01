@@ -2,12 +2,9 @@
 
 import * as React from "react";
 import * as persistence from "../../../data/persistence";
-//import {CourseResource} from "../common/resources";
 import * as models from "../../../data/models";
-import * as courseActions from '../../../actions/course';
 
 import {AbstractEditor, AbstractEditorProps, AbstractEditorState} from "../common/AbstractEditor";
-import {Resource} from "../../../data/resource";
 
 interface CourseEditor {
 }
@@ -18,33 +15,35 @@ export interface CourseEditorProps extends AbstractEditorProps<models.CourseMode
 
 
 interface CourseEditorState extends AbstractEditorState {
-  resources: Resource[];
+   failure: boolean;
 }
 
 class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState> {
 
   constructor(props) {
-    super(props, {resources: []});
+    super(props, {failure: false});
   }
 
   registration(developers: string, action: string) {
     const courseId = this.props.model.guid;
     persistence.developerRegistration(courseId, [developers], action)
-      .then(result => this.refreshCoursePackage(courseId))
-      .catch(err => console.log(err));
-  }
-
-  refreshCoursePackage(courseId: string) {
-    persistence.retrieveCoursePackage(courseId)
-      .then((document) => {
-        // Get an updated course content package payload
-        // if (document.model.modelType === models.ModelTypes.CourseModel) {
-        //   this.props.dispatch(courseActions.courseChanged(document.model));
-        // }
+      .then(result => {
+        let devs = this.props.model.developers;
+        result.forEach(item => {
+          console.log(JSON.stringify(item));
+          const userName = item.userName;
+          devs = devs.set(userName, item);
+        });
+        this.setState(
+          {failure: false},
+          () => this.props.onEdit(this.props.model.with({developers: devs})));
+        console.log(JSON.stringify(this.props.model.developers));
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        this.setState(
+          {failure: true});
+        console.log(err)});
   }
-
 
   renderResources() {
 
