@@ -34,6 +34,9 @@ export interface ActivityProps {
 
 export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> {
 
+  title: string;
+  guid: string;
+
   constructor(props) {
     super(props, {});
 
@@ -44,22 +47,12 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
     
   }
 
-  getTitle() {
-    const resources = this.props.blockProps
-      .context.courseModel.resources.toArray();
-
-    const resource = resources.find(resource => resource.id === this.props.data.activity.idref);
-
-    if (resource === undefined) {
-      return 'Not set';
-    } else {
-      return resource.title;
-    }
-  }
-
   onClick() {
-    this.props.blockProps.services.viewDocument(
-      this.props.data.activity.idref);
+    if (this.guid !== null) {
+      this.props.blockProps.services.viewDocument(
+      this.guid);
+    }
+    
   }
 
   onPurposeEdit(purpose) {
@@ -92,6 +85,22 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
           onCancel={this.onCancel}/>);
   }
 
+
+  findTitleId() {
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
+
+    if (resource === undefined) {
+      this.title = 'Not set';
+      this.guid = null;
+    } else {
+      this.title = resource.title;
+      this.guid = resource.guid;
+    }
+  }
+
   render() : JSX.Element {
     return (
       <div className="wbinline"
@@ -100,7 +109,7 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
         
         <b>Activity:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
-          className="btn btn-link">{this.getTitle()}</button>
+          className="btn btn-link">{this.title}</button>
         <Button editMode={this.props.blockProps.editMode} 
           onClick={this.onSelectActivity}>Set</Button>
         &nbsp;&nbsp;&nbsp;

@@ -35,17 +35,22 @@ export interface WbInlineProps {
 
 export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> {
 
+  title: string;
+  guid: string;
+
   constructor(props) {
     super(props, { });
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
 
-    
+    this.findTitleId();
   }
 
   onClick() {
-    this.props.blockProps.services.viewDocument(this.props.data.wbinline.idRef);
+    if (this.guid !== null) {
+      this.props.blockProps.services.viewDocument(this.guid);
+    } 
   }
 
   onPurposeEdit(purpose) {
@@ -77,16 +82,18 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
           onCancel={this.onCancel}/>);
   }
 
-  getTitle() {
+  findTitleId() {
     const resources = this.props.blockProps
       .context.courseModel.resources.toArray();
 
     const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
 
     if (resource === undefined) {
-      return 'Not set';
+      this.title = 'Not set';
+      this.guid = null;
     } else {
-      return resource.title;
+      this.title = resource.title;
+      this.guid = resource.guid;
     }
   }
 
@@ -97,7 +104,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
         <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
-          className="btn btn-link">{this.getTitle()}</button>
+          className="btn btn-link">{this.title}</button>
         <Button editMode={this.props.blockProps.editMode} 
           onClick={this.onSelectActivity}>Set</Button>
         <Select editMode={this.props.blockProps.editMode} 
