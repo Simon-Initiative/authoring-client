@@ -26,6 +26,7 @@ const styles = {
     "justifyContent": "space-between",
     "background": "#ffffff",  
   },     
+  /*
   orgrowLandingPad : {
     "border": "none !important",
     "boxShadow": "none !important",
@@ -45,6 +46,19 @@ const styles = {
         "zIndex": -1
     }    
   },
+  */
+  dragStyle : {
+    "backgroundColor": "lightblue",
+    "border": "3px dashed white",
+    "content": "",
+    "position": "absolute",
+    "top": "0",
+    "right": "0",
+    "bottom": "0",
+    "left": "0",
+    "zIndex": -1      
+  },
+  /*
   orgrowCancelPad : {
     "border": "none !important",
     "boxShadow": "none !important",
@@ -64,6 +78,18 @@ const styles = {
         "zIndex": -1
     }
   },
+  */
+  noDragStyle : {
+   "backgroundColor": "#E6A8AD",
+   "border": "3px dashed white",
+   "content": "",
+   "position": "absolute",
+   "top": "0",
+   "right": "0",
+   "bottom": "0",
+   "left": "0",
+   "zIndex": -1    
+  },  
   orgrowSearchMatch : {
     "outline": "solid 3px #0080ff"
   },
@@ -297,7 +323,8 @@ const styles = {
     }    
   },
   titleContainer: {
-    "display" : "flex", 
+    "display" : "flex",
+    "border" : "0px solid blue", 
     "flexDirection" : 'column',
     "justifyContent": "space-between",
     'padding': '0px'
@@ -404,6 +431,67 @@ class OrganizationNodeRenderer extends Component <any,any>
     /**
      * 
      */
+    createDnDPreview (isSearchMatch:boolean,isDragging:boolean,isOver:boolean,canDrop:boolean,isSearchFocus:boolean,isDraggedDescendant:boolean):any {
+        
+      //let gStyle:any=styles.orgrow;
+      let gStyle:Object=new Object ();
+        
+      // take styles from styles.orgrow  
+      gStyle ["border"] = '0px solid green';  
+      gStyle ["height"] = "100%";
+      gStyle ["flexDirection"] = "row";  
+      gStyle ["display"] = "flex";
+      gStyle ["justifyContent"] = "space-between";
+      gStyle ["background"] = "#ffffff";       
+       
+      // add styles and changes others if we're dragging and dropping    
+              
+      if (isDragging && !isOver && canDrop) {
+        gStyle ["border"]= "none !important";
+        gStyle ["boxShadow"]= "none !important";
+        gStyle ["outline"]= "none !important";
+      }
+  
+      if (isSearchMatch) {
+        gStyle ["outline"]="solid 3px #0080ff"
+      }
+
+      if (isSearchFocus) {
+        gStyle ["outline"]="solid 3px #fc6421"
+      }
+
+      gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
+            
+      return (gStyle); 
+    }
+    
+    /**
+     * 
+     */
+    createDragHandle (isLandingPadActive:boolean):any {        
+      if (isLandingPadActive) {
+        console.log ("Ding!");  
+        return (<div id="draghandle" style={styles.dragStyle as any} ></div>);
+      }
+      
+      console.log ("Dong!");
+      return (<div></div>);
+    }
+    
+    /**
+     * 
+     */
+    createNoDragHandle (isLandingPadActive:boolean):any {        
+      if (isLandingPadActive) {  
+        return (<div id="draghandle" style={styles.dragStyle as any} ></div>);
+      }
+      
+      return (<div></div>);
+    }    
+    
+    /**
+     * 
+     */
     generatePopDown (node) {         
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
@@ -503,10 +591,12 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.addModule=addModule;
         this.addSection=addSection;
 
+        //canDrag=true;
+
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
-        if (node.orgType!=OrgContentTypes.Item) {
-         canDrag=true;
+        if (node.orgType==OrgContentTypes.Item) {
+         canDrag=false;
         }    
         
         let hStyle:any=styles.backupHamburger;
@@ -539,10 +629,18 @@ class OrganizationNodeRenderer extends Component <any,any>
         styles.orgexpandButton ["left"]= -0.5 * scaffoldBlockPxWidth;
 
         if (node.expanded==true) {            
-            handleStyle=styles.orgcollapseButton;
+          handleStyle=styles.orgcollapseButton;
         }    
         else {
-            handleStyle=styles.orgexpandButton;
+          handleStyle=styles.orgexpandButton;
+        }
+
+        //>--------------------------------------------------------------------
+
+        let dStyle:any=styles.orgrowContents;
+
+        if (canDrag==false) {
+          dStyle ["borderLeft"]="solid #BBB 1px"; // Move this to outside the render code ASAP
         }
 
         //>--------------------------------------------------------------------
@@ -552,74 +650,20 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
-        let gStyle:any=styles.orgrow;
-
-        if (isDragging && isOver) {
-          gStyle ["border"]= "none !important";
-          gStyle ["boxShadow"]= "none !important";
-          gStyle ["outline"]= "none !important";
-          gStyle ["*" ]= {
-            "opacity": "0 !important"
-          };
-          gStyle ["&::before" ]= {
-            "backgroundColor": "lightblue",
-            "border": "3px dashed white",
-            "content": "",
-            "position": "absolute",
-            "top": "0",
-            "right": "0",
-            "bottom": "0",
-            "left": "0",
-            "zIndex": -1
-          };           
-        }
-
-        if (isDragging && !isOver && canDrop) {
-          gStyle ["border"]= "none !important";
-          gStyle ["boxShadow"]= "none !important";
-          gStyle ["outline"]= "none !important";
-          gStyle ["*"]= {
-            "opacity": "0 !important"
-          };
-          gStyle ["&::before"]= {
-            "backgroundColor": "#E6A8AD",
-            "border": "3px dashed white",
-            "content": "",
-            "position": "absolute",
-            "top": "0",
-            "right": "0",
-            "bottom": "0",
-            "left": "0",
-            "zIndex": -1
-          };
-        }
-
-        if (isSearchMatch) {
-          gStyle ["outline"]="solid 3px #0080ff"
-        }
-
-        if (isSearchFocus) {
-          gStyle ["outline"]="solid 3px #fc6421"
-        }
-
-        gStyle ["opacity"]=isDraggedDescendant ? 0.5 : 1;
-
-        //>--------------------------------------------------------------------
-
-        let dStyle:any=styles.orgrowContents;
-
-        if (canDrag==false) {
-            dStyle ["borderLeft"]="solid #BBB 1px"; // Move this to outside the render code ASAP
-        }
+        let gStyle:any=this.createDnDPreview (isSearchMatch,isDragging,isOver,canDrop,isSearchFocus,isDraggedDescendant);
+        let dragHandle:any=this.createDragHandle (isLandingPadActive);
+        if (isLandingPadActive && !canDrop) {
+          dragHandle=this.createNoDragHandle (isLandingPadActive);
+        } 
 
         //>--------------------------------------------------------------------
 
         let iStyle:any=styles.orgrowTitle;
 
         if (node.subtitle) {
-            iStyle ["fontSize"]="85%";
-            iStyle ["display"]="block";
-            iStyle ["height"]="0.8rem";
+          iStyle ["fontSize"]="85%";
+          iStyle ["display"]="block";
+          iStyle ["height"]="0.8rem";
         }
 
         // If we assign the style directly then React freaks out (or TypeScript it's hard to tell)
@@ -642,7 +686,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         //>--------------------------------------------------------------------
 
         let popDown=this.generatePopDown (node);
-
+  
         return (
             <div style={{ height: '100%', width: '450px' }} {...otherProps}>
                 {toggleChildrenVisibility && node.children && node.children.length > 0 && (
@@ -660,7 +704,8 @@ class OrganizationNodeRenderer extends Component <any,any>
                 <div style={styles.orgrowWrapper as any}>
                     {/* Set the row preview to be used during drag and drop */}
                     {connectDragPreview(
-                        <div style={gStyle}>
+                        <div id="dragpreviewwrapper" style={gStyle}>
+                          {dragHandle}
                           {handle}
                            <div style={titleContainer}>
                              <TitleContentEditor 
@@ -674,10 +719,8 @@ class OrganizationNodeRenderer extends Component <any,any>
                              <div style={titleDivider}>
                              {node.orgType}
                              </div>                             
-                           </div>
-            
-                           {popDown}
-                               
+                           </div>            
+                           {popDown}                               
                         </div>
                     )}
                 </div>
