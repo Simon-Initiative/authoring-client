@@ -161,6 +161,9 @@ function handleSentinelTransition(
   } else if (type === common.EntityTypes.title_begin) {
     translateTitle(iterator, rawBlock, entityMap, context);
 
+  } else if (type === common.EntityTypes.material_begin) {
+    translateMaterial(iterator, rawBlock, entityMap, context);
+
   } else if (type === common.EntityTypes.pronunciation_begin) {
     translatePronunciation(iterator, rawBlock, entityMap, context);
 
@@ -484,6 +487,23 @@ function translateTranslation(
 
   top(context).push(p);
   context.push(p.translation['#array']);
+
+}
+
+function translateMaterial(
+  iterator: BlockIterator, 
+  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const arr = [];
+
+  const p = {
+    material: {
+      '#array': arr,
+    },
+  };
+
+  top(context).push(p);
+  context.push(p.material['#array']);
 
 }
 

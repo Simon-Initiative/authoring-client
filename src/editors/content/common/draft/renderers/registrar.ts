@@ -24,6 +24,9 @@ import { TranslationBegin } from './TranslationBegin';
 import { TranslationEnd } from './TranslationEnd';
 import { MeaningBegin } from './MeaningBegin';
 import { MeaningEnd } from './MeaningEnd';
+import { MaterialBegin } from './MaterialBegin';
+import { MaterialEnd } from './MaterialEnd';
+
 import { Activity } from './Activity';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
@@ -53,7 +56,9 @@ export default function init() {
   register(EntityTypes.translation_end, TranslationEnd, undefined);
   register(EntityTypes.meaning_begin, MeaningBegin, undefined);
   register(EntityTypes.meaning_end, MeaningEnd, undefined);
-
+  register(EntityTypes.material_begin, MaterialBegin, undefined);
+  register(EntityTypes.material_end, MaterialEnd, undefined);
+ 
   register(EntityTypes.activity, Activity, undefined);  
   register(EntityTypes.wb_inline, WbInline, undefined);  
   register(EntityTypes.table, Table, undefined);

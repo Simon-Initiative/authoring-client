@@ -51,6 +51,7 @@ const blockHandlers = {
   example,
   definition,
   pronunciation,
+  material,
   translation,
   meaning,
   title,
@@ -694,6 +695,28 @@ function meaning(item: Object, context: ParsingContext) {
     type: 'meaning_end',
   };
   addAtomicBlock(common.EntityTypes.meaning_end, endData, context);
+
+}
+
+function material(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  // Create the beginning block
+  const beginData : common.MaterialBegin = {
+    type: 'material_begin',
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.material_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.MaterialEnd = {
+    type: 'material_end',
+  };
+  addAtomicBlock(common.EntityTypes.material_end, endData, context);
 
 }
 

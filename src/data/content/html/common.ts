@@ -39,6 +39,8 @@ export const EntityTypes = types.strEnum([
   'translation_end',
   'meaning_begin',
   'meaning_end',
+  'material_begin',
+  'material_end',
 
   // Inline entities
   'activity_link',
@@ -96,6 +98,15 @@ export interface TitleBegin {
 export interface TitleEnd {
   type: 'title_end';
 }
+
+export interface MaterialBegin {
+  type: 'material_begin';
+}
+
+export interface MaterialEnd {
+  type: 'material_end';
+}
+
 
 export interface PronunciationBegin {
   type: 'pronunciation_begin';

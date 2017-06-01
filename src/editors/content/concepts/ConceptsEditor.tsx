@@ -53,6 +53,7 @@ export class ConceptsEditor
   renderConcepts() {
     return this.props.model.toArray()
       .map(c => <Concept key={'concept' + c} 
+         courseId={this.props.context.courseId}
          editMode={this.props.editMode}
          titleOracle={this.props.services.titleOracle} 
          conceptId={c} conceptType={this.props.conceptType} 

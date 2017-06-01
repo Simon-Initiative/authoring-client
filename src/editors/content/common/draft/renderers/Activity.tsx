@@ -40,8 +40,14 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
     this.onClick = this.onClick.bind(this);
     this.onSelectActivity = this.onSelectActivity.bind(this);
 
+    
+  }
+
+  componentDidMount() {
     this.props.blockProps.services
-      .titleOracle.getTitle(this.props.data.activity.idref, 'AssessmentModel')
+      .titleOracle.getTitle(
+        this.props.blockProps.context.courseId, 
+        this.props.data.activity.idref, 'AssessmentModel')
       .then(title => this.setState({ title }));
   }
 

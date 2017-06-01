@@ -116,7 +116,7 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
 
 export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Promise<Document> {
   if (courseId === null) {
-    throw 'courseId cannot be null';
+    throw new Error('courseId cannot be null');
   }
   return new Promise((resolve, reject) => {
     try {

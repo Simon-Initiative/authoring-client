@@ -33,8 +33,14 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
 
-    this.props.blockProps.services.titleOracle.getTitle(this.props.data.wbinline.idRef, 'AssessmentModel')
-      .then(title => this.setState({title}));
+    
+  }
+
+  componentDidMount() {
+    this.props.blockProps.services
+      .titleOracle.getTitle(this.props.blockProps.context.courseId, 
+        this.props.data.wbinline.idRef, 'AssessmentModel')
+      .then(title => this.setState({ title }));
   }
 
   onClick() {
