@@ -13,6 +13,7 @@ import { YouTube } from './youtube';
 import { Link } from './link';
 import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
+import { Activity } from './activity';
 import { Cite } from './cite';
 
 
@@ -59,6 +60,7 @@ const blockHandlers = {
   ol,
   ul,
   codeblock,
+  activity,
   table,
   audio,
   image: imageBlock,
@@ -203,6 +205,11 @@ function formulaInline(
 function wb_inline(item: Object, context: ParsingContext) {
   const wb = WbInline.fromPersistence(item, '');
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
+}
+
+function activity(item: Object, context: ParsingContext) {
+  const activity = Activity.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.activity, { activity }, context);
 }
 
 function codeblock(item: Object, context: ParsingContext) {

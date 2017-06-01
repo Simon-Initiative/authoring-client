@@ -64,6 +64,7 @@ export const EntityTypes = types.strEnum([
   'youtube',
   'unsupported',
   'iframe',
+  'activity',
 ]);
 
 export type EntityTypes = keyof typeof EntityTypes;

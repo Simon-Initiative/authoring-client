@@ -126,6 +126,8 @@ function translateBlock(
     translateAtomic('youtube', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('iframe', rawBlock, entityMap)) {
     translateAtomic('iframe', rawBlock, draftBlock, entityMap, context);
+  } else if (isCustom('activity', rawBlock, entityMap)) {
+    translateAtomic('activity', rawBlock, draftBlock, entityMap, context);
   } else {  
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
