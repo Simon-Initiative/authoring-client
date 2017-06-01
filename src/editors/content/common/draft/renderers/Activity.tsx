@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Activity as ActivityType } from '../../../../../data/content/html/activity';
 import PreformattedText from './PreformattedText';
 import * as persistence from '../../../../../data/persistence';
-import { LegacyTypes } from '../../../../../data/types';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState} from './InteractiveRenderer';
 import { BlockProps } from './properties';
@@ -10,6 +9,8 @@ import { Select } from '../../Select';
 import { Button } from '../../Button';
 import { PurposeTypes } from '../../../../../data/content/html/common';
 import { handleInsertion } from './common';
+import { LegacyTypes } from '../../../../../data/types';
+
 import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
 
 import './wbinline.scss';
@@ -23,7 +24,7 @@ export interface ActivityProps extends InteractiveRendererProps {
 }
 
 export interface ActivityState extends InteractiveRendererState {
-  title: string;
+  
 }
 
 export interface ActivityProps {
@@ -34,7 +35,7 @@ export interface ActivityProps {
 export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> {
 
   constructor(props) {
-    super(props, { title: '' });
+    super(props, {});
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -43,12 +44,17 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
     
   }
 
-  componentDidMount() {
-    this.props.blockProps.services
-      .titleOracle.getTitle(
-        this.props.blockProps.context.courseId, 
-        this.props.data.activity.idref, 'AssessmentModel')
-      .then(title => this.setState({ title }));
+  getTitle() {
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const resource = resources.find(resource => resource.id === this.props.data.activity.idref);
+
+    if (resource === undefined) {
+      return 'Not set';
+    } else {
+      return resource.title;
+    }
   }
 
   onClick() {
@@ -94,7 +100,7 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
         
         <b>Activity:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
-          className="btn btn-link">{this.state.title}</button>
+          className="btn btn-link">{this.getTitle()}</button>
         <Button editMode={this.props.blockProps.editMode} 
           onClick={this.onSelectActivity}>Set</Button>
         &nbsp;&nbsp;&nbsp;

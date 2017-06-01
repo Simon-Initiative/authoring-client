@@ -243,7 +243,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           userId: this.props.userId,
           courseId,
           baseUrl: configuration.baseUrl,
-          courseModel: this.props.course,
+          courseModel: this.props.course.model,
         },
         onEdit: this._onEdit,
         services: this.props.services,

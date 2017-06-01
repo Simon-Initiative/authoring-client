@@ -25,7 +25,7 @@ export interface WbInlineProps extends InteractiveRendererProps {
 }
 
 export interface WbInlineState extends InteractiveRendererState {
-  title: string;
+  
 }
 
 export interface WbInlineProps {
@@ -36,20 +36,12 @@ export interface WbInlineProps {
 export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> {
 
   constructor(props) {
-    super(props, { title: ''});
+    super(props, { });
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
 
     
-  }
-
-  componentDidMount() {
-    this.props.blockProps.services
-      .titleOracle.getTitle(
-        this.props.blockProps.context.courseId, 
-        this.props.data.wbinline.idRef, 'AssessmentModel')
-      .then(title => this.setState({ title }));
   }
 
   onClick() {
@@ -85,6 +77,19 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
           onCancel={this.onCancel}/>);
   }
 
+  getTitle() {
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
+
+    if (resource === undefined) {
+      return 'Not set';
+    } else {
+      return resource.title;
+    }
+  }
+
   render() : JSX.Element {
     return (
       <div className='wbinline' 
@@ -92,7 +97,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
         <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
-          className="btn btn-link">{this.state.title}</button>
+          className="btn btn-link">{this.getTitle()}</button>
         <Button editMode={this.props.blockProps.editMode} 
           onClick={this.onSelectActivity}>Set</Button>
         <Select editMode={this.props.blockProps.editMode} 
