@@ -52,6 +52,7 @@ export interface DraftWrapperProps {
   onEdit: (html : Html) => void;
   onSelectionChange: (state: SelectionState) => void;
   content: Html;
+  undoRedoGuid: string;
   locked: boolean;
   context: AppContext;
   services: AppServices;
@@ -230,7 +231,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const contentState = props.content.contentState;
     this.lastContent = contentState;
-
+    
     const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
 
@@ -274,11 +275,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   forceContentChangeWithSelection(contentState, changeType, selection) {
     this.lastContent = contentState;
+    
     const es = EditorState.push(this.state.editorState, contentState, changeType);
     const editorState = EditorState.forceSelection(
       EditorState.set(es, { allowUndo: false }), selection);
 
     this.setState({ editorState }, () => {
+
       this.props.onEdit(new Html({ contentState }));
       this.forceRender();
     });
@@ -286,6 +289,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
+    
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
     this.setState({editorState}, () => {
       this.props.onEdit(new Html({ contentState }));
@@ -530,8 +534,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       const current = this.state.editorState.getCurrentContent();
 
-      if (nextProps.content.contentState !== current) {
-
+      if (nextProps.content.contentState !== current 
+        && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
+        
         const selection = this.state.editorState.getSelection();
 
         const es = EditorState.createWithContent(nextProps.content.contentState, this.getCompositeDecorator());
@@ -540,7 +545,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.setState({
           editorState: newEditorState
         });
-      }
+      } 
+      
     }
   }
 
