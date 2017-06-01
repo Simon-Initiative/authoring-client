@@ -148,7 +148,7 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
 
 export function developerRegistration(courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
 
-  const url = `${configuration.baseUrl}/${courseId}/developers?action=${action}`;
+  const url = `${configuration.baseUrl}/${courseId}/developers/registration?action=${action}`;
 
   return new Promise((resolve, reject) => {
     try {
