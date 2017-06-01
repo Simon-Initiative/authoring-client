@@ -70,7 +70,7 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
         <div>
           <iframe src={fullSrc} height={height} width={width}/>
         </div>
-        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit</Button>
+        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
   }
 }

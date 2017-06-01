@@ -75,7 +75,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         <div>
           <video src={src} controls={controls}/>
         </div>
-        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit</Button>
+        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
   }
 }

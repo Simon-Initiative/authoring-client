@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState} from './InteractiveRenderer'
+import { InteractiveRenderer, InteractiveRendererProps, 
+  InteractiveRendererState} from './InteractiveRenderer';
 import { BlockProps } from './properties';
 import PreformattedText from './PreformattedText';
 
+const beautify = require('json-beautify');
 import './Unsupported.scss';
 
 export interface UnsupportedProps extends InteractiveRendererProps {
@@ -21,17 +23,32 @@ class Unsupported extends InteractiveRenderer<UnsupportedProps, UnsupportedState
     this.onEdit = this.onEdit.bind(this);
   }
 
+  shouldComponentUpdate() {
+    return false;
+  }
+
   onEdit(data) {
-    this.props.blockProps.onEdit(JSON.parse(data));
+
+    try {
+      const obj = JSON.parse(data.src);
+      this.props.blockProps.onEdit(obj);
+    } catch (err) {
+      console.log('error in parsing JSON');
+    }
+    
   }
 
   render() : JSX.Element {
-    return <PreformattedText 
-      editMode={this.state.editMode} 
-      onEdit={this.onEdit} 
-      src={JSON.stringify(this.props.data)} 
-      styleName='Unsupported-style'/>
+    return (
+      <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
+        <PreformattedText 
+          editMode={this.props.blockProps.editMode} 
+          onEdit={this.onEdit} 
+          src={beautify(this.props.data, null, 2, 100)} 
+          styleName="Unsupported-style"/>
+      </div>
+    );
   }
-};
+}
 
 export default Unsupported;

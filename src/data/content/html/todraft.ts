@@ -758,6 +758,14 @@ function parse(item: Object, context: ParsingContext) {
 
   // Get the key and then get the registered key handler
   const key = common.getKey(item);
+
+  // Handle the case where we have keyless data...aka, a blank
+  // JS object.  Just ignore it in the UI, but log to the console
+  if (key === undefined) {
+    console.log('An empty content block encountered');
+    return;
+  }
+
   const handler = blockHandlers[key];
 
   if (handler === undefined) {
