@@ -47,7 +47,11 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     this.onInsert = this.onInsert.bind(this);
     this.onCancel = this.onCancel.bind(this);
 
-    this.findTitleId();
+    this.findTitleId(this.props.data.wbinline.idRef);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.findTitleId(nextProps.data.wbinline.idRef);
   }
 
   onClick() {
@@ -85,11 +89,11 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
           onCancel={this.onCancel}/>);
   }
 
-  findTitleId() {
+  findTitleId(idref) {
     const resources = this.props.blockProps
       .context.courseModel.resources.toArray();
 
-    const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
+    const resource = resources.find(resource => resource.id === idref);
 
     if (resource === undefined) {
       this.title = 'Not set';
