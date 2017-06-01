@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Activity as ActivityType } from '../../../../../data/content/html/Activity';
+import { Activity as ActivityType } from '../../../../../data/content/html/activity';
 import PreformattedText from './PreformattedText';
 import * as persistence from '../../../../../data/persistence';
 import { LegacyTypes } from '../../../../../data/types';
