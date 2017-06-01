@@ -238,12 +238,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
       const childProps: AbstractEditorProps<any> = {
         model: this.state.document.model,
-        courseDoc: this.props.course,
         context: {
           documentId: this.props.documentId,
           userId: this.props.userId,
           courseId,
           baseUrl: configuration.baseUrl,
+          courseModel: this.props.course.model,
         },
         onEdit: this._onEdit,
         services: this.props.services,

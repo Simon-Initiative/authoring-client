@@ -72,7 +72,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
         <div>
           <image src={fullSrc}/>
         </div>
-        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit</Button>
+        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
   }
 }

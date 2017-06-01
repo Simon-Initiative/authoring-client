@@ -19,6 +19,8 @@ export interface ConceptProps {
 
   conceptType: string;
 
+  courseId: string;
+
   titleOracle: TitleOracle;
 
   onRemove: (id: string, type: string) => void;
@@ -43,7 +45,9 @@ export class Concept extends React.PureComponent<ConceptProps, ConceptState> {
   }
 
   componentDidMount() {
-    this.props.titleOracle.getTitle(this.props.conceptId, this.props.conceptType)
+    this.props.titleOracle.getTitle(
+      this.props.courseId, 
+      this.props.conceptId, this.props.conceptType)
       .then(title => this.setState({title}));
   }
 

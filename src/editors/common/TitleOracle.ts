@@ -1,7 +1,7 @@
 import * as persistence from '../../data/persistence';
 
 export interface TitleOracle {
-  getTitle: (id: string, type: string) => Promise<string>;
+  getTitle: (courseId: string, id: string, type: string) => Promise<string>;
 }
 
 // TODO create a title oracle that pulls from 
@@ -12,7 +12,7 @@ const titleCache = {};
 
 export class MockTitleOracle implements TitleOracle {
   
-  getTitle(id: string, type: string) : Promise<string> {
+  getTitle(courseId: string, id: string, type: string) : Promise<string> {
     
     if (type !== 'AssessmentModel') {
       return Promise.resolve('Skill ' + id);
@@ -21,7 +21,7 @@ export class MockTitleOracle implements TitleOracle {
     if (titleCache[id] === undefined) {
 
       return new Promise((resolve, reject) => {
-        persistence.retrieveDocument(null, id)
+        persistence.retrieveDocument(courseId, id)
         .then(doc => {
           switch (doc.model.modelType) {
             case 'AssessmentModel':

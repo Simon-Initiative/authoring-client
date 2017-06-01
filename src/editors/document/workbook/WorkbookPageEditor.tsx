@@ -50,9 +50,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   loadLearningObjectives () : void {
     console.log ("loadLearningObjectives ()");
             
-    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-    resourceList.map((value, id) => {        
+    this.props.context.courseModel.resources.map((value, id) => {        
       if (value.type=="x-oli-learning_objectives") {
         persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
         {
@@ -142,7 +140,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             onEdit={c => this.onEdit('title', c)} 
             />
                 
-          <a className="btn btn-secondary" href="#" onClick={e => this.linkLO ()}>+ Learning Objective</a>
+          <a className="btn btn-secondary" href="#" 
+            onClick={e => this.linkLO ()}>+ Learning Objective</a>
 
           {lolinker}              
           

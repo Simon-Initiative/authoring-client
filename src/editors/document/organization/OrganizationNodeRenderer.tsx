@@ -637,7 +637,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
-        const context = { userId: null, documentId: null, courseId: null, baseUrl: null};
+        const context = { courseModel: null, userId: null, documentId: null, courseId: null, baseUrl: null};
 
         //>--------------------------------------------------------------------
 

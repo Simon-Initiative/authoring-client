@@ -43,6 +43,10 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
     this.caretPosition = null;
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return (this.state.src !== nextState.src);
+  }
+
   onChange(e) {
 
     const target = e.target;
@@ -68,14 +72,15 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
         const divPosition = currentText.indexOf('<div>');
         this.setState({src: cleanedText }, 
           () => setCaretPosition(target, divPosition + 1));
-
+        
       } else {
         this.setState({src: cleanedText }, 
           () => setCaretPosition(target, this.caretPosition + 1));
       }
       
     } else {
-      this.setState({src: cleanedText });
+      this.setState({src: cleanedText }, 
+          () => setCaretPosition(target, this.caretPosition + 1));
     }
 
     // Persist this change
@@ -85,7 +90,6 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
   onKeyPress(e) {
     // Keep track of the position of caret 
     this.caretPosition = getCaretPosition(e.target);
-    
   }
 
   onKeyUp(e) {
@@ -98,6 +102,8 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
     // the TypeScript type definitions do not seem to
     // recognize 'suppressContentEditableWarning' as a valid
     // property. 
+
+    console.log('pre redner');
     
     return React.createElement('pre', {
       ref: (component) => this.pre = component,

@@ -57,6 +57,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentDidMount() {                    
+
+    /*  
     let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
           
     resourceList.map((value, id) => {          
@@ -67,6 +69,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         });
       }          
     })
+    */
+      
+    this.props.context.courseModel.resources.map((value, id) => {        
+      if (value.type === 'x-oli-skills_model') {
+        console.log ('Found skills document, loading ...');  
+        persistence.retrieveDocument (this.props.context.courseId,id)
+        .then((skillDocument) => {
+          console.log ('Loaded skill document, assinging ...');  
+          const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
+          this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
+        });
+      }          
+    });      
   }     
         
   onPageEdit(page: contentTypes.Page) {

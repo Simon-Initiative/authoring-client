@@ -14,7 +14,7 @@ import { Link } from '../../../../data/content/html/link';
 import { ActivityLink } from '../../../../data/content/html/activity_link';
 import { Xref } from '../../../../data/content/html/xref';
 import { Cite } from '../../../../data/content/html/cite';
-
+import { Activity } from '../../../../data/content/html/activity';
 
 
 import * as commands from '../draft/commands';
@@ -116,6 +116,9 @@ export function flowBlock() {
 
 export function bodyBlock() {
   return [
+    <Button key="activity_link" 
+      command={insertBlock(EntityTypes.activity, 'IMMUTABLE', { activity: new Activity() })} 
+      tooltip="Insert high stakes assessment" icon="check"/>,
     <Button key="pullout" command={new commands.InsertPulloutCommand()} 
       tooltip="Insert pullout" icon="external-link-square"/>,
     <Button key="example" command={new commands.InsertExampleCommand()} 

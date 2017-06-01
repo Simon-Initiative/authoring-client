@@ -13,6 +13,7 @@ import { YouTube } from './youtube';
 import { Link } from './link';
 import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
+import { Activity } from './activity';
 import { Cite } from './cite';
 
 
@@ -50,6 +51,7 @@ const blockHandlers = {
   example,
   definition,
   pronunciation,
+  material,
   translation,
   meaning,
   title,
@@ -59,6 +61,7 @@ const blockHandlers = {
   ol,
   ul,
   codeblock,
+  activity,
   table,
   audio,
   image: imageBlock,
@@ -66,6 +69,7 @@ const blockHandlers = {
   quote: quoteBlock,
   code: codeBlock,
   iframe,
+  input_ref: inputRefBlock,
   video,
   youtube,
   '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
@@ -205,6 +209,11 @@ function wb_inline(item: Object, context: ParsingContext) {
   addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
 }
 
+function activity(item: Object, context: ParsingContext) {
+  const activity = Activity.fromPersistence(item, '');
+  addAtomicBlock(common.EntityTypes.activity, { activity }, context);
+}
+
 function codeblock(item: Object, context: ParsingContext) {
 
   const codeblock = CodeBlock.fromPersistence(item, '');
@@ -248,6 +257,27 @@ function formulaBlock(item: Object, context: ParsingContext) {
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
     type: 'formula',
+  });
+}
+
+function inputRefBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: ' ',
+    markups : [],
+    entities : [],
+  };
+
+  insertEntity(
+    'IMMUTABLE', common.EntityTypes.input_ref, 
+    0, 1, item, context, blockContext);
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
   });
 }
 
@@ -316,6 +346,16 @@ function getInlineHandler(key: string) : InlineHandler {
   }
 }
 
+function isVirtualParagraph(persistenceFormat: Object) {
+  const children = getChildren(persistenceFormat);
+  if (children !== null && children.length > 0) {
+    const firstKey = common.getKey(children[0]);
+    return firstKey === '#cdata'
+      || firstKey === '#text'
+      || inlineHandlers[firstKey] !== undefined;
+  }
+  return false;
+}
 
 export function toDraft(persistenceFormat: Object) : ContentState {
   
@@ -323,8 +363,15 @@ export function toDraft(persistenceFormat: Object) : ContentState {
     entityMap : {},
     blocks : [],
   };
-  
-  parse(persistenceFormat, { draft, depth: 0 });
+
+  // Sometimes serialization results in a top-level object 
+  // that has just #text or just an array of inline styles. We
+  // handle this simply by treating it as a paragraph. 
+  if (isVirtualParagraph(persistenceFormat)) {
+    paragraph(persistenceFormat, { draft, depth: 0 });
+  } else {
+    parse(persistenceFormat, { draft, depth: 0 });
+  }
   
   // Add a final empty block that will ensure that we have content past
   // any last positioned atomic blocks. This allows the user to click
@@ -651,6 +698,28 @@ function meaning(item: Object, context: ParsingContext) {
 
 }
 
+function material(item: Object, context: ParsingContext) {
+
+  const key = common.getKey(item);
+
+  // Create the beginning block
+  const beginData : common.MaterialBegin = {
+    type: 'material_begin',
+  };
+  const beginBlock = addAtomicBlock(common.EntityTypes.material_begin, beginData, context);
+
+  // Handle the children
+  const children = getChildren(item);
+  children.forEach(subItem => parse(subItem, context));
+
+  // Create the ending block 
+  const endData : common.MaterialEnd = {
+    type: 'material_end',
+  };
+  addAtomicBlock(common.EntityTypes.material_end, endData, context);
+
+}
+
 function title(item: Object, context: ParsingContext) {
 
   const key = common.getKey(item);
@@ -758,10 +827,19 @@ function parse(item: Object, context: ParsingContext) {
 
   // Get the key and then get the registered key handler
   const key = common.getKey(item);
+
+  // Handle the case where we have keyless data...aka, a blank
+  // JS object.  Just ignore it in the UI, but log to the console
+  if (key === undefined) {
+    console.log('An empty content block encountered');
+    return;
+  }
+
   const handler = blockHandlers[key];
 
   if (handler === undefined) {
     handleUnsupported(item, context);
+    
   } else {
     handler(item, context);
   }

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { WbInline as WbInlineType } from '../../../../../data/content/html/wbinline';
+import { Activity as ActivityType } from '../../../../../data/content/html/activity';
 import PreformattedText from './PreformattedText';
+import * as persistence from '../../../../../data/persistence';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState} from './InteractiveRenderer';
-import * as persistence from '../../../../../data/persistence';
-
 import { BlockProps } from './properties';
 import { Select } from '../../Select';
 import { Button } from '../../Button';
@@ -17,47 +16,49 @@ import ResourceSelection from '../../../../../utils/selection/ResourceSelection'
 import './wbinline.scss';
 
 type Data = {
-  wbinline: WbInlineType;
-}
+  activity: ActivityType;
+};
 
-export interface WbInlineProps extends InteractiveRendererProps {
+export interface ActivityProps extends InteractiveRendererProps {
   data: Data;
 }
 
-export interface WbInlineState extends InteractiveRendererState {
+export interface ActivityState extends InteractiveRendererState {
   
 }
 
-export interface WbInlineProps {
+export interface ActivityProps {
   
 }
 
 
-export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> {
+export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> {
 
   title: string;
   guid: string;
 
   constructor(props) {
-    super(props, { });
+    super(props, {});
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onClick = this.onClick.bind(this);
     this.onSelectActivity = this.onSelectActivity.bind(this);
     this.onInsert = this.onInsert.bind(this);
     this.onCancel = this.onCancel.bind(this);
-
-    this.findTitleId();
+    
   }
 
   onClick() {
     if (this.guid !== null) {
-      this.props.blockProps.services.viewDocument(this.guid);
-    } 
+      this.props.blockProps.services.viewDocument(
+      this.guid);
+    }
+    
   }
 
   onPurposeEdit(purpose) {
-    this.props.blockProps.onEdit({wbinline: this.props.data.wbinline.with({purpose})});
+    this.props.blockProps.onEdit(
+      { activity: this.props.data.activity.with({ purpose }) });
   }
 
   onCancel() {
@@ -65,16 +66,26 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
   }
 
   onInsert(resource) {
-    this.props.blockProps.services.dismissModal();
-    this.props.blockProps.onEdit(
-      { activity: this.props.data.wbinline.with({ idRef: resource.id }) });
+
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const found = resources.find(r => r.guid === resource.id);
+
+    if (found !== undefined) {
+      this.props.blockProps.services.dismissModal();
+      this.props.blockProps.onEdit(
+        { activity: this.props.data.activity.with({ idref: found.id }) });
+    }
+
+    
   }
 
   onSelectActivity() {
 
     const predicate =
       (res: persistence.CourseResource) : boolean => {
-        return res.type === LegacyTypes.inline;
+        return res.type === LegacyTypes.assessment2;
       };
 
     this.props.blockProps.services.displayModal(
@@ -85,11 +96,12 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
           onCancel={this.onCancel}/>);
   }
 
+
   findTitleId() {
     const resources = this.props.blockProps
       .context.courseModel.resources.toArray();
 
-    const resource = resources.find(resource => resource.id === this.props.data.wbinline.idRef);
+    const resource = resources.find(resource => resource.id === this.props.data.activity.idref);
 
     if (resource === undefined) {
       this.title = 'Not set';
@@ -102,18 +114,20 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   render() : JSX.Element {
     return (
-      <div className='wbinline' 
-        ref={(c) => this.focusComponent = c} onFocus={this.onFocus} 
+      <div className="wbinline"
+        ref={c => this.focusComponent = c} onFocus={this.onFocus} 
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
-        <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
+        
+        <b>Activity:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
           className="btn btn-link">{this.title}</button>
         <Button editMode={this.props.blockProps.editMode} 
           onClick={this.onSelectActivity}>Set</Button>
+        &nbsp;&nbsp;&nbsp;
         <Select editMode={this.props.blockProps.editMode} 
-          label='Purpose' value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
+          label="Purpose" value={this.props.data.activity.purpose} onChange={this.onPurposeEdit}>
           {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </Select>
       </div>);
   }
-};
+}

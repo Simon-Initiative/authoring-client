@@ -129,12 +129,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
-      //console.log ("Resources: " + JSON.stringify (resourceList));  
-        
-      resourceList.map((value, id) => {        
+      
+      /*  
+      this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
           {
@@ -144,7 +141,20 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             });
           });
         }          
-      })  
+      })
+      */
+        
+      this.props.context.courseModel.resources.map((value, id) => {        
+        if (value.type=="x-oli-learning_objectives") {
+          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
+          {
+            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
+            this.setState ({los: loModel.with (this.state.los)},function (){
+              this.resolveReferences ();                
+            });
+          });
+        }          
+      });         
     }    
 
     /**
@@ -154,13 +164,15 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * list of Linkables.
      */
     loadPages () : void {
+
       console.log ("loadPages ()");
-            
+       
+      /*  
       let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
 
       let pageList:Array<Linkable>=new Array <Linkable>();  
         
-      resourceList.map((value, id) => {
+      this.props.context.courseModel.resources.map((value, id) => {
         if (value.type=="x-oli-workbook_page") {
           let pageLink:Linkable=new Linkable ();
           pageLink.id=value.guid;
@@ -171,7 +183,23 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       this.setState ({pages: pageList},function () {
           this.resolveReferences ();
-      });  
+      });
+      */
+        
+      let pageList:Array<Linkable>=new Array <Linkable>();  
+        
+      this.props.context.courseModel.resources.map((value, id) => {
+        if (value.type=="x-oli-workbook_page") {
+          let pageLink:Linkable=new Linkable ();
+          pageLink.id=value.guid;
+          pageLink.title=value.title;
+          pageList.push (pageLink);             
+        }          
+      })  
+        
+      this.setState ({pages: pageList},function (){
+        this.resolveReferences ();                
+      });         
     }    
     
     /**
@@ -180,11 +208,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadActivities () : void {
       console.log ("loadActivities ()");
             
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
+      /*  
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
-      resourceList.map((value, id) => {        
+      this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-inline-assessment") {
           let activityLink:Linkable=new Linkable ();
           activityLink.id=value.guid;
@@ -195,7 +222,23 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       this.setState ({activities: activityList},function () {
           this.resolveReferences ();
-      });    
+      });
+      */
+        
+      let activityList:Array<Linkable>=new Array <Linkable>();        
+        
+      this.props.context.courseModel.resources.map((value, id) => {        
+        if (value.type=="x-oli-inline-assessment") {
+          let activityLink:Linkable=new Linkable ();
+          activityLink.id=value.guid;
+          activityLink.title=value.title;
+          activityList.push (activityLink);    
+        }          
+      })  
+        
+      this.setState ({activities: activityList},function () {
+        this.resolveReferences ();
+      });         
     }
     
     /**
@@ -255,17 +298,16 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     findType (anId:string) : string {
       //console.log ("findType ("+anId+")");
-     
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;  
+            
       let activityList:Array<Linkable>=new Array <Linkable>();                
       let result:string="undefined";  
                 
-      resourceList.map((value, id) => {          
+      this.props.context.courseModel.resources.map((value, id) => {           
         if (value.id==anId) {
           //console.log ("Found type: " + value.type);  
           result=value.type;  
         }          
-      })
+      });
                   
       return (result);  
     }    

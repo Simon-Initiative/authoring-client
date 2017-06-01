@@ -62,8 +62,12 @@ export class CellData extends Immutable.Record(defaultContent) {
     if (t['@align'] !== undefined) {
       model = model.with({ align: t['@align'] });
     }
-    
-    model = model.with({ content: toDraft(getChildren(t)) });
+
+    if (t['#text'] !== undefined) {
+      model = model.with({ content: toDraft(t) });
+    } else {
+      model = model.with({ content: toDraft(getChildren(t)) });
+    }
     
     return model;
   }
