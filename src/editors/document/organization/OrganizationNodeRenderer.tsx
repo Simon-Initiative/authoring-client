@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { Component, PropTypes } from 'react';
 
 import { isDescendant } from 'react-sortable-tree';
@@ -331,7 +332,10 @@ const styles = {
 };
 
 /**
+ * Notes:
  * 
+ * Some code snippets and examples taken from:
+ * https://github.com/mlaursen/react-dd-menu/blob/master/src/js/DropdownMenu.js
  */
 class OrganizationNodeRenderer extends Component <any,any>
 {
@@ -343,6 +347,8 @@ class OrganizationNodeRenderer extends Component <any,any>
     addModule:any=null;
     addSection:any=null;
     
+    lastWindowClickEvent:any=null;
+    
     constructor() {
       super ();  
       this.state = {
@@ -351,21 +357,49 @@ class OrganizationNodeRenderer extends Component <any,any>
     }    
     
     popupToggle (e) : void {
-      console.log ("popup ()");
+      console.log ("popupToggle ()");
         
       if (this.state.isMenuOpen==true) {
-        this.setState ({isMenuOpen: false});    
+        this.setState ({isMenuOpen: false}, function () {
+          document.removeEventListener('click', this.lastWindowClickEvent);        
+          this.lastWindowClickEvent = null;            
+        });           
       }
       else {
-        this.setState ({isMenuOpen: true});
+        this.setState ({isMenuOpen: true}, function () {
+          this.lastWindowClickEvent = this.handleClickOutside;
+          document.addEventListener('click', this.lastWindowClickEvent);                
+        });
       }  
     }
     
     popupClose (e) : void {
       console.log ("popupClose ()");
         
-      this.setState ({isMenuOpen: false});  
-    }    
+      this.setState ({isMenuOpen: false}, function () {
+        if (this.lastWindowClickEvent) {  
+          document.removeEventListener('click', this.lastWindowClickEvent);
+          this.lastWindowClickEvent=null;
+        }});  
+    }
+        
+    componentWillUnmount() {
+      console.log ("componentWillUnmount ()");  
+        
+      this.popupClose (null);
+    }
+    
+    handleClickOutside = (e) => {
+      console.log ("handleClickOutside ()");
+      
+      /*  
+      if(!this.props.closeOnOutsideClick) {
+        return;
+      }
+      */
+
+      this.popupClose (e);
+    };    
     
     /**
      * 
