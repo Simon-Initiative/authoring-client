@@ -72,15 +72,13 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
         const divPosition = currentText.indexOf('<div>');
         this.setState({src: cleanedText }, 
           () => setCaretPosition(target, divPosition + 1));
-        console.log('set pos ' + divPosition);
+        
       } else {
-        console.log('set caret ' + this.caretPosition + 1);
         this.setState({src: cleanedText }, 
           () => setCaretPosition(target, this.caretPosition + 1));
       }
       
     } else {
-      console.log('text equalled');
       this.setState({src: cleanedText }, 
           () => setCaretPosition(target, this.caretPosition + 1));
     }
@@ -92,8 +90,6 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
   onKeyPress(e) {
     // Keep track of the position of caret 
     this.caretPosition = getCaretPosition(e.target);
-    console.log('caretposition');
-    console.log(this.caretPosition);
   }
 
   onKeyUp(e) {
