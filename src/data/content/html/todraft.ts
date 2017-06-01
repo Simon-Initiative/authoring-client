@@ -68,6 +68,7 @@ const blockHandlers = {
   quote: quoteBlock,
   code: codeBlock,
   iframe,
+  input_ref: inputRefBlock,
   video,
   youtube,
   '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
@@ -258,6 +259,27 @@ function formulaBlock(item: Object, context: ParsingContext) {
   });
 }
 
+function inputRefBlock(item: Object, context: ParsingContext) {
+
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: ' ',
+    markups : [],
+    entities : [],
+  };
+
+  insertEntity(
+    'IMMUTABLE', common.EntityTypes.input_ref, 
+    0, 1, item, context, blockContext);
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+  });
+}
+
 function codeBlock(item: Object, context: ParsingContext) {
 
   const children = getChildren(item);
@@ -323,6 +345,16 @@ function getInlineHandler(key: string) : InlineHandler {
   }
 }
 
+function isVirtualParagraph(persistenceFormat: Object) {
+  const children = getChildren(persistenceFormat);
+  if (children !== null && children.length > 0) {
+    const firstKey = common.getKey(children[0]);
+    return firstKey === '#cdata'
+      || firstKey === '#text'
+      || inlineHandlers[firstKey] !== undefined;
+  }
+  return false;
+}
 
 export function toDraft(persistenceFormat: Object) : ContentState {
   
@@ -330,8 +362,15 @@ export function toDraft(persistenceFormat: Object) : ContentState {
     entityMap : {},
     blocks : [],
   };
-  
-  parse(persistenceFormat, { draft, depth: 0 });
+
+  // Sometimes serialization results in a top-level object 
+  // that has just #text or just an array of inline styles. We
+  // handle this simply by treating it as a paragraph. 
+  if (isVirtualParagraph(persistenceFormat)) {
+    paragraph(persistenceFormat, { draft, depth: 0 });
+  } else {
+    parse(persistenceFormat, { draft, depth: 0 });
+  }
   
   // Add a final empty block that will ensure that we have content past
   // any last positioned atomic blocks. This allows the user to click
@@ -777,6 +816,7 @@ function parse(item: Object, context: ParsingContext) {
 
   if (handler === undefined) {
     handleUnsupported(item, context);
+    
   } else {
     handler(item, context);
   }
