@@ -611,11 +611,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel, SkillEditorProps, Sk
             <div style={styles.titleBarFolded}>
               <div style={styles.titleContainer}>
                 <TitleContentEditor
-                  services={services}
+                  services={this.props.services}
                   editMode={true}
                   model={titleObj}
                   styles={styles.skillTitleEditorFolded}
-                  context={{userId: null, documentId: null, courseId: null, baseUrl: null}}
+                  context={this.props.context}
                   onEdit={(content) => this.editTitle(item, content)}
                 />
               </div>
@@ -636,11 +636,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel, SkillEditorProps, Sk
             <div style={styles.titleBarUnfolded}>
               <div style={styles.titleContainer}>
                 <TitleContentEditor
-                  services={services}
+                  services={this.props.services}
                   editMode={true}
                   model={titleObj}
                   styles={styles.skillTitleEditorUnfolded}
-                  context={{userId: null, documentId: null, courseId: null, baseUrl: null}}
+                  context={this.props.context}
                   onEdit={(content) => this.editTitle(item, content)}
                 />
               </div>

@@ -116,12 +116,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
+      
       //console.log ("Resources: " + JSON.stringify (resourceList));  
         
-      resourceList.map((value, id) => {        
+      this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
           {
@@ -140,12 +138,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadPages () : void {
       console.log ("loadLearningObjectives ()");
-            
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-
+      
       let pageList:Array<Linkable>=new Array <Linkable>();  
         
-      resourceList.map((value, id) => {
+      this.props.context.courseModel.resources.map((value, id) => {
         if (value.type=="x-oli-workbook_page") {
           let pageLink:Linkable=new Linkable ();
           pageLink.id=value.guid;
@@ -163,11 +159,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadActivities () : void {
       console.log ("loadActivities ()");
             
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-  
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
-      resourceList.map((value, id) => {        
+      this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-inline-assessment") {
           let activityLink:Linkable=new Linkable ();
           activityLink.id=value.guid;
