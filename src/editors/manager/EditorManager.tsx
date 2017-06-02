@@ -227,7 +227,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     const stem = pathTo
       .substr(pathTo.indexOf('content\/') + 8);
     return stem
-      .substr(0, stem.lastIndexOf('\/' + resource.type));
+      .substr(0, stem.lastIndexOf('\/'));
   }
 
   listenForChanges() {
@@ -264,7 +264,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           userId: this.props.userId,
           courseId,
           resourcePath: this.determineBaseUrl((this.state.document.model as any).resource),
-          baseUrl: configuration.baseUrl,
+          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
           courseModel: this.props.course.model,
           undoRedoGuid: this.state.undoRedoGuid,
         },
