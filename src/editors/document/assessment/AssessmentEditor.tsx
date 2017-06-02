@@ -10,7 +10,7 @@ import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
-import { Select } from '../../content/common/select';
+import { Select } from '../../content/common/Select';
 import { TextInput } from '../../content/common/TextInput';
 import Linkable from '../../../data/linkable';
 import * as models from '../../../data/models';
