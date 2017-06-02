@@ -30,6 +30,14 @@ export class TitleContentEditor
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.text !== nextState) {
+      return true;
+    }
+    
+    return false;
+  }
+
   onChange(e) {
 
     const target = e.target;
