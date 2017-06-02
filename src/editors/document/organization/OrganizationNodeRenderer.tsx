@@ -469,12 +469,10 @@ class OrganizationNodeRenderer extends Component <any,any>
      * 
      */
     createDragHandle (isLandingPadActive:boolean):any {        
-      if (isLandingPadActive) {
-        console.log ("Ding!");  
+      if (isLandingPadActive) {  
         return (<div id="draghandle" style={styles.dragStyle as any} ></div>);
       }
       
-      console.log ("Dong!");
       return (<div></div>);
     }
     
@@ -483,7 +481,7 @@ class OrganizationNodeRenderer extends Component <any,any>
      */
     createNoDragHandle (isLandingPadActive:boolean):any {        
       if (isLandingPadActive) {  
-        return (<div id="draghandle" style={styles.dragStyle as any} ></div>);
+        return (<div id="draghandle" style={styles.noDragStyle as any} ></div>);
       }
       
       return (<div></div>);
@@ -544,7 +542,6 @@ class OrganizationNodeRenderer extends Component <any,any>
     }
 
     render() {        
-        //console.log ("render ()");
         
         var {
             editNodeTitle,
@@ -590,8 +587,6 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.addActivity=addActivity;
         this.addModule=addModule;
         this.addSection=addSection;
-
-        //canDrag=true;
 
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
@@ -679,7 +674,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
-        var titleObj=new contentTypes.Title({ text: node.title})
+        let titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
         const context = { courseModel: null, userId: null, documentId: null, courseId: null, baseUrl: null};
 
@@ -704,8 +699,8 @@ class OrganizationNodeRenderer extends Component <any,any>
                 <div style={styles.orgrowWrapper as any}>
                     {/* Set the row preview to be used during drag and drop */}
                     {connectDragPreview(
-                        <div id="dragpreviewwrapper" style={gStyle}>
-                          {dragHandle}
+                        {dragHandle}
+                        <div id="dragpreviewwrapper" style={gStyle}>                          
                           {handle}
                            <div style={titleContainer}>
                              <TitleContentEditor 
@@ -717,7 +712,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                                onEdit={(content) => this.editNodeTitle(node,content)} 
                              />
                              <div style={titleDivider}>
-                             {node.orgType}
+                             {node.orgType + " - actual title: " + node.title}
                              </div>                             
                            </div>            
                            {popDown}                               

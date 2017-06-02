@@ -79,6 +79,7 @@ export class OrgSection extends OrgItem {
   constructor() {
       super ();
       this.orgType=OrgContentTypes.Section;
+      this.typeDescription=OrgContentTypes.Section;
   }
     
   toJSONObject (anObject?:OrgSection): Object {
@@ -103,6 +104,7 @@ export class OrgModule extends OrgItem {
   constructor() {
     super ();
     this.orgType=OrgContentTypes.Module;
+    this.typeDescription=OrgContentTypes.Module;
   } 
     
   toJSONObject (anObject?:OrgModule): Object {
@@ -129,6 +131,7 @@ export class OrgUnit extends OrgItem {
   constructor() {
     super ();
     this.orgType=OrgContentTypes.Unit;
+    this.typeDescription=OrgContentTypes.Unit;
   } 
     
   toJSONObject (anObject?:OrgUnit): Object {
@@ -158,6 +161,7 @@ export class OrgSequence extends OrgItem{
   constructor() {
    super ();      
    this.orgType=OrgContentTypes.Sequence;
+   this.typeDescription=OrgContentTypes.Sequence;
   } 
     
   toJSONObject (anObject?:OrgSequence): Object {
@@ -190,6 +194,7 @@ export class OrgOrganization extends OrgSequence {
   constructor() {
     super ();      
     this.orgType=OrgContentTypes.Organization;
+    this.typeDescription=OrgContentTypes.Organization;
   }
     
   toJSONObject (anObject?: OrgOrganization): Object {

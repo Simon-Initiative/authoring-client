@@ -129,21 +129,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
-      
-      /*  
-      this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-learning_objectives") {
-          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
-          {
-            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.with (this.state.los)},function () {
-              this.resolveReferences ();
-            });
-          });
-        }          
-      })
-      */
-        
+
       this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
@@ -166,25 +152,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadPages () : void {
 
       console.log ("loadPages ()");
-       
-      /*  
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-
-      let pageList:Array<Linkable>=new Array <Linkable>();  
-        
-      this.props.context.courseModel.resources.map((value, id) => {
-        if (value.type=="x-oli-workbook_page") {
-          let pageLink:Linkable=new Linkable ();
-          pageLink.id=value.guid;
-          pageLink.title=value.title;
-          pageList.push (pageLink);             
-        }          
-      })  
-        
-      this.setState ({pages: pageList},function () {
-          this.resolveReferences ();
-      });
-      */
         
       let pageList:Array<Linkable>=new Array <Linkable>();  
         
@@ -207,23 +174,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadActivities () : void {
       console.log ("loadActivities ()");
-            
-      /*  
-      let activityList:Array<Linkable>=new Array <Linkable>();        
-        
-      this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-inline-assessment") {
-          let activityLink:Linkable=new Linkable ();
-          activityLink.id=value.guid;
-          activityLink.title=value.title;
-          activityList.push (activityLink);    
-        }          
-      })  
-        
-      this.setState ({activities: activityList},function () {
-          this.resolveReferences ();
-      });
-      */
         
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
@@ -620,6 +570,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           let newModule:OrgModule=new OrgModule ();
           newModule.title=("Module " + this.state.titleIndex);
           testNode.children.push (newModule);
+        
+          this.setState ({titleIndex: this.state.titleIndex+1});
+        
           break;
         }
       }
@@ -654,6 +607,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (testNode.id==aNode.id) {
           let newSection:OrgSection=new OrgSection ();
           newSection.title=("Section " + this.state.titleIndex);
+                    
+          this.setState ({titleIndex: this.state.titleIndex+1});
+            
           testNode.children.push (newSection);
           break;
         }
@@ -705,8 +661,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    closeLOModal () {
+    closeLOModal (annotations:any) {
       console.log ("LearningObjectiveEditor: closeLOModal ()");
+      console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
         this.onEdit ();
@@ -716,11 +673,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    closePagesModal () {
+    closePagesModal (annotations:any) {
       console.log ("LearningObjectiveEditor: closePagesModal ()");
+      console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false});        
         
+      /*    
       let immutableHelper = this.state.treeData.slice();
                 
       let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
@@ -741,6 +700,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
         if (testNode.id==this.state.orgTarget.id) {
           var newNode:OrgItem=new OrgItem ();
+          console.log ("Creating workbook link with name: " + testNode.title);
           newNode.title=testNode.title;
           newNode.typeDescription="x-oli-workbook_page";  
           testNode.children.push (newNode);
@@ -749,13 +709,15 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       }
             
       this.onEdit (immutableHelper);
+      */    
     }    
     
     /**
      * 
      */
-    closeActivtiesModal () {
+    closeActivtiesModal (annotations:any) {
       console.log ("LearningObjectiveEditor: closeActivtiesModal ()");
+      console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
         let immutableHelper = this.state.treeData.slice();
