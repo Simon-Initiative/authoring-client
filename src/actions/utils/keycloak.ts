@@ -64,6 +64,6 @@ function refreshOnExpiration() {
       } else {
         console.log('Token is still valid');
       }
-    }).error(() => initKeyCloak());
+    }).error(() => login());
   };
 }
