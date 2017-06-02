@@ -13,6 +13,7 @@ import { onFailureCallback, onSaveCompletedCallback,
     PersistenceStrategy} from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
+import { Resource } from '../../data/resource';
 
 interface EditorManager {
 
@@ -218,6 +219,17 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
   }
 
+  determineBaseUrl(resource: Resource) {
+
+    if (resource === undefined) return '';
+
+    const pathTo = resource.fileNode.pathTo;
+    const stem = pathTo
+      .substr(pathTo.indexOf('content\/') + 8);
+    return stem
+      .substr(0, stem.lastIndexOf('\/' + resource.type));
+  }
+
   listenForChanges() {
     // persistence.listenToDocument(this.state.document)
     //     .then(document => {
@@ -251,6 +263,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           documentId: this.props.documentId,
           userId: this.props.userId,
           courseId,
+          resourcePath: this.determineBaseUrl((this.state.document.model as any).resource),
           baseUrl: configuration.baseUrl,
           courseModel: this.props.course.model,
           undoRedoGuid: this.state.undoRedoGuid,

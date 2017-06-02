@@ -69,7 +69,9 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     if (sources.size > 0) {
       src = this.props.blockProps.context.baseUrl 
         + '/' + this.props.blockProps.context.courseId
-        + '/webcontents/' + sources.first().src;
+        + '/webcontents/' 
+        + this.props.blockProps.context 
+        + sources.first().src;
     }
     
     return (

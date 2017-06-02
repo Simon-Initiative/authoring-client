@@ -10,11 +10,13 @@ import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
+import { Select } from '../../content/common/select';
 import { TextInput } from '../../content/common/TextInput';
 import Linkable from '../../../data/linkable';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/resource';
 import * as contentTypes from '../../../data/contentTypes';
+import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
@@ -53,7 +55,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
-    
+    this.onTypeChange = this.onTypeChange.bind(this);
   }
 
   componentDidMount() {                    
@@ -216,6 +218,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
+  onTypeChange(type) {
+    const resource = this.props.model.resource.with({ type });
+    const model = this.props.model.with({ resource });
+
+    this.handleEdit(model);
+  }
+
   onAddPoolRef() {
     const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
     this.addNode(pool);
@@ -275,10 +284,25 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           
           <div className="container">
             <div className="row">
-              <div className="col-4">
+              <div className="col-8">
                 {titleEditor}
               </div>
-              <div className="col-8">
+              <div className="col-4">
+                <Select
+                  value={this.props.model.resource.type}
+                  label="Type:"
+                  editMode={this.props.editMode}
+                  onChange={this.onTypeChange}
+                >
+                  <option value={LegacyTypes.assessment2}>Graded</option>
+                  <option value={LegacyTypes.inline}>Not Graded</option>
+                  
+                </Select>
+              </div>
+            </div>
+            <div className="row">
+              
+              <div className="col">
                 <form className="form-inline">
                 <PageSelection 
                   editMode={this.props.editMode}
