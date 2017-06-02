@@ -103,8 +103,6 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
     // recognize 'suppressContentEditableWarning' as a valid
     // property. 
 
-    console.log('pre redner');
-    
     return React.createElement('pre', {
       ref: (component) => this.pre = component,
       contentEditable: this.props.editMode,
