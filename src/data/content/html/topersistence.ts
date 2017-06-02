@@ -75,8 +75,6 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
     translateBlock(iterator, content.entityMap, context);
   }
 
-  console.log(JSON.stringify(root.body));
-
   return root.body;
 }
 
