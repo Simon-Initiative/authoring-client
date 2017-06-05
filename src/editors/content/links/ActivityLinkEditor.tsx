@@ -66,8 +66,14 @@ export class ActivityLinkEditor
     this.props.onEdit(this.props.model.with({ target }));
   }
 
-  onIdrefEdit(idref) {
-    this.props.onEdit(this.props.model.with({ idref }));
+  onIdrefEdit(id) {
+    const resources = this.props.context.courseModel.resources.toArray();
+    const found = resources.find(r => r.guid === id);
+
+    if (found !== undefined && found !== null) {
+      const idref = found.id;
+      this.props.onEdit(this.props.model.with({ idref }));
+    }
   }
 
   onPurposeEdit(purpose) {

@@ -130,6 +130,8 @@ export function bodyBlock() {
     <Separator key="sep1"/>,
     <Button key="wbinline" command={new commands.InsertAssessmentCommand()} 
       tooltip="Insert inline assessment" icon="flask"/>,
+    <Button key="activity" command={new commands.InsertActivityCommand()} 
+      tooltip="Insert activity" icon="check"/>,
   ]; 
 }
 
