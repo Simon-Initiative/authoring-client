@@ -18,10 +18,12 @@ interface MathProps {
   offsetKey: string;
   contentState: ContentState;
   entityKey: string;
-  onEdit: () => void;
+  onEdit: (c: ContentState) => void;
 }
 
 class Math extends React.PureComponent<MathProps, any> {
+
+  attribute: string;
 
   constructor(props) {
     super(props);
@@ -33,21 +35,21 @@ class Math extends React.PureComponent<MathProps, any> {
 
     const entity = this.props.contentState.getEntity(this.props.entityKey);
     const { data } = entity;
-    const math = data['#cdata'];
+    const math = data[this.attribute];
 
     const editor = <ModalMathEditor content={math} 
       onCancel={() => this.props.services.dismissModal()}
       onInsert={(content) => {
 
-        const toMerge = {};
-        toMerge['#cdata'] = content;
-
-        Entity.mergeData(this.props.entityKey, toMerge);
-        this.forceUpdate();
-        this.props.onEdit(); 
-
         this.props.services.dismissModal();
 
+        const toMerge = {};
+        toMerge[this.attribute] = content;
+        
+        const contentState = this.props.contentState
+          .replaceEntityData(this.props.entityKey, toMerge);
+
+        this.props.onEdit(contentState); 
       }}/>;
 
     this.props.services.displayModal(editor);
@@ -55,7 +57,15 @@ class Math extends React.PureComponent<MathProps, any> {
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const math = data['#cdata'];
+    
+    let math;
+    if (data['#cdata'] !== undefined) {
+      math = data['#cdata'];
+      this.attribute = '#cdata';
+    } else {
+      math = data['#math'];
+      this.attribute = '#math';
+    }
 
     return (
       <span onClick={this._onClick} data-offset-key={this.props.offsetKey}>

@@ -99,6 +99,7 @@ export class HtmlContentEditor
             services={this.props.services}
             context={this.props.context}
             content={this.props.model} 
+            undoRedoGuid={this.props.context.undoRedoGuid}
             locked={!this.props.editMode}
             onEdit={this._onChange} />
         

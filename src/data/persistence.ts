@@ -7,6 +7,8 @@ import {Resource} from './resource';
 import {UserInfo} from "./user_info";
 import {isArray} from "util";
 
+import { login } from '../actions/utils/keycloak';
+
 const fetch = (window as any).fetch;
 
 export type Ok = '200';
@@ -55,6 +57,14 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
   }
 }
 
+function handleError(err, reject) {
+  if (err.message && err.message === 'Unauthorized') {
+    login();
+  } else {
+    reject(err);
+  }
+}
+
 export function getEditablePackages(): Promise<models.CourseModel[]> {
   return new Promise((resolve, reject) => {
 
@@ -76,10 +86,10 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
           });
           resolve(courseModels as models.CourseModel[]);
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
 
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -107,9 +117,9 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
             model: models.createModel(json),
           }));
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -139,9 +149,12 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
             model: models.createModel(json),
           }));
         })
-        .catch(err => reject(err));
+        .catch((err) => {
+
+          handleError(err, reject);
+        });
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -174,9 +187,9 @@ export function developerRegistration(courseId: string, userNames: string[], act
           }
           resolve([...userInfos.map(t => {return t})]);
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -211,9 +224,9 @@ export function listenToDocument(doc: Document): Promise<Document> {
             reject('empty');
           }
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -250,9 +263,9 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
             //model: content,
           }));
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -293,9 +306,9 @@ export function persistDocument(doc: Document): Promise<Document> {
 
           resolve(newDocument);
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -330,13 +343,13 @@ export function createWebContent(courseId: string, file): Promise<string> {
           .then((json) => {
             resolve(json.path);
           })
-          .catch(err => reject(err));
+          .catch(err => handleError(err, reject));
 
       } catch (err) {
-        reject(err);
+        handleError(err, reject);
       }
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -369,9 +382,9 @@ export function acquireLock(courseId: CourseId, id: DocumentId): Promise<Object>
         .then((json) => {
           resolve(json);
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }
@@ -406,9 +419,9 @@ function lock(courseId: CourseId, id: DocumentId, action: string): Promise<Objec
         .then((json) => {
           resolve(json);
         })
-        .catch(err => reject(err));
+        .catch(err => handleError(err, reject));
     } catch (err) {
-      reject(err);
+      handleError(err, reject);
     }
   });
 }

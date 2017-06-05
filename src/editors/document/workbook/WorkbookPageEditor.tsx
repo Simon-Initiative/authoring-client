@@ -39,22 +39,20 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     
   constructor(props) {
     super(props, {modalIsOpen: false, los: new Array()});
+
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
   componentDidMount() {                    
-      console.log ("componentDidMount ()");
-      
-      this.loadLearningObjectives ();
+    this.loadLearningObjectives ();
   }        
     
   loadLearningObjectives () : void {
-    console.log ("loadLearningObjectives ()");
-            
     this.props.context.courseModel.resources.map((value, id) => {        
       if (value.type=="x-oli-learning_objectives") {
         persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
         {
-          console.log ("LO document: " + JSON.stringify (loDocument));
+          //console.log ("LO document: " + JSON.stringify (loDocument));
           let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
           this.setState ({los: loModel}, function () {
             //console.log ("Verify: " + JSON.stringify (this.state.los));    
@@ -63,6 +61,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       }          
     })  
   }  
+
+  onTitleEdit(title) {
+    const head = this.props.model.head.with({ title });
+    this.handleEdit(this.props.model.with({ head }));
+  }
+
+
 
   onEdit(property : string, content : any) {
 
@@ -73,17 +78,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       model = this.props.model.with({ head });
         
     } else {      
-      if (property === 'title') {
-        const head = this.props.model.head.with({ title: content });
-        model = this.props.model.with({ head });
-        
-      } else {
-        model = this.props.model.with({ body: content });
-      }
+      model = this.props.model.with({ body: content });
     }
      
-    console.log ("New model: " + JSON.stringify (model));  
-      
     this.handleEdit(model);
   }
     
@@ -91,8 +88,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
    * 
    */
   closeModal (newAnnotations:any) {
-    console.log ("closeModal ()");
-
     this.setState ({modalIsOpen: false},function () {
       this.onEdit ("annotations",newAnnotations);
     });      
@@ -102,8 +97,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
    * 
    */
   linkLO() {        
-    console.log ("linkLO ()");
-                 
     this.setState ({modalIsOpen: true});
   }
 
@@ -137,7 +130,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.head.title}
-            onEdit={c => this.onEdit('title', c)} 
+            onEdit={this.onTitleEdit} 
             />
                 
           <a className="btn btn-secondary" href="#" 

@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as courseActions from '../../actions/course';
+import guid from '../../utils/guid';
 import { configuration } from '../../actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices } from '../common/AppServices';
@@ -12,6 +13,7 @@ import { onFailureCallback, onSaveCompletedCallback,
     PersistenceStrategy} from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
+import { Resource } from '../../data/resource';
 
 interface EditorManager {
 
@@ -51,6 +53,7 @@ export interface EditorManagerState {
   document: persistence.Document;
   editMode: boolean;
   activeSubEditorKey: string;
+  undoRedoGuid: string;
 }
 
 class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
@@ -63,12 +66,13 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       editingAllowed: null,
       editMode: true,
       activeSubEditorKey: null,
+      undoRedoGuid: guid(),
     };
-
 
     this.componentDidUnmount = false;
     this.persistenceStrategy = null;
     this._onEdit = this.onEdit.bind(this);
+    this.onUndoRedoEdit = this.onUndoRedoEdit.bind(this);
 
     this.onSaveCompleted = (doc: persistence.Document) => {
 
@@ -86,6 +90,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
   onEdit(model: models.ContentModel) {
     const doc = this.state.document.with({ model });
     this.setState({ document: doc }, () => this.persistenceStrategy.save(doc));
+  }
+
+  onUndoRedoEdit(model: models.ContentModel) {
+    const doc = this.state.document.with({ model });
+    const undoRedoGuid = guid();
+    this.setState({ document: doc, undoRedoGuid }, () => this.persistenceStrategy.save(doc));
   }
 
 
@@ -209,6 +219,17 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     }
   }
 
+  determineBaseUrl(resource: Resource) {
+
+    if (resource === undefined) return '';
+
+    const pathTo = resource.fileNode.pathTo;
+    const stem = pathTo
+      .substr(pathTo.indexOf('content\/') + 8);
+    return stem
+      .substr(0, stem.lastIndexOf('\/'));
+  }
+
   listenForChanges() {
     // persistence.listenToDocument(this.state.document)
     //     .then(document => {
@@ -242,10 +263,13 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           documentId: this.props.documentId,
           userId: this.props.userId,
           courseId,
-          baseUrl: configuration.baseUrl,
+          resourcePath: this.determineBaseUrl((this.state.document.model as any).resource),
+          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
           courseModel: this.props.course.model,
+          undoRedoGuid: this.state.undoRedoGuid,
         },
         onEdit: this._onEdit,
+        onUndoRedoEdit: this.onUndoRedoEdit,
         services: this.props.services,
         editMode: this.state.editMode,
       };

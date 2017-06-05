@@ -64,13 +64,17 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     const { src } = this.props.data.image;
 
     const fullSrc = this.props.blockProps.context.baseUrl 
-      + '/' + this.props.blockProps.context.courseId
-      + '/webcontents/' + src;
+        + '/' + this.props.blockProps.context.courseId
+        + '/' 
+        + this.props.blockProps.context.resourcePath 
+        + '/' + src;
+
+    console.log(fullSrc);
     
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
-          <image src={fullSrc}/>
+          <img src={fullSrc}/>
         </div>
         <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);

@@ -75,8 +75,6 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
     translateBlock(iterator, content.entityMap, context);
   }
 
-  console.log(JSON.stringify(root.body));
-
   return root.body;
 }
 
@@ -931,7 +929,14 @@ function translateInline(
     const obj = translateInlineEntity(s, text, entityMap);
 
     const sub = text.substr(s.offset, s.length);
-    obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+
+    const key = common.getKey(obj);
+
+    if (key === '#math') {
+      return obj;
+    } else {
+      obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+    }
 
     return obj;
   }
@@ -1008,7 +1013,13 @@ function quote(s : common.RawEntityRange, text : string, entityMap : common.RawE
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  return { 'm:math': { '#cdata': data['#cdata'] } };
+
+  if (data['#cdata'] !== undefined) {
+    return { 'm:math': { '#cdata': data['#cdata'] } };
+  } else {
+    return { '#math': data['#math'] };
+  }
+  
 }
 
 function translateInlineEntity(

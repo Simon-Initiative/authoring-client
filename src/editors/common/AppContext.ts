@@ -6,5 +6,7 @@ export type AppContext = {
   courseId: string;
   documentId: string;
   baseUrl: string;
+  resourcePath: string;
   courseModel: models.CourseModel;
+  undoRedoGuid: string;
 };

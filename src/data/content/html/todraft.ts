@@ -21,6 +21,7 @@ import { Cite } from './cite';
 
 const inlineTerminalTags = {};
 inlineTerminalTags['m:math'] = true;
+inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
 
@@ -100,6 +101,7 @@ const inlineHandlers = {
   var: applyStyle.bind(undefined, 'ITALIC'),
   image: imageInline,
   formula: formulaInline,
+  '#math': hashMath,
   'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
   quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
@@ -115,7 +117,15 @@ function em(
   offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
 
-  const style = common.styleMap[item[common.getKey(item)][common.STYLE]];
+  // Handle the case of no @style tag - treat it as italic
+  const em = item[common.getKey(item)];
+  let style;
+  if (em[common.STYLE] === undefined) {
+    style = 'ITALIC';
+  } else {
+    style = common.styleMap[em[common.STYLE]];
+  }
+
   workingBlock.markups.push({ offset, length, style });
 }
 
@@ -179,6 +189,24 @@ function insertEntity(
   };
 }
 
+function hashMath(
+  offset: number, length: number, item: Object, 
+  context: ParsingContext, workingBlock: WorkingBlock) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+  
+  const data = {};
+  data['#math'] = item['#math'];
+  
+  context.draft.entityMap[key] = {
+    type: common.EntityTypes.math,
+    mutability: 'IMMUTABLE',
+    data,
+  };
+}
+
 function imageInline(
   offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
@@ -200,8 +228,6 @@ function formulaInline(
   offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
 
-  // Do nothing for now, this effectively strips out the inline
-  // formula tag on save
 }
 
 function wb_inline(item: Object, context: ParsingContext) {
