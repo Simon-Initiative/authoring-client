@@ -643,7 +643,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     closeLOModal (annotations:any) {
       console.log ("LearningObjectiveEditor: closeLOModal ()");
-      console.log ("Processing annotations: " + JSON.stringify (annotations));
+      //console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
         this.onEdit ();
@@ -734,17 +734,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    createLOLinkerDialog () {                
-      if (this.state.loModalIsOpen==true) {  
-        if (this.state.los!=null) {
-          console.log ("createLOLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
-        } else {
-          console.log ("Internal error: learning objectives object can be empty but not null");
-        }
-      }    
+    createLOLinkerDialog () {                  
+      if (this.state.los!=null) {
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
+      }
                    
-      return (<div></div>);           
+      return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeLOModal.bind (this)} sourceData={[]} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);           
     }
     
     /**

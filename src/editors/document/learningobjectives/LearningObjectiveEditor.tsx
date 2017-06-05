@@ -106,7 +106,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
-      console.log ("New data: " + JSON.stringify (newData));
+      //console.log ("New data: " + JSON.stringify (newData));
                     
       this.saveToDB (newData);      
     }
@@ -217,7 +217,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       let newModel  
   
       if (newData) {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData.treeData);
+        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
       } else {
         newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
       }  
@@ -236,7 +236,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       //this.props.onEdit(newModel); 
         
       this.setState ({modalIsOpen: false, treeData: newModel.los});  
-    }     
+    }
         
     /**
      * Note that this manual method of adding a new node does not generate an
@@ -314,10 +314,13 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             let testNode:OrgItem=parentArray [i] as OrgItem;
             
             if (testNode.id==aNode.id) {
+                //console.log ("Removing lo ("+i+") with title: " + aNode.title);
                 parentArray.splice (i,1);
                 break;
             }
         }
+        
+        console.log ("Updated tree: " + JSON.stringify (immutableHelper));
         
         this.saveToDB (immutableHelper);
     }
@@ -423,7 +426,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     render() {        
         const skilllinker=this.createLinkerDialog ();
         
-        console.log ("Rendering: " + JSON.stringify (this.state.treeData));
+        //console.log ("Rendering: " + JSON.stringify (this.state.treeData));
         
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">

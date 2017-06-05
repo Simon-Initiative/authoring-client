@@ -251,19 +251,23 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   /**
    * 
    */
-  createLinkerDialog () {           
-    if (this.state.skillModel) {            
+  createLinkerDialog () {
+    if (!this.state.skillModel){
       return (<LearningObjectiveLinker 
         title="Available Skills" 
+        errorMessage="No skills available. Did you create a skills document?"
         closeModal={this.closeModal.bind (this)} 
-        sourceData={this.state.skillModel.skills} 
+        sourceData={[]} 
         modalIsOpen={this.state.modalIsOpen} 
-        targetAnnotations={new Array<Linkable>()} />);
-    } else {
-      console.log ('Internal error: skill model object can be empty but not null');
+        targetAnnotations={new Array<Linkable>()} />);         
     }
-                   
-    return (<div></div>);           
+
+    return (<LearningObjectiveLinker 
+      title="Available Skills" 
+      closeModal={this.closeModal.bind (this)} 
+      sourceData={this.state.skillModel.skills} 
+      modalIsOpen={this.state.modalIsOpen} 
+      targetAnnotations={new Array<Linkable>()} />);           
   }  
 
   render() {
