@@ -85,23 +85,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         _id: this.props.model.guid,
         model: this.props.model
       });
-                
-      /*  
-      this.setState({treeData: this.props.model.los, document: docu}, function (){
-        let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-          
-        resourceList.map((value, id) => {          
-          if (value.type=="x-oli-skills_model") {
-            persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
-            {
-              let skillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
-              this.setState ({skills: skillModel.skills});                  
-            });
-          }          
-        })            
-      });
-      */
-        
+
       this.setState({treeData: this.props.model.los, document: docu}, function (){  
         this.props.context.courseModel.resources.map((value, id) => {        
           if (value.type=="x-oli-skills_model") {
@@ -424,7 +408,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         
       if (this.state.target) {             
         if (!this.state.skills){
-          message="Error: no skills available. Did you create a skills document?"
+          message="No skills available. Did you create a skills document?"
         }
           
         return (<LearningObjectiveLinker title="Available Learning Skills" errorMessage={message} closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);          
