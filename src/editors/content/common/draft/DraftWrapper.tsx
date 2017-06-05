@@ -685,6 +685,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         <Editor ref="editor"
           spellCheck={true}
+          stripPastedStyles={true}
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}

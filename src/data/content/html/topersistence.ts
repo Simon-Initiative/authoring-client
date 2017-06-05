@@ -78,6 +78,8 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
   return root.body;
 }
 
+
+
 function translateBlock(
   iterator : BlockIterator,
   entityMap : common.RawEntityMap, context: Stack) {
@@ -126,7 +128,9 @@ function translateBlock(
     translateAtomic('iframe', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('activity', rawBlock, entityMap)) {
     translateAtomic('activity', rawBlock, draftBlock, entityMap, context);
-  } else {  
+  } else if (isHeaderBlock(rawBlock)) {
+    translateHeaderBlock(rawBlock, draftBlock, entityMap, context);
+  } else { 
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
   
@@ -190,6 +194,11 @@ function getSentinelType(
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (type === 'unstyled');
+}
+
+function isHeaderBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type.startsWith('header'));
 }
 
 function isQuoteBlock(block : common.RawContentBlock) : boolean {
@@ -549,6 +558,13 @@ function translateExample(
 
 }
 
+function translateHeaderBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  // Convert it to a paragraph:
+  translateParagraph(rawBlock, block, entityMap, context);
+}
 
 function translateParagraph(
   rawBlock : common.RawContentBlock, 
