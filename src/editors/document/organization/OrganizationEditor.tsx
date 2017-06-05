@@ -734,12 +734,18 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    createLOLinkerDialog () {                  
+    createLOLinkerDialog () {
+      let targetAnn:Array<Linkable>=new Array ();
+
+      if (this.state.orgTarget) {
+        targetAnn=this.state.orgTarget.annotations;
+      }
+
       if (this.state.los!=null) {
-        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);
       }
                    
-      return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeLOModal.bind (this)} sourceData={[]} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);           
+      return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeLOModal.bind (this)} sourceData={[]} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);           
     }
     
     /**
