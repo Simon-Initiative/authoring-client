@@ -53,7 +53,7 @@ export function login() {
 
 }
 
-export function refreshTokenIfInvalid() : Promise<boolean> {
+export function refreshTokenIfInvalid() : Promise<any> {
   
   const WITHIN_FIVE_SECONDS = 5;
 
