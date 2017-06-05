@@ -802,16 +802,27 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     }
       
     /**
-     * 
+     * A vital function we use to determine if a node in the sortable tree can be moved. For
+     * example a workbook page or assessment can be moved within and between items but can't
+     * be assigned to any other node in the tree. 
      */
-    canDrop (aNode) {
+    canDrop (anObject:Object) : boolean {
       console.log ("canDrop ()");  
         
+      //console.log (JSON.stringify (anObject));
+
+      if ((anObject ["node"]["typeDescription"]=="x-oli-assessment2") || (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")) {
+        if (anObject ["nextParent"]["typeDescription"]!="Item") {
+          return (false);  
+        } 
+      }
+
       return (true);
     }
 
     /**
-     * 
+     * Helper method given to the sortable tree so that we can provide access to functionality
+     * in the org editor directly within each node renderer.
      */    
     genProps () {
         //console.log ("OrganizationEditor:genProps ()");
@@ -856,6 +867,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}
                       generateNodeProps={this.genProps.bind(this)} 
+                      canDrop={this.canDrop.bind(this)} 
                   />
               </div>
       );

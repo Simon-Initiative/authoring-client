@@ -589,13 +589,15 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.addModule=addModule;
         this.addSection=addSection;
 
-        //canDrag=true;
+        canDrag=true;
 
+        /*
         // Currently a safety feature to make sure we can't drag workbook pages
         // to different levels but only keep them as leaf nodes.
         if (node.orgType==OrgContentTypes.Item) {
          canDrag=false;
-        }    
+        } 
+        */   
         
         let hStyle:any=styles.backupHamburger;
         let workbookPageStyle:any=styles.wpage;
