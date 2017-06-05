@@ -86,6 +86,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         model: this.props.model
       });
                 
+      /*  
       this.setState({treeData: this.props.model.los, document: docu}, function (){
         let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
           
@@ -99,6 +100,19 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
           }          
         })            
       });
+      */
+        
+      this.setState({treeData: this.props.model.los, document: docu}, function (){  
+        this.props.context.courseModel.resources.map((value, id) => {        
+          if (value.type=="x-oli-skills_model") {
+            persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
+            {
+              let skillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
+              this.setState ({skills: skillModel.skills}); 
+            });
+          }          
+        });
+      });    
     }              
 
      /**
@@ -406,15 +420,15 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     createLinkerDialog () {
+      let message="";
+        
       if (this.state.target) {             
-        if (this.state.skills){            
-          return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);
-        } else {
-          console.log ("Internal error: skills object can be empty but not null");
+        if (!this.state.skills){
+          message="Error: no skills available. Did you create a skills document?"
         }
-      } else {
-        console.log ("No target yet.");
-      }    
+          
+        return (<LearningObjectiveLinker title="Available Learning Skills" errorMessage={message} closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);          
+      }   
                    
       return (<div></div>);           
     }
@@ -423,7 +437,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     render() {        
-        const skilllinker=this.createLinkerDialog ();          
+        const skilllinker=this.createLinkerDialog ();
+        
+        console.log ("Rendering: " + JSON.stringify (this.state.treeData));
         
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
