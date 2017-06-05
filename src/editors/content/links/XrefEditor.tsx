@@ -23,6 +23,7 @@ export interface XrefEditorProps extends AbstractContentEditorProps<Xref> {
 
 export interface XrefEditorState {
   resources: persistence.CourseResource[];
+  selectedGuid: string;
 }
 
 /**
@@ -37,8 +38,12 @@ export class XrefEditor
     this.onTargetEdit = this.onTargetEdit.bind(this);
     this.onIdrefEdit = this.onIdrefEdit.bind(this);
 
+    const selected = this.props.context.courseModel
+      .resources.toArray().find(r => r.id === this.props.model.idref);
+
     this.state = {
       resources: [],
+      selectedGuid: selected !== undefined ? selected.guid : null,
     };
   }
 
@@ -83,7 +88,7 @@ export class XrefEditor
           <Select
             editMode={this.props.editMode}
             label=""
-            value={idref}
+            value={this.state.selectedGuid}
             onChange={this.onIdrefEdit}>
             {this.state.resources.map(a => <option value={a._id}>{a.title}</option>)}
           </Select>

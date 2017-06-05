@@ -23,6 +23,7 @@ export interface ActivityLinkEditorProps extends AbstractContentEditorProps<Acti
 
 export interface ActivityLinkEditorState {
   activities: persistence.CourseResource[];
+  selectedGuid: string;
 }
 
 /**
@@ -38,8 +39,12 @@ export class ActivityLinkEditor
     this.onIdrefEdit = this.onIdrefEdit.bind(this);
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
 
+    const selected = this.props.context.courseModel
+      .resources.toArray().find(r => r.id === this.props.model.idref);
+
     this.state = {
       activities: [],
+      selectedGuid: selected !== undefined ? selected.guid : null,
     };
   }
 
@@ -91,7 +96,7 @@ export class ActivityLinkEditor
           <Select
             editMode={this.props.editMode}
             label=""
-            value={idref}
+            value={this.state.selectedGuid}
             onChange={this.onIdrefEdit}>
             {this.state.activities.map(a => <option key={a._id} value={a._id}>{a.title}</option>)}
           </Select>
