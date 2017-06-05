@@ -70,7 +70,7 @@ export class Audio extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Audio {
+  static fromPersistence(root: Object, guid: string, toDraft) : Audio {
 
     const t = (root as any).audio;
 
@@ -119,7 +119,7 @@ export class Audio extends Immutable.Record(defaultContent) {
           model = model.with({ caption: Caption.fromPersistence(item, id) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
           
@@ -138,11 +138,11 @@ export class Audio extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(toPersistence) : Object {
 
     const children = [
       this.titleContent.toPersistence(),
-      this.cite.toPersistence(),
+      this.cite.toPersistence(toPersistence),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
       this.alternate.toPersistence(),

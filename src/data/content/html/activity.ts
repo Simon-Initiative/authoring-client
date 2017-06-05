@@ -36,7 +36,7 @@ export class Activity extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Activity {
+  static fromPersistence(root: Object, guid: string, toDraft) : Activity {
 
     const t = (root as any).activity;
 
@@ -56,7 +56,7 @@ export class Activity extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'image':
-          model = model.with({ image: Image.fromPersistence(item, id) });
+          model = model.with({ image: Image.fromPersistence(item, id, toDraft) });
           break;
         default:
       }

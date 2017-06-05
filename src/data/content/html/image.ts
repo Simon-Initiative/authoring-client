@@ -71,7 +71,7 @@ export class Image extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Image {
+  static fromPersistence(root: Object, guid: string, toDraft) : Image {
 
     const t = (root as any).image;
 
@@ -124,7 +124,7 @@ export class Image extends Immutable.Record(defaultContent) {
           model = model.with({ caption: Caption.fromPersistence(item, id) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id) });
+          model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
           
@@ -134,11 +134,11 @@ export class Image extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(toP) : Object {
 
     const children = [
       this.titleContent.toPersistence(),
-      this.cite.toPersistence(),
+      this.cite.toPersistence(toP),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
       this.alternate.toPersistence(),

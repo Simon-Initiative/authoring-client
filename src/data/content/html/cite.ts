@@ -8,9 +8,6 @@ import { ContentState } from 'draft-js';
 
 const emptyContent = ContentState.createFromText('');
 
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
-
 export type CiteParams = {
   title?: string,
   id?: string,
@@ -45,7 +42,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Cite {
+  static fromPersistence(root: Object, guid: string, toDraft) : Cite {
 
     const t = (root as any).cite;
 
@@ -66,7 +63,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(toPersistence) : Object {
     return {
       cite: {
         '@title': this.title,

@@ -5,6 +5,7 @@ import { ContentState, CharacterMetadata, ContentBlock,
 
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
+import { Link } from './link';
 import { Table } from './table';
 
 import * as common from './common';
@@ -45,6 +46,8 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
+  LINK: pastedLink,
+  IMAGE: pastedImage,
   math,
   input_ref,
   cite,
@@ -313,7 +316,7 @@ function translateAtomic(
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const item = entityMap[rawBlock.entityRanges[0].key].data[type];
-  top(context).push(item.toPersistence());
+  top(context).push(item.toPersistence(toPersistence));
 }
 
 
@@ -974,19 +977,41 @@ function translateInlineStyle(
   }
 }
 
+function pastedLink(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+
+  return {
+    link: {
+      '@href': data.href,
+    },
+  };
+}
+
+function pastedImage(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+
+  return {
+    image: {
+      '@src': data.src,
+      '#array': [],
+    },
+  };
+}
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
 
-  return data.link.toPersistence();
+  return data.link.toPersistence(toPersistence);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
   
-  return data.activity_link.toPersistence();
+  return data.activity_link.toPersistence(toPersistence);
   
 }
 
@@ -995,7 +1020,7 @@ function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
   
-  return data.cite.toPersistence();
+  return data.cite.toPersistence(toPersistence);
   
 }
 
@@ -1003,7 +1028,7 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
   
-  return data.xref.toPersistence();
+  return data.xref.toPersistence(toPersistence);
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {

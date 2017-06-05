@@ -63,11 +63,17 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
     const { src } = this.props.data.image;
 
-    const fullSrc = this.props.blockProps.context.baseUrl 
+    let fullSrc;
+
+    if (src.startsWith('..')) {
+      fullSrc = this.props.blockProps.context.baseUrl 
         + '/' + this.props.blockProps.context.courseId
         + '/' 
         + this.props.blockProps.context.resourcePath 
         + '/' + src;
+    } else {
+      fullSrc = src;
+    }
 
     console.log(fullSrc);
     

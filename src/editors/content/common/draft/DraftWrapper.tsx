@@ -448,6 +448,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     const entities = getAllEntities(contentState);
     
+    console.log('before clone');
+    console.log(convertToRaw(contentState));
+
     // Find any duplicated entities and clone them
     const seenKeys = {};
     entities.forEach(e => {
@@ -455,6 +458,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         seenKeys[e.entityKey] = e;
       } else {
         // This is a duplicate, clone it
+        console.log('found duplicate entity');
+        
         contentState = contentState.createEntity(
           e.entity.type, e.entity.mutability, Object.assign({}, e.entity.data));
         const createdKey = contentState.getLastCreatedEntityKey();
@@ -467,6 +472,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         contentState = Modifier.applyEntity(contentState, range, createdKey);
       }
     });
+
+    console.log('after clone');
+    console.log(convertToRaw(contentState));
+
     
     return contentState;
   }
@@ -669,6 +678,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
+  handlePastedText(text, html) {
+    // console.log(text);
+    // console.log(html);
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
@@ -685,7 +699,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         <Editor ref="editor"
           spellCheck={true}
-          stripPastedStyles={true}
+          stripPastedStyles={false}
+          handlePastedText={this.handlePastedText.bind(this)}
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}

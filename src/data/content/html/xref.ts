@@ -8,8 +8,6 @@ import { ContentState } from 'draft-js';
 
 const emptyContent = ContentState.createFromText('');
 
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
 
 export type XrefParams = {
   target?: string,
@@ -48,7 +46,7 @@ export class Xref extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Xref {
+  static fromPersistence(root: Object, guid: string, toDraft) : Xref {
 
     const t = (root as any).xref;
 
@@ -72,7 +70,7 @@ export class Xref extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(toPersistence) : Object {
     return {
       xref: {
         '@title': this.title,
