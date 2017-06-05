@@ -85,20 +85,18 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         _id: this.props.model.guid,
         model: this.props.model
       });
-                
-      this.setState({treeData: this.props.model.los, document: docu}, function (){
-        let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-          
-        resourceList.map((value, id) => {          
+
+      this.setState({treeData: this.props.model.los, document: docu}, function (){  
+        this.props.context.courseModel.resources.map((value, id) => {        
           if (value.type=="x-oli-skills_model") {
             persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
             {
               let skillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
-              this.setState ({skills: skillModel.skills});                  
+              this.setState ({skills: skillModel.skills}); 
             });
           }          
-        })            
-      });
+        });
+      });    
     }              
 
      /**
@@ -108,9 +106,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
-      console.log ("New data: " + JSON.stringify (newData));
+      //console.log ("New data: " + JSON.stringify (newData));
                     
-      this.saveToDB (newData);      
+      this.saveToDB (newData.treeData);      
     }
 
     /**
@@ -216,29 +214,20 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     onEdit(newData?:any) {
       console.log ("onEdit ()");  
         
-      let newModel  
+      let newModel;
   
       if (newData) {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData.treeData);
+        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
       } else {
         newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
       }  
-
-      /*        
-      if (newData) {
-        newModel=this.state.model.with ({'los': newData});
-      }    
-      else {
-        newModel=this.state.model.with ({'los': this.state.treeData});
-      } 
-      */   
-      
-      console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
-        
-      //this.props.onEdit(newModel); 
-        
-      this.setState ({modalIsOpen: false, treeData: newModel.los});  
-    }     
+       
+      //console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
+                
+      this.setState ({modalIsOpen: false, treeData: newModel.los}, function () {
+        //this.props.onEdit(newModel);
+      });  
+    }
         
     /**
      * Note that this manual method of adding a new node does not generate an
@@ -316,10 +305,13 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             let testNode:OrgItem=parentArray [i] as OrgItem;
             
             if (testNode.id==aNode.id) {
+                //console.log ("Removing lo ("+i+") with title: " + aNode.title);
                 parentArray.splice (i,1);
                 break;
             }
         }
+        
+        //console.log ("Updated tree: " + JSON.stringify (immutableHelper));
         
         this.saveToDB (immutableHelper);
     }
@@ -406,15 +398,15 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     createLinkerDialog () {
+      let message="";
+        
       if (this.state.target) {             
-        if (this.state.skills){            
-          return (<LearningObjectiveLinker title="Available Learning Skills" closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);
-        } else {
-          console.log ("Internal error: skills object can be empty but not null");
+        if (!this.state.skills){
+          message="No skills available. Did you create a skills document?"
         }
-      } else {
-        console.log ("No target yet.");
-      }    
+          
+        return (<LearningObjectiveLinker title="Available Learning Skills" errorMessage={message} closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);          
+      }   
                    
       return (<div></div>);           
     }
@@ -423,7 +415,9 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     render() {        
-        const skilllinker=this.createLinkerDialog ();          
+        const skilllinker=this.createLinkerDialog ();
+        
+        //console.log ("Rendering: " + JSON.stringify (this.state.treeData));
         
         return (
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">

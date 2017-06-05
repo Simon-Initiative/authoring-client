@@ -25,7 +25,7 @@ const tempnavstyle= {
         
   objectContainer: {
     marginTop: '10px',
-    overflow: "auto"    
+    overflow: "auto"   
   }    
 };
 
@@ -54,7 +54,19 @@ const customStyles = {
     padding: '20px',
     display : "flex", 
     flexDirection : 'column'  
-  }    
+  },
+  messagePanel: {
+    height: "150px",
+    lineHeight: "150px",
+    border: "1px solid black",
+    margin: "auto"
+  },
+  messageSpan : {
+    fontSize: "24pt",  
+    display: "inline-block",
+    verticalAlign: "middle",
+    lineHeight: "24pt"
+  }  
 };
 
 class Item extends Linkable {
@@ -70,15 +82,17 @@ export interface LearningObjectiveLinkerProps {
   modalIsOpen : boolean;    
   targetAnnotations: Array<Linkable>;
   closeModal: any;
-  title?:string;  
+  title?:string;
+  errorMessage?:string;  
 }
 
 export interface LearningObjectiveLinkerState {
-  sourceData: any;
-  localAnnotations: Array<Item>;     
+  sourceData?: any;
+  localAnnotations?: Array<Item>;     
   modalIsOpen : boolean;
-  targetAnnotations: Array<Linkable>;
+  targetAnnotations?: Array<Linkable>;
   closeModal: any;
+  errorMessage?:string;
 }
 
 /**
@@ -97,16 +111,14 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     console.log ("LearningObjectiveLinker ()");
         
     super(props);
-      
-    //console.log ("Linking target: " + JSON.stringify (this.props.targetAnnotations));
-    //console.log ("Linking sourceData: " + JSON.stringify (this.props.sourceData));
      
     this.state = {                                    
                    modalIsOpen: this.props.modalIsOpen,
                    sourceData: this.props.sourceData,
                    targetAnnotations: this.props.targetAnnotations,                                           
                    closeModal: this.props.closeModal,
-                   localAnnotations: new Array<Item> ()
+                   localAnnotations: new Array<Item> (),
+                   errorMessage: this.props.errorMessage
                  };
             
     this.openModal = this.openModal.bind(this);
@@ -119,10 +131,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
-      
-      //console.log ("componentWillReceiveProps, Linking targetAnnotations: " + JSON.stringify (this.props.targetAnnotations));
-      //console.log ("componentWillReceiveProps, Linking sourceData: " + JSON.stringify (this.props.sourceData));      
-      
+            
       this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], targetAnnotations: newProps.targetAnnotations}, function () {
         //this.resolveAnnotations ();
       });
@@ -141,7 +150,10 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       console.log ("No link target given yet, bump");  
       return;
     }
-
+      
+    console.log ("Linking targetAnnotations: " + JSON.stringify (this.state.targetAnnotations));
+    console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));  
+            
     // This will become local annotations
     var newData: Array <Item>=new Array ();
             
@@ -293,6 +305,28 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   render () {      
     //console.log ("Source data: " + JSON.stringify (this.state.sourceData)); 
+   
+    if (this.state.errorMessage) {  
+      if (this.state.errorMessage!="") {
+        let mPanel:any=tempnavstyle.objectContainer;
+        mPanel ["height"]="100%";
+        //mPanel ["border"]="1px solid red";     
+        return (<Modal
+                 isOpen={this.state.modalIsOpen}
+                 onAfterOpen={this.afterOpenModal}
+                 onRequestClose={this.closeModal}
+                 contentLabel="Linker Dialog"
+                 style={customStyles}>
+                   <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+                     <p className="h2" style={tempnavstyle.h2}>Error</p>
+                     <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
+                   </nav>
+                   <div style={tempnavstyle.objectContainer}>
+                     <span style={customStyles.messageSpan}>{this.state.errorMessage}</span>                   
+                   </div>
+               </Modal>);
+      }
+    }           
       
     var options = this.state.localAnnotations.map(function(item, index) {
                 
@@ -307,10 +341,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
         </label>
       </div>
       );
-    }.bind(this));      
-
-    //let tStyle:any=tempnavstyle.modalContainer;
-      
+    }.bind(this));
+         
     return (<Modal
              isOpen={this.state.modalIsOpen}
              onAfterOpen={this.afterOpenModal}

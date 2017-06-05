@@ -129,21 +129,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
-      
-      /*  
-      this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-learning_objectives") {
-          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
-          {
-            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.with (this.state.los)},function () {
-              this.resolveReferences ();
-            });
-          });
-        }          
-      })
-      */
-        
+
       this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
@@ -166,25 +152,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadPages () : void {
 
       console.log ("loadPages ()");
-       
-      /*  
-      let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-
-      let pageList:Array<Linkable>=new Array <Linkable>();  
-        
-      this.props.context.courseModel.resources.map((value, id) => {
-        if (value.type=="x-oli-workbook_page") {
-          let pageLink:Linkable=new Linkable ();
-          pageLink.id=value.guid;
-          pageLink.title=value.title;
-          pageList.push (pageLink);             
-        }          
-      })  
-        
-      this.setState ({pages: pageList},function () {
-          this.resolveReferences ();
-      });
-      */
         
       let pageList:Array<Linkable>=new Array <Linkable>();  
         
@@ -207,23 +174,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     loadActivities () : void {
       console.log ("loadActivities ()");
-            
-      /*  
-      let activityList:Array<Linkable>=new Array <Linkable>();        
-        
-      this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-inline-assessment") {
-          let activityLink:Linkable=new Linkable ();
-          activityLink.id=value.guid;
-          activityLink.title=value.title;
-          activityList.push (activityLink);    
-        }          
-      })  
-        
-      this.setState ({activities: activityList},function () {
-          this.resolveReferences ();
-      });
-      */
         
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
@@ -620,6 +570,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           let newModule:OrgModule=new OrgModule ();
           newModule.title=("Module " + this.state.titleIndex);
           testNode.children.push (newModule);
+        
+          this.setState ({titleIndex: this.state.titleIndex+1});
+        
           break;
         }
       }
@@ -654,6 +607,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (testNode.id==aNode.id) {
           let newSection:OrgSection=new OrgSection ();
           newSection.title=("Section " + this.state.titleIndex);
+                    
+          this.setState ({titleIndex: this.state.titleIndex+1});
+            
           testNode.children.push (newSection);
           break;
         }
@@ -681,9 +637,193 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         //this.linkPage (aNode);
         this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
     }     
+        
+    /**
+     * 
+     */
+    closeLOModal (annotations:any) {
+      console.log ("LearningObjectiveEditor: closeLOModal ()");
+      //console.log ("Processing annotations: " + JSON.stringify (annotations));
+        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
+        this.onEdit ();
+      });                
+    }        
+        
+    /**
+     * 
+     */
+    closePagesModal (annotations:any) {
+      console.log ("closePagesModal ()");
+
+      this.modifyItem (annotations,"x-oli-workbook_page");
+    }    
     
     /**
      * 
+     */
+    closeActivtiesModal (annotations:any) {
+      console.log ("closeActivtiesModal ()");
+        
+      this.modifyItem (annotations,"x-oli-inline-assessment");          
+    }
+
+    /**
+     * 
+     */
+    modifyItem (annotations:any,itemType:string) : void {
+      console.log ("modifyItem ()");    
+
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
+        let immutableHelper = this.state.treeData.slice();
+                
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
+        
+        if (immutableHelper==null) {
+          console.log ("Bump");
+          return;
+        }
+
+        if (parentArray!=null) {
+          console.log ("We have an object, performing edit ...");
+        } else {
+          console.log ("Internal error: node not found in tree");
+        }
+        
+        for (var i=0;i<parentArray.length;i++) {
+          let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+          if (testNode.id==this.state.orgTarget.id) {    
+
+            let mergedList:Array<OrgItem>=new Array ();
+
+            // First migrate all existing nodes (if they are not
+            // assessments into our new list
+
+            for (let t=0;t<testNode.children.length;t++) {
+              let mergeNode:OrgItem=testNode.children [t];
+              if (mergeNode.typeDescription!=itemType) {
+                mergedList.push (mergeNode);             
+              }
+            }
+
+            // Then copy over all the assessment nodes as they 
+            // were managed by the linker dialog and also add
+            // them to the list
+
+            for (let j=0;j<annotations.length;j++) {
+              let originNode:Linkable=annotations [j];            
+
+              var newNode:OrgItem=new OrgItem ();
+              newNode.id=originNode.id;
+              newNode.title=originNode.title;
+              newNode.typeDescription=itemType;  
+              mergedList.push (newNode);
+            }
+
+            testNode.children=mergedList;
+
+            break;
+          }
+        }
+
+        this.onEdit (immutableHelper);          
+      });    
+    }
+    
+    /**
+     * 
+     */
+    createLOLinkerDialog () {
+      let targetAnn:Array<Linkable>=new Array ();
+
+      if (this.state.orgTarget) {
+        targetAnn=this.state.orgTarget.annotations;
+      }
+
+      if (this.state.los!=null) {
+        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);
+      }
+                   
+      return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeLOModal.bind (this)} sourceData={[]} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);           
+    }
+    
+    /**
+     * 
+     */
+    createActivityLinkerDialog () {                
+      if (this.state.activitiesModalIsOpen==true) {  
+        if (this.state.activities!=null) {
+          console.log ("createLinkerDialog ()");              
+          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-inline-assessment")} />);
+        } else {
+          console.log ("Internal error: activities object can be empty but not null");
+        }
+      }    
+                   
+      return (<div></div>);           
+    }    
+    
+    /**
+     * 
+     */
+    createPageLinkerDialog () {      
+      if (this.state.pagesModalIsOpen==true) {
+        if (this.state.pages!=null) {
+          console.log ("createPageLinkerDialog ()");
+          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-workbook_page")} />);
+        } else {
+          console.log ("Internal error: pages array object can be empty but not null");
+        }
+      }    
+                   
+      return (<div></div>);           
+    }
+    
+    /**
+     * 
+     */
+    toItemList (aNode:any,aNodeType:string) : Array <Linkable> {
+      console.log ("toItemList ()");
+        
+      var actList:Array<Linkable>=new Array ();  
+        
+      for (let i=0;i<aNode.children.length;i++) {
+          let testItem:OrgItem=aNode.children [i];
+          
+          if (testItem.typeDescription==aNodeType) {
+            let ephemeral:Linkable=new Linkable ();
+            ephemeral.title=testItem.title;
+            ephemeral.id=testItem.id;
+            actList.push (ephemeral);
+          }
+      }
+        
+      return (actList);  
+    }
+      
+    /**
+     * A vital function we use to determine if a node in the sortable tree can be moved. For
+     * example a workbook page or assessment can be moved within and between items but can't
+     * be assigned to any other node in the tree. 
+     */
+    canDrop (anObject:Object) : boolean {
+      console.log ("canDrop ()");  
+        
+      //console.log (JSON.stringify (anObject));
+
+      if ((anObject ["node"]["typeDescription"]=="x-oli-assessment2") || (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")) {
+        if (anObject ["nextParent"]["typeDescription"]!="Item") {
+          return (false);  
+        } 
+      }
+
+      return (true);
+    }
+
+    /**
+     * Helper method given to the sortable tree so that we can provide access to functionality
+     * in the org editor directly within each node renderer.
      */    
     genProps () {
         //console.log ("OrganizationEditor:genProps ()");
@@ -700,195 +840,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         optionalProps ["addSection"]=this.addSection.bind (this);
         
         return (optionalProps);
-    }
-    
-    /**
-     * 
-     */
-    closeLOModal () {
-      console.log ("LearningObjectiveEditor: closeLOModal ()");
-        
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
-        this.onEdit ();
-      });                
-    }        
-        
-    /**
-     * 
-     */
-    closePagesModal () {
-      console.log ("LearningObjectiveEditor: closePagesModal ()");
-        
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false});        
-        
-      let immutableHelper = this.state.treeData.slice();
-                
-      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
-        
-      if (immutableHelper==null) {
-        console.log ("Bump");
-        return;
-      }
-        
-      if (parentArray!=null) {
-        console.log ("We have an object, performing edit ...");
-      } else {
-        console.log ("Internal error: node not found in tree");
-      }
-                    
-      for (var i=0;i<parentArray.length;i++) {
-        let testNode:OrgItem=parentArray [i] as OrgItem;
-            
-        if (testNode.id==this.state.orgTarget.id) {
-          var newNode:OrgItem=new OrgItem ();
-          newNode.title=testNode.title;
-          newNode.typeDescription="x-oli-workbook_page";  
-          testNode.children.push (newNode);
-          break;
-        }
-      }
-            
-      this.onEdit (immutableHelper);
-    }    
-    
-    /**
-     * 
-     */
-    closeActivtiesModal () {
-      console.log ("LearningObjectiveEditor: closeActivtiesModal ()");
-        
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
-        let immutableHelper = this.state.treeData.slice();
-                
-        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
-        
-        if (immutableHelper==null) {
-          console.log ("Bump");
-          return;
-        }
-
-        if (parentArray!=null) {
-          console.log ("We have an object, performing edit ...");
-        } else {
-          console.log ("Internal error: node not found in tree");
-        }
-                    
-        for (var i=0;i<parentArray.length;i++) {
-          let testNode:OrgItem=parentArray [i] as OrgItem;
-            
-          if (testNode.id==this.state.orgTarget.id) {
-            var newNode:OrgItem=new OrgItem ();
-            newNode.title=testNode.title;
-            newNode.typeDescription="x-oli-inline-assessment";
-            testNode.children.push (newNode);
-            break;
-          }
-        }
-            
-        this.onEdit (immutableHelper);          
-      });                
-    }     
-    
-    /**
-     * 
-     */
-    createLOLinkerDialog () {                
-      if (this.state.loModalIsOpen==true) {  
-        if (this.state.los!=null) {
-          console.log ("createLOLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={this.state.orgTarget.annotations} />);
-        } else {
-          console.log ("Internal error: learning objectives object can be empty but not null");
-        }
-      }    
-                   
-      return (<div></div>);           
-    }
-    
-    /**
-     * 
-     */
-    createActivityLinkerDialog () {                
-      if (this.state.activitiesModalIsOpen==true) {  
-        if (this.state.activities!=null) {
-          console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toActivityList (this.state.orgTarget)} />);
-        } else {
-          console.log ("Internal error: activities object can be empty but not null");
-        }
-      }    
-                   
-      return (<div></div>);           
-    }    
-    
-    /**
-     * 
-     */
-    createPageLinkerDialog () {      
-      if (this.state.pagesModalIsOpen==true) {
-        if (this.state.pages!=null) {
-          console.log ("createPageLinkerDialog ()");
-          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toPageList (this.state.orgTarget)} />);
-        } else {
-          console.log ("Internal error: pages array object can be empty but not null");
-        }
-      }    
-                   
-      return (<div></div>);           
-    }
-    
-    /**
-     * 
-     */
-    toActivityList (aNode) : Array <Linkable> {
-      console.log ("toActivityList ()");
-        
-      var actList:Array<Linkable>=new Array ();  
-        
-      for (let i=0;i<aNode.children.length;i++) {
-          let testItem:OrgItem=aNode.children [i];
-          
-          if (testItem.typeDescription=="x-oli-inline-assessment") {
-            let ephemeral:Linkable=new Linkable ();
-            ephemeral.title=testItem.title;
-            ephemeral.id=testItem.id;  
-            actList.push (ephemeral);
-          }
-      }
-        
-      return (actList);  
-    }
-    
-    /**
-     * 
-     */
-    toPageList (aNode) : Array <Linkable> {
-      console.log ("toPageList ()");
-
-      var actList:Array<Linkable>=new Array ();  
-        
-      for (let i=0;i<aNode.children.length;i++) {
-          let testItem:OrgItem=aNode.children [i];
-          
-          if (testItem.typeDescription=="x-oli-workbook_page") {
-            let ephemeral:Linkable=new Linkable ();
-            ephemeral.title=testItem.title;
-            ephemeral.id=testItem.id;  
-            actList.push (ephemeral);
-          }
-      }  
-        
-      return (actList);         
-    }    
-    
-    /**
-     * 
-     */
-    canDrop (aNode) {
-      console.log ("canDrop ()");  
-        
-      return (true);
-    }
+    }                
             
     /**
      * 

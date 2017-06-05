@@ -106,11 +106,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   createLinkerDialog () {           
     if (this.state.los!=null) {            
       return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);
-    } else {
-      console.log ("Internal error: learning objectives object can be empty but not null");
-    }
+    } 
                    
-    return (<div></div>);           
+    return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeModal.bind (this)} sourceData={[]} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);           
   }    
     
   render() {
