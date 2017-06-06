@@ -75,8 +75,6 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
       fullSrc = src;
     }
 
-    console.log(fullSrc);
-    
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
