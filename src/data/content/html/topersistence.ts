@@ -121,6 +121,8 @@ function translateBlock(
     translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
     translateWbInline(rawBlock, draftBlock, entityMap, context);
+  } else if (isCustom('image', rawBlock, entityMap)) {
+    translateAtomic('image', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('audio', rawBlock, entityMap)) {
     translateAtomic('audio', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('video', rawBlock, entityMap)) {

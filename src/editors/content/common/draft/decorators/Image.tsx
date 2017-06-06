@@ -13,9 +13,22 @@ class Image extends React.PureComponent<any, any> {
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    
+    const src = data.image.src;
+    let fullSrc;
+    if (src.startsWith('..')) {
+      fullSrc = this.props.context.baseUrl 
+        + '/' + this.props.context.courseId
+        + '/' 
+        + this.props.context.resourcePath 
+        + '/' + src;
+    } else {
+      fullSrc = src;
+    }
+
     return (
-      <img src={data.image.src}
+      <img src={fullSrc}
+        height={data.image.height}
+        width={data.image.width}
         data-offset-key={this.props.offsetKey}/>
     );
   }

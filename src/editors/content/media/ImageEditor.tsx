@@ -131,6 +131,8 @@ export class ImageEditor
     const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
+      console.log('ImageEditor render');
+      console.log(src);
       srcDisplay = src === '' ? '<not set>' : extractFileName(src);
     } else {
       srcDisplay = 

@@ -61,7 +61,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
   render() : JSX.Element {
 
-    const { src } = this.props.data.image;
+    const { src, height, width } = this.props.data.image;
 
     let fullSrc;
 
@@ -80,7 +80,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
-          <img src={fullSrc}/>
+          <img src={fullSrc} width={width} height={height}/>
         </div>
         <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
