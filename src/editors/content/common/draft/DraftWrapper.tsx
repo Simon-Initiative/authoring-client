@@ -262,6 +262,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           
           contentState = this.cloneDuplicatedEntities(contentState);
 
+          editorState = EditorState.push(editorState, contentState);
+
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {
@@ -458,7 +460,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         seenKeys[e.entityKey] = e;
       } else {
         // This is a duplicate, clone it
-        console.log('found duplicate entity');
         
         contentState = contentState.createEntity(
           e.entity.type, e.entity.mutability, Object.assign({}, e.entity.data));
