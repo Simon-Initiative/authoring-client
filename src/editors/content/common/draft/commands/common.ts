@@ -107,7 +107,7 @@ export function shouldInsertBlock(contentState: ContentState, blockKey: string) 
   if (block !== null && isAtomic(block)) {
 
     const nextBlockKey = contentState.getKeyAfter(blockKey);
-    if (nextBlockKey !== null) {
+    if (nextBlockKey !== undefined && nextBlockKey !== null) {
 
       const nextBlock = contentState.getBlockForKey(nextBlockKey);
       return isAtomic(nextBlock); // Case 1
@@ -158,7 +158,8 @@ export function createTitle(currentContent, blocks) {
 }
 
 // Insert an array of blocks after a particular block referenced by blockKey
-export function insertBlocksAfter(contentState: ContentState, blockKey: string, 
+export function insertBlocksAfter(
+  contentState: ContentState, blockKey: string, 
   blocks: ContentBlock[]) : ContentState {
 
   const blockMap = contentState.getBlockMap();
@@ -174,6 +175,6 @@ export function insertBlocksAfter(contentState: ContentState, blockKey: string,
   ).toOrderedMap();
 
   return contentState.merge({
-    blockMap: newBlocks
+    blockMap: newBlocks,
   });
 }
