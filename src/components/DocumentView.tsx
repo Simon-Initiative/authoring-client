@@ -7,7 +7,6 @@ import * as viewActions from '../actions/view';
 
 interface DocumentView {  
   viewActions: Object;
-  services: AppServices;
 }
 
 export interface DocumentViewProps {
@@ -23,7 +22,6 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
   constructor(props) {
     super(props);
     
-    this.services = new DispatchBasedServices(this.props.dispatch);
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
@@ -38,7 +36,6 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
                   <div className="col-12">
                     <EditorManager 
                       dispatch={this.props.dispatch}
-                      services={this.services} 
                       course={this.props.course}
                       userId={this.props.userId} 
                       userName={this.props.userName}

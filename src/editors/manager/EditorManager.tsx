@@ -8,7 +8,8 @@ import * as courseActions from '../../actions/course';
 import guid from '../../utils/guid';
 import { configuration } from '../../actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
-import { AppServices } from '../common/AppServices';
+import { AppServices, DispatchBasedServices } from '../common/AppServices';
+
 import { onFailureCallback, onSaveCompletedCallback, 
     PersistenceStrategy} from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
@@ -41,8 +42,6 @@ export interface EditorManagerProps {
   userId: string;
 
   userName: string;
-
-  services: AppServices;
 
   course: any;
 
@@ -270,7 +269,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         },
         onEdit: this._onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
-        services: this.props.services,
+        services: new DispatchBasedServices(this.props.dispatch, this.props.course.model),
         editMode: this.state.editMode,
       };
 
