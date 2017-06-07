@@ -25,7 +25,7 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 import { insertBlocksAfter } from './commands/common';
-import { hasBalancedSentinels } from './paste';
+import { wouldViolateSchema } from './paste';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 
@@ -689,11 +689,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   // unbalanced block sentinels or that would violate content
   // model schema.
   handlePastedFragment(fragment, editorState) {
-    if (!hasBalancedSentinels(fragment, editorState.getCurrentContent())) {
+    if (wouldViolateSchema(fragment, editorState)) {
       return true;
     } 
   }
-
 
   render() {
 
