@@ -237,6 +237,11 @@ const addStyle = (oliStyle, draftStyle) => {
 
 addStyle('bold', 'BOLD');
 addStyle('italic', 'ITALIC');
+addStyle('emphasis', 'BOLD');
+addStyle('deemphasis', 'DEEMPHASIS');
+addStyle('highlight', 'HIGHLIGHT');
+addStyle('line-through', 'STRIKETHROUGH');
+addStyle('oblique', 'OBLIQUE');
 addStyle('var', 'CODE');
 addStyle('cite', 'CITE');
 addStyle('term', 'TERM');
@@ -250,6 +255,11 @@ addStyle('quote', 'QUOTE');
 export const emStyles = {
   bold: true,
   italic: true,
+  emphasis: true,
+  deemphasis: true,
+  highlight: true,
+  'line-through': true,
+  oblique: true,
 };
 
 

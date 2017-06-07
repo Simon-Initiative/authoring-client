@@ -59,7 +59,7 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 
 function handleError(err, reject) {
   if (err.message && err.message === 'Unauthorized') {
-    login();
+    (window as any).location = configuration.protocol + configuration.hostname;
   } else {
     reject(err);
   }

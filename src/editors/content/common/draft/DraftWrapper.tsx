@@ -105,13 +105,25 @@ const styleMap = {
     textDecoration: 'underline'
   },
   QUOTE: {
-    fontStyle: 'italic'
+    fontStyle: 'italic',
   },
   IPA: {
     // TODO
   },
   FOREIGN: {
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+  },
+  STRIKETHROUGH: {
+    textDecoration: 'line-through',
+  },
+  HIGHLIGHT: {
+    backgroundColor: '#FFFF00',
+  },
+  OBLIQUE: {
+    fontStyle: 'oblique',
+  },
+  DEEMPHASIS: {
+    fontWeight: 'lighter',
   },
   SYM: {
     // TODO

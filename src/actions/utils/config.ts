@@ -1,5 +1,5 @@
-const protocol = 'http://';
-const hostname = 'dev.local';
+const protocol = window.location.protocol + '//';
+const hostname = window.location.host;
 const prefix = 'content-service/api/v1';
 const baseUrl = protocol + hostname + '/' + prefix;
 
