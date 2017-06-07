@@ -10,7 +10,7 @@ import { Image } from './image';
 import { IFrame } from './iframe';
 import { Video } from './video';
 import { YouTube } from './youtube';
-import { Link } from './link';
+import { Link as HyperLink } from './link';
 import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
 import { Activity } from './activity';
@@ -82,16 +82,16 @@ const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
   activity_link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
-    common.EntityTypes.activity_link, 'activity_link', ActivityLink),
+    common.EntityTypes.activity_link, 'activity_link', ActivityLink.fromPersistence),
   xref: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
-    common.EntityTypes.xref, 'xref', Xref),
+    common.EntityTypes.xref, 'xref', Xref.fromPersistence),
   link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
-    common.EntityTypes.link, 'link', Link),
+    common.EntityTypes.link, 'link', HyperLink.fromPersistence),
   cite: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE', 
-    common.EntityTypes.cite, 'cite', Cite),
+    common.EntityTypes.cite, 'cite', Cite.fromPersistence),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -152,7 +152,8 @@ function extractAttrs(item: Object) : Object {
 }
 
 function insertDataDrivenEntity(
-  mutability: string, type: string, label, ctor, offset: number, length: number, item: Object, 
+  mutability: string, type: string, label, 
+  fromPersistence, offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
@@ -160,7 +161,7 @@ function insertDataDrivenEntity(
   workingBlock.entities.push({ offset, length, key });
   
   const data = {};
-  data[label] = ctor.fromPersistence(item);
+  data[label] = fromPersistence(item, '', toDraft);
 
   context.draft.entityMap[key] = {
     type,
@@ -215,7 +216,7 @@ function imageInline(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const image = Image.fromPersistence(item, '');
+  const image = Image.fromPersistence(item, '', toDraft);
   
   context.draft.entityMap[key] = {
     type: common.EntityTypes.image,
@@ -236,7 +237,7 @@ function wb_inline(item: Object, context: ParsingContext) {
 }
 
 function activity(item: Object, context: ParsingContext) {
-  const activity = Activity.fromPersistence(item, '');
+  const activity = Activity.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.activity, { activity }, context);
 }
 
@@ -329,31 +330,31 @@ function codeBlock(item: Object, context: ParsingContext) {
 
 function audio(item: Object, context: ParsingContext) {
 
-  const audio = Audio.fromPersistence(item, '');
+  const audio = Audio.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.audio, { audio }, context);
 }
 
 function imageBlock(item: Object, context: ParsingContext) {
 
-  const image = Image.fromPersistence(item, '');
+  const image = Image.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.image, { image }, context);
 }
 
 function video(item: Object, context: ParsingContext) {
 
-  const video = Video.fromPersistence(item, '');
+  const video = Video.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.video, { video }, context);
 }
 
 function iframe(item: Object, context: ParsingContext) {
 
-  const iframe = IFrame.fromPersistence(item, '');
+  const iframe = IFrame.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.iframe, { iframe }, context);
 }
 
 function youtube(item: Object, context: ParsingContext) {
 
-  const youtube = YouTube.fromPersistence(item, '');
+  const youtube = YouTube.fromPersistence(item, '', toDraft);
   addAtomicBlock(common.EntityTypes.youtube, { youtube }, context);
 }
 

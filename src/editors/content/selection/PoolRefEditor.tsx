@@ -22,7 +22,7 @@ export interface PoolRefProps extends AbstractContentEditorProps<contentTypes.Po
 }
 
 export interface PoolRefState {
-  pool: contentTypes.Pool;
+  title: string;
 }
 
 
@@ -40,23 +40,27 @@ export class PoolRefEditor
     this.onClick = this.onClick.bind(this);
 
     this.state = {
-      pool: null,
+      title: null,
     };
   }
 
-  componentDidMount() {
-    if (this.props.model.idref !== '') {
-      persistence.retrieveDocument(this.props.context.courseId, this.props.model.idref)
-      .then((document) => {
-        if (document.model.modelType === 'PoolModel') {
-          this.setState({ pool: document.model.pool });
-        }
-      });
-    }
+  fetchTitlePoolById(id) {
+    this.props.services.fetchTitleById(id)
+    .then(title => this.setState({ title }));
   }
 
+  componentDidMount() {
+    this.fetchTitlePoolById(this.props.model.idref);
+  }
+  
   shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model || nextState.pool !== this.state.pool);
+    return (nextProps.model !== this.props.model || nextState.title !== this.state.title);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.model.idref !== nextProps.model.idref) {
+      this.fetchTitlePoolById(nextProps.model.idref);
+    }
   }
 
   onCancel() {
@@ -66,7 +70,8 @@ export class PoolRefEditor
   onInsert(resource) {
     this.props.services.dismissModal();
 
-    this.props.onEdit(this.props.model.with({ idref: resource.id }));
+    this.props.services.fetchIdByGuid(resource.id)
+    .then(idref => this.props.onEdit(this.props.model.with({ idref })));
   }
 
   onClick() {
@@ -89,10 +94,10 @@ export class PoolRefEditor
     let details;
     if (this.props.model.idref === '') {
       details = 'No external pool selected';
-    } else if (this.state.pool === null) {
+    } else if (this.state.title === null) {
       details = '';
     } else {
-      details = describePool(this.state.pool);
+      details = this.state.title;
     }
     
     return (

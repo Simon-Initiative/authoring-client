@@ -86,6 +86,8 @@ export class TitleContentEditor
   componentWillReceiveProps(nextProps: TitleContentEditorProps) {
     if (nextProps.context.undoRedoGuid !== this.props.context.undoRedoGuid) {
       this.setState({ text: nextProps.model.text });
+    } else if (nextProps.model.guid !== this.props.model.guid) {
+      this.setState({ text: nextProps.model.text });
     }
   }
 

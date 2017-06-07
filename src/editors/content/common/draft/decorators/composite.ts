@@ -8,6 +8,7 @@ import inputRef from './InputRef';
 import activityLink from './ActivityLink';
 import xref from './Xref';
 import quote from './Quote';
+import image from './Image';
 
 const decorators = [
   unsupported,
@@ -18,6 +19,7 @@ const decorators = [
   activityLink,
   xref,
   quote,
+  image,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

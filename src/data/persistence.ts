@@ -7,7 +7,7 @@ import {Resource} from './resource';
 import {UserInfo} from "./user_info";
 import {isArray} from "util";
 
-import { login } from '../actions/utils/keycloak';
+import { login, refreshTokenIfInvalid } from '../actions/utils/keycloak';
 
 const fetch = (window as any).fetch;
 
@@ -66,132 +66,220 @@ function handleError(err, reject) {
 }
 
 export function getEditablePackages(): Promise<models.CourseModel[]> {
-  return new Promise((resolve, reject) => {
+  
+  return refreshTokenIfInvalid()
+    .then(((tokenIsValid) => {
 
-    try {
+      if (!tokenIsValid) {
+        login();
+      }
 
-      fetch(`${configuration.baseUrl}/packages/editable`, {
-        method: 'GET',
-        headers: getHeaders(credentials),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          const courseModels: models.CourseModel[] = json.map((d) => {
-            return models.createModel(d);
-          });
-          resolve(courseModels as models.CourseModel[]);
-        })
-        .catch(err => handleError(err, reject));
+      return new Promise((resolve, reject) => {
 
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+        try {
+          fetch(`${configuration.baseUrl}/packages/editable`, {
+            method: 'GET',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              const courseModels: models.CourseModel[] = json.map((d) => {
+                return models.createModel(d);
+              });
+              resolve(courseModels as models.CourseModel[]);
+            })
+            .catch(err => handleError(err, reject));
+
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+    }));
 }
 
 export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
 
-  return new Promise((resolve, reject) => {
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
 
-    try {
-      fetch(`${configuration.baseUrl}/packages/${courseId}/details`, {
-        method: 'GET',
-        headers: getHeaders(credentials),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          resolve(new Document({
-            _courseId: courseId,
-            _id: json.guid,
-            _rev: json.rev,
-            model: models.createModel(json),
-          }));
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+
+        try {
+          fetch(`${configuration.baseUrl}/packages/${courseId}/details`, {
+            method: 'GET',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              resolve(new Document({
+                _courseId: courseId,
+                _id: json.guid,
+                _rev: json.rev,
+                model: models.createModel(json),
+              }));
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+    });
 }
 
 export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Promise<Document> {
   if (courseId === null) {
     throw new Error('courseId cannot be null');
   }
-  return new Promise((resolve, reject) => {
-    try {
-      fetch(`${configuration.baseUrl}/${courseId}/resources/${documentId}`, {
-        method: 'GET',
-        headers: getHeaders(credentials),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          json.courseId = courseId;
-          resolve(new Document({
-            _courseId: courseId,
-            _id: json.guid,
-            _rev: json.rev,
-            model: models.createModel(json),
-          }));
-        })
-        .catch((err) => {
 
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          fetch(`${configuration.baseUrl}/${courseId}/resources/${documentId}`, {
+            method: 'GET',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              json.courseId = courseId;
+              resolve(new Document({
+                _courseId: courseId,
+                _id: json.guid,
+                _rev: json.rev,
+                model: models.createModel(json),
+              }));
+            })
+            .catch((err) => {
+
+              handleError(err, reject);
+            });
+        } catch (err) {
           handleError(err, reject);
-        });
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+        }
+      });
+    });
+}
+
+export function bulkFetchDocuments(courseId: string, filters: string[], action: string): Promise<Document[]> {
+  // Valid values for 'action' is limited to 'byIds' or 'byTypes'
+  const url = `${configuration.baseUrl}/${courseId}/resources/bulk?action=${action}`;
+
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          fetch(url, {
+            method: 'POST',
+            headers: getHeaders(credentials),
+            body: JSON.stringify(filters),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              let documents : Array<Document> = new Array();
+              if (isArray(json)) {
+                json.forEach(function (item) {
+                  documents.push(new Document({
+                    _courseId: courseId,
+                    _id: item.guid,
+                    _rev: item.rev,
+                    model: models.createModel(item),
+                  }));
+                });
+              } else {
+                documents.push(new Document({
+                  _courseId: courseId,
+                  _id: json.guid,
+                  _rev: json.rev,
+                  model: models.createModel(json),
+                }));
+              }
+              resolve([...documents.map(t => {return t})]);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
 }
 
 export function developerRegistration(courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
-
+// Valid values for 'action' is limited to 'add' or 'remove'
   const url = `${configuration.baseUrl}/${courseId}/developers/registration?action=${action}`;
 
-  return new Promise((resolve, reject) => {
-    try {
-      fetch(url, {
-        method: 'POST',
-        headers: getHeaders(credentials),
-        body: JSON.stringify(userNames),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          let userInfos : Array<UserInfo> = new Array();
-          if (isArray(json)) {
-            json.forEach(function (item) {
-              userInfos.push(UserInfo.fromPersistence(item));
-            });
-          } else {
-            userInfos.push(UserInfo.fromPersistence(json));
-          }
-          resolve([...userInfos.map(t => {return t})]);
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          fetch(url, {
+            method: 'POST',
+            headers: getHeaders(credentials),
+            body: JSON.stringify(userNames),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              let userInfos : Array<UserInfo> = new Array();
+              if (isArray(json)) {
+                json.forEach(function (item) {
+                  userInfos.push(UserInfo.fromPersistence(item));
+                });
+              } else {
+                userInfos.push(UserInfo.fromPersistence(json));
+              }
+              resolve([...userInfos.map(t => {return t})]);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
 }
 
 export function listenToDocument(doc: Document): Promise<Document> {
@@ -240,77 +328,99 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
     url = `${configuration.baseUrl}/${courseId}/resources?resourceType=${content.type}`;
   }
 
-  return new Promise((resolve, reject) => {
-    try {
-      fetch(url, {
-        method: 'POST',
-        headers: getHeaders(credentials),
-        body: JSON.stringify(content.toPersistence()),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          const packageGuid = content.type === 'x-oli-package' ? json.guid : courseId;
-          resolve(new Document({
-            _courseId: packageGuid,
-            _id: json.guid,
-            _rev: json.rev,
-            model: models.createModel(json),
-            //model: content,
-          }));
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          fetch(url, {
+            method: 'POST',
+            headers: getHeaders(credentials),
+            body: JSON.stringify(content.toPersistence()),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              const packageGuid = content.type === 'x-oli-package' ? json.guid : courseId;
+              resolve(new Document({
+                _courseId: packageGuid,
+                _id: json.guid,
+                _rev: json.rev,
+                model: models.createModel(json),
+                //model: content,
+              }));
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
+
+  
 }
 
 export function persistDocument(doc: Document): Promise<Document> {
 
-  return new Promise((resolve, reject) => {
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
 
-    try {
-
-      let url = null;
-      if (doc.model.type === 'x-oli-package') {
-        url = `${configuration.baseUrl}/packages/${doc._courseId}`;
-      } else {
-        url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
+      if (!tokenIsValid) {
+        login();
       }
 
-      const toPersist = doc.model.toPersistence();
-      fetch(url, {
-        method: 'PUT',
-        headers: getHeaders(credentials),
-        body: JSON.stringify(toPersist),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
+      return new Promise((resolve, reject) => {
+
+        try {
+
+          let url = null;
+          if (doc.model.type === 'x-oli-package') {
+            url = `${configuration.baseUrl}/packages/${doc._courseId}`;
+          } else {
+            url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
           }
-          return response.json();
-        })
-        .then((json) => {
 
-          const newDocument = new Document({
-            _courseId: doc._courseId,
-            _id: json.guid,
-            _rev: json.rev,
-            model: doc.model,
-          });
+          const toPersist = doc.model.toPersistence();
+          fetch(url, {
+            method: 'PUT',
+            headers: getHeaders(credentials),
+            body: JSON.stringify(toPersist),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
 
-          resolve(newDocument);
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+              const newDocument = new Document({
+                _courseId: doc._courseId,
+                _id: json.guid,
+                _rev: json.rev,
+                model: doc.model,
+              });
+
+              resolve(newDocument);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
+
+  
 }
 
 /**
@@ -320,38 +430,50 @@ export function persistDocument(doc: Document): Promise<Document> {
  */
 export function createWebContent(courseId: string, file): Promise<string> {
 
-  return new Promise((resolve, reject) => {
-    try {
-      const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
 
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-
-        fetch(url, {
-          method: 'POST',
-          headers: getFormHeaders(credentials),
-          body: formData,
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw Error(response.statusText);
-            }
-            return response.json();
-          })
-          .then((json) => {
-            resolve(json.path);
-          })
-          .catch(err => handleError(err, reject));
-
-      } catch (err) {
-        handleError(err, reject);
+      if (!tokenIsValid) {
+        login();
       }
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+
+      return new Promise((resolve, reject) => {
+        try {
+          const url = `${configuration.baseUrl}/${courseId}/webcontents/upload`;
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          try {
+
+            fetch(url, {
+              method: 'POST',
+              headers: getFormHeaders(credentials),
+              body: formData,
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw Error(response.statusText);
+                }
+                return response.json();
+              })
+              .then((json) => {
+                resolve(json.path);
+              })
+              .catch(err => handleError(err, reject));
+
+          } catch (err) {
+            handleError(err, reject);
+          }
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
+
+
+  
 }
 
 export type CourseResource = {
@@ -366,27 +488,36 @@ export function acquireLock(courseId: CourseId, id: DocumentId): Promise<Object>
   }
   const url = `${configuration.baseUrl}/${courseId}/locks?action=AQUIRE&resourceId=${id}`;
 
-  return new Promise((resolve, reject) => {
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
 
-    try {
-      fetch(url, {
-        method: 'GET',
-        headers: getHeaders(credentials),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.json();
-        })
-        .then((json) => {
-          resolve(json);
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+
+        try {
+          fetch(url, {
+            method: 'GET',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              resolve(json);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+    });
+  
 }
 
 export function releaseLock(courseId: CourseId, id: DocumentId): Promise<Object> {
@@ -403,27 +534,38 @@ function lock(courseId: CourseId, id: DocumentId, action: string): Promise<Objec
   }
   const url = `${configuration.baseUrl}/${courseId}/locks?action=${action}&resourceId=${id}`;
 
-  return new Promise((resolve, reject) => {
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
 
-    try {
-      fetch(url, {
-        method: 'GET',
-        headers: getHeaders(credentials),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw Error(response.statusText);
-          }
-          return response.text();
-        })
-        .then((json) => {
-          resolve(json);
-        })
-        .catch(err => handleError(err, reject));
-    } catch (err) {
-      handleError(err, reject);
-    }
-  });
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+
+        try {
+          fetch(url, {
+            method: 'GET',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.text();
+            })
+            .then((json) => {
+              resolve(json);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
+
+  
 }
 
 export function fetchCourseResources(courseId: string): Promise<CourseResource[]> {

@@ -1,7 +1,8 @@
 import * as Immutable from "immutable";
 import * as types from "./types";
 import * as contentTypes from "./contentTypes";
-import {getKey} from "./common";
+import {getKey } from "./common";
+import { getChildren } from './content/common';
 import guid from "../utils/guid";
 import {MetaData} from "./metadata";
 import {WebContent} from "./webcontent";
@@ -14,6 +15,7 @@ import {isArray, isNullOrUndefined} from "util";
 import {assessmentTemplate} from "./activity_templates";
 import {UserInfo} from "./user_info";
 import {PoolModel} from './models/pool';
+
 import {Node} from './content/node';
 
 export {Node} from './content/node';
@@ -807,87 +809,47 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
           var destNode = obj ["sequences"]; // [j];
 
-          var seqList = destNode["#array"];
+          var seqList = getChildren(destNode);
+          
+          for (let w = 0; w < seqList.length; w++) {
+            let seqObj = seqList [w];
+            if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
+              console.log("Parsing sequence ...");
+              let newSequence: OrgSequence = new OrgSequence();
+              let seqReference = seqObj ["sequence"];
+              newData.push(newSequence);
+              newSequence.id = seqReference["@id"];
+              newSequence.expanded = seqReference["@expanded"];
+              newSequence.category = seqReference["@category"];
+              newSequence.audience = seqReference["@audience"];
+              if (seqReference ["#annotations"]) {
+                newSequence.annotations = Linkable.fromJSON(seqReference ["#annotations"]);
+              }
+              var sequenceList: Array<any> = seqReference ["#array"];
 
-          if (destNode["#array"]) {
-            for (let w = 0; w < seqList.length; w++) {
-              let seqObj = seqList [w];
-              if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
-                console.log("Parsing sequence ...");
-                let newSequence: OrgSequence = new OrgSequence();
-                let seqReference = seqObj ["sequence"];
-                newData.push(newSequence);
-                newSequence.id = seqReference["@id"];
-                newSequence.expanded = seqReference["@expanded"];
-                newSequence.category = seqReference["@category"];
-                newSequence.audience = seqReference["@audience"];
-                if (seqReference ["#annotations"]) {
-                  newSequence.annotations = Linkable.fromJSON(seqReference ["#annotations"]);
-                }
-                var sequenceList: Array<any> = seqReference ["#array"];
+              for (var t = 0; t < sequenceList.length; t++) {
+                var seq = sequenceList [t];
 
-                for (var t = 0; t < sequenceList.length; t++) {
-                  var seq = sequenceList [t];
+                for (var s in seq) {
+                  var mdl = seq [s];
 
-                  for (var s in seq) {
-                    var mdl = seq [s];
-
-                    if (s == "title") {
-                      console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
-                      newSequence.title = OrganizationModel.getTextFromNode(mdl);
-                    }
-
-                    if (s == "module") {
-                      let newModule = OrganizationModel.parseModule(mdl);
-                      newSequence.children.push(newModule);
-                    }
-                      
-                    if (s == "unit") {
-                      let newUnit = OrganizationModel.parseUnit(mdl);
-                      newSequence.children.push(newUnit);
-                    }                        
+                  if (s == "title") {
+                    console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
+                    newSequence.title = OrganizationModel.getTextFromNode(mdl);
                   }
+
+                  if (s == "module") {
+                    let newModule = OrganizationModel.parseModule(mdl);
+                    newSequence.children.push(newModule);
+                  }
+                    
+                  if (s == "unit") {
+                    let newUnit = OrganizationModel.parseUnit(mdl);
+                    newSequence.children.push(newUnit);
+                  }                        
                 }
               }
             }
-          } else if (!isNullOrUndefined(destNode.sequence)) {
-            console.log ("Detected old style sequence parsing code");  
-            /*  
-            let newSequence: OrgSequence = new OrgSequence();
-            let seqReference = destNode.sequence;
-            newData.push(newSequence);
-            newSequence.id = seqReference["@id"];
-            newSequence.expanded = seqReference["@expanded"];
-            newSequence.category = seqReference["@category"];
-            newSequence.audience = seqReference["@audience"];
-            if (seqReference ["#annotations"]) {
-              newSequence.annotations = Linkable.fromJSON(seqReference ["#annotations"]);
-            }
-            var sequenceList: Array<any> = seqReference ["#array"];
-
-            for (var t = 0; t < sequenceList.length; t++) {
-              var seq = sequenceList [t];
-
-              for (var s in seq) {
-                var mdl = seq [s];
-
-                if (s == "title") {
-                  console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
-                  newSequence.title = OrganizationModel.getTextFromNode(mdl);
-                }
-
-                if (s == "module") {
-                  let newModule = OrganizationModel.parseModule(mdl);
-                  newSequence.children.push(newModule);
-                }
-                  
-                if (s == "unit") {
-                  let newUnit = OrganizationModel.parseUnit(mdl);
-                  newSequence.children.push(newUnit);
-                }                  
-              }
-            }
-            */
           }
         }
         else {

@@ -42,8 +42,6 @@ export function login() {
 
         onLoginSuccess(profile, logoutUrl, accountManagementUrl);
       
-        refreshOnExpiration();
-
       }).error(() => onLoginFailure());
       
     } else {
@@ -55,15 +53,27 @@ export function login() {
 
 }
 
-function refreshOnExpiration() {
-  kc.onTokenExpired = () => {
-    kc.updateToken(5).success((refreshed) => {
-      if (refreshed) {
-        credentials.token = kc.token;
-        console.log('Token was successfully refreshed');
-      } else {
-        console.log('Token is still valid');
-      }
-    }).error(() => login());
-  };
+export function refreshTokenIfInvalid() : Promise<any> {
+  
+  const WITHIN_FIVE_SECONDS = 5;
+
+  if (kc.isTokenExpired(WITHIN_FIVE_SECONDS)) {
+    return new Promise((resolve, reject) => {
+      kc.updateToken(WITHIN_FIVE_SECONDS).success((refreshed) => {
+        if (refreshed) {
+          credentials.token = kc.token;
+          console.log('Token was successfully refreshed');
+          resolve(true);
+        } else {
+          console.log('Token is still valid');
+          resolve(true);
+        }
+      }).error(() => {
+        reject(false);
+      });
+    });
+  } else {
+    return Promise.resolve(true);
+  }
 }
+

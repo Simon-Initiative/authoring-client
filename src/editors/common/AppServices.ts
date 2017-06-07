@@ -1,7 +1,10 @@
 import * as types from '../../data/types';
 
-import {modalActions} from '../../actions/modal';
+import { modalActions } from '../../actions/modal';
+import * as persistence from '../../data/persistence';
 import * as viewActions from '../../actions/view';
+import * as courseActions from '../../actions/course';
+import * as models from '../../data/models';
 import { TitleOracle, MockTitleOracle } from './TitleOracle';
 
 /**
@@ -23,6 +26,11 @@ export interface AppServices {
   // Dismiss the modal dialog. 
   dismissModal: () => void;
 
+  // Allows fetching a document by an Id, not its guid
+  fetchTitleById: (internalId: string) => Promise<string>;
+
+  fetchIdByGuid: (guid: string) => Promise<string>;
+
   // Provides titles for strongly identified items. 
   titleOracle: TitleOracle;
 
@@ -30,15 +38,17 @@ export interface AppServices {
 
 export interface DispatchBasedServices {
   dispatch;
+  courseModel: models.CourseModel;
   titleOrace: TitleOracle;
 }
 
 export class DispatchBasedServices implements AppServices {
   
-  titleOracle = new MockTitleOracle()
+  titleOracle = new MockTitleOracle();
 
-  constructor(dispatch) {
+  constructor(dispatch, courseModel) {
     this.dispatch = dispatch;
+    this.courseModel = courseModel;
   }
 
   viewDocument(documentId: string) {
@@ -53,5 +63,44 @@ export class DispatchBasedServices implements AppServices {
     this.dispatch(modalActions.dismiss());
   }
 
+  fetchIdByGuid(guid: string) : Promise<string> {
+    return this.fetchAttributeBy('id', 'guid', guid);
+  }
 
+  fetchTitleById(internalId: string) : Promise<string> {
+    return this.fetchAttributeBy('title', 'id', internalId);
+  }
+
+  fetchAttributeBy(
+    attributeToFetch: string, attributeToFindBy: string, findByValue: any) : Promise<any> {
+    const find = (model) => {
+      return model.resources
+        .toArray()
+        .find(res => res[attributeToFindBy] === findByValue);
+    };
+
+    const found = find(this.courseModel);
+
+    if (found !== undefined && found !== null) {
+      return Promise.resolve(found[attributeToFetch]);
+    } else {
+      return new Promise((resolve, reject) => {
+        persistence.retrieveCoursePackage(this.courseModel.guid)
+        .then((doc) => {
+
+          if (doc.model.modelType === 'CourseModel') {
+            const found = find(doc.model);
+            if (found !== undefined && found !== null) {
+              resolve(found[attributeToFetch]);
+
+              this.dispatch(courseActions.courseChanged(doc.model));
+
+            } else {
+              reject('Could not find resource');
+            }
+          }
+        });
+      });
+    }
+  }
 }

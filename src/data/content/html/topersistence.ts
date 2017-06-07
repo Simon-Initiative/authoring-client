@@ -5,6 +5,7 @@ import { ContentState, CharacterMetadata, ContentBlock,
 
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
+import { Link } from './link';
 import { Table } from './table';
 
 import * as common from './common';
@@ -45,6 +46,8 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
+  LINK: pastedLink,
+  IMAGE: pastedImage,
   math,
   input_ref,
   cite,
@@ -77,6 +80,8 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
 
   return root.body;
 }
+
+
 
 function translateBlock(
   iterator : BlockIterator,
@@ -116,6 +121,8 @@ function translateBlock(
     translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
     translateWbInline(rawBlock, draftBlock, entityMap, context);
+  } else if (isCustom('image', rawBlock, entityMap)) {
+    translateAtomic('image', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('audio', rawBlock, entityMap)) {
     translateAtomic('audio', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('video', rawBlock, entityMap)) {
@@ -126,7 +133,9 @@ function translateBlock(
     translateAtomic('iframe', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('activity', rawBlock, entityMap)) {
     translateAtomic('activity', rawBlock, draftBlock, entityMap, context);
-  } else {  
+  } else if (isHeaderBlock(rawBlock)) {
+    translateHeaderBlock(rawBlock, draftBlock, entityMap, context);
+  } else { 
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
   
@@ -190,6 +199,11 @@ function getSentinelType(
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { data, type } = block; 
   return (type === 'unstyled');
+}
+
+function isHeaderBlock(block : common.RawContentBlock) : boolean {
+  const { data, type } = block; 
+  return (type.startsWith('header'));
 }
 
 function isQuoteBlock(block : common.RawContentBlock) : boolean {
@@ -304,7 +318,7 @@ function translateAtomic(
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const item = entityMap[rawBlock.entityRanges[0].key].data[type];
-  top(context).push(item.toPersistence());
+  top(context).push(item.toPersistence(toPersistence));
 }
 
 
@@ -549,6 +563,13 @@ function translateExample(
 
 }
 
+function translateHeaderBlock(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  // Convert it to a paragraph:
+  translateParagraph(rawBlock, block, entityMap, context);
+}
 
 function translateParagraph(
   rawBlock : common.RawContentBlock, 
@@ -958,19 +979,41 @@ function translateInlineStyle(
   }
 }
 
+function pastedLink(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+
+  return {
+    link: {
+      '@href': data.href,
+    },
+  };
+}
+
+function pastedImage(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+
+  return {
+    image: {
+      '@src': data.src,
+      '#array': [],
+    },
+  };
+}
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
 
-  return data.link.toPersistence();
+  return data.link.toPersistence(toPersistence);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
   
-  return data.activity_link.toPersistence();
+  return data.activity_link.toPersistence(toPersistence);
   
 }
 
@@ -979,7 +1022,7 @@ function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
   
-  return data.cite.toPersistence();
+  return data.cite.toPersistence(toPersistence);
   
 }
 
@@ -987,7 +1030,7 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
   
-  return data.xref.toPersistence();
+  return data.xref.toPersistence(toPersistence);
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {

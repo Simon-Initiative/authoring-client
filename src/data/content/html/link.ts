@@ -8,8 +8,6 @@ import { ContentState } from 'draft-js';
 
 const emptyContent = ContentState.createFromText('');
 
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
 
 export type LinkParams = {
   target?: string,
@@ -48,7 +46,7 @@ export class Link extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string) : Link {
+  static fromPersistence(root: Object, guid: string, toDraft) : Link {
 
     const t = (root as any).link;
 
@@ -72,7 +70,7 @@ export class Link extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(toPersistence) : Object {
     return {
       link: {
         '@title': this.title,

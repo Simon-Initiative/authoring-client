@@ -61,20 +61,24 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
   render() : JSX.Element {
 
-    const { src } = this.props.data.image;
+    const { src, height, width } = this.props.data.image;
 
-    const fullSrc = this.props.blockProps.context.baseUrl 
+    let fullSrc;
+
+    if (src.startsWith('..')) {
+      fullSrc = this.props.blockProps.context.baseUrl 
         + '/' + this.props.blockProps.context.courseId
         + '/' 
         + this.props.blockProps.context.resourcePath 
         + '/' + src;
+    } else {
+      fullSrc = src;
+    }
 
-    console.log(fullSrc);
-    
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
-          <img src={fullSrc}/>
+          <img src={fullSrc} width={width} height={height}/>
         </div>
         <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);

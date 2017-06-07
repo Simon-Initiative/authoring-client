@@ -25,7 +25,7 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 import { insertBlocksAfter } from './commands/common';
-
+import { wouldViolateSchema } from './paste';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 
@@ -262,6 +262,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           
           contentState = this.cloneDuplicatedEntities(contentState);
 
+          editorState = EditorState.push(editorState, contentState);
+
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {
@@ -448,6 +450,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     const entities = getAllEntities(contentState);
     
+    console.log('before clone');
+    console.log(convertToRaw(contentState));
+
     // Find any duplicated entities and clone them
     const seenKeys = {};
     entities.forEach(e => {
@@ -455,6 +460,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         seenKeys[e.entityKey] = e;
       } else {
         // This is a duplicate, clone it
+        
         contentState = contentState.createEntity(
           e.entity.type, e.entity.mutability, Object.assign({}, e.entity.data));
         const createdKey = contentState.getLastCreatedEntityKey();
@@ -467,6 +473,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         contentState = Modifier.applyEntity(contentState, range, createdKey);
       }
     });
+
+    console.log('after clone');
+    console.log(convertToRaw(contentState));
+
     
     return contentState;
   }
@@ -669,6 +679,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
+  handlePastedText(text, html) {
+    // console.log(text);
+    // console.log(html);
+  }
+
+
+  // Do not allow pasting of fragments that would introduce
+  // unbalanced block sentinels or that would violate content
+  // model schema.
+  handlePastedFragment(fragment, editorState) {
+    if (wouldViolateSchema(fragment, editorState)) {
+      return true;
+    } 
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
@@ -685,6 +710,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         <Editor ref="editor"
           spellCheck={true}
+          stripPastedStyles={false}
+          handlePastedText={this.handlePastedText.bind(this)}
+          handlePastedFragment={this.handlePastedFragment.bind(this)}
           renderPostProcess={this.renderPostProcess.bind(this)}
           customStyleMap={styleMap}
           handleKeyCommand={this.handleKeyCommand}
