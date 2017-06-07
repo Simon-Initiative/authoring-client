@@ -184,9 +184,62 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
     });
 }
 
-export function developerRegistration(
-  courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
+export function bulkFetchDocuments(courseId: string, filters: string[], action: string): Promise<Document[]> {
+  // Valid values for 'action' is limited to 'byIds' or 'byTypes'
+  const url = `${configuration.baseUrl}/${courseId}/resources/bulk?action=${action}`;
 
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        login();
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          fetch(url, {
+            method: 'POST',
+            headers: getHeaders(credentials),
+            body: JSON.stringify(filters),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              let documents : Array<Document> = new Array();
+              if (isArray(json)) {
+                json.forEach(function (item) {
+                  documents.push(new Document({
+                    _courseId: courseId,
+                    _id: item.guid,
+                    _rev: item.rev,
+                    model: models.createModel(item),
+                  }));
+                });
+              } else {
+                documents.push(new Document({
+                  _courseId: courseId,
+                  _id: json.guid,
+                  _rev: json.rev,
+                  model: models.createModel(json),
+                }));
+              }
+              resolve([...documents.map(t => {return t})]);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+
+    });
+}
+
+export function developerRegistration(courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
+// Valid values for 'action' is limited to 'add' or 'remove'
   const url = `${configuration.baseUrl}/${courseId}/developers/registration?action=${action}`;
 
   return refreshTokenIfInvalid()
@@ -227,8 +280,6 @@ export function developerRegistration(
       });
 
     });
-
-  
 }
 
 export function listenToDocument(doc: Document): Promise<Document> {
