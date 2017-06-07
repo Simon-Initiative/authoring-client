@@ -601,7 +601,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       if (i == "resourceref") {
         newNode.title = anItem [i]["@idref"];
-        //newNode.expanded=anItem [i]["@expanded"];
+        newNode.id=anItem [i]["@idref"];  
         newNode.resourceRef.idRef = anItem [i]["@idref"];
       }
     }

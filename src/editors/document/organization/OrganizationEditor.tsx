@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import { returnType } from '../../../utils/types';
 import { LOTypes, LearningObjective } from '../../../data/los';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
@@ -37,7 +40,7 @@ const tempnavstyle=
 
 interface OrganizationEditor 
 {
-
+  viewActions: any;
 }
 
 export interface OrganizationEditorState extends AbstractEditorState 
@@ -59,7 +62,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   loadState:number;  
 }
 
-export interface OrganizationEditorProps extends AbstractEditorProps<models.OrganizationModel>
+export interface OrganizationEditorOwnProps extends AbstractEditorProps<models.OrganizationModel>
 {
   dispatch: any;
   documentId: string;
@@ -67,6 +70,21 @@ export interface OrganizationEditorProps extends AbstractEditorProps<models.Orga
   userId: string;    
   context: AppContext;
 }
+
+function mapStateToProps(state: any) {
+
+  const {
+    course,
+  } = state;
+
+  return {
+    course,
+  };
+}
+
+const stateGeneric = returnType(mapStateToProps);
+type OrganizationEditorReduxProps = typeof stateGeneric;
+type OrganizationEditorProps = OrganizationEditorReduxProps & OrganizationEditorOwnProps & { dispatch };
 
 /**
 *
@@ -93,7 +111,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         activitiesModalIsOpen : false, 
         titleIndex: 0,
         loadState: 0
-      });  
+      });
+        
+      this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);  
     }
         
     /**
@@ -796,7 +816,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           if (testItem.typeDescription==aNodeType) {
             let ephemeral:Linkable=new Linkable ();
             ephemeral.title=testItem.title;
-            ephemeral.id=testItem.id;
+            //ephemeral.id=testItem.id;
+            ephemeral.id=testItem.resourceRef.idRef;
             actList.push (ephemeral);
           }
       }
@@ -840,6 +861,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         optionalProps ["addActivity"]=this.addActivity.bind (this);
         optionalProps ["addModule"]=this.addModule.bind (this);
         optionalProps ["addSection"]=this.addSection.bind (this);
+        optionalProps ["editWorkbookPage"]=this.editWorkbookPage.bind (this);
+        optionalProps ["editAssessment"]=this.editAssessment.bind (this);        
         
         return (optionalProps);
     }                
@@ -859,6 +882,32 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       console.log ("doRedo ()");
 
     }
+    
+    /**
+     * 
+     */
+    editWorkbookPage (aNode):void {
+      console.log ("editWorkbookPage");
+
+      console.log ("Switching to WorkbookPage editor for document with id: " + aNode ["resourceRef"]["idRef"]);
+        
+      this.setState ({orgTarget: aNode}, () => {
+        this.props.dispatch(viewActions.viewDocument(aNode.id));
+      });  
+    }
+    
+    /**
+     * 
+     */
+    editAssessment (aNode):void {
+      console.log ("editAssessment");
+        
+      console.log ("Switching to Assessment editor for document with id: " + aNode ["resourceRef"]["idRef"]);  
+      
+      this.setState ({orgTarget: aNode}, () => {
+        this.props.dispatch(viewActions.viewDocument(aNode.id));
+      });      
+    }     
 
     /**
      * 
@@ -897,4 +946,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     }
 }
 
-export default OrganizationEditor;
+//export default OrganizationEditor;
+export default connect<OrganizationEditorReduxProps, {}, OrganizationEditorOwnProps>
+  (mapStateToProps)(OrganizationEditor);

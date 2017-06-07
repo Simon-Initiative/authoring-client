@@ -374,6 +374,9 @@ class OrganizationNodeRenderer extends Component <any,any>
     addModule:any=null;
     addSection:any=null;
     
+    editWorkbookPage:any=null;
+    editAssessment:any=null;    
+    
     lastWindowClickEvent:any=null;
     
     constructor() {
@@ -484,23 +487,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       }      
       return (<div></div>);
     }    
-    
-    /**
-     * 
-     */
-    editWorkbookPage (aNode):void {
-      console.log ("editWorkbookPage");
-          
-    }
-    
-    /**
-     * 
-     */
-    editAssessment (aNode):void {
-      console.log ("editAssessment");
-          
-    }    
-    
+      
     /**
      * 
      */
@@ -581,6 +568,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             addActivity,  
             addModule,
             addSection,
+            editWorkbookPage,
+            editAssessment,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -617,6 +606,8 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.addActivity=addActivity;
         this.addModule=addModule;
         this.addSection=addSection;
+        this.editWorkbookPage=editWorkbookPage;
+        this.editAssessment=editAssessment;
 
         canDrag=true;
 
@@ -746,7 +737,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                                onEdit={(content) => this.editNodeTitle(node,content)} 
                              />
                              <div style={titleDivider}>
-                             {node.orgType + " actual title: " + node.title}
+                             {node.orgType + " id: " + node.id}
                              </div>                             
                            </div>            
                            {popDown}                               
