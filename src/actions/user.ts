@@ -54,7 +54,7 @@ export module user {
           dispatch(loginSuccess(
             profile.username, profile.id, profile, logoutUrl, accountManagementUrl)),
         () => dispatch(loginFailure()),
-        'http://dev.local');
+        configuration.protocol + configuration.hostname);
     };
   }
 

@@ -1,9 +1,10 @@
 import { credentials, getHeaders } from './credentials';
+import { configuration } from './config';
 const keyCloak = require('keycloak-js');
 
 
 const keycloakConfig = {
-  url: 'http://dev.local/auth',
+  url: configuration.protocol + configuration.hostname + '/auth',
   realm: 'oli_security',
   clientId: 'content_client',
 };
@@ -45,7 +46,7 @@ export function login() {
       }).error(() => onLoginFailure());
       
     } else {
-      // Requires inserting "http://dev.local/*" in the Valid Redirect URIs entry
+      // Requires inserting "http://<hostname>/*" in the Valid Redirect URIs entry
       // of the Content_client settings in the KeyCloak admin UI
       kc.login({ redirectUri });
     }
