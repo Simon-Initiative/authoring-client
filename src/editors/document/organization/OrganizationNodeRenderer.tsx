@@ -488,6 +488,22 @@ class OrganizationNodeRenderer extends Component <any,any>
     /**
      * 
      */
+    editWorkbookPage (aNode):void {
+      console.log ("editWorkbookPage");
+          
+    }
+    
+    /**
+     * 
+     */
+    editAssessment (aNode):void {
+      console.log ("editAssessment");
+          
+    }    
+    
+    /**
+     * 
+     */
     generatePopDown (node) {         
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
@@ -507,6 +523,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       let assetLink=<li className="list-group-item"><a href="#" >Add-On</a></li>;
       let sectionLink;
       let moduleLink;
+      let editLink;
         
       if (node.orgType==OrgContentTypes.Module) {
         sectionLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addSection (node)}>Section</a></li>
@@ -520,7 +537,18 @@ class OrganizationNodeRenderer extends Component <any,any>
         pageLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>;
         activityLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
       }
-                 
+             
+      if (node.orgType==OrgContentTypes.Item) {
+
+        if (node.typeDescription==="x-oli-workbook_page") {  
+          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editWorkbookPage (node)}>Edit</a></li>;
+        }
+
+        if (node.typeDescription==="x-oli-assessment2") {  
+          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editAssessment (node)}>Edit</a></li>;
+        }
+      }
+
       return (
             <div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
             <div tabIndex={0} className="onclick-menu">
@@ -532,6 +560,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                 {loLink}
                 {pageLink}
                 {activityLink}
+                {editLink}
                 Assets
                 {assetLink}
               </ul>

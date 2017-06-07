@@ -14,6 +14,8 @@ import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
+
 import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
@@ -841,7 +843,23 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         return (optionalProps);
     }                
-            
+
+    /**
+     * 
+     */
+    doUndo () : void {
+      console.log ("doUndo ()");
+
+    }
+
+    /**
+     * 
+     */
+    doRedo () : void {
+      console.log ("doRedo ()");
+
+    }
+
     /**
      * 
      */
@@ -858,6 +876,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                      <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
+                                       onRedo={this.doRedo.bind(this)}             
+                                       undoEnabled={this.state.undoStackSize > 0}
+                                       redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>
                   </div>
                   {lolinker}
                   {pagelinker}
