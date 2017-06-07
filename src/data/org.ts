@@ -65,7 +65,7 @@ export class OrgItem extends Linkable {
         ephemeral ["item"]["resourceref"]=new Object ();
         ephemeral ["item"]["resourceref"]["@idref"]=anObject.resourceRef.idRef;          
       } else {    
-        ephemeral ["item"]["@expanded"]=anObject.expanded;
+        ephemeral ["item"]["@expanded"]=this.expanded;
         ephemeral ["item"]["@scoring_mode"]=this.scoringMode;
         ephemeral ["item"]["resourceref"]=new Object ();
         ephemeral ["item"]["resourceref"]["@idref"]=this.resourceRef.idRef;

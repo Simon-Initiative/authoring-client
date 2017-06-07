@@ -200,8 +200,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
       this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-inline-assessment") {
+        if ((value.type=="x-oli-inline-assessment") || (value.type=="x-oli-assessment2")) {
           let activityLink:Linkable=new Linkable ();
+          console.log ("Activity Check: " + JSON.stringify (value));   
           activityLink.id=value.guid;
           activityLink.title=value.title;
           activityList.push (activityLink);    
@@ -221,7 +222,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
        this.setState ({loadState : (this.state.loadState + 1)}, function () {
          if (this.state.loadState>1) {
-           console.log ("Kicking in model validation ...");
+           //console.log ("Kicking in model validation ...");
            this.assignItemTypes ();  
          }
        }); 
@@ -255,13 +256,39 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (targetObject.orgType==OrgContentTypes.Item) {
            console.log ("found an item, searching for type content ..."); 
            targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
+           //targetObject.typeDescription=this.findType (targetObject.id);
+            
+           let testTarget:any=this.findTarget (targetObject.id); 
+            
+           if (testTarget!=null) { 
+             targetObject.id=testTarget.guid;
+             targetObject.title=testTarget.title;
+           }    
         }
                    
         if (targetObject.children.length>0) {  
           this.assignType (targetObject.children);
         }      
       }          
-    }      
+    }
+    
+    /**
+     * 
+     */
+    findTarget (anId:string) : Object {
+      console.log ("findTarget ("+anId+")");
+        
+      let foundTarget:Object=null;  
+        
+      this.props.context.courseModel.resources.map((value, id) => {        
+
+        if (value.id==anId) {
+          foundTarget=value;              
+        }              
+      })          
+        
+      return (foundTarget);
+    }
     
     /**
      * This is currently highly inefficient since we can't break out of the map routine
@@ -738,6 +765,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
 
               var newNode:OrgItem=new OrgItem ();
               newNode.id=originNode.id;
+              //newNode.resourceRef.idRef=originNode.resourceRef.idRef;
               newNode.title=originNode.title;
               newNode.typeDescription=itemType;  
               mergedList.push (newNode);
@@ -799,7 +827,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }    
                    
-      return (<div></div>);           
+      return (<div></div>);
     }
     
     /**
@@ -816,8 +844,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           if (testItem.typeDescription==aNodeType) {
             let ephemeral:Linkable=new Linkable ();
             ephemeral.title=testItem.title;
-            //ephemeral.id=testItem.id;
-            ephemeral.id=testItem.resourceRef.idRef;
+            ephemeral.id=testItem.id;
+            //ephemeral.id=testItem.resourceRef.idRef;
             actList.push (ephemeral);
           }
       }
@@ -835,7 +863,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       //console.log (JSON.stringify (anObject));
 
-      if ((anObject ["node"]["typeDescription"]=="x-oli-assessment2") || (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")) {
+      if (
+          (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
+          (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
+          (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
+         ) {
         if (anObject ["nextParent"]["typeDescription"]!="Item") {
           return (false);  
         } 
@@ -889,7 +921,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     editWorkbookPage (aNode):void {
       console.log ("editWorkbookPage");
 
-      console.log ("Switching to WorkbookPage editor for document with id: " + aNode ["resourceRef"]["idRef"]);
+      console.log ("Switching to WorkbookPage editor for document with id: " + aNode.id);
         
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
@@ -902,7 +934,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     editAssessment (aNode):void {
       console.log ("editAssessment");
         
-      console.log ("Switching to Assessment editor for document with id: " + aNode ["resourceRef"]["idRef"]);  
+      console.log ("Switching to Assessment editor for document with id: " + aNode.id);  
       
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));

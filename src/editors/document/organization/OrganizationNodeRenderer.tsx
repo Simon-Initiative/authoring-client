@@ -421,12 +421,6 @@ class OrganizationNodeRenderer extends Component <any,any>
     
     handleClickOutside = (e) => {
       console.log ("handleClickOutside ()");
-      
-      /*  
-      if(!this.props.closeOnOutsideClick) {
-        return;
-      }
-      */
 
       this.popupClose (e);
     };    
@@ -737,7 +731,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                                onEdit={(content) => this.editNodeTitle(node,content)} 
                              />
                              <div style={titleDivider}>
-                             {node.orgType + " id: " + node.id}
+                             {node.orgType}
                              </div>                             
                            </div>            
                            {popDown}                               
