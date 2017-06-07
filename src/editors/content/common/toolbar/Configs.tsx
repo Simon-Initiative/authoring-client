@@ -35,6 +35,12 @@ export function flowInline() {
     <Button key="bold" command={style('BOLD')} tooltip="Bold" icon="bold"/>,
     <Button key="italic" command={style('ITALIC')} tooltip="Italic" icon="italic"/>,
     <Button 
+      key="strikethrough" command={style('STRIKETHROUGH')} 
+      tooltip="Strikethrough" icon="strikethrough"/>,
+    <Button 
+      key="highlight" command={style('HIGHLIGHT')} 
+      tooltip="Highlight" icon="pencil"/>,
+    <Button 
       key="superscript" command={style('SUPERSCRIPT')} 
       tooltip="Superscript" icon="superscript"/>,
     <Button key="subscript" command={style('SUBSCRIPT')} 

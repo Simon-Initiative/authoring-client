@@ -20,6 +20,10 @@ import { Block, BlockIterator, BlockProvider } from './provider';
 const styleContainers = {
   BOLD: () => ({ em: { '@style': 'bold' } }),
   ITALIC: () => ({ em: { '@style': 'italic' } }),
+  DEEMPHASIS: () => ({ em: { '@style': 'deemphasis' } }),
+  HIGHLIGHT: () => ({ em: { '@style': 'highlight' } }),
+  STRIKETHROUGH: () => ({ em: { '@style': 'line-through' } }),
+  OBLIQUE: () => ({ em: { '@style': 'oblique' } }),
   CODE: () => ({ var: { } }),
   TERM: () => ({ term: { } }),
   IPA: () => ({ ipa: { } }),
