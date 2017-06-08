@@ -11,6 +11,7 @@ import { Image as ImageData } from '../../../../data/content/html/image';
 import { Video } from '../../../../data/content/html/video';
 import { IFrame } from '../../../../data/content/html/iframe';
 import { Link } from '../../../../data/content/html/link';
+
 import { ActivityLink } from '../../../../data/content/html/activity_link';
 import { Xref } from '../../../../data/content/html/xref';
 import { Cite } from '../../../../data/content/html/cite';
@@ -78,6 +79,16 @@ export function flowInline() {
     <Button key="undordered" command={block('unordered-list-item')} 
       tooltip="Unordered list" icon="list-ul"/>,
     <Separator key="sep3"/>,
+
+    <Button key="image" 
+      command={insertInline(EntityTypes.image, 'IMMUTABLE', { image: new ImageData() })} 
+      tooltip="Insert image" icon="image"/>,
+    <Button key="imageLink" 
+      command={insertInline(
+        EntityTypes.link, 'IMMUTABLE', 
+        { link: new Link({ content: new ImageData() }) })} 
+      tooltip="Insert a hyperlinked image" icon="file-image-o"/>,
+      
 
     <Button key="math" 
       command={insertInline(EntityTypes.math, 'IMMUTABLE', defaultMathML)} 

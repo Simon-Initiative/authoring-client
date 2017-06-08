@@ -10,7 +10,7 @@ interface ModalMediaEditor {
 }
 
 export interface ModalMediaEditorProps {
-  onInsert: (model: contentTypes.Table) => void;
+  onInsert: (model) => void;
   onCancel: () => void;
   model: any;
   context: AppContext;

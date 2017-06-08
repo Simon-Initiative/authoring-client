@@ -74,7 +74,7 @@ export function refreshTokenIfInvalid() : Promise<any> {
           resolve(true);
         }
       }).error(() => {
-        reject(false);
+        resolve(false);
       });
     });
   } else {
