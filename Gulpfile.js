@@ -52,6 +52,9 @@ gulp.task('setupDist', function() {
   gulp.src('./icons/fonts/icomoon*')
         .pipe(gulp.dest(config.distDir + '/assets/fonts'));
 
+  gulp.src('./assets/*')
+        .pipe(gulp.dest(config.distDir + '/assets'));
+
   var patterns = ["./index.html",
                   "/../assets/*",                   
                   config.srcDir + '/vendor/**/*.*'];

@@ -69,7 +69,9 @@
   },
   "devDependencies": {
     "jasmine": "^2.5.3",
-    "jest": "^18.1.0"
+    "jest": "^18.1.0",
+    "uglify-js": "^3.0.15",
+    "uglifyjs-webpack-plugin": "^0.4.3"
   },
   "jest": {
     "verbose": true,

@@ -1,4 +1,6 @@
 var path = require('path');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
     entry: "./src/app.tsx",
@@ -13,6 +15,14 @@ module.exports = {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: ["", ".ts", ".tsx", ".js"]
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        "process.env": { 
+            NODE_ENV: JSON.stringify("production") 
+        }
+      }),
+      new webpack.optimize.UglifyJsPlugin(),
+    ],
     module: {
         unknownContextCritical: false,
         loaders: [

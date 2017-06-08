@@ -1321,7 +1321,7 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^2.5.0, commander@^2.9.0:
+commander@^2.5.0, commander@^2.9.0, commander@~2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.9.0.tgz#9c99094176e12240cb22d6c5146098400fe0f7d4"
   dependencies:
@@ -1726,41 +1726,9 @@ draft-js@Simon-Initiative/draft-js:
   version "0.9.0"
   resolved "https://codeload.github.com/Simon-Initiative/draft-js/tar.gz/ea08ea994d0f03e8deb300091a2b709c1e8308ab"
   dependencies:
-    babel-core "^6.8.0"
-    babel-eslint "^6.1.2"
-    babel-plugin-transform-class-properties "^6.24.1"
-    babel-preset-fbjs "^2.1.0"
-    del "^2.2.0"
-    envify "^3.4.0"
-    es6-shim "^0.34.4"
-    eslint "^3.0.1"
-    eslint-config-fbjs "^1.1.0"
-    eslint-plugin-babel "^3.3.0"
-    eslint-plugin-flowtype "^2.17.1"
-    eslint-plugin-react "^5.2.2"
     fbjs "^0.8.7"
-    fbjs-scripts "^0.7.0"
-    flow-bin "^0.38.0"
-    gulp "^3.9.0"
-    gulp-babel "^6.1.2"
-    gulp-browserify-thin "^0.1.5"
-    gulp-clean-css "^2.0.3"
-    gulp-concat-css "^2.2.0"
-    gulp-derequire "^2.1.0"
-    gulp-flatten "^0.2.0"
-    gulp-header "1.8.2"
-    gulp-rename "^1.2.2"
-    gulp-uglify "^1.2.0"
-    gulp-util "^3.0.6"
     immutable "~3.7.4"
-    jest "^15.1.1"
     object-assign "^4.1.0"
-    react "^15.0.0-rc.1"
-    react-dom "^15.0.0-rc.1"
-    run-sequence "^1.1.2"
-    through2 "^2.0.1"
-    vinyl-buffer "^1.0.0"
-    webpack-stream "^3.0.0"
 
 duplexer2@0.0.2:
   version "0.0.2"
@@ -5180,6 +5148,10 @@ source-list-map@^0.1.4, source-list-map@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-0.1.8.tgz#c550b2ab5427f6b3f21f5afead88c4f5587b2106"
 
+source-list-map@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-1.1.2.tgz#9889019d1024cce55cdc069498337ef6186a11a1"
+
 source-map-support@^0.4.2:
   version "0.4.11"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.11.tgz#647f939978b38535909530885303daf23279f322"
@@ -5192,7 +5164,7 @@ source-map@^0.4.2, source-map@^0.4.4, source-map@~0.4.1:
   dependencies:
     amdefine ">=0.0.4"
 
-source-map@^0.5.0, source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.0, source-map@~0.5.1:
+source-map@^0.5.0, source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.0, source-map@~0.5.1, source-map@~0.5.3:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
@@ -5581,9 +5553,23 @@ uglify-js@^2.6, uglify-js@~2.7.3:
     uglify-to-browserify "~1.0.0"
     yargs "~3.10.0"
 
+uglify-js@^3.0.15:
+  version "3.0.15"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.0.15.tgz#aacb323a846b234602270dead8a32441a8806f42"
+  dependencies:
+    commander "~2.9.0"
+    source-map "~0.5.1"
+
 uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
+
+uglifyjs-webpack-plugin@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/uglifyjs-webpack-plugin/-/uglifyjs-webpack-plugin-0.4.3.tgz#a672a7d6655f94dfa7e09670d48030f37cc93267"
+  dependencies:
+    source-map "^0.5.6"
+    webpack-sources "^0.2.3"
 
 uid-number@~0.0.6:
   version "0.0.6"
@@ -5791,6 +5777,13 @@ webpack-dev-server@^1.16.2:
     strip-ansi "^3.0.0"
     supports-color "^3.1.1"
     webpack-dev-middleware "^1.4.0"
+
+webpack-sources@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-0.2.3.tgz#17c62bfaf13c707f9d02c479e0dcdde8380697fb"
+  dependencies:
+    source-list-map "^1.1.1"
+    source-map "~0.5.3"
 
 webpack@^1.14.0:
   version "1.14.0"
