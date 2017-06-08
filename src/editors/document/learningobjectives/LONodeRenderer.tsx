@@ -379,6 +379,8 @@ class LONodeRenderer extends Component <any, any>
 
         let bStyle:any=styles.orgrowTitle;
         bStyle ["marginLeft"]="2px";
+        bStyle ["marginRight"]="2px";
+        bStyle ["outline"]="none";
 
         //>--------------------------------------------------------------------
 

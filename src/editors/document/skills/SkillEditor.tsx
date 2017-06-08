@@ -16,6 +16,8 @@ import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../com
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { AppServices } from '../../common/AppServices';
 
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
+
 import Knob from 'react-canvas-knob';
 
 import SkillNodeRenderer from './SkillNodeRenderer';
@@ -608,6 +610,22 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
     /**
      * 
      */
+    doUndo () : void {
+      console.log ("doUndo ()");
+
+    }
+
+    /**
+     * 
+     */
+    doRedo () : void {
+      console.log ("doRedo ()");
+
+    }
+
+    /**
+     * 
+     */
     render() {  
         //console.log ("SkillEditor:render ()");
                 
@@ -709,6 +727,10 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <button type="button" className="btn btn-secondary" onClick={e => this.toggleAdvanced (e)}>Advanced</button>
+                        <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
+                                         onRedo={this.doRedo.bind(this)}             
+                                         undoEnabled={this.state.undoStackSize > 0}
+                                         redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>                        
                     </nav>
                     {advancedcontrols}
                     {tryoutcontrols}

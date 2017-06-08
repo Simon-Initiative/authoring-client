@@ -600,8 +600,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       }
 
       if (i == "resourceref") {
+        // newNode.title will be resolved dynamically in the org editor when it mounts  
         newNode.title = anItem [i]["@idref"];
-        //newNode.expanded=anItem [i]["@expanded"];
+        newNode.id=anItem [i]["@idref"];  
         newNode.resourceRef.idRef = anItem [i]["@idref"];
       }
     }

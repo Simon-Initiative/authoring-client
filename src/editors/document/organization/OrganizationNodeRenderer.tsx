@@ -374,6 +374,9 @@ class OrganizationNodeRenderer extends Component <any,any>
     addModule:any=null;
     addSection:any=null;
     
+    editWorkbookPage:any=null;
+    editAssessment:any=null;    
+    
     lastWindowClickEvent:any=null;
     
     constructor() {
@@ -418,12 +421,6 @@ class OrganizationNodeRenderer extends Component <any,any>
     
     handleClickOutside = (e) => {
       console.log ("handleClickOutside ()");
-      
-      /*  
-      if(!this.props.closeOnOutsideClick) {
-        return;
-      }
-      */
 
       this.popupClose (e);
     };    
@@ -484,7 +481,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       }      
       return (<div></div>);
     }    
-    
+      
     /**
      * 
      */
@@ -507,6 +504,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       let assetLink=<li className="list-group-item"><a href="#" >Add-On</a></li>;
       let sectionLink;
       let moduleLink;
+      let editLink;
         
       if (node.orgType==OrgContentTypes.Module) {
         sectionLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addSection (node)}>Section</a></li>
@@ -520,7 +518,18 @@ class OrganizationNodeRenderer extends Component <any,any>
         pageLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>;
         activityLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
       }
-                 
+             
+      if (node.orgType==OrgContentTypes.Item) {
+
+        if (node.typeDescription==="x-oli-workbook_page") {  
+          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editWorkbookPage (node)}>Edit</a></li>;
+        }
+
+        if (node.typeDescription==="x-oli-assessment2") {  
+          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editAssessment (node)}>Edit</a></li>;
+        }
+      }
+
       return (
             <div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
             <div tabIndex={0} className="onclick-menu">
@@ -532,6 +541,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                 {loLink}
                 {pageLink}
                 {activityLink}
+                {editLink}
                 Assets
                 {assetLink}
               </ul>
@@ -552,6 +562,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             addActivity,  
             addModule,
             addSection,
+            editWorkbookPage,
+            editAssessment,
             scaffoldBlockPxWidth,
             toggleChildrenVisibility,
             connectDragPreview,
@@ -588,6 +600,8 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.addActivity=addActivity;
         this.addModule=addModule;
         this.addSection=addSection;
+        this.editWorkbookPage=editWorkbookPage;
+        this.editAssessment=editAssessment;
 
         canDrag=true;
 
@@ -717,7 +731,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                                onEdit={(content) => this.editNodeTitle(node,content)} 
                              />
                              <div style={titleDivider}>
-                             {node.orgType + " actual title: " + node.title}
+                             {node.orgType}
                              </div>                             
                            </div>            
                            {popDown}                               

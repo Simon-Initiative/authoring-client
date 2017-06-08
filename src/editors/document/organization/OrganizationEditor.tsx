@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
+import { returnType } from '../../../utils/types';
 import { LOTypes, LearningObjective } from '../../../data/los';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
@@ -13,6 +16,8 @@ import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../..
 import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
+
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 
 import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
@@ -35,7 +40,7 @@ const tempnavstyle=
 
 interface OrganizationEditor 
 {
-
+  viewActions: any;
 }
 
 export interface OrganizationEditorState extends AbstractEditorState 
@@ -57,7 +62,7 @@ export interface OrganizationEditorState extends AbstractEditorState
   loadState:number;  
 }
 
-export interface OrganizationEditorProps extends AbstractEditorProps<models.OrganizationModel>
+export interface OrganizationEditorOwnProps extends AbstractEditorProps<models.OrganizationModel>
 {
   dispatch: any;
   documentId: string;
@@ -65,6 +70,21 @@ export interface OrganizationEditorProps extends AbstractEditorProps<models.Orga
   userId: string;    
   context: AppContext;
 }
+
+function mapStateToProps(state: any) {
+
+  const {
+    course,
+  } = state;
+
+  return {
+    course,
+  };
+}
+
+const stateGeneric = returnType(mapStateToProps);
+type OrganizationEditorReduxProps = typeof stateGeneric;
+type OrganizationEditorProps = OrganizationEditorReduxProps & OrganizationEditorOwnProps & { dispatch };
 
 /**
 *
@@ -91,7 +111,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         activitiesModalIsOpen : false, 
         titleIndex: 0,
         loadState: 0
-      });  
+      });
+        
+      this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);  
     }
         
     /**
@@ -178,8 +200,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
       this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-inline-assessment") {
+        if ((value.type=="x-oli-inline-assessment") || (value.type=="x-oli-assessment2")) {
           let activityLink:Linkable=new Linkable ();
+          console.log ("Activity Check: " + JSON.stringify (value));   
           activityLink.id=value.guid;
           activityLink.title=value.title;
           activityList.push (activityLink);    
@@ -199,7 +222,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
        this.setState ({loadState : (this.state.loadState + 1)}, function () {
          if (this.state.loadState>1) {
-           console.log ("Kicking in model validation ...");
+           //console.log ("Kicking in model validation ...");
            this.assignItemTypes ();  
          }
        }); 
@@ -233,13 +256,39 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (targetObject.orgType==OrgContentTypes.Item) {
            console.log ("found an item, searching for type content ..."); 
            targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
+           //targetObject.typeDescription=this.findType (targetObject.id);
+            
+           let testTarget:any=this.findTarget (targetObject.id); 
+            
+           if (testTarget!=null) { 
+             targetObject.id=testTarget.guid;
+             targetObject.title=testTarget.title;
+           }    
         }
                    
         if (targetObject.children.length>0) {  
           this.assignType (targetObject.children);
         }      
       }          
-    }      
+    }
+    
+    /**
+     * 
+     */
+    findTarget (anId:string) : Object {
+      console.log ("findTarget ("+anId+")");
+        
+      let foundTarget:Object=null;  
+        
+      this.props.context.courseModel.resources.map((value, id) => {        
+
+        if (value.id==anId) {
+          foundTarget=value;              
+        }              
+      })          
+        
+      return (foundTarget);
+    }
     
     /**
      * This is currently highly inefficient since we can't break out of the map routine
@@ -716,6 +765,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
 
               var newNode:OrgItem=new OrgItem ();
               newNode.id=originNode.id;
+              //newNode.resourceRef.idRef=originNode.resourceRef.idRef;
               newNode.title=originNode.title;
               newNode.typeDescription=itemType;  
               mergedList.push (newNode);
@@ -777,7 +827,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }    
                    
-      return (<div></div>);           
+      return (<div></div>);
     }
     
     /**
@@ -795,6 +845,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             let ephemeral:Linkable=new Linkable ();
             ephemeral.title=testItem.title;
             ephemeral.id=testItem.id;
+            //ephemeral.id=testItem.resourceRef.idRef;
             actList.push (ephemeral);
           }
       }
@@ -812,7 +863,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       //console.log (JSON.stringify (anObject));
 
-      if ((anObject ["node"]["typeDescription"]=="x-oli-assessment2") || (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")) {
+      if (
+          (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
+          (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
+          (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
+         ) {
         if (anObject ["nextParent"]["typeDescription"]!="Item") {
           return (false);  
         } 
@@ -838,10 +893,54 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         optionalProps ["addActivity"]=this.addActivity.bind (this);
         optionalProps ["addModule"]=this.addModule.bind (this);
         optionalProps ["addSection"]=this.addSection.bind (this);
+        optionalProps ["editWorkbookPage"]=this.editWorkbookPage.bind (this);
+        optionalProps ["editAssessment"]=this.editAssessment.bind (this);        
         
         return (optionalProps);
     }                
-            
+
+    /**
+     * 
+     */
+    doUndo () : void {
+      console.log ("doUndo ()");
+
+    }
+
+    /**
+     * 
+     */
+    doRedo () : void {
+      console.log ("doRedo ()");
+
+    }
+    
+    /**
+     * 
+     */
+    editWorkbookPage (aNode):void {
+      console.log ("editWorkbookPage");
+
+      console.log ("Switching to WorkbookPage editor for document with id: " + aNode.id);
+        
+      this.setState ({orgTarget: aNode}, () => {
+        this.props.dispatch(viewActions.viewDocument(aNode.id));
+      });  
+    }
+    
+    /**
+     * 
+     */
+    editAssessment (aNode):void {
+      console.log ("editAssessment");
+        
+      console.log ("Switching to Assessment editor for document with id: " + aNode.id);  
+      
+      this.setState ({orgTarget: aNode}, () => {
+        this.props.dispatch(viewActions.viewDocument(aNode.id));
+      });      
+    }     
+
     /**
      * 
      */
@@ -858,6 +957,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                      <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
+                                       onRedo={this.doRedo.bind(this)}             
+                                       undoEnabled={this.state.undoStackSize > 0}
+                                       redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>
                   </div>
                   {lolinker}
                   {pagelinker}
@@ -875,4 +978,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     }
 }
 
-export default OrganizationEditor;
+//export default OrganizationEditor;
+export default connect<OrganizationEditorReduxProps, {}, OrganizationEditorOwnProps>
+  (mapStateToProps)(OrganizationEditor);

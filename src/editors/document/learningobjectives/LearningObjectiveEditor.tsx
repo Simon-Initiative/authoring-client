@@ -16,6 +16,8 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
+
 import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
@@ -410,6 +412,22 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                    
       return (<div></div>);           
     }
+    
+    /**
+     * 
+     */
+    doUndo () : void {
+      console.log ("doUndo ()");
+
+    }
+
+    /**
+     * 
+     */
+    doRedo () : void {
+      console.log ("doRedo ()");
+
+    }    
 
     /**
      * 
@@ -426,6 +444,10 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
                         <a className="nav-link" style={{"outline": "none"}} href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                         <a className="nav-link" style={{"outline": "none"}} href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                        <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
+                                         onRedo={this.doRedo.bind(this)}             
+                                         undoEnabled={this.state.undoStackSize > 0}
+                                         redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>                        
                     </nav>
                    {skilllinker}
                     <SortableTree
