@@ -52,6 +52,7 @@ const entityHandlers = {
   link,
   LINK: pastedLink,
   IMAGE: pastedImage,
+  image: inlineImage,
   math,
   input_ref,
   cite,
@@ -976,7 +977,9 @@ function translateInline(
     if (key === '#math') {
       return obj;
     } else {
-      obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+      if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
+        obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+      }
     }
 
     return obj;
@@ -1027,6 +1030,13 @@ function link(s : common.RawEntityRange, text : string, entityMap : common.RawEn
   const { data } = entityMap[s.key];
 
   return data.link.toPersistence(toPersistence);
+}
+
+function inlineImage(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+
+  return data.image.toPersistence(toPersistence);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {

@@ -61,7 +61,7 @@ class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
             <option value="xml">XML</option>
           </Select>
         <PreformattedText onEdit={this.onSourceEdit} 
-          src={this.props.data.codeblock.source} editMode={this.state.editMode} />
+          src={this.props.data.codeblock.source} editMode={this.props.blockProps.editMode} />
       </div>);
   }
 }

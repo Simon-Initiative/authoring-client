@@ -44,12 +44,14 @@ export const EntityTypes = types.strEnum([
 
   // Inline entities
   'activity_link',
+  'link',
+  'image_link',
+  'image_activity_link',
   'code',
   'formula',
   'math',
   'quote',
   'bdo',
-  'link',
   'xref',
   'wb_manual',
   'cite',
