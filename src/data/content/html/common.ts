@@ -20,7 +20,7 @@ export const PurposeTypes : PurposeType[] = [
 
 export const EntityTypes = types.strEnum([
 
-  // Sentinals
+  // Block Sentinels
   'pullout_begin',
   'pullout_end',
   'example_begin',
@@ -41,6 +41,10 @@ export const EntityTypes = types.strEnum([
   'meaning_end',
   'material_begin',
   'material_end',
+
+  // Inline sentinels
+  'formula_begin',
+  'formula_end',
 
   // Inline entities
   'activity_link',

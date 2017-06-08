@@ -63,12 +63,14 @@ class Image extends React.PureComponent<any, any> {
     }
 
     return (
-      <img 
-        onClick={this.onClick}
-        src={fullSrc}
-        height={data.image.height}
-        width={data.image.width}
-        data-offset-key={this.props.offsetKey}/>
+      <span data-offset-key={this.props.offsetKey}>
+        <img 
+          onClick={this.onClick}
+          src={fullSrc}
+          height={data.image.height}
+          width={data.image.width}
+          />
+      </span>
     );
   }
 }

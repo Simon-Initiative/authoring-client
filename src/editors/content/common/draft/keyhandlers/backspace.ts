@@ -15,7 +15,7 @@ export default function handle(
   } 
 
   // Handle backspacing to delete an immutable entity
-  const entityBefore = getEntityBefore(start - 1, editorState);
+  const entityBefore = getEntityBefore(start, editorState);
   if (entityBefore !== null) {
     return handleBackspaceAtEntity(editorState, onChange);
   }
@@ -33,9 +33,9 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
   const key = currentContentBlock.getKey();
   const rangeToRemove = new SelectionState({
     anchorKey: key,
-    anchorOffset: start - 2,
+    anchorOffset: start,
     focusKey: key,
-    focusOffset: start - 1,
+    focusOffset: start + 1,
     isBackwards: false,
     hasFocus: false,
   });
@@ -48,9 +48,9 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
 
   const newSelection = new SelectionState({
     anchorKey: key,
-    anchorOffset: start - 2,
+    anchorOffset: start - 1,
     focusKey: key,
-    focusOffset: start - 2,
+    focusOffset: start - 1,
     isBackwards: false,
     hasFocus: false,
   });
@@ -69,7 +69,7 @@ function getEntityBefore(position: number, editorState: EditorState) {
   const currentContent = editorState.getCurrentContent();
   const currentContentBlock = currentContent.getBlockForKey(anchorKey);
 
-  const key = currentContentBlock.getEntityAt(position - 1);
+  const key = currentContentBlock.getEntityAt(position);
 
   if (key !== null) {
     const entity = currentContent.getEntity(key);

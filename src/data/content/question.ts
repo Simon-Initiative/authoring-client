@@ -63,8 +63,13 @@ function tagInputRefsWithType(model: Question) {
   const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
     .reduce((contentState, info) => {
       console.log(info);
-      const type = byId[info.entity.data['@input']].contentType;
-      return contentState.mergeEntityData(info.entityKey, { $type: type });
+      if (byId[info.entity.data['@input']] !== undefined) {
+        const type = byId[info.entity.data['@input']].contentType;
+        return contentState.mergeEntityData(info.entityKey, { $type: type });
+      } else {
+        return contentState;
+      }
+      
     }, model.body.contentState);
 
   const body = model.body.with({contentState});
