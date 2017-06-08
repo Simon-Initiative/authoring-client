@@ -24,6 +24,17 @@
 }
 
 /**
+ * Override to the default sortable tree class that adds a scrollbar
+ * to the inner pane. 
+ */
+.rst__virtualScrollOverride {
+    overflow: hidden !important;
+    * {
+        box-sizing: border-box;
+    }
+}
+
+/**
 * The CSS below is used by the Org node renderer to display the drop-
 * down menu Nick designed. It should really go into its own file but
 * I'm keeping it here to have all node renderer settings together

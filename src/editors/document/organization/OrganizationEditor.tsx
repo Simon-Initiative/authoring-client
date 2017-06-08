@@ -30,11 +30,17 @@ import LearningObjectiveLinker from '../../../components/LinkerDialog';
 
 import { AppContext } from '../../common/AppContext';
 
-const tempnavstyle=
+const orgstyle=
 {
-    h2:
-    {
-        marginRight: '10px'
+    h2: {
+      marginRight: '10px'
+    },
+    treeStyle: {
+      //border: "1px solid green"
+      height: "100%",    
+    },
+    treeInnerStyle: {
+      //border: "1px solid red"  
     }
 };
 
@@ -152,6 +158,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
 
+      /*  
       this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
@@ -162,7 +169,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             });
           });
         }          
-      });         
+      });
+      */
+        
+      persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
+        if (loDocuments.length!=0) {  
+          console.log ("Retrieved " + loDocuments.length + " LO documents");
+           
+          let loModel:models.LearningObjectiveModel=loDocuments [0].model as models.LearningObjectiveModel;   
+          this.setState ({los: loModel.with (this.state.los)},function (){
+            this.resolveReferences ();                
+          });
+        } else {
+          console.log ("Error: no learning objectives retrieved!");  
+        }
+      });   
     }    
 
     /**
@@ -236,7 +257,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       let immutableHelper = this.state.treeData.slice();
                 
-      this.assignType (immutableHelper);  
+      this.assignType (immutableHelper);
 
       this.onEdit (immutableHelper);          
     }
@@ -246,21 +267,22 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     assignType (aNode:Array <OrgItem>): void
     {
-      console.log ("assignType ()");
+      //console.log ("assignType ()");
         
       for (let i=0;i<aNode.length;i++) {
         let targetObject:OrgItem=aNode [i] as OrgItem;
           
-        console.log ("Examining node with type: " + targetObject.orgType);  
+        //console.log ("Examining node with type: " + targetObject.orgType);  
         
         if (targetObject.orgType==OrgContentTypes.Item) {
-           console.log ("found an item, searching for type content ..."); 
-           targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
+           //console.log ("found an item, searching for type content ..."); 
+           //targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
            //targetObject.typeDescription=this.findType (targetObject.id);
             
            let testTarget:any=this.findTarget (targetObject.id); 
             
            if (testTarget!=null) { 
+             targetObject.typeDescription=testTarget.type;
              targetObject.id=testTarget.guid;
              targetObject.title=testTarget.title;
            }    
@@ -273,10 +295,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     }
     
     /**
-     * 
+     * This is currently highly inefficient since we can't break out of the map routine
+     * by using 'return'. Should be changed when possible because this can become a
+     * time sink.
      */
     findTarget (anId:string) : Object {
-      console.log ("findTarget ("+anId+")");
+      //console.log ("findTarget ("+anId+")");
         
       let foundTarget:Object=null;  
         
@@ -295,6 +319,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * by using 'return'. Should be changed when possible because this can become a
      * time sink.
      */
+    /*
     findType (anId:string) : string {
       //console.log ("findType ("+anId+")");
             
@@ -309,7 +334,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       });
                   
       return (result);  
-    }    
+    }
+    */   
     
     /**
      *
@@ -953,7 +979,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       return (
               <div>
                   <div>
-                      <h2 className="h2 organize" style={tempnavstyle.h2}>Course Content</h2>
+                      <h2 className="h2 organize" style={orgstyle.h2}>Course Content</h2>
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
@@ -965,7 +991,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                   {lolinker}
                   {pagelinker}
                   {activitylinker}
-                  <SortableTree
+                  <SortableTree id="orgtree"
+                      style={orgstyle.treeStyle}
+                      innerStyle={orgstyle.treeInnerStyle}
                       maxDepth={3}
                       treeData={this.state.treeData}
                       onChange={ treeData => this.processDataChange({treeData}) }
