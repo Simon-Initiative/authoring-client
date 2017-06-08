@@ -167,7 +167,6 @@ function handleSentinelTransition(
 
   if (type.endsWith('_end')) {
     // Simply pop the context stack
-    console.log(type);
     context.pop();
 
   } else if (type === common.EntityTypes.section_begin) {
@@ -422,7 +421,6 @@ function translateSection(
   };
 
   top(context).push(s);
-  console.log('pushing context section');
   context.push((s.section['#array'][1] as any).body['#array']);
 
 }
@@ -442,7 +440,6 @@ function translatePullout(
   };
 
   top(context).push(p);
-  console.log('pushing context pullout');
   context.push(p.pullout['#array']);
 
 }
@@ -465,7 +462,6 @@ function translateDefinition(
   };
 
   top(context).push(p);
-  console.log('pushing context definition');
   context.push(p.definition['#array']);
 
 }
@@ -483,7 +479,6 @@ function translateTitle(
   };
 
   top(context).push(p);
-  console.log('pushing context title');
   context.push(p.title['#array']);
 
 }
@@ -506,7 +501,6 @@ function translatePronunciation(
   };
 
   top(context).push(p);
-  console.log('pushing context pro');
   context.push(p.pronunciation['#array']);
 
 }
@@ -524,7 +518,6 @@ function translateTranslation(
   };
 
   top(context).push(p);
-  console.log('pushing context transl');
   context.push(p.translation['#array']);
 
 }
@@ -542,7 +535,6 @@ function translateMaterial(
   };
 
   top(context).push(p);
-  console.log('pushing context material');
   context.push(p.material['#array']);
 
 }
@@ -560,7 +552,6 @@ function translateMeaning(
   };
 
   top(context).push(p);
-  console.log('pushing context meaning');
   context.push(p.meaning['#array']);
 
 }
@@ -588,7 +579,6 @@ function translateExample(
   };
 
   top(context).push(e);
-  console.log('pushing context example');
   context.push(e.example['#array']);
 
 }
@@ -1150,10 +1140,8 @@ function translateTextBlock(
   const intervals = combineIntervals(rawBlock);
 
   if (hasOverlappingIntervals(intervals)) {
-    console.log('has overlapping');
     translateOverlapping(rawBlock, block, entityMap, container);
   } else {
-    console.log('does not have overlapping');
     translateNonOverlapping(rawBlock, block, intervals, entityMap, container);
   }
 }
