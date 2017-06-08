@@ -1298,7 +1298,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     const doc = [{
         "skills_model": {
           "@id": this.resource.id,
-          "title": this.title,
+          "title": this.title.text,
           "skills": this.skills
         }
       }];
