@@ -158,6 +158,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
 
+      /*  
       this.props.context.courseModel.resources.map((value, id) => {        
         if (value.type=="x-oli-learning_objectives") {
           persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
@@ -168,7 +169,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             });
           });
         }          
-      });         
+      });
+      */
+        
+      persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
+        if (loDocuments.length!=0) {  
+          console.log ("Retrieved " + loDocuments.length + " LO documents");
+           
+          let loModel:models.LearningObjectiveModel=loDocuments [0].model as models.LearningObjectiveModel;   
+          this.setState ({los: loModel.with (this.state.los)},function (){
+            this.resolveReferences ();                
+          });
+        } else {
+          console.log ("Error: no learning objectives retrieved!");  
+        }
+      });   
     }    
 
     /**
