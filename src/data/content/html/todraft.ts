@@ -384,6 +384,15 @@ function isVirtualParagraph(persistenceFormat: Object) {
   return false;
 }
 
+function isEmptyContent(obj) {
+  if (obj instanceof Array) {
+    return obj.length === 0 || (obj.length === 1 && Object.keys(obj[0]).length === 0);
+  } else {
+    return Object.keys(obj).length === 0;
+  }
+  
+}
+
 export function toDraft(persistenceFormat: Object) : ContentState {
   
   const draft : common.RawDraft = {
@@ -394,10 +403,19 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   // Sometimes serialization results in a top-level object 
   // that has just #text or just an array of inline styles. We
   // handle this simply by treating it as a paragraph. 
-  if (isVirtualParagraph(persistenceFormat)) {
+
+  if (isEmptyContent(persistenceFormat)) {
+    addNewBlock(draft, {});
+    return convertFromRaw(draft);
+  } else if (isVirtualParagraph(persistenceFormat)) {
     paragraph(persistenceFormat, { draft, depth: 0 });
   } else {
-    parse(persistenceFormat, { draft, depth: 0 });
+    if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
+      parse(persistenceFormat[0], { draft, depth: 0 });
+    } else {
+      parse(persistenceFormat, { draft, depth: 0 });
+    }
+    
   }
   
   // Add a final empty block that will ensure that we have content past

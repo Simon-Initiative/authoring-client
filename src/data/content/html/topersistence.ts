@@ -147,7 +147,19 @@ function translateBlock(
 
 
 
-const top = (stack : Stack) => stack[stack.length - 1];
+const top = (stack : Stack) => {
+  const s = stack[stack.length - 1];
+  return {
+    push: (o) => {
+      if (s !== undefined) {
+        s.push(o);
+      } else {
+        console.log('Count not push onto context');
+      }
+    },
+  };
+    
+};
 
 function handleSentinelTransition(
   type: common.EntityTypes, iterator: BlockIterator, 
@@ -155,6 +167,7 @@ function handleSentinelTransition(
 
   if (type.endsWith('_end')) {
     // Simply pop the context stack
+    console.log(type);
     context.pop();
 
   } else if (type === common.EntityTypes.section_begin) {
@@ -377,14 +390,18 @@ function translateSection(
     // Process the title content
     title = processTitle(block.rawBlock, block.block, entityMap);
 
+    // Move past the title_end block
     block = iterator.peek();
-    while (block !== null 
-      && block.rawBlock.type === 'atomic' 
-      && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
-
+    while (block !== null) {
+      if (block.rawBlock.type === 'atomic' 
+        && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
+        block = iterator.next();
+        break;
+      }
       block = iterator.next();
     }
-
+    
+    
   } else {
     title = {
       title: {
@@ -405,6 +422,7 @@ function translateSection(
   };
 
   top(context).push(s);
+  console.log('pushing context section');
   context.push((s.section['#array'][1] as any).body['#array']);
 
 }
@@ -424,6 +442,7 @@ function translatePullout(
   };
 
   top(context).push(p);
+  console.log('pushing context pullout');
   context.push(p.pullout['#array']);
 
 }
@@ -446,6 +465,7 @@ function translateDefinition(
   };
 
   top(context).push(p);
+  console.log('pushing context definition');
   context.push(p.definition['#array']);
 
 }
@@ -463,6 +483,7 @@ function translateTitle(
   };
 
   top(context).push(p);
+  console.log('pushing context title');
   context.push(p.title['#array']);
 
 }
@@ -485,6 +506,7 @@ function translatePronunciation(
   };
 
   top(context).push(p);
+  console.log('pushing context pro');
   context.push(p.pronunciation['#array']);
 
 }
@@ -502,6 +524,7 @@ function translateTranslation(
   };
 
   top(context).push(p);
+  console.log('pushing context transl');
   context.push(p.translation['#array']);
 
 }
@@ -519,6 +542,7 @@ function translateMaterial(
   };
 
   top(context).push(p);
+  console.log('pushing context material');
   context.push(p.material['#array']);
 
 }
@@ -536,6 +560,7 @@ function translateMeaning(
   };
 
   top(context).push(p);
+  console.log('pushing context meaning');
   context.push(p.meaning['#array']);
 
 }
@@ -563,6 +588,7 @@ function translateExample(
   };
 
   top(context).push(e);
+  console.log('pushing context example');
   context.push(e.example['#array']);
 
 }
