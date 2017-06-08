@@ -25,7 +25,7 @@ export class InsertSectionCommand extends AbstractCommand<EditorState> {
     const endBlockKey = generateRandomKey();
 
     let content = editorState.getCurrentContent();
-    content = content.createEntity(EntityTypes.section_begin, 'IMMUTABLE', { type: 'section_begin', purpose: 'checkpoint' });
+    content = content.createEntity(EntityTypes.section_begin, 'IMMUTABLE', { type: 'section_begin', purpose: '' });
     const beginKey = content.getLastCreatedEntityKey();
 
     content = content.createEntity(EntityTypes.section_end, 'IMMUTABLE', { type: 'section_end', beginBlockKey});

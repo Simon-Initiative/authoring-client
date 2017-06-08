@@ -39,6 +39,8 @@ export class SectionBegin extends InteractiveRenderer<SectionBeginProps, Section
         <span className='SentinelUI'>
           <Select editMode={this.props.blockProps.editMode} 
             label='Purpose' value={this.props.data.purpose} onChange={onClick}>
+            
+            <option value="">- none -</option>
             <option value='checkpoint'>Checkpoint</option>
             <option value='didigetthis'>Did I get this</option>
             <option value='lab'>Lab</option>
