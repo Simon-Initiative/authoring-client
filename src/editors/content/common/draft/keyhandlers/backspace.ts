@@ -102,14 +102,14 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
     let start;
     let end;
 
-    if (data.type.endsWith('_begin')) {
-      oppositeSentinel = data.type.substr(0, data.type.indexOf('_') + 1) + 'end';
+    if (entity.type.endsWith('_begin')) {
+      oppositeSentinel = entity.type.substr(0, entity.type.indexOf('_') + 1) + 'end';
       direction = 1;
       start = 0;
       end = currentContent.getBlocksAsArray().length;
 
-    } else if (data.type.endsWith('_end')) {
-      oppositeSentinel = data.type.substr(0, data.type.indexOf('_') + 1) + 'begin';
+    } else if (entity.type.endsWith('_end')) {
+      oppositeSentinel = entity.type.substr(0, entity.type.indexOf('_') + 1) + 'begin';
       direction = -1;
       start = currentContent.getBlocksAsArray().length - 1;
       end = -1;
