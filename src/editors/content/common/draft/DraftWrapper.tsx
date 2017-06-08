@@ -130,6 +130,9 @@ const styleMap = {
   }
 };
 
+const UL_WRAP = <ul className="public-DraftStyleDefault-ul" />;
+const OL_WRAP = <ol className="public-DraftStyleDefault-ol" />;
+
 const blockRenderMap = Immutable.Map({
   'header-one': { element: 'h1' },
   'header-two': { element: 'h2' },
@@ -140,8 +143,8 @@ const blockRenderMap = Immutable.Map({
   'blockquote': { element: 'blockquote' },
   'code': { element: 'pre' },
   'atomic': { element: 'div' },
-  'unordered-list-item': { element: 'li' },
-  'ordered-list-item': { element: 'li' },
+  'unordered-list-item': { element: 'li', wrapper: UL_WRAP },
+  'ordered-list-item': { element: 'li', wrapper: OL_WRAP },
   'unstyled': { element: 'div' },
   'formula': { element: 'div' },
 });
