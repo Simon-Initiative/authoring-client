@@ -1,13 +1,13 @@
-import {CourseId, DocumentId} from './types';
+import { CourseId, DocumentId } from './types';
 import * as models from './models';
 import * as Immutable from 'immutable';
-import {credentials, getHeaders, getFormHeaders} from '../actions/utils/credentials';
-import {configuration} from '../actions/utils/config';
-import {Resource} from './resource';
-import {UserInfo} from "./user_info";
-import {isArray} from "util";
+import { credentials, getHeaders, getFormHeaders } from '../actions/utils/credentials';
+import { configuration } from '../actions/utils/config';
+import { Resource } from './resource';
+import { UserInfo } from "./user_info";
+import { isArray } from "util";
 
-import { login, refreshTokenIfInvalid } from '../actions/utils/keycloak';
+import { forceLogin, refreshTokenIfInvalid } from '../actions/utils/keycloak';
 
 const fetch = (window as any).fetch;
 
@@ -59,7 +59,7 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 
 function handleError(err, reject) {
   if (err.message && err.message === 'Unauthorized') {
-    (window as any).location = configuration.protocol + configuration.hostname;
+    forceLogin();
   } else {
     reject(err);
   }
@@ -71,7 +71,7 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
     .then(((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -108,7 +108,7 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -149,7 +149,7 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -184,7 +184,8 @@ export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Pr
     });
 }
 
-export function bulkFetchDocuments(courseId: string, filters: string[], action: string): Promise<Document[]> {
+export function bulkFetchDocuments(
+  courseId: string, filters: string[], action: string): Promise<Document[]> {
   // Valid values for 'action' is limited to 'byIds' or 'byTypes'
   const url = `${configuration.baseUrl}/${courseId}/resources/bulk?action=${action}`;
 
@@ -192,7 +193,7 @@ export function bulkFetchDocuments(courseId: string, filters: string[], action: 
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -246,7 +247,7 @@ export function developerRegistration(courseId: string, userNames: string[], act
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -332,7 +333,7 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -375,7 +376,7 @@ export function persistDocument(doc: Document): Promise<Document> {
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -434,7 +435,7 @@ export function createWebContent(courseId: string, file): Promise<string> {
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -492,7 +493,7 @@ export function acquireLock(courseId: CourseId, id: DocumentId): Promise<Object>
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {
@@ -538,7 +539,7 @@ function lock(courseId: CourseId, id: DocumentId, action: string): Promise<Objec
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        login();
+        forceLogin();
       }
 
       return new Promise((resolve, reject) => {

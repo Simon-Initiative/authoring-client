@@ -24,6 +24,10 @@ export function initialize(
   login();
 }
 
+export function forceLogin() {
+  (window as any).location = configuration.protocol + configuration.hostname;
+}
+
 export function login() {
   
   kc = keyCloak(keycloakConfig);
