@@ -65,19 +65,24 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
 
     const { sources, controls } = this.props.data.audio;
 
-    let src = '';
+    let fullSrc = '';
     if (sources.size > 0) {
-      src = this.props.blockProps.context.baseUrl 
-        + '/' + this.props.blockProps.context.courseId
-        + '/' 
-        + this.props.blockProps.context 
-        + sources.first().src;
+      const src = sources.first().src;
+      if (src.startsWith('..')) {
+        fullSrc = this.props.blockProps.context.baseUrl 
+          + '/' + this.props.blockProps.context.courseId
+          + '/' 
+          + this.props.blockProps.context.resourcePath 
+          + '/' + src;
+      } else {
+        fullSrc = src;
+      }
     }
     
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
-          <audio src={src} controls={controls}/>
+          <audio src={fullSrc} controls={controls}/>
         </div>
         <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
