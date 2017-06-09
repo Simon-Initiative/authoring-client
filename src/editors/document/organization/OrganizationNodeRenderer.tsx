@@ -142,7 +142,7 @@ const styles = {
     "margin" : "auto",
     "width" : "16px",
     "height" : "16px",
-    /*"cursor": "move",*/
+    "cursor": "move",
     "backgroundSize" : "44px 44px",
     "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAKMSURBVDhPXVNLT1NREP7u7e0LAwrdeLFRm1RdkKgLqUseCV3ZB60JbixoIIGwlLUJj59RIcACcaOCLCCGda3ijpg0lTRtMFFopTxa+qDHM9PemvBtZua7M3PO+WauIiTmZmfw+88BVFWFDKEoCgiGf5kjXG1rxczsHJSpqVfCopnxenoax/k8rFYrKpWKLFChaSacn5/DZrOhWq1yoaZpUOW3+fk32Pm+A4yNjcqmQsiEpr24uGBfFrOl+DJHGI48F6pm0nB6egaTycQnkKWnFAoFvg2BTieOYHDlcqWeS4HNakH++BhtrVfg6GhHNBpFS0sLJicnMBgMwGKxYHt7Gw5HB+w2K1KplOTM3AgT4+Pi5OSEr7S1uSk83Y/YJzx8cF/cvnWzEQkxMhwRCwsL7JdKZfHyxYhQBQQLQxjwehH/+o19ulHh7AwulwvJZJK59bU1eL0DqNVqMJvrNWp9OECpVGLraL+GRCKBT+trCIef4onPh7crK/wt+/cInZ03muOmgbIGJJIhji8QwOetLbxbXcVgOAS/P4CPH94jHo+jr7eHcyhfTgV0uGygyOuYmSAEg0FsbGxgb+8nurs9cLvdODg8xPLyEkKhMOfQUlGNkFY2ELw4Bjyex/gSj+HO3XsNBujp7cWqfEZffz/HNL5yqQy5xpAi1reLyGKxCF3Xkcsd8U0MhOXJB9kcurq6OCa9NDnGpgYEIu12O4uzv/8LkcgwNyT4/H5kMhn2mwvW+Ce4AalKpCGO3qk3G9LzaGxOp5Mb0oJRrMgaGqFalQmxWIy70VOMnTCmQmIZa04NCXTgj91dfqqSy2bF0LMh6Nd1qS5JakDOWSjM/Yf8KjnVpCKdTmNxcQn/AC+cYPqO5VjgAAAAAElFTkSuQmCC') no-repeat center",      
   },
@@ -150,7 +150,7 @@ const styles = {
     "margin" : "auto",
     "width" : "16px",
     "height" : "16px",
-    /*"cursor": "move",*/
+    "cursor": "move",
     "backgroundSize" : "44px 44px",
     "background": "#ffffff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAEOSURBVDhPrZOxjYUwDIZ/rqCmRdCxAHSA6GECBDuwBAUbwAJ0bABbsAMUjIBE8e7ZlzxCDj2d9O6TrMR2Yjm/HOPxBB9wW2BdV7Rti3me2fd9H1VVwXVd9i9QAZUoiqjgrVFO59KBYRhi9x7lCr7EijiOxe6kaRrUdS28k8tZ6mBZlkur0iR3ObpDcAckmE6SJNj3ndsNw1BET7qu45U1yLIM0zRxQDIMA7Ztg2masCwLZVmKzA9pmmIcx1MDnTzP4TgObNtGURQieiIF5wJBELAj8TyP1+M4+BmEjEloNhh6gi5i3/cUfvkExdQzUsSX1O8GSDd1oP5vkAhKPKsL7zeUUy8TH3+m2wJ/B/gGDaPth4EM8IcAAAAASUVORK5CYII=') no-repeat center",      
   },  

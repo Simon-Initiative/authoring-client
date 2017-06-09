@@ -154,11 +154,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     loadLearningObjectives () : void {
-      console.log ("loadLearningObjectives ()");
+      //console.log ("loadLearningObjectives ()");
 
       persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
         if (loDocuments.length!=0) {  
-          console.log ("Retrieved " + loDocuments.length + " LO documents");
+          //console.log ("Retrieved " + loDocuments.length + " LO documents");
 
           var tempLOArray:Array<LearningObjective>=new Array ();  
             
@@ -171,7 +171,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }  
           }
             
-          console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
+          //console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
             
           this.setState ({los: tempLOArray}, () => {
 
@@ -882,7 +882,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Item")) {
           console.log ("Can't put an item below an item");  
           return (false);  
-        }     
+        }
+
         /*        
         if (
             (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
