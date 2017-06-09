@@ -51,7 +51,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, {}> {
         <div className="row">
           <div className="col-md-12">
             <h1>Create a new course content package</h1>
-            <p>After this process if you would like to change these settings you can always go to Settings > My Course</p>
+            
           </div>
         </div>
         <div className="row">
