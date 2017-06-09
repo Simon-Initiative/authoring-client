@@ -56,6 +56,8 @@ function tagInputRefsWithType(model: Question) {
       if ((c as any).id !== undefined) {
         p[(c as any).id] = c;
         return p;
+      } else {
+        return p;
       }
     }, 
     {});
