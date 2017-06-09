@@ -396,13 +396,21 @@ function getInlineHandler(key: string) : InlineHandler {
 }
 
 function isVirtualParagraph(persistenceFormat: Object) {
-  const children = getChildren(persistenceFormat);
+  
+  let children = null;
+  if (persistenceFormat['#array'] !== undefined) {
+    children = persistenceFormat['#array'];
+  } else {
+    children = getChildren(persistenceFormat);
+  }
+  
   if (children !== null && children.length > 0) {
     const firstKey = common.getKey(children[0]);
     return firstKey === '#cdata'
       || firstKey === '#text'
       || inlineHandlers[firstKey] !== undefined;
   }
+  
   return false;
 }
 
@@ -430,7 +438,15 @@ export function toDraft(persistenceFormat: Object) : ContentState {
     addNewBlock(draft, {});
     return convertFromRaw(draft);
   } else if (isVirtualParagraph(persistenceFormat)) {
-    paragraph(persistenceFormat, { draft, depth: 0 });
+
+    if (persistenceFormat['#array'] !== undefined) {
+      paragraph(
+        { p: persistenceFormat }, 
+        { draft, depth: 0 });
+    } else {
+      paragraph(persistenceFormat, { draft, depth: 0 });
+    }
+
   } else {
     if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
       parse(persistenceFormat[0], { draft, depth: 0 });
@@ -509,6 +525,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
 }
 
 function getChildren(item: Object, ignore = null) : Object[] {
+  
   const key = common.getKey(item);
 
   // Handle a case where there is no key
