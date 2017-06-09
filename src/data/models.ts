@@ -1225,11 +1225,16 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       aToList.push (newObj);
           
       if (aTree [i]["children"]) {
-        //console.log ("Lo has children, processing ...");  
-        let tList=aTree [i]["children"];
-        this.toFlat (tList,aToList);
+        if (aTree [i]["children"].length>0) {
+          //console.log ("Lo has children, processing ...");  
+          let tList=aTree [i]["children"];
+          this.toFlat (tList,aToList);
+        }    
       }
     }
+      
+    //console.log ("From tree: " + JSON.stringify (aTree));  
+    //console.log ("To flat: " + JSON.stringify (aToList));
         
     return (aToList);  
   }      
