@@ -196,7 +196,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * list of Linkables.
      */
     loadPages () : void {
-
       console.log ("loadPages ()");
         
       let pageList:Array<Linkable>=new Array <Linkable>();  
@@ -316,30 +315,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       return (foundTarget);
     }
-    
-    /**
-     * This is currently highly inefficient since we can't break out of the map routine
-     * by using 'return'. Should be changed when possible because this can become a
-     * time sink.
-     */
-    /*
-    findType (anId:string) : string {
-      //console.log ("findType ("+anId+")");
-            
-      let activityList:Array<Linkable>=new Array <Linkable>();                
-      let result:string="undefined";  
-                
-      this.props.context.courseModel.resources.map((value, id) => {           
-        if (value.id==anId) {
-          //console.log ("Found type: " + value.type);  
-          result=value.type;  
-        }          
-      });
-                  
-      return (result);  
-    }
-    */   
-    
+
     /**
      *
      */            
@@ -368,7 +344,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       } else {
         newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
       }  
-              
+
+      console.log ("To persistence: " + JSON.stringify (newModel));
+
       //this.props.onEdit(newModel);       
     }    
 
@@ -981,6 +959,15 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
       });      
+    }
+    
+    /**
+     * 
+     */
+    check ():void {
+      console.log ("check ()");
+              
+      this.onEdit (null); 
     }     
 
     /**
@@ -1001,6 +988,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                      <a className="btn btn-secondary" href="#" onClick={e => this.check ()}>Check</a>
                       <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
                                        onRedo={this.doRedo.bind(this)}             
                                        undoEnabled={this.state.undoStackSize > 0}

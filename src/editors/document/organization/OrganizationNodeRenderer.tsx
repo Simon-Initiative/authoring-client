@@ -501,7 +501,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       let loLink=<li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>;
       let pageLink=<li className="list-group-item">Page</li>;
       let activityLink=<li className="list-group-item">Activity</li>;
-      let assetLink=<li className="list-group-item"><a href="#" >Add-On</a></li>;
+      let assetLink=<li className="list-group-item">Add-On</li>;
       let sectionLink;
       let moduleLink;
       let editLink;
@@ -514,7 +514,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         moduleLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addModule (node)}>Module</a></li>
       }
 
-      if (node.orgType==OrgContentTypes.Section) {
+      if ((node.orgType==OrgContentTypes.Section) || (node.orgType==OrgContentTypes.Module)) {
         pageLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>;
         activityLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
       }
