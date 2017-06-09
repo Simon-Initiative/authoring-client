@@ -2208,8 +2208,8 @@ draft-js-utils@^0.1.5:
   resolved "https://registry.yarnpkg.com/draft-js-utils/-/draft-js-utils-0.1.7.tgz#e2b6927ca620edf1855a4bfc1cf1d21080a70f16"
 
 draft-js@Simon-Initiative/draft-js:
-  version "0.9.1"
-  resolved "https://codeload.github.com/Simon-Initiative/draft-js/tar.gz/4e51b0e9aa506f919778d150d9e4c4239d9bcce4"
+  version "0.9.2"
+  resolved "https://codeload.github.com/Simon-Initiative/draft-js/tar.gz/4cab2ed27606476d372c82df51cc0564ff785b3b"
   dependencies:
     babel-core "^6.8.0"
     babel-eslint "^6.1.2"
