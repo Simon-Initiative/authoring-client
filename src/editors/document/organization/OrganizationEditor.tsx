@@ -51,14 +51,12 @@ interface OrganizationEditor
 
 export interface OrganizationEditorState extends AbstractEditorState 
 {    
-  treeData : any;  
-  orgData: OrgOrganization;
+  treeData : any;
   loModalIsOpen : boolean;
   pagesModalIsOpen : boolean;
   activitiesModalIsOpen : boolean;
   model: any;
   context: AppContext;
-  //los: models.LearningObjectiveModel;
   los: Array <LearningObjective>;  
   pages: any;
   activities: any;
@@ -104,7 +102,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     constructor(props) {
       super(props, {
         treeData: [],
-        orgData: [],
         context: props.context,
         los: null,
         pages: null,
@@ -135,7 +132,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         model: this.props.model
       });
                 
-      this.setState({orgData: this.props.model.toplevel, treeData: this.props.model.organization, document: docu});
+      this.setState({treeData: this.props.model.organization, document: docu});
         
       this.loadLearningObjectives ();
       
@@ -339,13 +336,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       let newModel
 
       if (newData) {
-        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,newData);
+        newModel=models.OrganizationModel.updateModel (this.props.model,newData);
         this.setState ({treeData: newData});
       } else {
-        newModel=models.OrganizationModel.updateModel (this.props.model, this.state.orgData,this.state.treeData);
-      }  
-
-      console.log ("To persistence: " + JSON.stringify (newModel));
+        newModel=models.OrganizationModel.updateModel (this.props.model,this.state.treeData);
+      }
+        
+      newModel.toPersistence ();  
 
       //this.props.onEdit(newModel);       
     }    
@@ -800,16 +797,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         targetAnn=this.state.orgTarget.annotations;
       }
 
-      if (this.state.los) {
-        console.log ("A");  
+      if (this.state.los) {  
         return (<LearningObjectiveLinker title="Available Learning Objectives" 
                                          errorMessage="" 
                                          closeModal={this.closeLOModal.bind (this)} 
                                          sourceData={models.LearningObjectiveModel.toFlat (this.state.los,new Array<Linkable>())} 
                                          modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);
       }
-
-      console.log ("B");        
         
       return (<LearningObjectiveLinker title="Error" 
                                        errorMessage="No learning objectives available, did you create a Learning Objectives document?" 
@@ -968,7 +962,52 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       console.log ("check ()");
               
       this.onEdit (null); 
-    }     
+    }
+    
+    /**
+     * 
+     */    
+    handleTitleChange (event:any) : void {
+      console.log ("handleTitleChange ()");
+                
+      let newTopLevel:OrgOrganization=new OrgOrganization ();
+      newTopLevel.version=this.state.model.toplevel.version;      
+      newTopLevel.audience=this.state.model.toplevel.audience;
+      newTopLevel.description=this.state.model.toplevel.description;
+      newTopLevel.title=event.target.value;
+        
+      this.setState({model: this.state.model.with ({'toplevel': newTopLevel})});  
+    }
+    
+    /**
+     * 
+     */    
+    handleDescriptionChange (event:any) : void {
+      console.log ("handleDescriptionChange ()");
+        
+      let newTopLevel:OrgOrganization=new OrgOrganization ();
+      newTopLevel.version=this.state.model.toplevel.version;      
+      newTopLevel.audience=this.state.model.toplevel.audience;
+      newTopLevel.description=event.target.value;
+      newTopLevel.title=this.state.model.toplevel.title;
+        
+      this.setState({model: this.state.model.with ({'toplevel': newTopLevel})});        
+    }
+    
+    /**
+     * 
+     */    
+    handleAudienceChange (event:any) : void {
+      console.log ("handleAudienceChange ()");
+        
+      let newTopLevel:OrgOrganization=new OrgOrganization ();
+      newTopLevel.version=this.state.model.toplevel.version;      
+      newTopLevel.audience=event.target.value;
+      newTopLevel.description=this.state.model.toplevel.description;
+      newTopLevel.title=this.state.model.toplevel.title;
+        
+      this.setState({model: this.state.model.with ({'toplevel': newTopLevel})});        
+    }    
 
     /**
      * 
@@ -993,6 +1032,17 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                                        onRedo={this.doRedo.bind(this)}             
                                        undoEnabled={this.state.undoStackSize > 0}
                                        redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>
+                  </div>
+                  <div>
+                   <label>
+                   Organization Title: <input type="text" value={this.state.model.toplevel.title} onChange={e => this.handleTitleChange (e)} />
+                   </label>
+                   <label>
+                   Organization Description: <input type="text" value={this.state.model.toplevel.description} onChange={e => this.handleDescriptionChange (e)} />
+                   </label>
+                   <label>
+                   Audience: <input type="text" value={this.state.model.toplevel.audience} onChange={e => this.handleAudienceChange (e)} />
+                   </label>                       
                   </div>
                   {lolinker}
                   {pagelinker}

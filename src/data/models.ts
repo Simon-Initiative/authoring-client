@@ -715,9 +715,10 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   /**
    *
    */
-  static updateModel(oldModel: OrganizationModel, newTopLevel: OrgOrganization, newOrgModel: any): OrganizationModel {
+  static updateModel(oldModel: OrganizationModel, newOrgModel: any): OrganizationModel {
     console.log("updateModel ()");
-    var model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newOrgModel});
+    var model = new OrganizationModel({'organization': newOrgModel});
+    model = model.with({toplevel: oldModel.toplevel});
     model = model.with({resource: oldModel.resource});
     model = model.with({guid: oldModel.guid});
     model = model.with({type: oldModel.type});
@@ -741,8 +742,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     let orgNode = new OrgOrganization();// throw away for now
 
     if (aData) {
-      //for (let i in aData) {
-      //orgNode=new OrgOrganization ();// throw away for now
       orgNode.id = aData["@id"];
       orgNode.expanded = aData["@expanded"];
       orgNode.version = aData["@version"];
@@ -772,9 +771,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
             }
           }
         }
-        //}
       }
-      //}
     }
 
     return (orgNode);
@@ -785,8 +782,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    */
   static fromPersistence(json: Object): OrganizationModel {
     console.log("fromPersistence ()");
+      
+    console.log ("Org model: " + JSON.stringify (json));  
 
-    //var orgData:Array<Object>=json ["organization"];
     let a = (json as any);
     var orgData = a.doc.organization;
 
@@ -795,10 +793,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     var newData: Array<OrgSequence> = new Array();
     var newTopLevel: OrgOrganization = OrganizationModel.parseTopLevelOrganization(orgData);
 
-    //for (var i in orgData) {
     var oList = orgData["#array"];
 
-    //if (i=='organization') {
     console.log("Found start of organization data ...");
 
     if (oList) {
@@ -862,7 +858,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     console.log("toplevel: " + JSON.stringify(newTopLevel));
     console.log("newData: " + JSON.stringify(newData));
 
-    let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});//(OrganizationModel.updateModel(newTopLevel, newData));
+    let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});
 
     model = model.with({resource: Resource.fromPersistence(a)});
     model = model.with({guid: a.guid});
