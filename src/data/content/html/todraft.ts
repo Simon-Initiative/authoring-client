@@ -40,7 +40,9 @@ type WorkingBlock = {
 type BlockHandler = (item: Object, context: ParsingContext) => void;
 type InlineHandler = (
   offset: number, length: number, item: Object, 
-  context: ParsingContext, workingBlock: WorkingBlock) => void;
+  context: ParsingContext, 
+  workingBlock: WorkingBlock,
+  blockBeforeChildren: WorkingBlock) => void;
 
 const ol = listHandler.bind(undefined, 'ordered-list-item');
 const ul = listHandler.bind(undefined, 'unordered-list-item');
@@ -247,10 +249,35 @@ function imageInline(
 
 function formulaInline(
   offset: number, length: number, item: Object, 
-  context: ParsingContext, workingBlock: WorkingBlock) {
+  context: ParsingContext, workingBlock: WorkingBlock, 
+  blockBeforeChildren: WorkingBlock) {
 
+  // Adjust the full text to account for our insertion of
+  // the formula sentinels
+  workingBlock.fullText = workingBlock.fullText.substr(0, offset) 
+    + ' ' + workingBlock.fullText.substr(offset) + ' ';
   
+  // Adjust markup and entities that were added by children
+  const markupsStart = workingBlock.markups.length 
+    - (workingBlock.markups.length - blockBeforeChildren.markups.length);
+  const entitiesStart = workingBlock.entities.length 
+    - (workingBlock.entities.length - blockBeforeChildren.entities.length);
 
+  for (let i = markupsStart; i < workingBlock.markups.length; i += 1) {
+    workingBlock.markups[i].offset += 1;
+  }
+  for (let i = entitiesStart; i < workingBlock.entities.length; i += 1) {
+    workingBlock.entities[i].offset += 1;
+  }
+
+  // Now add the sentinels
+  insertEntity(
+    'IMMUTABLE', common.EntityTypes.formula_begin, 
+    offset, 1, item, context, workingBlock);
+
+  insertEntity(
+    'IMMUTABLE', common.EntityTypes.formula_end, 
+    offset + length + 1, 1, item, context, workingBlock);
 }
 
 function wb_inline(item: Object, context: ParsingContext) {
@@ -544,6 +571,14 @@ function getChildren(item: Object, ignore = null) : Object[] {
   }
 }
 
+function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {
+  return {
+    fullText: blockContext.fullText,
+    markups: [...blockContext.markups],
+    entities: [...blockContext.entities],
+  };
+}
+
 function processInline(
   item: Object, 
   context: ParsingContext, blockContext: WorkingBlock) {
@@ -557,6 +592,8 @@ function processInline(
   } else {
     
     const offset = blockContext.fullText.length;
+
+    const blockBeforeChildren = cloneWorkingBlock(blockContext);
 
     // Handle elements that do not have children, but
     // do require a specialized entity renderer
@@ -580,7 +617,7 @@ function processInline(
     
     const text = blockContext.fullText.substring(offset);
     const handler = getInlineHandler(key);
-    handler(offset, text.length, item, context, blockContext);
+    handler(offset, text.length, item, context, blockContext, blockBeforeChildren);
   }
   
 }
