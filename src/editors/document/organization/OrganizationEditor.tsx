@@ -58,7 +58,8 @@ export interface OrganizationEditorState extends AbstractEditorState
   activitiesModalIsOpen : boolean;
   model: any;
   context: AppContext;
-  los: models.LearningObjectiveModel;
+  //los: models.LearningObjectiveModel;
+  los: Array <LearningObjective>;  
   pages: any;
   activities: any;
   orgTarget : any;
@@ -158,31 +159,33 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     loadLearningObjectives () : void {
       console.log ("loadLearningObjectives ()");
 
-      /*  
-      this.props.context.courseModel.resources.map((value, id) => {        
-        if (value.type=="x-oli-learning_objectives") {
-          persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
-          {
-            let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-            this.setState ({los: loModel.with (this.state.los)},function (){
-              this.resolveReferences ();                
-            });
-          });
-        }          
-      });
-      */
-        
       persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
         if (loDocuments.length!=0) {  
           console.log ("Retrieved " + loDocuments.length + " LO documents");
-           
-          let loModel:models.LearningObjectiveModel=loDocuments [0].model as models.LearningObjectiveModel;   
-          this.setState ({los: loModel.with (this.state.los)},function (){
-            this.resolveReferences ();                
+
+          var tempLOArray:Array<LearningObjective>=new Array ();  
+            
+          for (let i=0;i<loDocuments.length;i++) {
+            let loModel:models.LearningObjectiveModel=loDocuments [i].model as models.LearningObjectiveModel;
+              
+            for (let j=0;j<loModel.los.length;j++) {
+               //console.log ("Adding LO: " + loModel.los [j].title); 
+               tempLOArray.push (loModel.los [j]); 
+            }  
+          }
+            
+          console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
+            
+          this.setState ({los: tempLOArray}, () => {
+
+            //console.log ("Data: " + JSON.stringify (this.state.los));              
+              
+            this.resolveReferences ();
           });
+                    
         } else {
           console.log ("Error: no learning objectives retrieved!");  
-        }
+        }         
       });   
     }    
 
@@ -223,7 +226,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       this.props.context.courseModel.resources.map((value, id) => {        
         if ((value.type=="x-oli-inline-assessment") || (value.type=="x-oli-assessment2")) {
           let activityLink:Linkable=new Linkable ();
-          console.log ("Activity Check: " + JSON.stringify (value));   
+          //console.log ("Activity Check: " + JSON.stringify (value));   
           activityLink.id=value.guid;
           activityLink.title=value.title;
           activityList.push (activityLink);    
@@ -811,17 +814,30 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     createLOLinkerDialog () {
+      console.log ("createLOLinkerDialog ()");
+                
       let targetAnn:Array<Linkable>=new Array ();
 
       if (this.state.orgTarget) {
         targetAnn=this.state.orgTarget.annotations;
       }
 
-      if (this.state.los!=null) {
-        return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeLOModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);
+      if (this.state.los) {
+        console.log ("A");  
+        return (<LearningObjectiveLinker title="Available Learning Objectives" 
+                                         errorMessage="" 
+                                         closeModal={this.closeLOModal.bind (this)} 
+                                         sourceData={models.LearningObjectiveModel.toFlat (this.state.los,new Array<Linkable>())} 
+                                         modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);
       }
-                   
-      return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeLOModal.bind (this)} sourceData={[]} modalIsOpen={this.state.loModalIsOpen} targetAnnotations={targetAnn} />);           
+
+      console.log ("B");        
+        
+      return (<LearningObjectiveLinker title="Error" 
+                                       errorMessage="No learning objectives available, did you create a Learning Objectives document?" 
+                                       closeModal={this.closeLOModal.bind (this)}
+                                       sourceData={[]} modalIsOpen={this.state.loModalIsOpen}
+                                       targetAnnotations={targetAnn} />);           
     }
     
     /**
@@ -829,7 +845,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createActivityLinkerDialog () {                
       if (this.state.activitiesModalIsOpen==true) {  
-        if (this.state.activities!=null) {
+        if (this.state.activities) {
           console.log ("createLinkerDialog ()");              
           return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-inline-assessment")} />);
         } else {
@@ -845,7 +861,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     createPageLinkerDialog () {      
       if (this.state.pagesModalIsOpen==true) {
-        if (this.state.pages!=null) {
+        if (this.state.pages) {
           console.log ("createPageLinkerDialog ()");
           return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-workbook_page")} />);
         } else {
@@ -972,6 +988,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     render() 
     {      
+      console.log ("render ()");
+        
       const lolinker=this.createLOLinkerDialog ();  
       const pagelinker=this.createPageLinkerDialog ();
       const activitylinker=this.createActivityLinkerDialog ();

@@ -132,7 +132,10 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
       console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
             
-      this.setState({sourceData: newProps.sourceData, modalIsOpen: newProps ["modalIsOpen"], targetAnnotations: newProps.targetAnnotations}, function () {
+      this.setState({sourceData: newProps.sourceData,
+                     errorMessage: newProps.errorMessage,     
+                     modalIsOpen: newProps ["modalIsOpen"], 
+                     targetAnnotations: newProps.targetAnnotations}, function () {
         //this.resolveAnnotations ();
       });
   }
@@ -151,8 +154,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       return;
     }
       
-    console.log ("Linking targetAnnotations: " + JSON.stringify (this.state.targetAnnotations));
-    console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));  
+    //console.log ("Linking targetAnnotations: " + JSON.stringify (this.state.targetAnnotations));
+    //console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));  
             
     // This will become local annotations
     var newData: Array <Item>=new Array ();
@@ -304,13 +307,13 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   render () {      
-    //console.log ("Source data: " + JSON.stringify (this.state.sourceData)); 
+    //console.log ("Source data: " + JSON.stringify (this.state.sourceData));
+    console.log ("Error message: " + this.state.errorMessage);   
    
     if (this.state.errorMessage) {  
       if (this.state.errorMessage!="") {
         let mPanel:any=tempnavstyle.objectContainer;
-        mPanel ["height"]="100%";
-        //mPanel ["border"]="1px solid red";     
+        mPanel ["height"]="100%";     
         return (<Modal
                  isOpen={this.state.modalIsOpen}
                  onAfterOpen={this.afterOpenModal}
