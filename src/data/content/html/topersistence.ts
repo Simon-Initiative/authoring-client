@@ -57,6 +57,8 @@ const entityHandlers = {
   input_ref,
   cite,
   quote,
+  formula_begin,
+  formula_end,
 };
 
 // Converts the draft ContentState object to the HtmlContent format
@@ -1032,6 +1034,14 @@ function link(s : common.RawEntityRange, text : string, entityMap : common.RawEn
   return data.link.toPersistence(toPersistence);
 }
 
+function formula_begin(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+  return { formula: { '#array': [] } };
+}
+
+function formula_end(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+  return { formula_end: {} };
+}
+
 function inlineImage(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
@@ -1138,6 +1148,28 @@ function translateNonOverlapping(
       container.push({ '#text': rawBlock.text.substring((s.offset + s.length), endOrNext) });
     }
     
+  }
+
+  // Post process to identify inline formula sentinels and reparent the 
+  // styles underneath a singular formula tag
+  let begin = null;
+  let end = null;
+  for (let i = 0; i < container.length; i += 1) {
+    const key = common.getKey(container[i]);
+    if (key === 'formula') {
+      begin = i;
+    } else if (key === 'formula_end') {
+      end = i;
+    }
+  }
+  if (begin !== null && end !== null) {
+    // We found both a begin and end, now slice the container array
+    // up to reposition the elements between the sentinels to be under
+    // the formula array
+    const deleted = container.splice(begin + 1, end - begin);
+    deleted.pop();
+
+    (container[begin] as any).formula['#array'] = deleted;
   }
     
 }

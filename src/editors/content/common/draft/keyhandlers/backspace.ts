@@ -1,4 +1,5 @@
-import { EditorState, Modifier, ContentState, SelectionState, ContentBlock } from 'draft-js';
+import { EditorState, Modifier, ContentState, 
+  SelectionState, ContentBlock, Entity } from 'draft-js';
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
 
@@ -17,34 +18,69 @@ export default function handle(
   // Handle backspacing to delete an immutable entity
   const entityBefore = getEntityBefore(start, editorState);
   if (entityBefore !== null) {
-    return handleBackspaceAtEntity(editorState, onChange);
+    return handleBackspaceAtEntity(entityBefore, editorState, onChange);
   }
   
   return 'not-handled';
 }
 
-function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorState) => void) {
+function removeRange(
+  contentState: ContentState, start: number, end: number, key: string) : ContentState {
+
+  const rangeToRemove = new SelectionState({
+    anchorKey: key,
+    anchorOffset: start,
+    focusKey: key,
+    focusOffset: end,
+    isBackwards: false,
+    hasFocus: false,
+  });
+
+  return Modifier.removeRange(
+    contentState,
+    rangeToRemove,
+    'forward',
+  );
+}
+
+function handleBackspaceAtEntity(
+  entity: Entity, 
+  editorState: EditorState, onChange: (e: EditorState) => void) {
 
   const currentContent = editorState.getCurrentContent();
   const ss = editorState.getSelection();
   const start = ss.getStartOffset();
   const currentContentBlock = currentContent.getBlockForKey(ss.getAnchorKey());
-
   const key = currentContentBlock.getKey();
-  const rangeToRemove = new SelectionState({
-    anchorKey: key,
-    anchorOffset: start,
-    focusKey: key,
-    focusOffset: start + 1,
-    isBackwards: false,
-    hasFocus: false,
-  });
 
-  const updatedContent = Modifier.removeRange(
-    editorState.getCurrentContent(),
-    rangeToRemove,
-    'forward',
-  );
+  let updatedContent;
+  
+  if (entity.type === common.EntityTypes.formula_begin) {
+    // We must find and remove the corresponding end
+    const endPosition = findPositionOfEntity(
+      common.EntityTypes.formula_end,
+      currentContentBlock,
+      currentContent,
+      start,
+      1);
+    if (endPosition !== -1) {
+      updatedContent = removeRange(currentContent, start - 1, endPosition + 1, key);
+    }
+      
+  } else if (entity.type === common.EntityTypes.formula_end) {
+    // We must find and remove the corresponding begin
+    const startPosition = findPositionOfEntity(
+      common.EntityTypes.formula_begin,
+      currentContentBlock,
+      currentContent,
+      start - 1,
+      -1);
+    if (startPosition !== -1) {
+      updatedContent = removeRange(currentContent, startPosition, start, key);
+    }
+  } else {
+    updatedContent = removeRange(currentContent, start, start + 1, key);
+  }
 
   const newSelection = new SelectionState({
     anchorKey: key,
@@ -63,13 +99,36 @@ function handleBackspaceAtEntity(editorState: EditorState, onChange: (e: EditorS
 
 }
 
-function getEntityBefore(position: number, editorState: EditorState) {
+function findPositionOfEntity(
+  type: common.EntityTypes,
+  contentBlock: ContentBlock, 
+  contentState: ContentState,
+  start: number, direction: number) : number {
+
+  const end = direction === 1 ? contentBlock.text.length : -1;
+
+  for (let i = start; i !== end; i += direction) {
+    const key = contentBlock.getEntityAt(i);
+
+    if (key !== null) {
+      const entity = contentState.getEntity(key);
+      if (entity.getType() === type) {
+        return i;
+      }
+    }
+  }
+
+  return -1;
+  
+}
+
+function getEntityBefore(position: number, editorState: EditorState) : Entity {
 
   const anchorKey = editorState.getSelection().getAnchorKey();
   const currentContent = editorState.getCurrentContent();
   const currentContentBlock = currentContent.getBlockForKey(anchorKey);
 
-  const key = currentContentBlock.getEntityAt(position);
+  const key = currentContentBlock.getEntityAt(position - 1);
 
   if (key !== null) {
     const entity = currentContent.getEntity(key);
