@@ -593,7 +593,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       // block level wrapper such as a ol or a ul that is wrapping a series
       // of li blocks.  
       if (block === undefined) {
-        updated.push(comp);
+        if (currentWrapper === null) {
+          updated.push(comp);
+        } else {
+          current.push(comp);
+        }
+        
         continue;
       }
 
