@@ -25,7 +25,7 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 import { insertBlocksAfter } from './commands/common';
-import { wouldViolateSchema } from './paste';
+import { wouldViolateSchema, validateSchema } from './paste';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 
@@ -714,6 +714,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } 
   }
 
+  // Prevent cut operations that would leave the document in
+  // an invalid state.
+  handleCutFragment(fragment, editorState, previewEditorState) {
+    if (!validateSchema(previewEditorState.getCurrentContent())) {
+      return true;
+    } 
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
@@ -731,6 +739,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         <Editor ref="editor"
           spellCheck={true}
           stripPastedStyles={false}
+          handleCutFragment={this.handleCutFragment.bind(this)}
           handlePastedText={this.handlePastedText.bind(this)}
           handlePastedFragment={this.handlePastedFragment.bind(this)}
           renderPostProcess={this.renderPostProcess.bind(this)}
