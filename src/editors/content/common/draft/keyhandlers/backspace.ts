@@ -2,12 +2,27 @@ import { EditorState, Modifier, ContentState,
   SelectionState, ContentBlock, Entity } from 'draft-js';
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
-
+import { validateSchema } from '../paste';
 export default function handle(
   editorState: EditorState, onChange: (e: EditorState) => void) : string {
   
   const ss = editorState.getSelection();
   const start = ss.getStartOffset();
+
+  // Handle backspacing when there is a selection. We
+  // need to make sure that the removal of the fragment 
+  // associated with the selection does not result in a document
+  // with invalid schema.
+  if (!ss.isCollapsed()) {
+    const updated = Modifier.removeRange(
+      editorState.getCurrentContent(), 
+      ss, ss.getIsBackward() ? 'backward' : 'forward');
+    if (!validateSchema(updated)) {
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  }
 
   // Handle backspacing at the beginning of a block to 
   // account for removing sentinel blocks
