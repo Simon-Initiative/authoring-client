@@ -873,20 +873,34 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * be assigned to any other node in the tree. 
      */
     canDrop (anObject:Object) : boolean {
-      console.log ("canDrop ()");  
-        
+      console.log ("canDrop ()");
+            
       //console.log (JSON.stringify (anObject));
-
-      if (
-          (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
-          (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
-          (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
-         ) {
-        if (anObject ["nextParent"]["typeDescription"]!="Item") {
+          
+      if (anObject ["nextParent"]) {
+          
+        if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Item")) {
+          console.log ("Can't put an item below an item");  
           return (false);  
-        } 
+        }     
+        /*        
+        if (
+            (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
+            (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
+            (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
+           ) {
+                     
+          if ((anObject ["nextParent"]["typeDescription"]!="Item") && (anObject ["nextParent"]["typeDescription"]!="Module")) {
+            return (false);  
+          }
+        } else {
+          return (false);
+        }
+        */
       }
 
+      console.log ("returning true");
+  
       return (true);
     }
 
@@ -1050,7 +1064,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                   <SortableTree id="orgtree"
                       style={orgstyle.treeStyle}
                       innerStyle={orgstyle.treeInnerStyle}
-                      maxDepth={3}
+                      maxDepth={5}
                       treeData={this.state.treeData}
                       onChange={ treeData => this.processDataChange({treeData}) }
                       nodeContentRenderer={OrganizationNodeRenderer}

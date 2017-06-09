@@ -108,7 +108,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   constructor(props) {
-    console.log ("LearningObjectiveLinker ()");
+    //console.log ("LearningObjectiveLinker ()");
         
     super(props);
      
@@ -130,7 +130,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
-      console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
+      //console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
             
       this.setState({sourceData: newProps.sourceData,
                      errorMessage: newProps.errorMessage,     
@@ -147,7 +147,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * a not aligned! This might be a false assumption but for now it's safer.
    */   
   resolveAnnotations () {
-    console.log ("resolveAnnotations ()");
+    //console.log ("resolveAnnotations ()");
     
     if (this.state.targetAnnotations==null) {
       console.log ("No link target given yet, bump");  
@@ -308,7 +308,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    */    
   render () {      
     //console.log ("Source data: " + JSON.stringify (this.state.sourceData));
-    console.log ("Error message: " + this.state.errorMessage);   
+    //console.log ("Error message: " + this.state.errorMessage);   
    
     if (this.state.errorMessage) {  
       if (this.state.errorMessage!="") {

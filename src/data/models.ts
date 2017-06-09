@@ -973,7 +973,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     //var formattedOrganization = JSON.stringify(orgRoot);
     var formattedOrganization = JSON.stringify(orgRoot ["organization"]);
-    console.log("To: " + formattedOrganization);
+    //console.log("To: " + formattedOrganization);
 
     let resource = this.resource.toPersistence();
     let doc = [{
