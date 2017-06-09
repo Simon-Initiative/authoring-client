@@ -48,6 +48,7 @@ const ul = listHandler.bind(undefined, 'unordered-list-item');
 const blockHandlers = {
   objref,
   'wb:inline': wb_inline,
+  activity_link: activityLinkBlock,
   pullout,
   example,
   definition,
@@ -106,6 +107,25 @@ const inlineHandlers = {
   quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
   code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
 };
+
+function activityLinkBlock(item: Object, context: ParsingContext) {
+  const children = getChildren(item);
+  
+  const blockContext = {
+    fullText: '',
+    markups : [],
+    entities : [],
+  };
+
+  processInline(item, context, blockContext);
+
+  addNewBlock(context.draft, { 
+    text: blockContext.fullText,
+    inlineStyleRanges: blockContext.markups,
+    entityRanges: blockContext.entities,
+    type: 'unstyled',
+  });
+}
 
 function applyStyle(
   style: string, offset: number, length: number, item: Object, 
@@ -228,6 +248,8 @@ function imageInline(
 function formulaInline(
   offset: number, length: number, item: Object, 
   context: ParsingContext, workingBlock: WorkingBlock) {
+
+  
 
 }
 
@@ -508,9 +530,6 @@ function getChildren(item: Object, ignore = null) : Object[] {
 function processInline(
   item: Object, 
   context: ParsingContext, blockContext: WorkingBlock) {
-  
-  console.log('processInline:');
-  console.log(item);
   
   const key = common.getKey(item);
 
