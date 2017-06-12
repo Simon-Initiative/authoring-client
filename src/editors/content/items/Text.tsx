@@ -75,13 +75,7 @@ export class Text
     
     let feedback;
 
-    if (this.props.partModel.responses.size > 0) {
-      feedback = <TabularFeedback
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />;
-    } else if (this.props.partModel.responseMult.size > 0) {
+    if (this.props.partModel.responseMult.size > 0) {
 
       feedback = this.props.partModel.responseMult
         .toArray().map(m => <ResponseMultEditor
@@ -91,7 +85,16 @@ export class Text
           model={m}
           onEdit={this.onEditMult.bind(this)}
         />);
-    }
+    } else {
+      
+      feedback = <TabularFeedback
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
+            model={this.props.partModel}
+            onEdit={this.onPartEdit}
+          />;
+    } 
 
 
     const controls = (
