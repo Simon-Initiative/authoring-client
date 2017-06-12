@@ -62,14 +62,23 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.iframe;
-    const fullSrc = src === '' ? 'http://www.google.com' : src;
+    let fullSrc;
+    if (src.startsWith('..')) {
+      fullSrc = this.props.blockProps.context.baseUrl 
+        + '/' + this.props.blockProps.context.courseId
+        + '/' 
+        + this.props.blockProps.context.resourcePath 
+        + '/' + src;
+    } else {
+      fullSrc = src;
+    }
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <div>
           <iframe src={fullSrc} height={height} width={width}/>
         </div>
-        <Button editMode={this.state.editMode} onClick={this.onClick}>Edit</Button>
+        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
       </div>);
   }
 }
