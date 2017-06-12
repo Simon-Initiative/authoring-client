@@ -345,7 +345,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       newModel.toPersistence ();  
 
       //this.props.onEdit(newModel);
-      this.onEdit(newModel);
+      //this.onEdit(newModel);
+      this.handleEdit (newModel);  
     }    
 
     /**
@@ -885,6 +886,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           console.log ("Can't put an item below an item");  
           return (false);  
         }
+          
+        if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Section")) {
+          console.log ("Can't put a sequence in a section");  
+          return (false);  
+        }          
 
         /*        
         if (
