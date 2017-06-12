@@ -1,9 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Collapse, Button } from '../common/controls';
-import { FeedbackEditor } from './FeedbackEditor';
+import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
+import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
+import { AppServices } from '../../common/AppServices';
+import DraftWrapper from '../../content/common/draft/DraftWrapper';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import InlineToolbar from '../html/InlineToolbar';
+import BlockToolbar from '../html/BlockToolbar';
 
 export interface FeedbackRow {
   
@@ -34,6 +40,8 @@ export abstract class FeedbackRow
       match,
       score
     }
+
+    this.onBodyEdit = this.onBodyEdit.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,18 +85,38 @@ export abstract class FeedbackRow
         value={this.state.score}/>);
   }
 
+
+  onBodyEdit(body) {
+
+    let feedback = this.props.model.feedback.first();
+    feedback = feedback.with({ body });
+    const response = this.props.model.with(
+      { feedback: this.props.model.feedback.set(feedback.guid, feedback) });
+    this.props.onEdit(response);
+  }
+
   renderFeedback(response: contentTypes.Response) {
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
+
+    const feedback = response.feedback.first();
+
+    const bodyStyle = {
+      minHeight: '20px',
+      borderStyle: 'none',
+      borderWith: 1,
+      borderColor: '#AAAAAA'
+    }
     return (
-      <div className="input-group">
-        <FeedbackEditor
-          {...this.props}
-          showLabel={false}
-          model={response.feedback.first()}
-          onEdit={this.onFeedbackEdit.bind(this)} 
-          onRemove={this.props.onRemove.bind(this, this.props.model)}
+      <HtmlContentEditor 
+        editorStyles={bodyStyle}
+        inlineToolbar={inlineToolbar}
+        blockToolbar={blockToolbar}
+        {...this.props}
+        model={feedback.body}
+        onEdit={this.onBodyEdit} 
         />
-      </div>
-    )
+    );
   }
   
   render() : JSX.Element {
@@ -98,6 +126,9 @@ export abstract class FeedbackRow
         <td style={{width: '100px'}}>{this.renderMatch(r)}</td>
         <td style={{width: '100px'}}>{this.renderScore(r)}</td>
         <td>{this.renderFeedback(r)}</td>
+        <td><span className="closebtn input-group-addon" 
+          onClick={() => this.props.onRemove(this.props.model)}>&times;</span>
+        </td>
       </tr>
     )
   }
