@@ -258,7 +258,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                 
       this.assignType (immutableHelper);
 
-      this.onEdit (immutableHelper);          
+      this.orgOnEdit (immutableHelper);          
     }
     
     /**
@@ -331,7 +331,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    onEdit(newData?:any) {
+    orgOnEdit(newData?:any) {
           
       let newModel
 
@@ -344,7 +344,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       newModel.toPersistence ();  
 
-      //this.props.onEdit(newModel);       
+      //this.props.onEdit(newModel);
+      this.onEdit(newModel);
     }    
 
     /**
@@ -432,7 +433,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       console.log ("Fixed tree data: " + JSON.stringify (fixedData));
         
-      this.onEdit (fixedData);      
+      this.orgOnEdit (fixedData);      
     }    
     
     /**
@@ -521,7 +522,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
 
-        this.onEdit (immutableHelper);    
+        this.orgOnEdit (immutableHelper);    
     }
             
     /**
@@ -558,7 +559,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.onEdit (immutableHelper);   
+        this.orgOnEdit (immutableHelper);   
     }
 
     /**
@@ -592,7 +593,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         this.setState ({titleIndex: this.state.titleIndex+1});
 
-        this.onEdit (immutableHelper);    
+        this.orgOnEdit (immutableHelper);    
     }   
     
     /**
@@ -630,7 +631,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }
 
-      this.onEdit (immutableHelper);           
+      this.orgOnEdit (immutableHelper);           
     }
     
     /**
@@ -668,7 +669,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }
 
-      this.onEdit (immutableHelper);         
+      this.orgOnEdit (immutableHelper);         
     }    
     
     /**
@@ -699,7 +700,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       //console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
-        this.onEdit ();
+        this.orgOnEdit ();
       });                
     }        
         
@@ -781,7 +782,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           }
         }
 
-        this.onEdit (immutableHelper);          
+        this.orgOnEdit (immutableHelper);          
       });    
     }
     
@@ -870,7 +871,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * A vital function we use to determine if a node in the sortable tree can be moved. For
      * example a workbook page or assessment can be moved within and between items but can't
-     * be assigned to any other node in the tree. 
+     * be assigned to any other node in the tree. Please us the official DTD to build and
+     * verify the rules below. http://oli.web.cmu.edu/dtd/oli_content_organization_simple_2_2.dtd  
      */
     canDrop (anObject:Object) : boolean {
       console.log ("canDrop ()");
@@ -976,7 +978,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     check ():void {
       console.log ("check ()");
               
-      this.onEdit (null); 
+      this.orgOnEdit (null); 
     }
     
     /**
