@@ -3,6 +3,8 @@ import * as React from 'react';
 import { removeHTML, getCaretPosition, setCaretPosition } from '../utils';
 
 require('./PreformattedText.scss');
+
+const BACKSPACE = 8;
  
 interface PreformattedText {
   _onChange: any;
@@ -10,6 +12,7 @@ interface PreformattedText {
   _onKeyUp: any;
   caretPosition: any;
   pre: any;
+  direction: number;
 }
 
 export interface PreformattedTextProps {
@@ -50,46 +53,30 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
   onChange(e) {
 
     const target = e.target;
-    const currentText = target.innerHTML;
+    const currentText = target.innerText;
 
-    // Strip out any HTML introduced by how contentEditable 
-    // handles processing the 'Enter' key
-    const cleanedText = removeHTML(currentText);
-
-    // If the cleaned text doesn't equal the original text then we
-    // know that we did clean out some HTML. We need to restore the
-    // caret position back as the browser will lose it and reset it
-    // to the beginning of the div  
-    if (cleanedText !== currentText) {
-
-      if (this.caretPosition === null) {
-        // Work around the browser quirk that an onKeyPress won't be 
-        // called on the initial key press - which if the initial key
-        // press is an 'Enter' we have no caret position information to go on
-
-        // Instead find the first <div> in the currentText and use that as the
-        // current caret position 
-        const divPosition = currentText.indexOf('<div>');
-        this.setState({src: cleanedText }, 
-          () => setCaretPosition(target, divPosition + 1));
-        
-      } else {
-        this.setState({src: cleanedText }, 
-          () => setCaretPosition(target, this.caretPosition + 1));
-      }
-      
-    } else {
-      this.setState({src: cleanedText }, 
-          () => setCaretPosition(target, this.caretPosition + 1));
-    }
-
+    this.setState(
+      { src: currentText }, 
+      () => setCaretPosition(target, this.caretPosition + this.direction));
+    
     // Persist this change
-    this.props.onEdit({src: cleanedText});
+    this.props.onEdit({ src: currentText });
   }
 
   onKeyPress(e) {
+
+    console.log(e.charCode);
+    console.log(e.keyCode);
+    if (e.keyCode === BACKSPACE) {
+      this.direction = -1;
+    } else {
+      this.direction = 1;
+    }
+
     // Keep track of the position of caret 
     this.caretPosition = getCaretPosition(e.target);
+
+
   }
 
   onKeyUp(e) {
@@ -110,7 +97,7 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
       children: this.state.src,
       className: this.props.styleName,
       onInput: this._onChange,
-      onKeyPress: this._onKeyPress,
+      onKeyDown: this._onKeyPress,
       onKeyUp: this._onKeyUp
     });
 
