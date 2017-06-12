@@ -877,8 +877,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     canDrop (anObject:Object) : boolean {
       console.log ("canDrop ()");
-            
-      //console.log (JSON.stringify (anObject));
           
       if (anObject ["nextParent"]) {
           
@@ -892,20 +890,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           return (false);  
         }          
 
-        /*        
-        if (
-            (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
-            (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
-            (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
-           ) {
-                     
-          if ((anObject ["nextParent"]["typeDescription"]!="Item") && (anObject ["nextParent"]["typeDescription"]!="Module")) {
-            return (false);  
-          }
-        } else {
-          return (false);
+        if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Sequence")) {
+          console.log ("Can't put an item in a sequence");  
+          return (false);  
         }
-        */
       }
 
       console.log ("returning true");
@@ -917,9 +905,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * Helper method given to the sortable tree so that we can provide access to functionality
      * in the org editor directly within each node renderer.
      */    
-    genProps () {
-        //console.log ("OrganizationEditor:genProps ()");
-        
+    genProps () {        
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
@@ -970,8 +956,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     editAssessment (aNode):void {
       console.log ("editAssessment");
-        
-      console.log ("Switching to Assessment editor for document with id: " + aNode.id);  
       
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
