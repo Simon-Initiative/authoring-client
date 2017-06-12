@@ -944,8 +944,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     editWorkbookPage (aNode):void {
       console.log ("editWorkbookPage");
 
-      console.log ("Switching to WorkbookPage editor for document with id: " + aNode.id);
-        
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
       });  
@@ -1034,7 +1032,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
                       <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
                       <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
-                      <a className="btn btn-secondary" href="#" onClick={e => this.check ()}>Check</a>
                       <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
                                        onRedo={this.doRedo.bind(this)}             
                                        undoEnabled={this.state.undoStackSize > 0}

@@ -108,7 +108,6 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      */
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
-      //console.log ("New data: " + JSON.stringify (newData));
                     
       this.saveToDB (newData.treeData);      
     }
@@ -207,27 +206,26 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     saveToDB (newData?:any): void {
         console.log ("saveToDB ()");
         
-        this.onEdit (newData);     
+        this.onLOEdit (newData);     
     }    
     
     /**
      * 
      */
-    onEdit(newData?:any) {
-      console.log ("onEdit ()");  
+    onLOEdit(newData?:any) {
+      console.log ("onLOEdit ()");  
         
       let newModel;
+        
+      let reparented:any=this.assignParents (newData);
   
-      if (newData) {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.model,newData);
-      } else {
-        newModel=models.LearningObjectiveModel.updateModel (this.state.model,this.state.treeData);
-      }  
+      newModel=models.LearningObjectiveModel.updateModel (this.state.model,reparented);
        
-      //console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
+      console.log ("Giving the following model to this.props.onLOEdit: " + JSON.stringify (newModel));  
                 
       this.setState ({modalIsOpen: false, treeData: newModel.los}, function () {
         //this.props.onEdit(newModel);
+        this.handleEdit (newModel);  
       });  
     }
         
@@ -313,7 +311,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             }
         }
         
-        //console.log ("Updated tree: " + JSON.stringify (immutableHelper));
+        console.log ("Updated tree: " + JSON.stringify (immutableHelper));
         
         this.saveToDB (immutableHelper);
     }

@@ -1097,20 +1097,75 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   }
 
   /**
-   *
+   * We parse a single learning objective here. Please note that for now we're
+   * flattening compound title objects into a single text string. For example
+   * we might get the following learning objective:
+   * 
+   * {
+   * "@id": "id_2_a",
+   * "@category": "domain_specific",
+   * "#array": [
+   *    {
+   *      "#text": "Evaluate expressions of type "
+   *    },
+   *    {
+   *      "code": {
+   *        "@style": "inline",
+   *        "#text": "int, float, bool, string"
+   *      }
+   *    }
+   *  ]
+   * }
    */
   static parseLearningObjective(anObjective: Object): LearningObjective {
 
+    console.log ("parseLearningObjective : " + JSON.stringify (anObjective));  
+      
     var newLO: LearningObjective = new LearningObjective();
 
     newLO.id = anObjective ["@id"];
-    newLO.title = anObjective ["#text"];
+      
     newLO.category = anObjective ["@category"];
-    newLO.parent = anObjective ["@parent"];
-    newLO.expanded = anObjective ["@expanded"];
+      
+    if (anObjective ["@expanded"]) {  
+      newLO.expanded = anObjective ["@expanded"];
+    }
+      
+    if (anObjective ["@parent"]) {
+      newLO.parent = anObjective ["@parent"];
+    }      
+      
     if (anObjective ["#annotations"]) {
       newLO.annotations = Linkable.fromJSON(anObjective ["#annotations"]);
     }
+      
+    // Flatten title for now. Keep in mind that once the text is in the
+    // title attribute that's where any updates will be stored.  
+      
+    if (anObjective ["#array"]) {
+      console.log ("Found composite title");  
+      let compositeTitle=anObjective ["#array"];
+      let newTitle:string="";  
+      for (let i=0;i<compositeTitle.length;i++) {
+        let testTitleObject:any=compositeTitle [i];
+          
+        console.log ("Examining sub title object: " + JSON.stringify (testTitleObject));  
+          
+        if (testTitleObject ["#text"]) {
+          newTitle+=testTitleObject ["#text"];
+          newTitle+=" ";              
+        }
+          
+        if (testTitleObject ["code"]) {
+          newTitle+=testTitleObject ["code"]["#text"];
+          newTitle+=" ";            
+        }          
+      }
+        
+      newLO.title = newTitle;         
+    } else {     
+      newLO.title = anObjective ["#text"];
+    }   
 
     return (newLO);
   }
@@ -1211,7 +1266,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   toPersistence(): Object {
     console.log("toPersistence ()");
     let resource: any = this.resource.toPersistence();
-    let flatLOs: Array<Object> = new Array();
+    let flatLOs: Array<Object> = new Array ();
 
     var newData: Object = new Object();
     newData ["objectives"] = new Object();
@@ -1247,7 +1302,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     let newTitle: string = "";
     let newId: string = loObject ["@id"];
 
-    let lObjectiveTest = loObject ["#array"];//[j];
+    let lObjectiveTest = loObject ["#array"];
     lObjectiveTest.forEach(function (item: any) {
       if (!isNullOrUndefined(item.objective)) {
         newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
