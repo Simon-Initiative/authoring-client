@@ -12,6 +12,7 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
+import { LOTypes, LearningObjective } from '../../../data/los';
 
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 
@@ -30,7 +31,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {
   modalIsOpen : boolean;
-  los: models.LearningObjectiveModel;  
+  los: Array <LearningObjective>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -47,6 +48,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.loadLearningObjectives ();
   }        
     
+  /*
   loadLearningObjectives () : void {
     this.props.context.courseModel.resources.map((value, id) => {        
       if (value.type=="x-oli-learning_objectives") {
@@ -60,7 +62,39 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         });
       }          
     })  
-  }  
+  } 
+  */
+  
+    /**
+     * 
+     */
+    loadLearningObjectives () : void {
+      //console.log ("loadLearningObjectives ()");
+
+      persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
+        if (loDocuments.length!=0) {  
+          //console.log ("Retrieved " + loDocuments.length + " LO documents");
+
+          var tempLOArray:Array<LearningObjective>=new Array ();  
+            
+          for (let i=0;i<loDocuments.length;i++) {
+            let loModel:models.LearningObjectiveModel=loDocuments [i].model as models.LearningObjectiveModel;
+              
+            for (let j=0;j<loModel.los.length;j++) {
+               //console.log ("Adding LO: " + loModel.los [j].title); 
+               tempLOArray.push (loModel.los [j]); 
+            }  
+          }
+            
+          //console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
+            
+          this.setState ({los: tempLOArray}, () => {  });
+                    
+        } else {
+          console.log ("Error: no learning objectives retrieved!");  
+        }         
+      });   
+    }   
 
   onTitleEdit(title) {
     const head = this.props.model.head.with({ title });
@@ -105,7 +139,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
    */
   createLinkerDialog () {           
     if (this.state.los!=null) {            
-      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);
+      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);
     } 
                    
     return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeModal.bind (this)} sourceData={[]} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);           

@@ -154,11 +154,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     loadLearningObjectives () : void {
-      console.log ("loadLearningObjectives ()");
+      //console.log ("loadLearningObjectives ()");
 
       persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
         if (loDocuments.length!=0) {  
-          console.log ("Retrieved " + loDocuments.length + " LO documents");
+          //console.log ("Retrieved " + loDocuments.length + " LO documents");
 
           var tempLOArray:Array<LearningObjective>=new Array ();  
             
@@ -171,7 +171,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }  
           }
             
-          console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
+          //console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
             
           this.setState ({los: tempLOArray}, () => {
 
@@ -258,7 +258,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                 
       this.assignType (immutableHelper);
 
-      this.onEdit (immutableHelper);          
+      this.orgOnEdit (immutableHelper);          
     }
     
     /**
@@ -331,7 +331,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    onEdit(newData?:any) {
+    orgOnEdit(newData?:any) {
           
       let newModel
 
@@ -344,7 +344,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       newModel.toPersistence ();  
 
-      //this.props.onEdit(newModel);       
+      //this.props.onEdit(newModel);
+      //this.onEdit(newModel);
+      this.handleEdit (newModel);  
     }    
 
     /**
@@ -432,7 +434,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       console.log ("Fixed tree data: " + JSON.stringify (fixedData));
         
-      this.onEdit (fixedData);      
+      this.orgOnEdit (fixedData);      
     }    
     
     /**
@@ -521,7 +523,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
 
-        this.onEdit (immutableHelper);    
+        this.orgOnEdit (immutableHelper);    
     }
             
     /**
@@ -558,7 +560,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             }
         }
             
-        this.onEdit (immutableHelper);   
+        this.orgOnEdit (immutableHelper);   
     }
 
     /**
@@ -592,7 +594,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
         this.setState ({titleIndex: this.state.titleIndex+1});
 
-        this.onEdit (immutableHelper);    
+        this.orgOnEdit (immutableHelper);    
     }   
     
     /**
@@ -630,7 +632,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }
 
-      this.onEdit (immutableHelper);           
+      this.orgOnEdit (immutableHelper);           
     }
     
     /**
@@ -668,7 +670,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         }
       }
 
-      this.onEdit (immutableHelper);         
+      this.orgOnEdit (immutableHelper);         
     }    
     
     /**
@@ -699,7 +701,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       //console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
-        this.onEdit ();
+        this.orgOnEdit ();
       });                
     }        
         
@@ -781,7 +783,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           }
         }
 
-        this.onEdit (immutableHelper);          
+        this.orgOnEdit (immutableHelper);          
       });    
     }
     
@@ -870,33 +872,28 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * A vital function we use to determine if a node in the sortable tree can be moved. For
      * example a workbook page or assessment can be moved within and between items but can't
-     * be assigned to any other node in the tree. 
+     * be assigned to any other node in the tree. Please us the official DTD to build and
+     * verify the rules below. http://oli.web.cmu.edu/dtd/oli_content_organization_simple_2_2.dtd  
      */
     canDrop (anObject:Object) : boolean {
       console.log ("canDrop ()");
-            
-      //console.log (JSON.stringify (anObject));
           
       if (anObject ["nextParent"]) {
           
         if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Item")) {
           console.log ("Can't put an item below an item");  
           return (false);  
-        }     
-        /*        
-        if (
-            (anObject ["node"]["typeDescription"]=="x-oli-assessment2") ||
-            (anObject ["node"]["typeDescription"]=="x-oli-inline-assessment") ||
-            (anObject ["node"]["typeDescription"]=="x-oli-workbook_page")
-           ) {
-                     
-          if ((anObject ["nextParent"]["typeDescription"]!="Item") && (anObject ["nextParent"]["typeDescription"]!="Module")) {
-            return (false);  
-          }
-        } else {
-          return (false);
         }
-        */
+          
+        if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Section")) {
+          console.log ("Can't put a sequence in a section");  
+          return (false);  
+        }          
+
+        if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Sequence")) {
+          console.log ("Can't put an item in a sequence");  
+          return (false);  
+        }
       }
 
       console.log ("returning true");
@@ -908,9 +905,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * Helper method given to the sortable tree so that we can provide access to functionality
      * in the org editor directly within each node renderer.
      */    
-    genProps () {
-        //console.log ("OrganizationEditor:genProps ()");
-        
+    genProps () {        
         var optionalProps:Object=new Object ();
         
         optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
@@ -961,8 +956,6 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     editAssessment (aNode):void {
       console.log ("editAssessment");
-        
-      console.log ("Switching to Assessment editor for document with id: " + aNode.id);  
       
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
@@ -975,7 +968,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     check ():void {
       console.log ("check ()");
               
-      this.onEdit (null); 
+      this.orgOnEdit (null); 
     }
     
     /**
