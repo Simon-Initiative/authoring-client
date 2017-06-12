@@ -30,7 +30,7 @@ interface EditorManager {
 
   _onEdit: (model: models.ContentModel) => void;
 
-
+  waitBufferTimer: any;
 }
 
 export interface EditorManagerProps {
@@ -51,6 +51,7 @@ export interface EditorManagerState {
   editingAllowed: boolean;
   document: persistence.Document;
   failure: string;
+  waitBufferElapsed: boolean;
   editMode: boolean;
   activeSubEditorKey: string;
   undoRedoGuid: string;
@@ -67,6 +68,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       editingAllowed: null,
       editMode: true,
       activeSubEditorKey: null,
+      waitBufferElapsed: false,
       undoRedoGuid: guid(),
     };
 
@@ -130,6 +132,16 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   fetchDocument(courseId: string, documentId: string) {
     
+    if (this.waitBufferTimer !== null) {
+      clearTimeout(this.waitBufferTimer);
+    }
+    this.waitBufferTimer = setTimeout(
+      () => {
+        this.waitBufferTimer = null;
+        this.setState({ waitBufferElapsed: true });  
+      }, 
+      200);
+
     persistence.retrieveDocument(courseId, documentId)
       .then((document) => {
 
@@ -151,7 +163,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         this.setState({ document });
 
       })
-      .catch(failure => this.setState({ failure }));
+      .catch((failure) => {
+        this.setState({ failure });
+        
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -176,9 +191,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         } else {
           this.initPersistence(document);
         }
-        this.setState({ document, failure: null });
+        this.setState({ document, failure: null, waitBufferElapsed: false });
       } else {
-        this.setState({ document: null, editingAllowed: null, failure: null });
+        this.setState({ document: null, editingAllowed: null, 
+          failure: null, waitBufferElapsed: false });
         if (nextProps.course) {
           this.fetchDocument(nextProps.course.model.guid, nextProps.documentId);
         }
@@ -259,7 +275,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           </div>
           <div className="col-8">
             <div className="alert alert-info" role="alert">
-              <strong>Please wait.</strong> Loading the course content. 
+              <strong>Please wait.</strong> Loading the course material. 
             </div>
           </div>
           <div className="col-2">
@@ -273,7 +289,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   renderError() {
 
-    console.log(this.state.failure);
     return (
       <div className="container">
         <div className="row">
@@ -307,7 +322,13 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     if (this.state.failure !== null) {
       return this.renderError();
     } else if (this.state.document === null || this.state.editingAllowed === null) {
-      return this.renderWaiting();
+      
+      if (this.state.waitBufferElapsed) {
+        return this.renderWaiting();
+      } else {
+        return null;
+      }
+      
     } else {
 
       const courseId = (this.props.course.model as models.CourseModel).guid;
