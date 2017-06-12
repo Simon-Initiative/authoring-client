@@ -21,6 +21,18 @@ import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/auth
 import * as models from '../../../data/models';
 
 
+const styles = {  
+  loContainer : {
+    "border": "1px solid grey",
+    "background": "#ffffff",  
+    "height": "125px",
+    "overflowX": "auto",
+    "overflowY": "scroll",
+    "marginBottom" : "10px",
+    "padding" : "4px"
+  }
+}
+
 interface WorkbookPageEditor {
   
 }
@@ -143,13 +155,17 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     } 
                    
     return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeModal.bind (this)} sourceData={[]} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);           
-  }    
-    
+  }
+       
   render() {
 
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
-    const lolinker = this.createLinkerDialog ();    
+    const lolinker = this.createLinkerDialog ();
+    let testArray:Array<Linkable>=this.props.model.head.annotations;  
+    const listItems = testArray.map((lo) =>      
+       <li>{lo.title}</li>  
+    ); 
 
     return (
       <div>
@@ -168,7 +184,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
           <a className="btn btn-secondary" href="#" 
             onClick={e => this.linkLO ()}>+ Learning Objective</a>
 
-          {lolinker}              
+          {lolinker}          
+          <div style={styles.loContainer}>
+            Linked Learning Objectives:<br/>
+            <ul>{listItems}</ul>
+          </div>
           
           <HtmlContentEditor 
               inlineToolbar={inlineToolbar}
