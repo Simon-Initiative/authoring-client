@@ -30,7 +30,7 @@ interface EditorManager {
 
   _onEdit: (model: models.ContentModel) => void;
 
-
+  waitBufferTimer: any;
 }
 
 export interface EditorManagerProps {
@@ -50,6 +50,8 @@ export interface EditorManagerProps {
 export interface EditorManagerState {
   editingAllowed: boolean;
   document: persistence.Document;
+  failure: string;
+  waitBufferElapsed: boolean;
   editMode: boolean;
   activeSubEditorKey: string;
   undoRedoGuid: string;
@@ -61,10 +63,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     super(props);
 
     this.state = {
+      failure: null,
       document: null,
       editingAllowed: null,
       editMode: true,
       activeSubEditorKey: null,
+      waitBufferElapsed: false,
       undoRedoGuid: guid(),
     };
 
@@ -128,6 +132,16 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   fetchDocument(courseId: string, documentId: string) {
     
+    if (this.waitBufferTimer !== null) {
+      clearTimeout(this.waitBufferTimer);
+    }
+    this.waitBufferTimer = setTimeout(
+      () => {
+        this.waitBufferTimer = null;
+        this.setState({ waitBufferElapsed: true });  
+      }, 
+      200);
+
     persistence.retrieveDocument(courseId, documentId)
       .then((document) => {
 
@@ -149,12 +163,16 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         this.setState({ document });
 
       })
-      .catch(err => console.log(err));
+      .catch((failure) => {
+        this.setState({ failure });
+        
+      });
   }
 
   componentWillReceiveProps(nextProps) {
     
     if (this.props.documentId !== nextProps.documentId) {
+
       this.stopListening = true;
       // Special processing if next document is a CourseModel - don't call fetchDocument
       if (nextProps.course && nextProps.course.model.guid === nextProps.documentId) {
@@ -173,9 +191,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         } else {
           this.initPersistence(document);
         }
-        this.setState({ document });
+        this.setState({ document, failure: null, waitBufferElapsed: false });
       } else {
-        this.setState({ document: null, editingAllowed: null });
+        this.setState({ document: null, editingAllowed: null, 
+          failure: null, waitBufferElapsed: false });
         if (nextProps.course) {
           this.fetchDocument(nextProps.course.model.guid, nextProps.documentId);
         }
@@ -247,9 +266,69 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     //     })
   }
 
+  renderWaiting() {
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-2">
+            &nbsp;
+          </div>
+          <div className="col-8">
+            <div className="alert alert-info" role="alert">
+              <strong>Please wait.</strong> Loading the course material. 
+            </div>
+          </div>
+          <div className="col-2">
+            &nbsp;
+          </div>
+        </div>
+        
+      </div>
+    );
+  }
+
+  renderError() {
+
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-2">
+            &nbsp;
+          </div>
+          <div className="col-8">
+            <div className="alert alert-danger" role="alert">
+              <h4 className="alert-heading">Problem encountered!</h4>
+              <p>
+                A problem was encountered while trying to render the
+                course material.  
+              </p>
+              <p className="mb-0">Resource id:</p>
+              <pre>{this.props.documentId}</pre>
+
+              <p className="mb-0">Error:</p>
+              <pre className="mb-0">{(this.state.failure as any).stack}</pre>
+            </div>
+          </div>
+          <div className="col-2">
+            &nbsp;
+          </div>
+        </div>
+      </div>
+    );
+    
+  }
+
   render(): JSX.Element {
-    if (this.state.document === null || this.state.editingAllowed === null) {
-      return null;
+    if (this.state.failure !== null) {
+      return this.renderError();
+    } else if (this.state.document === null || this.state.editingAllowed === null) {
+      
+      if (this.state.waitBufferElapsed) {
+        return this.renderWaiting();
+      } else {
+        return null;
+      }
+      
     } else {
 
       const courseId = (this.props.course.model as models.CourseModel).guid;
