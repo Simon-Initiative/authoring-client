@@ -140,6 +140,39 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
     });
 }
 
+export function deleteCoursePackage(courseId: CourseId): Promise<string> {
+
+  return refreshTokenIfInvalid()
+    .then((tokenIsValid) => {
+
+      if (!tokenIsValid) {
+        forceLogin();
+      }
+
+      return new Promise((resolve, reject) => {
+
+        try {
+          fetch(`${configuration.baseUrl}/packages/${courseId}?remove_src=false`, {
+            method: 'DELETE',
+            headers: getHeaders(credentials),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              return response.json();
+            })
+            .then((json) => {
+              resolve(json.message);
+            })
+            .catch(err => handleError(err, reject));
+        } catch (err) {
+          handleError(err, reject);
+        }
+      });
+    });
+}
+
 export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Promise<Document> {
   if (courseId === null) {
     throw new Error('courseId cannot be null');

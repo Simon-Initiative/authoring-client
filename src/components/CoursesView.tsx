@@ -5,9 +5,11 @@ import * as viewActions from "../actions/view";
 
 import * as models from "../data/models";
 import * as courseActions from "../actions/course";
+import { hasRole } from '../actions/utils/keycloak';
 
 interface CoursesView {
   onSelect: (id) => void;
+  _deleteCourse: (id) => void;
   _createCourse: () => void;
 }
 
@@ -34,6 +36,9 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     this.onSelect = (id) => {
       this.fetchDocument(id);
     }
+    this._deleteCourse = (id) => {
+      this.removeCourse(id);
+    }
   }
 
   createCourse() {
@@ -59,6 +64,14 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
   }
 
+  removeCourse(courseId: string) {
+    persistence.deleteCoursePackage(courseId)
+      .then(document => {
+        this.props.dispatch(viewActions.viewAllCourses());
+      })
+      .catch(err => console.log(err));
+  }
+
   fetchDocument(courseId: string) {
     console.log("fetchDocument (" + courseId + ")");
     persistence.retrieveCoursePackage(courseId)
@@ -74,7 +87,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
   }
 
   render() {
-
+console.log("is admin "+hasRole("admin"));
     let rows = this.state.courses.map((c, i) => {
       const {guid, id, version, title, description} = c;
       return <div className="course" key={guid}>
@@ -95,10 +108,20 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
               {description}
               </div>
             <div className="enter col-2">
+              <div className="row">
               <button type="button" className="btn btn-primary" key={guid}
                       onClick={this.onSelect.bind(this, guid)}>
                 Enter Course
               </button>
+              </div>
+              { hasRole("admin")?
+                <div className="row">
+                  <button type="button" className="btn btn-remove" key={guid}
+                          onClick={this._deleteCourse.bind(this, guid)}>
+                    Remove
+                  </button>
+                </div>:''
+              }
             </div>
           </div>
         </div>

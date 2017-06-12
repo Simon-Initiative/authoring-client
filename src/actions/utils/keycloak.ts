@@ -82,3 +82,11 @@ export function refreshTokenIfInvalid() : Promise<any> {
   }
 }
 
+export function hasRole(role: string) : boolean {
+  const WITHIN_FIVE_SECONDS = 5;
+  if(kc.isTokenExpired(WITHIN_FIVE_SECONDS)){
+    return false;
+  }
+  return kc.hasRealmRole(role);
+}
+

@@ -1,8 +1,8 @@
 import * as Immutable from "immutable";
 import * as types from "./types";
 import * as contentTypes from "./contentTypes";
-import {getKey } from "./common";
-import { getChildren } from './content/common';
+import {getKey} from "./common";
+import {getChildren} from './content/common';
 import guid from "../utils/guid";
 import {MetaData} from "./metadata";
 import {WebContent} from "./webcontent";
@@ -33,7 +33,8 @@ export const ModelTypes = types.strEnum([
   'OrganizationModel',
   'LearningObjectiveModel',
   'SkillModel',
-  'PoolModel'
+  'PoolModel',
+  'DefaultModel'
 ])
 
 // Create an actual type
@@ -64,6 +65,8 @@ export function createModel(object: any): ContentModel {
       return MediaModel.fromPersistence(object);
     case 'x-oli-assessment2-pool':
       return PoolModel.fromPersistence(object);
+    default:
+      return DefaultModel.fromPersistence(object);
   }
 }
 
@@ -474,6 +477,68 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 }
 
+export type DefaultModelParams = {
+  resource?: Resource,
+  guid?: string,
+  type?: string,
+  content?: string,
+  lock?: contentTypes.Lock
+};
+
+const defaultModelParams = {
+  modelType: 'DefaultModel',
+  resource: new Resource(),
+  guid: '',
+  type: '',
+  content: '',
+  lock: new contentTypes.Lock()
+}
+
+export class DefaultModel extends Immutable.Record(defaultModelParams) {
+  modelType: 'DefaultModel';
+  resource: Resource;
+  guid: string;
+  type: string;
+  content: string;
+  lock: contentTypes.Lock;
+
+  constructor(params?: DefaultModelParams) {
+    params ? super(params) : super();
+  }
+
+  with(values: DefaultModelParams) {
+    return this.merge(values) as this;
+  }
+
+  static fromPersistence(json: Object): DefaultModel {
+    let model = new DefaultModel();
+
+    let info = (json as any);
+    model = model.with({resource: Resource.fromPersistence(info)});
+    model = model.with({guid: info.guid});
+    model = model.with({type: info.type});
+    if (info.lock !== undefined && info.lock !== null) {
+      model = model.with({lock: contentTypes.Lock.fromPersistence(info.lock)});
+    }
+    model.with({content: info.doc});
+
+    return model;
+  }
+
+  toPersistence(): Object {
+    let resource: any = this.resource.toPersistence();
+    let doc = [
+      this.content
+    ];
+
+    const root = {
+      "doc": doc
+    };
+
+    return Object.assign({}, resource, root, this.lock.toPersistence());
+  }
+}
+
 export type OrganizationModelParams = {
   resource?: Resource,
   guid?: string,
@@ -602,7 +667,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       if (i == "resourceref") {
         // newNode.title will be resolved dynamically in the org editor when it mounts  
         newNode.title = anItem [i]["@idref"];
-        newNode.id=anItem [i]["@idref"];  
+        newNode.id = anItem [i]["@idref"];
         newNode.resourceRef.idRef = anItem [i]["@idref"];
       }
     }
@@ -657,13 +722,13 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
-      console.log ("typeSwitch: " + typeSwitch);  
-        
+      console.log("typeSwitch: " + typeSwitch);
+
       if (typeSwitch == "title") {
         moduleNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
       }
 
-      if (typeSwitch == "item") {  
+      if (typeSwitch == "item") {
         moduleNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
       }
 
@@ -674,7 +739,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     return (moduleNode);
   }
-    
+
   /**
    *
    */
@@ -694,13 +759,13 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
-      console.log ("typeSwitch: " + typeSwitch);  
-        
+      console.log("typeSwitch: " + typeSwitch);
+
       if (typeSwitch == "title") {
         unitNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
       }
 
-      if (typeSwitch == "item") {  
+      if (typeSwitch == "item") {
         unitNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
       }
 
@@ -710,7 +775,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     }
 
     return (unitNode);
-  }    
+  }
 
   /**
    *
@@ -782,8 +847,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    */
   static fromPersistence(json: Object): OrganizationModel {
     console.log("fromPersistence ()");
-      
-    console.log ("Org model: " + JSON.stringify (json));  
+
+    console.log("Org model: " + JSON.stringify(json));
 
     let a = (json as any);
     var orgData = a.doc.organization;
@@ -807,7 +872,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           var destNode = obj ["sequences"]; // [j];
 
           var seqList = getChildren(destNode);
-          
+
           for (let w = 0; w < seqList.length; w++) {
             let seqObj = seqList [w];
             if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
@@ -839,11 +904,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                     let newModule = OrganizationModel.parseModule(mdl);
                     newSequence.children.push(newModule);
                   }
-                    
+
                   if (s == "unit") {
                     let newUnit = OrganizationModel.parseUnit(mdl);
                     newSequence.children.push(newUnit);
-                  }                        
+                  }
                 }
               }
             }
@@ -1164,8 +1229,8 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     const root = {
       "doc": newData
     };
-      
-    console.log ("Persisting LO model as: " + JSON.stringify (root));  
+
+    console.log("Persisting LO model as: " + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
@@ -1202,38 +1267,38 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     }
     return model
   }
-    
+
   /**
    * We need to move this to a utility class because there are different instances
-   * of it 
+   * of it
    */
-  static toFlat (aTree:Array<Linkable>, aToList:Array<Linkable>) : Array<Linkable>{
+  static toFlat(aTree: Array<Linkable>, aToList: Array<Linkable>): Array<Linkable> {
     //console.log ("toFlat ()");
-       
+
     if (!aTree) {
       return [];
-    }  
-        
-    for (let i=0;i<aTree.length;i++) {
-      let newObj:Linkable=new Linkable ();
-      newObj.id=aTree [i].id;
-      newObj.title=aTree [i].title;
-      aToList.push (newObj);
-          
+    }
+
+    for (let i = 0; i < aTree.length; i++) {
+      let newObj: Linkable = new Linkable();
+      newObj.id = aTree [i].id;
+      newObj.title = aTree [i].title;
+      aToList.push(newObj);
+
       if (aTree [i]["children"]) {
-        if (aTree [i]["children"].length>0) {
+        if (aTree [i]["children"].length > 0) {
           //console.log ("Lo has children, processing ...");  
-          let tList=aTree [i]["children"];
-          this.toFlat (tList,aToList);
-        }    
+          let tList = aTree [i]["children"];
+          this.toFlat(tList, aToList);
+        }
       }
     }
-      
+
     //console.log ("From tree: " + JSON.stringify (aTree));  
     //console.log ("To flat: " + JSON.stringify (aToList));
-        
-    return (aToList);  
-  }      
+
+    return (aToList);
+  }
 }
 
 //>------------------------------------------------------------------
@@ -1297,17 +1362,17 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     console.log("toPersistence ()");
     let resource: any = this.resource.toPersistence();
     const doc = [{
-        "skills_model": {
-          "@id": this.resource.id,
-          "title": this.title.text,
-          "skills": this.skills
-        }
-      }];
+      "skills_model": {
+        "@id": this.resource.id,
+        "title": this.title.text,
+        "skills": this.skills
+      }
+    }];
     const root = {
       "doc": doc
     };
-      
-    console.log ("SkillModel: " + JSON.stringify (root));  
+
+    console.log("SkillModel: " + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
@@ -1404,7 +1469,8 @@ export type ContentModel =
   OrganizationModel |
   LearningObjectiveModel |
   SkillModel |
-  PoolModel;
+  PoolModel |
+  DefaultModel;
 
 // A pure function that takes a content model as
 // input and returns a changed content model
