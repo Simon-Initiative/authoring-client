@@ -52,7 +52,6 @@ export interface EditorManagerState {
   document: persistence.Document;
   failure: string;
   waitBufferElapsed: boolean;
-  editMode: boolean;
   activeSubEditorKey: string;
   undoRedoGuid: string;
 }
@@ -66,7 +65,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       failure: null,
       document: null,
       editingAllowed: null,
-      editMode: true,
       activeSubEditorKey: null,
       waitBufferElapsed: false,
       undoRedoGuid: guid(),
@@ -349,7 +347,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         onEdit: this._onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
         services: new DispatchBasedServices(this.props.dispatch, this.props.course.model),
-        editMode: this.state.editMode,
+        editMode: this.state.editingAllowed,
       };
 
       const registeredEditor = lookUpByName(this.state.document.model.modelType);
