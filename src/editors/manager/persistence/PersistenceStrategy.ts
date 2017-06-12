@@ -7,6 +7,11 @@ export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) 
 
 export type onFailureCallback = (result: any) => void;
 
+export type LockDetails = {
+  lockedBy: string;
+  lockedAt: number;
+};
+
 export interface PersistenceStrategy {
   
   /**
@@ -28,5 +33,7 @@ export interface PersistenceStrategy {
    * should clean up any resources and flush any pending changes immediately.
    */
   destroy: () => Promise<{}>;
+
+  getLockDetails: () => LockDetails;
   
 }

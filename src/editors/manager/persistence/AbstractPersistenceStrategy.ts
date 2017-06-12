@@ -3,7 +3,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 
 import {onFailureCallback, onSaveCompletedCallback, 
-  PersistenceStrategy } from './PersistenceStrategy';
+  PersistenceStrategy, LockDetails } from './PersistenceStrategy';
 
 export interface AbstractPersistenceStrategy {
   successCallback: onSaveCompletedCallback;
@@ -11,6 +11,7 @@ export interface AbstractPersistenceStrategy {
   writeLockedDocumentId: string;
   courseId: string;
   destroyed: boolean;
+  lockDetails: LockDetails;
 }
 
 export abstract class AbstractPersistenceStrategy implements PersistenceStrategy {
@@ -21,6 +22,11 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.writeLockedDocumentId = null;
     this.courseId = null;
     this.destroyed = false;
+    this.lockDetails = null;
+  }
+
+  getLockDetails() : LockDetails {
+    return this.lockDetails;
   }
 
   releaseLock(when: number) {
@@ -52,13 +58,14 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
       persistence.acquireLock(doc._courseId, doc._id)
       .then((result) => {
         if ((result as any).lockedBy === userName) {
-          
+          this.lockDetails = (result as any);
           this.writeLockedDocumentId = doc._id;
           this.courseId = doc._courseId;
           onSuccess(doc);
           resolve(true);
           
         } else {
+          this.lockDetails = (result as any);
           resolve(false);
         }
       });      
