@@ -70,8 +70,18 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   onInsert(resource) {
     this.props.blockProps.services.dismissModal();
-    this.props.blockProps.onEdit(
-      { activity: this.props.data.wbinline.with({ idRef: resource.id }) });
+
+    const resources = this.props.blockProps
+      .context.courseModel.resources.toArray();
+
+    const found = resources.find(r => r.guid === resource.id);
+
+    if (found !== undefined) {
+      
+      this.props.blockProps.onEdit(
+        { wbinline: this.props.data.wbinline.with({ idRef: found.id }) });
+    }
+
   }
 
   onSelectActivity() {
