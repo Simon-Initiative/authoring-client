@@ -5,7 +5,7 @@ import * as viewActions from "../actions/view";
 
 import * as models from "../data/models";
 import * as courseActions from "../actions/course";
-import { hasRole } from '../actions/utils/keycloak';
+import {hasRole} from '../actions/utils/keycloak';
 
 interface CoursesView {
   onSelect: (id) => void;
@@ -107,26 +107,30 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
             </div>
             <div className="description col-7">
               {description}
-              </div>
+            </div>
             <div className="enter col-2">
-              <div className="row">
-                { buildStatus==='READY'?
+              { buildStatus === 'READY' ?
+                <div>
+                <div className="row">
+
                   <button type="button" className="btn btn-primary" key={guid}
                           onClick={this.onSelect.bind(this, guid)}>
                     Enter Course
-                  </button>:<div style={{margin: "auto"}} className="three-bounce">
-                    <div className="bounce1"/>
-                    <div className="bounce2"/>
-                    <div className="bounce3"/>
-                  </div>
-                }
-              </div>
-              { hasRole("admin") &&
-              <div className="row">
+                  </button>
+                </div>
+                  {hasRole("admin") &&
+                <div className="row">
                   <button type="button" className="btn btn-remove" key={guid}
                           onClick={this._deleteCourse.bind(this, guid)}>
                     Remove
                   </button>
+                </div>}
+                </div>
+                :<div><div>Package Importing...</div><div style={{margin: "auto"}} className="three-bounce">
+                <div className="bounce1"/>
+                <div className="bounce2"/>
+                <div className="bounce3"/>
+                </div>
                 </div>
               }
             </div>
