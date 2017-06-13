@@ -171,17 +171,21 @@ export class FillInTheBlank
             onEdit={this.onEditMult.bind(this)}
           />);
       }
+
+      if (responses.length > i) {
+        rendered.push(
+          <ChoiceFeedback key={c.guid}>
+            {this.renderChoice(c, responses[i])}
+            {renderedFeedback}
+            <InlineForm position='right'>
+              <TextInput editMode={this.props.editMode} 
+                label='Score' value={responses[i].score} type='number' width='75px'
+                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
+            </InlineForm>
+          </ChoiceFeedback>);
+      }
       
-      rendered.push(
-        <ChoiceFeedback key={c.guid}>
-          {this.renderChoice(c, responses[i])}
-          {renderedFeedback}
-          <InlineForm position='right'>
-            <TextInput editMode={this.props.editMode} 
-              label='Score' value={responses[i].score} type='number' width='75px'
-              onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-          </InlineForm>
-        </ChoiceFeedback>);
+      
     }
 
     return rendered;

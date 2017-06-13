@@ -59,11 +59,9 @@ export class PoolEditor
     this.props.onEdit(this.props.model.with({ content }));
   }
 
-  
-
-
   renderQuestion(question: contentTypes.Question) {
     return <QuestionEditor
+             key={question.guid}
              {...this.props}
              model={question}
              onEdit={this.onEditQuestion}
@@ -75,7 +73,7 @@ export class PoolEditor
     
     return (
       <div>
-        {this.props.model.questions.map(q => this.renderQuestion(q))}
+        {this.props.model.questions.toArray().map(q => this.renderQuestion(q))}
       </div>
     );
   }
