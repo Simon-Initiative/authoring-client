@@ -329,8 +329,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    orgOnEdit(newData?:any) {
-          
+    orgOnEdit(newData?:any) {          
       let newModel;
 
       if (newData) {
