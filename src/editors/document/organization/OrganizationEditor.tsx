@@ -672,49 +672,59 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     addPage (aNode:any): void {
-       // console.log ("LearningObjectiveEditor:addPage ()");
-        
-        //this.linkPage (aNode);
-        this.setState ({pagesModalIsOpen: true, loModalIsOpen: false, activitiesModalIsOpen : false, orgTarget: aNode});                         
+      this.setState ({pagesModalIsOpen: true, loModalIsOpen: false, activitiesModalIsOpen : false, orgTarget: aNode});                         
     }     
     
     /**
      * 
      */    
     addActivity (aNode:any): void {
-      //  console.log ("LearningObjectiveEditor:addActivity ()");
-        
-        //this.linkPage (aNode);
-        this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
     }     
         
     /**
      * 
      */
     closeLOModal (annotations:any) {
-     // console.log ("LearningObjectiveEditor: closeLOModal ()");
-      //console.log ("Processing annotations: " + JSON.stringify (annotations));
-        
+      /*        
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
         this.orgOnEdit ();
-      });                
+      });
+      */
+        
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
+        let immutableHelper = this.state.treeData.slice();
+                
+        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
+        
+        if (immutableHelper==null) {
+          return;
+        }
+        
+        for (var i=0;i<parentArray.length;i++) {
+          let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+          if (testNode.id==this.state.orgTarget.id) {    
+            testNode.annotations=annotations;
+            break;
+          }
+        }
+
+        this.orgOnEdit (immutableHelper);          
+      });        
     }        
         
     /**
      * 
      */
     closePagesModal (annotations:any) {
-      //console.log ("closePagesModal ()");
-
       this.modifyItem (annotations,"x-oli-workbook_page");
     }    
     
     /**
      * 
      */
-    closeActivtiesModal (annotations:any) {
-      //console.log ("closeActivtiesModal ()");
-        
+    closeActivtiesModal (annotations:any) {      
       this.modifyItem (annotations,"x-oli-inline-assessment");          
     }
 
