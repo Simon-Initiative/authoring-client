@@ -725,7 +725,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                 <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
-                        <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
+                        <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Skill</button>
                         <button type="button" className="btn btn-secondary" onClick={e => this.toggleAdvanced (e)}>Advanced</button>
                         <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
                                          onRedo={this.doRedo.bind(this)}             
