@@ -79,7 +79,7 @@ export class ImageEditor
 
   onFileChange(e) {
     const file = e.target.files[0];
-    const src = '../webcontent/' + file.name;
+    const src = file.name;
     
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {
@@ -132,8 +132,6 @@ export class ImageEditor
     const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
-      console.log('ImageEditor render');
-      console.log(src);
       srcDisplay = src === '' ? '<not set>' : extractFileName(src);
     } else {
       srcDisplay = 

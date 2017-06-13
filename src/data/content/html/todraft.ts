@@ -435,7 +435,7 @@ function isVirtualParagraph(persistenceFormat: Object) {
     const firstKey = common.getKey(children[0]);
     return firstKey === '#cdata'
       || firstKey === '#text'
-      || inlineHandlers[firstKey] !== undefined;
+      || (inlineHandlers[firstKey] !== undefined && blockHandlers[firstKey] === undefined);
   }
   
   return false;

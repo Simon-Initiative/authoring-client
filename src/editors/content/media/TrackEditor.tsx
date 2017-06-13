@@ -78,7 +78,7 @@ export class TrackEditor
 
   onFileChange(e) {
     const file = e.target.files[0];
-    const src = 'webcontent/' + file.name;
+    const src = file.name;
     
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {

@@ -2,7 +2,7 @@ import * as types from '../../data/types';
 
 import { modalActions } from '../../actions/modal';
 import * as persistence from '../../data/persistence';
-import * as viewActions from '../../actions/view';
+import * as view from '../../actions/view';
 import * as courseActions from '../../actions/course';
 import * as models from '../../data/models';
 import { TitleOracle, MockTitleOracle } from './TitleOracle';
@@ -52,7 +52,7 @@ export class DispatchBasedServices implements AppServices {
   }
 
   viewDocument(documentId: string) {
-    this.dispatch(viewActions.viewDocument(documentId));
+    view.viewDocument(documentId);
   }
 
   displayModal(component: any) {

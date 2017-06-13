@@ -124,7 +124,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      *
      */    
     componentDidMount() {                    
-      console.log ("componentDidMount ()");
+      //console.log ("componentDidMount ()");
 
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
@@ -145,9 +145,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     componentWillReceiveProps (newProps:OrganizationEditorProps) {
-      console.log ("componentWillReceiveProps ()");
-
-      this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: this.props.model.organization});  
+      this.setState({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false, treeData: newProps.model.organization});  
     }
         
     /**
@@ -193,7 +191,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * list of Linkables.
      */
     loadPages () : void {
-      console.log ("loadPages ()");
+      //console.log ("loadPages ()");
         
       let pageList:Array<Linkable>=new Array <Linkable>();  
         
@@ -215,7 +213,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     loadActivities () : void {
-      console.log ("loadActivities ()");
+      //console.log ("loadActivities ()");
         
       let activityList:Array<Linkable>=new Array <Linkable>();        
         
@@ -238,7 +236,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     resolveReferences () : void {
-       console.log ("resolveReferences ("+this.state.loadState+")");
+       //console.log ("resolveReferences ("+this.state.loadState+")");
         
        this.setState ({loadState : (this.state.loadState + 1)}, function () {
          if (this.state.loadState>1) {
@@ -252,7 +250,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     assignItemTypes () : void {
-      console.log ("assignItemTypes ()");
+      //console.log ("assignItemTypes ()");
         
       let immutableHelper = this.state.treeData.slice();
                 
@@ -317,7 +315,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      *
      */            
     loadDocument (anID:string):any {
-      console.log ("loadDocument ("+anID+")");
+      //console.log ("loadDocument ("+anID+")");
         
       let docu = new persistence.Document({
         _courseId: this.props.context.courseId,
@@ -332,23 +330,25 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     orgOnEdit(newData?:any) {          
-      let newModel
+      let newModel;
 
       if (newData) {
         newModel=models.OrganizationModel.updateModel (this.props.model,newData);
-        this.setState ({treeData: newData});
       } else {
         newModel=models.OrganizationModel.updateModel (this.props.model,this.state.treeData);
       }
 
-      this.handleEdit (newModel);  
+      this.setState(
+        { treeData: newModel.organization }, 
+        () => this.handleEdit(newModel)
+      );
     }    
 
     /**
      * 
      */
     evaluateTree (aTree:Array<OrgItem>):Array <OrgItem> {
-      console.log ("evaluateTree ()");
+      //console.log ("evaluateTree ()");
         
       for (let i=0;i<aTree.length;i++) {
 
@@ -361,7 +361,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             let evalSection:OrgItem=evalModule.children [k];
               
             if ((evalSection.orgType!=OrgContentTypes.Section) && (evalSection.orgType!=OrgContentTypes.Item)) {
-              console.log ("Changing " + evalSection.orgType + " to section ...");
+              //console.log ("Changing " + evalSection.orgType + " to section ...");
                         
               evalModule.children [k]=new OrgSection ();
               evalModule.children [k].id=evalSection.id;
@@ -377,7 +377,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           }  
             
           if ((evalModule.orgType!=OrgContentTypes.Module) && (evalModule.orgType!=OrgContentTypes.Item)) {
-            console.log ("Changing " + evalModule.orgType + " to module ...");
+            //console.log ("Changing " + evalModule.orgType + " to module ...");
                         
             evalSequence.children [j]=new OrgModule ();
             evalSequence.children [j].id=evalModule.id;
@@ -395,7 +395,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         //>-----------------------------------------------------------------------  
 
         if ((evalSequence.orgType!=OrgContentTypes.Sequence) && (evalSequence.orgType!=OrgContentTypes.Item)) {
-          console.log ("Changing " + aTree [i].orgType + " to sequence ...");
+          //console.log ("Changing " + aTree [i].orgType + " to sequence ...");
                        
           aTree [i]=new OrgSequence ();
           aTree [i].id=evalSequence.id;
@@ -421,13 +421,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * changes that haven't been reflected in the global component state yet.
      */
     processDataChange (newData: any) {
-      console.log ("processDataChange ()");
+      //console.log ("processDataChange ()");
         
-      console.log ("Changed tree data: " + JSON.stringify (newData));  
+      //console.log ("Changed tree data: " + JSON.stringify (newData));  
                     
       let fixedData:Array <OrgItem>=this.evaluateTree (newData ["treeData"]);
         
-      console.log ("Fixed tree data: " + JSON.stringify (fixedData));
+      //console.log ("Fixed tree data: " + JSON.stringify (fixedData));
         
       this.orgOnEdit (fixedData);      
     }    
@@ -465,7 +465,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     findTreeParent (aTree:any,aNode:any) : Array<Object> {
-      console.log ("findTreeParent ("+aNode.id+")");
+      //console.log ("findTreeParent ("+aNode.id+")");
         
       for (var i=0;i<aTree.length;i++) {
         let testNode:OrgItem=aTree [i];
@@ -491,22 +491,22 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     deleteNode (aNode:any): void {
-        console.log ("LearningObjectiveEditor:deleteNode ()");
+        //console.log ("LearningObjectiveEditor:deleteNode ()");
           
         let immutableHelper = this.state.treeData.slice();
                 
         let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
         if (immutableHelper==null) {
-            console.log ("Bump");
+            //console.log ("Bump");
             return;
         }
         
         if (parentArray!=null) {
-            console.log ("We have an object, performing edit ...");
+            //console.log ("We have an object, performing edit ...");
         }
         else {
-           console.log ("Internal error: node not found in tree");
+          // console.log ("Internal error: node not found in tree");
         }        
                         
         for (var i=0;i<parentArray.length;i++) {
@@ -525,25 +525,25 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     editTitle (aNode:any, aTitle:any):void {
-        console.log ("OrganizationEditorr:editTitle ()");
+      //  console.log ("OrganizationEditorr:editTitle ()");
                 
         let newTitle=aTitle.text;
         let immutableHelper = this.state.treeData.slice();
         
-        console.log ("Tree: " + JSON.stringify (immutableHelper));
+      //  console.log ("Tree: " + JSON.stringify (immutableHelper));
         
         let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
         if (immutableHelper==null) {
-            console.log ("Bump");
+         //   console.log ("Bump");
             return;
         }
         
         if (parentArray!=null) {
-            console.log ("We have an object, performing edit ...");
+        //    console.log ("We have an object, performing edit ...");
         }
         else {
-           console.log ("Internal error: node not found in tree");
+       //    console.log ("Internal error: node not found in tree");
         }
                     
         for (var i=0;i<parentArray.length;i++) {
@@ -562,7 +562,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     linkLO(aNode:any) {        
-        console.log ("OrganizationEditor:linkLO ()");
+       // console.log ("OrganizationEditor:linkLO ()");
                 
         this.setState ({pagesModalIsOpen: false, loModalIsOpen: true, activitiesModalIsOpen : false, orgTarget: aNode});
     }    
@@ -573,13 +573,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * last function call.
      */
     addNode (anEvent) {
-        console.log ("addNode ()");
+       // console.log ("addNode ()");
         
         var immutableHelper = this.state.treeData.slice()
         
         if (immutableHelper==null)
         {
-            console.log ("Bump");
+          //  console.log ("Bump");
             return;
         }
         
@@ -596,21 +596,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      *
      */
     addModule (aNode:any) {
-      console.log ("addModule ()");
+     // console.log ("addModule ()");
              
       let immutableHelper = this.state.treeData.slice();
                 
       let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
       if (immutableHelper==null) {
-        console.log ("Bump");
+      //  console.log ("Bump");
         return;
       }
         
       if (parentArray!=null) {
-        console.log ("We have an object, performing edit ...");
+      ////  console.log ("We have an object, performing edit ...");
       } else {
-        console.log ("Internal error: node not found in tree");
+      //  console.log ("Internal error: node not found in tree");
       }        
                         
       for (var i=0;i<parentArray.length;i++) {
@@ -634,21 +634,21 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      *
      */
     addSection (aNode:any) {
-      console.log ("addSection ()");
+     // console.log ("addSection ()");
              
       let immutableHelper = this.state.treeData.slice();
                 
       let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
       if (immutableHelper==null) {
-        console.log ("Bump");
+      //  console.log ("Bump");
         return;
       }
         
       if (parentArray!=null) {
-        console.log ("We have an object, performing edit ...");
+      //  console.log ("We have an object, performing edit ...");
       } else {
-        console.log ("Internal error: node not found in tree");
+      //  console.log ("Internal error: node not found in tree");
       }        
                         
       for (var i=0;i<parentArray.length;i++) {
@@ -672,7 +672,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     addPage (aNode:any): void {
-        console.log ("LearningObjectiveEditor:addPage ()");
+       // console.log ("LearningObjectiveEditor:addPage ()");
         
         //this.linkPage (aNode);
         this.setState ({pagesModalIsOpen: true, loModalIsOpen: false, activitiesModalIsOpen : false, orgTarget: aNode});                         
@@ -682,7 +682,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     addActivity (aNode:any): void {
-        console.log ("LearningObjectiveEditor:addActivity ()");
+      //  console.log ("LearningObjectiveEditor:addActivity ()");
         
         //this.linkPage (aNode);
         this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : true, orgTarget: aNode});                         
@@ -692,7 +692,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     closeLOModal (annotations:any) {
-      console.log ("LearningObjectiveEditor: closeLOModal ()");
+     // console.log ("LearningObjectiveEditor: closeLOModal ()");
       //console.log ("Processing annotations: " + JSON.stringify (annotations));
         
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
@@ -704,7 +704,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     closePagesModal (annotations:any) {
-      console.log ("closePagesModal ()");
+      //console.log ("closePagesModal ()");
 
       this.modifyItem (annotations,"x-oli-workbook_page");
     }    
@@ -713,7 +713,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     closeActivtiesModal (annotations:any) {
-      console.log ("closeActivtiesModal ()");
+      //console.log ("closeActivtiesModal ()");
         
       this.modifyItem (annotations,"x-oli-inline-assessment");          
     }
@@ -722,7 +722,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     modifyItem (annotations:any,itemType:string) : void {
-      console.log ("modifyItem ()");    
+     // console.log ("modifyItem ()");    
 
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
         let immutableHelper = this.state.treeData.slice();
@@ -730,14 +730,14 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.orgTarget);
         
         if (immutableHelper==null) {
-          console.log ("Bump");
+         // console.log ("Bump");
           return;
         }
 
         if (parentArray!=null) {
-          console.log ("We have an object, performing edit ...");
+        //  console.log ("We have an object, performing edit ...");
         } else {
-          console.log ("Internal error: node not found in tree");
+        //  console.log ("Internal error: node not found in tree");
         }
         
         for (var i=0;i<parentArray.length;i++) {
@@ -786,7 +786,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     createLOLinkerDialog () {
-      console.log ("createLOLinkerDialog ()");
+     // console.log ("createLOLinkerDialog ()");
                 
       let targetAnn:Array<Linkable>=new Array ();
 
@@ -815,10 +815,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     createActivityLinkerDialog () {                
       if (this.state.activitiesModalIsOpen==true) {  
         if (this.state.activities) {
-          console.log ("createLinkerDialog ()");              
+         // console.log ("createLinkerDialog ()");              
           return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-inline-assessment")} />);
         } else {
-          console.log ("Internal error: activities object can be empty but not null");
+         // console.log ("Internal error: activities object can be empty but not null");
         }
       }    
                    
@@ -831,10 +831,10 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     createPageLinkerDialog () {      
       if (this.state.pagesModalIsOpen==true) {
         if (this.state.pages) {
-          console.log ("createPageLinkerDialog ()");
+        //  console.log ("createPageLinkerDialog ()");
           return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-workbook_page")} />);
         } else {
-          console.log ("Internal error: pages array object can be empty but not null");
+        //  console.log ("Internal error: pages array object can be empty but not null");
         }
       }    
                    
@@ -845,7 +845,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     toItemList (aNode:any,aNodeType:string) : Array <Linkable> {
-      console.log ("toItemList ()");
+     // console.log ("toItemList ()");
         
       var actList:Array<Linkable>=new Array ();  
         
@@ -871,27 +871,27 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * verify the rules below. http://oli.web.cmu.edu/dtd/oli_content_organization_simple_2_2.dtd  
      */
     canDrop (anObject:Object) : boolean {
-      console.log ("canDrop ()");
+     // console.log ("canDrop ()");
           
       if (anObject ["nextParent"]) {
           
         if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Item")) {
-          console.log ("Can't put an item below an item");  
+       //   console.log ("Can't put an item below an item");  
           return (false);  
         }
           
         if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Section")) {
-          console.log ("Can't put a sequence in a section");  
+       //   console.log ("Can't put a sequence in a section");  
           return (false);  
         }          
 
         if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Sequence")) {
-          console.log ("Can't put an item in a sequence");  
+       //   console.log ("Can't put an item in a sequence");  
           return (false);  
         }
       }
 
-      console.log ("returning true");
+     // console.log ("returning true");
   
       return (true);
     }
@@ -921,7 +921,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     doUndo () : void {
-      console.log ("doUndo ()");
+     // console.log ("doUndo ()");
 
     }
 
@@ -929,7 +929,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     doRedo () : void {
-      console.log ("doRedo ()");
+     // console.log ("doRedo ()");
 
     }
     
@@ -937,7 +937,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     editWorkbookPage (aNode):void {
-      console.log ("editWorkbookPage");
+    //  console.log ("editWorkbookPage");
 
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
@@ -948,7 +948,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     editAssessment (aNode):void {
-      console.log ("editAssessment");
+     // console.log ("editAssessment");
       
       this.setState ({orgTarget: aNode}, () => {
         this.props.dispatch(viewActions.viewDocument(aNode.id));
@@ -959,7 +959,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     check ():void {
-      console.log ("check ()");
+    //  console.log ("check ()");
               
       this.orgOnEdit (null); 
     }
@@ -968,7 +968,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     handleTitleChange (event:any) : void {
-      console.log ("handleTitleChange ()");
+     // console.log ("handleTitleChange ()");
                 
       let newTopLevel:OrgOrganization=new OrgOrganization ();
       newTopLevel.version=this.state.model.toplevel.version;      
@@ -983,7 +983,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     handleDescriptionChange (event:any) : void {
-      console.log ("handleDescriptionChange ()");
+     // console.log ("handleDescriptionChange ()");
         
       let newTopLevel:OrgOrganization=new OrgOrganization ();
       newTopLevel.version=this.state.model.toplevel.version;      
@@ -998,7 +998,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */    
     handleAudienceChange (event:any) : void {
-      console.log ("handleAudienceChange ()");
+     // console.log ("handleAudienceChange ()");
         
       let newTopLevel:OrgOrganization=new OrgOrganization ();
       newTopLevel.version=this.state.model.toplevel.version;      
@@ -1014,8 +1014,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     render() 
     {      
-      console.log ("render ()");
-        
+     // console.log ("render ()");
+      
       const lolinker=this.createLOLinkerDialog ();  
       const pagelinker=this.createPageLinkerDialog ();
       const activitylinker=this.createActivityLinkerDialog ();

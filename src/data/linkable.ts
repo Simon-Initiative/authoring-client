@@ -39,7 +39,7 @@ export default class Linkable {
    */  
   static toJSON (toAnnotations:any): Object {
       
-    console.log ("Linkable.toJSON ()");
+    //console.log ("Linkable.toJSON ()");
     //console.log ("annotations: " + JSON.stringify (toAnnotations));  
       
     let ephemeral=new Array <String> ();    

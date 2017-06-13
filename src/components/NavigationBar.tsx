@@ -6,7 +6,7 @@ import * as models from "../data/models";
 import * as contentTypes from "../data/contentTypes";
 import {Resource} from "../data/resource";
 import guid from "../utils/guid";
-
+import * as view from '../actions/view';
 /**
  *
  */
@@ -257,88 +257,15 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     let menuControl = null;
     let mStyle = null;
 
-    const viewOrganizations = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Organizations',
-        'x-oli-organization',
-        (resource) => resource.type === 'x-oli-organization',
-        (title, type) => new models.OrganizationModel({
-          type: type,
-          title: new contentTypes.Title({text: title})
-        })
-      );
-
-    const viewActivities = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Assessments',
-        'x-oli-assessment',
-        (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
-        (title, type) => new models.AssessmentModel({
-          type: type,
-          title: new contentTypes.Title({text: title})
-        })
-      );
-
-    const viewWorkbookPages = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Workbook Pages',
-        'x-oli-workbook_page',
-        (resource) => resource.type === 'x-oli-workbook_page',
-        (title, type) => new models.WorkbookPageModel({
-          type: type,
-          head: new contentTypes.Head({title: new contentTypes.Title({text: title})})
-        })
-      );
-
-    const viewLearningObjectives = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Learning Objectives',
-        'x-oli-learning_objectives',
-        (resource) => resource.type === 'x-oli-learning_objectives',
-        (title, type) => new models.LearningObjectiveModel({
-          type: type,
-          title: title,
-          id:title.split(" ")[0]+guid()
-        })
-      );
-
-    const viewSkills = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Skills',
-        'x-oli-skills_model',
-        (resource) => resource.type === 'x-oli-skills_model',
-        (title, type) => new models.SkillModel({
-          type: type,
-          title: new contentTypes.Title({text: title}),
-          resource: new Resource({id:title.split(" ")[0]+guid(), title:title})
-        })
-      );
-
-    const viewPools = () =>
-      this.props.viewActions.viewResources(
-        this.props.course.model.guid,
-        'Question Pools',
-        'x-oli-assessment2-pool',
-        (resource) => resource.type === 'x-oli-assessment2-pool',
-        (title, type) => new models.PoolModel({
-          type,
-          pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),
-        }),
-      );
-
     
-    this.opts.get('package').onclick = () => this.props.viewActions.viewDocument(this.props.course.model.guid);
-    this.opts.get('organizations').onclick = viewOrganizations;
-    this.opts.get('workBookPages').onclick = viewWorkbookPages;
-    this.opts.get('activities').onclick = viewActivities;
-    this.opts.get('objectives').onclick = viewLearningObjectives;
-    this.opts.get('skills').onclick = viewSkills;
-    this.opts.get('pools').onclick = viewPools;
+    
+    this.opts.get('package').onclick = () => view.viewDocument(this.props.course.model.guid);
+    this.opts.get('organizations').onclick = view.viewOrganizations;
+    this.opts.get('workBookPages').onclick = view.viewPages;
+    this.opts.get('activities').onclick = view.viewAssessments;
+    this.opts.get('objectives').onclick = view.viewObjectives;
+    this.opts.get('skills').onclick = view.viewSkills;
+    this.opts.get('pools').onclick = view.viewPools;
     
     // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
     // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
