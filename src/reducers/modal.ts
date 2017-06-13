@@ -1,4 +1,5 @@
 import { modalActions } from '../actions/modal';
+import * as Immutable from 'immutable';
 import { OtherAction } from './utils';
 
 type ModalActions = 
@@ -6,12 +7,14 @@ type ModalActions =
   modalActions.displayAction |
   OtherAction;
 
-export function modal(state = null, action: ModalActions): Object[] {
+const defaultState = Immutable.Stack<any>();
+
+export function modal(state = defaultState, action: ModalActions): Immutable.Stack<any> {
   switch (action.type) {
     case modalActions.DISMISS_MODAL:
-      return null;
+      return state.pop();
     case modalActions.DISPLAY_MODAL:
-      return action.component;
+      return state.push(action.component);
     default:
       return state;
   }
