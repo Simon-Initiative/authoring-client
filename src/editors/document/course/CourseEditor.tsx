@@ -57,8 +57,8 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
     //       <td>{link(r._id, r.title)}</td>
     //   </tr>)
 
-    let developers = this.props.model.developers.map(d =>
-      <div className="row user">
+    let developers = this.props.model.developers.toArray().map(d =>
+      <div key={d.userName} className="row user">
         <div className="col-10">
           <span className="profile"></span>
           <span className="name">{d.firstName} {d.lastName}</span>
