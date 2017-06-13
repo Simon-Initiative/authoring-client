@@ -6,6 +6,8 @@ import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { VideoEditor } from '../../../media/VideoEditor';
+import { buildUrl } from '../../../../../utils/path';
+
 
 import './markers.scss';
 
@@ -66,15 +68,11 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;
-      if (src.startsWith('..')) {
-        fullSrc = this.props.blockProps.context.baseUrl 
-          + '/' + this.props.blockProps.context.courseId
-          + '/' 
-          + this.props.blockProps.context.resourcePath 
-          + '/' + src;
-      } else {
-        fullSrc = src;
-      }
+      fullSrc = buildUrl(
+      this.props.blockProps.context.baseUrl, 
+      this.props.blockProps.context.courseId, 
+      this.props.blockProps.context.resourcePath, 
+      src);
     }
     
     return (

@@ -6,6 +6,7 @@ import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { AudioEditor } from '../../../media/AudioEditor';
+import { buildUrl } from '../../../../../utils/path';
 
 import './markers.scss';
 
@@ -68,15 +69,11 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;
-      if (src.startsWith('..')) {
-        fullSrc = this.props.blockProps.context.baseUrl 
-          + '/' + this.props.blockProps.context.courseId
-          + '/' 
-          + this.props.blockProps.context.resourcePath 
-          + '/' + src;
-      } else {
-        fullSrc = src;
-      }
+      fullSrc = buildUrl(
+      this.props.blockProps.context.baseUrl, 
+      this.props.blockProps.context.courseId, 
+      this.props.blockProps.context.resourcePath, 
+      src);
     }
     
     return (

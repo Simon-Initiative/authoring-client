@@ -153,7 +153,7 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
               </div>
               <div className="row">
                 <div className="col-3">Thumbnail<br/><br/>
-                  <button type="button" className="btn btn-primary">Upload</button>
+                  
                 </div>
                 <div className="col-9">
                   <img src="assets/ph-courseView.png" className="img-fluid" alt=""></img>
