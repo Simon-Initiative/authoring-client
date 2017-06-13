@@ -18,7 +18,8 @@ type CourseDescription = {
   id: string,
   version: string,
   title: string,
-  description: string
+  description: string,
+  buildStatus: string
 }
 
 export interface CoursesViewProps {
@@ -54,7 +55,8 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
           id: d.id,
           version: d.version,
           title: d.title,
-          description: d.description
+          description: d.description,
+          buildStatus: d.buildStatus
         }));
         this.setState({courses});
       })
@@ -87,9 +89,8 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
   }
 
   render() {
-console.log("is admin "+hasRole("admin"));
     let rows = this.state.courses.map((c, i) => {
-      const {guid, id, version, title, description} = c;
+      const {guid, id, version, title, description, buildStatus} = c;
       return <div className="course" key={guid}>
         <img src="assets/ph-courseView.png" className="img-fluid" alt=""/>
         <div className="content container">
@@ -109,18 +110,24 @@ console.log("is admin "+hasRole("admin"));
               </div>
             <div className="enter col-2">
               <div className="row">
-              <button type="button" className="btn btn-primary" key={guid}
-                      onClick={this.onSelect.bind(this, guid)}>
-                Enter Course
-              </button>
+                { buildStatus==='READY'?
+                  <button type="button" className="btn btn-primary" key={guid}
+                          onClick={this.onSelect.bind(this, guid)}>
+                    Enter Course
+                  </button>:<div style={{margin: "auto"}} className="three-bounce">
+                    <div className="bounce1"/>
+                    <div className="bounce2"/>
+                    <div className="bounce3"/>
+                  </div>
+                }
               </div>
-              { hasRole("admin")?
-                <div className="row">
+              { hasRole("admin") &&
+              <div className="row">
                   <button type="button" className="btn btn-remove" key={guid}
                           onClick={this._deleteCourse.bind(this, guid)}>
                     Remove
                   </button>
-                </div>:''
+                </div>
               }
             </div>
           </div>

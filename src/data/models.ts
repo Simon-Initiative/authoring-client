@@ -77,6 +77,7 @@ export type CourseModelParams = {
   title?: string,
   type?: string,
   description?: string,
+  buildStatus?: string,
   metadata?: MetaData,
   options?: string,
   icon?: WebContent,
@@ -94,6 +95,7 @@ const defaultCourseModel = {
   type: 'x-oli-package',
   title: '',
   description: '',
+  buildStatus: '',
   metadata: new MetaData(),
   options: '',
   icon: new WebContent(),
@@ -111,6 +113,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   title: string;
   type: string;
   description: string;
+  buildStatus: string;
   metadata: MetaData;
   options: string;
   icon: WebContent;
@@ -136,6 +139,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
     model = model.with({title: c.title});
     model = model.with({type: c.type});
     model = model.with({description: c.description});
+    model = model.with({buildStatus: c.buildStatus});
     model = model.with({options: JSON.stringify(c.options)});
     if (!isNullOrUndefined(c.metadata.jsonObject)) {
       model = model.with({metadata: MetaData.fromPersistence(c.metadata.jsonObject)});
