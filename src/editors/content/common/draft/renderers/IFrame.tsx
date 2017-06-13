@@ -6,6 +6,7 @@ import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { IFrameEditor } from '../../../media/IFrameEditor';
+import { buildUrl } from '../../../../../utils/path';
 
 import './markers.scss';
 
@@ -62,16 +63,11 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.iframe;
-    let fullSrc;
-    if (src.startsWith('..')) {
-      fullSrc = this.props.blockProps.context.baseUrl 
-        + '/' + this.props.blockProps.context.courseId
-        + '/' 
-        + this.props.blockProps.context.resourcePath 
-        + '/' + src;
-    } else {
-      fullSrc = src;
-    }
+    const fullSrc = buildUrl(
+        this.props.blockProps.context.baseUrl, 
+        this.props.blockProps.context.courseId, 
+        this.props.blockProps.context.resourcePath, 
+        src);
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
