@@ -357,7 +357,18 @@ const styles = {
   popupAddedStyle : {
     "zIndex": -1,
     "border": "1px solid red"
-  }
+  },
+  numberStyle: {
+    'border-radius': '50%',    
+    'width': '24px',
+    'height': '24px',
+    'padding': '5px',
+    'background': '#fff',
+    'border': '2px solid #666',
+    'color': '#666',
+    'text-align': 'center',
+    'font': '12px Arial, sans-serif'
+  }  
 };
 
 /**
@@ -487,7 +498,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     /**
      * 
      */
-    generatePopDown (node) {         
+    generatePopDown (node) {               
       let bStyle:any=styles.orgrowTitle;
       bStyle ["marginLeft"]="10px";
         
@@ -533,21 +544,22 @@ class OrganizationNodeRenderer extends Component <any,any>
       }
 
       return (
-            <div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
-            <div tabIndex={0} className="onclick-menu">
-              <ul className={menuStyle}>
-                Content
-                {moduleLink}
-                {sectionLink}
-                <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
-                {loLink}
-                {pageLink}
-                {activityLink}
-                {editLink}
-                Assets
-                {assetLink}
-              </ul>
-            </div>
+            <div>
+             <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
+             <div tabIndex={0} className="onclick-menu">
+               <ul className={menuStyle}>
+                 Content
+                 {moduleLink}
+                 {sectionLink}
+                 <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+                 {loLink}
+                 {pageLink}
+                 {activityLink}
+                 {editLink}
+                 Assets
+                 {assetLink}
+               </ul>
+             </div>
             </div>);
     }
 
@@ -711,6 +723,10 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
+        let numberStyle:any=styles.numberStyle;
+
+        //>--------------------------------------------------------------------
+
         let popDown=this.generatePopDown (node);
   
         return (
@@ -745,8 +761,9 @@ class OrganizationNodeRenderer extends Component <any,any>
                              <div style={titleDivider}>
                              {node.orgType}
                              </div>                             
-                           </div>            
-                           {popDown}                               
+                           </div> 
+                           <div style={numberStyle}>{node.annotations.length}</div>           
+                           {popDown}
                         </div>
                     )}
                 </div>
