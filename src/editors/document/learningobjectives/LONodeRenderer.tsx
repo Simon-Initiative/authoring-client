@@ -272,11 +272,24 @@ const styles = {
       "overflowY": "hidden",
       "overflowX": "hidden",
       "minWidth": "350px",      
-      "maxWidth": "400px",
+      "maxWidth": "350px",
       'height': '42px',
-      'line-height': '42px',
-      'margin-top': '0px'
-  }  
+      'lineHeight': '42px',
+      'margin': '0px'
+  },
+  numberStyle: { 
+    'marginLeft' : '4px',
+    'marginTop' : '8px',  
+    'border-radius': '50%',    
+    'width': '26px',
+    'height': '24px',
+    'padding': '4px',
+    'background': '#fff',
+    'border': '2px solid #666',
+    'color': '#666',
+    'text-align': 'center',
+    'font': '12px Arial, sans-serif'
+  },  
 };
 
 /**
@@ -416,7 +429,8 @@ class LONodeRenderer extends Component <any, any>
                         context={context}
                         styles={styles.loTitleRenderer}
                         onEdit={(content) => this.editNodeTitle(node,content)} 
-                       />            
+                       />
+                       <div style={styles.numberStyle}>{node.annotations.length}</div>
                        <a style={bStyle} href="#" onClick={(e) => this.deleteNodeFunction (node)}><i className="fa fa-window-close"></i>&nbsp;</a>
                        <a style={bStyle} href="#" onClick={(e) => this.linkAnnotation (node)}><i className="fa fa-plus"></i>&nbsp;</a>
                      </div>
