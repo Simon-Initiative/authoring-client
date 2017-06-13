@@ -45,7 +45,6 @@ export function isLockable(model: ContentModel) {
 }
 
 export function createModel(object: any): ContentModel {
-  console.log("createModel ()");
   switch (object.type) {
     case 'x-oli-package':
       return CourseModel.fromPersistence(object);
@@ -571,7 +570,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   lock: contentTypes.Lock;
 
   constructor(params?: OrganizationModelParams) {
-    console.log("constructor ()");
+    //console.log("constructor ()");
     params ? super(params) : super();
   }
 
@@ -580,7 +579,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   }
 
   static getTextFromNode(aNode: any): string {
-    console.log("getTextFromNode: " + JSON.stringify(aNode));
+    //console.log("getTextFromNode: " + JSON.stringify(aNode));
 
     // Check for old style text nodes
     if (aNode ['#text']) {
@@ -679,7 +678,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static parseSection(aSection: any): OrgSection {
-    console.log("parseSection ()");
+    //console.log("parseSection ()");
 
     var newNode: OrgSection = new OrgSection();
     newNode.id = aSection ["@id"];
@@ -708,7 +707,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static parseModule(aModule: any): OrgItem {
-    console.log("parseModule ()");
+    //console.log("parseModule ()");
 
     let moduleNode: OrgModule = new OrgModule();
     moduleNode.id = aModule ["@id"];
@@ -722,7 +721,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
-      console.log("typeSwitch: " + typeSwitch);
+      //console.log("typeSwitch: " + typeSwitch);
 
       if (typeSwitch == "title") {
         moduleNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
@@ -744,7 +743,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static parseUnit(aUnit: any): OrgItem {
-    console.log("parseUnit ()");
+   // console.log("parseUnit ()");
 
     let unitNode: OrgUnit = new OrgUnit();
     unitNode.id = aUnit ["@id"];
@@ -759,7 +758,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
       var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
-      console.log("typeSwitch: " + typeSwitch);
+     // console.log("typeSwitch: " + typeSwitch);
 
       if (typeSwitch == "title") {
         unitNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
@@ -781,7 +780,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static updateModel(oldModel: OrganizationModel, newOrgModel: any): OrganizationModel {
-    console.log("updateModel ()");
+   // console.log("updateModel ()");
     var model = new OrganizationModel({'organization': newOrgModel});
     model = model.with({toplevel: oldModel.toplevel});
     model = model.with({resource: oldModel.resource});
@@ -802,7 +801,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    */
   static parseTopLevelOrganization(aData: any): OrgOrganization {
 
-    console.log("parseTopLevelOrganization ()");
+    //console.log("parseTopLevelOrganization ()");
 
     let orgNode = new OrgOrganization();// throw away for now
 
@@ -846,21 +845,21 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static fromPersistence(json: Object): OrganizationModel {
-    console.log("fromPersistence ()");
+    //console.log("fromPersistence ()");
 
-    console.log("Org model: " + JSON.stringify(json));
+    //console.log("Org model: " + JSON.stringify(json));
 
     let a = (json as any);
     var orgData = a.doc.organization;
 
-    console.log("Org JSON: " + JSON.stringify(orgData));
+    //console.log("Org JSON: " + JSON.stringify(orgData));
 
     var newData: Array<OrgSequence> = new Array();
     var newTopLevel: OrgOrganization = OrganizationModel.parseTopLevelOrganization(orgData);
 
     var oList = orgData["#array"];
 
-    console.log("Found start of organization data ...");
+    //console.log("Found start of organization data ...");
 
     if (oList) {
       for (var k = 0; k < oList.length; k++) {
@@ -876,7 +875,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           for (let w = 0; w < seqList.length; w++) {
             let seqObj = seqList [w];
             if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
-              console.log("Parsing sequence ...");
+              //console.log("Parsing sequence ...");
               let newSequence: OrgSequence = new OrgSequence();
               let seqReference = seqObj ["sequence"];
               newData.push(newSequence);
@@ -896,7 +895,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                   var mdl = seq [s];
 
                   if (s == "title") {
-                    console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
+                    //console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
                     newSequence.title = OrganizationModel.getTextFromNode(mdl);
                   }
 
@@ -920,8 +919,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       }
     }
 
-    console.log("toplevel: " + JSON.stringify(newTopLevel));
-    console.log("newData: " + JSON.stringify(newData));
+    //console.log("toplevel: " + JSON.stringify(newTopLevel));
+    //console.log("newData: " + JSON.stringify(newData));
 
     let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});
 
@@ -940,11 +939,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   toPersistence(): Object {
-    console.log("toPersistence ()");
+    //console.log("toPersistence ()");
 
     var newData = this.organization;
 
-    console.log("Persisting from visual tree: " + JSON.stringify(this.organization));
+    //console.log("Persisting from visual tree: " + JSON.stringify(this.organization));
 
     // First process our organization object and add it to the tree we're building
 
@@ -964,7 +963,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     // We can point directly to .children because we ensure in the constructor that
     // this object always exists
 
-    console.log("Persisting " + newData.length + " items ...");
+    //console.log("Persisting " + newData.length + " items ...");
 
     for (let j = 0; j < newData.length; j++) {
       let seqObject: OrgSequence = newData [j] as OrgSequence;
@@ -986,7 +985,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         let mObj: OrgItem = seqObject.children [k];
 
         // Check the type here. We can expect Module, Section and Item
-        console.log("Object: " + mObj.orgType);
+        //console.log("Object: " + mObj.orgType);
 
         let moduleContainer: Object = new Object();
         let moduleObj: Object = new Object();
@@ -1003,7 +1002,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         moduleObj["#array"].push(OrgItem.addTextObject("title", mObj.title));
 
         for (let l = 0; l < mObj.children.length; l++) {
-          console.log("Section: " + mObj.children [l].title);
+          //console.log("Section: " + mObj.children [l].title);
 
           let sObj: OrgItem = mObj.children [l];
 
@@ -1119,7 +1118,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    */
   static parseLearningObjective(anObjective: Object): LearningObjective {
 
-    console.log ("parseLearningObjective : " + JSON.stringify (anObjective));  
+    //console.log ("parseLearningObjective : " + JSON.stringify (anObjective));  
       
     var newLO: LearningObjective = new LearningObjective();
 
@@ -1143,13 +1142,13 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     // title attribute that's where any updates will be stored.  
       
     if (anObjective ["#array"]) {
-      console.log ("Found composite title");  
+      //console.log ("Found composite title");  
       let compositeTitle=anObjective ["#array"];
       let newTitle:string="";  
       for (let i=0;i<compositeTitle.length;i++) {
         let testTitleObject:any=compositeTitle [i];
           
-        console.log ("Examining sub title object: " + JSON.stringify (testTitleObject));  
+        //console.log ("Examining sub title object: " + JSON.stringify (testTitleObject));  
           
         if (testTitleObject ["#text"]) {
           newTitle+=testTitleObject ["#text"];
@@ -1196,7 +1195,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    * objects based on the parent parameter.
    */
   static reparent(fromSet: Array<LearningObjective>): Array<LearningObjective> {
-    console.log("reparent ()");
+    //console.log("reparent ()");
 
     let toSet: Array<LearningObjective> = new Array();
 
@@ -1264,7 +1263,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   }
 
   toPersistence(): Object {
-    console.log("toPersistence ()");
+    //console.log("toPersistence ()");
     let resource: any = this.resource.toPersistence();
     let flatLOs: Array<Object> = new Array ();
 
@@ -1285,14 +1284,14 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       "doc": newData
     };
 
-    console.log("Persisting LO model as: " + JSON.stringify(root));
+    //console.log("Persisting LO model as: " + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
   static fromPersistence(json: Object): LearningObjectiveModel {
 
-    console.log("fromPersistence ()");
+    //console.log("fromPersistence ()");
 
     let a = (json as any);
     //var obData=a.doc.objectives;
@@ -1389,7 +1388,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   skills: Array<Skill>;
 
   constructor(params?: SkillModelParams) {
-    console.log("constructor ()");
+    //console.log("constructor ()");
     params ? super(params) : super();
   }
 
@@ -1400,7 +1399,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
 
   static updateModel(oldSkillModel: SkillModel, newSkillModel: any): SkillModel {
-    console.log("updateModel ()");
+    //console.log("updateModel ()");
     var newModel = new SkillModel({'skills': newSkillModel});
     newModel = newModel.with({resource: oldSkillModel.resource});
     newModel = newModel.with({guid: oldSkillModel.guid});
@@ -1409,12 +1408,12 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     if (!isNullOrUndefined(oldSkillModel.lock)) {
       newModel = newModel.with({lock: oldSkillModel.lock});
     }
-    console.log("updateModel () done");
+    //console.log("updateModel () done");
     return newModel;
   }
 
   toPersistence(): Object {
-    console.log("toPersistence ()");
+    //console.log("toPersistence ()");
     let resource: any = this.resource.toPersistence();
     const doc = [{
       "skills_model": {
@@ -1427,7 +1426,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       "doc": doc
     };
 
-    console.log("SkillModel: " + JSON.stringify(root));
+    //console.log("SkillModel: " + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }

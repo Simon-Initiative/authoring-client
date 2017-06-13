@@ -389,7 +389,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     }    
     
     popupToggle (e) : void {
-      console.log ("popupToggle ()");
+      //console.log ("popupToggle ()");
         
       if (this.state.isMenuOpen==true) {
         this.setState ({isMenuOpen: false}, function () {
@@ -406,7 +406,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     }
     
     popupClose (e) : void {
-      console.log ("popupClose ()");
+      //console.log ("popupClose ()");
         
       this.setState ({isMenuOpen: false}, function () {
         if (this.lastWindowClickEvent) {  
@@ -416,13 +416,13 @@ class OrganizationNodeRenderer extends Component <any,any>
     }
         
     componentWillUnmount() {
-      console.log ("componentWillUnmount ()");  
+      //console.log ("componentWillUnmount ()");  
         
       this.popupClose (null);
     }
     
     handleClickOutside = (e) => {
-      console.log ("handleClickOutside ()");
+      //console.log ("handleClickOutside ()");
 
       this.popupClose (e);
     };    
