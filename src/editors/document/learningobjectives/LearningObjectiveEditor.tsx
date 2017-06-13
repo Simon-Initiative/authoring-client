@@ -221,7 +221,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
   
       newModel=models.LearningObjectiveModel.updateModel (this.state.model,reparented);
        
-      console.log ("Giving the following model to this.props.onLOEdit: " + JSON.stringify (newModel));  
+      //console.log ("Giving the following model to this.props.onLOEdit: " + JSON.stringify (newModel));  
                 
       this.setState ({modalIsOpen: false, treeData: newModel.los}, function () {
         //this.props.onEdit(newModel);
