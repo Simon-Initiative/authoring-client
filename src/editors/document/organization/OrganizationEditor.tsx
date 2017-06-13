@@ -331,8 +331,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    orgOnEdit(newData?:any) {
-          
+    orgOnEdit(newData?:any) {          
       let newModel
 
       if (newData) {
@@ -341,11 +340,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       } else {
         newModel=models.OrganizationModel.updateModel (this.props.model,this.state.treeData);
       }
-        
-      newModel.toPersistence ();  
 
-      //this.props.onEdit(newModel);
-      //this.onEdit(newModel);
       this.handleEdit (newModel);  
     }    
 
