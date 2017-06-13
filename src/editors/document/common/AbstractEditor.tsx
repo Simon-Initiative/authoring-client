@@ -6,6 +6,8 @@ import * as models from '../../../data/models';
 import * as types from '../../../data/types';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
+import { handleKey, unhandleKey } from './keyhandlers';
+
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
   
@@ -57,6 +59,22 @@ export abstract class AbstractEditor<ModelType,
         undoStackSize: 0, 
         redoStackSize: 0
       }, childState) as S);
+    }
+
+    componentDidMount() {
+      handleKey(
+        'ctrl+z', 
+        () => this.undoStack.size > 1, 
+        this.undo.bind(this));
+      handleKey(
+        'ctrl+y', 
+        () => this.redoStack.size > 1, 
+        this.redo.bind(this));
+    }
+
+    componentWillUnmount() {
+      unhandleKey('ctrl+z');
+      unhandleKey('ctrl+y');
     }
 
     undo() {

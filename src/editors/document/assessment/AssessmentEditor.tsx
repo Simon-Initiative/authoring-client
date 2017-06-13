@@ -59,7 +59,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentDidMount() {                    
-
+    super.componentDidMount();
     /*  
     let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
           

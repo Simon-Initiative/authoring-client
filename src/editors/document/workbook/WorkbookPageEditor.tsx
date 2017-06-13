@@ -15,7 +15,6 @@ import Linkable from '../../../data/linkable';
 import { LOTypes, LearningObjective } from '../../../data/los';
 
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
-
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
 import * as models from '../../../data/models';
@@ -56,7 +55,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  componentDidMount() {                    
+  componentDidMount() {      
+    super.componentDidMount();              
     this.loadLearningObjectives ();
   }        
     

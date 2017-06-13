@@ -177,7 +177,14 @@ class Main extends React.Component<MainProps, MainState> {
       return null;
     }
 
-    const modalDisplay = this.props.modal !== null ? <div>{this.props.modal}</div> : <div></div>;
+    let modalDisplay = null;
+    if (this.props.modal.peek() !== undefined) {
+      modalDisplay = this.props.modal
+        .toArray()
+        .reverse()
+        .map((component, i) => <div key={i}>{component}</div>);
+    }
+      
     const currentView = this.getView(this.state.current.pathname);
 
     const logoutUrl = this.props.user !== null ? this.props.user.logoutUrl : '';

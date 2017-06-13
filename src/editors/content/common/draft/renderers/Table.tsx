@@ -1,4 +1,6 @@
 import * as React from 'react';
+
+import * as contentTypes from '../../../../../data/contentTypes';
 import { Table as TableType } from '../../../../../data/content/html/table';
 import PreformattedText from './PreformattedText';
 import { InteractiveRenderer, InteractiveRendererProps, 
@@ -6,7 +8,6 @@ import { InteractiveRenderer, InteractiveRendererProps,
 import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalTableEditor from '../../../table/ModalTableEditor';
-import { getHtmlDetails } from '../../../common/details';
 import { Html } from '../../../../../data/content/html';
 
 type Data = {
@@ -24,6 +25,23 @@ export interface TableState extends InteractiveRendererState {
 export interface TableProps {
   
 }
+
+export function getHtmlDetails(html : contentTypes.Html) : JSX.Element {
+
+  const blocks = html.contentState.getBlocksAsArray();
+
+  const filtered = html.contentState.getBlocksAsArray()
+    .filter(b => b.getType !== 'atomic' 
+      && b.getCharacterList().toArray().every(e => e.getEntity() === null));
+    
+  if (filtered.length !== blocks.length) {
+    return <i>Click &apos;Edit&apos; to see cell content</i>;
+  } else {
+    return blocks.map(b => <p key={b.getKey()}>{b.getText()}</p>);
+  }
+
+}
+
 
 export class Table extends InteractiveRenderer<TableProps, TableState> {
 
@@ -53,6 +71,8 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
         }
       }/>);
   }
+
+
 
   render() : JSX.Element {
 
