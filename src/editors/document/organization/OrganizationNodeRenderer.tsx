@@ -230,18 +230,6 @@ const styles = {
     "display": "inline-block",
     "verticalAlign": "middle",          
   },
-  orgrowTitle : {    
-    "border": "0px solid red",
-    "display": "inline-block",
-    "width": "inherited",
-    "height": "100%",    
-    "overflowY": "hidden",
-    "overflowX": "hidden",
-    "marginRight": "auto", 
-    "fontFamily" : "'Roboto Slab', serif",
-    "verticalAlign": "middle",
-    "lineHeight": "42px"
-  },
   orgrowControl : {    
     "border": "1px solid red",
     "width": "26px",
@@ -358,17 +346,34 @@ const styles = {
     "zIndex": -1,
     "border": "1px solid red"
   },
-  numberStyle: {
+  chevronStyle : {    
+    "border": "0px solid red",
+    "width": "24px",
+    "height": "18px",    
+    "overflowY": "hidden",
+    "overflowX": "hidden",
+    "margin" : "0px",
+    "marginLeft" : "5px",
+    "fontFamily" : "'Roboto Slab', serif",
+    "verticalAlign": "middle",
+    "padding" : "0px",
+    "lineHeight": "18px"
+  },  
+  numberStyle: { 
     'border-radius': '50%',    
     'width': '24px',
     'height': '24px',
-    'padding': '5px',
+    'padding': '4px',
     'background': '#fff',
     'border': '2px solid #666',
     'color': '#666',
     'text-align': 'center',
     'font': '12px Arial, sans-serif'
-  }  
+  },
+  controlsContainer : {
+    'width': '24px',   
+    "border": "0px solid green"
+  }
 };
 
 /**
@@ -498,15 +503,19 @@ class OrganizationNodeRenderer extends Component <any,any>
     /**
      * 
      */
-    generatePopDown (node) {               
-      let bStyle:any=styles.orgrowTitle;
-      bStyle ["marginLeft"]="10px";
-        
-      const chevron=<div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a></div>;  
+    generatePopDown (node) {
+      let controlsContainer:any=styles.controlsContainer;  
+      let numberStyle:any=styles.numberStyle;               
+      let bStyle:any=styles.chevronStyle;
         
       if (this.state.isMenuOpen==false)
       {
-          return (<div><a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a></div>);
+          return (
+            <div style={controlsContainer}>
+              <div style={numberStyle}>{node.annotations.length}</div>
+              <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-down"></div></a>
+            </div>
+          );
       }  
         
       let menuStyle:string="flex-column onclick-menu-content list-group";
@@ -544,8 +553,9 @@ class OrganizationNodeRenderer extends Component <any,any>
       }
 
       return (
-            <div>
-             <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><i className="fa fa-chevron-down"></i>&nbsp;</a>
+            <div style={controlsContainer}>
+             <div style={numberStyle}>{node.annotations.length}</div>
+             <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-up"></div></a>
              <div tabIndex={0} className="onclick-menu">
                <ul className={menuStyle}>
                  Content
@@ -696,6 +706,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         //>--------------------------------------------------------------------
 
+        /*
         let iStyle:any=styles.orgrowTitle;
 
         if (node.subtitle) {
@@ -703,14 +714,17 @@ class OrganizationNodeRenderer extends Component <any,any>
           iStyle ["display"]="block";
           iStyle ["height"]="0.8rem";
         }
+        */
 
         // If we assign the style directly then React freaks out (or TypeScript it's hard to tell)
         // and claims that 'bold' isn't a valid option for fontWeight
-        let tStyle:any=styles.orgrowTitle;
+        //let tStyle:any=styles.orgrowTitle;
 
+        /*
         let bStyle:any=styles.orgrowTitle;
         bStyle ["marginLeft"]="10px";
         bStyle ["textDecoration"]="none";
+        */
  
         let titleDivider:any=styles.titleDivider;
         let titleContainer:any=styles.titleContainer;
@@ -720,10 +734,6 @@ class OrganizationNodeRenderer extends Component <any,any>
         var titleObj=new contentTypes.Title({ text: node.title})
         const services = ({} as AppServices);
         const context = { courseModel: null, resourcePath: null, userId: null, undoRedoGuid: null,documentId: null, courseId: null, baseUrl: null};
-
-        //>--------------------------------------------------------------------
-
-        let numberStyle:any=styles.numberStyle;
 
         //>--------------------------------------------------------------------
 
@@ -762,7 +772,6 @@ class OrganizationNodeRenderer extends Component <any,any>
                              {node.orgType}
                              </div>                             
                            </div> 
-                           <div style={numberStyle}>{node.annotations.length}</div>           
                            {popDown}
                         </div>
                     )}
