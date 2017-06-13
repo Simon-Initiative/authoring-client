@@ -274,7 +274,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           <div className="col-8">
             <div className="alert alert-warning" role="alert">
               <strong>Read Only</strong>&nbsp;&nbsp; 
-              This material is currently being edited by {lockDetails.lockedBy}
+              The contents of this page is being edited by {lockDetails.lockedBy}
             </div>
           </div>
           <div className="col-2">
