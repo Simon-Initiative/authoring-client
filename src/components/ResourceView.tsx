@@ -72,7 +72,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   clickResource(id) {
-    this.props.dispatch(viewActions.viewDocument(id));
+    viewActions.viewDocument(id);
   }
 
   createResource(e) {
