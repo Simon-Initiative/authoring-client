@@ -2,7 +2,7 @@ import guid from '../utils/guid';
 
 export class TResource {
   id:string=guid();
-  title:string="unassigned";    
+  title:string="";    
 }
 
 /** 
@@ -13,7 +13,7 @@ export class TResource {
 export default class Linkable {      
   //resource:TResource=new TResource ();
   id:string="";
-  title:string="unassigned";
+  title:string="";
   typeDescription:string="x-oli-workbook_page"; // This variable is only used for internal bookkeeping.
   expanded:boolean=false;
   annotations:Array <Linkable>=null;  
@@ -60,14 +60,19 @@ export default class Linkable {
   /**
    *
    */   
-  static fromJSON (json:Array<string>): Array <Linkable> {
+  static fromJSON (json:Array<string>): Array <Linkable> {      
+    //console.log ("Linkable:fromJSON ()");
+    //console.log (JSON.stringify (json));  
+        
     let ephemeral:Array <Linkable>=new Array ();
       
-    for (let j=0;j<json.length;j++) {
-      let newLinkable=new Linkable ();
-      newLinkable.id=json [j];
-      ephemeral.push (newLinkable);
-    }  
+    if (json) {  
+      for (let j=0;j<json.length;j++) {
+        let newLinkable=new Linkable ();
+        newLinkable.id=json [j];
+        ephemeral.push (newLinkable);
+      }
+    }      
       
     return (ephemeral);  
   }

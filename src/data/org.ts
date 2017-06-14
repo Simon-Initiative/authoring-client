@@ -22,7 +22,8 @@ export class OrgItem extends Linkable {
   orgType:OrgContentTypes=OrgContentTypes.Item;        
   scoringMode : string ="default";
   children:Array<OrgItem>;
-  resourceRef : IDRef;    
+  resourceRef : IDRef;
+  livelink: string ="";      
     
   constructor() {
     super();  
@@ -155,8 +156,8 @@ export class OrgUnit extends OrgItem {
 
 export class OrgSequence extends OrgItem{    
 
-  category:string="unassigned";
-  audience:string="unassigned";
+  category:string="";
+  audience:string="";
     
   constructor() {
    super ();      
@@ -188,8 +189,8 @@ export class OrgSequence extends OrgItem{
 
 export class OrgOrganization extends OrgSequence {
     
-  version:string="unassigned";
-  description:string="unassgined";
+  version:string="1.0.0";
+  description:string="";
         
   constructor() {
     super ();      

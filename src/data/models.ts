@@ -574,7 +574,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   lock: contentTypes.Lock;
 
   constructor(params?: OrganizationModelParams) {
-    //console.log("constructor ()");
     params ? super(params) : super();
   }
 
@@ -583,9 +582,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   }
 
   static getTextFromNode(aNode: any): string {
-    //console.log("getTextFromNode: " + JSON.stringify(aNode));
-
-    // Check for old style text nodes
     if (aNode ['#text']) {
       return (aNode ['#text']);
     }
@@ -656,9 +652,13 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    * },
    */
   static parseItem(anItem: any): OrgItem {
+    console.log ("parseItem ()");
+    console.log (JSON.stringify (anItem));          
+      
     var newNode: OrgItem = new OrgItem();
 
     for (var i in anItem) {
+      //console.log ("Examining: " + i);  
       if (i == "#annotations") {
         newNode.annotations = Linkable.fromJSON(anItem [i]["#annotations"]);
       }
@@ -667,10 +667,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         newNode.scoringMode = anItem [i];
       }
 
-      if (i == "resourceref") {
-        // newNode.title will be resolved dynamically in the org editor when it mounts  
-        newNode.title = anItem [i]["@idref"];
-        newNode.id = anItem [i]["@idref"];
+      if (i == "resourceref") {  
+        //newNode.title will be resolved dynamically in the org editor when it mounts          
         newNode.resourceRef.idRef = anItem [i]["@idref"];
       }
     }
@@ -917,9 +915,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
             }
           }
         }
+        /*  
         else {
           console.log("Error: unable to find sequence data");
         }
+        */
       }
     }
 
@@ -939,6 +939,67 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     return model;
   }
 
+  /**
+   *
+   */   
+  orgItemToJSON (testObject:any) {
+    //console.log ("orgItemToJSON ("+testObject.title+")");
+              
+    let newObject: Object = new Object();
+    newObject ["@id"] = testObject.id;
+    newObject ["@expanded"] = testObject.expanded;
+      
+    if (testObject.orgType==OrgContentTypes.Item) {
+        newObject["@scoring_mode"]=testObject.scoringMode;
+        newObject["resourceref"]=new Object ();
+        newObject["resourceref"]["@idref"]=testObject.resourceRef.idRef;        
+    } else {        
+      newObject ["#array"] = new Array();
+      newObject ["#array"].push(OrgItem.addTextObject("title", testObject.title));
+      if (testObject ["annotations"]) {
+        newObject ["#annotations"] = Linkable.toJSON(testObject ["annotations"]);
+      }
+      if (testObject.orgType==OrgContentTypes.Sequence) {
+        if (testObject ["category"]) {    
+          newObject ["@category"] = testObject.category;
+        }
+            
+        if (testObject ["audience"]) {        
+          newObject ["@audience"] = testObject.audience;
+        }    
+      }       
+     
+      if (testObject ["children"]) {
+        for (let i=0;i<testObject ["children"].length; i++) {
+          
+          var subObject:any=testObject ["children"][i];
+            
+          if (subObject.orgType==OrgContentTypes.Sequence) {  
+            newObject ["#array"].push({"sequence": this.orgItemToJSON (subObject)});
+          }
+          
+          if (subObject.orgType==OrgContentTypes.Module) {  
+            newObject ["#array"].push({"module": this.orgItemToJSON (subObject)});
+          }
+          
+          if (subObject.orgType==OrgContentTypes.Unit) {  
+            newObject ["#array"].push({"unit": this.orgItemToJSON (subObject)});
+          }
+          
+          if (subObject.orgType==OrgContentTypes.Section) {  
+            newObject ["#array"].push({"section": this.orgItemToJSON (subObject)});
+          }
+          
+          if (subObject.orgType==OrgContentTypes.Item) {  
+            newObject ["#array"].push({"item": this.orgItemToJSON (subObject)});
+          }          
+        }
+      }  
+    } 
+      
+    return (newObject);  
+  }      
+    
   /**
    *
    */
@@ -969,6 +1030,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     console.log("Persisting " + newData.length + " items ...");
 
+    /*  
     for (let j = 0; j < newData.length; j++) {
       let seqObject: OrgSequence = newData [j] as OrgSequence;
 
@@ -1015,6 +1077,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
             
           if (sObj.orgType==OrgContentTypes.Item) {
             sectionContainer ["item"] = sectionObj;
+            sectionContainer ["item"]["resourceref"]=new Object ();
+            sectionContainer ["item"]["resourceref"]["@idref"]=sObj.resourceRef.idRef;              
           } 
             
           if (sObj.orgType==OrgContentTypes.Unit) {
@@ -1049,6 +1113,31 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         }
       }
     }
+    */
+      
+    for (let j = 0; j < newData.length; j++) {
+      let testObject: OrgItem = newData [j] as OrgItem; // Start with the lowest level and detect what it actually is
+              
+      if (testObject.orgType==OrgContentTypes.Sequence) {         
+        sequences.push({"sequence": this.orgItemToJSON (testObject)});
+      }
+        
+      if (testObject.orgType==OrgContentTypes.Module) {         
+        sequences.push({"module": this.orgItemToJSON (testObject)});
+      }
+        
+      if (testObject.orgType==OrgContentTypes.Unit) {         
+        sequences.push({"unit": this.orgItemToJSON (testObject)});
+      }
+        
+      if (testObject.orgType==OrgContentTypes.Section) {         
+        sequences.push({"section": this.orgItemToJSON (testObject)});
+      }
+        
+      if (testObject.orgType==OrgContentTypes.Item) {         
+        sequences.push({"item": this.orgItemToJSON (testObject)});
+      }        
+    }  
 
     //var formattedOrganization = JSON.stringify(orgRoot);
     var formattedOrganization = JSON.stringify(orgRoot ["organization"]);

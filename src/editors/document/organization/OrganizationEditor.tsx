@@ -23,7 +23,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org'
+import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgUnit,OrgModule,OrgOrganization} from '../../../data/org'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
@@ -198,7 +198,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       this.props.context.courseModel.resources.map((value, id) => {
         if (value.type=="x-oli-workbook_page") {
           let pageLink:Linkable=new Linkable ();
-          pageLink.id=value.guid;
+          pageLink.id=value.id;
           pageLink.title=value.title;
           pageList.push (pageLink);             
         }          
@@ -221,7 +221,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if ((value.type=="x-oli-inline-assessment") || (value.type=="x-oli-assessment2")) {
           let activityLink:Linkable=new Linkable ();
           //console.log ("Activity Check: " + JSON.stringify (value));   
-          activityLink.id=value.guid;
+          activityLink.id=value.id;
           activityLink.title=value.title;
           activityList.push (activityLink);    
         }          
@@ -252,6 +252,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     assignItemTypes () : void {
       //console.log ("assignItemTypes ()");
         
+      console.log ("Resources: " + JSON.stringify (this.props.context.courseModel.resources));  
+        
       let immutableHelper = this.state.treeData.slice();
                 
       this.assignType (immutableHelper);
@@ -263,24 +265,22 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     assignType (aNode:Array <OrgItem>): void
-    {
+    {       
       //console.log ("assignType ()");
-        
+         
       for (let i=0;i<aNode.length;i++) {
         let targetObject:OrgItem=aNode [i] as OrgItem;
-          
-        //console.log ("Examining node with type: " + targetObject.orgType);  
         
-        if (targetObject.orgType==OrgContentTypes.Item) {
-           //console.log ("found an item, searching for type content ..."); 
-           //targetObject.typeDescription=this.findType (targetObject.resourceRef.idRef);
-           //targetObject.typeDescription=this.findType (targetObject.id);
+        if (targetObject.orgType==OrgContentTypes.Item) {            
+           let testTarget:any=this.findTarget (targetObject.resourceRef.idRef); 
             
-           let testTarget:any=this.findTarget (targetObject.id); 
-            
-           if (testTarget!=null) { 
+           if (testTarget!=null) {
+             // Also make sure we presever the originally assigned id here. Even though
+             // we might not use it and might not even store it, it's the only way we
+             // can ensure that when we delete an item we delete the correct one.
+             targetObject.livelink=testTarget.guid;
              targetObject.typeDescription=testTarget.type;
-             targetObject.id=testTarget.guid;
+             targetObject.resourceRef.idRef=testTarget.id;
              targetObject.title=testTarget.title;
            }    
         }
@@ -296,14 +296,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * by using 'return'. Should be changed when possible because this can become a
      * time sink.
      */
-    findTarget (anId:string) : Object {
-      //console.log ("findTarget ("+anId+")");
-        
+    findTarget (anId:string) : Object {        
       let foundTarget:Object=null;  
         
-      this.props.context.courseModel.resources.map((value, id) => {        
-
-        if (value.id==anId) {
+      this.props.context.courseModel.resources.map((value, id) => {          
+        if (value.id==anId) {  
           foundTarget=value;              
         }              
       })          
@@ -562,9 +559,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     linkLO(aNode:any) {        
-       // console.log ("OrganizationEditor:linkLO ()");
-                
-        this.setState ({pagesModalIsOpen: false, loModalIsOpen: true, activitiesModalIsOpen : false, orgTarget: aNode});
+      console.log ("linkLO ()");                
+      this.setState ({pagesModalIsOpen: false, loModalIsOpen: true, activitiesModalIsOpen : false, orgTarget: aNode});
     }    
 
     /**
@@ -591,6 +587,44 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
 
         this.orgOnEdit (immutableHelper);    
     }   
+    
+    /**
+     *
+     */
+    addUnit (aNode:any) {
+     // console.log ("addModule ()");
+             
+      let immutableHelper = this.state.treeData.slice();
+                
+      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
+        
+      if (immutableHelper==null) {
+      //  console.log ("Bump");
+        return;
+      }
+        
+      if (parentArray!=null) {
+      ////  console.log ("We have an object, performing edit ...");
+      } else {
+      //  console.log ("Internal error: node not found in tree");
+      }        
+                        
+      for (var i=0;i<parentArray.length;i++) {
+        let testNode:OrgItem=parentArray [i] as OrgItem;
+            
+        if (testNode.id==aNode.id) {
+          let newUnit:OrgUnit=new OrgUnit ();
+          newUnit.title=("Unit " + this.state.titleIndex);
+          testNode.children.push (newUnit);
+        
+          this.setState ({titleIndex: this.state.titleIndex+1});
+        
+          break;
+        }
+      }
+
+      this.orgOnEdit (immutableHelper);           
+    }    
     
     /**
      *
@@ -704,8 +738,19 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         for (var i=0;i<parentArray.length;i++) {
           let testNode:OrgItem=parentArray [i] as OrgItem;
             
-          if (testNode.id==this.state.orgTarget.id) {    
-            testNode.annotations=annotations;
+          if (testNode.id==this.state.orgTarget.id) {
+            /*  
+            let loList:Array<string>=new Array ();  
+            for (let j=0;j<annotations.length;j++) {
+              let originNode:Linkable=annotations [j];              
+              loList.push (originNode.id);
+            }
+              
+            testNode.annotations=loList;
+            */  
+              
+            testNode.annotations=annotations;  
+                 
             break;
           }
         }
@@ -774,9 +819,11 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             for (let j=0;j<annotations.length;j++) {
               let originNode:Linkable=annotations [j];            
 
-              var newNode:OrgItem=new OrgItem ();
-              newNode.id=originNode.id;
-              //newNode.resourceRef.idRef=originNode.resourceRef.idRef;
+              // We need to preserve the unique id generated in the constructor.
+              // It's the only way we can be sure
+              var newNode:OrgItem=new OrgItem (); 
+              //newNode.id=originNode.id;
+              newNode.resourceRef.idRef=originNode.id;
               newNode.title=originNode.title;
               newNode.typeDescription=itemType;  
               mergedList.push (newNode);
@@ -919,6 +966,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         optionalProps ["treeData"]=this.state.treeData;
         optionalProps ["addPage"]=this.addPage.bind (this);
         optionalProps ["addActivity"]=this.addActivity.bind (this);
+        optionalProps ["addUnit"]=this.addUnit.bind (this);        
         optionalProps ["addModule"]=this.addModule.bind (this);
         optionalProps ["addSection"]=this.addSection.bind (this);
         optionalProps ["editWorkbookPage"]=this.editWorkbookPage.bind (this);
@@ -950,7 +998,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     //  console.log ("editWorkbookPage");
 
       this.setState ({orgTarget: aNode}, () => {
-        viewActions.viewDocument(aNode.id, this.props.context.courseId);
+        viewActions.viewDocument(aNode.livelink, this.props.context.courseId);
       });  
     }
     
@@ -961,7 +1009,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      // console.log ("editAssessment");
       
       this.setState ({orgTarget: aNode}, () => {
-        viewActions.viewDocument(aNode.id, this.props.context.courseId);
+        viewActions.viewDocument(aNode.livelink, this.props.context.courseId);
       });      
     }
     
@@ -1017,7 +1065,16 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       newTopLevel.title=this.state.model.toplevel.title;
         
       this.setState({model: this.state.model.with ({'toplevel': newTopLevel})});        
-    }    
+    }
+    
+    /**
+     * 
+     */
+    handleMetaChange (event:any): void {
+      console.log ("handleMetaChange ()");
+         
+      this.orgOnEdit (null); 
+    }
 
     /**
      * 
@@ -1044,13 +1101,13 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                   </div>
                   <div>
                    <label>
-                   Organization Title: <input type="text" value={this.state.model.toplevel.title} onChange={e => this.handleTitleChange (e)} />
+                   Organization Title: <input type="text" value={this.state.model.toplevel.title} onBlur={e => this.handleMetaChange (e)} onChange={e => this.handleTitleChange (e)} />
                    </label>
                    <label>
-                   Organization Description: <input type="text" value={this.state.model.toplevel.description} onChange={e => this.handleDescriptionChange (e)} />
+                   Organization Description: <input type="text" value={this.state.model.toplevel.description} onBlur={e => this.handleMetaChange (e)} onChange={e => this.handleDescriptionChange (e)} />
                    </label>
                    <label>
-                   Audience: <input type="text" value={this.state.model.toplevel.audience} onChange={e => this.handleAudienceChange (e)} />
+                   Audience: <input type="text" value={this.state.model.toplevel.audience} onBlur={e => this.handleMetaChange (e)} onChange={e => this.handleAudienceChange (e)} />
                    </label>                       
                   </div>
                   {lolinker}

@@ -390,6 +390,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     addPage:any=null;
     addActivity:any=null;
     addModule:any=null;
+    addUnit:any=null;
     addSection:any=null;
     
     editWorkbookPage:any=null;
@@ -511,7 +512,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         return (<div style={styles.loTitleRenderer}>{node.title}</div>);
       }        
         
-      var titleObj=new contentTypes.Title({ text: node.title})        
+      let titleObj=new contentTypes.Title({ text: node.title});
         
       return (<TitleContentEditor 
                 services={services}
@@ -546,13 +547,17 @@ class OrganizationNodeRenderer extends Component <any,any>
       let loLink=<li className="list-group-item"><a onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>;
       let pageLink=<li className="list-group-item">Page</li>;
       let activityLink=<li className="list-group-item">Activity</li>;
-      let assetLink=<li className="list-group-item">Add-On</li>;
-      let sectionLink;
       let moduleLink;
+      let unitLink;
+      let sectionLink;
       let editLink;
         
       if (node.orgType==OrgContentTypes.Module) {
         sectionLink=<li className="list-group-item"><a onClick={(e) => this.addSection (node)}>Section</a></li>
+      }
+
+      if (node.orgType==OrgContentTypes.Sequence) {
+        unitLink=<li className="list-group-item"><a onClick={(e) => this.addUnit (node)}>Unit</a></li>
       }
 
       if (node.orgType==OrgContentTypes.Sequence) {
@@ -570,7 +575,7 @@ class OrganizationNodeRenderer extends Component <any,any>
           editLink=<li className="list-group-item"><a onClick={(e) => this.editWorkbookPage (node)}>Edit</a></li>;
         }
 
-        if (node.typeDescription==="x-oli-assessment2") {  
+        if ((node.typeDescription==="x-oli-assessment2") || (node.typeDescription==="x-oli-inline-assessment")) {  
           editLink=<li className="list-group-item"><a onClick={(e) => this.editAssessment (node)}>Edit</a></li>;
         }
       }
@@ -581,23 +586,23 @@ class OrganizationNodeRenderer extends Component <any,any>
              <a style={bStyle} onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-up"></div></a>
              <div tabIndex={0} className="onclick-menu">
                <ul className={menuStyle}>
+                 Actions
+                 <li className="list-group-item"><a onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+                 {editLink}
                  Content
+                 {unitLink}
                  {moduleLink}
                  {sectionLink}
-                 <li className="list-group-item"><a onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
                  {loLink}
                  {pageLink}
-                 {activityLink}
-                 {editLink}
-                 Assets
-                 {assetLink}
+                 {activityLink}                 
                </ul>
              </div>
             </div>);
     }
 
     render() {        
-        //console.log ("render ()");
+        console.log ("OrNode render ()");
         //console.log ("Props: " + JSON.stringify (this.props));;
         
         var {
@@ -606,7 +611,8 @@ class OrganizationNodeRenderer extends Component <any,any>
             deleteNode,
             treeData,
             linkAnnotation,
-            addActivity,  
+            addActivity,
+            addUnit,  
             addModule,
             addSection,
             editWorkbookPage,
@@ -645,6 +651,7 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.deleteNodeFunction=deleteNode;
         this.addPage=addPage;
         this.addActivity=addActivity;
+        this.addUnit=addUnit;
         this.addModule=addModule;
         this.addSection=addSection;
         this.editWorkbookPage=editWorkbookPage;
@@ -670,11 +677,9 @@ class OrganizationNodeRenderer extends Component <any,any>
             ), { dropEffect: 'copy' });              
           }
             
-          if ((node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")) {  
-            //handle = <div style={styles.orgpageHandle}><div id="handle" style={activityPageStyle}></div></div>;
-              
+          if ((node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")) {                
             handle = connectDragSource((
-              <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>
+              <div style={styles.orgpageHandle}><div id="handle" style={activityPageStyle}></div></div>
             ), { dropEffect: 'copy' });              
           }
 
