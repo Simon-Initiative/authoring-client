@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from 'react';
 
-import * as persistence from "../data/persistence";
-import * as viewActions from "../actions/view";
+import * as persistence from '../data/persistence';
+import * as viewActions from '../actions/view';
 
-import * as models from "../data/models";
-import * as courseActions from "../actions/course";
-import {hasRole} from '../actions/utils/keycloak';
+import * as models from '../data/models';
+import * as courseActions from '../actions/course';
+import { hasRole } from '../actions/utils/keycloak';
 
 interface CoursesView {
   onSelect: (id) => void;
@@ -19,8 +19,8 @@ type CourseDescription = {
   version: string,
   title: string,
   description: string,
-  buildStatus: string
-}
+  buildStatus: string,
+};
 
 export interface CoursesViewProps {
   userId: string;
@@ -32,35 +32,35 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
   constructor(props) {
     super(props);
 
-    this.state = {courses: []};
+    this.state = { courses: [] };
     this._createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
       this.fetchDocument(id);
-    }
+    };
     this._deleteCourse = (id) => {
       this.removeCourse(id);
-    }
+    };
   }
 
   createCourse() {
-    console.log("createCourse called");
+    console.log('createCourse called');
     this.props.dispatch(viewActions.viewCreateCourse());
   }
 
   componentDidMount() {
     persistence.getEditablePackages()
-      .then(docs => {
-        let courses: CourseDescription[] = docs.map(d => ({
+      .then((docs) => {
+        const courses: CourseDescription[] = docs.map(d => ({
           guid: d.guid,
           id: d.id,
           version: d.version,
           title: d.title,
           description: d.description,
-          buildStatus: d.buildStatus
+          buildStatus: d.buildStatus,
         }));
-        this.setState({courses});
+        this.setState({ courses });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
 
@@ -68,16 +68,16 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
   removeCourse(courseId: string) {
     persistence.deleteCoursePackage(courseId)
-      .then(document => {
+      .then((document) => {
         this.props.dispatch(viewActions.viewAllCourses());
       })
       .catch(err => console.log(err));
   }
 
   fetchDocument(courseId: string) {
-    console.log("fetchDocument (" + courseId + ")");
+    console.log('fetchDocument (' + courseId + ')');
     persistence.retrieveCoursePackage(courseId)
-      .then(document => {
+      .then((document) => {
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(courseActions.courseChanged(document.model));
@@ -89,8 +89,8 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
   }
 
   render() {
-    let rows = this.state.courses.map((c, i) => {
-      const {guid, id, version, title, description, buildStatus} = c;
+    const rows = this.state.courses.map((c, i) => {
+      const { guid, id, version, title, description, buildStatus } = c;
       return <div className="course" key={guid}>
         <img src="assets/ph-courseView.png" className="img-fluid" alt=""/>
         <div className="content container">
@@ -111,32 +111,34 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
             <div className="enter col-2">
               { buildStatus === 'READY' ?
                 <div>
-                <div className="row">
+                  <div className="row">
 
-                  <button type="button" className="btn btn-primary" key={guid}
-                          onClick={this.onSelect.bind(this, guid)}>
-                    Enter Course
-                  </button>
+                    <button type="button" className="btn btn-primary" key={guid}
+                            onClick={this.onSelect.bind(this, guid)}>
+                      Enter Course
+                    </button>
+                  </div>
+                  {hasRole('admin') &&
+                  <div className="row">
+                    <button type="button" className="btn btn-remove" key={guid}
+                            onClick={this._deleteCourse.bind(this, guid)}>
+                      Remove
+                    </button>
+                  </div>}
                 </div>
-                  {hasRole("admin") &&
-                <div className="row">
-                  <button type="button" className="btn btn-remove" key={guid}
-                          onClick={this._deleteCourse.bind(this, guid)}>
-                    Remove
-                  </button>
-                </div>}
-                </div>
-                :<div><div>Package Importing...</div><div style={{margin: "auto"}} className="three-bounce">
-                <div className="bounce1"/>
-                <div className="bounce2"/>
-                <div className="bounce3"/>
-                </div>
+                : <div>
+                  <div>Package Importing...</div>
+                  <div style={{ margin: 'auto' }} className="three-bounce">
+                    <div className="bounce1"/>
+                    <div className="bounce2"/>
+                    <div className="bounce3"/>
+                  </div>
                 </div>
               }
             </div>
           </div>
         </div>
-      </div>
+      </div>;
     });
 
     return (

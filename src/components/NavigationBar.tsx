@@ -1,17 +1,17 @@
-import * as React from "react";
-import * as Immutable from "immutable";
-import {returnType} from "../utils/types";
-import {connect} from "react-redux";
-import * as models from "../data/models";
-import * as contentTypes from "../data/contentTypes";
-import {Resource} from "../data/resource";
-import guid from "../utils/guid";
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import { returnType } from '../utils/types';
+import { connect } from 'react-redux';
+import * as models from '../data/models';
+import * as contentTypes from '../data/contentTypes';
+import { Resource } from '../data/resource';
+import guid from '../utils/guid';
 import * as view from '../actions/view';
 /**
  *
  */
 interface NavigationBarState {
-  closed: boolean
+  closed: boolean;
 }
 
 /**
@@ -50,7 +50,7 @@ const navbarStyles =
       alignItems: 'stretch',
       alignContent: 'stretch',
       height: 'inherit',
-      borderRight: '1px solid grey'
+      borderRight: '1px solid grey',
     },
     closedMenu: {
       width: '64px',
@@ -60,52 +60,52 @@ const navbarStyles =
       alignItems: 'stretch',
       alignContent: 'stretch',
       height: 'inherit',
-      borderRight: '1px solid grey'
+      borderRight: '1px solid grey',
     },
     mainMenu: {
-      flex: "none",
+      flex: 'none',
       flexGrow: 1,
       order: 0,
-      border: "0px solid #c4c0c0",
-      padding: "0px",
-      margin: "0 0 0 0"
+      border: '0px solid #c4c0c0',
+      padding: '0px',
+      margin: '0 0 0 0',
     },
     verticalMenu: {
-      listStyleType: 'none'
+      listStyleType: 'none',
     },
     bottomMenu: {
-      margin: "0 0 0 14px",
-      height: "24px"
+      margin: '0 0 0 14px',
+      height: '24px',
     },
     sidebar: {
       paddingLeft: 0,
       paddingRight: 0,
-      'position': 'fixed',
+      position: 'fixed',
       top: '58px',
       bottom: 0,
       left: 0,
       zIndex: 1000,
       overflowX: 'hidden',
       overflowY: 'auto',
-    }
+    },
   };
 
 interface MenuItem {
-  label?: string,
-  icon?: string,
-  staticContent?: boolean,
-  onclick?: any
+  label?: string;
+  icon?: string;
+  staticContent?: boolean;
+  onclick?: any;
 }
 
 function mapStateToProps(state: any) {
 
   const {
-    course
+    course,
   } = state;
 
   return {
-    course
-  }
+    course,
+  };
 }
 
 
@@ -121,79 +121,79 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
   opts = Immutable.OrderedMap<string, MenuItem>(
     {
       package: {
-        label: "Content Package",
-        icon: "C",
+        label: 'Content Package',
+        icon: 'C',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       sequencing: {
-        label: "Sequencing",
+        label: 'Sequencing',
         staticContent: true,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       organizations: {
-        label: "Organizations",
-        icon: "O",
+        label: 'Organizations',
+        icon: 'O',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       content: {
-        label: "Content",
+        label: 'Content',
         staticContent: true,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       workBookPages: {
-        label: "Pages",
-        icon: "O",
+        label: 'Pages',
+        icon: 'O',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       activities: {
-        label: "Assessments",
-        icon: "A",
+        label: 'Assessments',
+        icon: 'A',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       pools: {
-        label: "Question Pools",
-        icon: "P",
+        label: 'Question Pools',
+        icon: 'P',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       others: {
-        label: "Others",
-        icon: "M",
+        label: 'Others',
+        icon: 'M',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       learning: {
-        label: "Learning",
+        label: 'Learning',
         staticContent: true,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       objectives: {
-        label: "Objectives",
-        icon: "A",
+        label: 'Objectives',
+        icon: 'A',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       skills: {
-        label: "Skills",
-        icon: "A",
+        label: 'Skills',
+        icon: 'A',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       assets: {
-        label: "Assets",
+        label: 'Assets',
         staticContent: true,
-        onclick: this.placeholderMenuHandler
+        onclick: this.placeholderMenuHandler,
       },
       media: {
-        label: "Files/Media",
-        icon: "M",
+        label: 'Files/Media',
+        icon: 'M',
         staticContent: false,
-        onclick: this.placeholderMenuHandler
-      }
+        onclick: this.placeholderMenuHandler,
+      },
       // ,
       // addOns: {
       //   label: "Add-Ons",
@@ -205,33 +205,33 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
 
   constructor(props) {
     super(props);
-    this.state = {closed: false};
+    this.state = { closed: false };
   }
 
   handleFoldIn(event: any) {
-    this.setState({closed: true});
+    this.setState({ closed: true });
   }
 
   handleFoldOut(event: any) {
-    this.setState({closed: false});
+    this.setState({ closed: false });
   }
 
   /**
    *
    */
   placeholderMenuHandler(props) {
-    console.log("placeHolderMenuHanlder ()");
+    console.log('placeHolderMenuHanlder ()');
   }
 
   /**
    *
    */
   generateMenuItem(closed: boolean, item: any) {
-    if (item.staticContent == true) {
+    if (item.staticContent === true) {
       return (<h2 key={item.label}>{item.label}</h2>);
     }
 
-    if (closed == true) {
+    if (closed === true) {
       return (
         <li key={item.label} className="nav-item"><a className="nav-link" onClick={item.onclick}>{item.icon}</a>
         </li>);
@@ -267,20 +267,16 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     this.opts.get('objectives').onclick = view.viewObjectives.bind(undefined, courseId);
     this.opts.get('skills').onclick = view.viewSkills.bind(undefined, courseId);
     this.opts.get('pools').onclick = view.viewPools.bind(undefined, courseId);
-    
-    // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
-    // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);
 
-    if (this.state.closed == true) {
+    if (this.state.closed === true) {
       menuControl = <FoldOutButton onClick={ e => this.handleFoldOut(e) }/>;
       mStyle = navbarStyles.closedMenu as any;
-    }
-    else {
+    } else {
       menuControl = <FoldInButton onClick={ e => this.handleFoldIn(e) }/>;
       mStyle = navbarStyles.openMenu as any;
     }
 
-    let menuData = this.generateMenu(this.state.closed);
+    const menuData = this.generateMenu(this.state.closed);
 
     const title = this.props.course === null || typeof this.props.course === 'undefined' ? '' : this.props.course.model.title;
 
