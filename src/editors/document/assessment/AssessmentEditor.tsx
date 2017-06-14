@@ -15,6 +15,7 @@ import { TextInput } from '../../content/common/TextInput';
 import Linkable from '../../../data/linkable';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/resource';
+import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
@@ -280,11 +281,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     return (
       <div>
         <div className="docHead">
-          <Toolbar 
+          <UndoRedoToolbar 
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}
-            onAddContent={this.onAddContent} onAddQuestion={this.onAddQuestion}/>
+            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
           
           <div className="container">
             <div className="row">
