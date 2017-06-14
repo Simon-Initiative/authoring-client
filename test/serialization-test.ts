@@ -64,7 +64,7 @@ it('AssessmentModel', () => {
 
   const part : contentTypes.Part = parts[0];
   const responses = part.responses.toArray();
-  expect(responses.length).toBe(2);
+  expect(responses.length).toBe(3);
   expect(responses[0].match).toBe('correct');
   expect(responses[0].score).toBe('10');
   expect(responses[0].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is feedback for a correct choice');
