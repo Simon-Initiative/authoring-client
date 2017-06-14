@@ -271,7 +271,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.handleSelectionChange(changeType, ss);
 
         let contentState = editorState.getCurrentContent();
-        const contentChange = (contentState !== this.lastContent);
+        const contentChange = contentState !== this.lastContent;
         
         if (contentChange) {
           
@@ -330,7 +330,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
   }
 
-  onBlur() {
+  onBlur(e) {
+    e.stopPropagation();
     if (this.state.show) {
       setTimeout(() => this.setState({ show: false, x: null, y: null}), 200);
     }
@@ -563,7 +564,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
         
         const selection = this.state.editorState.getSelection();
-
+        this.lastContent = nextProps.content.contentState;
         const es = EditorState.createWithContent(nextProps.content.contentState, this.getCompositeDecorator());
         const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
 
