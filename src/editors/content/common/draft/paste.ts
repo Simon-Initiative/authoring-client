@@ -10,7 +10,7 @@ import { ContentBlock, ContentState,
 // types in the value array
 const schema = {
   title: [],
-  section: ['title', 'pullout', 'example', 'definition'],
+  section: ['title', 'pullout', 'example', 'definition', 'section'],
   pullout: ['title'],
   example: ['title'],
   definition: ['title', 'meaning', 'translation', 'pronunciation'],
