@@ -257,15 +257,16 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     let menuControl = null;
     let mStyle = null;
 
+    const courseId = this.props.course.model.guid;
     
-    
-    this.opts.get('package').onclick = () => view.viewDocument(this.props.course.model.guid);
-    this.opts.get('organizations').onclick = view.viewOrganizations;
-    this.opts.get('workBookPages').onclick = view.viewPages;
-    this.opts.get('activities').onclick = view.viewAssessments;
-    this.opts.get('objectives').onclick = view.viewObjectives;
-    this.opts.get('skills').onclick = view.viewSkills;
-    this.opts.get('pools').onclick = view.viewPools;
+    this.opts.get('package').onclick = 
+      () => view.viewDocument(courseId, courseId);
+    this.opts.get('organizations').onclick = view.viewOrganizations.bind(undefined, courseId);
+    this.opts.get('workBookPages').onclick = view.viewPages.bind(undefined, courseId);
+    this.opts.get('activities').onclick = view.viewAssessments.bind(undefined, courseId);
+    this.opts.get('objectives').onclick = view.viewObjectives.bind(undefined, courseId);
+    this.opts.get('skills').onclick = view.viewSkills.bind(undefined, courseId);
+    this.opts.get('pools').onclick = view.viewPools.bind(undefined, courseId);
     
     // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
     // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);

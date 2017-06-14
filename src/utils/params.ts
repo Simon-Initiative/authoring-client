@@ -1,5 +1,5 @@
 
-function getQueryVariable(variable: string) : string {
+export function getQueryVariable(variable: string) : string {
   const query = window.location.search.substring(1);
   const vars = query.split('&');
   for (let i = 0; i < vars.length; i += 1) {

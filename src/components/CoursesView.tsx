@@ -81,7 +81,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           this.props.dispatch(courseActions.courseChanged(document.model));
-          viewActions.viewDocument(courseId);
+          viewActions.viewDocument(courseId, courseId);
         }
 
       })

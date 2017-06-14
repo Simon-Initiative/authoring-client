@@ -950,7 +950,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     //  console.log ("editWorkbookPage");
 
       this.setState ({orgTarget: aNode}, () => {
-        this.props.dispatch(viewActions.viewDocument(aNode.id));
+        viewActions.viewDocument(aNode.id, this.props.context.courseId);
       });  
     }
     
@@ -961,7 +961,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      // console.log ("editAssessment");
       
       this.setState ({orgTarget: aNode}, () => {
-        this.props.dispatch(viewActions.viewDocument(aNode.id));
+        viewActions.viewDocument(aNode.id, this.props.context.courseId);
       });      
     }
     
