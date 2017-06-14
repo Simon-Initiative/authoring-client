@@ -431,8 +431,8 @@ class LONodeRenderer extends Component <any, any>
                         onEdit={(content) => this.editNodeTitle(node,content)} 
                        />
                        <div style={styles.numberStyle}>{node.annotations.length}</div>
-                       <a style={bStyle} href="#" onClick={(e) => { e.preventDefault(); this.deleteNodeFunction (node)}}><i className="fa fa-window-close"></i>&nbsp;</a>
-                       <a style={bStyle} href="#" onClick={(e) => { e.preventDefault(); this.linkAnnotation (node)}}><i className="fa fa-plus"></i>&nbsp;</a>
+                       <a style={bStyle} onClick={(e) => { e.preventDefault(); this.deleteNodeFunction (node)}}><i className="fa fa-window-close"></i>&nbsp;</a>
+                       <a style={bStyle} onClick={(e) => { e.preventDefault(); this.linkAnnotation (node)}}><i className="fa fa-plus"></i>&nbsp;</a>
                      </div>
                     )}
                 </div>
