@@ -563,13 +563,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (nextProps.content.contentState !== current 
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
         
-        const selection = this.state.editorState.getSelection();
+        const selection = nextProps.content.contentState.getSelectionBefore();
         this.lastContent = nextProps.content.contentState;
-        const es = EditorState.createWithContent(nextProps.content.contentState, this.getCompositeDecorator());
-        const newEditorState = EditorState.forceSelection(EditorState.set(es, { allowUndo: false }), selection);
-
+        const newEditorState = EditorState.push(
+          this.state.editorState, nextProps.content.contentState);
+        
         this.setState({
-          editorState: newEditorState
+          editorState: newEditorState,
         });
       } 
       
