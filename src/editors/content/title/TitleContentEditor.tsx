@@ -7,8 +7,11 @@ import { removeHTML, getCaretPosition, setCaretPosition } from '../../content/co
 
 import '../common/editor.scss';
 
+const BACKSPACE = 8;
+
 export interface TitleContentEditor {
   caretPosition: any;
+  direction: number;
 }
 
 export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
@@ -31,7 +34,7 @@ export class TitleContentEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.text !== nextState) {
+    if (this.state.text !== nextState.text) {
       return true;
     }
     
@@ -41,44 +44,14 @@ export class TitleContentEditor
   onChange(e) {
 
     const target = e.target;
-    const currentText = target.innerHTML;
+    const currentText = target.innerText;
 
-    // Strip out any HTML introduced by how contentEditable 
-    // handles processing the 'Enter' key
-    const cleanedText = removeHTML(currentText);
-
-    // If the cleaned text doesn't equal the original text then we
-    // know that we did clean out some HTML. We need to restore the
-    // caret position back as the browser will lose it and reset it
-    // to the beginning of the div  
-    if (cleanedText !== currentText) {
-
-      if (this.caretPosition === null) {
-        // Work around the browser quirk that an onKeyPress won't be 
-        // called on the initial key press - which if the initial key
-        // press is an 'Enter' we have no caret position information to go on
-
-        // Instead find the first <div> in the currentText and use that as the
-        // current caret position 
-        const divPosition = currentText.indexOf('<div>');
-        this.setState(
-          { text: cleanedText }, 
-          () => setCaretPosition(target, divPosition + 1));
-        
-      } else {
-        this.setState(
-          { text: cleanedText }, 
-          () => setCaretPosition(target, this.caretPosition + 1));
-      }
-      
-    } else {
-      this.setState( 
-        { text: cleanedText }, 
-        () => setCaretPosition(target, this.caretPosition + 1));
-    }
-
+    this.setState(
+      { text: currentText }, 
+      () => setCaretPosition(target, this.caretPosition + this.direction));
+    
     // Persist this change
-    const updatedContent = this.props.model.with({ text: cleanedText });
+    const updatedContent = this.props.model.with({ text: currentText });
     this.props.onEdit(updatedContent);
   
   }
@@ -101,6 +74,12 @@ export class TitleContentEditor
 
   onKeyPress(e) {
     // Keep track of the position of caret 
+    if (e.keyCode === BACKSPACE) {
+      this.direction = -1;
+    } else {
+      this.direction = 1;
+    }
+
     this.caretPosition = getCaretPosition(e.target);
   }
 
@@ -118,7 +97,7 @@ export class TitleContentEditor
         style={this.props.styles} 
         ref="text" 
         onInput={this.onChange} 
-        onKeyPress={this.onKeyPress}
+        onKeyDown={this.onKeyPress}
         onKeyUp={this.onKeyUp}
         contentEditable 
         dangerouslySetInnerHTML={html}/>

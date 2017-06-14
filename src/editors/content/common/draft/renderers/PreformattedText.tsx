@@ -65,8 +65,6 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
 
   onKeyPress(e) {
 
-    console.log(e.charCode);
-    console.log(e.keyCode);
     if (e.keyCode === BACKSPACE) {
       this.direction = -1;
     } else {
