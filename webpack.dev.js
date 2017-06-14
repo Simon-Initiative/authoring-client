@@ -18,6 +18,9 @@ module.exports = {
     devtool: 'source-map',
     devServer: {
         contentBase: './dev',
+        historyApiFallback: {
+          index: 'index.html'  
+        }
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
