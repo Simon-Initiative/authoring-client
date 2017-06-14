@@ -68,7 +68,7 @@ export abstract class AbstractEditor<ModelType,
         this.undo.bind(this));
       handleKey(
         'ctrl+y', 
-        () => this.redoStack.size > 1, 
+        () => this.redoStack.size > 0, 
         this.redo.bind(this));
     }
 
@@ -78,6 +78,7 @@ export abstract class AbstractEditor<ModelType,
     }
 
     undo() {
+
       const currentModel = this.undoStack.peek();
       this.redoStack = this.redoStack.push(currentModel);
 
@@ -104,6 +105,7 @@ export abstract class AbstractEditor<ModelType,
     }
 
     redo() {
+      
       const model = this.redoStack.peek();
       this.undoStack = this.undoStack.push(model);
       this.redoStack = this.redoStack.pop();

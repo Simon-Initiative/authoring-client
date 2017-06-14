@@ -712,9 +712,15 @@ function translateOverlappingGroup(
       
       // For each style, create the object representation for that style
       if (s !== undefined) {
-
-        const style = Object.assign({}, styleContainers[s]());
-
+        const container = styleContainers[s];
+        let style;
+        if (container === undefined) {
+          console.log('undefined style: ' + s);
+          style = styleContainers.BOLD();
+        } else {
+          style = Object.assign({}, styleContainers[s]());
+        }
+        
         // Now root this style object into the parent style
         last[common.getKey(last)] = style;
         last = style; 
