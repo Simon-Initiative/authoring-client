@@ -26,7 +26,7 @@ export interface NavigationBarOwnProps {
  */
 function FoldInButton(props) {
   return (
-    <a href="#" onClick={props.onClick}>Collapse Menu</a>
+    <a onClick={props.onClick}>Collapse Menu</a>
   );
 }
 
@@ -35,7 +35,7 @@ function FoldInButton(props) {
  */
 function FoldOutButton(props) {
   return (
-    <a href="#" onClick={props.onClick}>Open</a>
+    <a onClick={props.onClick}>Open</a>
   );
 }
 
@@ -267,6 +267,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     this.opts.get('objectives').onclick = view.viewObjectives.bind(undefined, courseId);
     this.opts.get('skills').onclick = view.viewSkills.bind(undefined, courseId);
     this.opts.get('pools').onclick = view.viewPools.bind(undefined, courseId);
+
     
     // this.opts.get('objectives').onclick=() => this.props.viewActions.viewDocument(this.props.course.LOId);
     // this.opts.get('skills').onclick=() => this.props.viewActions.viewDocument(this.props.course.skillsId);

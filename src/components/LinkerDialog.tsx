@@ -322,7 +322,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                  style={customStyles}>
                    <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                      <p className="h2" style={tempnavstyle.h2}>Error</p>
-                     <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
+                     <a className="nav-link" onClick={e => { e.preventDefault(); this.cancelModal ()}}>Cancel</a>
                    </nav>
                    <div style={tempnavstyle.objectContainer}>
                      <span style={customStyles.messageSpan}>{this.state.errorMessage}</span>                   
@@ -354,11 +354,11 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
              style={customStyles}>
                  <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                    <p className="h2" style={tempnavstyle.h2}>{this.props.title}</p>
-                   <a className="nav-link" href="#" onClick={e => this.checkAll ()}>Check All</a>
-                   <a className="nav-link" href="#" onClick={e => this.reset ()}>Check None</a>
-                   <a className="nav-link" href="#" onClick={e => this.checkInvert ()}>Check Invert</a>
-                   <a className="nav-link" href="#" onClick={e => this.closeModal ()}>Submit</a>
-                   <a className="nav-link" href="#" onClick={e => this.cancelModal ()}>Cancel</a>
+                   <a className="nav-link" onClick={e => this.checkAll ()}>Check All</a>
+                   <a className="nav-link" onClick={e => this.reset ()}>Check None</a>
+                   <a className="nav-link" onClick={e => this.checkInvert ()}>Check Invert</a>
+                   <a className="nav-link" onClick={e => this.closeModal ()}>Submit</a>
+                   <a className="nav-link" onClick={e => this.cancelModal ()}>Cancel</a>
                  </nav>
                  <div style={tempnavstyle.objectContainer}>
                   {options}

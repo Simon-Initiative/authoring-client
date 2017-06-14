@@ -74,8 +74,8 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
         style={customStyles}>
           <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
             <h2>{this.props.title}</h2>
-            <a className="nav-link" href="#" onClick={e => this.props.onCancel()}>{cancelLabel}</a>
-            <a className="nav-link" href="#" onClick={e => this.props.onInsert()}>{okLabel}</a>
+            <a className="nav-link" href="#" onClick={e => { e.preventDefault(); this.props.onCancel()} }>{cancelLabel}</a>
+            <a className="nav-link" href="#" onClick={e => { e.preventDefault(); this.props.onInsert()} }>{okLabel}</a>
           </nav>
           <div style={tempnavstyle.objectContainer}>
             {this.props.children}                 

@@ -1035,8 +1035,8 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
                   <div>
                       <h2 className="h2 organize" style={orgstyle.h2}>Course Content</h2>
                       <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Sequence</button>
-                      <a className="btn btn-secondary" href="#" onClick={e => this.expandAll ()}>+ Expand All</a>
-                      <a className="btn btn-secondary" href="#" onClick={e => this.collapseAll ()}>- Collapse All</a>
+                      <a className="btn btn-secondary" onClick={e => this.expandAll ()}>+ Expand All</a>
+                      <a className="btn btn-secondary" onClick={e => this.collapseAll ()}>- Collapse All</a>
                       <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
                                        onRedo={this.doRedo.bind(this)}             
                                        undoEnabled={this.state.undoStackSize > 0}

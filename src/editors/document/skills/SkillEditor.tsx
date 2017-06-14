@@ -658,8 +658,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             />
                          </div>
                          <div style={styles.toolContainer}>
-                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleFolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded} onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBarHidden}>
@@ -681,8 +681,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             />
                          </div>
                          <div style={styles.toolContainer}>
-                           <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleUnfolded} href="#" onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleUnfolded} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleUnfolded} onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
                          </div>  
                       </div>
                       <div style={styles.controlBar}>
