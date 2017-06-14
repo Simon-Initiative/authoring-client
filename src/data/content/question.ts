@@ -12,6 +12,8 @@ import { ShortAnswer } from './short_answer';
 import { GradingCriteria } from './criteria';
 import { Essay } from './essay';
 import { Numeric } from './numeric';
+import { Feedback } from './feedback';
+import { Response } from './response';
 import { Unsupported } from './unsupported';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
@@ -76,6 +78,39 @@ function tagInputRefsWithType(model: Question) {
 
   const body = model.body.with({contentState});
   return model.with({body});
+}
+
+function ensureResponsesExist(model: Question) {
+  const itemsArray = model.items.toArray();
+  const partsArray = model.parts.toArray();
+  let updated = model;
+
+  for (let i = 0; i < itemsArray.length; i += 1) {
+    const item = itemsArray[i];
+    let part = partsArray[i];
+
+    if (item.contentType === 'MultipleChoice') {
+      // Make sure that there are n responses for n choices
+      const choiceCount = item.choices.size;
+      const responseCount = part.responses.size;
+
+      let difference = choiceCount - responseCount;
+      while (difference > 0) {
+
+        const f = new Feedback();
+        const feedback = Immutable.OrderedMap<string, Feedback>();
+        const response = new Response().with({ feedback: feedback.set(f.guid, f) });
+        part = part.with({ responses: part.responses.set(response.guid, response) });
+        difference -= 1;
+
+      }
+      if (choiceCount - responseCount > 0) {
+        updated = updated.with({ parts: updated.parts.set(part.guid, part) });
+      }
+      
+    }
+  }
+  return updated;
 }
 
 export class Question extends Immutable.Record(defaultQuestionParams) {
@@ -165,7 +200,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       }
     });
 
-    return tagInputRefsWithType(model);
+    return ensureResponsesExist(tagInputRefsWithType(model));
   }
 
   toPersistence() : Object {
