@@ -466,9 +466,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     const entities = getAllEntities(contentState);
     
-    console.log('before clone');
-    console.log(convertToRaw(contentState));
-
     // Find any duplicated entities and clone them
     const seenKeys = {};
     entities.forEach(e => {
@@ -490,10 +487,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       }
     });
 
-    console.log('after clone');
-    console.log(convertToRaw(contentState));
-
-    
     return contentState;
   }
 
