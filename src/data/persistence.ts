@@ -4,8 +4,8 @@ import * as Immutable from 'immutable';
 import { credentials, getHeaders, getFormHeaders } from '../actions/utils/credentials';
 import { configuration } from '../actions/utils/config';
 import { Resource } from './resource';
-import { UserInfo } from "./user_info";
-import { isArray } from "util";
+import { UserInfo } from './user_info';
+import { isArray } from 'util';
 
 import { forceLogin, refreshTokenIfInvalid } from '../actions/utils/keycloak';
 
@@ -35,7 +35,7 @@ const defaultDocumentParams = {
   _courseId: '',
   _id: '',
   _rev: '',
-  model: Immutable.Record({modelType: models.EmptyModel}),
+  model: Immutable.Record({ modelType: models.EmptyModel }),
 };
 
 export class Document extends Immutable.Record(defaultDocumentParams) {
@@ -243,16 +243,14 @@ export function bulkFetchDocuments(
               return response.json();
             })
             .then((json) => {
-              let documents : Array<Document> = new Array();
+              const documents =  [];
               if (isArray(json)) {
-                json.forEach(function (item) {
-                  documents.push(new Document({
-                    _courseId: courseId,
-                    _id: item.guid,
-                    _rev: item.rev,
-                    model: models.createModel(item),
-                  }));
-                });
+                json.forEach(item => documents.push(new Document({
+                  _courseId: courseId,
+                  _id: item.guid,
+                  _rev: item.rev,
+                  model: models.createModel(item),
+                })));
               } else {
                 documents.push(new Document({
                   _courseId: courseId,
@@ -261,7 +259,7 @@ export function bulkFetchDocuments(
                   model: models.createModel(json),
                 }));
               }
-              resolve([...documents.map(t => {return t})]);
+              resolve([...documents.map(t => t)]);
             })
             .catch(err => handleError(err, reject));
         } catch (err) {
@@ -272,7 +270,8 @@ export function bulkFetchDocuments(
     });
 }
 
-export function developerRegistration(courseId: string, userNames: string[], action: string): Promise<UserInfo[]> {
+export function developerRegistration(courseId: string,
+                                      userNames: string[], action: string): Promise<UserInfo[]> {
 // Valid values for 'action' is limited to 'add' or 'remove'
   const url = `${configuration.baseUrl}/${courseId}/developers/registration?action=${action}`;
 
@@ -297,15 +296,13 @@ export function developerRegistration(courseId: string, userNames: string[], act
               return response.json();
             })
             .then((json) => {
-              let userInfos : Array<UserInfo> = new Array();
+              const userInfos = [];
               if (isArray(json)) {
-                json.forEach(function (item) {
-                  userInfos.push(UserInfo.fromPersistence(item));
-                });
+                json.forEach(item => userInfos.push(UserInfo.fromPersistence(item)));
               } else {
                 userInfos.push(UserInfo.fromPersistence(json));
               }
-              resolve([...userInfos.map(t => {return t})]);
+              resolve([...userInfos.map(t => t)]);
             })
             .catch(err => handleError(err, reject));
         } catch (err) {
@@ -353,7 +350,8 @@ export function listenToDocument(doc: Document): Promise<Document> {
   });
 }
 
-export function createDocument(courseId: CourseId, content: models.ContentModel): Promise<Document> {
+export function createDocument(courseId: CourseId,
+                               content: models.ContentModel): Promise<Document> {
 
   let url = null;
   if (content.type === 'x-oli-package') {
@@ -389,7 +387,6 @@ export function createDocument(courseId: CourseId, content: models.ContentModel)
                 _id: json.guid,
                 _rev: json.rev,
                 model: models.createModel(json),
-                //model: content,
               }));
             })
             .catch(err => handleError(err, reject));
@@ -612,7 +609,7 @@ export function fetchCourseResources(courseId: string): Promise<CourseResource[]
           switch (doc.model.modelType) {
             case 'CourseModel':
               resolve(doc.model.resources.toArray().map(
-                (r: Resource) => ({_id: r.guid, title: r.title, type: r.type })));
+                (r: Resource) => ({ _id: r.guid, title: r.title, type: r.type })));
               return;
             default:
           }
