@@ -1,4 +1,6 @@
 
-const createHistory = require('history').createBrowserHistory;
+const createHistory = require('history').createHashHistory;
 
-export default createHistory();
+export default createHistory({
+  hashType: 'noslash', // Omit the leading slash
+});

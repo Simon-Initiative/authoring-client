@@ -56,7 +56,9 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   onClick() {
     if (this.guid !== null) {
-      this.props.blockProps.services.viewDocument(this.guid);
+      this.props.blockProps.services.viewDocument(
+        this.guid,
+        this.props.blockProps.context.courseId);
     } 
   }
 

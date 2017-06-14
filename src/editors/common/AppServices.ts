@@ -18,7 +18,7 @@ import { TitleOracle, MockTitleOracle } from './TitleOracle';
 export interface AppServices {
 
   // Request to view a document with the specified document id.
-  viewDocument: (documentId: types.DocumentId) => void;
+  viewDocument: (documentId: types.DocumentId, courseId: string) => void;
 
   // Display the given component in a modal dialog.
   displayModal: (component: any) => void;
@@ -51,8 +51,8 @@ export class DispatchBasedServices implements AppServices {
     this.courseModel = courseModel;
   }
 
-  viewDocument(documentId: string) {
-    view.viewDocument(documentId);
+  viewDocument(documentId: string, courseId: string) {
+    view.viewDocument(documentId, courseId);
   }
 
   displayModal(component: any) {

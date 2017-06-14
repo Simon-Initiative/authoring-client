@@ -536,14 +536,14 @@ class OrganizationNodeRenderer extends Component <any,any>
           return (
             <div style={controlsContainer}>
               <div style={numberStyle}>{node.annotations.length}</div>
-              <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-down"></div></a>
+              <a style={bStyle} onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-down"></div></a>
             </div>
           );
       }  
         
       let menuStyle:string="flex-column onclick-menu-content list-group";
         
-      let loLink=<li className="list-group-item"><a href="#" onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>;
+      let loLink=<li className="list-group-item"><a onClick={(e) => this.linkAnnotation (node)}>Learning Objective</a></li>;
       let pageLink=<li className="list-group-item">Page</li>;
       let activityLink=<li className="list-group-item">Activity</li>;
       let assetLink=<li className="list-group-item">Add-On</li>;
@@ -552,39 +552,39 @@ class OrganizationNodeRenderer extends Component <any,any>
       let editLink;
         
       if (node.orgType==OrgContentTypes.Module) {
-        sectionLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addSection (node)}>Section</a></li>
+        sectionLink=<li className="list-group-item"><a onClick={(e) => this.addSection (node)}>Section</a></li>
       }
 
       if (node.orgType==OrgContentTypes.Sequence) {
-        moduleLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addModule (node)}>Module</a></li>
+        moduleLink=<li className="list-group-item"><a onClick={(e) => this.addModule (node)}>Module</a></li>
       }
 
       if ((node.orgType==OrgContentTypes.Section) || (node.orgType==OrgContentTypes.Module)) {
-        pageLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addPage (node)}>Page</a></li>;
-        activityLink=<li className="list-group-item"><a href="#" onClick={(e) => this.addActivity (node)}>Activity</a></li>
+        pageLink=<li className="list-group-item"><a onClick={(e) => this.addPage (node)}>Page</a></li>;
+        activityLink=<li className="list-group-item"><a onClick={(e) => this.addActivity (node)}>Activity</a></li>
       }
              
       if (node.orgType==OrgContentTypes.Item) {
 
         if (node.typeDescription==="x-oli-workbook_page") {  
-          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editWorkbookPage (node)}>Edit</a></li>;
+          editLink=<li className="list-group-item"><a onClick={(e) => this.editWorkbookPage (node)}>Edit</a></li>;
         }
 
         if (node.typeDescription==="x-oli-assessment2") {  
-          editLink=<li className="list-group-item"><a href="#" onClick={(e) => this.editAssessment (node)}>Edit</a></li>;
+          editLink=<li className="list-group-item"><a onClick={(e) => this.editAssessment (node)}>Edit</a></li>;
         }
       }
 
       return (
             <div style={controlsContainer}>
              <div style={numberStyle}>{node.annotations.length}</div>
-             <a style={bStyle} href="#" onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-up"></div></a>
+             <a style={bStyle} onClick={(e) => this.popupToggle (e)}><div className="fa fa-chevron-up"></div></a>
              <div tabIndex={0} className="onclick-menu">
                <ul className={menuStyle}>
                  Content
                  {moduleLink}
                  {sectionLink}
-                 <li className="list-group-item"><a href="#" onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
+                 <li className="list-group-item"><a onClick={(e) => this.deleteNodeFunction (node)}>Delete</a></li>
                  {loLink}
                  {pageLink}
                  {activityLink}

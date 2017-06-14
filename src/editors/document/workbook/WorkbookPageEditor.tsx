@@ -181,8 +181,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             onEdit={this.onTitleEdit} 
             />
                 
-          <a className="btn btn-secondary" href="#" 
-            onClick={e => this.linkLO ()}>+ Learning Objective</a>
+          <a className="btn btn-secondary" 
+            onClick={e => { e.preventDefault(); this.linkLO (); }}>+ Learning Objective</a>
 
           {lolinker}          
           <div style={styles.loContainer}>

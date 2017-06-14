@@ -56,13 +56,13 @@ export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
 
     // We cannot insert an entity at the beginning of a content block,
     // to handle that case we adjust and add 1 to the focus offset 
-    if (selectionState.focusOffset === 0 && selectionState.anchorOffset === 0) {
+    if (selectionState.focusOffset === selectionState.anchorOffset) {
       
       selectionState = new SelectionState({ 
         anchorKey: selectionState.anchorKey,
         focusKey: selectionState.focusKey,
-        anchorOffset: 0,
-        focusOffset: 1
+        anchorOffset: selectionState.anchorOffset,
+        focusOffset: selectionState.anchorOffset + 1,
       });
     }
 

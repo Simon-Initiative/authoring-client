@@ -56,7 +56,7 @@ export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> 
   onClick() {
     if (this.guid !== null) {
       this.props.blockProps.services.viewDocument(
-      this.guid);
+      this.guid, this.props.blockProps.context.courseId);
     }
     
   }

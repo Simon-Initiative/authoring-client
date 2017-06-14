@@ -109,13 +109,16 @@ export abstract class QuestionEditor
     }
   }
 
-  onInsertNumeric() {
+  onInsertNumeric(e) {
+    e.preventDefault();
     this.htmlEditor.process(this.numericCommand);
   }
-  onInsertText() {
+  onInsertText(e) {
+    e.preventDefault();
     this.htmlEditor.process(this.textCommand);
   }
-  onInsertFillInTheBlank() {
+  onInsertFillInTheBlank(e) {
+    e.preventDefault();
     this.htmlEditor.process(this.fillInTheBlankCommand);
   }
 
@@ -202,6 +205,7 @@ export abstract class QuestionEditor
 
 
   onAddMultipleChoice(select) {
+    
     let item = new contentTypes.MultipleChoice();
     item = item.with({ guid: guid(), select });
 
@@ -232,10 +236,12 @@ export abstract class QuestionEditor
   }
 
   onGradingChange(grading) {
+    
     this.props.onEdit(this.props.model.with({ grading }));
   }
 
-  onAddShortAnswer() {
+  onAddShortAnswer(e) {
+    e.preventDefault();
     const item = new contentTypes.ShortAnswer();
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
 
@@ -248,7 +254,9 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onAddOrdering() {
+  onAddOrdering(e) {
+    e.preventDefault();
+
     const item = new contentTypes.Ordering();
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
 
@@ -426,9 +434,9 @@ export abstract class QuestionEditor
           Add Item
         </button>
         <div className="dropdown-menu">
-          <a onClick={() => this.onAddMultipleChoice('single')} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single')}} 
             className="dropdown-item" href="#">Multiple choice</a>
-          <a onClick={() => this.onAddMultipleChoice('multiple')} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple')}} 
             className="dropdown-item" href="#">Check all that apply</a>
           <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>

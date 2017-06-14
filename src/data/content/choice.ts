@@ -39,6 +39,10 @@ export class Choice extends Immutable.Record(defaultContent) {
 
     let choice = (root as any).choice;
     let model = new Choice({ guid });
+
+    if (Object.keys(choice).length === 1 && choice['@value'] !== undefined) {
+      choice['#text'] = choice['@value'];
+    } 
     
     let body = Html.fromPersistence(choice, '');
     model = model.with({ body });

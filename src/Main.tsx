@@ -36,8 +36,16 @@ function res(title, resourceType, filterFn, createResourceFn) : ResourceList {
   };
 }
 
+function getPathName(pathname: string): string {
+  if (pathname.startsWith('/state')) {
+    return '/';
+  } else {
+    return pathname;
+  }
+}
+
 const resources = {
-  '/organizations': res(
+  'organizations': res(
         'Organizations',
         'x-oli-organization',
         resource => resource.type === 'x-oli-organization',
@@ -45,7 +53,7 @@ const resources = {
           type,
           title: new contentTypes.Title({text: title})
         })),
-  '/assessments': res(
+  'assessments': res(
         'Assessments',
         'x-oli-assessment',
         (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
@@ -53,7 +61,7 @@ const resources = {
           type,
           title: new contentTypes.Title({text: title})
         })),
-  '/pages': res(
+  'pages': res(
         'Workbook Pages',
         'x-oli-workbook_page',
         (resource) => resource.type === 'x-oli-workbook_page',
@@ -61,7 +69,7 @@ const resources = {
           type,
           head: new contentTypes.Head({title: new contentTypes.Title({text: title})})
         })),
-  '/objectives': res(
+  'objectives': res(
         'Learning Objectives',
         'x-oli-learning_objectives',
         (resource) => resource.type === 'x-oli-learning_objectives',
@@ -70,7 +78,7 @@ const resources = {
           title: title,
           id:title.split(" ")[0]+guid()
         })),
-  '/skills': res(
+  'skills': res(
         'Skills',
         'x-oli-skills_model',
         (resource) => resource.type === 'x-oli-skills_model',
@@ -79,7 +87,7 @@ const resources = {
           title: new contentTypes.Title({text: title}),
           resource: new Resource({id:title.split(" ")[0]+guid(), title:title})
         })),
-  '/pools': res(
+  'pools': res(
         'Question Pools',
         'x-oli-assessment2-pool',
         (resource) => resource.type === 'x-oli-assessment2-pool',
@@ -106,10 +114,11 @@ function mapStateToProps(state: any) {
 interface Main {
   modalActions: Object;
   viewActions: Object;
+  unlisten: any;
 }
 
 interface MainOwnProps {
-
+  location: any;
 }
 
 interface MainState {
@@ -127,19 +136,21 @@ class Main extends React.Component<MainProps, MainState> {
 
     this.modalActions = bindActionCreators((modalActions as any), this.props.dispatch);
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
-
+    
     this.state = {
-      current: history.location,
+      current: this.props.location,
     };
   }
 
   componentDidMount() {
-    this.props.dispatch(userActions.initAuthenticationProvider());
-
-    history.listen(current => this.setState({ current }));
+    this.unlisten = history.listen((current) => {
+      this.setState({ current });
+    });
   }
 
-  
+  componentWillUnmount() {
+    this.unlisten();
+  }
 
   renderResource(resource: ResourceList) {
     return <ResourceView 
@@ -152,22 +163,27 @@ class Main extends React.Component<MainProps, MainState> {
   }
 
   getView(url: string): JSX.Element {
-    
     if (url === '/') {
       return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;
     } else if (url === '/create') {
       return <CreateCourseView dispatch={this.props.dispatch}/>;
-    } else if (resources[url] !== undefined) {
-      return this.renderResource(resources[url]);
     } else {
-      const documentId = url.substr(1);
-      return <DocumentView
-            dispatch={this.props.dispatch}
-            course={this.props.course}
-            userId={this.props.user.userId}
-            userName={this.props.user.user}
-            documentId={documentId}/>;
+
+      const firstPart = url.substr(1, url.indexOf('-') - 1);
+
+      if (resources[firstPart] !== undefined) {
+        return this.renderResource(resources[firstPart]);
+      } else {
+        const documentId = firstPart;
+        return <DocumentView
+              dispatch={this.props.dispatch}
+              course={this.props.course}
+              userId={this.props.user.userId}
+              userName={this.props.user.user}
+              documentId={documentId}/>;
+      }
     }
+ 
   }
 
 
@@ -184,8 +200,8 @@ class Main extends React.Component<MainProps, MainState> {
         .reverse()
         .map((component, i) => <div key={i}>{component}</div>);
     }
-      
-    const currentView = this.getView(this.state.current.pathname);
+    
+    const currentView = this.getView(getPathName(this.state.current.pathname));
 
     const logoutUrl = this.props.user !== null ? this.props.user.logoutUrl : '';
 

@@ -4,32 +4,32 @@ export function viewCreateCourse(): void {
   history.push('/create');
 }
 
-export function viewDocument(documentId: string): void {
-  history.push('/' + documentId);
+export function viewDocument(documentId: string, courseId: string): void {
+  history.push('/' + documentId + '-' + courseId);
 }
 
-export function viewSkills() : void {
-  history.push('/skills');
+export function viewSkills(courseId: string) : void {
+  history.push('/skills-' + courseId);
 }
 
-export function viewPages() : void {
-  history.push('/pages');
+export function viewPages(courseId: string) : void {
+  history.push('/pages-' + courseId);
 }
 
-export function viewAssessments() : void {
-  history.push('/assessments');
+export function viewAssessments(courseId: string) : void {
+  history.push('/assessments-' + courseId);
 }
 
-export function viewOrganizations() : void {
-  history.push('/organizations');
+export function viewOrganizations(courseId: string) : void {
+  history.push('/organizations-' + courseId);
 }
 
-export function viewObjectives() : void {
-  history.push('/objectives');
+export function viewObjectives(courseId: string) : void {
+  history.push('/objectives-' + courseId);
 }
 
-export function viewPools() : void {
-  history.push('/pools');
+export function viewPools(courseId: string) : void {
+  history.push('/pools-' + courseId);
 }
 
 export function viewAllCourses(): void {
