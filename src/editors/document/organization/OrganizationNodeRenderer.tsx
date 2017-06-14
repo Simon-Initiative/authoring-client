@@ -499,6 +499,29 @@ class OrganizationNodeRenderer extends Component <any,any>
       }      
       return (<div></div>);
     }    
+    
+    /**
+     * 
+     */
+    createTitleEditor (node):any {
+      const services = ({} as AppServices);
+      const context = { courseModel: null, resourcePath: null, userId: null, undoRedoGuid: null,documentId: null, courseId: null, baseUrl: null};
+
+      if ((node.typeDescription=="x-oli-workbook_page") || (node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")) {
+        return (<div style={styles.loTitleRenderer}>{node.title}</div>);
+      }        
+        
+      var titleObj=new contentTypes.Title({ text: node.title})        
+        
+      return (<TitleContentEditor 
+                services={services}
+                editMode={true}
+                model={titleObj}
+                context={context}
+                styles={styles.loTitleRenderer}
+                onEdit={(content) => this.editNodeTitle(node,content)} 
+               />);        
+    }
       
     /**
      * 
@@ -628,14 +651,6 @@ class OrganizationNodeRenderer extends Component <any,any>
         this.editAssessment=editAssessment;
 
         canDrag=true;
-
-        /*
-        // Currently a safety feature to make sure we can't drag workbook pages
-        // to different levels but only keep them as leaf nodes.
-        if (node.orgType==OrgContentTypes.Item) {
-         canDrag=false;
-        } 
-        */   
         
         let hStyle:any=styles.backupHamburger;
         let workbookPageStyle:any=styles.wpage;
@@ -649,9 +664,7 @@ class OrganizationNodeRenderer extends Component <any,any>
           ), { dropEffect: 'copy' });
         } else {
 
-          if (node.typeDescription=="x-oli-workbook_page") {  
-            //handle = <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>;
-              
+          if (node.typeDescription=="x-oli-workbook_page") {              
             handle = connectDragSource((
               <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>
             ), { dropEffect: 'copy' });              
@@ -705,35 +718,13 @@ class OrganizationNodeRenderer extends Component <any,any>
         } 
 
         //>--------------------------------------------------------------------
-
-        /*
-        let iStyle:any=styles.orgrowTitle;
-
-        if (node.subtitle) {
-          iStyle ["fontSize"]="85%";
-          iStyle ["display"]="block";
-          iStyle ["height"]="0.8rem";
-        }
-        */
-
-        // If we assign the style directly then React freaks out (or TypeScript it's hard to tell)
-        // and claims that 'bold' isn't a valid option for fontWeight
-        //let tStyle:any=styles.orgrowTitle;
-
-        /*
-        let bStyle:any=styles.orgrowTitle;
-        bStyle ["marginLeft"]="10px";
-        bStyle ["textDecoration"]="none";
-        */
  
         let titleDivider:any=styles.titleDivider;
         let titleContainer:any=styles.titleContainer;
 
         //>--------------------------------------------------------------------
 
-        var titleObj=new contentTypes.Title({ text: node.title})
-        const services = ({} as AppServices);
-        const context = { courseModel: null, resourcePath: null, userId: null, undoRedoGuid: null,documentId: null, courseId: null, baseUrl: null};
+        let titleeditor=this.createTitleEditor (node);
 
         //>--------------------------------------------------------------------
 
@@ -760,14 +751,7 @@ class OrganizationNodeRenderer extends Component <any,any>
                           {dragHandle}
                           {handle}
                            <div style={titleContainer}>
-                             <TitleContentEditor 
-                               services={services}
-                               editMode={true}
-                               model={titleObj}
-                               context={context}
-                               styles={styles.loTitleRenderer}
-                               onEdit={(content) => this.editNodeTitle(node,content)} 
-                             />
+                             {titleeditor}
                              <div style={titleDivider}>
                              {node.orgType}
                              </div>                             

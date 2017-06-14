@@ -348,7 +348,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * 
      */
     evaluateTree (aTree:Array<OrgItem>):Array <OrgItem> {
-      //console.log ("evaluateTree ()");
+      console.log ("evaluateTree ()");
         
       for (let i=0;i<aTree.length;i++) {
 
@@ -361,7 +361,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             let evalSection:OrgItem=evalModule.children [k];
               
             if ((evalSection.orgType!=OrgContentTypes.Section) && (evalSection.orgType!=OrgContentTypes.Item)) {
-              //console.log ("Changing " + evalSection.orgType + " to section ...");
+              console.log ("Changing " + evalSection.orgType + " to section ...");
                         
               evalModule.children [k]=new OrgSection ();
               evalModule.children [k].id=evalSection.id;
@@ -377,7 +377,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
           }  
             
           if ((evalModule.orgType!=OrgContentTypes.Module) && (evalModule.orgType!=OrgContentTypes.Item)) {
-            //console.log ("Changing " + evalModule.orgType + " to module ...");
+            console.log ("Changing " + evalModule.orgType + " to module ...");
                         
             evalSequence.children [j]=new OrgModule ();
             evalSequence.children [j].id=evalModule.id;
@@ -395,7 +395,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         //>-----------------------------------------------------------------------  
 
         if ((evalSequence.orgType!=OrgContentTypes.Sequence) && (evalSequence.orgType!=OrgContentTypes.Item)) {
-          //console.log ("Changing " + aTree [i].orgType + " to sequence ...");
+          console.log ("Changing " + aTree [i].orgType + " to sequence ...");
                        
           aTree [i]=new OrgSequence ();
           aTree [i].id=evalSequence.id;

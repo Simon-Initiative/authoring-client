@@ -849,21 +849,21 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static fromPersistence(json: Object): OrganizationModel {
-    //console.log("fromPersistence ()");
+    console.log("fromPersistence ()");
 
     //console.log("Org model: " + JSON.stringify(json));
 
     let a = (json as any);
     var orgData = a.doc.organization;
 
-    //console.log("Org JSON: " + JSON.stringify(orgData));
+    console.log("Org JSON: " + JSON.stringify(orgData));
 
     var newData: Array<OrgSequence> = new Array();
     var newTopLevel: OrgOrganization = OrganizationModel.parseTopLevelOrganization(orgData);
 
     var oList = orgData["#array"];
 
-    //console.log("Found start of organization data ...");
+    console.log("Found start of organization data ...");
 
     if (oList) {
       for (var k = 0; k < oList.length; k++) {
@@ -879,7 +879,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           for (let w = 0; w < seqList.length; w++) {
             let seqObj = seqList [w];
             if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
-              //console.log("Parsing sequence ...");
+              console.log("Parsing sequence ...");
               let newSequence: OrgSequence = new OrgSequence();
               let seqReference = seqObj ["sequence"];
               newData.push(newSequence);
@@ -899,7 +899,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                   var mdl = seq [s];
 
                   if (s == "title") {
-                    //console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
+                    console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
                     newSequence.title = OrganizationModel.getTextFromNode(mdl);
                   }
 
@@ -924,7 +924,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     }
 
     //console.log("toplevel: " + JSON.stringify(newTopLevel));
-    //console.log("newData: " + JSON.stringify(newData));
+    console.log("newData: " + JSON.stringify(newData));
 
     let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});
 
@@ -943,11 +943,11 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   toPersistence(): Object {
-    //console.log("toPersistence ()");
+    console.log("toPersistence ()");
 
     var newData = this.organization;
 
-    //console.log("Persisting from visual tree: " + JSON.stringify(this.organization));
+    console.log("Persisting from visual tree: " + JSON.stringify(this.organization));
 
     // First process our organization object and add it to the tree we're building
 
@@ -967,7 +967,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     // We can point directly to .children because we ensure in the constructor that
     // this object always exists
 
-    //console.log("Persisting " + newData.length + " items ...");
+    console.log("Persisting " + newData.length + " items ...");
 
     for (let j = 0; j < newData.length; j++) {
       let seqObject: OrgSequence = newData [j] as OrgSequence;
@@ -989,7 +989,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         let mObj: OrgItem = seqObject.children [k];
 
         // Check the type here. We can expect Module, Section and Item
-        //console.log("Object: " + mObj.orgType);
+        // console.log("Object: " + mObj.orgType);
 
         let moduleContainer: Object = new Object();
         let moduleObj: Object = new Object();
@@ -1012,7 +1012,18 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
           let sectionObj: Object = new Object();
           let sectionContainer: Object = new Object();
-          sectionContainer ["section"] = sectionObj;
+            
+          if (sObj.orgType==OrgContentTypes.Item) {
+            sectionContainer ["item"] = sectionObj;
+          } 
+            
+          if (sObj.orgType==OrgContentTypes.Unit) {
+            sectionContainer ["unit"] = sectionObj;
+          }
+            
+          if (sObj.orgType==OrgContentTypes.Section) {
+            sectionContainer ["section"] = sectionObj;
+          }            
 
           moduleObj["#array"].push(sectionContainer);
 
@@ -1041,7 +1052,8 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     //var formattedOrganization = JSON.stringify(orgRoot);
     var formattedOrganization = JSON.stringify(orgRoot ["organization"]);
-    //console.log("To: " + formattedOrganization);
+      
+    console.log("To: " + formattedOrganization);
 
     let resource = this.resource.toPersistence();
     let doc = [{
