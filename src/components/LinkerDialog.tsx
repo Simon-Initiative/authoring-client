@@ -83,7 +83,8 @@ export interface LearningObjectiveLinkerProps {
   targetAnnotations: Array<Linkable>;
   closeModal: any;
   title?:string;
-  errorMessage?:string;  
+  errorMessage?:string;
+  hideChecked?: boolean;  
 }
 
 export interface LearningObjectiveLinkerState {
@@ -93,6 +94,7 @@ export interface LearningObjectiveLinkerState {
   targetAnnotations?: Array<Linkable>;
   closeModal: any;
   errorMessage?:string;
+  hideChecked: boolean;
 }
 
 /**
@@ -118,7 +120,8 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                    targetAnnotations: this.props.targetAnnotations,                                           
                    closeModal: this.props.closeModal,
                    localAnnotations: new Array<Item> (),
-                   errorMessage: this.props.errorMessage
+                   errorMessage: this.props.errorMessage,
+                   hideChecked: false
                  };
             
     this.openModal = this.openModal.bind(this);
@@ -173,14 +176,24 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(newItem);        
     });
       
+    // Next we either check an item in new annotation list when it
+    // occurs both in the source list and target annotation list. Or
+    // if hideChecked is set to true we omit it so that users can't
+    // add the same item twice.  
     for (var i=0;i<this.state.targetAnnotations.length;i++) {    
-       let item=this.state.targetAnnotations [i];  
-       //console.log ("Checking item: " + item);
+       let item=this.state.targetAnnotations [i];          
+       let checkIndex:number=0; 
         
-       for (var j=0;j<newData.length;j++) {
-         let sourceItem=newData [j];  
+       while ((checkIndex<newData.length) && (newData.length>0) ) {   
+         let sourceItem=newData [checkIndex];
          if (sourceItem.id==item.id) {
-            sourceItem.checked=true;
+           if (this.state.hideChecked==true) {   
+             newData.splice (checkIndex,0);
+             checkIndex=0; // Start all over. This can of course be greatly optimized
+           } else {
+             sourceItem.checked=true;
+             checkIndex++;  
+           }    
          }
        }
     }

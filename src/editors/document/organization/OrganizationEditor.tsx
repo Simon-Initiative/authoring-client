@@ -826,7 +826,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.activitiesModalIsOpen==true) {  
         if (this.state.activities) {
          // console.log ("createLinkerDialog ()");              
-          return (<LearningObjectiveLinker title="Available Activities" closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-inline-assessment")} />);
+          return (<LearningObjectiveLinker title="Available Activities" hideChecked={true}  closeModal={this.closeActivtiesModal.bind (this)} sourceData={this.state.activities} modalIsOpen={this.state.activitiesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-inline-assessment")} />);
         } else {
          // console.log ("Internal error: activities object can be empty but not null");
         }
@@ -842,7 +842,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
       if (this.state.pagesModalIsOpen==true) {
         if (this.state.pages) {
         //  console.log ("createPageLinkerDialog ()");
-          return (<LearningObjectiveLinker title="Available Workbook Pages" closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-workbook_page")} />);
+          return (<LearningObjectiveLinker title="Available Workbook Pages" hideChecked={true} closeModal={this.closePagesModal.bind (this)} sourceData={this.state.pages} modalIsOpen={this.state.pagesModalIsOpen} targetAnnotations={this.toItemList (this.state.orgTarget,"x-oli-workbook_page")} />);
         } else {
         //  console.log ("Internal error: pages array object can be empty but not null");
         }
