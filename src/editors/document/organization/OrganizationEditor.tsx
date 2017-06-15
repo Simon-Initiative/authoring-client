@@ -750,7 +750,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             */  
               
             testNode.annotations=annotations;  
-                 
+
             break;
           }
         }

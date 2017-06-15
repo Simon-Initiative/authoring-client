@@ -1492,11 +1492,9 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   skillDefaults: Skill;
   skills: Array<Skill>;
 
-  constructor(params?: SkillModelParams) {
-    //console.log("constructor ()");
-    params ? super(params) : super();
+  constructor(params?: SkillModelParams) {  
+    params ? super(params) : super(); 
   }
-
 
   with(values: SkillModelParams) {
     return this.merge(values) as this;
