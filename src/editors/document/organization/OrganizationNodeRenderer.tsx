@@ -560,11 +560,11 @@ class OrganizationNodeRenderer extends Component <any,any>
         unitLink=<li className="list-group-item"><a onClick={(e) => this.addUnit (node)}>Unit</a></li>
       }
 
-      if (node.orgType==OrgContentTypes.Sequence) {
+      if ((node.orgType==OrgContentTypes.Sequence) || (node.orgType==OrgContentTypes.Unit)) {
         moduleLink=<li className="list-group-item"><a onClick={(e) => this.addModule (node)}>Module</a></li>
       }
 
-      if ((node.orgType==OrgContentTypes.Section) || (node.orgType==OrgContentTypes.Module)) {
+      if ((node.orgType==OrgContentTypes.Section) || (node.orgType==OrgContentTypes.Module) || (node.orgType==OrgContentTypes.Unit)) {
         pageLink=<li className="list-group-item"><a onClick={(e) => this.addPage (node)}>Page</a></li>;
         activityLink=<li className="list-group-item"><a onClick={(e) => this.addActivity (node)}>Activity</a></li>
       }

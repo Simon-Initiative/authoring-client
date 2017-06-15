@@ -23,6 +23,8 @@ export class OrgItem extends Linkable {
   scoringMode : string ="default";
   children:Array<OrgItem>;
   resourceRef : IDRef;
+  // This is a helper variable we need to keep the guid in memory that represents a pointer to the actual workbook page or activity resource
+  // We only need this in memory, it doesn't have to be stored on disk. It is linked by the org editor in assignType
   livelink: string ="";      
     
   constructor() {

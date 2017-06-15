@@ -20,8 +20,12 @@ export default class Linkable {
     
   constructor (anId?:string) 
   {
-    if (anId) {  
-     this.id=anId;
+    if (anId) {   
+     if (anId=="undefined") {
+       this.id=guid();
+     } else {         
+       this.id=anId;
+     }    
     }
     else {
      this.id=guid();
