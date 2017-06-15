@@ -311,6 +311,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      *
      */            
+    /*
     loadDocument (anID:string):any {
       //console.log ("loadDocument ("+anID+")");
         
@@ -322,6 +323,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         
       this.setState({loModalIsOpen: false, treeData: this.props.model.organization, document: docu});
     }
+    */
         
     /**
      * 
@@ -690,13 +692,12 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         let testNode:OrgItem=parentArray [i] as OrgItem;
             
         if (testNode.id==aNode.id) {
-          let newSection:OrgSection=new OrgSection ();
-          newSection.expanded=true;
+          let newSection:OrgSection=new OrgSection ();          
           newSection.title=("Section " + this.state.titleIndex);
-                    
-          this.setState ({titleIndex: this.state.titleIndex+1});
-            
+          testNode.expanded=true;            
           testNode.children.push (newSection);
+            
+          this.setState ({titleIndex: this.state.titleIndex+1});            
           break;
         }
       }

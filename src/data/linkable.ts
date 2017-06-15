@@ -1,21 +1,15 @@
 import guid from '../utils/guid';
 
-export class TResource {
-  id:string=guid();
-  title:string="";    
-}
-
 /** 
  * Base class for any resources that can function as an annotation. It it also
  * the class that can store annotations. That means you can build annotation
  * trees if we have to. 
  */
 export default class Linkable {      
-  //resource:TResource=new TResource ();
   id:string="";
   title:string="";
   typeDescription:string="x-oli-workbook_page"; // This variable is only used for internal bookkeeping.
-  expanded:boolean=false;
+  expanded:boolean=true;
   annotations:Array <Linkable>=null;  
     
   constructor (anId?:string) 
