@@ -10,6 +10,7 @@ export type TableParams = {
   id?: string,
   summary?: string,
   rowstyle?: string,
+  title?: string,
   rows?: Immutable.OrderedMap<string, Row>,
   guid?: string,
 };
@@ -18,6 +19,7 @@ const defaultContent = {
   id: createGuid(),
   contentType: 'Table',
   summary: '',
+  title: '',
   rowstyle: 'plain',
   rows: Immutable.OrderedMap<string, Row>(),
   guid: '',
@@ -28,6 +30,7 @@ export class Table extends Immutable.Record(defaultContent) {
   contentType: 'Table';
   rowstyle: string;
   summary: string;
+  title: string;
   rows: Immutable.OrderedMap<string, Row>;
   guid: string;
   
@@ -50,6 +53,9 @@ export class Table extends Immutable.Record(defaultContent) {
     }
     if (t['@summary'] !== undefined) {
       model = model.with({ summary: t['@summary'] });
+    }
+    if (t['@title'] !== undefined) {
+      model = model.with({ title: t['@title'] });
     }
     if (t['@rowstyle'] !== undefined) {
       model = model.with({ rowstyle: t['@rowstyle'] });
@@ -78,6 +84,7 @@ export class Table extends Immutable.Record(defaultContent) {
       table: {
         '@id': this.id,
         '@summary': this.summary,
+        '@title': this.title,
         '@rowstyle': this.rowstyle,
         '#array': this.rows.toArray().map(p => p.toPersistence()),
       }, 

@@ -15,6 +15,7 @@ import { Xref } from './xref';
 import { ActivityLink } from './activity_link';
 import { Activity } from './activity';
 import { Cite } from './cite';
+import guid from '../../../utils/guid';
 
 
 // Translation routines to convert from persistence model to draft model 
@@ -311,7 +312,8 @@ function quoteBlock(item: Object, context: ParsingContext) {
 
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
+    data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
@@ -332,6 +334,7 @@ function formulaBlock(item: Object, context: ParsingContext) {
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
   addNewBlock(context.draft, { 
+    data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
@@ -373,6 +376,7 @@ function codeBlock(item: Object, context: ParsingContext) {
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
   addNewBlock(context.draft, { 
+    data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
@@ -492,11 +496,9 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   if (draft.blocks[draft.blocks.length - 1].type === 'atomic') {
     addNewBlock(draft, {});
   }
-  
+
   return convertFromRaw(draft);
 }
-
-
 
 function getBlockStyleForDepth(depth: number) : string {
   if (common.sectionBlockStyles[depth] === undefined) {
@@ -546,6 +548,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
     children.forEach(subItem => processInline(subItem, context, blockContext));
 
     addNewBlock(context.draft, { 
+      data: extractIdTitle(item),
       text: blockContext.fullText,
       inlineStyleRanges: blockContext.markups,
       entityRanges: blockContext.entities,
@@ -647,12 +650,26 @@ function paragraph(item: Object, context: ParsingContext) {
 
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
+    data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
   });
 
+}
+
+function extractIdTitle(item: Object) : Object {
+  const data = { id: '', title: '', type: '' };
+  if (item !== undefined && item !== null && item['@id'] !== undefined) {
+    data.id = item['@id'];
+  } else {
+    data.id = guid();
+  }
+  if (item !== undefined && item !== null && item['@title'] !== undefined) {
+    data.title = item['@title'];
+  } 
+  return data;
 }
 
 function pureTextBlockHandler(key: string, item: Object, context: ParsingContext) {
@@ -688,6 +705,7 @@ function section(item: Object, context: ParsingContext) {
   };
   
   const beginBlock = addAtomicBlock(common.EntityTypes.section_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Create a content block displaying the title text
   processTitle(item, context);
@@ -715,6 +733,7 @@ function pullout(item: Object, context: ParsingContext) {
     subType: item[key]['@type'],
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.pullout_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Process the title
   processTitle(item, context);
@@ -745,7 +764,8 @@ function definition(item: Object, context: ParsingContext) {
     term,
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.definition_begin, beginData, context);
-
+  beginBlock.data = extractIdTitle(item);
+  
   // Handle the children, excluding 'term'
   const children = getChildren(item, 'term');
   children.forEach(subItem => parse(subItem, context));
@@ -772,6 +792,7 @@ function pronunciation(item: Object, context: ParsingContext) {
     srcType,
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.pronunciation_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Handle the children
   const children = getChildren(item);
@@ -794,6 +815,7 @@ function translation(item: Object, context: ParsingContext) {
     type: 'translation_begin',
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.translation_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Handle the children
   const children = getChildren(item);
@@ -816,6 +838,7 @@ function meaning(item: Object, context: ParsingContext) {
     type: 'meaning_begin',
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.meaning_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Handle the children
   const children = getChildren(item);
@@ -838,6 +861,7 @@ function material(item: Object, context: ParsingContext) {
     type: 'material_begin',
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.material_begin, beginData, context);
+  beginBlock.data = extractIdTitle(item);
 
   // Handle the children
   const children = getChildren(item);
@@ -903,7 +927,8 @@ function example(item: Object, context: ParsingContext) {
     type: 'example_begin',
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.example_begin, beginData, context);
-
+  beginBlock.data = extractIdTitle(item);
+  
   // Process the title
   processTitle(item, context);
 

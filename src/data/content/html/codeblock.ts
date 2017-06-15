@@ -6,6 +6,7 @@ import { getKey } from '../../common';
 
 export type CodeBlockParams = {
   id?: string,
+  title?: string,
   source?: string,
   syntax?: string,
   number?: boolean,
@@ -17,6 +18,7 @@ export type CodeBlockParams = {
 const defaultContent = {
   contentType: 'CodeBlock',
   id: createGuid(),
+  title: '',
   source: '',
   syntax: 'text',
   number: false,
@@ -29,6 +31,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   
   contentType: 'CodeBlock';
   id: string;
+  title: string;
   source: string;
   syntax: string;
   number: boolean;
@@ -52,6 +55,9 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
     
     if (cb['@id'] !== undefined) {
       model = model.with({ id: cb['@id'] });
+    }
+    if (cb['@title'] !== undefined) {
+      model = model.with({ title: cb['@title'] });
     }
     if (cb['@syntax'] !== undefined) {
       model = model.with({ syntax: cb['@syntax'] });
@@ -77,6 +83,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
       codeblock: {
         '@id': this.id,
         '@syntax': this.syntax,
+        '@title': this.title,
         '@highlight': this.highlight,
         '@number': this.number ? 'true' : 'false',
         '@start': this.start,
