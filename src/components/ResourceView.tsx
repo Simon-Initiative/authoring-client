@@ -80,6 +80,9 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   createResource(e) {
     e.preventDefault();
     const title = (this.refs['title'] as any).value;
+    if (isNullOrUndefined(title) || title === '') {
+      return;
+    }
     let type = this.props.resourceType;
     if (type === 'x-oli-assessment') {
       type = 'x-oli-inline-assessment';
