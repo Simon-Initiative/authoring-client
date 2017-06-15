@@ -51,6 +51,7 @@ const resources = {
         resource => resource.type === 'x-oli-organization',
         (title, type) => new models.OrganizationModel({
           type,
+          version: '1.0',
           title: new contentTypes.Title({ text: title }),
         })),
   assessments: res(
@@ -152,10 +153,9 @@ class Main extends React.Component<MainProps, MainState> {
   componentWillUnmount() {
     this.unlisten();
   }
-
+//// course={this.props.course}
   renderResource(resource: ResourceList) {
-    return <ResourceView 
-              courseId={this.props.course.model.guid}
+    return <ResourceView
               title={resource.title}
               resourceType={resource.resourceType}
               filterFn={resource.filterFn}
