@@ -35,7 +35,6 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
                 <div className="row">
                   <div className="col-12">
                     <EditorManager 
-                      dispatch={this.props.dispatch}
                       course={this.props.course}
                       userId={this.props.userId} 
                       userName={this.props.userName}

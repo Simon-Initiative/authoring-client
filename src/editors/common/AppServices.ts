@@ -5,7 +5,7 @@ import * as persistence from '../../data/persistence';
 import * as view from '../../actions/view';
 import * as courseActions from '../../actions/course';
 import * as models from '../../data/models';
-import { TitleOracle, MockTitleOracle } from './TitleOracle';
+import { TitleOracle } from './TitleOracle';
 
 /**
  * An interface that defines the  'services' that are available to 
@@ -39,16 +39,15 @@ export interface AppServices {
 export interface DispatchBasedServices {
   dispatch;
   courseModel: models.CourseModel;
-  titleOrace: TitleOracle;
+  titleOracle: TitleOracle;
 }
 
 export class DispatchBasedServices implements AppServices {
   
-  titleOracle = new MockTitleOracle();
-
-  constructor(dispatch, courseModel) {
+  constructor(dispatch, courseModel, titleOracle) {
     this.dispatch = dispatch;
     this.courseModel = courseModel;
+    this.titleOracle = titleOracle;
   }
 
   viewDocument(documentId: string, courseId: string) {

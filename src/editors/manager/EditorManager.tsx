@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { bindActionCreators } from 'redux';
+import { returnType } from '../../utils/types';
+import { connect } from 'react-redux';
 
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
@@ -33,20 +35,6 @@ interface EditorManager {
   waitBufferTimer: any;
 }
 
-export interface EditorManagerProps {
-
-  dispatch: any;
-
-  documentId: string;
-
-  userId: string;
-
-  userName: string;
-
-  course: any;
-
-}
-
 export interface EditorManagerState {
   editingAllowed: boolean;
   document: persistence.Document;
@@ -55,6 +43,31 @@ export interface EditorManagerState {
   activeSubEditorKey: string;
   undoRedoGuid: string;
 }
+
+function mapStateToProps(state: any) {
+  const {
+    titles,
+  } = state;
+
+  return {
+    titles,
+  };
+}
+
+interface EditorManagerOwnProps {
+
+  documentId: string;
+
+  userId: string;
+
+  userName: string;
+
+  course: any;
+}
+
+const stateGeneric = returnType(mapStateToProps);
+type EditorManagerReduxProps = typeof stateGeneric;
+type EditorManagerProps = EditorManagerReduxProps & EditorManagerOwnProps & { dispatch };
 
 class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
 
@@ -368,7 +381,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         },
         onEdit: this._onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
-        services: new DispatchBasedServices(this.props.dispatch, this.props.course.model),
+        services: new DispatchBasedServices(
+          this.props.dispatch, 
+          this.props.course.model, this.props.titles),
         editMode: this.state.editingAllowed,
       };
 
@@ -388,4 +403,5 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
 }
 
-export default EditorManager;
+export default connect<EditorManagerReduxProps, {}, EditorManagerOwnProps>
+  (mapStateToProps)(EditorManager);
