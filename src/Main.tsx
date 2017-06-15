@@ -45,52 +45,53 @@ function getPathName(pathname: string): string {
 }
 
 const resources = {
-  'organizations': res(
+  organizations: res(
         'Organizations',
         'x-oli-organization',
         resource => resource.type === 'x-oli-organization',
         (title, type) => new models.OrganizationModel({
           type,
-          title: new contentTypes.Title({text: title})
+          title: new contentTypes.Title({ text: title }),
         })),
-  'assessments': res(
+  assessments: res(
         'Assessments',
         'x-oli-assessment',
-        (resource) => resource.type === 'x-oli-inline-assessment' || resource.type === 'x-oli-assessment2',
+        resource => resource.type === 'x-oli-inline-assessment'
+        || resource.type === 'x-oli-assessment2',
         (title, type) => new models.AssessmentModel({
           type,
-          title: new contentTypes.Title({text: title})
+          title: new contentTypes.Title({ text: title }),
         })),
-  'pages': res(
+  pages: res(
         'Workbook Pages',
         'x-oli-workbook_page',
-        (resource) => resource.type === 'x-oli-workbook_page',
+        resource => resource.type === 'x-oli-workbook_page',
         (title, type) => new models.WorkbookPageModel({
           type,
-          head: new contentTypes.Head({title: new contentTypes.Title({text: title})})
+          head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
         })),
-  'objectives': res(
+  objectives: res(
         'Learning Objectives',
         'x-oli-learning_objectives',
-        (resource) => resource.type === 'x-oli-learning_objectives',
+        resource => resource.type === 'x-oli-learning_objectives',
         (title, type) => new models.LearningObjectiveModel({
           type,
-          title: title,
-          id:title.split(" ")[0]+guid()
+          title,
+          id:title.split(' ')[0] + guid(),
         })),
-  'skills': res(
+  skills: res(
         'Skills',
         'x-oli-skills_model',
-        (resource) => resource.type === 'x-oli-skills_model',
+        resource => resource.type === 'x-oli-skills_model',
         (title, type) => new models.SkillModel({
           type,
-          title: new contentTypes.Title({text: title}),
-          resource: new Resource({id:title.split(" ")[0]+guid(), title:title})
+          title: new contentTypes.Title({ text: title }),
+          resource: new Resource({ id:title.split(' ')[0] + guid(), title }),
         })),
-  'pools': res(
+  pools: res(
         'Question Pools',
         'x-oli-assessment2-pool',
-        (resource) => resource.type === 'x-oli-assessment2-pool',
+        resource => resource.type === 'x-oli-assessment2-pool',
         (title, type) => new models.PoolModel({
           type,
           pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),
