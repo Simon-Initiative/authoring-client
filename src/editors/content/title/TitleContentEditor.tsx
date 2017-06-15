@@ -3,7 +3,8 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, 
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { removeHTML, getCaretPosition, setCaretPosition } from '../../content/common/draft/utils';
+import { removeHTML, getCaretPosition, 
+  setCaretPosition, getSelectionRange } from '../../content/common/draft/utils';
 
 import '../common/editor.scss';
 
@@ -74,13 +75,25 @@ export class TitleContentEditor
 
   onKeyPress(e) {
     // Keep track of the position of caret 
-    if (e.keyCode === BACKSPACE) {
-      this.direction = -1;
-    } else {
-      this.direction = 1;
-    }
 
-    this.caretPosition = getCaretPosition(e.target);
+    const range : any = getSelectionRange(e.target);
+    if (range.endOffset - range.startOffset > 0) {
+      this.caretPosition = range.startOffset;
+      
+      if (e.keyCode === BACKSPACE) {
+        this.direction = 0;
+      } else {
+        this.direction = 1;
+      }
+    } else {
+      this.caretPosition = getCaretPosition(e.target);
+      if (e.keyCode === BACKSPACE) {
+        this.direction = -1;
+      } else {
+        this.direction = 1;
+      }
+    }
+    
   }
 
   onKeyUp(e) {
@@ -106,6 +119,7 @@ export class TitleContentEditor
   }
 
   render() : JSX.Element {
+    console.log('render title');
     if (this.props.editMode) {
       return this.renderEdit();
     } else {

@@ -6,7 +6,7 @@ import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
 
-const emptyContent = ContentState.createFromText('');
+const emptyContent = ContentState.createFromText(' ');
 
 export type CiteParams = {
   title?: string,
@@ -46,7 +46,7 @@ export class Cite extends Immutable.Record(defaultContent) {
 
     const t = (root as any).cite;
 
-    let model = new Cite({ guid });
+    let model = new Cite({ guid, content: emptyContent });
     
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
@@ -57,8 +57,10 @@ export class Cite extends Immutable.Record(defaultContent) {
     if (t['@entry'] !== undefined) {
       model = model.with({ entry: t['@entry'] });
     }
-    
-    model = model.with({ content: toDraft(getChildren(t)) });
+
+    if (!Object.keys(t).every(k => k.startsWith('@'))) {
+      model = model.with({ content: toDraft(getChildren(t)) });  
+    } 
     
     return model;
   }

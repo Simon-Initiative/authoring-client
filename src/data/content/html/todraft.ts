@@ -25,6 +25,9 @@ inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
 
+const inlineTagsDefaultContent = {};
+inlineTagsDefaultContent['cite'] = ' ';
+
 
 type ParsingContext = {
   draft : common.RawDraft, 
@@ -612,6 +615,16 @@ function processInline(
           processInline(subItem, context, blockContext);
         }
       });
+
+      // If a tag's children provided no additional content,
+      // set the default content for that tag, if one is defined.
+      // This exists primarily to support empty 'cite' tags
+      // that have to have at least a space to be able to render,
+      // and thus be preserved
+      if (blockContext.fullText === blockBeforeChildren.fullText
+        && inlineTagsDefaultContent[key]) {
+        blockContext.fullText += inlineTagsDefaultContent[key];
+      }
 
     }
     

@@ -80,6 +80,7 @@ export class ConceptsEditor
   onAddConcept() {
     this.props.services.displayModal(
         <SkillSelection
+          titleOracle={this.props.services.titleOracle} 
           courseId={this.props.courseId}
           onInsert={(item) => {
             this.props.services.dismissModal();

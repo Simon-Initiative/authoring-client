@@ -15,7 +15,11 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
    
     services.dismissModal();
     
-    const data = { activity: new Activity({ idref: assessment.id }) };
+    const resources = context.courseModel.resources.toArray();
+
+    const found = resources.find(r => r.guid === assessment.id);
+    
+    const data = { activity: new Activity({ idref: found.id }) };
 
     const delegate = new InsertBlockEntityCommand(EntityTypes.activity, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)

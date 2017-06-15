@@ -11,6 +11,7 @@ export interface SkillSelection {
 }
 
 export interface SkillSelectionProps {
+  titleOracle: any;
   onInsert: (item: Skill) => void;
   onCancel: () => void;
   courseId: string;
@@ -42,13 +43,21 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
   }
 
   fetchResources() {
-    persistence.fetchCourseResources(this.props.courseId)
-    .then(resources => resources.filter(r => r.type === 'x-oli-skills_model'))
-    .then((skills) => {
-      this.setState({
-        resources: skills.map(s => ({ id: s._id, title: s.title })),
+    persistence.bulkFetchDocuments(
+      this.props.courseId, ['x-oli-skills_model'],'byTypes')
+      .then ((skills) => {
+        
+        const resources = skills
+            .map(doc => (doc.model as any).skills)
+            .reduce((p, c) => [...p, ...c])
+            .map(skill => ({ id: skill.id, title: skill.title }));
+        
+        resources.forEach(r => this.props.titleOracle.putTitle(r.id, r.title));
+
+        this.setState({
+          resources,
+        });
       });
-    });
   }
 
   clickResource(selected) {

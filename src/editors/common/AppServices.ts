@@ -5,7 +5,7 @@ import * as persistence from '../../data/persistence';
 import * as view from '../../actions/view';
 import * as courseActions from '../../actions/course';
 import * as models from '../../data/models';
-import { TitleOracle, MockTitleOracle } from './TitleOracle';
+import { TitleOracle } from './TitleOracle';
 
 /**
  * An interface that defines the  'services' that are available to 
@@ -31,6 +31,11 @@ export interface AppServices {
 
   fetchIdByGuid: (guid: string) => Promise<string>;
 
+  fetchGuidById: (id: string) => Promise<string>;
+
+  fetchAttributesBy(
+    attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any>;
+
   // Provides titles for strongly identified items. 
   titleOracle: TitleOracle;
 
@@ -39,16 +44,15 @@ export interface AppServices {
 export interface DispatchBasedServices {
   dispatch;
   courseModel: models.CourseModel;
-  titleOrace: TitleOracle;
+  titleOracle: TitleOracle;
 }
 
 export class DispatchBasedServices implements AppServices {
   
-  titleOracle = new MockTitleOracle();
-
-  constructor(dispatch, courseModel) {
+  constructor(dispatch, courseModel, titleOracle) {
     this.dispatch = dispatch;
     this.courseModel = courseModel;
+    this.titleOracle = titleOracle;
   }
 
   viewDocument(documentId: string, courseId: string) {
@@ -64,25 +68,38 @@ export class DispatchBasedServices implements AppServices {
   }
 
   fetchIdByGuid(guid: string) : Promise<string> {
-    return this.fetchAttributeBy('id', 'guid', guid);
+    return this.fetchAttributesBy(['id'], 'guid', guid);
+  }
+
+  fetchGuidById(id: string) : Promise<string> {
+    return this.fetchAttributesBy(['guid'], 'id', id);
   }
 
   fetchTitleById(internalId: string) : Promise<string> {
-    return this.fetchAttributeBy('title', 'id', internalId);
+    return this.fetchAttributesBy(['title'], 'id', internalId);
   }
 
-  fetchAttributeBy(
-    attributeToFetch: string, attributeToFindBy: string, findByValue: any) : Promise<any> {
+  fetchAttributesBy(
+    attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any> {
+    
     const find = (model) => {
       return model.resources
         .toArray()
         .find(res => res[attributeToFindBy] === findByValue);
     };
+    const extract = found => attributesToFetch
+      .map(a => [a, found[a]])
+      .reduce(
+        (p, c) => {
+          p[c[0]] = c[1];
+          return p;
+        }, 
+        {});
 
     const found = find(this.courseModel);
 
     if (found !== undefined && found !== null) {
-      return Promise.resolve(found[attributeToFetch]);
+      return Promise.resolve(extract(found));
     } else {
       return new Promise((resolve, reject) => {
         persistence.retrieveCoursePackage(this.courseModel.guid)
@@ -91,7 +108,7 @@ export class DispatchBasedServices implements AppServices {
           if (doc.model.modelType === 'CourseModel') {
             const found = find(doc.model);
             if (found !== undefined && found !== null) {
-              resolve(found[attributeToFetch]);
+              resolve(extract(found));
 
               this.dispatch(courseActions.courseChanged(doc.model));
 

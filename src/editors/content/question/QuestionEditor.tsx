@@ -435,15 +435,15 @@ export abstract class QuestionEditor
         </button>
         <div className="dropdown-menu">
           <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single')}} 
-            className="dropdown-item" href="#">Multiple choice</a>
+            className="dropdown-item">Multiple choice</a>
           <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple')}} 
-            className="dropdown-item" href="#">Check all that apply</a>
-          <a onClick={this.onAddOrdering} className="dropdown-item" href="#">Ordering</a>
-          <a onClick={this.onAddShortAnswer} className="dropdown-item" href="#">Short answer</a>
-          <a onClick={this.onInsertNumeric} className="dropdown-item" href="#">Numeric</a>
-          <a onClick={this.onInsertText} className="dropdown-item" href="#">Text</a>
+            className="dropdown-item">Check all that apply</a>
+          <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
+          <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
+          <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
+          <a onClick={this.onInsertText} className="dropdown-item">Text</a>
           <a onClick={this.onInsertFillInTheBlank} 
-            className="dropdown-item" href="#">Fill in the Blank</a>
+            className="dropdown-item">Fill in the Blank</a>
         </div>
         </div>
         <Select editMode={this.props.editMode} 
