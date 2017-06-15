@@ -10,6 +10,7 @@ import { Resource } from '../data/resource';
 import * as courseActions from '../actions/course';
 import * as contentTypes from '../data/contentTypes';
 import { isNullOrUndefined } from 'util';
+import guid from '../utils/guid';
 
 interface ResourceView {
   viewActions: any;
@@ -85,9 +86,11 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     }
     let resource = this.props.createResourceFn(title, type);
     if (type === 'x-oli-organization') {
+      const g = guid();
       resource = new models.OrganizationModel({
         type,
-        id: this.props.course.model.id + '_' + title.split(' ')[0],
+        id: this.props.course.model.id + '_' +
+        title.toLocaleLowerCase().split(' ')[0] + '__' + g.substring(g.lastIndexOf('-')),
         version: '1.0',
         title: new contentTypes.Title({ text: title }),
       });

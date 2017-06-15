@@ -564,7 +564,7 @@ const defaultOrganizationModel = {
   type: 'x-oli-organization',
   title: new contentTypes.Title(),
   organization: [],
-  toplevel: null,
+  toplevel: new OrgOrganization(),
   lock: new contentTypes.Lock(),
 };
 
@@ -1024,8 +1024,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     // First process our organization object and add it to the tree we're building
 
     const orgObject: OrgOrganization = this.toplevel;
-    //orgObject.title = this.title.text;
+    orgObject.title = this.title.text;
     const orgRoot: Object = (new OrgOrganization()).toJSONObject(orgObject);
+
     const seqRoot = new Object();
     orgRoot ['modelType'] = 'OrganizationModel';
     orgRoot ['title'] = this.title.text;
