@@ -70,6 +70,19 @@ export function setCaretPosition(editableDiv, positionIndex) {
   sel.addRange(range);
 }
 
+export function getSelectionRange(editableDiv) : Object {
+  if (window.getSelection) {
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      return range;
+    }
+  } else {
+    return null;
+  }
+}
+
+
 export function getCaretPosition(editableDiv) {
   var caretPos = 0,
     sel, range;
