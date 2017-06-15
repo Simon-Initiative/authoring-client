@@ -128,6 +128,8 @@ function translateBlock(
     translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
   } else if (isWbInline(rawBlock, entityMap)) {
     translateWbInline(rawBlock, draftBlock, entityMap, context);
+  } else if (isObjRef(rawBlock, entityMap)) {
+    translateObjRef(rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('image', rawBlock, entityMap)) {
     translateAtomic('image', rawBlock, draftBlock, entityMap, context);
   } else if (isCustom('audio', rawBlock, entityMap)) {
@@ -289,6 +291,15 @@ function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityM
   return false; 
 }
 
+function isObjRef(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
+  const { type } = block; 
+  if (block.type === 'atomic') {
+    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
+    return entity.type === 'objref';
+  } 
+  return false; 
+}
+
 function translateList(
   listType : string, 
   rawBlock : common.RawContentBlock, 
@@ -370,6 +381,14 @@ function translateWbInline(
 
   const wb : WbInline = entityMap[rawBlock.entityRanges[0].key].data.wbinline;
   top(context).push(wb.toPersistence());
+}
+
+function translateObjRef(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
+
+  const objref : Object = entityMap[rawBlock.entityRanges[0].key].data;
+  top(context).push(objref);
 }
 
 function translateSection(
