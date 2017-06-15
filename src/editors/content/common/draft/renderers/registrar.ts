@@ -26,13 +26,14 @@ import { MeaningBegin } from './MeaningBegin';
 import { MeaningEnd } from './MeaningEnd';
 import { MaterialBegin } from './MaterialBegin';
 import { MaterialEnd } from './MaterialEnd';
-
+import { ObjRef } from './ObjRef';
 import { Activity } from './Activity';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { register } from './registry';
 
 
 export default function init() {
+  register(EntityTypes.objref, ObjRef, undefined);
   register(EntityTypes.audio, Audio, undefined);
   register(EntityTypes.image, Image, undefined);
   register(EntityTypes.video, Video, undefined);

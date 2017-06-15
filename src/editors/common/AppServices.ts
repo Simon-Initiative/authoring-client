@@ -26,13 +26,17 @@ export interface AppServices {
   // Dismiss the modal dialog. 
   dismissModal: () => void;
 
-  // Allows fetching a document by an Id, not its guid
+  // Fetch a title by id
   fetchTitleById: (internalId: string) => Promise<string>;
 
+  // Fetch an id by guid
   fetchIdByGuid: (guid: string) => Promise<string>;
 
+  // Fetch guid by an id
   fetchGuidById: (id: string) => Promise<string>;
 
+  // Fetch a colleciton of attributes by some other attribute,
+  // returns an object whose keys are the attributes requested
   fetchAttributesBy(
     attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any>;
 

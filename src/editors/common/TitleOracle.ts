@@ -24,10 +24,24 @@ function fetchSkillTitles(courseId: string, titleOracle)
     });
 }
 
+function fetchObjectiveTitles(courseId: string, titleOracle)
+  : Promise<any> {
+  
+  return persistence.bulkFetchDocuments(
+    courseId, ['x-oli-learning_objectives'],'byTypes')
+    .then ((objectives) => {
+      objectives
+        .map(doc => (doc.model as any).los)
+        .reduce((p, c) => [...p, ...c])
+        .forEach(r => titleOracle.putTitle(r.id, r.title));
+    });
+}
+
 export class CachingTitleOracle implements TitleOracle {
   
   constructor(courseId: string) {
     fetchSkillTitles(courseId, this);
+    fetchObjectiveTitles(courseId, this);
   }
 
   putTitle(id: string, title: string) {
@@ -42,6 +56,9 @@ export class CachingTitleOracle implements TitleOracle {
 
         if (type === 'skill') {
           fetchSkillTitles(courseId, this)
+            .then(() => resolve(titleCache[id]));
+        } else if (type === 'objective') {
+          fetchObjectiveTitles(courseId, this)
             .then(() => resolve(titleCache[id]));
         } else {
           persistence.retrieveDocument(courseId, id)
