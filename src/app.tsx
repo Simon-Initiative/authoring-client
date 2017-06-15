@@ -18,6 +18,7 @@ import rootReducer from './reducers';
 import Main from './Main';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
+import { CachingTitleOracle } from './editors/common/TitleOracle';
 
 // Stylesheets
 import './stylesheets/main.scss';
@@ -122,7 +123,13 @@ function main() {
       }
     })
     .then((model) => {
-      render(initStoreWithState({ user: userInfo, course: { model } }), current);
+      render(
+        initStoreWithState({ 
+          user: userInfo, 
+          course: { model },
+          titles: new CachingTitleOracle(model.guid),
+        }), 
+        current);
     })
     .catch((err) => {
       render(initStoreWithState({ user: userInfo }), current);
