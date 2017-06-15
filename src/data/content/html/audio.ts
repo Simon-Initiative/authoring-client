@@ -30,7 +30,7 @@ export type AudioParams = {
 
 const defaultContent = {
   contentType: 'Audio',
-  id: '',
+  id: createGuid(),
   title: '',
   src: '',
   type: 'audio/mpeg',

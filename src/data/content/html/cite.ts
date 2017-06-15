@@ -19,7 +19,7 @@ export type CiteParams = {
 const defaultContent = {
   contentType: 'Cite',
   title: '',
-  id: '',
+  id: createGuid(),
   entry: '',
   content: emptyContent,
   guid: '',

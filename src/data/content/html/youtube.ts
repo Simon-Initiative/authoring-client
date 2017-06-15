@@ -28,7 +28,7 @@ export type YouTubeParams = {
 
 const defaultContent = {
   contentType: 'YouTube',
-  id: '',
+  id: createGuid(),
   title: '',
   src: '',
   width: '500',

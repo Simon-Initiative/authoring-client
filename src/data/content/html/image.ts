@@ -29,7 +29,7 @@ export type ImageParams = {
 
 const defaultContent = {
   contentType: 'Image',
-  id: '',
+  id: createGuid(),
   title: '',
   src: '',
   alt: '',
