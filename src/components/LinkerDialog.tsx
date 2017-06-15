@@ -197,15 +197,11 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     // occurs both in the source list and target annotation list. Or
     // if hideChecked is set to true we omit it so that users can't
     // add the same item twice.  
-    for (var i=0;i<this.state.targetAnnotations.length;i++) {
-       console.log ("-");    
+    for (var i=0;i<this.state.targetAnnotations.length;i++) {    
        let item=this.state.targetAnnotations [i];          
        let checkIndex:number=0; 
-        
-       let breakout:number=0; 
-        
-       while ((checkIndex<newData.length) && (newData.length>0) && (breakout<500)) {
-         //console.log ("length: " + newData.length + ", checkIndex: " + checkIndex);     
+                
+       while ((checkIndex<newData.length) && (newData.length>0)) {     
          let sourceItem=newData [checkIndex];
          if (sourceItem.id==item.id) {
            if (this.state.hideChecked==true) {   
@@ -217,9 +213,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
            }  
          } else {
            checkIndex++;             
-         }
-           
-         breakout++;  
+         }  
        }
     }
       
