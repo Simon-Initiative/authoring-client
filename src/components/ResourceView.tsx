@@ -8,6 +8,7 @@ import * as models from '../data/models';
 import * as viewActions from '../actions/view';
 import { Resource } from '../data/resource';
 import * as courseActions from '../actions/course';
+import * as contentTypes from '../data/contentTypes';
 import { isNullOrUndefined } from 'util';
 
 interface ResourceView {
@@ -15,7 +16,7 @@ interface ResourceView {
 }
 
 export interface ResourceViewOwnProps {
-  courseId: string;
+  // course: any;
   dispatch: any;
   title: string;
   resourceType: string;
@@ -72,20 +73,28 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   clickResource(id) {
-    viewActions.viewDocument(id, this.props.courseId);
+    viewActions.viewDocument(id, this.props.course.model.guid);
   }
 
   createResource(e) {
     e.preventDefault();
     const title = (this.refs['title'] as any).value;
     let type = this.props.resourceType;
-    if (this.props.resourceType === 'x-oli-assessment') {
+    if (type === 'x-oli-assessment') {
       type = 'x-oli-inline-assessment';
     }
-    const resource = this.props.createResourceFn(title, type);
+    let resource = this.props.createResourceFn(title, type);
+    if (type === 'x-oli-organization') {
+      resource = new models.OrganizationModel({
+        type,
+        id: this.props.course.model.id + '_' + title.split(' ')[0],
+        version: '1.0',
+        title: new contentTypes.Title({ text: title }),
+      });
+    }
 
-    persistence.createDocument(this.props.courseId, resource)
-      .then(result => this.refreshCoursePackage(this.props.courseId));
+    persistence.createDocument(this.props.course.model.guid, resource)
+      .then(result => this.refreshCoursePackage(this.props.course.model.guid));
   }
 
   refreshCoursePackage(courseId: string) {
@@ -101,20 +110,20 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderResources() {
 
-    let creationTitle=<h2>{this.props.title}</h2>;
+    let creationTitle = <h2>{this.props.title}</h2>;
 
     // This is temporary patch. For some of the document titles we
     // need to translate and map to a more appropriate title.  
-    if (this.props.title=="Skills") {
-      creationTitle=<h2>Available Skill Models</h2>;
+    if (this.props.title === 'Skills') {
+      creationTitle = <h2>Available Skill Models</h2>;
     }
-      
+
     // This is temporary patch. For some of the document titles we
     // need to translate and map to a more appropriate title.      
-    if (this.props.title=="Learning Objectives") {
-      creationTitle=<h2>Available Learning Objective Models</h2>;
-    }      
-      
+    if (this.props.title === 'Learning Objectives') {
+      creationTitle = <h2>Available Learning Objective Models</h2>;
+    }
+
     const link = (id, title) =>
       <button onClick={this.clickResource.bind(this, id)}
               className="btn btn-link">{title}</button>;
@@ -149,10 +158,11 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <div className="input-group col-12">
         <form className="form-inline">
           <input type="text" ref="title"
-            className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-            placeholder="Title"></input>
-          <button onClick={this.createResource.bind(this)} 
-            className="btn btn-primary">Create</button>
+                 className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
+                 placeholder="Title"></input>
+          <button onClick={this.createResource.bind(this)}
+                  className="btn btn-primary">Create
+          </button>
         </form>
       </div>);
   }
@@ -180,4 +190,4 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 }
 
 export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>
-  (mapStateToProps)(ResourceView);
+(mapStateToProps)(ResourceView);
