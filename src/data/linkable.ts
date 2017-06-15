@@ -49,12 +49,16 @@ export default class Linkable {
     let ephemeral=new Array <String> ();    
       
     if (toAnnotations) {  
-      for (var i=0;i<toAnnotations.length;i++) {      
+      for (var i=0;i<toAnnotations.length;i++) {
+        /*        
         if (toAnnotations [i].id) {  
           ephemeral.push (toAnnotations [i].id);
         } else {
           ephemeral.push (toAnnotations [i]);          
-        }    
+        } 
+        */     
+
+        ephemeral.push (toAnnotations [i].id);          
       }
     }    
       

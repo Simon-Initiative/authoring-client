@@ -591,23 +591,22 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      *
      */
-    addUnit (aNode:any) {
-     // console.log ("addModule ()");
-             
+    addUnit (aNode:any) {             
       let immutableHelper = this.state.treeData.slice();
                 
       let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
         
       if (immutableHelper==null) {
-      //  console.log ("Bump");
         return;
       }
         
+      /*  
       if (parentArray!=null) {
       ////  console.log ("We have an object, performing edit ...");
       } else {
       //  console.log ("Internal error: node not found in tree");
-      }        
+      } 
+      */         
                         
       for (var i=0;i<parentArray.length;i++) {
         let testNode:OrgItem=parentArray [i] as OrgItem;
@@ -615,6 +614,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (testNode.id==aNode.id) {
           let newUnit:OrgUnit=new OrgUnit ();
           newUnit.title=("Unit " + this.state.titleIndex);
+          testNode.expanded=true;
           testNode.children.push (newUnit);
         
           this.setState ({titleIndex: this.state.titleIndex+1});
@@ -653,6 +653,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (testNode.id==aNode.id) {
           let newModule:OrgModule=new OrgModule ();
           newModule.title=("Module " + this.state.titleIndex);
+          testNode.expanded=true;
           testNode.children.push (newModule);
         
           this.setState ({titleIndex: this.state.titleIndex+1});
@@ -690,6 +691,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             
         if (testNode.id==aNode.id) {
           let newSection:OrgSection=new OrgSection ();
+          newSection.expanded=true;
           newSection.title=("Section " + this.state.titleIndex);
                     
           this.setState ({titleIndex: this.state.titleIndex+1});
@@ -719,13 +721,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     /**
      * 
      */
-    closeLOModal (annotations:any) {
-      /*        
-      this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function (){
-        this.orgOnEdit ();
-      });
-      */
-        
+    closeLOModal (annotations:any) {        
       this.setState ({pagesModalIsOpen: false, loModalIsOpen: false, activitiesModalIsOpen : false}, function () {
         let immutableHelper = this.state.treeData.slice();
                 

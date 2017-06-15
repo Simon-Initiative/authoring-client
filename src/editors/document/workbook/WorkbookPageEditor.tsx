@@ -58,55 +58,31 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   componentDidMount() {      
     super.componentDidMount();              
     this.loadLearningObjectives ();
-  }        
-    
-  /*
+  }
+
+  /**
+   * 
+   */
   loadLearningObjectives () : void {
-    this.props.context.courseModel.resources.map((value, id) => {        
-      if (value.type=="x-oli-learning_objectives") {
-        persistence.retrieveDocument (this.props.context.courseId,id).then(loDocument => 
-        {
-          //console.log ("LO document: " + JSON.stringify (loDocument));
-          let loModel:models.LearningObjectiveModel=loDocument.model as models.LearningObjectiveModel;   
-          this.setState ({los: loModel}, function () {
-            //console.log ("Verify: " + JSON.stringify (this.state.los));    
-          });
-        });
-      }          
-    })  
-  } 
-  */
-  
-    /**
-     * 
-     */
-    loadLearningObjectives () : void {
-      //console.log ("loadLearningObjectives ()");
-
-      persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
-        if (loDocuments.length!=0) {  
-          //console.log ("Retrieved " + loDocuments.length + " LO documents");
-
-          var tempLOArray:Array<LearningObjective>=new Array ();  
+    persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
+      if (loDocuments.length!=0) {  
+        var tempLOArray:Array<LearningObjective>=new Array ();  
             
-          for (let i=0;i<loDocuments.length;i++) {
-            let loModel:models.LearningObjectiveModel=loDocuments [i].model as models.LearningObjectiveModel;
+        for (let i=0;i<loDocuments.length;i++) {
+          let loModel:models.LearningObjectiveModel=loDocuments [i].model as models.LearningObjectiveModel;
               
-            for (let j=0;j<loModel.los.length;j++) {
-               //console.log ("Adding LO: " + loModel.los [j].title); 
-               tempLOArray.push (loModel.los [j]); 
-            }  
-          }
+          for (let j=0;j<loModel.los.length;j++) {
+            tempLOArray.push (loModel.los [j]); 
+          }  
+        }
             
-          //console.log ("Compound LO data: " + JSON.stringify (tempLOArray));
-            
-          this.setState ({los: tempLOArray}, () => {  });
-                    
-        } else {
-          console.log ("Error: no learning objectives retrieved!");  
-        }         
-      });   
-    }   
+        this.setState ({los: tempLOArray}, () => {  });
+                  
+      } else {
+        console.log ("Error: no learning objectives retrieved!");  
+      }         
+    });   
+  }   
 
   onTitleEdit(title) {
     const head = this.props.model.head.with({ title });
