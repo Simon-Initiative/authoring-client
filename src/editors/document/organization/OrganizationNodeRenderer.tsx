@@ -602,7 +602,7 @@ class OrganizationNodeRenderer extends Component <any,any>
     }
 
     render() {        
-        console.log ("OrNode render ()");
+        //console.log ("OrNode render ()");
         //console.log ("Props: " + JSON.stringify (this.props));;
         
         var {

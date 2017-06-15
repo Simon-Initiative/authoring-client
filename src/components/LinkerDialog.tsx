@@ -133,14 +133,27 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
-      //console.log ("componentWillReceiveProps ("+newProps ["modalIsOpen"]+")");
-            
+      console.log ("componentWillReceiveProps ()");
+      
+      let tempHideChecked:boolean=false;
+      
+      if (newProps ["hideChecked"]) {
+        tempHideChecked=newProps ["hideChecked"];
+      }
+
       this.setState({sourceData: newProps.sourceData,
                      errorMessage: newProps.errorMessage,     
-                     modalIsOpen: newProps ["modalIsOpen"], 
+                     modalIsOpen: newProps ["modalIsOpen"],
+                     hideChecked: tempHideChecked,
                      targetAnnotations: newProps.targetAnnotations}, function () {
-        //this.resolveAnnotations ();
+        this.resolveAnnotations ();
       });
+      
+      /*
+      this.setState({errorMessage: newProps.errorMessage,     
+                     modalIsOpen: newProps ["modalIsOpen"],
+                     hideChecked: tempHideChecked});
+      */      
   }
    
   /**
@@ -150,7 +163,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * a not aligned! This might be a false assumption but for now it's safer.
    */   
   resolveAnnotations () {
-    //console.log ("resolveAnnotations ()");
+    console.log ("resolveAnnotations ("+this.state.hideChecked+")");
     
     if (this.state.targetAnnotations==null) {
       console.log ("No link target given yet, bump");  
@@ -158,7 +171,9 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     }
       
     //console.log ("Linking targetAnnotations: " + JSON.stringify (this.state.targetAnnotations));
-    //console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));  
+    //console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));
+      
+    console.log ("A");  
             
     // This will become local annotations
     var newData: Array <Item>=new Array ();
@@ -176,27 +191,37 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(newItem);        
     });
       
+    console.log ("B");  
+      
     // Next we either check an item in new annotation list when it
     // occurs both in the source list and target annotation list. Or
     // if hideChecked is set to true we omit it so that users can't
     // add the same item twice.  
-    for (var i=0;i<this.state.targetAnnotations.length;i++) {    
+    for (var i=0;i<this.state.targetAnnotations.length;i++) {
+       console.log ("-");    
        let item=this.state.targetAnnotations [i];          
        let checkIndex:number=0; 
         
-       while ((checkIndex<newData.length) && (newData.length>0) ) {   
+       let breakout:number=0; 
+        
+       while ((checkIndex<newData.length) && (newData.length>0) && (breakout<500)) {
+         console.log ("length: " + newData.length + ", checkIndex: " + checkIndex);     
          let sourceItem=newData [checkIndex];
          if (sourceItem.id==item.id) {
            if (this.state.hideChecked==true) {   
-             newData.splice (checkIndex,0);
+             newData.splice (checkIndex,1);               
              checkIndex=0; // Start all over. This can of course be greatly optimized
            } else {
              sourceItem.checked=true;
              checkIndex++;  
-           }    
+           }
          }
+           
+         breakout++;  
        }
     }
+      
+    console.log ("C");  
   
     this.setState({localAnnotations: newData});
   }    
@@ -344,18 +369,17 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
       }
     }           
       
-    var options = this.state.localAnnotations.map(function(item, index) {
-                
-    return (
-      <div key={'chk-' + index} className="checkbox">
-        <label>
-          <input type="checkbox"
-            id={item.id}
-            value={item.title}
-            onChange={this.handleItemChange.bind(this)}
-            checked={item.checked ? true : false} /> {item.title}
-        </label>
-      </div>
+    var options = this.state.localAnnotations.map(function(item, index) {                
+      return (
+        <div key={'chk-' + index} className="checkbox">
+          <label>
+            <input type="checkbox"
+              id={item.id}
+              value={item.title}
+              onChange={this.handleItemChange.bind(this)}
+              checked={item.checked ? true : false} /> {item.title}
+          </label>
+        </div>
       );
     }.bind(this));
          

@@ -1078,11 +1078,25 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      */
     render() 
     {      
-     // console.log ("render ()");
+      console.log ("render ()");
       
-      const lolinker=this.createLOLinkerDialog ();  
-      const pagelinker=this.createPageLinkerDialog ();
-      const activitylinker=this.createActivityLinkerDialog ();
+      let lolinker;
+        
+      if (this.state.loModalIsOpen==true) {  
+        lolinker=this.createLOLinkerDialog ();  
+      }
+            
+      let pagelinker;
+        
+      if (this.state.pagesModalIsOpen==true) {        
+        pagelinker=this.createPageLinkerDialog ();
+      }
+            
+      let activitylinker;
+        
+      if (this.state.activitiesModalIsOpen==true) {        
+        activitylinker=this.createActivityLinkerDialog ();
+      }    
       
       return (
               <div>
