@@ -173,7 +173,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
     //console.log ("Linking targetAnnotations: " + JSON.stringify (this.state.targetAnnotations));
     //console.log ("Linking sourceData: " + JSON.stringify (this.state.sourceData));
       
-    console.log ("A");  
+    //console.log ("A");  
             
     // This will become local annotations
     var newData: Array <Item>=new Array ();
@@ -191,7 +191,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        newData.push(newItem);        
     });
       
-    console.log ("B");  
+    //console.log ("B");  
       
     // Next we either check an item in new annotation list when it
     // occurs both in the source list and target annotation list. Or
@@ -205,7 +205,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
        let breakout:number=0; 
         
        while ((checkIndex<newData.length) && (newData.length>0) && (breakout<500)) {
-         console.log ("length: " + newData.length + ", checkIndex: " + checkIndex);     
+         //console.log ("length: " + newData.length + ", checkIndex: " + checkIndex);     
          let sourceItem=newData [checkIndex];
          if (sourceItem.id==item.id) {
            if (this.state.hideChecked==true) {   
@@ -213,15 +213,17 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
              checkIndex=0; // Start all over. This can of course be greatly optimized
            } else {
              sourceItem.checked=true;
-             checkIndex++;  
-           }
+             checkIndex++;
+           }  
+         } else {
+           checkIndex++;             
          }
            
          breakout++;  
        }
     }
       
-    console.log ("C");  
+    //console.log ("C");  
   
     this.setState({localAnnotations: newData});
   }    
