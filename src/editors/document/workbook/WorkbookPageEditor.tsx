@@ -13,7 +13,7 @@ import * as persistence from '../../../data/persistence';
 import {Resource} from "../../../data/resource";
 import Linkable from '../../../data/linkable';
 import { LOTypes, LearningObjective } from '../../../data/los';
-
+import { Collapse } from '../../content/common/Collapse';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 
@@ -138,10 +138,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const lolinker = this.createLinkerDialog ();
-    let testArray:Array<Linkable>=this.props.model.head.annotations;  
-    const listItems = testArray.map((lo) =>      
-       <li>{lo.title}</li>  
-    ); 
+    const testArray = this.props.model.head.annotations;  
+    const listItems = testArray.map(lo => <li>{lo.title}</li>); 
+    const loDisplay = (testArray as any).size === 0
+      ? <p>No learning objectives currently linked</p>
+      : <ul>{listItems}</ul>;
+
+    const addLearningObj = <button className="btn btn-link" 
+            onClick={e => { e.preventDefault(); this.linkLO (); }}>Edit Learning Objectives</button>
+
 
     return (
       <div>
@@ -157,15 +162,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             onEdit={this.onTitleEdit} 
             />
                 
-          <a className="btn btn-secondary" 
-            onClick={e => { e.preventDefault(); this.linkLO (); }}>+ Learning Objective</a>
-
-          {lolinker}          
-          <div style={styles.loContainer}>
-            Linked Learning Objectives:<br/>
-            <ul>{listItems}</ul>
-          </div>
           
+          {lolinker}        
+
+          <Collapse 
+            caption="Learning Objectives" 
+            expanded={addLearningObj}>
+            {loDisplay}
+          </Collapse>
+
           <HtmlContentEditor 
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
