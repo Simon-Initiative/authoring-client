@@ -1529,7 +1529,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       "doc": doc
     };
 
-    //console.log("SkillModel: " + JSON.stringify(root));
+    console.log("SkillModel: " + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }

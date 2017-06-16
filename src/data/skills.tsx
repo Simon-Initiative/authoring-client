@@ -160,15 +160,21 @@ export class Skill extends Linkable {
   /**
    * 
    */  
-  toJSONObject (): Object {
+  toJSONObject (aSkill?:Skill): Object {
     var ephemeral:Object=new Object ();
       
-    ephemeral ["@id"]=this.id;
-    ephemeral ["@title"]=this.title;
-    ephemeral ["#skillModel"]=this.skillModel.toJSONObject ();
+    if (aSkill) {
+     ephemeral ["@id"]=aSkill.id;
+     ephemeral ["@title"]=aSkill.title;
+     ephemeral ["#skillModel"]=aSkill.skillModel.toJSONObject ();        
+    } else {             
+     ephemeral ["@id"]=this.id;
+     ephemeral ["@title"]=this.title;
+     ephemeral ["#skillModel"]=this.skillModel.toJSONObject ();
+    }    
             
     return (ephemeral);
-  }  
+  } 
     
   /**
    *
