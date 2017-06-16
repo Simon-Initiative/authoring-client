@@ -16,7 +16,7 @@ export interface TitleContentEditor {
 }
 
 export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
-
+  styles?: Object;
 }
 
 export class TitleContentEditor 

@@ -223,6 +223,34 @@ function splitBlockInContentState(
   });
 }
 
+function appendText(contentBlock, contentState, text) {
+
+  const targetRange = new SelectionState({
+    anchorKey: contentBlock.key,
+    focusKey: contentBlock.key,
+    anchorOffset: contentBlock.text.length,
+    focusOffset: contentBlock.text.length,
+  });
+
+  return Modifier.insertText(
+    contentState,
+    targetRange,
+    text);
+    
+}
+
+function addSpaceAfterEntity(editorState, block) {
+    
+  const blockKey = block.key;
+  const characterList = block.characterList;
+  if (block.type !== 'atomic' && (!characterList.isEmpty() && characterList.last().getEntity())) {
+    const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
+    return EditorState.push(editorState, modifiedContent, editorState.getLastChangeType());
+    
+  } else {
+    return editorState;
+  }
+}
 
 
 
@@ -279,6 +307,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           editorState = EditorState.push(editorState, contentState);
 
+          const blocks = contentState.blockMap;
+          editorState = blocks.reduce(addSpaceAfterEntity, editorState);
+          contentState = editorState.getCurrentContent();
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {
@@ -314,21 +345,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     });
   }
 
-  appendText(contentBlock, contentState, text) {
-
-    const targetRange = new SelectionState({
-      anchorKey: contentBlock.key,
-      focusKey: contentBlock.key,
-      anchorOffset: contentBlock.text.length,
-      focusOffset: contentBlock.text.length
-    })
-
-    return Modifier.insertText(
-      contentState,
-      targetRange,
-      text);
-    
-  }
+  
 
   onBlur(e) {
     e.stopPropagation();
