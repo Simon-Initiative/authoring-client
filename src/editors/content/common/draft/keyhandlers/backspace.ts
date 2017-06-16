@@ -24,17 +24,35 @@ export default function handle(
     }
   }
 
+  const currentBlock = editorState.getCurrentContent().getBlockForKey(ss.getAnchorKey());
+  
+
   // Handle backspacing at the beginning of a block to 
   // account for removing sentinel blocks
   if (start === 0) {
     return handleBackspaceAtBeginning(editorState, onChange);
-  } 
+  } else if (start === currentBlock.text.length) {
+    const entityBefore = getEntityBefore(start - 1, editorState);
+    const moveBackward = new SelectionState({
+      anchorKey: currentBlock.key,
+      anchorOffset: start - 1,
+      focusKey: currentBlock.key,
+      focusOffset: start - 1,
+      isBackwards: false,
+      hasFocus: false,
+    });
+    onChange(EditorState.forceSelection(editorState, moveBackward));
+    return 'handled';
+  } else {
+    const entityBefore = getEntityBefore(start, editorState);
+    if (entityBefore !== null) {
+      return handleBackspaceAtEntity(entityBefore, editorState, onChange);
+    }
+    
+  }
 
   // Handle backspacing to delete an immutable entity
-  const entityBefore = getEntityBefore(start, editorState);
-  if (entityBefore !== null) {
-    return handleBackspaceAtEntity(entityBefore, editorState, onChange);
-  }
+  
   
   return 'not-handled';
 }
@@ -143,7 +161,7 @@ function getEntityBefore(position: number, editorState: EditorState) : Entity {
   const currentContent = editorState.getCurrentContent();
   const currentContentBlock = currentContent.getBlockForKey(anchorKey);
 
-  const key = currentContentBlock.getEntityAt(position - 1);
+  const key = currentContentBlock.getEntityAt(position);
 
   if (key !== null) {
     const entity = currentContent.getEntity(key);
