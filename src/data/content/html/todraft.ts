@@ -490,12 +490,13 @@ export function toDraft(persistenceFormat: Object) : ContentState {
     
   }
   
-  // Add a final empty block that will ensure that we have content past
-  // any last positioned atomic blocks. This allows the user to click
-  // past the last atomic block and begin inserting new text
-  if (draft.blocks[draft.blocks.length - 1].type === 'atomic') {
+  if (draft.blocks.length === 0 || 
+    draft.blocks[draft.blocks.length - 1].type === 'atomic') {
+    // Add a final empty block that will ensure that we have content past
+    // any last positioned atomic blocks. This allows the user to click
+    // past the last atomic block and begin inserting new text
     addNewBlock(draft, {});
-  }
+  }  
 
   return convertFromRaw(draft);
 }
@@ -928,7 +929,7 @@ function example(item: Object, context: ParsingContext) {
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.example_begin, beginData, context);
   beginBlock.data = extractIdTitle(item);
-  
+
   // Process the title
   processTitle(item, context);
 
