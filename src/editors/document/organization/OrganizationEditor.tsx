@@ -303,7 +303,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
         if (value.id==anId) {  
           foundTarget=value;              
         }              
-      })          
+      });          
         
       return (foundTarget);
     }

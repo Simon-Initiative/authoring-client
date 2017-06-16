@@ -63,8 +63,8 @@ export default class Linkable {
    *
    */   
   static fromJSON (json:Array<string>): Array <Linkable> {      
-    console.log ("Linkable:fromJSON ()");
-    console.log (JSON.stringify (json));  
+    //console.log ("Linkable:fromJSON ()");
+    //console.log (JSON.stringify (json));  
         
     let ephemeral:Array <Linkable>=new Array ();
       

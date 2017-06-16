@@ -139,7 +139,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * 
    */    
   componentWillReceiveProps (newProps:LearningObjectiveLinkerProps) {      
-      console.log ("componentWillReceiveProps ()");
+      //console.log ("componentWillReceiveProps ()");
       
       let tempHideChecked:boolean=false;
       
@@ -169,7 +169,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
    * a not aligned! This might be a false assumption but for now it's safer.
    */   
   resolveAnnotations () {
-    console.log ("resolveAnnotations ("+this.state.hideChecked+")");
+    //console.log ("resolveAnnotations ("+this.state.hideChecked+")");
     
     if (this.state.targetAnnotations==null) {
       console.log ("No link target given yet, bump");  

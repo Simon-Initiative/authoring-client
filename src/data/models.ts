@@ -234,6 +234,9 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   static fromPersistence(json: Object): WorkbookPageModel {
     let model = new WorkbookPageModel();
+      
+    //console.log ("Blank workbookpage model: " + JSON.stringify (model));
+    //console.log ("Raw JSON : " + JSON.stringify (json));
 
     const wb = (json as any);
     model = model.with({ resource: Resource.fromPersistence(wb) });
@@ -249,6 +252,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     } else {
       workbook = wb.doc.workbook_page;
     }
+      
     workbook['#array'].forEach((item) => {
 
       const key = getKey(item);
@@ -265,10 +269,12 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       }
     });
 
+    console.log ("Workbook model: " + JSON.stringify (model));  
+      
     return model;
   }
 
-  toPersistence(): Object {
+  toPersistence(): Object {        
     let resource: any = this.resource.toPersistence();
     let doc = null;
     if (isNullOrUndefined(this.guid) || this.guid === '') {
@@ -312,6 +318,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     const root = {
       doc,
     };
+      
+    console.log ("Workbook toPersistence: " + JSON.stringify (root));  
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
@@ -1243,7 +1251,7 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       // This LO has a parent, reparent ...
       if (testLO.parent) {
         if ((testLO.parent !== '') && (testLO.parent !== 'unassigned')) {
-          console.log('We have an LO with a parent: ' + testLO.parent);
+          //console.log('We have an LO with a parent: ' + testLO.parent);
 
           // this should be valid since we essentially have a clean fromSet
           for (let j = 0; j < fromSet.length; j++) {
