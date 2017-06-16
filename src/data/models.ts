@@ -660,15 +660,16 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    * },
    */
   static parseItem(anItem: any): OrgItem {
-    console.log ('parseItem ()');
-    console.log (JSON.stringify (anItem));          
+    //console.log ('parseItem ()');
+    //console.log (JSON.stringify (anItem));          
       
     const newNode: OrgItem = new OrgItem();
 
     for (const i in anItem) {
-      // console.log ("Examining: " + i);  
+      //console.log ("Examining: " + i);  
       if (i === '#annotations') {
-        newNode.annotations = Linkable.fromJSON(anItem [i]['#annotations']);
+        console.log ("Giving annotations to Linkable: " + JSON.stringify (anItem [i]));  
+        newNode.annotations = Linkable.fromJSON(anItem [i]);
       }
 
       if (i === '@scoring_mode') {
@@ -871,7 +872,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
     const oList = orgData['#array'];
 
-    console.log('Found start of organization data ...');
+    //console.log('Found start of organization data ...');
 
     if (oList) {
       for (let k = 0; k < oList.length; k++) {
@@ -887,7 +888,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           for (let w = 0; w < seqList.length; w++) {
             const seqObj = seqList [w];
             if (seqObj ['sequence']) { // checking to make absolutely sure we're in the right place
-              console.log('Parsing sequence ...');
+              //console.log('Parsing sequence ...');
               const newSequence: OrgSequence = new OrgSequence();
               const seqReference = seqObj ['sequence'];
               newData.push(newSequence);
@@ -907,7 +908,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
                   const mdl = seq [s];
 
                   if (s === 'title') {
-                    console.log('Found sequence title: ' + OrganizationModel.getTextFromNode(mdl));
+                    //console.log('Found sequence title: ' + OrganizationModel.getTextFromNode(mdl));
                     newSequence.title = OrganizationModel.getTextFromNode(mdl);
                   }
 
@@ -934,7 +935,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     }
 
     // console.log("toplevel: " + JSON.stringify(newTopLevel));
-    console.log('newData: ' + JSON.stringify(newData));
+    console.log('Org treedata: ' + JSON.stringify(newData));
 
     let model = new OrganizationModel({ toplevel: newTopLevel, organization: newData });
 
@@ -965,6 +966,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       newObject['@scoring_mode'] = testObject.scoringMode;
       newObject['resourceref'] = new Object ();
       newObject['resourceref']['@idref'] = testObject.resourceRef.idRef;        
+      if (testObject ['annotations']) {
+        newObject ['#annotations'] = Linkable.toJSON(testObject ['annotations']);
+      }        
     } else {        
       newObject ['#array'] = new Array();
       newObject ['#array'].push(OrgItem.addTextObject('title', testObject.title));
@@ -1034,8 +1038,9 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     orgRoot ['organization']['#array'].push(seqRoot);
     orgRoot ['organization']['@id'] = this.id;
     orgRoot ['organization']['@version'] = this.version;
-    // orgRoot ['organization']['@title'] = this.title;
+      
     const sequences: Array<Object> = new Array();
+      
     seqRoot ['sequences'] = new Object();
     seqRoot ['sequences']['#array'] = new Array();
     seqRoot ['sequences']['#array'] = sequences;
@@ -1044,91 +1049,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     // this object always exists
 
     console.log('Persisting ' + newData.length + ' items ...');
-
-    /*  
-    for (let j = 0; j < newData.length; j++) {
-      let seqObject: OrgSequence = newData [j] as OrgSequence;
-
-      let sequence: Object = new Object();
-      sequence ["@id"] = seqObject.id;
-      sequence ["@expanded"] = seqObject.expanded;
-      sequence ["@category"] = seqObject.category;
-      sequence ["@audience"] = seqObject.audience;
-      if (seqObject ["annotations"]) {
-        sequence ["#annotations"] = Linkable.toJSON(seqObject ["annotations"]);
-      }
-      sequence ["#array"] = new Array();
-      sequence ["#array"].push(OrgItem.addTextObject("title", seqObject.title));
-
-      sequences.push({"sequence": sequence});
-
-      for (let k = 0; k < seqObject.children.length; k++) {
-        let mObj: OrgItem = seqObject.children [k];
-
-        // Check the type here. We can expect Module, Section and Item
-        // console.log("Object: " + mObj.orgType);
-
-        let moduleContainer: Object = new Object();
-        let moduleObj: Object = new Object();
-        moduleContainer ["module"] = moduleObj;
-
-        sequence ["#array"].push(moduleContainer);
-
-        moduleObj["@id"] = mObj.id;
-        moduleObj ["@expanded"] = mObj.expanded;
-        if (moduleObj ["annotations"]) {
-          moduleObj ["#annotations"] = Linkable.toJSON(moduleObj ["annotations"]);
-        }
-        moduleObj["#array"] = new Array();
-        moduleObj["#array"].push(OrgItem.addTextObject("title", mObj.title));
-
-        for (let l = 0; l < mObj.children.length; l++) {
-          // console.log("Section: " + mObj.children [l].title);
-
-          let sObj: OrgItem = mObj.children [l];
-
-          let sectionObj: Object = new Object();
-          let sectionContainer: Object = new Object();
-            
-          if (sObj.orgType==OrgContentTypes.Item) {
-            sectionContainer ["item"] = sectionObj;
-            sectionContainer ["item"]["resourceref"]=new Object ();
-            sectionContainer ["item"]["resourceref"]["@idref"]=sObj.resourceRef.idRef;              
-          } 
-            
-          if (sObj.orgType==OrgContentTypes.Unit) {
-            sectionContainer ["unit"] = sectionObj;
-          }
-            
-          if (sObj.orgType==OrgContentTypes.Section) {
-            sectionContainer ["section"] = sectionObj;
-          }            
-
-          moduleObj["#array"].push(sectionContainer);
-
-          sectionObj ["#id"] = sObj.id;
-          sectionObj ["@expanded"] = sObj.expanded;
-          if (sectionObj ["annotations"]) {
-            sectionObj ["#annotations"] = Linkable.toJSON(sectionObj ["annotations"]);
-          }
-          sectionObj ["#array"] = new Array();
-          sectionObj ["#array"].push(OrgItem.addTextObject("title", sObj.title));
-
-          for (let m = 0; m < sObj.children.length; m++) {
-            let iObj = sObj.children [m];
-
-            if (iObj.orgType ===OrgContentTypes.Item) {
-              var itemObj: OrgItem = iObj as OrgItem;
-              sectionObj ["#array"].push(new OrgItem().toJSONObject(iObj));
-            }
-            else {
-              console.log("Error: undefined type found at this level: " + iObj.orgType);
-            }
-          }
-        }
-      }
-    }
-    */
       
     for (let j = 0; j < newData.length; j++) {
       const testObject: OrgItem = newData [j] as OrgItem; // Start with the lowest level and detect what it actually is
@@ -1154,9 +1074,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       }        
     }  
 
-    // var formattedOrganization = JSON.stringify(orgRoot);
     const formattedOrganization = JSON.stringify(orgRoot ['organization']);
-      
     console.log('To: ' + formattedOrganization);
 
     const resource = this.resource.toPersistence();

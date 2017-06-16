@@ -63,14 +63,15 @@ export default class Linkable {
    *
    */   
   static fromJSON (json:Array<string>): Array <Linkable> {      
-    //console.log ("Linkable:fromJSON ()");
-    //console.log (JSON.stringify (json));  
+    console.log ("Linkable:fromJSON ()");
+    console.log (JSON.stringify (json));  
         
     let ephemeral:Array <Linkable>=new Array ();
       
     if (json) {  
       for (let j=0;j<json.length;j++) {
         let newLinkable=new Linkable ();
+        //console.log ("Adding annotation with id: " + json [j]);  
         newLinkable.id=json [j];
         ephemeral.push (newLinkable);
       }

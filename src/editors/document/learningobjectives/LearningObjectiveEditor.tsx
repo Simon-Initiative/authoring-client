@@ -109,7 +109,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     processDataChange (newData: any) {
       console.log ("processDataChange ()");
                     
-      this.saveToDB (newData.treeData);      
+      this.onLOEdit (newData.treeData);      
     }
 
     /**
@@ -178,6 +178,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       if (newData) {
         console.log ("We have alternative facts, let's use those instead ...");
         
+        // We should really unify this across the code, it's very brittle
         if (newData ["treeData"]) {
          immutableHelper=newData ["treeData"];
         } else {  
@@ -203,11 +204,13 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
     /**
      * 
      */
+    /*
     saveToDB (newData?:any): void {
         console.log ("saveToDB ()");
         
         this.onLOEdit (newData);     
-    }    
+    } 
+    */   
     
     /**
      * 
@@ -250,14 +253,18 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         newNode.title=("Title " + this.state.titleIndex);
         immutableHelper.push (newNode);
         
-        this.setState ({titleIndex: this.state.titleIndex+1});
+        this.setState ({modalIsOpen : false,titleIndex: this.state.titleIndex+1}, () => {
+          this.onLOEdit (immutableHelper);
+        });
         
+        /*
         this.setState({
           modalIsOpen : false, 
           treeData: immutableHelper
         },function (){
-          this.saveToDB ();
-        });   
+          this.saveToDB (immutableHelper);
+        });
+        */   
     }
     
     /**
@@ -313,7 +320,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         
         console.log ("Updated tree: " + JSON.stringify (immutableHelper));
         
-        this.saveToDB (immutableHelper);
+        this.onLOEdit (immutableHelper);
     }
     
     /**
@@ -340,7 +347,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
             }
         }
         
-        this.saveToDB (immutableHelper);
+        this.onLOEdit (immutableHelper);
     }
     
     /**
@@ -390,7 +397,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       }
         
       this.setState ({modalIsOpen: false, treeData: immutableHelper},function (){
-        this.saveToDB ();    
+        this.onLOEdit ();    
       });
     }
     
