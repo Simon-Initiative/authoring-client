@@ -27,7 +27,8 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, {}> {
     if (isNullOrUndefined(title) || title === '') {
       return;
     }
-    const id = title.split(' ')[0] + guid();
+    const g = guid();
+    const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
     const model = new models.CourseModel({ id, version: '1.0', title });
 
     persistence.createDocument(null, model)

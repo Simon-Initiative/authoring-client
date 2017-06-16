@@ -102,8 +102,19 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
              </div>
              */}
             <div className="information col-3">
-              <span className="title">{title}</span>
-              <span className="name">Instructor Name</span>
+
+                <div className="row">
+                  {title}
+                  {/*<span className="title">{title}</span>*/}
+                </div>
+                <div className="row">
+                  Id: {id}
+                  {/*<span className="name">Id: {id}</span>*/}
+                </div>
+                <div className="row">
+                  Version: {version}
+                  {/*<span className="name">Version: {version}</span>*/}
+                </div>
             </div>
             <div className="description col-7">
               {description}

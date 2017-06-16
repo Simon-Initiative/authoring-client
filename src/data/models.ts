@@ -276,7 +276,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       // Generate artificial id from title
       try {
         const title = this.head.title.text;
-        const id = title.split(' ')[0] + guid();
+        const g = guid();
+        const id = title.toLowerCase().split(' ')[0] + g.substring(g.lastIndexOf('-'));
         resource = new Resource({ id, title });
       } catch (err) {
         console.log(err);
@@ -411,7 +412,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       model = model.with({ maxAttempts: assessment['@maxAttempts'] });
     }
 
-    assessment['#array'].forEach(item => {
+    assessment['#array'].forEach((item) => {
 
       const key = getKey(item);
       const id = guid();

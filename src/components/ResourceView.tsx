@@ -93,7 +93,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       resource = new models.OrganizationModel({
         type,
         id: this.props.course.model.id + '_' +
-        title.toLocaleLowerCase().split(' ')[0] + '__' + g.substring(g.lastIndexOf('-')),
+        title.toLowerCase().split(' ')[0] + '_' + g.substring(g.lastIndexOf('-') + 1),
         version: '1.0',
         title: new contentTypes.Title({ text: title }),
       });
