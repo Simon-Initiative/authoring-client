@@ -322,11 +322,15 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
       // model we already have one so we need to extract the contents from
       // inside that object. Bit confusing prehaps but we'll clean it up
       // later.
-      let newModel=models.SkillModel.updateModel (this.state.model,extractedData.skills);
+      let newModel:models.SkillModel=models.SkillModel.updateModel (this.state.model,extractedData.skills);
         
+      /*  
       console.log ("Giving the following model to this.props.onEdit: " + JSON.stringify (newModel));  
         
-      this.props.onEdit(newModel); 
+      this.props.onEdit(newModel);
+      */
+
+      this.handleEdit(newModel);             
     }       
             
     /**

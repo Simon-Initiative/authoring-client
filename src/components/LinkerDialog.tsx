@@ -66,7 +66,13 @@ const customStyles = {
     display: "inline-block",
     verticalAlign: "middle",
     lineHeight: "24pt"
-  }  
+  },
+  // Temp overrides until we get a better handle on the overall styles we want to use
+  // from bootstrap in the linker
+  navbar: {
+    fontSize : "10pt",  
+    lineHeight : "10pt"
+  }
 };
 
 class Item extends Linkable {
@@ -385,7 +391,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
              onRequestClose={this.closeModal}
              contentLabel="Linker Dialog"
              style={customStyles}>
-                 <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+                 <nav className="navbar navbar-toggleable-md navbar-light bg-faded" style={customStyles.navbar}>
                    <p className="h2" style={tempnavstyle.h2}>{this.props.title}</p>
                    <a className="nav-link" onClick={e => this.checkAll ()}>Check All</a>
                    <a className="nav-link" onClick={e => this.reset ()}>Check None</a>

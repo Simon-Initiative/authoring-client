@@ -252,7 +252,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
     assignItemTypes () : void {
       //console.log ("assignItemTypes ()");
         
-      console.log ("Resources: " + JSON.stringify (this.props.context.courseModel.resources));  
+      //console.log ("Resources: " + JSON.stringify (this.props.context.courseModel.resources));  
         
       let immutableHelper = this.state.treeData.slice();
                 
