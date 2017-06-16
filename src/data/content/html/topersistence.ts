@@ -7,7 +7,7 @@ import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
 import { Link } from './link';
 import { Table } from './table';
-
+import guid from '../../../utils/guid';
 import * as common from './common';
 import { Block, BlockIterator, BlockProvider } from './provider';
 
@@ -313,10 +313,17 @@ function translateList(
 
   const listBlockType = rawBlock.type;
 
+
   top(context).push(list);
 
   let rb = rawBlock;
   let b = block;
+
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
+  list[listType]['@id'] = id;
+  list[listType]['@title'] = title;
 
   // To translate a list we have iterate through the blocks
   // to find the transition out of blocks of this list type.
@@ -431,9 +438,14 @@ function translateSection(
     };
   }
 
+  const id = extractId(rawBlock);
+  const titleAttr = extractTitle(rawBlock);
+
   const s = { 
     section: {
       '@purpose': entityMap[rawBlock.entityRanges[0].key].data.purpose,
+      '@id': id, 
+      '@title': titleAttr,
       '#array': [title, {
         body: {
           '#array': [],
@@ -453,11 +465,16 @@ function translatePullout(
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
+
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
   
   const p = {
     pullout: {
       '@type': entityMap[rawBlock.entityRanges[0].key].data.subType,
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -477,9 +494,14 @@ function translateDefinition(
     },
   }];
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const p = {
     definition: {
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -514,11 +536,16 @@ function translatePronunciation(
   
   const arr = [];
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const p = {
     pronunciation: {
       '@src': src,
       '@type': type,
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -533,9 +560,14 @@ function translateTranslation(
 
   const arr = [];
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const p = {
     translation: {
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -550,9 +582,14 @@ function translateMaterial(
 
   const arr = [];
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const p = {
     material: {
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -567,9 +604,14 @@ function translateMeaning(
 
   const arr = [];
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const p = {
     meaning: {
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -593,10 +635,15 @@ function translateExample(
   iterator: BlockIterator, 
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   const arr = [];
   const e = {
     example: {
       '#array': arr,
+      '@id': id, 
+      '@title': title,
     },
   };
 
@@ -617,24 +664,45 @@ function translateParagraph(
   rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ p: { '#text': rawBlock.text } });
+    top(context).push({ p: { '#text': rawBlock.text, '@id': id, '@title': title } });
   } else {
-    const p = { p: { '#array': [] } };
+    const p = { p: { '#array': [], '@id': id, '@title': title } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.p['#array']);
   }
 
 }
 
+function extractId(rawBlock : common.RawContentBlock) {
+  if (rawBlock.data === undefined || rawBlock.data.id === undefined) {
+    return guid();
+  } else {
+    return rawBlock.data.id;
+  }
+}
+function extractTitle(rawBlock : common.RawContentBlock) {
+  if (rawBlock.data === undefined || rawBlock.data.title === undefined) {
+    return '';
+  } else {
+    return rawBlock.data.title;
+  }
+}
+
 function translateQuoteBlock(
   rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ quote: { '#text': rawBlock.text } });
+    top(context).push({ quote: { '#text': rawBlock.text, '@id': id, '@title': title } });
   } else {
-    const p = { quote: { '#array': [] } };
+    const p = { quote: { '#array': [], '@id': id, '@title': title } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.quote['#array']);
   }
@@ -645,10 +713,13 @@ function translateFormulaBlock(
   rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ formula: { '#text': rawBlock.text } });
+    top(context).push({ formula: { '#text': rawBlock.text, '@id': id, '@title': title } });
   } else {
-    const p = { formula: { '#array': [] } };
+    const p = { formula: { '#array': [], '@id': id, '@title': title } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.formula['#array']);
   }
@@ -659,10 +730,13 @@ function translateBasicCodeBlock(
   rawBlock : common.RawContentBlock, 
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
+  const id = extractId(rawBlock);
+  const title = extractTitle(rawBlock);
+
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ code: { '#text': rawBlock.text } });
+    top(context).push({ code: { '#text': rawBlock.text, '@id': id, '@title': title } });
   } else {
-    const p = { code: { '#array': [] } };
+    const p = { code: { '#array': [], '@id': id, '@title': title } };
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.code['#array']);
   }

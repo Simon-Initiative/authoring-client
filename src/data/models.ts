@@ -1,26 +1,27 @@
-import * as Immutable from "immutable";
-import * as types from "./types";
-import * as contentTypes from "./contentTypes";
-import {getKey} from "./common";
-import {getChildren} from './content/common';
-import guid from "../utils/guid";
-import {MetaData} from "./metadata";
-import {WebContent} from "./webcontent";
-import {Resource} from "./resource";
-import Linkable from "./linkable";
-import {Skill} from "./skills";
-import {LearningObjective} from "./los";
-import {OrgContentTypes, OrgItem, OrgModule, OrgUnit, OrgOrganization, OrgSection, OrgSequence} from "./org";
-import {isArray, isNullOrUndefined} from "util";
-import {assessmentTemplate} from "./activity_templates";
-import {UserInfo} from "./user_info";
-import {PoolModel} from './models/pool';
+import * as Immutable from 'immutable';
+import * as types from './types';
+import * as contentTypes from './contentTypes';
+import { getKey } from './common';
+import { getChildren } from './content/common';
+import guid from '../utils/guid';
+import { MetaData } from './metadata';
+import { WebContent } from './webcontent';
+import { Resource } from './resource';
+import Linkable from './linkable';
+import { Skill } from './skills';
+import { LearningObjective } from './los';
+import { OrgContentTypes, OrgItem, OrgModule,
+  OrgUnit, OrgOrganization, OrgSection, OrgSequence } from './org';
+import { isArray, isNullOrUndefined } from 'util';
+import { assessmentTemplate } from './activity_templates';
+import { UserInfo } from './user_info';
+import { PoolModel } from './models/pool';
 
-import {Node} from './content/node';
+import { Node } from './content/node';
 
-export {Node} from './content/node';
+export { Node } from './content/node';
 
-export {PoolModel} from './models/pool';
+export { PoolModel } from './models/pool';
 
 export type EmptyModel = 'EmptyModel';
 export const EmptyModel: EmptyModel = 'EmptyModel';
@@ -34,8 +35,8 @@ export const ModelTypes = types.strEnum([
   'LearningObjectiveModel',
   'SkillModel',
   'PoolModel',
-  'DefaultModel'
-])
+  'DefaultModel',
+]);
 
 // Create an actual type
 export type ModelTypes = keyof typeof ModelTypes;
@@ -83,7 +84,7 @@ export type CourseModelParams = {
   icon?: WebContent,
   resources?: Immutable.OrderedMap<string, Resource>,
   webContents?: Immutable.OrderedMap<string, WebContent>,
-  developers?: Immutable.OrderedMap<string, UserInfo>
+  developers?: Immutable.OrderedMap<string, UserInfo>,
 };
 
 const defaultCourseModel = {
@@ -101,8 +102,8 @@ const defaultCourseModel = {
   icon: new WebContent(),
   resources: Immutable.OrderedMap<string, Resource>(),
   webContents: Immutable.OrderedMap<string, WebContent>(),
-  developers: Immutable.OrderedMap<string, UserInfo>()
-}
+  developers: Immutable.OrderedMap<string, UserInfo>(),
+};
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
   modelType: 'CourseModel';
@@ -132,53 +133,53 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   static fromPersistence(json: Object): CourseModel {
     let model = new CourseModel();
     const c = json as any;
-    model = model.with({rev: c.rev});
-    model = model.with({guid: c.guid});
-    model = model.with({id: c.id});
-    model = model.with({version: c.version});
-    model = model.with({title: c.title});
-    model = model.with({type: c.type});
-    model = model.with({description: c.description});
-    model = model.with({buildStatus: c.buildStatus});
-    model = model.with({options: JSON.stringify(c.options)});
+    model = model.with({ rev: c.rev });
+    model = model.with({ guid: c.guid });
+    model = model.with({ id: c.id });
+    model = model.with({ version: c.version });
+    model = model.with({ title: c.title });
+    model = model.with({ type: c.type });
+    model = model.with({ description: c.description });
+    model = model.with({ buildStatus: c.buildStatus });
+    model = model.with({ options: JSON.stringify(c.options) });
     if (!isNullOrUndefined(c.metadata.jsonObject)) {
-      model = model.with({metadata: MetaData.fromPersistence(c.metadata.jsonObject)});
+      model = model.with({ metadata: MetaData.fromPersistence(c.metadata.jsonObject) });
     }
     if (!isNullOrUndefined(c.icon)) {
-      model = model.with({icon: WebContent.fromPersistence(c.icon)});
+      model = model.with({ icon: WebContent.fromPersistence(c.icon) });
     }
     if (!isNullOrUndefined(c.resources)) {
-      c.resources.forEach(item => {
+      c.resources.forEach((item) => {
         const id = item.guid;
-        model = model.with({resources: model.resources.set(id, Resource.fromPersistence(item))});
+        model = model.with({ resources: model.resources.set(id, Resource.fromPersistence(item)) });
       });
     }
     if (!isNullOrUndefined(c.webContents)) {
-      c.webContents.forEach(item => {
+      c.webContents.forEach((item) => {
         const id = item.guid;
-        model = model.with({webContents: model.webContents.set(id, WebContent.fromPersistence(item))});
+        model = model.with({ webContents: model.webContents.set(id, WebContent.fromPersistence(item)) });
       });
     }
     if (!isNullOrUndefined(c.developers)) {
-      c.developers.forEach(item => {
+      c.developers.forEach((item) => {
         const userName = item.userName;
-        model = model.with({developers: model.developers.set(userName, UserInfo.fromPersistence(item))});
+        model = model.with({ developers: model.developers.set(userName, UserInfo.fromPersistence(item)) });
       });
     }
     return model;
   }
 
   toPersistence(): Object {
-    let doc = [{
-      "package": {
-        "@id": this.id,
-        "icon": this.icon.toPersistence(),
-        "title": this.title,
-        "@version": this.version,
-        "metadata": this.metadata.toPersistence(),
-        "description": this.description,
-        "preferences": this.options
-      }
+    const doc = [{
+      package: {
+        '@id': this.id,
+        icon: this.icon.toPersistence(),
+        title: this.title,
+        '@version': this.version,
+        metadata: this.metadata.toPersistence(),
+        description: this.description,
+        preferences: this.options,
+      },
     }];
     const values = {
       modelType: 'CourseModel',
@@ -188,8 +189,8 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       title: this.title,
       type: this.type,
       description: this.description,
-      "doc": doc
-    }
+      doc,
+    };
     return Object.assign({}, values);
   }
 }
@@ -210,8 +211,8 @@ const defaultWorkbookPageModelParams = {
   type: 'x-oli-workbook_page',
   head: new contentTypes.Head(),
   body: new contentTypes.Html(),
-  lock: new contentTypes.Lock()
-}
+  lock: new contentTypes.Lock(),
+};
 
 export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModelParams) {
 
@@ -234,12 +235,12 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   static fromPersistence(json: Object): WorkbookPageModel {
     let model = new WorkbookPageModel();
 
-    let wb = (json as any);
-    model = model.with({resource: Resource.fromPersistence(wb)});
-    model = model.with({guid: wb.guid});
-    model = model.with({type: wb.type});
+    const wb = (json as any);
+    model = model.with({ resource: Resource.fromPersistence(wb) });
+    model = model.with({ guid: wb.guid });
+    model = model.with({ type: wb.type });
     if (wb.lock !== undefined && wb.lock !== null) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(wb.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(wb.lock) });
     }
 
     let workbook = null;
@@ -248,17 +249,17 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     } else {
       workbook = wb.doc.workbook_page;
     }
-    workbook['#array'].forEach(item => {
+    workbook['#array'].forEach((item) => {
 
       const key = getKey(item);
       const id = guid();
 
       switch (key) {
         case 'head':
-          model = model.with({head: contentTypes.Head.fromPersistence(item, id)})
+          model = model.with({ head: contentTypes.Head.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({body: contentTypes.Html.fromPersistence(item, id)})
+          model = model.with({ body: contentTypes.Html.fromPersistence(item, id) });
           break;
         default:
       }
@@ -269,46 +270,47 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   toPersistence(): Object {
     let resource: any = this.resource.toPersistence();
-    let doc = null
+    let doc = null;
     if (isNullOrUndefined(this.guid) || this.guid === '') {
       // Assume new workbook page created if guid is null
       // Generate artificial id from title
       try {
         const title = this.head.title.text;
-        const id = title.split(" ")[0] + guid();
-        resource = new Resource({id: id, title: title});
+        const g = guid();
+        const id = title.toLowerCase().split(' ')[0] + g.substring(g.lastIndexOf('-'));
+        resource = new Resource({ id, title });
       } catch (err) {
         console.log(err);
         return null;
       }
       doc = [{
-        "workbook_page": {
-          "@id": resource.id,
-          "#array": [
+        workbook_page: {
+          '@id': resource.id,
+          '#array': [
             this.head.toPersistence(),
             {
-              "body": {
-                "p": {
-                  "#text": "(This space intentionally left blank.)"
-                }
-              }
-            }
-          ]
-        }
+              body: {
+                p: {
+                  '#text': '(This space intentionally left blank.)',
+                },
+              },
+            },
+          ],
+        },
       }];
     } else {
       doc = [{
-        "workbook_page": {
-          "@id": resource.id,
-          "#array": [
+        workbook_page: {
+          '@id': resource.id,
+          '#array': [
             this.head.toPersistence(),
-            {body: this.body.toPersistence()}
-          ]
-        }
+            { body: this.body.toPersistence() },
+          ],
+        },
       }];
     }
     const root = {
-      "doc": doc
+      doc,
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -338,7 +340,7 @@ const defaultAssessmentModelParams = {
   title: new contentTypes.Title(),
   nodes: Immutable.OrderedMap<string, Node>(),
   pages: Immutable.OrderedMap<string, contentTypes.Page>(),
-}
+};
 
 function migrateNodesToPage(model: AssessmentModel) {
   let updated = model;
@@ -346,17 +348,17 @@ function migrateNodesToPage(model: AssessmentModel) {
   // Ensure that we have at least one page
   if (updated.pages.size === 0) {
     let newPage = new contentTypes.Page();
-    newPage = newPage.with({title: new contentTypes.Title({text: 'Page 1'})});
-    updated = updated.with({pages: updated.pages.set(newPage.guid, newPage)});
+    newPage = newPage.with({ title: new contentTypes.Title({ text: 'Page 1' }) });
+    updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
   }
 
   // Now move any root nodes to the first page
   if (updated.nodes.size > 0) {
     let page = updated.pages.first();
     updated.nodes.toArray().forEach(
-      node => page = page.with({nodes: page.nodes.set(node.guid, node)}));
-    updated = updated.with({pages: updated.pages.set(page.guid, page)});
-    updated = updated.with({nodes: Immutable.OrderedMap<string, Node>()});
+      node => page = page.with({ nodes: page.nodes.set(node.guid, node) }));
+    updated = updated.with({ pages: updated.pages.set(page.guid, page) });
+    updated = updated.with({ nodes: Immutable.OrderedMap<string, Node>() });
   }
 
   return updated;
@@ -388,13 +390,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     let model = new AssessmentModel();
 
     const a = (json as any);
-    model = model.with({resource: Resource.fromPersistence(a)});
-    model = model.with({guid: a.guid});
-    model = model.with({type: a.type});
-    model = model.with({title: new contentTypes.Title({guid: guid(), text: a.title})});
+    model = model.with({ resource: Resource.fromPersistence(a) });
+    model = model.with({ guid: a.guid });
+    model = model.with({ type: a.type });
+    model = model.with({ title: new contentTypes.Title({ guid: guid(), text: a.title }) });
 
     if (a.lock !== undefined && a.lock !== null) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
     let assessment = null;
     if (isArray(a.doc)) {
@@ -404,13 +406,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     }
 
     if (assessment['@recommendedAttempts'] !== undefined) {
-      model = model.with({recommendedAttempts: assessment['@recommendedAttempts']});
+      model = model.with({ recommendedAttempts: assessment['@recommendedAttempts'] });
     }
     if (assessment['@maxAttempts'] !== undefined) {
-      model = model.with({maxAttempts: assessment['@maxAttempts']});
+      model = model.with({ maxAttempts: assessment['@maxAttempts'] });
     }
 
-    assessment['#array'].forEach(item => {
+    assessment['#array'].forEach((item) => {
 
       const key = getKey(item);
       const id = guid();
@@ -418,19 +420,19 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       switch (key) {
         case 'page':
           model = model.with(
-            {pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id))});
+            { pages: model.pages.set(id, contentTypes.Page.fromPersistence(item, id)) });
           break;
         case 'question':
-          model = model.with({nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id))})
+          model = model.with({ nodes: model.nodes.set(id, contentTypes.Question.fromPersistence(item, id)) });
           break;
         case 'content':
-          model = model.with({nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id))})
+          model = model.with({ nodes: model.nodes.set(id, contentTypes.Content.fromPersistence(item, id)) });
           break;
         case 'selection':
-          model = model.with({nodes: model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id))})
+          model = model.with({ nodes: model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id)) });
           break;
         default:
-          model = model.with({nodes: model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id))})
+          model = model.with({ nodes: model.nodes.set(id, contentTypes.Unsupported.fromPersistence(item, id)) });
       }
     });
 
@@ -444,7 +446,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     const children = [
       this.title.toPersistence(),
       ...this.pages.toArray().map(page => page.toPersistence()),
-    ]
+    ];
     let resource = this.resource.toPersistence();
     let doc = null;
 
@@ -453,27 +455,27 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       const assessment = assessmentTemplate(this.title.text);
       try {
         const id = assessment.assessment['@id'];
-        resource = new Resource({id: id, title: this.title.text});
+        resource = new Resource({ id, title: this.title.text });
       } catch (err) {
         console.log(err);
         return null;
       }
       doc = [
-        assessment
+        assessment,
       ];
 
     } else {
       doc = [{
-        "assessment": {
-          "@id": this.resource.id,
+        assessment: {
+          '@id': this.resource.id,
           '@recommendedAttempts': this.recommendedAttempts,
           '@maxAttempts': this.maxAttempts,
-          "#array": children
-        }
+          '#array': children,
+        },
       }];
     }
     const root = {
-      "doc": doc
+      doc,
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -485,7 +487,7 @@ export type DefaultModelParams = {
   guid?: string,
   type?: string,
   content?: string,
-  lock?: contentTypes.Lock
+  lock?: contentTypes.Lock,
 };
 
 const defaultModelParams = {
@@ -494,8 +496,8 @@ const defaultModelParams = {
   guid: '',
   type: '',
   content: '',
-  lock: new contentTypes.Lock()
-}
+  lock: new contentTypes.Lock(),
+};
 
 export class DefaultModel extends Immutable.Record(defaultModelParams) {
   modelType: 'DefaultModel';
@@ -516,26 +518,26 @@ export class DefaultModel extends Immutable.Record(defaultModelParams) {
   static fromPersistence(json: Object): DefaultModel {
     let model = new DefaultModel();
 
-    let info = (json as any);
-    model = model.with({resource: Resource.fromPersistence(info)});
-    model = model.with({guid: info.guid});
-    model = model.with({type: info.type});
+    const info = (json as any);
+    model = model.with({ resource: Resource.fromPersistence(info) });
+    model = model.with({ guid: info.guid });
+    model = model.with({ type: info.type });
     if (info.lock !== undefined && info.lock !== null) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(info.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(info.lock) });
     }
-    model.with({content: info.doc});
+    model.with({ content: info.doc });
 
     return model;
   }
 
   toPersistence(): Object {
-    let resource: any = this.resource.toPersistence();
-    let doc = [
-      this.content
+    const resource: any = this.resource.toPersistence();
+    const doc = [
+      this.content,
     ];
 
     const root = {
-      "doc": doc
+      doc,
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -544,28 +546,34 @@ export class DefaultModel extends Immutable.Record(defaultModelParams) {
 
 export type OrganizationModelParams = {
   resource?: Resource,
+  id?: string,
+  version?: string,
   guid?: string,
   type?: string,
   title?: contentTypes.Title,
   organization?: any,
   toplevel?: OrgOrganization,
-  lock?: contentTypes.Lock
+  lock?: contentTypes.Lock,
 };
 
 const defaultOrganizationModel = {
   modelType: 'OrganizationModel',
   resource: new Resource(),
+  id: '',
+  version: '',
   guid: '',
   type: 'x-oli-organization',
   title: new contentTypes.Title(),
   organization: [],
-  toplevel: null,
-  lock: new contentTypes.Lock()
-}
+  toplevel: new OrgOrganization(),
+  lock: new contentTypes.Lock(),
+};
 
 export class OrganizationModel extends Immutable.Record(defaultOrganizationModel) {
   modelType: 'OrganizationModel';
   resource: Resource;
+  id: string;
+  version: string;
   guid: string;
   type: string;
   title: contentTypes.Title;
@@ -586,7 +594,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       return (aNode ['#text']);
     }
 
-    return ("");
+    return ('');
   }
 
   /**
@@ -602,42 +610,42 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *  }
    */
   getNodeType(aNode: any): string {
-    for (var i in aNode) {
+    for (const i in aNode) {
       return (i);
     }
 
-    return ("");
+    return ('');
   }
 
   /**
    *
    */
   static getNodeContentType(aNode: any): string {
-    if (aNode == null) {
-      return "";
+    if (aNode === null) {
+      return '';
     }
 
-    if (aNode ["title"]) {
-      return ("title");
+    if (aNode ['title']) {
+      return ('title');
     }
 
-    if (aNode ["section"]) {
-      return ("section");
+    if (aNode ['section']) {
+      return ('section');
     }
 
-    if (aNode ["sequence"]) {
-      return ("section");
+    if (aNode ['sequence']) {
+      return ('section');
     }
 
-    if (aNode ["module"]) {
-      return ("module");
+    if (aNode ['module']) {
+      return ('module');
     }
 
-    if (aNode ["item"]) {
-      return ("item");
+    if (aNode ['item']) {
+      return ('item');
     }
 
-    return ("");
+    return ('');
   }
 
   /**
@@ -652,24 +660,24 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    * },
    */
   static parseItem(anItem: any): OrgItem {
-    console.log ("parseItem ()");
+    console.log ('parseItem ()');
     console.log (JSON.stringify (anItem));          
       
-    var newNode: OrgItem = new OrgItem();
+    const newNode: OrgItem = new OrgItem();
 
-    for (var i in anItem) {
-      //console.log ("Examining: " + i);  
-      if (i == "#annotations") {
-        newNode.annotations = Linkable.fromJSON(anItem [i]["#annotations"]);
+    for (const i in anItem) {
+      // console.log ("Examining: " + i);  
+      if (i === '#annotations') {
+        newNode.annotations = Linkable.fromJSON(anItem [i]['#annotations']);
       }
 
-      if (i == "@scoring_mode") {
+      if (i === '@scoring_mode') {
         newNode.scoringMode = anItem [i];
       }
 
-      if (i == "resourceref") {  
-        //newNode.title will be resolved dynamically in the org editor when it mounts          
-        newNode.resourceRef.idRef = anItem [i]["@idref"];
+      if (i === 'resourceref') {  
+        // newNode.title will be resolved dynamically in the org editor when it mounts
+        newNode.resourceRef.idRef = anItem [i]['@idref'];
       }
     }
 
@@ -680,24 +688,24 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static parseSection(aSection: any): OrgSection {
-    //console.log("parseSection ()");
+    // console.log("parseSection ()");
 
-    var newNode: OrgSection = new OrgSection();
-    newNode.id = aSection ["@id"];
-    newNode.expanded = aSection ["@expanded"];
-    if (aSection ["#annotations"]) {
-      newNode.annotations = Linkable.fromJSON(aSection ["#annotations"]);
+    const newNode: OrgSection = new OrgSection();
+    newNode.id = aSection ['@id'];
+    newNode.expanded = aSection ['@expanded'];
+    if (aSection ['#annotations']) {
+      newNode.annotations = Linkable.fromJSON(aSection ['#annotations']);
     }
 
-    for (var i = 0; i < aSection ["#array"].length; i++) {
-      var potentialSection = aSection ["#array"] [i];
+    for (let i = 0; i < aSection ['#array'].length; i++) {
+      const potentialSection = aSection ['#array'] [i];
 
-      for (var j in potentialSection) {
-        if (j == "title") {
+      for (const j in potentialSection) {
+        if (j === 'title') {
           newNode.title = OrganizationModel.getTextFromNode(potentialSection [j]);
         }
 
-        if (j == "item") {
+        if (j === 'item') {
           newNode.addNode(OrganizationModel.parseItem(potentialSection [j]));
         }
       }
@@ -709,32 +717,32 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static parseModule(aModule: any): OrgItem {
-    //console.log("parseModule ()");
+    // console.log("parseModule ()");
 
-    let moduleNode: OrgModule = new OrgModule();
-    moduleNode.id = aModule ["@id"];
-    moduleNode.expanded = aModule ["@expanded"];
-    if (aModule ["#annotations"]) {
-      moduleNode.annotations = Linkable.fromJSON(aModule ["#annotations"]);
+    const moduleNode: OrgModule = new OrgModule();
+    moduleNode.id = aModule ['@id'];
+    moduleNode.expanded = aModule ['@expanded'];
+    if (aModule ['#annotations']) {
+      moduleNode.annotations = Linkable.fromJSON(aModule ['#annotations']);
     }
 
-    for (var t = 0; t < aModule ["#array"].length; t++) {
-      var mdl = aModule ["#array"] [t];
+    for (let t = 0; t < aModule ['#array'].length; t++) {
+      const mdl = aModule ['#array'] [t];
 
-      var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
+      const typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
-      //console.log("typeSwitch: " + typeSwitch);
+      // console.log("typeSwitch: " + typeSwitch);
 
-      if (typeSwitch == "title") {
-        moduleNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
+      if (typeSwitch === 'title') {
+        moduleNode.title = OrganizationModel.getTextFromNode(mdl ['title']);
       }
 
-      if (typeSwitch == "item") {
-        moduleNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
+      if (typeSwitch === 'item') {
+        moduleNode.addNode(OrganizationModel.parseItem(mdl ['item']));
       }
 
-      if (typeSwitch == "section") {
-        moduleNode.addNode(OrganizationModel.parseSection(mdl ["section"]));
+      if (typeSwitch === 'section') {
+        moduleNode.addNode(OrganizationModel.parseSection(mdl ['section']));
       }
     }
 
@@ -747,31 +755,31 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   static parseUnit(aUnit: any): OrgItem {
    // console.log("parseUnit ()");
 
-    let unitNode: OrgUnit = new OrgUnit();
-    unitNode.id = aUnit ["@id"];
-    unitNode.expanded = aUnit ["@expanded"];
-    unitNode.duration = aUnit ["@duration"];
-    if (aUnit ["#annotations"]) {
-      unitNode.annotations = Linkable.fromJSON(aUnit ["#annotations"]);
+    const unitNode: OrgUnit = new OrgUnit();
+    unitNode.id = aUnit ['@id'];
+    unitNode.expanded = aUnit ['@expanded'];
+    unitNode.duration = aUnit ['@duration'];
+    if (aUnit ['#annotations']) {
+      unitNode.annotations = Linkable.fromJSON(aUnit ['#annotations']);
     }
 
-    for (var t = 0; t < aUnit ["#array"].length; t++) {
-      var mdl = aUnit ["#array"] [t];
+    for (let t = 0; t < aUnit ['#array'].length; t++) {
+      const mdl = aUnit ['#array'] [t];
 
-      var typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
+      const typeSwitch: string = OrganizationModel.getNodeContentType(mdl);
 
      // console.log("typeSwitch: " + typeSwitch);
 
-      if (typeSwitch == "title") {
-        unitNode.title = OrganizationModel.getTextFromNode(mdl ["title"]);
+      if (typeSwitch === 'title') {
+        unitNode.title = OrganizationModel.getTextFromNode(mdl ['title']);
       }
 
-      if (typeSwitch == "item") {
-        unitNode.addNode(OrganizationModel.parseItem(mdl ["item"]));
+      if (typeSwitch === 'item') {
+        unitNode.addNode(OrganizationModel.parseItem(mdl ['item']));
       }
 
-      if (typeSwitch == "module") {
-        unitNode.addNode(OrganizationModel.parseModule(mdl ["module"]));
+      if (typeSwitch === 'module') {
+        unitNode.addNode(OrganizationModel.parseModule(mdl ['module']));
       }
     }
 
@@ -783,14 +791,16 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    */
   static updateModel(oldModel: OrganizationModel, newOrgModel: any): OrganizationModel {
    // console.log("updateModel ()");
-    var model = new OrganizationModel({'organization': newOrgModel});
-    model = model.with({toplevel: oldModel.toplevel});
-    model = model.with({resource: oldModel.resource});
-    model = model.with({guid: oldModel.guid});
-    model = model.with({type: oldModel.type});
-    model = model.with({title: oldModel.title});
+    let model = new OrganizationModel({ organization: newOrgModel });
+    model = model.with({ toplevel: oldModel.toplevel });
+    model = model.with({ resource: oldModel.resource });
+    model = model.with({ id: oldModel.id });
+    model = model.with({ version: oldModel.version });
+    model = model.with({ guid: oldModel.guid });
+    model = model.with({ type: oldModel.type });
+    model = model.with({ title: oldModel.title });
     if (!isNullOrUndefined(oldModel.lock)) {
-      model = model.with({lock: oldModel.lock});
+      model = model.with({ lock: oldModel.lock });
     }
     return model;
   }
@@ -803,36 +813,36 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    */
   static parseTopLevelOrganization(aData: any): OrgOrganization {
 
-    //console.log("parseTopLevelOrganization ()");
+    // console.log("parseTopLevelOrganization ()");
 
-    let orgNode = new OrgOrganization();// throw away for now
+    const orgNode = new OrgOrganization();// throw away for now
 
     if (aData) {
-      orgNode.id = aData["@id"];
-      orgNode.expanded = aData["@expanded"];
-      orgNode.version = aData["@version"];
-      if (aData["#annotations"]) {
-        orgNode.annotations = Linkable.fromJSON(aData["#annotations"]);
+      orgNode.id = aData['@id'];
+      orgNode.expanded = aData['@expanded'];
+      orgNode.version = aData['@version'];
+      if (aData['#annotations']) {
+        orgNode.annotations = Linkable.fromJSON(aData['#annotations']);
       }
-      let oList = aData["#array"];
+      const oList = aData['#array'];
 
       if (oList) {
-        //if (i=='organization') {
+        // if (i=='organization') {
         for (let k = 0; k < oList.length; k++) {
-          let obj = oList [k];
+          const obj = oList [k];
 
-          for (let j in obj) {
-            let destNode = obj [j];
+          for (const j in obj) {
+            const destNode = obj [j];
 
-            if (j == 'title') {
+            if (j === 'title') {
               orgNode.title = OrganizationModel.getTextFromNode(destNode);
             }
 
-            if (j == 'description') {
+            if (j === 'description') {
               orgNode.description = OrganizationModel.getTextFromNode(destNode);
             }
 
-            if (j == 'audience') {
+            if (j === 'audience') {
               orgNode.audience = OrganizationModel.getTextFromNode(destNode);
             }
           }
@@ -847,67 +857,67 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   static fromPersistence(json: Object): OrganizationModel {
-    console.log("fromPersistence ()");
+    console.log('fromPersistence ()');
 
-    //console.log("Org model: " + JSON.stringify(json));
+    // console.log("Org model: " + JSON.stringify(json));
 
-    let a = (json as any);
-    var orgData = a.doc.organization;
+    const a = (json as any);
+    const orgData = a.doc.organization;
 
-    console.log("Org JSON: " + JSON.stringify(orgData));
+    console.log('Org JSON: ' + JSON.stringify(orgData));
 
-    var newData: Array<OrgSequence> = new Array();
-    var newTopLevel: OrgOrganization = OrganizationModel.parseTopLevelOrganization(orgData);
+    const newData: Array<OrgSequence> = new Array();
+    const newTopLevel: OrgOrganization = OrganizationModel.parseTopLevelOrganization(orgData);
 
-    var oList = orgData["#array"];
+    const oList = orgData['#array'];
 
-    console.log("Found start of organization data ...");
+    console.log('Found start of organization data ...');
 
     if (oList) {
-      for (var k = 0; k < oList.length; k++) {
+      for (let k = 0; k < oList.length; k++) {
 
-        var obj = oList [k];
+        const obj = oList [k];
 
-        if (!isNullOrUndefined(obj ["sequences"])) {
+        if (!isNullOrUndefined(obj ['sequences'])) {
 
-          var destNode = obj ["sequences"]; // [j];
+          const destNode = obj ['sequences']; // [j];
 
-          var seqList = getChildren(destNode);
+          const seqList = getChildren(destNode);
 
           for (let w = 0; w < seqList.length; w++) {
-            let seqObj = seqList [w];
-            if (seqObj ["sequence"]) { // checking to make absolutely sure we're in the right place
-              console.log("Parsing sequence ...");
-              let newSequence: OrgSequence = new OrgSequence();
-              let seqReference = seqObj ["sequence"];
+            const seqObj = seqList [w];
+            if (seqObj ['sequence']) { // checking to make absolutely sure we're in the right place
+              console.log('Parsing sequence ...');
+              const newSequence: OrgSequence = new OrgSequence();
+              const seqReference = seqObj ['sequence'];
               newData.push(newSequence);
-              newSequence.id = seqReference["@id"];
-              newSequence.expanded = seqReference["@expanded"];
-              newSequence.category = seqReference["@category"];
-              newSequence.audience = seqReference["@audience"];
-              if (seqReference ["#annotations"]) {
-                newSequence.annotations = Linkable.fromJSON(seqReference ["#annotations"]);
+              newSequence.id = seqReference['@id'];
+              newSequence.expanded = seqReference['@expanded'];
+              newSequence.category = seqReference['@category'];
+              newSequence.audience = seqReference['@audience'];
+              if (seqReference ['#annotations']) {
+                newSequence.annotations = Linkable.fromJSON(seqReference ['#annotations']);
               }
-              var sequenceList: Array<any> = seqReference ["#array"];
+              const sequenceList: Array<any> = seqReference ['#array'];
 
-              for (var t = 0; t < sequenceList.length; t++) {
-                var seq = sequenceList [t];
+              for (let t = 0; t < sequenceList.length; t++) {
+                const seq = sequenceList [t];
 
-                for (var s in seq) {
-                  var mdl = seq [s];
+                for (const s in seq) {
+                  const mdl = seq [s];
 
-                  if (s == "title") {
-                    console.log("Found sequence title: " + OrganizationModel.getTextFromNode(mdl));
+                  if (s === 'title') {
+                    console.log('Found sequence title: ' + OrganizationModel.getTextFromNode(mdl));
                     newSequence.title = OrganizationModel.getTextFromNode(mdl);
                   }
 
-                  if (s == "module") {
-                    let newModule = OrganizationModel.parseModule(mdl);
+                  if (s === 'module') {
+                    const newModule = OrganizationModel.parseModule(mdl);
                     newSequence.children.push(newModule);
                   }
 
-                  if (s == "unit") {
-                    let newUnit = OrganizationModel.parseUnit(mdl);
+                  if (s === 'unit') {
+                    const newUnit = OrganizationModel.parseUnit(mdl);
                     newSequence.children.push(newUnit);
                   }
                 }
@@ -923,17 +933,19 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       }
     }
 
-    //console.log("toplevel: " + JSON.stringify(newTopLevel));
-    console.log("newData: " + JSON.stringify(newData));
+    // console.log("toplevel: " + JSON.stringify(newTopLevel));
+    console.log('newData: ' + JSON.stringify(newData));
 
-    let model = new OrganizationModel({'toplevel': newTopLevel, 'organization': newData});
+    let model = new OrganizationModel({ toplevel: newTopLevel, organization: newData });
 
-    model = model.with({resource: Resource.fromPersistence(a)});
-    model = model.with({guid: a.guid});
-    model = model.with({type: a.type});
-    model = model.with({title: new contentTypes.Title({guid: guid(), text: a.title})});
+    model = model.with({ resource: Resource.fromPersistence(a) });
+    model = model.with({ guid: a.guid });
+    model = model.with({ id: a.id });
+    model = model.with({ version: a.doc.organization['@version'] });
+    model = model.with({ type: a.type });
+    model = model.with({ title: new contentTypes.Title({ guid: guid(), text: a.title }) });
     if (a.lock !== undefined && a.lock !== null) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
 
     return model;
@@ -943,55 +955,55 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */   
   orgItemToJSON (testObject:any) {
-    //console.log ("orgItemToJSON ("+testObject.title+")");
+    // console.log ("orgItemToJSON ("+testObject.title+")");
               
-    let newObject: Object = new Object();
-    newObject ["@id"] = testObject.id;
-    newObject ["@expanded"] = testObject.expanded;
+    const newObject: Object = new Object();
+    newObject ['@id'] = testObject.id;
+    newObject ['@expanded'] = testObject.expanded;
       
-    if (testObject.orgType==OrgContentTypes.Item) {
-        newObject["@scoring_mode"]=testObject.scoringMode;
-        newObject["resourceref"]=new Object ();
-        newObject["resourceref"]["@idref"]=testObject.resourceRef.idRef;        
+    if (testObject.orgType === OrgContentTypes.Item) {
+      newObject['@scoring_mode'] = testObject.scoringMode;
+      newObject['resourceref'] = new Object ();
+      newObject['resourceref']['@idref'] = testObject.resourceRef.idRef;        
     } else {        
-      newObject ["#array"] = new Array();
-      newObject ["#array"].push(OrgItem.addTextObject("title", testObject.title));
-      if (testObject ["annotations"]) {
-        newObject ["#annotations"] = Linkable.toJSON(testObject ["annotations"]);
+      newObject ['#array'] = new Array();
+      newObject ['#array'].push(OrgItem.addTextObject('title', testObject.title));
+      if (testObject ['annotations']) {
+        newObject ['#annotations'] = Linkable.toJSON(testObject ['annotations']);
       }
-      if (testObject.orgType==OrgContentTypes.Sequence) {
-        if (testObject ["category"]) {    
-          newObject ["@category"] = testObject.category;
+      if (testObject.orgType === OrgContentTypes.Sequence) {
+        if (testObject ['category']) {    
+          newObject ['@category'] = testObject.category;
         }
             
-        if (testObject ["audience"]) {        
-          newObject ["@audience"] = testObject.audience;
+        if (testObject ['audience']) {        
+          newObject ['@audience'] = testObject.audience;
         }    
       }       
      
-      if (testObject ["children"]) {
-        for (let i=0;i<testObject ["children"].length; i++) {
+      if (testObject ['children']) {
+        for (let i = 0;i < testObject ['children'].length; i++) {
           
-          var subObject:any=testObject ["children"][i];
+          const subObject:any = testObject ['children'][i];
             
-          if (subObject.orgType==OrgContentTypes.Sequence) {  
-            newObject ["#array"].push({"sequence": this.orgItemToJSON (subObject)});
+          if (subObject.orgType === OrgContentTypes.Sequence) {  
+            newObject ['#array'].push({ sequence: this.orgItemToJSON (subObject) });
           }
           
-          if (subObject.orgType==OrgContentTypes.Module) {  
-            newObject ["#array"].push({"module": this.orgItemToJSON (subObject)});
+          if (subObject.orgType === OrgContentTypes.Module) {  
+            newObject ['#array'].push({ module: this.orgItemToJSON (subObject) });
           }
           
-          if (subObject.orgType==OrgContentTypes.Unit) {  
-            newObject ["#array"].push({"unit": this.orgItemToJSON (subObject)});
+          if (subObject.orgType === OrgContentTypes.Unit) {  
+            newObject ['#array'].push({ unit: this.orgItemToJSON (subObject) });
           }
           
-          if (subObject.orgType==OrgContentTypes.Section) {  
-            newObject ["#array"].push({"section": this.orgItemToJSON (subObject)});
+          if (subObject.orgType === OrgContentTypes.Section) {  
+            newObject ['#array'].push({ section: this.orgItemToJSON (subObject) });
           }
           
-          if (subObject.orgType==OrgContentTypes.Item) {  
-            newObject ["#array"].push({"item": this.orgItemToJSON (subObject)});
+          if (subObject.orgType === OrgContentTypes.Item) {  
+            newObject ['#array'].push({ item: this.orgItemToJSON (subObject) });
           }          
         }
       }  
@@ -1004,31 +1016,34 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
    *
    */
   toPersistence(): Object {
-    console.log("toPersistence ()");
+    console.log('toPersistence ()');
 
-    var newData = this.organization;
+    const newData = this.organization;
 
-    console.log("Persisting from visual tree: " + JSON.stringify(this.organization));
+    console.log('Persisting from visual tree: ' + JSON.stringify(this.organization));
 
     // First process our organization object and add it to the tree we're building
 
-    let orgObject: OrgOrganization = this.toplevel;
+    const orgObject: OrgOrganization = this.toplevel;
+    orgObject.title = this.title.text;
+    const orgRoot: Object = (new OrgOrganization()).toJSONObject(orgObject);
 
-    let orgRoot: Object = (new OrgOrganization()).toJSONObject(orgObject);
-    let seqRoot = new Object();
-    orgRoot ["modelType"] = "OrganizationModel";
-    orgRoot ["title"] = this.title;
-    orgRoot ["organization"]["#array"].push(seqRoot);
-
-    let sequences: Array<Object> = new Array();
-    seqRoot ["sequences"] = new Object();
-    seqRoot ["sequences"]["#array"] = new Array();
-    seqRoot ["sequences"]["#array"] = sequences;
+    const seqRoot = new Object();
+    orgRoot ['modelType'] = 'OrganizationModel';
+    orgRoot ['title'] = this.title.text;
+    orgRoot ['organization']['#array'].push(seqRoot);
+    orgRoot ['organization']['@id'] = this.id;
+    orgRoot ['organization']['@version'] = this.version;
+    // orgRoot ['organization']['@title'] = this.title;
+    const sequences: Array<Object> = new Array();
+    seqRoot ['sequences'] = new Object();
+    seqRoot ['sequences']['#array'] = new Array();
+    seqRoot ['sequences']['#array'] = sequences;
 
     // We can point directly to .children because we ensure in the constructor that
     // this object always exists
 
-    console.log("Persisting " + newData.length + " items ...");
+    console.log('Persisting ' + newData.length + ' items ...');
 
     /*  
     for (let j = 0; j < newData.length; j++) {
@@ -1068,7 +1083,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         moduleObj["#array"].push(OrgItem.addTextObject("title", mObj.title));
 
         for (let l = 0; l < mObj.children.length; l++) {
-          //console.log("Section: " + mObj.children [l].title);
+          // console.log("Section: " + mObj.children [l].title);
 
           let sObj: OrgItem = mObj.children [l];
 
@@ -1102,7 +1117,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           for (let m = 0; m < sObj.children.length; m++) {
             let iObj = sObj.children [m];
 
-            if (iObj.orgType == OrgContentTypes.Item) {
+            if (iObj.orgType ===OrgContentTypes.Item) {
               var itemObj: OrgItem = iObj as OrgItem;
               sectionObj ["#array"].push(new OrgItem().toJSONObject(iObj));
             }
@@ -1116,41 +1131,41 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     */
       
     for (let j = 0; j < newData.length; j++) {
-      let testObject: OrgItem = newData [j] as OrgItem; // Start with the lowest level and detect what it actually is
+      const testObject: OrgItem = newData [j] as OrgItem; // Start with the lowest level and detect what it actually is
               
-      if (testObject.orgType==OrgContentTypes.Sequence) {         
-        sequences.push({"sequence": this.orgItemToJSON (testObject)});
+      if (testObject.orgType === OrgContentTypes.Sequence) {         
+        sequences.push({ sequence: this.orgItemToJSON (testObject) });
       }
         
-      if (testObject.orgType==OrgContentTypes.Module) {         
-        sequences.push({"module": this.orgItemToJSON (testObject)});
+      if (testObject.orgType === OrgContentTypes.Module) {         
+        sequences.push({ module: this.orgItemToJSON (testObject) });
       }
         
-      if (testObject.orgType==OrgContentTypes.Unit) {         
-        sequences.push({"unit": this.orgItemToJSON (testObject)});
+      if (testObject.orgType === OrgContentTypes.Unit) {         
+        sequences.push({ unit: this.orgItemToJSON (testObject) });
       }
         
-      if (testObject.orgType==OrgContentTypes.Section) {         
-        sequences.push({"section": this.orgItemToJSON (testObject)});
+      if (testObject.orgType === OrgContentTypes.Section) {         
+        sequences.push({ section: this.orgItemToJSON (testObject) });
       }
         
-      if (testObject.orgType==OrgContentTypes.Item) {         
-        sequences.push({"item": this.orgItemToJSON (testObject)});
+      if (testObject.orgType === OrgContentTypes.Item) {         
+        sequences.push({ item: this.orgItemToJSON (testObject) });
       }        
     }  
 
-    //var formattedOrganization = JSON.stringify(orgRoot);
-    var formattedOrganization = JSON.stringify(orgRoot ["organization"]);
+    // var formattedOrganization = JSON.stringify(orgRoot);
+    const formattedOrganization = JSON.stringify(orgRoot ['organization']);
       
-    console.log("To: " + formattedOrganization);
+    console.log('To: ' + formattedOrganization);
 
-    let resource = this.resource.toPersistence();
-    let doc = [{
-      "organization": orgRoot["organization"]
+    const resource = this.resource.toPersistence();
+    const doc = [{
+      organization: orgRoot['organization'],
     }];
 
     const root = {
-      "doc": doc
+      doc,
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
@@ -1158,7 +1173,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
 
 }
 
-//>------------------------------------------------------------------
+// >------------------------------------------------------------------
 
 export type LearningObjectiveModelParams = {
   resource?: Resource,
@@ -1167,7 +1182,7 @@ export type LearningObjectiveModelParams = {
   id?: string,
   title?: string,
   los?: Array<LearningObjective>,
-  lock?: contentTypes.Lock
+  lock?: contentTypes.Lock,
 };
 
 const defaultLearningObjectiveModel = {
@@ -1178,9 +1193,9 @@ const defaultLearningObjectiveModel = {
   title: '',
   modelType: 'LearningObjectiveModel',
   los: [],
-  lock: new contentTypes.Lock()
+  lock: new contentTypes.Lock(),
 
-}
+};
 
 export class LearningObjectiveModel extends Immutable.Record(defaultLearningObjectiveModel) {
   modelType: 'LearningObjectiveModel';
@@ -1223,75 +1238,75 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    */
   static parseLearningObjective(anObjective: Object): LearningObjective {
 
-    //console.log ("parseLearningObjective : " + JSON.stringify (anObjective));  
+    // console.log ("parseLearningObjective : " + JSON.stringify (anObjective));  
       
-    var newLO: LearningObjective = new LearningObjective();
+    const newLO: LearningObjective = new LearningObjective();
 
-    newLO.id = anObjective ["@id"];
+    newLO.id = anObjective ['@id'];
       
-    newLO.category = anObjective ["@category"];
+    newLO.category = anObjective ['@category'];
       
-    if (anObjective ["@expanded"]) {  
-      newLO.expanded = anObjective ["@expanded"];
+    if (anObjective ['@expanded']) {  
+      newLO.expanded = anObjective ['@expanded'];
     }
       
-    if (anObjective ["@parent"]) {
-      newLO.parent = anObjective ["@parent"];
+    if (anObjective ['@parent']) {
+      newLO.parent = anObjective ['@parent'];
     }      
       
-    if (anObjective ["#annotations"]) {
-      newLO.annotations = Linkable.fromJSON(anObjective ["#annotations"]);
+    if (anObjective ['#annotations']) {
+      newLO.annotations = Linkable.fromJSON(anObjective ['#annotations']);
     }
       
     // Flatten title for now. Keep in mind that once the text is in the
     // title attribute that's where any updates will be stored.  
       
-    if (anObjective ["#array"]) {
-      //console.log ("Found composite title");  
-      let compositeTitle=anObjective ["#array"];
-      let newTitle:string="";  
-      for (let i=0;i<compositeTitle.length;i++) {
-        let testTitleObject:any=compositeTitle [i];
+    if (anObjective ['#array']) {
+      // console.log ("Found composite title");  
+      const compositeTitle = anObjective ['#array'];
+      let newTitle:string = '';  
+      for (let i = 0;i < compositeTitle.length;i++) {
+        const testTitleObject:any = compositeTitle [i];
           
-        //console.log ("Examining sub title object: " + JSON.stringify (testTitleObject));  
+        // console.log ("Examining sub title object: " + JSON.stringify (testTitleObject));  
           
-        if (testTitleObject ["#text"]) {
-          newTitle+=testTitleObject ["#text"];
-          newTitle+=" ";              
+        if (testTitleObject ['#text']) {
+          newTitle += testTitleObject ['#text'];
+          newTitle += ' ';              
         }
           
-        if (testTitleObject ["code"]) {
-          newTitle+=testTitleObject ["code"]["#text"];
-          newTitle+=" ";            
+        if (testTitleObject ['code']) {
+          newTitle += testTitleObject ['code']['#text'];
+          newTitle += ' ';            
         }          
       }
         
       newLO.title = newTitle;         
     } else {     
-      newLO.title = anObjective ["#text"];
+      newLO.title = anObjective ['#text'];
     }   
 
     return (newLO);
   }
 
   static updateModel(oldLDModel: LearningObjectiveModel, treeData: any): LearningObjectiveModel {
-    console.log("updateModel ()");
-    var model = new LearningObjectiveModel({'los': treeData});
-    model = model.with({resource: oldLDModel.resource});
-    model = model.with({guid: oldLDModel.guid});
-    model = model.with({type: oldLDModel.type});
-    model = model.with({id: oldLDModel.id});
-    model = model.with({title: oldLDModel.title})
+    console.log('updateModel ()');
+    let model = new LearningObjectiveModel({ los: treeData });
+    model = model.with({ resource: oldLDModel.resource });
+    model = model.with({ guid: oldLDModel.guid });
+    model = model.with({ type: oldLDModel.type });
+    model = model.with({ id: oldLDModel.id });
+    model = model.with({ title: oldLDModel.title });
     if (!isNullOrUndefined(oldLDModel.lock)) {
-      model = model.with({lock: oldLDModel.lock});
+      model = model.with({ lock: oldLDModel.lock });
     }
     return model;
   }
 
   static addTextObject(aText, aValue) {
-    let newTextObject: Object = new Object();
+    const newTextObject: Object = new Object();
     newTextObject [aText] = new Object();
-    newTextObject [aText]["#text"] = aValue;
+    newTextObject [aText]['#text'] = aValue;
     return (newTextObject);
   }
 
@@ -1300,32 +1315,30 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    * objects based on the parent parameter.
    */
   static reparent(fromSet: Array<LearningObjective>): Array<LearningObjective> {
-    //console.log("reparent ()");
+    // console.log("reparent ()");
 
-    let toSet: Array<LearningObjective> = new Array();
+    const toSet: Array<LearningObjective> = new Array();
 
     for (let i = 0; i < fromSet.length; i++) {
-      let testLO: LearningObjective = fromSet [i];
+      const testLO: LearningObjective = fromSet [i];
 
       // This LO has a parent, reparent ...
       if (testLO.parent) {
-        if ((testLO.parent != "") && (testLO.parent != "unassigned")) {
-          console.log("We have an LO with a parent: " + testLO.parent);
+        if ((testLO.parent !== '') && (testLO.parent !== 'unassigned')) {
+          console.log('We have an LO with a parent: ' + testLO.parent);
 
           // this should be valid since we essentially have a clean fromSet
           for (let j = 0; j < fromSet.length; j++) {
-            let tempLO: LearningObjective = fromSet [j];
+            const tempLO: LearningObjective = fromSet [j];
 
-            if (tempLO.id == testLO.parent) {
+            if (tempLO.id === testLO.parent) {
               tempLO.children.push(testLO);
             }
           }
-        } // This LO doesn't have a parent, just add it to the top-level array
-        else {
+        } else {// This LO doesn't have a parent, just add it to the top-level array
           toSet.push(testLO);
         }
-      }
-      else {
+      } else {
         toSet.push(testLO);
       }
     }
@@ -1337,30 +1350,30 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    *
    */
   pushLO(anLO: LearningObjective, anArray: Array<Object>): void {
-    //console.log("pushLO ()");
+    // console.log("pushLO ()");
 
     // First add the object we're given directly to the array ...
 
-    var testLOContainer: Object = new Object();
-    var ephemeral: Object = new Object();
+    const testLOContainer: Object = new Object();
+    const ephemeral: Object = new Object();
 
-    ephemeral ["@id"] = anLO.id;
-    ephemeral ["@category"] = anLO.category;
-    ephemeral ["@parent"] = anLO.parent;
-    ephemeral ["@expanded"] = anLO.expanded;
-    ephemeral ["#text"] = anLO.title;
+    ephemeral ['@id'] = anLO.id;
+    ephemeral ['@category'] = anLO.category;
+    ephemeral ['@parent'] = anLO.parent;
+    ephemeral ['@expanded'] = anLO.expanded;
+    ephemeral ['#text'] = anLO.title;
 
     // Add all the annotations of type skill to the skill list. Currently
     // we do not define a type on annotations so for now we will assume
     // that all annotations are skills
 
-    ephemeral ["#annotations"] = Linkable.toJSON(anLO.annotations);
+    ephemeral ['#annotations'] = Linkable.toJSON(anLO.annotations);
 
-    anArray.push({"objective": ephemeral});
+    anArray.push({ objective: ephemeral });
 
     // Then we add any children this LO might have ...
 
-    //console.log("Adding " + anLO.children.length + " children ...");
+    // console.log("Adding " + anLO.children.length + " children ...");
 
     for (let j = 0; j < anLO.children.length; j++) {
       this.pushLO(anLO.children [j], anArray);
@@ -1368,63 +1381,63 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
   }
 
   toPersistence(): Object {
-    //console.log("toPersistence ()");
-    let resource: any = this.resource.toPersistence();
-    let flatLOs: Array<Object> = new Array ();
+    // console.log("toPersistence ()");
+    const resource: any = this.resource.toPersistence();
+    const flatLOs: Array<Object> = new Array ();
 
-    var newData: Object = new Object();
-    newData ["objectives"] = new Object();
-    newData ["objectives"]["@id"] = this.id;
-    newData ["objectives"]["#array"] = flatLOs;
-    newData ["objectives"]["#array"].push(LearningObjectiveModel.addTextObject("title", this.title));
+    const newData: Object = new Object();
+    newData ['objectives'] = new Object();
+    newData ['objectives']['@id'] = this.id;
+    newData ['objectives']['#array'] = flatLOs;
+    newData ['objectives']['#array'].push(LearningObjectiveModel.addTextObject('title', this.title));
 
-    for (var i = 0; i < this.los.length; i++) {
-      let tempLO = this.los [i];
+    for (let i = 0; i < this.los.length; i++) {
+      const tempLO = this.los [i];
 
       this.pushLO(tempLO, flatLOs);
     }
 
-    //console.log ("To: " + JSON.stringify (newData));
+    // console.log ("To: " + JSON.stringify (newData));
     const root = {
-      "doc": [newData]
+      doc: [newData],
     };
 
-    console.log("Persisting LO model as: " + JSON.stringify(root));
+    console.log('Persisting LO model as: ' + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
   static fromPersistence(json: Object): LearningObjectiveModel {
 
-    //console.log("fromPersistence ()");
+    // console.log("fromPersistence ()");
 
-    let a = (json as any);
-    //var obData=a.doc.objectives;
-    let loObject: Array<Object> = a.doc ["objectives"];
+    const a = (json as any);
+    // var obData=a.doc.objectives;
+    const loObject: Array<Object> = a.doc ['objectives'];
 
-    let newData: Array<LearningObjective> = new Array();
-    let newTitle: string = "";
-    let newId: string = loObject ["@id"];
+    const newData: Array<LearningObjective> = new Array();
+    const newTitle: string = '';
+    const newId: string = loObject ['@id'];
 
-    let lObjectiveTest = loObject ["#array"];
-    lObjectiveTest.forEach(function (item: any) {
+    const lObjectiveTest = loObject ['#array'];
+    lObjectiveTest.forEach((item) => {
       if (!isNullOrUndefined(item.objective)) {
         newData.push(LearningObjectiveModel.parseLearningObjective(item.objective));
       }
     });
 
-    //console.log("New data LO: " + JSON.stringify(newData));
+    // console.log("New data LO: " + JSON.stringify(newData));
 
-    let model = new LearningObjectiveModel({'los': LearningObjectiveModel.reparent(newData)});
-    model = model.with({resource: Resource.fromPersistence(a)});
-    model = model.with({guid: a.guid});
-    model = model.with({type: a.type});
-    model = model.with({id: a.id});
-    model = model.with({title: a.title})
+    let model = new LearningObjectiveModel({ los: LearningObjectiveModel.reparent(newData) });
+    model = model.with({ resource: Resource.fromPersistence(a) });
+    model = model.with({ guid: a.guid });
+    model = model.with({ type: a.type });
+    model = model.with({ id: a.id });
+    model = model.with({ title: a.title });
     if (!isNullOrUndefined(a.lock)) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
-    return model
+    return model;
   }
 
   /**
@@ -1432,35 +1445,35 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    * of it
    */
   static toFlat(aTree: Array<Linkable>, aToList: Array<Linkable>): Array<Linkable> {
-    //console.log ("toFlat ()");
+    // console.log ("toFlat ()");
 
     if (!aTree) {
       return [];
     }
 
     for (let i = 0; i < aTree.length; i++) {
-      let newObj: Linkable = new Linkable();
+      const newObj: Linkable = new Linkable();
       newObj.id = aTree [i].id;
       newObj.title = aTree [i].title;
       aToList.push(newObj);
 
-      if (aTree [i]["children"]) {
-        if (aTree [i]["children"].length > 0) {
-          //console.log ("Lo has children, processing ...");  
-          let tList = aTree [i]["children"];
+      if (aTree [i]['children']) {
+        if (aTree [i]['children'].length > 0) {
+          // console.log ("Lo has children, processing ...");  
+          const tList = aTree [i]['children'];
           this.toFlat(tList, aToList);
         }
       }
     }
 
-    //console.log ("From tree: " + JSON.stringify (aTree));  
-    //console.log ("To flat: " + JSON.stringify (aToList));
+    // console.log ("From tree: " + JSON.stringify (aTree));  
+    // console.log ("To flat: " + JSON.stringify (aToList));
 
     return (aToList);
   }
 }
 
-//>------------------------------------------------------------------
+// >------------------------------------------------------------------
 
 export type SkillModelParams = {
   resource?: Resource,
@@ -1468,7 +1481,7 @@ export type SkillModelParams = {
   type?: string,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  skills?: any
+  skills?: any,
 };
 
 const defaultSkillModel = {
@@ -1479,8 +1492,8 @@ const defaultSkillModel = {
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   skillDefaults: Skill,
-  skills: []
-}
+  skills: [],
+};
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {
   modelType: 'SkillModel';
@@ -1502,31 +1515,31 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
 
   static updateModel(oldSkillModel: SkillModel, newSkillModel: any): SkillModel {
-    //console.log("updateModel ()");
-    var newModel = new SkillModel({'skills': newSkillModel});
-    newModel = newModel.with({resource: oldSkillModel.resource});
-    newModel = newModel.with({guid: oldSkillModel.guid});
-    newModel = newModel.with({type: oldSkillModel.type});
-    newModel = newModel.with({title: oldSkillModel.title})
+    // console.log("updateModel ()");
+    let newModel = new SkillModel({ skills: newSkillModel });
+    newModel = newModel.with({ resource: oldSkillModel.resource });
+    newModel = newModel.with({ guid: oldSkillModel.guid });
+    newModel = newModel.with({ type: oldSkillModel.type });
+    newModel = newModel.with({ title: oldSkillModel.title });
     if (!isNullOrUndefined(oldSkillModel.lock)) {
-      newModel = newModel.with({lock: oldSkillModel.lock});
+      newModel = newModel.with({ lock: oldSkillModel.lock });
     }
-    //console.log("updateModel () done");
+    // console.log("updateModel () done");
     return newModel;
   }
 
   toPersistence(): Object {
-    //console.log("toPersistence ()");
-    let resource: any = this.resource.toPersistence();
+    // console.log("toPersistence ()");
+    const resource: any = this.resource.toPersistence();
     const doc = [{
-      "skills_model": {
-        "@id": this.resource.id,
-        "title": this.title.text,
-        "skills": this.skills
-      }
+      skills_model: {
+        '@id': this.resource.id,
+        title: this.title.text,
+        skills: this.skills,
+      },
     }];
     const root = {
-      "doc": doc
+      doc,
     };
 
     console.log("SkillModel: " + JSON.stringify(root));
@@ -1535,25 +1548,25 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   }
 
   static fromPersistence(json: Object): SkillModel {
-    let a = (json as any);
-    var replacementSkills: Array<Skill> = new Array<Skill>();
+    const a = (json as any);
+    const replacementSkills: Array<Skill> = new Array<Skill>();
 
-    let skillData: Array<Skill> = a.doc.skills_model["skills"];
+    const skillData: Array<Skill> = a.doc.skills_model['skills'];
 
     for (let i = 0; i < skillData.length; i++) {
-      let newSkill: Skill = new Skill();
+      const newSkill: Skill = new Skill();
       newSkill.fromJSONObject(skillData [i]);
 
       replacementSkills.push(newSkill);
     }
 
-    let model = new SkillModel({'skills': replacementSkills});
-    model = model.with({resource: Resource.fromPersistence(a)});
-    model = model.with({guid: a.guid});
-    model = model.with({type: a.type});
-    model = model.with({title: a.title})
+    let model = new SkillModel({ skills: replacementSkills });
+    model = model.with({ resource: Resource.fromPersistence(a) });
+    model = model.with({ guid: a.guid });
+    model = model.with({ type: a.type });
+    model = model.with({ title: a.title });
     if (!isNullOrUndefined(a.lock)) {
-      model = model.with({lock: contentTypes.Lock.fromPersistence(a.lock)});
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
     return model;
   }
@@ -1566,7 +1579,7 @@ export type MediaModelParams = {
   type?: string
   name?: string,
   _attachments?: any,
-  referencingDocuments?: Immutable.List<types.DocumentId>
+  referencingDocuments?: Immutable.List<types.DocumentId>,
 };
 const defaultMediaModelParams = {
   modelType: 'MediaModel',
@@ -1575,8 +1588,8 @@ const defaultMediaModelParams = {
   type: 'x-oli-webcontent',
   name: '',
   _attachments: {},
-  referencingDocuments: Immutable.List<types.DocumentId>()
-}
+  referencingDocuments: Immutable.List<types.DocumentId>(),
+};
 
 export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
 
@@ -1586,7 +1599,7 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
   type: string;
   name: string;
   _attachments: any;
-  referencingDocuments: Immutable.List<types.DocumentId>
+  referencingDocuments: Immutable.List<types.DocumentId>;
 
   constructor(params?: MediaModelParams) {
     params ? super(params) : super();
@@ -1598,12 +1611,12 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
 
   static fromPersistence(json: Object): MediaModel {
     let model = new MediaModel();
-    let m = json as any;
-    model = model.with({webContent: WebContent.fromPersistence(m)})
-    model = model.with({guid: m.guid});
-    model = model.with({name: m.name});
-    model = model.with({_attachments: m._attachments});
-    model = model.with({referencingDocuments: Immutable.List<types.DocumentId>(m.referencingDocuments)});
+    const m = json as any;
+    model = model.with({ webContent: WebContent.fromPersistence(m) });
+    model = model.with({ guid: m.guid });
+    model = model.with({ name: m.name });
+    model = model.with({ _attachments: m._attachments });
+    model = model.with({ referencingDocuments: Immutable.List<types.DocumentId>(m.referencingDocuments) });
 
     return model;
   }
@@ -1613,7 +1626,7 @@ export class MediaModel extends Immutable.Record(defaultMediaModelParams) {
       modelType: 'MediaModel',
       name: this.name,
       _attachments: this._attachments,
-      referencingDocuments: this.referencingDocuments.toArray()
+      referencingDocuments: this.referencingDocuments.toArray(),
     };
   }
 }

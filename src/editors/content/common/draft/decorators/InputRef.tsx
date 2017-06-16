@@ -41,7 +41,15 @@ const InputRef = (props) => {
       );
 
   } else {
-    return <span>Unsupported</span>;
+    let classes = 'form-control form-control-sm ' + selected;
+    return (
+        <input 
+          data-offset-key={props.offsetKey} 
+          style={{width:'65px', marginRight: '2px', display: 'inline'}}
+          disabled
+          className={classes}
+          value={data.$type}/>
+      );
   }
 
 };

@@ -9,6 +9,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
+import { TextInput } from '../common/TextInput';
 
 import '../common/editor.scss';
 
@@ -37,9 +38,10 @@ export class XrefEditor
     
     this.onTargetEdit = this.onTargetEdit.bind(this);
     this.onIdrefEdit = this.onIdrefEdit.bind(this);
+    this.onPageEdit = this.onPageEdit.bind(this);
 
     const selected = this.props.context.courseModel
-      .resources.toArray().find(r => r.id === this.props.model.idref);
+      .resources.toArray().find(r => r.id === this.props.model.page);
 
     this.state = {
       resources: [],
@@ -65,16 +67,17 @@ export class XrefEditor
     this.props.onEdit(this.props.model.with({ target }));
   }
 
-  onIdrefEdit(id) {
+  onPageEdit(guid) {
 
     const resources = this.props.context.courseModel.resources.toArray();
-    const found = resources.find(r => r.guid === id);
+    const found = resources.find(r => r.guid === guid);
 
-    if (found !== undefined && found !== null) {
-      const idref = found.id;
-      this.props.onEdit(this.props.model.with({ idref }));
-    }
-    
+    this.props.services.fetchIdByGuid(guid)
+      .then(idref => this.props.onEdit(this.props.model.with({ idref })));
+  }
+
+  onIdrefEdit(idref) {
+    this.props.onEdit(this.props.model.with({ idref }));    
   }
 
   render() : JSX.Element {
@@ -84,14 +87,25 @@ export class XrefEditor
     return (
       <div className="itemWrapper">
 
-        <InputLabel label="Activity">
+        <InputLabel label="Page">
           <Select
             editMode={this.props.editMode}
             label=""
             value={this.state.selectedGuid}
-            onChange={this.onIdrefEdit}>
+            onChange={this.onPageEdit}>
             {this.state.resources.map(a => <option value={a._id}>{a.title}</option>)}
           </Select>
+        </InputLabel>
+
+        <InputLabel label="Reference">
+          <TextInput
+            editMode={this.props.editMode}
+            width="300px"
+            type="text"
+            label=""
+            value={this.props.model.idref}
+            onEdit={this.onIdrefEdit}>
+          </TextInput>
         </InputLabel>
 
         <InputLabel label="Target">

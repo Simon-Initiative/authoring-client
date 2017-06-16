@@ -2,6 +2,9 @@ import * as React from 'react';
 
 import * as contentTypes from '../../../../../data/contentTypes';
 import { Table as TableType } from '../../../../../data/content/html/table';
+import { CellData } from '../../../../../data/content/html/celldata';
+import { CellHeader } from '../../../../../data/content/html/cellheader';
+
 import PreformattedText from './PreformattedText';
 import { InteractiveRenderer, InteractiveRendererProps, 
   InteractiveRendererState } from './InteractiveRenderer';
@@ -80,9 +83,21 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
     const empty = <tr><td>&nbsp;&nbsp;&nbsp;</td><td>&nbsp;&nbsp;&nbsp;</td></tr>;
     let renderedRows;
 
-    const renderCell = 
-      cell => <td key={cell.guid}>{getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
-
+    const renderCell = (cell) => {
+      let colspan = 1;
+      if (cell.colspan !== '') {
+        colspan = parseInt(cell.colspan);
+      }
+      if (cell instanceof CellHeader) {
+        
+        return <th colSpan={colspan} key={cell.guid}>
+          {getHtmlDetails(new Html({ contentState: cell.content }))}</th>;
+      } else {
+        return <td colSpan={colspan} key={cell.guid}>
+          {getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
+      }
+    }
+    
     if (rows.length > 0) {
       renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.map(renderCell)}</tr>);
     } else {

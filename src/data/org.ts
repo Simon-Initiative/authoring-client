@@ -191,7 +191,7 @@ export class OrgSequence extends OrgItem{
 
 export class OrgOrganization extends OrgSequence {
     
-  version:string="1.0.0";
+  version:string="1.0";
   description:string="";
         
   constructor() {
