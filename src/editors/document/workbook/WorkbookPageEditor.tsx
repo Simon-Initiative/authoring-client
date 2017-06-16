@@ -139,7 +139,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const blockToolbar = <BlockToolbar/>;
     const lolinker = this.createLinkerDialog ();
     const testArray = this.props.model.head.annotations;  
-    const listItems = testArray.map(lo => <li>{lo.title}</li>); 
+
+    const losById = this.state.los.reduce((p, c) => {
+      p[c.id] = c.title;
+      return p;
+    }, {});
+
+    const listItems = testArray.map(lo => <li key={lo.id}>{losById[lo.id]}</li>); 
     const loDisplay = (testArray as any).size === 0
       ? <p>No learning objectives currently linked</p>
       : <ul>{listItems}</ul>;
