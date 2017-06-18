@@ -72,15 +72,18 @@ export class DispatchBasedServices implements AppServices {
   }
 
   fetchIdByGuid(guid: string) : Promise<string> {
-    return this.fetchAttributesBy(['id'], 'guid', guid);
+    return this.fetchAttributesBy(['id'], 'guid', guid)
+      .then(o => o.id);
   }
 
   fetchGuidById(id: string) : Promise<string> {
-    return this.fetchAttributesBy(['guid'], 'id', id);
+    return this.fetchAttributesBy(['guid'], 'id', id)
+      .then(o => o.guid);
   }
 
   fetchTitleById(internalId: string) : Promise<string> {
-    return this.fetchAttributesBy(['title'], 'id', internalId);
+    return this.fetchAttributesBy(['title'], 'id', internalId)
+      .then(o => o.title);
   }
 
   fetchAttributesBy(

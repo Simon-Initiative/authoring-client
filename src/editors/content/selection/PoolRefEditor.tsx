@@ -77,7 +77,9 @@ export class PoolRefEditor
     this.props.services.dismissModal();
 
     this.props.services.fetchIdByGuid(resource.id)
-    .then(idref => this.props.onEdit(this.props.model.with({ idref })));
+    .then(idref => {
+      this.props.onEdit(this.props.model.with({ idref }));
+    });
   }
 
   onViewPool() {
