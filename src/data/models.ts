@@ -1328,17 +1328,13 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       doc: [newData],
     };
 
-    console.log('Persisting LO model as: ' + JSON.stringify(root));
+    //console.log('Persisting LO model as: ' + JSON.stringify(root));
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
   static fromPersistence(json: Object): LearningObjectiveModel {
-
-    // console.log("fromPersistence ()");
-
     const a = (json as any);
-    // var obData=a.doc.objectives;
     const loObject: Array<Object> = a.doc ['objectives'];
 
     const newData: Array<LearningObjective> = new Array();
@@ -1352,8 +1348,6 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       }
     });
 
-    // console.log("New data LO: " + JSON.stringify(newData));
-
     let model = new LearningObjectiveModel({ los: LearningObjectiveModel.reparent(newData) });
     model = model.with({ resource: Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
@@ -1363,6 +1357,9 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
     if (!isNullOrUndefined(a.lock)) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
+      
+    //console.log ("LO fromPersistence: " + JSON.stringify (model));  
+      
     return model;
   }
 
@@ -1371,8 +1368,6 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
    * of it
    */
   static toFlat(aTree: Array<Linkable>, aToList: Array<Linkable>): Array<Linkable> {
-    // console.log ("toFlat ()");
-
     if (!aTree) {
       return [];
     }
@@ -1384,16 +1379,12 @@ export class LearningObjectiveModel extends Immutable.Record(defaultLearningObje
       aToList.push(newObj);
 
       if (aTree [i]['children']) {
-        if (aTree [i]['children'].length > 0) {
-          // console.log ("Lo has children, processing ...");  
+        if (aTree [i]['children'].length > 0) {  
           const tList = aTree [i]['children'];
           this.toFlat(tList, aToList);
         }
       }
     }
-
-    // console.log ("From tree: " + JSON.stringify (aTree));  
-    // console.log ("To flat: " + JSON.stringify (aToList));
 
     return (aToList);
   }
@@ -1429,7 +1420,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   skillDefaults: Skill;
-  skills: Array<Skill>;
+  skills: Array<Object>;
 
   constructor(params?: SkillModelParams) {  
     params ? super(params) : super(); 
@@ -1441,7 +1432,6 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
 
   static updateModel(oldSkillModel: SkillModel, newSkillModel: any): SkillModel {
-    // console.log("updateModel ()");
     let newModel = new SkillModel({ skills: newSkillModel });
     newModel = newModel.with({ resource: oldSkillModel.resource });
     newModel = newModel.with({ guid: oldSkillModel.guid });
@@ -1450,50 +1440,61 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     if (!isNullOrUndefined(oldSkillModel.lock)) {
       newModel = newModel.with({ lock: oldSkillModel.lock });
     }
-    // console.log("updateModel () done");
     return newModel;
   }
-
+    
   toPersistence(): Object {
     // console.log("toPersistence ()");
     const resource: any = this.resource.toPersistence();
-    const doc = [{
+    let doc = [{
       skills_model: {
-        '@id': this.resource.id,
-        title: this.title.text,
-        skills: this.skills,
+        '@id': this.resource.id,        
+        '#array': this.skills,
       },
     }];
+      
+    // Add the title object to the array where we have the skills in
+    // a very clumsy way.
+    let titleObj=new Object ();
+    titleObj ["title"]=new Object ();  
+    titleObj ["title"]["#text"]=this.title.text;      
+    doc [0]["skills_model"]["#array"].push (titleObj);  
+      
     const root = {
       doc,
     };
 
-    console.log("SkillModel: " + JSON.stringify(root));
-
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
 
-  static fromPersistence(json: Object): SkillModel {
+  static fromPersistence(json: Object): SkillModel {      
     const a = (json as any);
-    const replacementSkills: Array<Skill> = new Array<Skill>();
-
-    const skillData: Array<Skill> = a.doc.skills_model['skills'];
+    const replacementSkills: Array<Skill> = new Array<Skill>();  
+    const skillData: Array<Skill> = a.doc.skills_model['#array'];
+     
+    let extractedTitle:contentTypes.Title=new contentTypes.Title ("Unassigned");  
 
     for (let i = 0; i < skillData.length; i++) {
       const newSkill: Skill = new Skill();
-      newSkill.fromJSONObject(skillData [i]);
-
-      replacementSkills.push(newSkill);
+      let testSkillObj:Object=skillData [i];
+        
+      if (testSkillObj ["title"]) {
+        extractedTitle=new contentTypes.Title ({text : testSkillObj ["title"]["#text"]});
+      } else {                
+        newSkill.fromJSONObject(testSkillObj as Skill);
+        replacementSkills.push(newSkill);          
+      }    
     }
 
     let model = new SkillModel({ skills: replacementSkills });
     model = model.with({ resource: Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
     model = model.with({ type: a.type });
-    model = model.with({ title: a.title });
+    model = model.with({ title: extractedTitle });
     if (!isNullOrUndefined(a.lock)) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
+      
     return model;
   }
 }
