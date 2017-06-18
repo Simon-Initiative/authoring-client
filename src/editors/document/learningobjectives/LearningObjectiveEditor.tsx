@@ -158,7 +158,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     assignParent (aLOObject:LearningObjective,anId:string):void {
-      console.log ("assignParent ()");
+      //console.log ("assignParent ()");
 
       aLOObject.parent=anId;
 
@@ -176,7 +176,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       let immutableHelper = this.state.treeData.slice();
 
       if (newData) {
-        console.log ("We have alternative facts, let's use those instead ...");
+        //console.log ("We have alternative facts, let's use those instead ...");
         
         // We should really unify this across the code, it's very brittle
         if (newData ["treeData"]) {
@@ -192,7 +192,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         return;
       }
 
-      console.log ("assignParents ("+immutableHelper.length+")");
+      //console.log ("assignParents ("+immutableHelper.length+")");
 
       for (let i=0;i<immutableHelper.length;i++) {
         this.assignParent(immutableHelper [i],"");
