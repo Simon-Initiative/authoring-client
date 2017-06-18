@@ -32,17 +32,24 @@ export default function handle(
   if (start === 0) {
     return handleBackspaceAtBeginning(editorState, onChange);
   } else if (start === currentBlock.text.length) {
+    // Handle backspacing at the forced space that exists 
+    // when an entity is the last thing in a block
     const entityBefore = getEntityBefore(start - 1, editorState);
-    const moveBackward = new SelectionState({
-      anchorKey: currentBlock.key,
-      anchorOffset: start - 1,
-      focusKey: currentBlock.key,
-      focusOffset: start - 1,
-      isBackwards: false,
-      hasFocus: false,
-    });
-    onChange(EditorState.forceSelection(editorState, moveBackward));
-    return 'handled';
+    if (entityBefore !== null) {
+      const moveBackward = new SelectionState({
+        anchorKey: currentBlock.key,
+        anchorOffset: start - 1,
+        focusKey: currentBlock.key,
+        focusOffset: start - 1,
+        isBackwards: false,
+        hasFocus: false,
+      });
+      onChange(EditorState.forceSelection(editorState, moveBackward));
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+    
   } else {
     const entityBefore = getEntityBefore(start, editorState);
     if (entityBefore !== null) {

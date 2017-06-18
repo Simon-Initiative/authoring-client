@@ -26,6 +26,7 @@ import handleBackspace from './keyhandlers/backspace';
 import { getCursorPosition, hasSelection, getPosition } from './utils';
 import { insertBlocksAfter } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
+import guid from '../../../../utils/guid';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 
@@ -239,6 +240,22 @@ function appendText(contentBlock, contentState, text) {
     
 }
 
+function updateData(contentBlock, contentState, blockData) {
+
+  const targetRange = new SelectionState({
+    anchorKey: contentBlock.key,
+    focusKey: contentBlock.key,
+    anchorOffset: 0,
+    focusOffset: contentBlock.text.length,
+  });
+
+  return Modifier.setBlockData(
+    contentState,
+    targetRange,
+    blockData);
+    
+}
+
 function addSpaceAfterEntity(editorState, block) {
     
   const blockKey = block.key;
@@ -249,6 +266,41 @@ function addSpaceAfterEntity(editorState, block) {
     
   } else {
     return editorState;
+  }
+}
+
+type StateAndSeen = { editorState: EditorState, seenIds: Object };
+
+function deDupeIds(stateAndSeen: StateAndSeen, block) {
+    
+  const { editorState, seenIds } = stateAndSeen;
+
+  const blockKey = block.key;
+  const characterList = block.characterList;
+
+  const id = block.data === undefined || block.data === null
+    ? undefined
+    : block.data.get('id');
+
+  if (id !== undefined && seenIds[id]) {
+    // Dedupe
+    const blockData = Immutable.Map<string, string>()
+      .set('id', guid())
+      .set('title', '')
+      .set('type', '');
+
+    const modifiedContent = updateData(block, editorState.getCurrentContent(), blockData);
+    return { 
+      editorState: EditorState.push(
+        editorState, modifiedContent, editorState.getLastChangeType()),
+      seenIds,
+    };
+    
+  } else if (id !== undefined) {
+    seenIds[id] = true;
+    return { editorState, seenIds };
+  } else {
+    return stateAndSeen;
   }
 }
 
@@ -310,6 +362,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           const blocks = contentState.blockMap;
           editorState = blocks.reduce(addSpaceAfterEntity, editorState);
           contentState = editorState.getCurrentContent();
+
+          const seenIds = {};
+          const result = contentState.blockMap.reduce(deDupeIds, { editorState, seenIds });
+          editorState = result.editorState;
+          contentState = editorState.getCurrentContent();
+
           this.lastContent = contentState;
           this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
         } else {

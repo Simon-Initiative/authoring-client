@@ -1470,7 +1470,10 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   static fromPersistence(json: Object): SkillModel {      
     const a = (json as any);
     const replacementSkills: Array<Skill> = new Array<Skill>();  
-    const skillData: Array<Skill> = a.doc.skills_model['#array'];
+    const skillData: Array<Skill> = 
+      a.doc.skills_model.skills !== undefined
+      ? a.doc.skills_model.skills
+      : a.doc.skills_model['#array'];
      
     let extractedTitle:contentTypes.Title=new contentTypes.Title ("Unassigned");  
 

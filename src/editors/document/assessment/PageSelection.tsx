@@ -46,7 +46,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, { tex
   }
 
   renderPage(page: contentTypes.Page) {
-    return <a className="dropdown-item" 
+    return <a key={page.guid} className="dropdown-item" 
       onClick={this.onChange.bind(this, page)}>{page.title.text}</a>;
   }
   
@@ -71,7 +71,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, { tex
           </button>
 
           <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {this.props.pages.map(p => this.renderPage(p))}
+            {this.props.pages.toArray().map(p => this.renderPage(p))}
           </div>
         </div>
           
