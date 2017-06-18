@@ -269,7 +269,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       }
     });
 
-    console.log ("Workbook model: " + JSON.stringify (model));  
+    //console.log ("Workbook model: " + JSON.stringify (model));  
       
     return model;
   }
@@ -319,7 +319,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       doc,
     };
       
-    console.log ("Workbook toPersistence: " + JSON.stringify (root));  
+    //console.log ("Workbook toPersistence: " + JSON.stringify (root));  
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }

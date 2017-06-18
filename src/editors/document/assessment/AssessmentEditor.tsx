@@ -61,25 +61,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentDidMount() {                    
     super.componentDidMount();
-    /*  
-    let resourceList:Immutable.OrderedMap<string, Resource>=this.props.courseDoc ["model"]["resources"] as Immutable.OrderedMap<string, Resource>;
-          
-    resourceList.map((value, id) => {          
-      if (value.type=="x-oli-skills_model") {
-        persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => {
-          let sModel:models.SkillModel=skillDocument.model as models.SkillModel;  
-          this.setState ({skillModel: sModel});                  
-        });
-      }          
-    })
-    */
-      
+
     this.props.context.courseModel.resources.map((value, id) => {        
       if (value.type === 'x-oli-skills_model') {
-        console.log ('Found skills document, loading ...');  
+        //console.log ('Found skills document, loading ...');  
         persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {
-          console.log ('Loaded skill document, assinging ...');  
+          //console.log ('Loaded skill document, assinging ...');  
           const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
           this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
         });
@@ -101,7 +89,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onNodeRemove(guid: string) {
-
     let page = this.props.model.pages.get(this.state.current);
     page = page.with({ nodes: page.nodes.delete(guid) });
 
@@ -253,16 +240,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
    * 
    */
   createLinkerDialog () {
-    if (!this.state.skillModel){
-      return (<LearningObjectiveLinker 
-        title="Available Skills" 
-        errorMessage="No skills available. Did you create a skills document?"
-        closeModal={this.closeModal.bind (this)} 
-        sourceData={[]} 
-        modalIsOpen={this.state.modalIsOpen} 
-        targetAnnotations={new Array<Linkable>()} />);         
-    }
-
     return (<LearningObjectiveLinker 
       title="Available Skills" 
       closeModal={this.closeModal.bind (this)} 
@@ -276,7 +253,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.current);
     const nodeEditors = page.nodes.toArray().map(n => this.renderNode(n));
-    const skilllinker = this.createLinkerDialog ();    
+    let skilllinker;
+            
+    if (this.state.skillModel) {  
+      skilllinker= this.createLinkerDialog ();
+    }        
     
     return (
       <div>
