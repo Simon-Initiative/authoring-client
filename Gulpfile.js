@@ -110,6 +110,10 @@ gulp.task('clean:dev', function() {
   });
 });
 
+gulp.task('install-pre-commit-hook', function() {
+    gulp.src('hooks/pre-commit')
+        .pipe(gulp.dest('.git/hooks'));
+});
 
 gulp.task('build', function(callback) {
   // run webpack
@@ -146,17 +150,17 @@ gulp.task('tslint', function(cb) {
 
 
 gulp.task('dev', function(cb) {
-  runSequence('prelude', 'clean:dev', 'setupDev', 'tslint', 'serve', cb);
+  runSequence('install-pre-commit-hook', 'prelude', 'clean:dev', 'setupDev', 'tslint', 'serve', cb);
 });
 
 gulp.task('dist', function(cb) {
-  runSequence('prelude', 'clean', 'setupDist', 'tslint', 'build', 'postdist', cb);
+  runSequence('install-pre-commit-hook', 'prelude', 'clean', 'setupDist', 'tslint', 'build', 'postdist', cb);
 });
 
 
 
 gulp.task('test', function(cb) {
-  runSequence('clean:test', 'setup:test', 'exec:test', cb);
+  runSequence('install-pre-commit-hook', 'clean:test', 'setup:test', 'exec:test', cb);
 });
 
 gulp.task('test-dist', function(cb) {
