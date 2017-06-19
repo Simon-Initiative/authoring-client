@@ -6,6 +6,8 @@ import { modal } from './reducers/modal';
 import { requests } from './reducers/requests';
 import { titles } from './reducers/titles';
 
+
+var x  = 3;
 const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
   course,         // Information about current course, null if no current course
