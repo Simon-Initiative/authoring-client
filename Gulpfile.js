@@ -3,6 +3,7 @@
 
 var gulp = require('gulp');
 var open = require('gulp-open');
+var chmod = require('gulp-chmod');
 var del = require('del');
 var gutil = require('gulp-util');
 var run = require('gulp-run');
@@ -112,6 +113,7 @@ gulp.task('clean:dev', function() {
 
 gulp.task('install-pre-commit-hook', function() {
     gulp.src('hooks/pre-commit')
+        .pipe(chmod(0o777))
         .pipe(gulp.dest('.git/hooks'));
 });
 
