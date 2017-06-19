@@ -7,8 +7,8 @@ type CourseActions =
     OtherAction
 
 type CurrentCourse = {
-    model: models.CourseModel
-}
+  model: models.CourseModel,
+};
 
 export function course(state = null, action: CourseActions): CurrentCourse {
     switch (action.type) {
