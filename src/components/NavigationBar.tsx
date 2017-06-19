@@ -160,12 +160,12 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         staticContent: false,
         onclick: this.placeholderMenuHandler,
       },
-      others: {
-        label: 'Others',
-        icon: 'M',
-        staticContent: false,
-        onclick: this.placeholderMenuHandler,
-      },
+      // others: {
+      //   label: 'Others',
+      //   icon: 'M',
+      //   staticContent: false,
+      //   onclick: this.placeholderMenuHandler,
+      // },
       learning: {
         label: 'Learning',
         staticContent: true,
