@@ -804,9 +804,9 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
 
             for (let t=0;t<testNode.children.length;t++) {
               let mergeNode:OrgItem=testNode.children [t];
-              if (mergeNode.typeDescription!=itemType) {
+              //if (mergeNode.typeDescription!=itemType) {
                 mergedList.push (mergeNode);             
-              }
+              //}
             }
 
             // Then copy over all the assessment nodes as they 
