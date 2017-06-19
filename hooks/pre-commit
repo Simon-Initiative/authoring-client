@@ -2,7 +2,15 @@
 
 TSLINT="$(git rev-parse --show-toplevel)/node_modules/.bin/tslint"
 
-for file in $(git diff --cached --name-only | grep -E '\.ts[x]?$')
+for file in $(git diff --cached --name-only | grep -E '\.ts?$')
+do
+        git show ":$file" | "$TSLINT" "$file"
+        if [ $? -ne 0 ]; then
+                exit 1
+        fi
+done
+
+for file in $(git diff --cached --name-only | grep -E '\.tsx?$')
 do
         git show ":$file" | "$TSLINT" "$file"
         if [ $? -ne 0 ]; then
