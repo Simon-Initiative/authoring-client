@@ -9,7 +9,10 @@ import { createStore, applyMiddleware } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
+
+// tslint:disable-next-line
 var Provider = (require('react-redux') as RR).Provider;
+// tslint:disable-next-line
 var createLogger = require('redux-logger');
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
@@ -26,7 +29,7 @@ import './stylesheets/main.scss';
 import './stylesheets/sortabletree.scss';
 
 interface RR {
-    Provider: any;
+  Provider: any;
 }
 
 function initStore() {
@@ -35,7 +38,7 @@ function initStore() {
 
   const createStoreWithMiddleware = applyMiddleware(
     thunkMiddleware, // lets us dispatch async actions
-    loggerMiddleware // middleware that logs actions
+    loggerMiddleware, // middleware that logs actions
   )(createStore);
 
   return createStoreWithMiddleware(rootReducer);
