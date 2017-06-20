@@ -113,9 +113,9 @@ function translateBlock(
     translateParagraph(rawBlock, draftBlock, entityMap, context);
 
   } else if (isOrderedListBlock(rawBlock)) {
-    translateList('ol', rawBlock, block, iterator, entityMap, context);
+    translateList('ol', rawBlock, draftBlock, iterator, entityMap, context);
   } else if (isUnorderedListBlock(rawBlock)) {
-    translateList('ul', rawBlock, block, iterator, entityMap, context);
+    translateList('ul', rawBlock, draftBlock, iterator, entityMap, context);
   } else if (isTable(rawBlock, entityMap)) {
     translateTable(rawBlock, draftBlock, entityMap, context);
   } else if (isCodeBlock(rawBlock, entityMap)) {
