@@ -809,13 +809,14 @@ function translateOverlappingGroup(
         let style;
         if (container === undefined) {
           console.log('undefined style: ' + s);
-          style = styleContainers.BOLD();
+          style = Object.assign({}, styleContainers.BOLD());
         } else {
-          style = Object.assign({}, styleContainers[s]());
+          style = Object.assign({}, container());
         }
         
         // Now root this style object into the parent style
-        last[common.getKey(last)] = style;
+        const key = common.getKey(last);
+        last[key][common.getKey(style)] = style[common.getKey(style)];
         last = style; 
       }
     });
@@ -843,7 +844,9 @@ function translateOverlappingGroup(
     }
   }
 
-  createStyleTree(current, begin, (offset + length));
+  createStyleTree(
+    chars.get(offset + length - 1).getStyle(), 
+    begin, (offset + length));
     
   return container;
 }
@@ -942,7 +945,8 @@ function splitOverlappingStyles(
             updatedInlines.push(
               { offset: linkRange.offset, length: linkRange.length, style: s.style });
             updatedInlines.push(
-              { offset: linkRange.offset, length: linkRange.length, style: s.style });
+              { offset: linkRange.offset + linkRange.length, 
+                length: sEndOffset - (linkEndOffset), style: s.style });
           
           } else {
             updatedInlines.push(
