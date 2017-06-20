@@ -862,7 +862,7 @@ function groupOverlappingRanges(ranges: InlineOrEntity[]) : OverlappingRanges[] 
     const g = groups[groups.length - 1];
     const endOffset = g.offset + g.length;
     if (s.offset < endOffset) {
-      g.length = (s.offset + s.length) - g.offset;
+      g.length = Math.max((s.offset + s.length) - g.offset, g.length);
       g.ranges.push(s);
     } else {
       groups.push({ offset: s.offset, length: s.length, ranges: [s] });
