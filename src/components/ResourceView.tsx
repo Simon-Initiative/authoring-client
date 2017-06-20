@@ -15,7 +15,6 @@ import guid from '../utils/guid';
 interface ResourceView {
   viewActions: any;
 }
-
 export interface ResourceViewOwnProps {
   // course: any;
   dispatch: any;
@@ -144,6 +143,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     return (
       <div className="">
         {creationTitle}
+        {this.renderCreation()}
         <table className="table table-striped table-hover">
           <thead>
           <tr>
@@ -161,7 +161,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderCreation() {
     return (
-      <div className="input-group col-12">
+      <div className="input-group col-4 float-right">
         <form className="form-inline">
           <input type="text" ref="title"
                  className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
@@ -175,14 +175,13 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   render() {
     return (
-      <div className="container-fluid">
+      <div className="container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
-                  {this.renderCreation()}
                   {this.renderResources()}
                 </div>
               </div>

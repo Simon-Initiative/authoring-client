@@ -12,6 +12,9 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
     outline: 0px solid transparent;
 }
 
+.nav-link {
+	cursor: pointer;
+}
 .document {
 
 	h2 {
@@ -325,6 +328,7 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 		min-height: 142px;
     	position: relative;
     	transition: box-shadow 0.3s ease-in-out;
+    	margin-bottom: 20px;
 
     	&:hover {
     		box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.17);
@@ -459,7 +463,7 @@ h1 {
 	>span {
 		display: block;
 		text-align: center;
-		background-color: blue;
+		background-color: transparent;
 	}
 	.preview {
 		// margin-right: 1rem;
@@ -496,6 +500,14 @@ h1 {
 			font-family: $sans-font !important;
 			font-size: 16px;
 			font-weight: 600;
+		}
+	}
+
+	.skillTitle {
+		h2 {
+			font-size: 1.3em;
+			font-family: $serif-font;
+			margin: 10px;
 		}
 	}
 }
