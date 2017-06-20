@@ -6,7 +6,7 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
 import { Resource } from '../../data/resource';
-import guid from "../guid";
+import guid from '../guid';
 
 interface AssessmentSelection {
 
@@ -48,7 +48,10 @@ class AssessmentSelection
     persistence.fetchCourseResources(this.props.courseId)
     .then((resources) => {
       this.setState({
-        assessments: resources.map(d => ({ id: d._id, title: d.title })),
+        assessments: resources
+          .filter(d => d.type === types.LegacyTypes.assessment2 
+            || d.type === types.LegacyTypes.inline)
+          .map(d => ({ id: d._id, title: d.title })),
       });
     });
   }
@@ -59,8 +62,8 @@ class AssessmentSelection
 
     const title = (this.refs['title'] as any).value;
     // :TODO: get a real id value from user ui input field?
-    const id = title.split(" ")[0] + guid();
-    const resource = { id: id, type: 'x-oli-assessment', title };
+    const id = title.split(' ')[0] + guid();
+    const resource = { id, type: 'x-oli-assessment', title };
     const res = Resource.fromPersistence(resource);
     const assessment = new models.AssessmentModel({
       resource: res,
