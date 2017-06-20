@@ -1,32 +1,24 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import {Resource} from "../../../data/resource";
-import { LOTypes, LearningObjective } from '../../../data/los';
-import * as types from '../../../data/types';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
-import * as viewActions from '../../../actions/view';
+import { LearningObjective } from '../../../data/los';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 
-import SortableTree from 'react-sortable-tree';
-import { toggleExpandedForAll } from 'react-sortable-tree';
-import NodeRendererDefault from 'react-sortable-tree';
+import SortableTree, { toggleExpandedForAll } from 'react-sortable-tree';
 
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 
-import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgModule,OrgOrganization} from '../../../data/org';
+import { OrgItem } from '../../../data/org';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { AppContext } from '../../common/AppContext';
 
-const tempnavstyle= {
-    h2: {
-        marginRight: '10px'
-    }
+const tempnavstyle = {
+  h2: {
+    marginRight: '10px',
+  },
 };
 
 interface LearningObjectiveEditor {
@@ -34,437 +26,444 @@ interface LearningObjectiveEditor {
 }
 
 export interface LearningObjectiveEditorState extends AbstractEditorState {
-  treeData : any;  
-  modalIsOpen : boolean;
+  treeData: any;
+  modalIsOpen: boolean;
   model: any;
   context: AppContext;
   skills: any;
-  target : any;
+  target: any;
   document: any;
   documentId: string;
-  titleIndex:number; 
+  titleIndex: number;
 }
 
-export interface LearningObjectiveEditorProps extends AbstractEditorProps<models.LearningObjectiveModel> {
+export interface LearningObjectiveEditorProps extends
+  AbstractEditorProps<models.LearningObjectiveModel> {
   dispatch: any;
   documentId: string;
   document: any;
-  userId: string;    
+  userId: string;
   context: AppContext;
 }
 
 /**
-*
-*/
-class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveModel,LearningObjectiveEditorProps, LearningObjectiveEditorState> {
+ *
+ */
+class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveModel,
+  LearningObjectiveEditorProps, LearningObjectiveEditorState> {
 
-    /**
-     * 
-     */
-    constructor(props) {
-        console.log ("LearningObjectiveEditor ()");
-        
-        super(props, {
-                        treeData: [],    
-                        context: props.context,
-                        skills: null,
-                        target: null,
-                        documentId: props.context.documentId,
-                        model: props.model,
-                        document: {},
-                        modalIsOpen: false,
-                        titleIndex: 0                      
-                     });                        
-    }
-  
-    /**
-     *
-     */    
-    componentDidMount() {                    
-      console.log ("componentDidMount ()");
-      let docu = new persistence.Document({
-        _courseId: this.props.context.courseId,
-        _id: this.props.model.guid,
-        model: this.props.model
+  /**
+   *
+   */
+  constructor(props) {
+    console.log('LearningObjectiveEditor ()');
+
+    super(props, {
+      treeData: [],
+      context: props.context,
+      skills: null,
+      target: null,
+      documentId: props.context.documentId,
+      model: props.model,
+      document: {},
+      modalIsOpen: false,
+      titleIndex: 0,
+    });
+  }
+
+  /**
+   *
+   */
+  componentDidMount() {
+    console.log('componentDidMount ()');
+    const docu = new persistence.Document({
+      _courseId: this.props.context.courseId,
+      _id: this.props.model.guid,
+      model: this.props.model,
+    });
+
+    this.setState({ treeData: this.props.model.los, document: docu }, function () {
+      this.props.context.courseModel.resources.map((value, id) => {
+        if (value.type === 'x-oli-skills_model') {
+          persistence.retrieveDocument(this.props.context.courseId, id).then((skillDocument) => {
+            const skillModel: models.SkillModel = skillDocument.model as models.SkillModel;
+            this.setState({ skills: skillModel.skills });
+          });
+        }
       });
+    });
+  }
 
-      this.setState({treeData: this.props.model.los, document: docu}, function (){  
-        this.props.context.courseModel.resources.map((value, id) => {        
-          if (value.type=="x-oli-skills_model") {
-            persistence.retrieveDocument (this.props.context.courseId,id).then(skillDocument => 
-            {
-              let skillModel:models.SkillModel=skillDocument.model as models.SkillModel;   
-              this.setState ({skills: skillModel.skills}); 
-            });
-          }          
-        });
-      });    
-    }              
+  /**
+   * This method is called by the tree component and even though we could access
+   * the state directly we're going to assume that the tree component made some
+   * changes that haven't been reflected in the global component state yet.
+   */
+  processDataChange(newData: any) {
+    console.log('processDataChange ()');
 
-     /**
-     * This method is called by the tree component and even though we could access
-     * the state directly we're going to assume that the tree component made some
-     * changes that haven't been reflected in the global component state yet.
-     */
-    processDataChange (newData: any) {
-      console.log ("processDataChange ()");
-                    
-      this.onLOEdit (newData.treeData);      
+    this.onLOEdit(newData.treeData);
+  }
+
+  /**
+   *
+   */
+  expand(expanded) {
+    this.setState({
+      modalIsOpen: false,
+      treeData: toggleExpandedForAll({
+        treeData: this.state.treeData,
+        expanded,
+      }),
+    });
+  }
+
+  /**
+   *
+   */
+  expandAll() {
+    this.expand(true);
+  }
+
+  /**
+   *
+   */
+  collapseAll() {
+    this.expand(false);
+  }
+
+  /**
+   *
+   */
+  static getTextFromNode(aNode: any): string {
+
+    console.log('getTextFromNode: ' + JSON.stringify(aNode));
+
+    // Check for old style text nodes
+    if (aNode ['#text']) {
+      return (aNode ['#text']);
     }
 
-    /**
-     * 
-     */
-    expand(expanded) {
-      this.setState({
-         modalIsOpen : false,
-         treeData: toggleExpandedForAll({
-           treeData: this.state.treeData,                
-           expanded,
-         }),
-      });
-    }
+    return ('');
+  }
 
-    /**
-     * 
-     */
-    expandAll() {
-        this.expand(true);
-    }
+  /**
+   *
+   */
+  assignParent(aLOObject: LearningObjective, anId: string): void {
+    // console.log ("assignParent ()");
 
-    /**
-     * 
-     */
-    collapseAll() {
-        this.expand(false);
-    }
-    
-    /**
-     * 
-     */
-    static getTextFromNode (aNode: any) : string {
-        
-      console.log ("getTextFromNode: " + JSON.stringify (aNode));
-          
-      // Check for old style text nodes  
-      if (aNode ['#text']) { 
-        return (aNode ['#text']);
-      } 
+    aLOObject.parent = anId;
+    aLOObject.children.forEach((loHelper) => {
+      this.assignParent(loHelper, aLOObject.id);
+    });
+    // for (let i = 0; i < aLOObject.children.length; i++) {
+    //   const loHelper = aLOObject.children [i];
+    //
+    //   this.assignParent(loHelper, aLOObject.id);
+    // }
+  }
 
-      return ("");
-    }
- 
-    /**
-     * 
-     */
-    assignParent (aLOObject:LearningObjective,anId:string):void {
-      //console.log ("assignParent ()");
+  /**
+   *
+   */
+  assignParents(newData: any): void {
+    let immutableHelper = this.state.treeData.slice();
 
-      aLOObject.parent=anId;
+    if (newData) {
+      // console.log ("We have alternative facts, let's use those instead ...");
 
-      for (let i=0;i<aLOObject.children.length;i++) {
-        let loHelper=aLOObject.children [i];
-
-        this.assignParent(loHelper,aLOObject.id);
+      // We should really unify this across the code, it's very brittle
+      if (newData ['treeData']) {
+        immutableHelper = newData ['treeData'];
+      } else {
+        immutableHelper = newData;
       }
     }
 
-    /**
-     * 
-     */
-    assignParents (newData:any):void {    
-      let immutableHelper = this.state.treeData.slice();
-
-      if (newData) {
-        //console.log ("We have alternative facts, let's use those instead ...");
-        
-        // We should really unify this across the code, it's very brittle
-        if (newData ["treeData"]) {
-         immutableHelper=newData ["treeData"];
-        } else {  
-         immutableHelper=newData;
-        }    
-      }
-        
-      if (immutableHelper==null)
-      {
-        console.log ("Bump");
-        return;
-      }
-
-      //console.log ("assignParents ("+immutableHelper.length+")");
-
-      for (let i=0;i<immutableHelper.length;i++) {
-        this.assignParent(immutableHelper [i],"");
-      }
-
-      return (immutableHelper);      
+    if (immutableHelper === null) {
+      console.log('Bump');
+      return;
     }
 
-    /**
-     * 
-     */
+    // console.log ("assignParents ("+immutableHelper.length+")");
+    immutableHelper.forEach((e) => {
+      this.assignParent(e, '');
+    });
+    // for (let i = 0; i < immutableHelper.length; i++) {
+    //   this.assignParent(immutableHelper [i], '');
+    // }
+
+    return (immutableHelper);
+  }
+
+  /**
+   *
+   */
+  /*
+   saveToDB (newData?:any): void {
+   console.log ("saveToDB ()");
+
+   this.onLOEdit (newData);
+   }
+   */
+
+  /**
+   *
+   */
+  onLOEdit(newData?: any) {
+    console.log('onLOEdit ()');
+
+    let newModel;
+
+    const reparented: any = this.assignParents(newData);
+
+    newModel = models.LearningObjectiveModel.updateModel(this.state.model, reparented);
+
+    // console.log ("Giving the
+    // following model to this.props.onLOEdit: " + JSON.stringify (newModel));
+
+    this.setState({ modalIsOpen: false, treeData: newModel.los }, function () {
+      // this.props.onEdit(newModel);
+      this.handleEdit(newModel);
+    });
+  }
+
+  /**
+   * Note that this manual method of adding a new node does not generate an
+   * onChange event. That's why we call extractData manually as the very
+   * last function call.
+   */
+  addNode(anEvent) {
+
+    console.log('addNode ()');
+
+    const immutableHelper = this.state.treeData.slice();
+
+    if (immutableHelper === null) {
+      console.log('Bump');
+      return;
+    }
+
+    const newNode: LearningObjective = new LearningObjective();
+    newNode.title = ('Title ' + this.state.titleIndex);
+    immutableHelper.push(newNode);
+
+    this.setState({ modalIsOpen: false, titleIndex: this.state.titleIndex + 1 }, () => {
+      this.onLOEdit(immutableHelper);
+    });
+
     /*
-    saveToDB (newData?:any): void {
-        console.log ("saveToDB ()");
-        
-        this.onLOEdit (newData);     
-    } 
-    */   
-    
-    /**
-     * 
+     this.setState({
+     modalIsOpen : false,
+     treeData: immutableHelper
+     },function (){
+     this.saveToDB (immutableHelper);
+     });
      */
-    onLOEdit(newData?:any) {
-      console.log ("onLOEdit ()");  
-        
-      let newModel;
-        
-      let reparented:any=this.assignParents (newData);
-  
-      newModel=models.LearningObjectiveModel.updateModel (this.state.model,reparented);
-       
-      //console.log ("Giving the following model to this.props.onLOEdit: " + JSON.stringify (newModel));  
-                
-      this.setState ({modalIsOpen: false, treeData: newModel.los}, function () {
-        //this.props.onEdit(newModel);
-        this.handleEdit (newModel);  
-      });  
-    }
-        
-    /**
-     * Note that this manual method of adding a new node does not generate an
-     * onChange event. That's why we call extractData manually as the very
-     * last function call.
-     */
-    addNode (anEvent) {
-        
-        console.log ("addNode ()");
-                
-        var immutableHelper = this.state.treeData.slice();
-        
-        if (immutableHelper==null)
-        {
-            console.log ("Bump");
-            return;
-        }
-        
-        var newNode:LearningObjective=new LearningObjective ();
-        newNode.title=("Title " + this.state.titleIndex);
-        immutableHelper.push (newNode);
-        
-        this.setState ({modalIsOpen : false,titleIndex: this.state.titleIndex+1}, () => {
-          this.onLOEdit (immutableHelper);
-        });
-        
-        /*
-        this.setState({
-          modalIsOpen : false, 
-          treeData: immutableHelper
-        },function (){
-          this.saveToDB (immutableHelper);
-        });
-        */   
-    }
-    
-    /**
-     * 
-     */
-    findTreeParent (aTree:any,aNode:any) : Array<Object> {
-      console.log ("findTreeParent ("+aNode.id+")");
-        
-      for (var i=0;i<aTree.length;i++) {
-        let testNode:OrgItem=aTree [i];
-            
-        if (testNode.id==aNode.id) {
-         return (aTree);
-        }
-            
-        // We can test length here because we always make sure this object exists
-        if (testNode.children.length>0) {
-          let result:Array<Object>=this.findTreeParent (testNode.children,aNode);
-                
-          if (result!=null) {
-            return (result);
-          }
+  }
+
+  /**
+   *
+   */
+  findTreeParent(aTree: any, aNode: any): Array<Object> {
+    console.log('findTreeParent (' + aNode.id + ')');
+
+    for (let i = 0; i < aTree.length; i++) {
+      const testNode: OrgItem = aTree [i];
+
+      if (testNode.id === aNode.id) {
+        return (aTree);
+      }
+
+      // We can test length here because we always make sure this object exists
+      if (testNode.children.length > 0) {
+        const result = this.findTreeParent(testNode.children, aNode);
+
+        if (result != null) {
+          return (result);
         }
       }
-        
-      return (null);
-    }     
-    
-    /**
-     * 
-     */    
-    deleteNode (aNode:any): void {
-        console.log ("LearningObjectiveEditor:deleteNode ()");
-            
-        var immutableHelper = this.state.treeData.slice();
-        
-        let parentArray:Array<Object>=this.findTreeParent (immutableHelper,aNode);
-        
-        if (immutableHelper==null) {
-            console.log ("Bump");
-            return;
-        }
-        
-        for (var i=0;i<parentArray.length;i++) {
-            let testNode:OrgItem=parentArray [i] as OrgItem;
-            
-            if (testNode.id==aNode.id) {
-                //console.log ("Removing lo ("+i+") with title: " + aNode.title);
-                parentArray.splice (i,1);
-                break;
-            }
-        }
-        
-        console.log ("Updated tree: " + JSON.stringify (immutableHelper));
-        
-        this.onLOEdit (immutableHelper);
     }
-    
-    /**
-     * 
-     */    
-    editTitle (aNode:any, aTitle:any):void {
-        console.log ("LearningObjectiveEditor:editTitle ()");
 
-        let newTitle=aTitle.text;
-            
-        var immutableHelper = this.state.treeData.slice();
-        
-        if (immutableHelper==null) {
-            console.log ("Bump");
-            return;
-        }
-                
-        for (var i=0;i<immutableHelper.length;i++) {
-            let testNode:LearningObjective=immutableHelper [i];
-            
-            if (testNode.id==aNode.id) {
-                testNode.title=newTitle;
-                break;
-            }
-        }
-        
-        this.onLOEdit (immutableHelper);
-    }
-    
-    /**
-     * 
-     */
-    linkSkill(aNode:any) {        
-        console.log ("linkSkill ()");
-                
-        this.setState ({modalIsOpen: true, target: aNode});
-    }
-    
-    /**
-     * 
-     */    
-    genProps () {        
-        var optionalProps:Object=new Object ();
-        
-        optionalProps ["editNodeTitle"]=this.editTitle.bind (this);
-        optionalProps ["deleteNode"]=this.deleteNode.bind (this);
-        optionalProps ["linkAnnotation"]=this.linkSkill.bind (this);
-        optionalProps ["treeData"]=this.state.treeData;
+    return (null);
+  }
 
-        return (optionalProps);
+  /**
+   *
+   */
+  deleteNode(aNode: any): void {
+    console.log('LearningObjectiveEditor:deleteNode ()');
+
+    const immutableHelper = this.state.treeData.slice();
+
+    const parentArray = this.findTreeParent(immutableHelper, aNode);
+
+    if (immutableHelper === null) {
+      console.log('Bump');
+      return;
     }
-    
-    /**
-     * 
-     */
-    closeModal (newAnnotations:any) {
-        
-      var immutableHelper = this.state.treeData.slice();
-        
-      let parentArray:Array<Object>=this.findTreeParent (immutableHelper,this.state.target);
-        
-      if (immutableHelper==null) {
-        console.log ("Bump");
-        return;
+
+    for (let i = 0; i < parentArray.length; i++) {
+      const testNode: OrgItem = parentArray [i] as OrgItem;
+
+      if (testNode.id === aNode.id) {
+        // console.log ("Removing lo ("+i+") with title: " + aNode.title);
+        parentArray.splice(i, 1);
+        break;
       }
-       
-      for (var i=0;i<parentArray.length;i++) {
-        let testNode:OrgItem=parentArray [i] as OrgItem;
-            
-        if (testNode.id==this.state.target.id) {
-          testNode.annotations=newAnnotations;      
-          break;
-        }
+    }
+
+    console.log('Updated tree: ' + JSON.stringify(immutableHelper));
+
+    this.onLOEdit(immutableHelper);
+  }
+
+  /**
+   *
+   */
+  editTitle(aNode: any, aTitle: any): void {
+    console.log('LearningObjectiveEditor:editTitle ()');
+
+    const newTitle = aTitle.text;
+
+    const immutableHelper = this.state.treeData.slice();
+
+    if (immutableHelper === null) {
+      console.log('Bump');
+      return;
+    }
+
+    for (let i = 0; i < immutableHelper.length; i++) {
+      const testNode: LearningObjective = immutableHelper [i];
+
+      if (testNode.id === aNode.id) {
+        testNode.title = newTitle;
+        break;
       }
-        
-      this.setState ({modalIsOpen: false, treeData: immutableHelper},function (){
-        this.onLOEdit ();    
-      });
-    }
-    
-    /**
-     * 
-     */
-    createLinkerDialog () {
-      let message="";
-        
-      if (this.state.target) {             
-        if (!this.state.skills){
-          message="No skills available. Did you create a skills document?"
-        }
-          
-        return (<LearningObjectiveLinker title="Available Learning Skills" errorMessage={message} closeModal={this.closeModal.bind (this)} sourceData={this.state.skills} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.target.annotations} />);          
-      }   
-                   
-      return (<div></div>);           
-    }
-    
-    /**
-     * 
-     */
-    doUndo () : void {
-      console.log ("doUndo ()");
-
     }
 
-    /**
-     * 
-     */
-    doRedo () : void {
-      console.log ("doRedo ()");
+    this.onLOEdit(immutableHelper);
+  }
 
-    }    
+  /**
+   *
+   */
+  linkSkill(aNode: any) {
+    console.log('linkSkill ()');
 
-    /**
-     * 
-     */
-    render() {        
-        const skilllinker=this.createLinkerDialog ();
-        
-        //console.log ("Rendering: " + JSON.stringify (this.state.treeData));
-        
-        return (
-                <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
-                    <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                        <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
-                        <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <a className="nav-link" style={{"outline": "none"}} onClick={e => this.expandAll ()}>+ Expand Tree</a>
-                        <a className="nav-link" style={{"outline": "none"}} onClick={e => this.collapseAll ()}>- Collapse Tree</a>
-                        <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
-                                         onRedo={this.doRedo.bind(this)}             
-                                         undoEnabled={this.state.undoStackSize > 0}
-                                         redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>                        
-                    </nav>
-                   {skilllinker}
-                    <SortableTree
-                        maxDepth={3}
-                        treeData={this.state.treeData}
-                        onChange={ treeData => this.processDataChange({treeData}) }                        
-                        nodeContentRenderer={LONodeRenderer}
-                        generateNodeProps={this.genProps.bind(this)}
-                    />
-                </div>
-        );
+    this.setState({ modalIsOpen: true, target: aNode });
+  }
+
+  /**
+   *
+   */
+  genProps() {
+    const optionalProps: Object = new Object();
+
+    optionalProps ['editNodeTitle'] = this.editTitle.bind(this);
+    optionalProps ['deleteNode'] = this.deleteNode.bind(this);
+    optionalProps ['linkAnnotation'] = this.linkSkill.bind(this);
+    optionalProps ['treeData'] = this.state.treeData;
+
+    return (optionalProps);
+  }
+
+  /**
+   *
+   */
+  closeModal(newAnnotations: any) {
+
+    const immutableHelper = this.state.treeData.slice();
+
+    const parentArray = this.findTreeParent(immutableHelper, this.state.target);
+
+    if (immutableHelper === null) {
+      console.log('Bump');
+      return;
     }
+
+    for (let i = 0; i < parentArray.length; i++) {
+      const testNode: OrgItem = parentArray [i] as OrgItem;
+
+      if (testNode.id === this.state.target.id) {
+        testNode.annotations = newAnnotations;
+        break;
+      }
+    }
+
+    this.setState({ modalIsOpen: false, treeData: immutableHelper }, function () {
+      this.onLOEdit();
+    });
+  }
+
+  /**
+   *
+   */
+  createLinkerDialog() {
+    let message = '';
+
+    if (this.state.target) {
+      if (!this.state.skills) {
+        message = 'No skills available. Did you create a skills document?';
+      }
+
+      return (<LearningObjectiveLinker title="Available Learning Skills" errorMessage={message}
+                                       closeModal={this.closeModal.bind(this)} sourceData={this.state.skills}
+                                       modalIsOpen={this.state.modalIsOpen}
+                                       targetAnnotations={this.state.target.annotations}/>);
+    }
+
+    return (<div></div>);
+  }
+
+  /**
+   *
+   */
+  doUndo(): void {
+    console.log('doUndo ()');
+
+  }
+
+  /**
+   *
+   */
+  doRedo(): void {
+    console.log('doRedo ()');
+
+  }
+
+  /**
+   *
+   */
+  render() {
+    const skilllinker = this.createLinkerDialog();
+
+    // console.log ("Rendering: " + JSON.stringify (this.state.treeData));
+
+    return (
+      <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
+        <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
+          <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
+          <button type="button" className="btn btn-secondary" onClick={e => this.addNode(e)}>Add Item</button>
+          <a className="nav-link" style={{ outline: 'none' }} onClick={e => this.expandAll()}>+ Expand Tree</a>
+          <a className="nav-link" style={{ outline: 'none' }} onClick={e => this.collapseAll()}>- Collapse Tree</a>
+          <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
+                           onRedo={this.doRedo.bind(this)}
+                           undoEnabled={this.state.undoStackSize > 0}
+                           redoEnabled={this.state.redoStackSize > 0}></UndoRedoToolbar>
+        </nav>
+        {skilllinker}
+        <SortableTree
+          maxDepth={3}
+          treeData={this.state.treeData}
+          onChange={ treeData => this.processDataChange({ treeData }) }
+          nodeContentRenderer={LONodeRenderer}
+          generateNodeProps={this.genProps.bind(this)}
+        />
+      </div>
+    );
+  }
 }
 
 export default LearningObjectiveEditor;
