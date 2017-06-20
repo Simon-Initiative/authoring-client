@@ -649,7 +649,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
             
             if (item.folded==true) {
               return (
-                  <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowUnselected}>
+                  <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowUnselected} className="skillTitle">
                       <div style={styles.titleBarFolded}>
                          <div style={styles.titleContainer}>
                             <TitleContentEditor 
@@ -726,7 +726,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
         }.bind(this));         
 
         return (
-                <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
+                <div className="skillEditor">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Skills</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Skill</button>

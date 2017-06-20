@@ -144,6 +144,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     return (
       <div className="">
         {creationTitle}
+        {this.renderCreation()}
         <table className="table table-striped table-hover">
           <thead>
           <tr>
@@ -161,7 +162,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderCreation() {
     return (
-      <div className="input-group col-12">
+      <div className="input-group col-4 float-right">
         <form className="form-inline">
           <input type="text" ref="title"
                  className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
@@ -182,7 +183,6 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
-                  {this.renderCreation()}
                   {this.renderResources()}
                 </div>
               </div>

@@ -443,7 +443,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         //console.log ("Rendering: " + JSON.stringify (this.state.treeData));
         
         return (
-                <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
+                <div className="">
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
