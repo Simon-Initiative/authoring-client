@@ -158,7 +158,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
      * 
      */
     assignParent (aLOObject:LearningObjective,anId:string):void {
-      //console.log ("assignParent ()");
+      console.log ("assignParent ()");
 
       aLOObject.parent=anId;
 
@@ -176,7 +176,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
       let immutableHelper = this.state.treeData.slice();
 
       if (newData) {
-        //console.log ("We have alternative facts, let's use those instead ...");
+        console.log ("We have alternative facts, let's use those instead ...");
         
         // We should really unify this across the code, it's very brittle
         if (newData ["treeData"]) {
@@ -192,7 +192,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         return;
       }
 
-      //console.log ("assignParents ("+immutableHelper.length+")");
+      console.log ("assignParents ("+immutableHelper.length+")");
 
       for (let i=0;i<immutableHelper.length;i++) {
         this.assignParent(immutableHelper [i],"");
@@ -447,8 +447,7 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
                     <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
                         <p className="h2" style={tempnavstyle.h2}>Learning Objectives</p>
                         <button type="button" className="btn btn-secondary" onClick={e => this.addNode (e)}>Add Item</button>
-                        <a className="nav-link" style={{"outline": "none"}} onClick={e => this.expandAll ()}>+ Expand Tree</a>
-                        <a className="nav-link" style={{"outline": "none"}} onClick={e => this.collapseAll ()}>- Collapse Tree</a>
+                        
                         <UndoRedoToolbar onUndo={this.doUndo.bind(this)}
                                          onRedo={this.doRedo.bind(this)}             
                                          undoEnabled={this.state.undoStackSize > 0}
