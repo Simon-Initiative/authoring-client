@@ -287,6 +287,9 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         <ul className="nav nav-pills flex-column">
           {menuData}
         </ul>
+        <ul className="nav nav-pills flex-column feedback">
+          <li><a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSfrkoCCe2cX5KFKcdzmtbLVNPkTSQeiJ4w0mEBqCNrT6hfceA/viewform?usp=sf_link">Feedback</a></li>
+        </ul>
       </nav>
     );
   }
