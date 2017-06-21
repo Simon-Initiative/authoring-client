@@ -56,3 +56,38 @@ export function authenticatedFetch(params: HttpRequestParams) {
     })
     .catch(err => handleError(err));
 }
+
+export type RevisionId = string;
+
+export type DocumentParams = {
+  _courseId?: CourseId,
+  _id?: DocumentId,
+  _rev?: RevisionId,
+  model?: models.ContentModel,
+};
+
+const defaultDocumentParams = {
+  _courseId: '',
+  _id: '',
+  _rev: '',
+  model: Immutable.Record({ modelType: models.EmptyModel }),
+};
+
+export class Document extends Immutable.Record(defaultDocumentParams) {
+
+  /* tslint:disable */
+  _courseId?: CourseId;
+  _id: DocumentId;
+  _rev: RevisionId;
+  /* tslint:enable */
+
+  model: models.ContentModel;
+
+  constructor(params?: DocumentParams) {
+    params ? super(params) : super();
+  }
+
+  with(values: DocumentParams) {
+    return this.merge(values) as this;
+  }
+}
