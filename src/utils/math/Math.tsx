@@ -108,7 +108,15 @@ export class Math extends React.Component<MathProps, any> {
 
     if (!this.script) {
       this.script = document.createElement('script');
-      this.script.type = 'math/mml; ' + (inline ? '' : 'mode=display');
+      
+      const tex = 'math/tex; ';
+      const mml = 'math/mml; ';
+      let type = tex;
+      if (text.startsWith('<')) {
+        type = mml;
+      }
+      
+      this.script.type = type + (inline ? '' : 'mode=display');
       (this.node as any).appendChild(this.script);
     }
 
