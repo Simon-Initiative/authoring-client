@@ -925,27 +925,27 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
      * verify the rules below. http://oli.web.cmu.edu/dtd/oli_content_organization_simple_2_2.dtd  
      */
     canDrop (anObject:Object) : boolean {
-     // console.log ("canDrop ()");
+   //   console.log ("canDrop ()");
           
       if (anObject ["nextParent"]) {
           
         if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Item")) {
-       //   console.log ("Can't put an item below an item");  
+   //       console.log ("Can't put an item below an item");  
           return (false);  
         }
           
         if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Section")) {
-       //   console.log ("Can't put a sequence in a section");  
+   //       console.log ("Can't put a sequence in a section");  
           return (false);  
         }          
 
-        if ((anObject ["node"]["orgType"]!="Item") && (anObject ["nextParent"]["orgType"]=="Sequence")) {
-       //   console.log ("Can't put an item in a sequence");  
+        if ((anObject ["node"]["orgType"]=="Item") && (anObject ["nextParent"]["orgType"]=="Sequence")) {
+   //      console.log ("Can't put an item in a sequence");  
           return (false);  
         }
       }
 
-     // console.log ("returning true");
+   //   console.log ("returning true");
   
       return (true);
     }
