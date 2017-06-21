@@ -1398,7 +1398,7 @@ export type SkillModelParams = {
   type?: string,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  skills?: any,
+  skills?: Immutable.List<Object>,
 };
 
 const defaultSkillModel = {
@@ -1409,7 +1409,7 @@ const defaultSkillModel = {
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   skillDefaults: Skill,
-  skills: [],
+  skills: Immutable.List<Object>(),
 };
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {
@@ -1420,7 +1420,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   skillDefaults: Skill;
-  skills: Array<Object>;
+  skills: Immutable.List<Object>;
 
   constructor(params?: SkillModelParams) {  
     params ? super(params) : super(); 
@@ -1444,21 +1444,14 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   }
     
   toPersistence(): Object {
-    // console.log("toPersistence ()");
+    
     const resource: any = this.resource.toPersistence();
     let doc = [{
       skills_model: {
         '@id': this.resource.id,        
-        '#array': this.skills,
+        '#array': [this.title.toPersistence(), ...this.skills.toArray()],
       },
     }];
-      
-    // Add the title object to the array where we have the skills in
-    // a very clumsy way.
-    let titleObj=new Object ();
-    titleObj ["title"]=new Object ();  
-    titleObj ["title"]["#text"]=this.title.text;      
-    doc [0]["skills_model"]["#array"].push (titleObj);  
       
     const root = {
       doc,
@@ -1469,7 +1462,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
   static fromPersistence(json: Object): SkillModel {      
     const a = (json as any);
-    const replacementSkills: Array<Skill> = new Array<Skill>();  
+    let replacementSkills = Immutable.List<Skill>();  
     const skillData: Array<Skill> = 
       a.doc.skills_model.skills !== undefined
       ? a.doc.skills_model.skills
@@ -1485,7 +1478,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
         extractedTitle=new contentTypes.Title ({text : testSkillObj ["title"]["#text"]});
       } else {                
         newSkill.fromJSONObject(testSkillObj as Skill);
-        replacementSkills.push(newSkill);          
+        replacementSkills = replacementSkills.push(newSkill);          
       }    
     }
 
