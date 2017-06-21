@@ -831,7 +831,7 @@ class OrganizationEditor extends AbstractEditor<models.OrganizationModel,Organiz
             break;
           }
         }
-
+        this.assignType (immutableHelper);
         this.orgOnEdit (immutableHelper);          
       });    
     }

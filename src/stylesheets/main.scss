@@ -127,6 +127,17 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
     		text-decoration: underline !important;
     	}
 	}
+	.feedback {
+		margin-top: 25px;
+		a {
+			display: block;
+		    text-align: center;
+		    background: #fff;
+		    width: 85%;
+		    margin: 0 auto;
+		    padding: 10px;
+		}
+	}
 }
 
 // Editor Global
