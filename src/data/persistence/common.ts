@@ -24,12 +24,15 @@ export type HttpRequestParams = {
   url: string,
   body?: any,
   headers?: Object,
+  hasTextResult?: boolean,
 };
 
 export function authenticatedFetch(params: HttpRequestParams) {
   
   const method = params.method ? params.method : 'GET';
   const headers = params.headers ? params.headers : getHeaders(credentials);
+  const hasTextResult = params.hasTextResult ? params.hasTextResult : false;
+  
   const { body, url } = params;
   
   return refreshTokenIfInvalid()
@@ -49,7 +52,7 @@ export function authenticatedFetch(params: HttpRequestParams) {
       if (!response.ok) {
         throw Error(response.statusText);
       }
-      return response.text();
+      return hasTextResult ? response.text() : response.json();
     })
     .catch(err => handleError(err));
 }
