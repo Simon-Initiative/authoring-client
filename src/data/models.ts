@@ -1398,7 +1398,7 @@ export type SkillModelParams = {
   type?: string,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  skills?: Immutable.List<Object>,
+  skills?: Object[],
 };
 
 const defaultSkillModel = {
@@ -1409,7 +1409,7 @@ const defaultSkillModel = {
   lock: new contentTypes.Lock(),
   title: new contentTypes.Title(),
   skillDefaults: Skill,
-  skills: Immutable.List<Object>(),
+  skills: [],
 };
 
 export class SkillModel extends Immutable.Record(defaultSkillModel) {
@@ -1420,7 +1420,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   skillDefaults: Skill;
-  skills: Immutable.List<Object>;
+  skills: Object[];
 
   constructor(params?: SkillModelParams) {  
     params ? super(params) : super(); 
@@ -1449,9 +1449,17 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
     let doc = [{
       skills_model: {
         '@id': this.resource.id,        
-        '#array': [this.title.toPersistence(), ...this.skills.toArray()],
+        '#array': this.skills,
       },
     }];
+
+    // Add the title object to the array where we have the skills in
+    // a very clumsy way.
+    let titleObj=new Object ();
+    titleObj ["title"]=new Object ();  
+    titleObj ["title"]["#text"]=this.title.text;    
+
+    doc [0]["skills_model"]["#array"] = [titleObj, ...doc [0]["skills_model"]["#array"]];  
       
     const root = {
       doc,
@@ -1462,7 +1470,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
   static fromPersistence(json: Object): SkillModel {      
     const a = (json as any);
-    let replacementSkills = Immutable.List<Skill>();  
+    let replacementSkills = [];  
     const skillData: Array<Skill> = 
       a.doc.skills_model.skills !== undefined
       ? a.doc.skills_model.skills
@@ -1478,7 +1486,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
         extractedTitle=new contentTypes.Title ({text : testSkillObj ["title"]["#text"]});
       } else {                
         newSkill.fromJSONObject(testSkillObj as Skill);
-        replacementSkills = replacementSkills.push(newSkill);          
+        replacementSkills.push(newSkill);          
       }    
     }
 
