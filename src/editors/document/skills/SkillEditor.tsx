@@ -28,7 +28,6 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 //var skillData=require ('./Skills.json');
-
 const styles = {
   skillContainer : {
     "marginTop" : "10px"

@@ -1398,7 +1398,7 @@ export type SkillModelParams = {
   type?: string,
   lock?: contentTypes.Lock,
   title?: contentTypes.Title,
-  skills?: any,
+  skills?: Object[],
 };
 
 const defaultSkillModel = {
@@ -1420,7 +1420,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   lock: contentTypes.Lock;
   title: contentTypes.Title;
   skillDefaults: Skill;
-  skills: Array<Object>;
+  skills: Object[];
 
   constructor(params?: SkillModelParams) {  
     params ? super(params) : super(); 
@@ -1444,7 +1444,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
   }
     
   toPersistence(): Object {
-    // console.log("toPersistence ()");
+    
     const resource: any = this.resource.toPersistence();
     let doc = [{
       skills_model: {
@@ -1452,13 +1452,14 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
         '#array': this.skills,
       },
     }];
-      
+
     // Add the title object to the array where we have the skills in
     // a very clumsy way.
     let titleObj=new Object ();
     titleObj ["title"]=new Object ();  
-    titleObj ["title"]["#text"]=this.title.text;      
-    doc [0]["skills_model"]["#array"].push (titleObj);  
+    titleObj ["title"]["#text"]=this.title.text;    
+
+    doc [0]["skills_model"]["#array"] = [titleObj, ...doc [0]["skills_model"]["#array"]];  
       
     const root = {
       doc,
@@ -1469,7 +1470,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
 
   static fromPersistence(json: Object): SkillModel {      
     const a = (json as any);
-    const replacementSkills: Array<Skill> = new Array<Skill>();  
+    let replacementSkills = [];  
     const skillData: Array<Skill> = 
       a.doc.skills_model.skills !== undefined
       ? a.doc.skills_model.skills

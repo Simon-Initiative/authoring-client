@@ -15,7 +15,6 @@ import guid from '../utils/guid';
 interface ResourceView {
   viewActions: any;
 }
-
 export interface ResourceViewOwnProps {
   // course: any;
   dispatch: any;
@@ -176,7 +175,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   render() {
     return (
-      <div className="container-fluid">
+      <div className="container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 document">
