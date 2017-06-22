@@ -16,18 +16,39 @@ export interface MathProps {
  * React component to render maths using mathjax
  * @type {ReactClass}
  */
-export class Math extends React.Component<MathProps, any> {
+export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }> {
+
+  constructor(props) {
+    super(props);
+
+    console.log('isMathJaxReady: ' + MathJax.isReady);
+
+    this.state = {
+      isMathJaxReady: MathJax.isReady,
+    };
+  }
 
   componentDidMount() {
-    this.typeset(false);
+
+    if (this.state.isMathJaxReady) {
+      this.typeset(false);
+    } else {
+      MathJax.Hub.Register.StartupHook(
+        'End',
+        () => this.setState({ isMathJaxReady: true }),
+      );
+    }
+
   } 
 
     /**
      * Update the jax, force update if the display mode changed
      */
   componentDidUpdate(prevProps) {
-    const forceUpdate = prevProps.inline !== this.props.inline;
-    this.typeset(forceUpdate);
+    if (this.state.isMathJaxReady) {
+      const forceUpdate = prevProps.inline !== this.props.inline;
+      this.typeset(forceUpdate);
+    }
   }
 
   /**
@@ -35,7 +56,8 @@ export class Math extends React.Component<MathProps, any> {
    */
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return (
-        nextProps.children !== this.props.children
+        nextState.isMathJaxReady !== this.state.isMathJaxReady
+        || nextProps.children !== this.props.children
         || nextProps.inline !== this.props.inline
         || nextContext.MathJax !== this.context.MathJax
     );
