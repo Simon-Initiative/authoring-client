@@ -49,7 +49,7 @@ export class Title extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       title: {
-        '#array': toPersistence(this.content)['#array'],
+        '#array': toPersistence(this.content, true),
       },
     };
   }

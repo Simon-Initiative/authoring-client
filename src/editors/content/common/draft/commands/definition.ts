@@ -45,8 +45,6 @@ export class InsertDefinitionCommand extends AbstractCommand<EditorState> {
     const blocks = [
       new ContentBlock({ type: 'atomic', key: beginBlockKey, 
         text: ' ', characterList: beginCharList }),
-      new ContentBlock({ type: 'unstyled', key: contentKey, 
-        text: ' ', characterList: emptyCharList }),
       new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
       new ContentBlock({ type: 'unstyled', key: contentKey, 
         text: ' ', characterList: emptyCharList }),

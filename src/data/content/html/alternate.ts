@@ -65,7 +65,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
       alternate: {
         '@title': this.title,
         '@idref': this.idref,
-        '#array': toPersistence(this.content)['#array'],
+        '#array': toPersistence(this.content, true),
       },
     };
   }

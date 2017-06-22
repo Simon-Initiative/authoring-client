@@ -63,13 +63,13 @@ const entityHandlers = {
 
 // Converts the draft ContentState object to the HtmlContent format
 // (which ultimately is serialized and stored in persistence)
-export function toPersistence(state: ContentState) : Object {
+export function toPersistence(state: ContentState, inlineText = false) : Object {
 
   const rawContent = convertToRaw(state);
-  return translate(rawContent, state);
+  return translate(rawContent, state, inlineText);
 }
 
-function translate(content: common.RawDraft, state: ContentState) : Object {
+function translate(content: common.RawDraft, state: ContentState, inlineText: boolean) : Object {
 
   // Create a top-level container for the object tree to root itself into
   const root = { body: { '#array': [] } };
@@ -85,7 +85,27 @@ function translate(content: common.RawDraft, state: ContentState) : Object {
     translateBlock(iterator, content.entityMap, context);
   }
 
-  return root.body;
+  if (inlineText) {
+
+    const arr = root.body['#array'];
+    const p = arr.find(e => common.getKey(e) === 'p');
+
+    if (p !== undefined) {
+      if (p.p['#text'] !== undefined) {
+        delete p.p['@id'];
+        delete p.p['@title'];
+        return [p.p];
+      } else if (p.p['#array'] !== undefined) {
+        return p.p['#array'];
+      }
+    } else {
+      return root.body['#array'];
+    }
+    
+  } else {
+    return root.body;
+  }
+  
 }
 
 
@@ -441,9 +461,10 @@ function translateSection(
   const id = extractId(rawBlock);
   const titleAttr = extractTitle(rawBlock);
 
+  const purpose = entityMap[rawBlock.entityRanges[0].key].data.purpose;
+
   const s = { 
     section: {
-      '@purpose': entityMap[rawBlock.entityRanges[0].key].data.purpose,
       '@id': id, 
       '@title': titleAttr,
       '#array': [title, {
@@ -453,6 +474,10 @@ function translateSection(
       }],
     },
   };
+
+  if (purpose !== undefined && purpose !== null && purpose.trim() !== '') {
+    s.section['@purpose'] = purpose;
+  }
 
   top(context).push(s);
   context.push((s.section['#array'][1] as any).body['#array']);
@@ -521,9 +546,26 @@ function translateTitle(
       '#array': arr,
     },
   };
-
+  
   top(context).push(p);
-  context.push(p.title['#array']);
+
+  // Get the content of the title
+  let block = iterator.next();
+
+  // Process the content
+  translatePureInline(block.rawBlock, block.block, entityMap, arr);
+
+  // Move past the title_end block
+  block = iterator.peek();
+  while (block !== null) {
+    if (block.rawBlock.type === 'atomic' 
+      && entityMap[
+        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
+      block = iterator.next();
+      break;
+    }
+    block = iterator.next();
+  }
 
 }
 
@@ -550,8 +592,40 @@ function translatePronunciation(
   };
 
   top(context).push(p);
-  context.push(p.pronunciation['#array']);
 
+  // Get the content of the pronunciation
+  let block = iterator.next();
+
+  // Process the content
+  translatePureInline(block.rawBlock, block.block, entityMap, arr);
+
+  // Move past the pronunciation_end block
+  block = iterator.peek();
+  while (block !== null) {
+    if (block.rawBlock.type === 'atomic' 
+      && entityMap[
+        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
+      block = iterator.next();
+      break;
+    }
+    block = iterator.next();
+  }
+
+}
+
+function translatePureInline(
+  rawBlock : common.RawContentBlock, 
+  block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
+
+  if (rawBlock.inlineStyleRanges.length === 0
+    && rawBlock.entityRanges.length === 0) {
+    container.push({ '#text': rawBlock.text });
+  } else {
+    translateTextBlock(block.rawBlock, block.block, entityMap, container);
+
+  }
+
+  
 }
 
 function translateTranslation(
@@ -572,7 +646,24 @@ function translateTranslation(
   };
 
   top(context).push(p);
-  context.push(p.translation['#array']);
+  
+  // Get the content of the translation
+  let block = iterator.next();
+
+  // Process the content
+  translatePureInline(block.rawBlock, block.block, entityMap, arr);
+
+  // Move past the translation_end block
+  block = iterator.peek();
+  while (block !== null) {
+    if (block.rawBlock.type === 'atomic' 
+      && entityMap[
+        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
+      block = iterator.next();
+      break;
+    }
+    block = iterator.next();
+  }
 
 }
 
@@ -679,7 +770,7 @@ function translateParagraph(
 
 function extractId(rawBlock : common.RawContentBlock) {
   if (rawBlock.data === undefined || rawBlock.data.id === undefined) {
-    return guid();
+    return 'a' + guid();
   } else {
     return rawBlock.data.id;
   }

@@ -20,7 +20,7 @@ const defaultContent = {
   contentType: 'Cite',
   title: '',
   id: createGuid(),
-  entry: '',
+  entry: ' ',
   content: emptyContent,
   guid: '',
 };
@@ -55,7 +55,7 @@ export class Cite extends Immutable.Record(defaultContent) {
       model = model.with({ id: t['@id'] });
     }
     if (t['@entry'] !== undefined) {
-      model = model.with({ entry: t['@entry'] });
+      model = model.with({ entry: t['@entry'] === '' ? ' ' : t['@entry'] });
     }
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {

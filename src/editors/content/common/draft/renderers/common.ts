@@ -77,6 +77,48 @@ export function within(
   return false;
 }
 
+export function insertNoSpace(
+  key: string, contentState: ContentState, 
+  beginType: EntityTypes, endType: EntityTypes,
+  beginData: Object, endData: Object, includePad = true) : ContentState {
+
+  const beginBlockKey = generateRandomKey();
+  const contentKey = generateRandomKey();
+  const endBlockKey = generateRandomKey();
+
+  let content = contentState;
+
+  content = content.createEntity(
+    beginType, 
+    'IMMUTABLE', beginData);
+  const beginKey = content.getLastCreatedEntityKey();
+
+  content = content.createEntity(
+    endType, 
+    'IMMUTABLE', endData);
+  const endKey = content.getLastCreatedEntityKey();
+
+  const beginCharList = Immutable.List().push(new CharacterMetadata({ entity: beginKey }));
+  const emptyCharList = Immutable.List().push(new CharacterMetadata());
+  const endCharList = Immutable.List().push(new CharacterMetadata({ entity: endKey }));
+
+  const blocks = [
+    new ContentBlock({ type: 'atomic', key: beginBlockKey, 
+      text: ' ', characterList: beginCharList }),
+    new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
+    
+  ];
+
+  if (includePad) {
+    blocks.push(new ContentBlock({ type: 'unstyled', 
+      key: contentKey, text: ' ', characterList: emptyCharList }));
+  }
+  
+
+  return insertBlocksAfter(content, key, blocks);
+
+}
+
 export function insert(
   key: string, contentState: ContentState, 
   beginType: EntityTypes, endType: EntityTypes,

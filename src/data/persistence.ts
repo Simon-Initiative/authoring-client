@@ -58,11 +58,17 @@ export class Document extends Immutable.Record(defaultDocumentParams) {
 }
 
 function handleError(err, reject) {
-  if (err.message && err.message === 'Unauthorized') {
-    forceLogin();
-  } else {
+  console.log('handleError');
+  console.log(err);
+  
+  
+  
+  //if (err.message && err.message === 'Unauthorized') {
+   // alert('forceLogin from handle');
+  //  forceLogin();
+  //} else {
     reject(err);
-  }
+ // }
 }
 
 export function getEditablePackages(): Promise<models.CourseModel[]> {
@@ -404,8 +410,9 @@ export function persistDocument(doc: Document): Promise<Document> {
 
   return refreshTokenIfInvalid()
     .then((tokenIsValid) => {
-
+      console.log('tokenisValue: ' + tokenIsValid);
       if (!tokenIsValid) {
+        alert('forceLogin from persist');
         forceLogin();
       }
 
