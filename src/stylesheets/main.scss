@@ -103,6 +103,7 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 	color: $color-white;
 	font-size: 16px;
 	font-weight: 600;
+	min-height: 78vh;
 	h1 {
 		margin: 0px;
 	    font-size: 1.5em;
@@ -395,7 +396,6 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
     background-color: #f2f2f2;
     border-top: 1px solid #e8e8e8;
     padding: 3rem;
-    margin-top: 20rem;
     color: #0067cb;
     line-height: 1.2em;
     font-family: $serif-font;

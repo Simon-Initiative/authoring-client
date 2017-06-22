@@ -178,7 +178,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <div className="container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
-          <div className="col-sm-9 offset-sm-3 col-md-10 offset-md-2 document">
+          <div className="col-sm-9 col-md-10 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">

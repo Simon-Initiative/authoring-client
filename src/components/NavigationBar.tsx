@@ -80,8 +80,7 @@ const navbarStyles =
     sidebar: {
       paddingLeft: 0,
       paddingRight: 0,
-      position: 'fixed',
-      top: '58px',
+      paddingBottom: '20px',
       bottom: 0,
       left: 0,
       zIndex: 1000,
