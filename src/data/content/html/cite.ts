@@ -19,8 +19,8 @@ export type CiteParams = {
 const defaultContent = {
   contentType: 'Cite',
   title: '',
-  id: createGuid(),
-  entry: ' ',
+  id: '',
+  entry: '',
   content: emptyContent,
   guid: '',
 };
@@ -66,13 +66,18 @@ export class Cite extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(toPersistence) : Object {
-    return {
+    const o = {
       cite: {
         '@title': this.title,
         '@id': this.id,
-        '@entry': this.entry,
         '#array': toPersistence(this.content)['#array'],
       },
     };
+
+    if (this.entry.trim() !== '') {
+      o['@entry'] = this.entry;
+    }
+
+    return o;
   }
 }
