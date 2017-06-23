@@ -131,7 +131,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
       iframe: {
         '@id': this.id,
         '@title': this.title,
-        '@src': this.src,
+        '@src': this.src === '' ? 'http://www.google.com' : this.src,
         '@height': this.height,
         '@width': this.width,
         '#array': children,

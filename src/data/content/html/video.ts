@@ -155,13 +155,19 @@ export class Video extends Immutable.Record(defaultContent) {
 
   toPersistence(toPersistence) : Object {
 
+    let sources = this.sources.toArray();
+    if (sources.length === 0
+      && this.tracks.size > 0) {
+      sources = [new Source().with({ src: this.tracks.toArray()[0].src })];
+    }
+
     const children = [
       this.titleContent.toPersistence(),
-      this.cite.toPersistence(toPersistence),
+      // this.cite.toPersistence(toPersistence),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
       this.alternate.toPersistence(),
-      ...this.sources.toArray().map(p => p.toPersistence()),
+      ...sources.map(p => p.toPersistence()),
       ...this.tracks.toArray().map(p => p.toPersistence()),
     ];
 

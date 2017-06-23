@@ -138,7 +138,7 @@ export class Image extends Immutable.Record(defaultContent) {
 
     const children = [
       this.titleContent.toPersistence(),
-      this.cite.toPersistence(toP),
+      // this.cite.toPersistence(toP),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
       this.alternate.toPersistence(),

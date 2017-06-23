@@ -74,6 +74,7 @@ export function refreshTokenIfInvalid() : Promise<any> {
           resolve(true);
         }
       }).error(() => {
+        console.log('Could not refresh token');
         resolve(false);
       });
     });

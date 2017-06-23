@@ -19,7 +19,7 @@ export type CiteParams = {
 const defaultContent = {
   contentType: 'Cite',
   title: '',
-  id: createGuid(),
+  id: '',
   entry: '',
   content: emptyContent,
   guid: '',
@@ -55,7 +55,7 @@ export class Cite extends Immutable.Record(defaultContent) {
       model = model.with({ id: t['@id'] });
     }
     if (t['@entry'] !== undefined) {
-      model = model.with({ entry: t['@entry'] });
+      model = model.with({ entry: t['@entry'] === '' ? ' ' : t['@entry'] });
     }
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {
@@ -66,13 +66,18 @@ export class Cite extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(toPersistence) : Object {
-    return {
+    const o = {
       cite: {
         '@title': this.title,
         '@id': this.id,
-        '@entry': this.entry,
         '#array': toPersistence(this.content)['#array'],
       },
     };
+
+    if (this.entry.trim() !== '') {
+      o['@entry'] = this.entry;
+    }
+
+    return o;
   }
 }

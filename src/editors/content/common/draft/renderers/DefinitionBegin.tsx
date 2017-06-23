@@ -11,7 +11,7 @@ import { insertBlocksAfter } from '../commands/common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { ContentState, Entity, ContentBlock, Modifier, CharacterMetadata } from 'draft-js';
 
-import { within, insert, findKeyOfLast, isPredicate } from './common';
+import { within, insert, insertNoSpace, findKeyOfLast, isPredicate } from './common';
 
 import './markers.scss';
 
@@ -66,11 +66,11 @@ export class DefinitionBegin
       this.props.block.key, ['definition_end'], this.props.contentState,
       'title_end', 'pronunciation_end', 'translation_end', 'meaning_end');
 
-    let updated = insert(
+    let updated = insertNoSpace(
       insertionKey, this.props.contentState, 
       EntityTypes.meaning_begin, EntityTypes.meaning_end,
       { type: 'meaning_begin' }, 
-      { type: 'meaning_end' });
+      { type: 'meaning_end' }, false);
 
     const meaningBeginKey = findKeyOfLast(
       this.props.block.key, ['meaning_end'], updated,

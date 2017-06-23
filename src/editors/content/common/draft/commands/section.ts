@@ -9,9 +9,10 @@ import { EditorState, RichUtils, SelectionState,
 export class InsertSectionCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
-    return containerPrecondition(editorState, 
+    return containerPrecondition(
+      editorState.getSelection(), editorState.getCurrentContent(),
       [EntityTypes.section_begin, EntityTypes.pullout_begin, EntityTypes.example_begin], 
-      [EntityTypes.section_end, EntityTypes.pullout_end, EntityTypes.example_end]
+      [EntityTypes.section_end, EntityTypes.pullout_end, EntityTypes.example_end],
     );
   }
 
@@ -25,10 +26,12 @@ export class InsertSectionCommand extends AbstractCommand<EditorState> {
     const endBlockKey = generateRandomKey();
 
     let content = editorState.getCurrentContent();
-    content = content.createEntity(EntityTypes.section_begin, 'IMMUTABLE', { type: 'section_begin', purpose: '' });
+    content = content.createEntity(
+      EntityTypes.section_begin, 'IMMUTABLE', { type: 'section_begin', purpose: '' });
     const beginKey = content.getLastCreatedEntityKey();
 
-    content = content.createEntity(EntityTypes.section_end, 'IMMUTABLE', { type: 'section_end', beginBlockKey});
+    content = content.createEntity(
+      EntityTypes.section_end, 'IMMUTABLE', { type: 'section_end', beginBlockKey});
     const endKey = content.getLastCreatedEntityKey();
 
     const beginCharList = Immutable.List().push(new CharacterMetadata({entity: beginKey}));
@@ -48,6 +51,8 @@ export class InsertSectionCommand extends AbstractCommand<EditorState> {
 
     content = insertBlocksAfter(content, key, blocks);
     
-    return Promise.resolve(EditorState.forceSelection(EditorState.push(editorState, content, 'insert-fragment'), stateFromKey(contentKey)));
+    return Promise.resolve(
+      EditorState.forceSelection(
+        EditorState.push(editorState, content, 'insert-fragment'), stateFromKey(contentKey)));
   }
 }
