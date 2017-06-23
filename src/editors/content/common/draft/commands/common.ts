@@ -32,13 +32,11 @@ export function stateFromKey(key: string) : SelectionState {
 // the current editor selection anchor point is not within a 
 // set of entity containers specified by entity begin and entity end types
 export function containerPrecondition(
-  editorState: EditorState,
+  selection: SelectionState, contentState: ContentState,
   beginTypes: EntityTypes[], endTypes: EntityTypes[]) : boolean {
 
   // Do not allow a pullout to be inserted inside of another pullout, 
   // or example.  They are allowed to be inserted inside of sections.
-  const contentState = editorState.getCurrentContent();
-  const selection = editorState.getSelection();
   const insertionPointKey = selection.getAnchorKey();
   const blocks = contentState.getBlocksAsArray();
 
@@ -100,7 +98,11 @@ export function isAtomic(contentBlock: ContentBlock) : boolean {
 // by blockKey.  We do this for two cases:
 // 1) There are two atomic blocks in a row
 // 2) The last block is an atomic block
-export function shouldInsertBlock(contentState: ContentState, blockKey: string) : boolean {
+// BUT, we do not do this if inserting the block would
+// then allow the user to place text where they should
+// not. 
+export function shouldInsertBlock(
+  selection: SelectionState, contentState: ContentState, blockKey: string) : boolean {
   
   const block = contentState.getBlockForKey(blockKey);
 
@@ -110,7 +112,12 @@ export function shouldInsertBlock(contentState: ContentState, blockKey: string) 
     if (nextBlockKey !== undefined && nextBlockKey !== null) {
 
       const nextBlock = contentState.getBlockForKey(nextBlockKey);
-      return isAtomic(nextBlock); // Case 1
+      return isAtomic(nextBlock)
+          && containerPrecondition(
+            selection, contentState, 
+            [EntityTypes.definition_begin], 
+            [EntityTypes.definition_end]);
+        
 
     } else {
       return true;  // Case 2

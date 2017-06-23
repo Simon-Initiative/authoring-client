@@ -10,9 +10,10 @@ import { EditorState, RichUtils, SelectionState, ContentBlock, Modifier, Charact
 export class InsertPulloutCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
-    return containerPrecondition(editorState, 
+    return containerPrecondition(
+      editorState.getSelection(), editorState.getCurrentContent(),
       [EntityTypes.pullout_begin, EntityTypes.example_begin], 
-      [EntityTypes.pullout_end, EntityTypes.example_end]
+      [EntityTypes.pullout_end, EntityTypes.example_end],
     );
   }
 

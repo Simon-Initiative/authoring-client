@@ -4,7 +4,7 @@ import { shouldInsertBlock, insertBlocksAfter } from '../commands/common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 
 export function handleInsertion(props : any) {
-  if (shouldInsertBlock(props.contentState, props.block.key)) {
+  if (shouldInsertBlock(props.selection, props.contentState, props.block.key)) {
     props.blockProps.onInsertBlock(props.block.key);
   }
 }

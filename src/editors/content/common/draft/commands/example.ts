@@ -11,7 +11,8 @@ import { EditorState, RichUtils, SelectionState,
 export class InsertExampleCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
-    return containerPrecondition(editorState, 
+    return containerPrecondition(
+      editorState.getSelection(), editorState.getCurrentContent(),
       [EntityTypes.pullout_begin, EntityTypes.example_begin], 
       [EntityTypes.pullout_end, EntityTypes.example_end]
     );

@@ -3,15 +3,38 @@ import { insertBlocksAfter, stateFromKey, containerPrecondition } from './common
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { AbstractCommand } from '../../command';
 import { EditorState, RichUtils, SelectionState, 
-  ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
+  ContentBlock, ContentState,  Modifier, CharacterMetadata} from 'draft-js';
 
+function buildTextBlock(key: string, container: Object[]) : ContentState {
+  
+  const emptyCharList = Immutable.List().push(new CharacterMetadata());
+    
+  container.push(new ContentBlock({ type: 'unstyled', key, 
+    text: ' ', characterList: emptyCharList }));
+}
 
+function buildEntityBlock(
+  container: Object[],
+  content: ContentState, type: EntityTypes, data: Object) : ContentState {
+
+  const blockKey = generateRandomKey();
+  const updated = content.createEntity(type, 'IMMUTABLE', data);
+  const entityKey = content.getLastCreatedEntityKey();
+  const beginCharList = Immutable.List().push(new CharacterMetadata({ entity: entityKey }));
+    
+  container.push(
+    new ContentBlock({ type: 'atomic', key: blockKey, 
+      text: ' ', characterList: beginCharList }),
+  );
+
+  return updated;
+}
 
 export class InsertDefinitionCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
     return containerPrecondition(
-      editorState, 
+      editorState.getSelection(), editorState.getCurrentContent(), 
       [EntityTypes.pullout_begin, EntityTypes.example_begin, EntityTypes.definition_begin], 
       [EntityTypes.pullout_end, EntityTypes.example_end, EntityTypes.definition_end],
       
@@ -21,35 +44,35 @@ export class InsertDefinitionCommand extends AbstractCommand<EditorState> {
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
 
     const ss = editorState.getSelection();
-    const key = ss.getAnchorKey();
-
-    const beginBlockKey = generateRandomKey();
-    const contentKey = generateRandomKey();
-    const endBlockKey = generateRandomKey();
-
     let content = editorState.getCurrentContent();
-    content = content.createEntity(
-      EntityTypes.definition_begin, 
-      'IMMUTABLE', { type: 'definition_begin', term: '' });
-    const beginKey = content.getLastCreatedEntityKey();
+    const key = ss.getAnchorKey();
+    const contentKey = generateRandomKey();
 
-    content = content.createEntity(
-      EntityTypes.definition_end, 
-      'IMMUTABLE', { type: 'definition_end' });
-    const endKey = content.getLastCreatedEntityKey();
+    const blocks = [];
 
-    const beginCharList = Immutable.List().push(new CharacterMetadata({ entity: beginKey }));
-    const emptyCharList = Immutable.List().push(new CharacterMetadata());
-    const endCharList = Immutable.List().push(new CharacterMetadata({ entity: endKey }));
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.definition_begin, { type: 'definition_begin', term: '' });
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.meaning_begin, { type: 'meaning_begin' });
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.material_begin, { type: 'material_begin' });
 
-    const blocks = [
-      new ContentBlock({ type: 'atomic', key: beginBlockKey, 
-        text: ' ', characterList: beginCharList }),
-      new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
-      new ContentBlock({ type: 'unstyled', key: contentKey, 
-        text: ' ', characterList: emptyCharList }),
-    ];
+    buildTextBlock(contentKey, blocks);
 
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.material_end, { type: 'material_end' });
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.meaning_end, { type: 'meaning_end' });
+    buildEntityBlock(
+      blocks, content, 
+      EntityTypes.definition_end, { type: 'definition_end' });
+    buildTextBlock(generateRandomKey(), blocks);
+    
     content = insertBlocksAfter(content, key, blocks);
     
     return Promise.resolve(EditorState.forceSelection(
