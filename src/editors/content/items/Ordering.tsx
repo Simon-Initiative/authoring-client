@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractItemPartEditor, 
@@ -62,7 +63,11 @@ export class Ordering
   }
 
   onAddChoice() {
-    const choice = new contentTypes.Choice();
+
+    const count = this.props.itemModel.choices.size;
+    const value = this.toLetter(count);
+    
+    const choice = new contentTypes.Choice().with({ value });
     
     const itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) });
@@ -106,9 +111,25 @@ export class Ordering
     return partModel;
   }
 
+  updateChoiceValues(itemModel: contentTypes.Ordering) : contentTypes.Ordering {
+    
+    const choices = itemModel.choices.toArray();
+    let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
+    
+    choices.forEach((choice, index) => {
+      const value = this.toLetter(index);
+      const updated = choice.with({ value });
+      newChoices = newChoices.set(updated.guid, updated);
+    });
+    
+    return itemModel.with({ choices: newChoices });
+  }
+
   onRemoveChoice(choice: contentTypes.Choice) {
-    const itemModel = this.props.itemModel.with(
+    let itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.delete(choice.guid) });
+    
+    itemModel = this.updateChoiceValues(itemModel); 
     const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
 
     this.props.onEdit(itemModel, partModel);
