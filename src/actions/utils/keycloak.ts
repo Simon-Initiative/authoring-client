@@ -45,6 +45,8 @@ export function login() {
         const logoutUrl = kc.createLogoutUrl({ redirectUri });
         const accountManagementUrl = kc.createAccountUrl();
 
+        continuallyRefreshToken();
+
         onLoginSuccess(profile, logoutUrl, accountManagementUrl);
       
       }).error(() => onLoginFailure());
@@ -58,23 +60,29 @@ export function login() {
 
 }
 
-export function refreshTokenIfInvalid() : Promise<any> {
-  
-  const WITHIN_FIVE_SECONDS = 5;
+function continuallyRefreshToken() {
+  setTimeout(
+    () => {
+      refreshTokenIfInvalid(60)
+        .then(validToken => validToken ? continuallyRefreshToken() : forceLogin());
+    }, 
+    30000);
+}
 
-  if (kc.isTokenExpired(WITHIN_FIVE_SECONDS)) {
+const WITHIN_FIVE_SECONDS = 5;
+
+export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Promise<any> {
+  
+  if (kc.isTokenExpired(within)) {
     return new Promise((resolve, reject) => {
-      kc.updateToken(WITHIN_FIVE_SECONDS).success((refreshed) => {
+      kc.updateToken(within).success((refreshed) => {
         if (refreshed) {
           credentials.token = kc.token;
-          console.log('Token was successfully refreshed');
           resolve(true);
         } else {
-          console.log('Token is still valid');
           resolve(true);
         }
       }).error(() => {
-        console.log('Could not refresh token');
         resolve(false);
       });
     });

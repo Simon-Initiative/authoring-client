@@ -13,8 +13,10 @@ import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak'
 
 function handleError(err) {
   if (err.message && err.message === 'Unauthorized') {
+    console.log('forcing login');
     forceLogin();
   } else {
+    console.log('unhandled err');
     console.log(err);
   }
 }
@@ -39,6 +41,7 @@ export function authenticatedFetch(params: HttpRequestParams) {
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
+        console.log('token was not valid');
         throw Error('Unauthorized');
       } else {
         return fetch(url, {
