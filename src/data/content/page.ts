@@ -21,7 +21,7 @@ export type PageParams = {
 
 const defaultPageParams = {
   contentType: 'Page',
-  id: createGuid(),
+  id: '',
   title: new Title({ text: 'Assessment Page Title' }),
   nodes: Immutable.OrderedMap<string, Node>(),
   guid: '',

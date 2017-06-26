@@ -1,9 +1,8 @@
-'use strict'
-
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import { AbstractItemPartEditor, 
+  AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
@@ -17,14 +16,15 @@ import './MultipleChoice.scss';
 
 type IdTypes = {
   select: string,
-  shuffle: string
-}
+  shuffle: string,
+};
 
 export interface MultipleChoice {
   ids: IdTypes;
 }
 
-export interface MultipleChoiceProps extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
+export interface MultipleChoiceProps 
+  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
 
 }
 
@@ -32,30 +32,33 @@ export interface MultipleChoiceState {
 
 }
 
+// tslint:disable-next-line
 const ChoiceFeedback = (props) => {
   return (
-    <div className='ChoiceFeedback clearfix'>
+    <div className="ChoiceFeedback clearfix">
       {props.children}
     </div>
-  )
-}
+  );
+};
 
 /**
  * The content editor for HtmlContent.
  */
 export class MultipleChoice 
-  extends AbstractItemPartEditor<contentTypes.MultipleChoice, MultipleChoiceProps, MultipleChoiceState> {
+  extends AbstractItemPartEditor<contentTypes.MultipleChoice, 
+    MultipleChoiceProps, MultipleChoiceState> {
     
   constructor(props) {
     super(props);
 
     this.state = {
-      editHistory: []
+      editHistory: [],
     };
     this.ids = {
       select: guid(),
-      shuffle: guid()
-    }
+      shuffle: guid(),
+    };
+
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onShuffleChange = this.onShuffleChange.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
@@ -64,42 +67,50 @@ export class MultipleChoice
   }
 
   onExplanation(explanation) {
-    const part = this.props.partModel.with({explanation});
+    const part = this.props.partModel.with({ explanation });
     this.props.onEdit(this.props.itemModel, part);
   }
 
   onShuffleChange(e) {
-    this.props.onEdit(this.props.itemModel.with({shuffle: e.target.value}), this.props.partModel);
+    this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
   }
 
   onAddChoice() {
-    const value = guid();
+    const value = guid().replace('-', '');
     const match = value; 
-    const choice = new contentTypes.Choice({value});
+    const choice = new contentTypes.Choice({ value });
     const feedback = new contentTypes.Feedback();
-    let response = new contentTypes.Response({match});
-    response = response.with({feedback: response.feedback.set(feedback.guid, feedback)});
+    let response = new contentTypes.Response({ match });
+    response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
-    let itemModel = this.props.itemModel.with({choices: this.props.itemModel.choices.set(choice.guid, choice) });
-    let partModel = this.props.partModel.with({responses: this.props.partModel.responses.set(response.guid, response)});
+    const itemModel = this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
+    const partModel = this.props.partModel.with(
+      { responses: this.props.partModel.responses.set(response.guid, response) });
 
     this.props.onEdit(itemModel, partModel);
   }
 
   onChoiceEdit(c) {
-    this.props.onEdit(this.props.itemModel.with({choices: this.props.itemModel.choices.set(c.guid, c) }), this.props.partModel);
+    this.props.onEdit(
+      this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.set(c.guid, c) }), 
+      this.props.partModel);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
-    let part = this.props.partModel.with({responses: this.props.partModel.responses.set(response.guid, response) });
+    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
+    const part = this.props.partModel.with(
+      { responses: this.props.partModel.responses.set(updated.guid, updated) });
     this.props.onEdit(this.props.itemModel, part);
   }
 
-  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response,) {
+  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response) {
     return <Choice 
               key={choice.guid}
-              {...this.props}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
               model={choice}
               onEdit={this.onChoiceEdit} 
               onRemove={this.onRemoveChoice.bind(this, choice, response)}
@@ -111,16 +122,21 @@ export class MultipleChoice
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
-    response = response.with({score});
-    const partModel = this.props.partModel.with({responses: this.props.partModel.responses.set(response.guid, response)});
+    const updated = response.with({ score });
+    const partModel = this.props.partModel.with(
+      { responses: this.props.partModel.responses.set(updated.guid, updated) });
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  renderFeedback(choice: contentTypes.Choice, response : contentTypes.Response, feedback: contentTypes.Feedback) {
+  renderFeedback(
+    choice: contentTypes.Choice, 
+    response : contentTypes.Response, feedback: contentTypes.Feedback) {
     return (
       <FeedbackEditor 
         key={feedback.guid}
-        {...this.props}
+        context={this.props.context}
+        services={this.props.services}
+        editMode={this.props.editMode}
         showLabel={true}
         model={feedback}
         onRemove={this.onRemoveChoice.bind(this, choice, response)}
@@ -129,14 +145,16 @@ export class MultipleChoice
   }
 
   onRemoveChoice(choice, response) {
-    let itemModel = this.props.itemModel.with({choices: this.props.itemModel.choices.delete(choice.guid) });
-    let partModel = this.props.partModel.with({responses: this.props.partModel.responses.delete(response.guid)});
+    const itemModel = this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.delete(choice.guid) });
+    const partModel = this.props.partModel.with(
+      { responses: this.props.partModel.responses.delete(response.guid) });
 
     this.props.onEdit(itemModel, partModel);
   }
 
   onShuffleEdit(shuffle: boolean) {
-    const itemModel = this.props.itemModel.with({shuffle});
+    const itemModel = this.props.itemModel.with({ shuffle });
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
@@ -147,20 +165,20 @@ export class MultipleChoice
 
     const rendered = [];
 
-    for (let i = 0; i < choices.length; i++) {
-      let c = choices[i];
+    for (let i = 0; i < choices.length; i += 1) {
+      const c = choices[i];
 
       let renderedFeedback = null;
       let renderedScore = null;
 
       if (responses.length > i) {
         if (responses[i].feedback.size > 0) {
-          let f = responses[i].feedback.first();
+          const f = responses[i].feedback.first();
           renderedFeedback = this.renderFeedback(c, responses[i], f);
 
-          renderedScore = <InlineForm position='right'>
+          renderedScore = <InlineForm position="right">
               <TextInput editMode={this.props.editMode}
-                label='Score' value={responses[i].score} type='number' width='75px'
+                label="Score" value={responses[i].score} type="number" width="75px"
                 onEdit={this.onScoreEdit.bind(this, responses[i])}/>
             </InlineForm>;
         }
@@ -189,9 +207,9 @@ export class MultipleChoice
     const expanded = (
       <div style={ { display: 'inline' } }>
         <Button editMode={this.props.editMode}
-          type='link' onClick={this.onAddChoice}>Add Choice</Button>
+          type="link" onClick={this.onAddChoice}>Add Choice</Button>
         <Checkbox editMode={this.props.editMode} 
-          label='Shuffle' value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+          label="Shuffle" value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
       </div>);
 
     return (
@@ -199,24 +217,26 @@ export class MultipleChoice
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label='Multiple Choice' editMode={this.props.editMode}
+        <ItemLabel label="Multiple Choice" editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
-        <Collapse caption='Choices' expanded={expanded}>
+        <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
         </Collapse>
         <Hints
-            {...this.props}
+            context={this.props.context}
+            services={this.props.services}
+            editMode={this.props.editMode}
             model={this.props.partModel}
             onEdit={this.onHintsEdit}
           />
         <ExplanationEditor
-            {...this.props}
+            context={this.props.context}
+            services={this.props.services}
+            editMode={this.props.editMode}
             model={this.props.partModel.explanation}
             onEdit={this.onExplanation}
           />
       </div>);
   }
-
 }
-

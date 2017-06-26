@@ -4,8 +4,7 @@ import { Title } from './title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { Hint } from './hint';
-import { getChildren } from './common';
-import { augment } from './common';
+import { getChildren, augment } from './common';
 
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
@@ -27,8 +26,8 @@ export type PartParams = {
 const defaultPartParams = {
   contentType: 'Part',
   id: '',
-  correct: '',
-  scoreOutOf: '',
+  correct: '0',
+  scoreOutOf: '0',
   targets: '',
   title: new Title(),
   concepts: Immutable.List<string>(),
@@ -69,16 +68,16 @@ export class Part extends Immutable.Record(defaultPartParams) {
     const part = json.part;
 
     if (part['@id'] !== undefined) {
-      model = model.with({ id: part['@id']});
+      model = model.with({ id: part['@id'] });
     }
     if (part['@correct'] !== undefined) {
-      model = model.with({ correct: part['@correct']});
+      model = model.with({ correct: part['@correct'] });
     }
     if (part['@score_out_of'] !== undefined) {
-      model = model.with({ scoreOutOf: part['@score_out_of']});
+      model = model.with({ scoreOutOf: part['@score_out_of'] });
     }
     if (part['@targets'] !== undefined) {
-      model = model.with({ targets: part['@targets']});
+      model = model.with({ targets: part['@targets'] });
     }
 
     getChildren(part).forEach((item) => {
@@ -88,10 +87,10 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id)});
+          model = model.with({ title: Title.fromPersistence(item, id) });
           break;
         case 'concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text'])});
+          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
         case 'response':
           model = model.with(
@@ -125,7 +124,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       ...this.concepts
         .toArray()
-        .map(concept => ({concept: { '#text': concept}})),
+        .map(concept => ({ concept: { '#text': concept } })),
 
       ...this.responses
         .toArray()
@@ -139,17 +138,17 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(hint => hint.toPersistence()),
 
-      { explanation }
+      { explanation },
     ];
 
     return {
-      "part": {
-        "@id": this.id,
-        "@correct": this.correct,
-        "@score_out_of": this.scoreOutOf,
-        "@targets": this.targets,
-        "#array": children
-      }
-    }
+      part: {
+        '@id': this.id,
+        '@correct': this.correct.trim() === '' ? '0' : this.correct,
+        '@score_out_of': this.scoreOutOf.trim() === '' ? '0' : this.scoreOutOf,
+        '@targets': this.targets,
+        '#array': children,
+      },
+    };
   }
 }

@@ -3,8 +3,7 @@ import * as Immutable from 'immutable';
 import { Feedback } from './feedback';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
-import { getChildren } from './common';
-import { augment } from './common';
+import { getChildren, augment } from './common';
 
 export type ResponseParams = {
 
@@ -14,7 +13,7 @@ export type ResponseParams = {
   match? : string,
   score? : string,
   name? : string,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -22,11 +21,11 @@ const defaultContent = {
   concepts : Immutable.List<string>(),
   input : '',
   match : '',
-  score : '',
+  score : '0',
   name : '',
   guid: '',
-  contentType: 'Response'
-}
+  contentType: 'Response',
+};
 
 export class Response extends Immutable.Record(defaultContent) {
   
@@ -49,33 +48,35 @@ export class Response extends Immutable.Record(defaultContent) {
 
   static fromPersistence(json: Object, guid: string) : Response {
     
-    let r = (json as any).response;
+    const r = (json as any).response;
     let model = new Response({ guid });
 
     if (r['@input'] !== undefined) {
-      model = model.with({ input: r['@input']});
+      model = model.with({ input: r['@input'] });
     }
     if (r['@name'] !== undefined) {
-      model = model.with({ name: r['@name']});
+      model = model.with({ name: r['@name'] });
     }
     if (r['@match'] !== undefined) {
-      model = model.with({ match: r['@match']});
+      model = model.with({ match: r['@match'] });
     }
     if (r['@score'] !== undefined) {
-      model = model.with({ score: r['@score']});
+      model = model.with({ score: r['@score'] });
     }
 
-    getChildren(r).forEach(item => {
+    getChildren(r).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'concept':
-          model = model.with({ concepts: model.concepts.push(item['#text'])});
+          model = model.with({ concepts: model.concepts.push(item['#text']) });
           break;
         case 'feedback':
-          model = model.with({ feedback: model.feedback.set(id, Feedback.fromPersistence(item, id))});
+          model = model.with(
+            { feedback: model.feedback.set(
+              id, Feedback.fromPersistence(item, id))});
           break;
         default:
       }
@@ -98,20 +99,25 @@ export class Response extends Immutable.Record(defaultContent) {
 
     const concepts = this.concepts
         .toArray()
-        .map(concept => ({concept: { '#text': concept}}));
+        .map(concept => ({ concept: { '#text': concept } }));
    
     const feedback = this.feedback
         .toArray()
         .map(f => f.toPersistence());
     
-    return {
-      "response": {
-        "@input": this.input,
-        "@match": this.match,
-        "@score": this.score,
-        "@name": this.name,
-        "#array": [...concepts, ...feedback]
-      }
+    const o = {
+      response: {
+        '@match': this.match,
+        '@score': this.score.trim() === '' ? '0' : this.score,
+        '@name': this.name,
+        '#array': [...concepts, ...feedback],
+      },
+    };
+
+    if (this.input.trim() !== '') {
+      o.response['@input'] = this.input;
     }
+
+    return o;
   }
 }

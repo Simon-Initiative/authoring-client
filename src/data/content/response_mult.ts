@@ -78,7 +78,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
 
     return {
       response_mult: {
-        '@score': this.score,
+        '@score': this.score.trim() === '' ? '0' : this.score,
         '@name': this.name,
         '@match_style': this.matchStyle,
         '#array': [...matches],
