@@ -49,6 +49,9 @@ const defaultQuestionParams = {
   guid: '',
 };
 
+const defaultItem = new ShortAnswer().toPersistence();
+const defaultPart = new Part().toPersistence();
+
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
 function tagInputRefsWithType(model: Question) {
@@ -65,19 +68,19 @@ function tagInputRefsWithType(model: Question) {
     {});
 
   const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
-    .reduce((contentState, info) => {
-      console.log(info);
-      if (byId[info.entity.data['@input']] !== undefined) {
-        const type = byId[info.entity.data['@input']].contentType;
-        return contentState.mergeEntityData(info.entityKey, { $type: type });
-      } else {
-        return contentState;
-      }
-      
-    }, model.body.contentState);
+    .reduce(
+      (contentState, info) => {
+        if (byId[info.entity.data['@input']] !== undefined) {
+          const type = byId[info.entity.data['@input']].contentType;
+          return contentState.mergeEntityData(info.entityKey, { $type: type });
+        } else {
+          return contentState;
+        }
+      }, 
+      model.body.contentState);
 
-  const body = model.body.with({contentState});
-  return model.with({body});
+  const body = model.body.with({ contentState });
+  return model.with({ body });
 }
 
 function ensureResponsesExist(model: Question) {
@@ -147,14 +150,14 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       model = model.with({ grading: question['@grading'] });
     }
 
-    getChildren(question).forEach(item => {
+    getChildren(question).forEach((item) => {
       
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text'])});
+          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
         case 'grading_criteria':
           model = model.with(
@@ -167,10 +170,12 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
           break;
         case 'multiple_choice':
-          model = model.with({ items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
+          model = model.with(
+            { items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
           break;
         case 'fill_in_the_blank':
-          model = model.with({ items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
+          model = model.with(
+            { items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
           break;
         case 'numeric':
           model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
@@ -205,35 +210,39 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   toPersistence() : Object {
 
+    // For a question with no items, serialize with a default one
+    const itemsAndParts = this.items.size === 0
+      ? [defaultItem, defaultPart]
+      : [...this.items
+        .toArray()
+        .map(item => item.toPersistence()),
+        ...this.parts
+          .toArray()
+          .map(part => part.toPersistence())];
+
     const children = [
       
       { body: this.body.toPersistence() },
 
       ...this.concepts
         .toArray()
-        .map(concept => ({concept: { '#text': concept}})),
+        .map(concept => ({ concept: { '#text': concept } })),
 
       ...this.criteria
         .toArray()
         .map(item => item.toPersistence()),
  
-      ...this.items
-        .toArray()
-        .map(item => item.toPersistence()),
-      
-      ...this.parts
-        .toArray()
-        .map(part => part.toPersistence()),
+      ...itemsAndParts,
 
-      { explanation: this.explanation.toPersistence() }
+      { explanation: this.explanation.toPersistence() },
     ];
 
     return {
-      "question": {
-        "@id": this.id,
-        "@grading": this.grading,
-        "#array": children
-      }
-    }
+      question: {
+        '@id': this.id,
+        '@grading': this.grading,
+        '#array': children,
+      },
+    };
   }
 }
