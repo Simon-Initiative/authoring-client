@@ -98,6 +98,8 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       });
     }
 
+    (this.refs['title'] as any).value = '';
+
     persistence.createDocument(this.props.course.model.guid, resource)
       .then(result => this.refreshCoursePackage(this.props.course.model.guid));
   }
