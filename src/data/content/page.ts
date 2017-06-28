@@ -83,13 +83,17 @@ export class Page extends Immutable.Record(defaultPageParams) {
 
   toPersistence() : Object {
 
-    const children = [
-
-      this.title.toPersistence(),
-
-      ...this.nodes
+    // If no nodes exist, serialize with an empty content
+    // just so as to satisfy DTD constraints
+    const nodes = this.nodes.size === 0
+      ? [new Content().toPersistence()]
+      : this.nodes
         .toArray()
-        .map(item => item.toPersistence()),
+        .map(item => item.toPersistence());
+
+    const children = [
+      this.title.toPersistence(),
+      ...nodes,
     ];
 
     return {
