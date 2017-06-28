@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
@@ -7,24 +5,22 @@ import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, CharacterMetadata, 
   convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
 import { CommandProcessor, Command } from '../command';
-import { generateRandomKey } from '../../../../data/content/html/common';
 
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
-import { determineChangeType, SelectionChangeType } from './utils';
+import { determineChangeType, SelectionChangeType, 
+  getCursorPosition, hasSelection, getPosition } from './utils';
 import { BlockProps } from './renderers/properties';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
 import * as common from '../../../../data/content/html/common';
 import { Html } from '../../../../data/contentTypes';
-import { EntityTypes } from '../../../../data/content/html/common';
 import { getRendererByName, BlockRenderer } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
 import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/content/html/changes';
 import handleBackspace from './keyhandlers/backspace';
-import { getCursorPosition, hasSelection, getPosition } from './utils';
-import { insertBlocksAfter } from './commands/common';
+import { insertBlocksAfter, containerPrecondition } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
 import guid from '../../../../utils/guid';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
@@ -38,7 +34,6 @@ const PADDING = 30;
 interface DraftWrapper {
   onChange: any;
   focus: () => any; 
-  handleKeyCommand: any;
   lastSelectionState: SelectionState;
   lastContent: ContentState;
   container: any;
@@ -79,8 +74,8 @@ const styles = {
   editor: {
     border: 'none',
     cursor: 'text',
-    minHeight: 300
-  }
+    minHeight: 300,
+  },
 };
 
 const styleMap = {
@@ -89,21 +84,21 @@ const styleMap = {
     position: 'relative',
     verticalAlign: 'baseline',
     fontSize: '75%',
-    bottom: '-0.25em'
+    bottom: '-0.25em',
   },
   SUPERSCRIPT: {
     lineHeight: '0',
     position: 'relative',
     verticalAlign: 'baseline',
     fontSize: '75%',
-    top: '-0.5em'
+    top: '-0.5em',
   },
   CITE: {
     fontStyle: 'italic',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
   },
   TERM: {
-    textDecoration: 'underline'
+    textDecoration: 'underline',
   },
   QUOTE: {
     fontStyle: 'italic',
@@ -128,7 +123,7 @@ const styleMap = {
   },
   SYM: {
     // TODO
-  }
+  },
 };
 
 const UL_WRAP = <ul className="public-DraftStyleDefault-ul" />;
@@ -141,28 +136,28 @@ const blockRenderMap = Immutable.Map({
   'header-four': { element: 'h4' },
   'header-five': { element: 'h5' },
   'header-six': { element: 'h6' },
-  'blockquote': { element: 'blockquote' },
-  'code': { element: 'pre' },
-  'atomic': { element: 'div' },
+  blockquote: { element: 'blockquote' },
+  code: { element: 'pre' },
+  atomic: { element: 'div' },
   'unordered-list-item': { element: 'li', wrapper: UL_WRAP },
   'ordered-list-item': { element: 'li', wrapper: OL_WRAP },
-  'unstyled': { element: 'div' },
-  'formula': { element: 'div' },
+  unstyled: { element: 'div' },
+  formula: { element: 'div' },
 });
 
-
+// tslint:disable-next-line
 const BlockRendererFactory = (props) => {
 
   const entity = props.contentState.getEntity(
-    props.block.getEntityAt(0)
+    props.block.getEntityAt(0),
   );
 
   const data = entity.getData();
   const type = entity.getType();
 
-  let viewer = getRendererByName(type).viewer;
+  const viewer = getRendererByName(type).viewer;
 
-  let childProps = Object.assign({}, props, { data });
+  const childProps = Object.assign({}, props, { data });
 
   return React.createElement((viewer as any), childProps);
 };
@@ -173,15 +168,15 @@ function splitBlockInContentState(
   selectionState: SelectionState,
 ): ContentState {
   
-  var key = selectionState.getAnchorKey();
-  var offset = selectionState.getAnchorOffset();
-  var blockMap = contentState.getBlockMap();
-  var blockToSplit = blockMap.get(key);
+  const key = selectionState.getAnchorKey();
+  const offset = selectionState.getAnchorOffset();
+  const blockMap = contentState.getBlockMap();
+  const blockToSplit = blockMap.get(key);
 
-  var text = blockToSplit.getText();
-  var chars = blockToSplit.getCharacterList();
+  const text = blockToSplit.getText();
+  const chars = blockToSplit.getCharacterList();
 
-  var blockAbove = blockToSplit.merge({
+  const blockAbove = blockToSplit.merge({
     text: text.slice(0, offset),
     characterList: chars.slice(0, offset),
   });
@@ -190,23 +185,24 @@ function splitBlockInContentState(
   
   const toPreserve = Object.keys(dataAbove)
     .filter(key => key.startsWith('oli') || key === 'semanticContext')
-    .reduce((o, key) => {
-      o[key] = dataAbove[key]
-      return o;
-    }, {});
+    .reduce(
+      (o, key) => {
+        o[key] = dataAbove[key];
+        return o;
+      }, 
+      {});
   
-
-  var keyBelow = common.generateRandomKey();
-  var blockBelow = blockAbove.merge({
+  const keyBelow = common.generateRandomKey();
+  const blockBelow = blockAbove.merge({
     key: keyBelow,
     text: text.slice(offset),
     characterList: chars.slice(offset),
     data: Immutable.Map(toPreserve),
   });
 
-  var blocksBefore = blockMap.toSeq().takeUntil(v => v === blockToSplit);
-  var blocksAfter = blockMap.toSeq().skipUntil(v => v === blockToSplit).rest();
-  var newBlocks = blocksBefore.concat(
+  const blocksBefore = blockMap.toSeq().takeUntil(v => v === blockToSplit);
+  const blocksAfter = blockMap.toSeq().skipUntil(v => v === blockToSplit).rest();
+  const newBlocks = blocksBefore.concat(
     [[blockAbove.getKey(), blockAbove], [blockBelow.getKey(), blockBelow]],
     blocksAfter,
   ).toOrderedMap();
@@ -313,7 +309,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     super(props);
 
     this.focus = () => (this.refs as any).editor.focus();
-    this.handleKeyCommand = this._handleKeyCommand.bind(this);
+    this.handleKeyCommand = this.handleKeyCommand.bind(this);
     this.lastSelectionState = null;
 
     this._dismissToolbar = this.dismissToolbar.bind(this);
@@ -336,14 +332,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       show: false,
       x: null,
       y: null,
-      component: null
+      component: null,
     };
     
-    this.onChange = (editorState : EditorState) => {
+    this.onChange = (currentEditorState : EditorState) => {
     
       // You wouldn't think that this check would be necessary, but I was seeing
       // change notifications fired from Draft even when it was not in edit mode.
       if (!this.props.locked) {
+        
+        let editorState = currentEditorState;
 
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
@@ -369,9 +367,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           contentState = editorState.getCurrentContent();
 
           this.lastContent = contentState;
-          this.setState({editorState}, () => this.props.onEdit(new Html({ contentState })));
+          this.setState({ editorState }, () => this.props.onEdit(new Html({ contentState })));
         } else {
-          this.setState({editorState});
+          this.setState({ editorState });
         }
         
         
@@ -397,7 +395,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.lastContent = contentState;
     
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
-    this.setState({editorState}, () => {
+    this.setState({ editorState }, () => {
       this.props.onEdit(new Html({ contentState }));
       this.forceRender();
     });
@@ -408,7 +406,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   onBlur(e) {
     e.stopPropagation();
     if (this.state.show) {
-      setTimeout(() => this.setState({ show: false, x: null, y: null}), 200);
+      setTimeout(() => this.setState({ show: false, x: null, y: null }), 200);
     }
   }
 
@@ -418,10 +416,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (hasSelection(ss)) {
         const selection = document.getSelection();
         if (selection.rangeCount !== 0) {
-          let topRect = getPosition();
+          const topRect = getPosition();
 
           if (topRect === null) {
-            this.setState({ show: false, x: null, y: null});
+            this.setState({ show: false, x: null, y: null });
             return;
           }
           
@@ -432,25 +430,25 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           if (topRect !== null) {
             const show = !this.shiftPressed;
 
-            this.setState({show, x: topRect.left, y, component: this.props.inlineToolbar});
+            this.setState({ show, x: topRect.left, y, component: this.props.inlineToolbar });
             
-        } else {
-            this.setState({ show: false, x: null, y: null});
+          } else {
+            this.setState({ show: false, x: null, y: null });
           }
         }
       } else {   
-        this.setState({ show: false, x: null, y: null});
+        this.setState({ show: false, x: null, y: null });
       }
       
       
     } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ show: false, x: null, y: null});
+      this.setState({ show: false, x: null, y: null });
     } 
   }
   
 
   dismissToolbar() {
-    this.setState({show: false, x: null, y: null});
+    this.setState({ show: false, x: null, y: null });
   }
 
   onKeyDown(e) {
@@ -462,7 +460,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         show: true, 
         x: point.x, 
         y: point.y, 
-        component: this.props.blockToolbar
+        component: this.props.blockToolbar,
       });        
     }
   }
@@ -473,21 +471,34 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       this.shiftPressed = false;
 
       if (this.state.x !== null) {
-        this.setState({show: true});
+        this.setState({ show: true });
       }
 
     } else if (e.keyCode === ENTER_KEY) {
       // Every time the user presses 'Enter', we display
       // the block toolbar just below their cursor
-      const point = getCursorPosition();
-      this.setState({
-        show: true, 
-        x: point.x, 
-        y: point.y + PADDING, 
-        component: this.props.blockToolbar
-      });        
+
+      if (containerPrecondition(
+        this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
+        [common.EntityTypes.title_begin, 
+          common.EntityTypes.pronunciation_begin, 
+          common.EntityTypes.translation_begin],
+        [common.EntityTypes.title_end, 
+          common.EntityTypes.pronunciation_end, 
+          common.EntityTypes.translation_end])) {
+
+        const point = getCursorPosition();
+        this.setState({
+          show: true, 
+          x: point.x, 
+          y: point.y + PADDING, 
+          component: this.props.blockToolbar,
+        }); 
+
+      }
+             
     } else if (e.keyCode === ALT_KEY) {
-      this.setState({show: false, x: null, y: null});
+      this.setState({ show: false, x: null, y: null });
     }
   }
 
@@ -515,7 +526,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       new ContentBlock({ 
         type: 'unstyled',  
         text: ' ', 
-        key: generateRandomKey(),
+        key: common.generateRandomKey(),
         characterList: emptyCharList,
       }),
     ];
@@ -537,13 +548,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       contentState, 'insert-fragment', selection);
   }
 
-  cloneDuplicatedEntities(contentState: ContentState) : ContentState {
+  cloneDuplicatedEntities(current: ContentState) : ContentState {
     
+    let contentState = current;
     const entities = getAllEntities(contentState);
     
     // Find any duplicated entities and clone them
     const seenKeys = {};
-    entities.forEach(e => {
+    entities.forEach((e) => {
       if (seenKeys[e.entityKey] === undefined) {
         seenKeys[e.entityKey] = e;
       } else {
@@ -556,8 +568,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           anchorKey: e.range.contentBlock.key,
           focusKey: e.range.contentBlock.key,
           anchorOffset: e.range.start,
-          focusOffset: e.range.end
-        })
+          focusOffset: e.range.end,
+        });
         contentState = Modifier.applyEntity(contentState, range, createdKey);
       }
     });
@@ -578,7 +590,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             this.setState({ lockedByBlockRenderer: locked });
           },
           onEditModeChange: (editMode) => {
-            //this.props.onEditModeChange(block.getKey(), editMode);
+            // this.props.onEditModeChange(block.getKey(), editMode);
           },
           onEdit: (data) => {
             this.processBlockEdit(block, data);
@@ -588,15 +600,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           editMode: !this.props.locked,
           services: this.props.services,
-          context: this.props.context
-        }
+          context: this.props.context,
+        },
       };
     }
 
     return null;
   }
 
-  _handleKeyCommand(command) {
+  handleKeyCommand(command) {
 
     const editorState = this.state.editorState;
     
@@ -604,6 +616,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (handleBackspace(editorState, this.onChange) === 'handled') {
         return 'handled';
       }
+
+      // Do not allow users to press enter and create a new block when
+      // their cursor is within titles, pronunciations, or translations
+    } else if (command === 'split-block' && 
+        !containerPrecondition(
+          editorState.getSelection(), editorState.getCurrentContent(),
+          [common.EntityTypes.title_begin, 
+            common.EntityTypes.pronunciation_begin, 
+            common.EntityTypes.translation_begin],
+          [common.EntityTypes.title_end, 
+            common.EntityTypes.pronunciation_end, 
+            common.EntityTypes.translation_end])) {
+
+      return 'handled';
     }
 
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -653,10 +679,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const content =  this.state.editorState.getCurrentContent();
     let currentWrapper : ContentWrapper = null;
     
-    for (let i = 0; i < components.length; i++) {
+    for (let i = 0; i < components.length; i += 1) {
       
-      let comp = components[i];
-      let block = content.getBlockForKey(comp.key);
+      const comp = components[i];
+      const block = content.getBlockForKey(comp.key);
 
       // Block will be undefined when what we have encountered is a Draft
       // block level wrapper such as a ol or a ul that is wrapping a series
@@ -673,12 +699,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       if (currentWrapper === null) {
 
-        let foundWrapperBegin = wrappers.find((w) => w.isBeginBlock(block, content));
+        const foundWrapperBegin = wrappers.find(w => w.isBeginBlock(block, content));
         if (foundWrapperBegin !== undefined) {
           
           currentWrapper = foundWrapperBegin;
 
           children = [];
+          // tslint:disable-next-line
           current = children;
           children.push(components[i]);
 
@@ -689,7 +716,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       } else if (currentWrapper.isEndBlock(block, content)) {
 
         children.push(components[i]);
-        updated.push(React.createElement(currentWrapper.component, {key: 'block-' + block.key}, children));
+        updated.push(
+          React.createElement(
+            currentWrapper.component, 
+            { key: 'block-' + block.key }, children));
+        // tslint:disable-next-line
         current = updated;
         currentWrapper = null;
 
@@ -729,24 +760,24 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     const es = EditorState.createWithContent(content, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
-    this.setState({editorState: newEditorState});
+    this.setState({ editorState: newEditorState });
   }
 
   renderToolbar() {
-    let toolbarAndContainer = null;
+    
     if (this.state.show) {
       
       const additionalProps = {
         editorState: this.state.editorState,
         commandProcessor: this, 
-        dismissToolbar: this._dismissToolbar
-      }
+        dismissToolbar: this._dismissToolbar,
+      };
       const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
       
       const positionStyle = {
         position: 'fixed',
         top: this.state.y,
-        left: this.state.x
+        left: this.state.x,
       };
 
       return <div style={positionStyle}>
@@ -793,7 +824,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   render() {
 
-    const editorStyle = this.props.editorStyles !== undefined ? this.props.editorStyles : styles.editor;
+    const editorStyle = this.props.editorStyles !== undefined 
+      ? this.props.editorStyles 
+      : styles.editor;
     
     return (
       <div ref={(container => this.container = container)} 

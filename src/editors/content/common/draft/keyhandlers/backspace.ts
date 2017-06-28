@@ -3,6 +3,8 @@ import { EditorState, Modifier, ContentState,
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
 import { validateSchema } from '../paste';
+
+
 export default function handle(
   editorState: EditorState, onChange: (e: EditorState) => void) : string {
   
