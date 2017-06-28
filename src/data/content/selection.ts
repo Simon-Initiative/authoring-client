@@ -10,7 +10,6 @@ import { PoolRef } from './pool_ref';
 export type SelectionSource = Pool | PoolRef;
 
 export type SelectionParams = {
-  id?: string;
   selectionCount?: string;
   strategy?: string;
   exhaustion?: string;
@@ -21,7 +20,6 @@ export type SelectionParams = {
 
 const defaultSelectionParams = {
   contentType: 'Selection',
-  id: '',
   selectionCount: '1',
   strategy: 'random',
   exhaustion: 'reuse',
@@ -33,7 +31,6 @@ const defaultSelectionParams = {
 export class Selection extends Immutable.Record(defaultSelectionParams) {
 
   contentType: 'Selection';
-  id: string;
   selectionCount: string;
   strategy: string;
   exhaustion: string;
@@ -55,9 +52,6 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
 
     const s = json.selection;
 
-    if (s['@id'] !== undefined) {
-      model = model.with({ id: s['@id'] });
-    }
     if (s['@count'] !== undefined) {
       model = model.with({ selectionCount: s['@count'] });
     }
@@ -96,7 +90,6 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
 
     return {
       selection: {
-        '@id': this.id,
         '@count': this.selectionCount,
         '@strategy': this.strategy,
         '@exhaustion': this.exhaustion,
