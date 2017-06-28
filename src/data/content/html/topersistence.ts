@@ -1192,9 +1192,7 @@ function translateInlineStyle(
   if (common.emStyles[mappedStyle] !== undefined) {
     return { em: { '@style': mappedStyle, '#text': substr } };
   } else {
-    const value = {};
-    value[mappedStyle] = { '#text': substr };
-    return value;
+    return { em: { '@style': 'bold', '#text': substr } };
   }
 }
 

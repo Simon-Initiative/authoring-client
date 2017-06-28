@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { Row } from './row';
+import { CellData } from './celldata';
 import { getKey } from '../../common';
 import { Param } from './param';
 
@@ -16,7 +17,7 @@ export type TableParams = {
 };
 
 const defaultContent = {
-  id: createGuid(),
+  id: '',
   contentType: 'Table',
   summary: '',
   title: '',
@@ -24,6 +25,15 @@ const defaultContent = {
   rows: Immutable.OrderedMap<string, Row>(),
   guid: '',
 };
+
+
+function createDefaultRows() {
+  const cell = new CellData().with({ guid: createGuid() });
+  const cells = Immutable.OrderedMap<string, CellData>().set(cell.guid, cell);
+  const row = new Row().with({ cells, guid: createGuid() });
+  return Immutable.OrderedMap<string, Row>().set(row.guid, row);
+}
+
 
 export class Table extends Immutable.Record(defaultContent) {
   id: string;
@@ -80,13 +90,18 @@ export class Table extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    const rows = this.rows.size === 0
+      ? createDefaultRows().toArray().map(p => p.toPersistence())
+      : this.rows.toArray().map(p => p.toPersistence());
+
     return {
       table: {
         '@id': this.id,
         '@summary': this.summary,
         '@title': this.title,
         '@rowstyle': this.rowstyle,
-        '#array': this.rows.toArray().map(p => p.toPersistence()),
+        '#array': rows,
       }, 
     };
   }
