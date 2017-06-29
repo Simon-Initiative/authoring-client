@@ -1476,7 +1476,7 @@ export class SkillModel extends Immutable.Record(defaultSkillModel) {
       ? a.doc.skills_model.skills
       : a.doc.skills_model['#array'];
      
-    let extractedTitle:contentTypes.Title=new contentTypes.Title ("Unassigned");  
+    let extractedTitle:contentTypes.Title = new contentTypes.Title().with({ text: 'Unassigned' });  
 
     for (let i = 0; i < skillData.length; i++) {
       const newSkill: Skill = new Skill();

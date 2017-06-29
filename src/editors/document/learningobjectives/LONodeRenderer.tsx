@@ -345,7 +345,7 @@ class LONodeRenderer extends Component <any, any>
        let hStyle:any=styles.backupHamburger;
 
        handle = connectDragSource((
-            <div style={styles.orgloadingHandle}>
+            <div style={styles.orgloadingHandle as any}>
                <div id="handle" style={hStyle}></div>
             </div>
         ), { dropEffect: 'copy' });

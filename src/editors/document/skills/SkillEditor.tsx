@@ -520,7 +520,7 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
       let dStyle:any=styles.settingsPreviewContainer;
       if (this.state.advanced==true) {    
         return (
-           <div style={styles.advancedSettingsContainer}>
+           <div style={styles.advancedSettingsContainer as any}>
              <select className="form-control">
                <option value="bkt">Bayesian Knowledge Tracing</option>
                <option value="oli">OLI Skill Modeling</option>
@@ -648,8 +648,8 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
             
             if (item.folded==true) {
               return (
-                  <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowUnselected} className="skillTitle">
-                      <div style={styles.titleBarFolded}>
+                  <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowUnselected as any} className="skillTitle">
+                      <div style={styles.titleBarFolded as any}>
                          <div style={styles.titleContainer}>
                             <TitleContentEditor 
                              services={services}
@@ -661,18 +661,18 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             />
                          </div>
                          <div style={styles.toolContainer}>
-                           <a style={styles.orgrowTitleFolded} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleFolded} onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded as any} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleFolded as any} onClick={(e) => this.fold (item)}><i className="fa fa-angle-down">&nbsp;</i></a>
                          </div>  
                       </div>
-                      <div style={styles.controlBarHidden}>
+                      <div style={styles.controlBarHidden as any}>
                       </div>        
                   </div> 
               );
             } else {
               return (
-              <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowSelected}>
-                      <div style={styles.titleBarUnfolded}>
+              <div id={'skill-' + index} key={'skill-' + index} style={styles.skillRowSelected as any}>
+                      <div style={styles.titleBarUnfolded as any}>
                          <div style={styles.titleContainer}>
                             <TitleContentEditor 
                              services={services}
@@ -684,11 +684,11 @@ class SkillEditor extends AbstractEditor<models.SkillModel,SkillEditorProps, Ski
                             />
                          </div>
                          <div style={styles.toolContainer}>
-                           <a style={styles.orgrowTitleUnfolded} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
-                           <a style={styles.orgrowTitleUnfolded} onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleUnfolded as any} onClick={(e) => this.deleteNode (item,item.title)}><i className="fa fa-window-close">&nbsp;</i></a>
+                           <a style={styles.orgrowTitleUnfolded as any} onClick={(e) => this.fold (item)}><i className="fa fa-angle-up">&nbsp;</i></a>
                          </div>  
                       </div>
-                      <div style={styles.controlBar}>
+                      <div style={styles.controlBar as any}>
                         <div style={styles.sliderPanel}>
                           <Knob
                             min={0}

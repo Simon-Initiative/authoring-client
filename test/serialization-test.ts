@@ -5,8 +5,12 @@ import * as contentTypes from '../src/data/contentTypes';
 import * as models from '../src/data/models';
 import { ContentState } from 'draft-js';
 
+import {} from 'node';
+
 const assessment = require('./assessment.json');
 const workbook_page = require('./master-workbook.json');
+
+import {} from 'jasmine';
 
 it('WorkbookPageModel', () => {
 

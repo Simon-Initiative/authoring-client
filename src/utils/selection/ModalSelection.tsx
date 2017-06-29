@@ -13,7 +13,7 @@ export interface ModalSelectionProps {
   onCancel: () => void;
 }
 
-const tempnavstyle = {   
+const tempnavstyle : any = {   
   objectContainer: {
     marginTop: '10px',
     overflow: 'auto',

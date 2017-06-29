@@ -280,7 +280,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     const title = this.props.course === null || typeof this.props.course === 'undefined' ? '' : this.props.course.model.title;
 
     return (
-      <nav style={navbarStyles.sidebar} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
+      <nav style={navbarStyles.sidebar as any} className="col-sm-3 col-md-2 hidden-xs-down sidebar">
         <h1>{title}</h1>
         <br/>
         <ul className="nav nav-pills flex-column">

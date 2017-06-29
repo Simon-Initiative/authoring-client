@@ -63,7 +63,7 @@ export class HtmlContentEditor
   } 
 
   onSelectionChange(selectionState) {
-    this.setState({selectionState});
+    this.setState({ selectionState });
   }
 
   shouldComponentUpdate(nextProps, nextState) {

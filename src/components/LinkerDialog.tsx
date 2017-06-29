@@ -364,7 +364,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                      <p className="h2" style={tempnavstyle.h2}>Error</p>
                      <a className="nav-link" onClick={e => { e.preventDefault(); this.cancelModal ()}}>Cancel</a>
                    </nav>
-                   <div style={tempnavstyle.objectContainer}>
+                   <div style={tempnavstyle.objectContainer as any}>
                      <span style={customStyles.messageSpan}>{this.state.errorMessage}</span>                   
                    </div>
                </Modal>);
@@ -399,7 +399,7 @@ class LearningObjectiveLinker extends React.Component<LearningObjectiveLinkerPro
                    <a className="nav-link" onClick={e => this.closeModal ()}>Submit</a>
                    <a className="nav-link" onClick={e => this.cancelModal ()}>Cancel</a>
                  </nav>
-                 <div style={tempnavstyle.objectContainer}>
+                 <div style={tempnavstyle.objectContainer as any}>
                   {options}
                  </div>
              </Modal>);

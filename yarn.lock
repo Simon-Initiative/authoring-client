@@ -6,9 +6,9 @@
   version "2.5.41"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.41.tgz#d5e86161a0af80d52062b310a33ed65b051a0713"
 
-"@types/node@^7.0.4":
-  version "7.0.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.4.tgz#9aabc135979ded383325749f508894c662948c8b"
+"@types/node@^8.0.5":
+  version "8.0.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.5.tgz#71ac2a2c33a4231dd2427f1b5a5b66ad2b185b5f"
 
 "@types/react-dom@^0.14.21":
   version "0.14.21"
@@ -23,9 +23,13 @@
     "@types/react" "*"
     redux "^3.6.0"
 
-"@types/react@*", "@types/react@^15.0.4":
+"@types/react@*":
   version "15.0.4"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.4.tgz#97aedbba00448a137331aa8450232124aeb8d426"
+
+"@types/react@^15.0.33":
+  version "15.0.33"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.33.tgz#442b025b3ee7d65f25c5cf495b7bd773855c079b"
 
 "@types/redux-logger@^2.6.34":
   version "2.6.34"
@@ -7105,9 +7109,9 @@ typedarray@^0.0.6, typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
+typescript@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
 
 ua-parser-js@^0.7.9:
   version "0.7.12"

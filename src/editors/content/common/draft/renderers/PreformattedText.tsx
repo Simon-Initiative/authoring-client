@@ -31,13 +31,13 @@ export interface PreformattedTextState {
 class PreformattedText extends React.PureComponent<PreformattedTextProps, PreformattedTextState> {
 
   public static defaultProps: Partial<PreformattedTextProps> = {
-    styleName: "PreformattedText-code"
+    styleName: 'PreformattedText-code',
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      src: this.props.src
+      src: this.props.src,
     };
 
     this._onChange = this.onChange.bind(this);
@@ -88,18 +88,18 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
     // recognize 'suppressContentEditableWarning' as a valid
     // property. 
 
-    return React.createElement('pre', {
-      ref: (component) => this.pre = component,
+    return React.createElement(('pre' as any), {
+      ref: component => this.pre = component,
       contentEditable: this.props.editMode,
       suppressContentEditableWarning: true,
       children: this.state.src,
       className: this.props.styleName,
       onInput: this._onChange,
       onKeyDown: this._onKeyPress,
-      onKeyUp: this._onKeyUp
+      onKeyUp: this._onKeyUp,
     });
 
   }
-};
+}
 
 export default PreformattedText;

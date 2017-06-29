@@ -789,7 +789,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         left: this.state.x,
       };
 
-      return <div style={positionStyle}>
+      return <div style={positionStyle as any}>
           {clonedToolbar}
         </div>;
       

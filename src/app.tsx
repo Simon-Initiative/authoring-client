@@ -9,6 +9,7 @@ import { createStore, applyMiddleware } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
+import {} from 'node';
 
 // tslint:disable-next-line
 var Provider = (require('react-redux') as RR).Provider;
@@ -74,7 +75,9 @@ function loadCourse() : Promise<models.CourseModel> {
   return new Promise((resolve, reject) => {
     persistence.retrieveCoursePackage(courseId)
     .then((document) => {
-      resolve(document.model);
+      if (document.model.modelType === 'CourseModel') {
+        resolve(document.model);
+      }
     })
     .catch(err => reject(err));
   });

@@ -509,7 +509,7 @@ class OrganizationNodeRenderer extends Component <any,any>
       const context = { courseModel: null, resourcePath: null, userId: null, undoRedoGuid: null,documentId: null, courseId: null, baseUrl: null};
 
       if ((node.typeDescription=="x-oli-workbook_page") || (node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")) {
-        return (<div style={styles.loTitleRenderer}>{node.title}</div>);
+        return (<div style={styles.loTitleRenderer as any}>{node.title}</div>);
       }        
         
       let titleObj=new contentTypes.Title({ text: node.title});
@@ -665,7 +665,7 @@ class OrganizationNodeRenderer extends Component <any,any>
 
         if (node.orgType!=OrgContentTypes.Item) {
           handle = connectDragSource((
-            <div style={styles.orgloadingHandle}>
+            <div style={styles.orgloadingHandle as any}>
               <div id="handle" style={hStyle}></div>
             </div>
           ), { dropEffect: 'copy' });
@@ -673,13 +673,13 @@ class OrganizationNodeRenderer extends Component <any,any>
 
           if (node.typeDescription=="x-oli-workbook_page") {              
             handle = connectDragSource((
-              <div style={styles.orgpageHandle}><div id="handle" style={workbookPageStyle}></div></div>
+              <div style={styles.orgpageHandle as any}><div id="handle" style={workbookPageStyle}></div></div>
             ), { dropEffect: 'copy' });              
           }
             
           if ((node.typeDescription=="x-oli-inline-assessment") || (node.typeDescription=="x-oli-assessment2")) {                
             handle = connectDragSource((
-              <div style={styles.orgpageHandle}><div id="handle" style={activityPageStyle}></div></div>
+              <div style={styles.orgpageHandle as any}><div id="handle" style={activityPageStyle}></div></div>
             ), { dropEffect: 'copy' });              
           }
 
