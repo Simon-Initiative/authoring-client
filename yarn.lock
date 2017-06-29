@@ -23,17 +23,13 @@
     "@types/react" "*"
     redux "^3.6.0"
 
-"@types/react@*":
-  version "15.0.4"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.4.tgz#97aedbba00448a137331aa8450232124aeb8d426"
-
-"@types/react@^15.0.33":
+"@types/react@*", "@types/react@^15.0.33":
   version "15.0.33"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.33.tgz#442b025b3ee7d65f25c5cf495b7bd773855c079b"
 
-"@types/redux-logger@^2.6.34":
-  version "2.6.34"
-  resolved "https://registry.yarnpkg.com/@types/redux-logger/-/redux-logger-2.6.34.tgz#4f0201ce75cf7e35f3ea22cbeb71f20568e93262"
+"@types/redux-logger@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/redux-logger/-/redux-logger-3.0.0.tgz#abe464fe812d03c3580ec56e6b5b375861439fca"
   dependencies:
     redux "^3.6.0"
 
