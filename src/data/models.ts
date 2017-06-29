@@ -17,9 +17,9 @@ import { assessmentTemplate } from './activity_templates';
 import { UserInfo } from './user_info';
 import { PoolModel } from './models/pool';
 
-import { Node } from './content/node';
+import { Node } from './content/assessment/node';
 
-export { Node } from './content/node';
+export { Node } from './content/assessment/node';
 
 export { PoolModel } from './models/pool';
 

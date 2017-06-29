@@ -1,21 +1,21 @@
 import * as Immutable from 'immutable';
 
-import { Html } from './html';
-import { augment } from './common';
-import { getKey } from '../common';
+import { Html } from '../html';
+import { augment } from '../common';
+import { getKey } from '../../common';
 
 export type FeedbackParams = {
   targets?: string,
   body?: Html
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Feedback',
   targets: '',
   body: new Html(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Feedback extends Immutable.Record(defaultContent) {
   
@@ -34,13 +34,13 @@ export class Feedback extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Feedback {
 
-    let feedback = (root as any).feedback;
+    const feedback = (root as any).feedback;
 
     let model = new Feedback({ guid });
-    model = model.with({ body: Html.fromPersistence(feedback, '')});
+    model = model.with({ body: Html.fromPersistence(feedback, '') });
     
     if (feedback['@targets'] !== undefined) {
-      model = model.with({ targets: feedback['@targets']});
+      model = model.with({ targets: feedback['@targets'] });
     }
     
     return model;

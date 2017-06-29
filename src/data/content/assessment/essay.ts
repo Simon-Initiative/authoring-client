@@ -1,13 +1,13 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../utils/guid';
-import { augment, getChildren } from './common';
-import { getKey } from '../common';
+import createGuid from '../../../utils/guid';
+import { augment, getChildren } from '../common';
+import { getKey } from '../../common';
 
 export type EssayParams = {
   id? : string,
   name? : string,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -34,14 +34,14 @@ export class Essay extends Immutable.Record(defaultContent) {
 
   static fromPersistence(json: Object, guid: string) : Essay {
     
-    let n = (json as any).essay;
+    const n = (json as any).essay;
     let model = new Essay({ guid });
 
     if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id']});
+      model = model.with({ id: n['@id'] });
     }
     if (n['@name'] !== undefined) {
-      model = model.with({ name: n['@name']});
+      model = model.with({ name: n['@name'] });
     }
     
     return model;
@@ -51,10 +51,10 @@ export class Essay extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     return {
-      "essay": {
-        "@id": this.id,
-        "@name": this.name,
-      }
-    }
+      essay: {
+        '@id': this.id,
+        '@name': this.name,
+      },
+    };
   }
 }

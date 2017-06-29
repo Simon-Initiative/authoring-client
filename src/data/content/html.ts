@@ -10,13 +10,13 @@ const emptyContent = ContentState.createFromText('');
 
 export type HtmlParams = {
   contentState?: ContentState,
-  guid?: string
+  guid?: string,
 };
 
 const defaultHtmlParams = {
   contentType: 'Html',
   contentState: emptyContent,
-  guid: ''
+  guid: '',
 };
 
 export class Html extends Immutable.Record(defaultHtmlParams) {
@@ -39,6 +39,6 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
   }
 
   static fromPersistence(json: Object, guid: string) : Html {
-    return new Html().with({ contentState: toDraft(json), guid});
+    return new Html().with({ contentState: toDraft(json), guid });
   }
 }

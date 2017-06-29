@@ -2,10 +2,10 @@ import * as Immutable from 'immutable';
 
 export type LockParams = {
   lockedBy?: string,
-  lockedAt?: number 
+  lockedAt?: number,
 };
 
-export class Lock extends Immutable.Record({contentType: 'Lock', lockedBy: '', lockedAt: 0}) {
+export class Lock extends Immutable.Record({ contentType: 'Lock', lockedBy: '', lockedAt: 0 }) {
   
   contentType: 'Lock';
   lockedBy: string;
@@ -21,11 +21,11 @@ export class Lock extends Immutable.Record({contentType: 'Lock', lockedBy: '', l
 
   toPersistence() : Object {
     return {
-      "lock": {
-        "lockedBy": this.lockedBy,
-        "lockedAt": this.lockedAt
-      }
-    }
+      lock: {
+        lockedBy: this.lockedBy,
+        lockedAt: this.lockedAt,
+      },
+    };
   } 
 
   static fromPersistence(data: any) {

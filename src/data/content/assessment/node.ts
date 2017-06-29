@@ -1,7 +1,7 @@
 import { Question } from './question';
 import { Content } from './content';
 import { Selection } from './selection';
-import { Unsupported } from './unsupported';
+import { Unsupported } from '../unsupported';
 
 export type Node = 
   Question | 

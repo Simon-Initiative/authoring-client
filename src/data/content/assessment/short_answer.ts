@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../utils/guid';
-import { augment, getChildren } from './common';
-import { getKey } from '../common';
+import createGuid from '../../../utils/guid';
+import { augment, getChildren } from '../common';
+import { getKey } from '../../common';
 
 export type ShortAnswerParams = {
   id? : string,
@@ -43,23 +43,23 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
 
   static fromPersistence(json: Object, guid: string) : ShortAnswer {
     
-    let n = (json as any).short_answer;
+    const n = (json as any).short_answer;
     let model = new ShortAnswer({ guid });
 
     if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id']});
+      model = model.with({ id: n['@id'] });
     }
     if (n['@name'] !== undefined) {
-      model = model.with({ name: n['@name']});
+      model = model.with({ name: n['@name'] });
     }
     if (n['@whitespace'] !== undefined) {
-      model = model.with({ whitespace: n['@whitespace']});
+      model = model.with({ whitespace: n['@whitespace'] });
     }
     if (n['@case_sensitive'] !== undefined) {
-      model = model.with({ caseSensitive: n['@case_sensitive']});
+      model = model.with({ caseSensitive: n['@case_sensitive'] });
     }
     if (n['@size'] !== undefined) {
-      model = model.with({ inputSize: n['@size']});
+      model = model.with({ inputSize: n['@size'] });
     }
     
     return model;
@@ -69,13 +69,13 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     return {
-      "short_answer": {
-        "@id": this.id,
-        "@name": this.name,
-        "@size": this.inputSize,
-        "@whitespace": this.whitespace,
-        "@case_sensitive": this.caseSensitive
-      }
-    }
+      short_answer: {
+        '@id': this.id,
+        '@name': this.name,
+        '@size': this.inputSize,
+        '@whitespace': this.whitespace,
+        '@case_sensitive': this.caseSensitive,
+      },
+    };
   }
 }

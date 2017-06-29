@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import { ContentState, ContentBlock, convertToRaw } from 'draft-js';
 
-import { Html } from './html';
+import { Html } from '../html';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
@@ -14,12 +14,12 @@ import { Essay } from './essay';
 import { Numeric } from './numeric';
 import { Feedback } from './feedback';
 import { Response } from './response';
-import { Unsupported } from './unsupported';
-import createGuid from '../../utils/guid';
-import { getKey } from '../common';
-import { getChildren, augment } from './common';
-import { getEntities } from './html/changes';
-import { EntityTypes } from './html/common';
+import { Unsupported } from '../unsupported';
+import createGuid from '../../../utils/guid';
+import { getKey } from '../../common';
+import { getChildren, augment } from '../common';
+import { getEntities } from '../html/changes';
+import { EntityTypes } from '../html/common';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;

@@ -1,7 +1,7 @@
 import { getKey } from '../common';
 import createGuid from '../../utils/guid';
 
-export function getChildren(item) : Array<Object> {
+export function getChildren(item) : Object[] {
 
   if (item['#array'] !== undefined) {
     return item['#array'];
@@ -11,9 +11,9 @@ export function getChildren(item) : Array<Object> {
 
 export function augment(params) {
   if (params === undefined) {
-    return { guid: createGuid()};
+    return { guid: createGuid() };
   } else if (params.guid === undefined) {
-    return Object.assign({}, params, {guid: createGuid()});
+    return Object.assign({}, params, { guid: createGuid() });
   } else {
     return params;
   }

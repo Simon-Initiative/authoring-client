@@ -1,14 +1,14 @@
 import * as Immutable from 'immutable';
 
-import { Html } from './html';
-import { augment } from './common';
-import { getKey } from '../common';
+import { Html } from '../html';
+import { augment } from '../common';
+import { getKey } from '../../common';
 
 export type ChoiceParams = {
   value?: string,
   color?: string,
   body?: Html,
-  guid?: string
+  guid?: string,
 };
 
 const defaultContent = {
@@ -16,8 +16,8 @@ const defaultContent = {
   value: '',
   color: '',
   body: new Html(),
-  guid: ''
-}
+  guid: '',
+};
 
 export class Choice extends Immutable.Record(defaultContent) {
   
@@ -37,21 +37,21 @@ export class Choice extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) {
 
-    let choice = (root as any).choice;
+    const choice = (root as any).choice;
     let model = new Choice({ guid });
 
     if (Object.keys(choice).length === 1 && choice['@value'] !== undefined) {
       choice['#text'] = choice['@value'];
     } 
     
-    let body = Html.fromPersistence(choice, '');
+    const body = Html.fromPersistence(choice, '');
     model = model.with({ body });
 
     if (choice['@value'] !== undefined) {
-      model = model.with({ value: choice['@value']});
+      model = model.with({ value: choice['@value'] });
     }
     if (choice['@color'] !== undefined) {
-      model = model.with({ color: choice['@color']});
+      model = model.with({ color: choice['@color'] });
     }
     
     return model;

@@ -7,7 +7,7 @@ export type TitleParams = {
   guid?: string,  
 };
 
-export class Title extends Immutable.Record({contentType: 'Title', guid: '', text: ''}) {
+export class Title extends Immutable.Record({ contentType: 'Title', guid: '', text: '' }) {
   
   contentType: 'Title';
   text: string;
@@ -27,9 +27,9 @@ export class Title extends Immutable.Record({contentType: 'Title', guid: '', tex
 
   toPersistence() : Object {
     return {
-      "title": {
-        "#text": this.text
-      }
-    }
+      title: {
+        '#text': this.text,
+      },
+    };
   }
 }

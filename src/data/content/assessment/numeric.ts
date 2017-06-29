@@ -1,9 +1,9 @@
 import * as Immutable from 'immutable';
 
 import { Choice } from './choice';
-import createGuid from '../../utils/guid';
-import { augment, getChildren } from './common';
-import { getKey } from '../common';
+import createGuid from '../../../utils/guid';
+import { augment, getChildren } from '../common';
+import { getKey } from '../../common';
 
 
 export type NumericParams = {
@@ -20,8 +20,8 @@ const defaultContent = {
   notation: 'automatic',
   inputSize: 'small',
   guid: '',
-  contentType: 'Numeric'
-}
+  contentType: 'Numeric',
+};
 
 export class Numeric extends Immutable.Record(defaultContent) {
   
@@ -42,20 +42,20 @@ export class Numeric extends Immutable.Record(defaultContent) {
 
   static fromPersistence(json: Object, guid: string) : Numeric {
     
-    let n = (json as any).numeric;
+    const n = (json as any).numeric;
     let model = new Numeric({ guid });
 
     if (n['@id'] !== undefined) {
-      model = model.with({ id: n['@id']});
+      model = model.with({ id: n['@id'] });
     }
     if (n['@name'] !== undefined) {
-      model = model.with({ name: n['@name']});
+      model = model.with({ name: n['@name'] });
     }
     if (n['@size'] !== undefined) {
-      model = model.with({ inputSize: n['@size']});
+      model = model.with({ inputSize: n['@size'] });
     }
     if (n['@notation'] !== undefined) {
-      model = model.with({ notation: n['@notation']});
+      model = model.with({ notation: n['@notation'] });
     }
     
     return model;
@@ -65,12 +65,12 @@ export class Numeric extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     return {
-      "numeric": {
-        "@id": this.id,
-        "@name": this.name,
-        "@size": this.inputSize,
-        "@notation": this.notation
-      }
-    }
+      numeric: {
+        '@id': this.id,
+        '@name': this.name,
+        '@size': this.inputSize,
+        '@notation': this.notation,
+      },
+    };
   }
 }
