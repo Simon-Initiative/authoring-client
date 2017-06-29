@@ -11,6 +11,8 @@ import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
 
+import {} from 'redux-logger';
+
 // tslint:disable-next-line
 var Provider = (require('react-redux') as RR).Provider;
 // tslint:disable-next-line
