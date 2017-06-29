@@ -5,26 +5,23 @@ import * as contentTypes from '../contentTypes';
 import { getKey } from '../common';
 import guid from '../../utils/guid';
 
-import { Resource } from '../resource';
-import { WebContent } from '../webcontent';
-
 export type PoolModelParams = {
   guid?: string,
   id?: string,
-  resource?: Resource,
+  resource?: contentTypes.Resource,
   type?: string,
   lock?: contentTypes.Lock,
-  icon?: WebContent,
+  icon?: contentTypes.WebContent,
   pool?: contentTypes.Pool,
 };
 
 const defaultPoolModel = {
   modelType: 'PoolModel',
-  resource: new Resource(),
+  resource: new contentTypes.Resource(),
   guid: '',
   id: '',
   type: 'x-oli-assessment2-pool',
-  icon: new WebContent(),
+  icon: new contentTypes.WebContent(),
   lock: new contentTypes.Lock(),
   pool: new contentTypes.Pool({ id: guid() }),
 };
@@ -33,10 +30,10 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
   modelType: 'PoolModel';
   guid: string;
   id: string;
-  resource: Resource;
+  resource: contentTypes.Resource;
   type: string;
   lock: contentTypes.Lock;
-  icon: WebContent;
+  icon: contentTypes.WebContent;
   pool: contentTypes.Pool;
 
   constructor(params?: PoolModelParams) {
@@ -52,7 +49,8 @@ export class PoolModel extends Immutable.Record(defaultPoolModel) {
     let model = new PoolModel();
 
     const p = (json as any);
-    model = model.with({ resource: Resource.fromPersistence(p) });
+    model = model.with({ resource: contentTypes.
+      Resource.fromPersistence(p) });
     model = model.with({ type: p.type });
     if (p.lock !== undefined && p.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(p.lock) });

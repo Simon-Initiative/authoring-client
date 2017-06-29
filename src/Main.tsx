@@ -18,7 +18,6 @@ import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
-import { Resource } from './data/resource';
 
 type ResourceList = {
   title: string, 
@@ -87,7 +86,7 @@ const resources = {
         (title, type) => new models.SkillModel({
           type,
           title: new contentTypes.Title({ text: title }),
-          resource: new Resource({ id:title.split(' ')[0] + guid(), title }),
+          resource: new contentTypes.Resource({ id:title.split(' ')[0] + guid(), title }),
         })),
   pools: res(
         'Question Pools',

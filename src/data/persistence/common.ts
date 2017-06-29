@@ -3,8 +3,8 @@ import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
 import { credentials, getHeaders, getFormHeaders } from '../../actions/utils/credentials';
 import { configuration } from '../../actions/utils/config';
-import { Resource } from '../resource';
-import { UserInfo } from '../user_info';
+import { Resource } from '../content/resource';
+import { UserInfo } from '../content/user_info';
 import { isArray } from 'util';
 
 const fetch = (window as any).fetch;

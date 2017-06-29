@@ -9,9 +9,9 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
 import { returnType } from '../../../utils/types';
-import { LOTypes, LearningObjective } from '../../../data/los';
-import {Resource} from "../../../data/resource";
-import Linkable from '../../../data/linkable';
+import { LOTypes, LearningObjective } from '../../../data/content/los';
+import {Resource} from "../../../data/content/resource";
+import {Linkable} from '../../../data/content/linkable';
 import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 
@@ -23,7 +23,7 @@ import SortableTree from 'react-sortable-tree';
 import { toggleExpandedForAll } from 'react-sortable-tree';
 import NodeRendererDefault from 'react-sortable-tree';
 
-import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgUnit,OrgModule,OrgOrganization} from '../../../data/org'
+import {OrgContentTypes,IDRef,OrgItem,OrgSection,OrgSequence,OrgUnit,OrgModule,OrgOrganization} from '../../../data/content/org'
 import OrganizationNodeRenderer from './OrganizationNodeRenderer';
 
 import LearningObjectiveLinker from '../../../components/LinkerDialog';

@@ -16,7 +16,7 @@ import { onFailureCallback, onSaveCompletedCallback,
     PersistenceStrategy, LockDetails} from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
-import { Resource } from '../../data/resource';
+import { Resource } from '../../data/content/resource';
 
 interface EditorManager {
 

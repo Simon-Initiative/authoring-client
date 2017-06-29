@@ -1,9 +1,9 @@
 
 import * as Immutable from 'immutable';
-import * as types from './types';
-import Linkable from './linkable';
-import {Skill} from './skills';
-import guid from '../utils/guid';
+import * as types from '../types';
+import { Linkable } from './linkable';
+import { Skill } from './skills';
+import guid from '../../utils/guid';
 
 export const LOTypes = types.strEnum([
   'LO'

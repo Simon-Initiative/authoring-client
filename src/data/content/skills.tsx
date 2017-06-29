@@ -1,8 +1,8 @@
 
 import * as Immutable from 'immutable';
-import * as types from './types';
-import Linkable from './linkable';
-import guid from '../utils/guid';
+import * as types from '../types';
+import { Linkable } from './linkable';
+import guid from '../../utils/guid';
 
 export const SkillTypes = types.strEnum([
   'Skill'
@@ -127,6 +127,7 @@ export class Skill extends Linkable {
               
   constructor() {
     super ();
+    
   }
    
   fromJSONObject (aData:any):void {  

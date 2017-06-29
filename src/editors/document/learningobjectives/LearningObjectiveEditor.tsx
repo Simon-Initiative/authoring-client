@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
-import { LearningObjective } from '../../../data/los';
+import { LearningObjective } from '../../../data/content/los';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 
@@ -10,7 +10,7 @@ import SortableTree, { toggleExpandedForAll } from 'react-sortable-tree';
 
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 
-import { OrgItem } from '../../../data/org';
+import { OrgItem } from '../../../data/content/org';
 import LONodeRenderer from './LONodeRenderer';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { AppContext } from '../../common/AppContext';

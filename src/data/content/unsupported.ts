@@ -5,10 +5,11 @@ import { augment } from './common';
 export type UnsupportedParams = {
   contentType?: 'Unsupported',
   data: Object,
-  guid: string
+  guid: string,
 };
 
-export class Unsupported extends Immutable.Record({contentType: 'Unsupported', guid: '', data: {}}) {
+export class Unsupported extends Immutable.Record(
+  { contentType: 'Unsupported', guid: '', data: {} }) {
   
   contentType: 'Unsupported';
   data: Object;

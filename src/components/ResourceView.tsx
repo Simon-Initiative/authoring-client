@@ -6,7 +6,7 @@ import NavigationBar from './NavigationBar';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';
-import { Resource } from '../data/resource';
+import { Resource } from '../data/content/resource';
 import * as courseActions from '../actions/course';
 import * as contentTypes from '../data/contentTypes';
 import { isNullOrUndefined } from 'util';

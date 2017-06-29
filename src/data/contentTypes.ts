@@ -27,6 +27,17 @@ export { Essay } from './content/assessment/essay';
 export { GradingCriteria } from './content/assessment/criteria';
 export { ResponseMult } from './content/assessment/response_mult';
 export { Match } from './content/assessment/match';
+export { FileNode } from './content/file_node';
+export { MetaData } from './content/metadata';
+export { Resource } from './content/resource';
+export { UserInfo } from './content/user_info';
+export { WebContent } from './content/webcontent';
+
+export { Linkable } from './content/linkable';
+export { LearningObjective } from './content/los';
+export { OrgContentTypes, OrgItem, OrgSection, 
+  OrgModule, OrgUnit, OrgSequence, OrgOrganization } from './content/org';
+export { Skill } from './content/skills';
 
 import { Essay } from './content/assessment/essay';
 import { Ordering } from './content/assessment/ordering';

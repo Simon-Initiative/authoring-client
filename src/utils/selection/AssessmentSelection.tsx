@@ -5,7 +5,6 @@ import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
-import { Resource } from '../../data/resource';
 import guid from '../guid';
 
 interface AssessmentSelection {
@@ -64,7 +63,7 @@ class AssessmentSelection
     // :TODO: get a real id value from user ui input field?
     const id = title.split(' ')[0] + guid();
     const resource = { id, type: 'x-oli-assessment', title };
-    const res = Resource.fromPersistence(resource);
+    const res = contentTypes.Resource.fromPersistence(resource);
     const assessment = new models.AssessmentModel({
       resource: res,
       title: new contentTypes.Title({ text: resource.title }),

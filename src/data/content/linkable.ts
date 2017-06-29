@@ -1,11 +1,11 @@
-import guid from '../utils/guid';
+import guid from '../../utils/guid';
 
 /** 
  * Base class for any resources that can function as an annotation. It it also
  * the class that can store annotations. That means you can build annotation
  * trees if we have to. 
  */
-export default class Linkable {      
+export class Linkable {      
   id:string="";
   title:string="";
   typeDescription:string="x-oli-workbook_page"; // This variable is only used for internal bookkeeping.

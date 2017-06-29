@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
-import * as types from './types';
-import guid from '../utils/guid';
-import Linkable from './linkable';
+import * as types from '../types';
+import guid from '../../utils/guid';
+import { Linkable } from './linkable';
 
 export const OrgContentTypes = types.strEnum([
   'Item',

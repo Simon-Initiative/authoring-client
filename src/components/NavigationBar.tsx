@@ -4,7 +4,7 @@ import { returnType } from '../utils/types';
 import { connect } from 'react-redux';
 import * as models from '../data/models';
 import * as contentTypes from '../data/contentTypes';
-import { Resource } from '../data/resource';
+import { Resource } from '../data/content/resource';
 import guid from '../utils/guid';
 import * as view from '../actions/view';
 /**

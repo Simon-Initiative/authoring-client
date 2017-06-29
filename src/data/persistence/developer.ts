@@ -2,8 +2,8 @@ import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
 import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
-import { Resource } from '../resource';
-import { UserInfo } from '../user_info';
+import { Resource } from '../content/resource';
+import { UserInfo } from '../content/user_info';
 
 export function developerRegistration(courseId: string,
                                       userNames: string[], action: string): Promise<UserInfo[]> {

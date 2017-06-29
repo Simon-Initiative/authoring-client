@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
-import {Skill} from '../../../data/skills';
+import { Skill } from '../../../data/content/skills';
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
 

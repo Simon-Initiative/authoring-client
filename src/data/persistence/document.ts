@@ -2,7 +2,7 @@ import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
 import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
-import { Resource } from '../resource';
+import { Resource } from '../content/resource';
 
 /**
  * Retrieve a document, given a course and document id.

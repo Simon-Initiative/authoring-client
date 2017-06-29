@@ -1,10 +1,9 @@
 import * as Immutable from 'immutable';
 import { Title } from './title';
-import { augment } from './common';
+import { augment, getChildren } from './common';
 import createGuid from '../../utils/guid';
-import { getChildren } from './common';
 import { getKey } from '../common';
-import Linkable from '../linkable';
+import { Linkable } from './linkable';
 
 export type HeadParams = {
   title?: Title,
