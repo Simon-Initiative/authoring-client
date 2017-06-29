@@ -8,7 +8,7 @@ import * as types from '../data/types';
 import { Linkable } from '../data/content/linkable';
 import { LOTypes, LearningObjective } from '../data/content/los';
 import { Skill } from '../data/content/skills';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../data/domain';
+import { initWorkbook } from '../data/domain';
 import * as viewActions from '../actions/view';
 import Modal from 'react-modal';
 

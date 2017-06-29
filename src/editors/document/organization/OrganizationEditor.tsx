@@ -12,7 +12,7 @@ import { returnType } from '../../../utils/types';
 import { LOTypes, LearningObjective } from '../../../data/content/los';
 import {Resource} from "../../../data/content/resource";
 import {Linkable} from '../../../data/content/linkable';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
+import { initWorkbook } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';

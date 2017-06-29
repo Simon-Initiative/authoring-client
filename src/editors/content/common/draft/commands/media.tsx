@@ -4,7 +4,6 @@ import { EntityTypes } from '../../../../../data/content/html/common';
 
 import { AppServices } from '../../../../common/AppServices';
 import { AppContext } from '../../../../common/AppContext';
-import { titlesForEmbeddedResources } from '../../../../../data/domain';
 import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
 import MediaSelection from '../../../../../utils/selection/MediaSelection';
 import { createAttachment } from '../../../../../utils/selection/upload';

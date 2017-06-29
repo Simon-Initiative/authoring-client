@@ -4,7 +4,6 @@ import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
-import { coursesQuery } from '../data/domain';
 import { initialize } from './utils/keycloak';
 import guid from '../utils/guid';
 

@@ -8,7 +8,7 @@ import { CourseResource, fetchCourseResources } from '../../../data/persistence'
 
 import * as contentTypes from '../../../data/contentTypes';
 import * as types from '../../../data/types';
-import { initWorkbook, resourceQuery, titlesForCoursesResources } from '../../../data/domain';
+import { initWorkbook } from '../../../data/domain';
 import * as viewActions from '../../../actions/view';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
