@@ -453,7 +453,7 @@ function translateSection(
   } else {
     title = {
       title: {
-        '#text': '',
+        '#text': ' ',
       },
     };
   }
@@ -714,7 +714,7 @@ function translateMeaning(
 function processTitle(
   rawBlock: common.RawContentBlock, block: ContentBlock, entityMap: common.RawEntityMap) {
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    return { title: { '#text': rawBlock.text } };
+    return { title: { '#text': (rawBlock.text === '' ? ' ' : rawBlock.text) } };
   } else {
     const title = { title: { '#array': [] } };
     translateTextBlock(rawBlock, block, entityMap, title.title['#array']);
