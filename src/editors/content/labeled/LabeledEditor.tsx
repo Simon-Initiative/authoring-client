@@ -91,18 +91,21 @@ export class LabeledEditor
           label="Title"
           {...this.props}
           onEdit={this.onTitleEdit}
+          inline={true}
           model={titleContent.content}
         />
         <RichTextEditor
           label="Caption"
           {...this.props}
           onEdit={this.onCaptionEdit}
+          inline={true}
           model={caption.content}
         />
         <RichTextEditor
           label="Cite"
           {...this.props}
           onEdit={this.onCiteEdit}
+          inline={true}
           model={cite.content}
         />
       </div>);

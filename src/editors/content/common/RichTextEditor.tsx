@@ -21,6 +21,7 @@ export interface RichTextEditor {
 
 export interface RichTextEditorProps extends AbstractContentEditorProps<ContentState> {
   label: string;
+  inline?: boolean;
 }
 
 export interface RichTextEditorState {
@@ -71,6 +72,7 @@ export class RichTextEditor
 
       <InputLabel label={this.props.label} style="default">
           <HtmlContentEditor 
+            inline={this.props.inline}
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}

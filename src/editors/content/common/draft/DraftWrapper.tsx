@@ -55,6 +55,7 @@ export interface DraftWrapperProps {
   inlineToolbar: any;
   blockToolbar: any;
   activeItemId: string;
+  inlineOnlyMode: boolean;
   editorStyles?: Object;
   changePreviewer?: ChangePreviewer;
 }
@@ -478,7 +479,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       // Every time the user presses 'Enter', we display
       // the block toolbar just below their cursor
 
-      if (containerPrecondition(
+      // We do not display the toolbar if their cursor is in
+      // an inline context, or if the entire draft editor is set
+      // to be inline 
+      if (!this.props.inlineOnlyMode && containerPrecondition(
         this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
         [common.EntityTypes.title_begin, 
           common.EntityTypes.pronunciation_begin, 
@@ -629,6 +633,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             common.EntityTypes.pronunciation_end, 
             common.EntityTypes.translation_end])) {
 
+      return 'handled';
+    
+    // In 'inlineOnlyMode' we do not allow the user to create additional
+    // blocks
+    } else if (command === 'split-block' && this.props.inlineOnlyMode) {
       return 'handled';
     }
 
@@ -800,8 +809,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   handlePastedText(text, html) {
-    // console.log(text);
-    // console.log(html);
+    // Disable pasting in inline mode
+    if (this.props.inlineOnlyMode) {
+      return true;
+    }
   }
 
 
@@ -809,7 +820,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   // unbalanced block sentinels or that would violate content
   // model schema.
   handlePastedFragment(fragment, editorState) {
-    if (wouldViolateSchema(fragment, editorState)) {
+    if (this.props.inlineOnlyMode || wouldViolateSchema(fragment, editorState)) {
       return true;
     } 
   }

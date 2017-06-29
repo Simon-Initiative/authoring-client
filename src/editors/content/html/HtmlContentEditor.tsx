@@ -1,4 +1,3 @@
-'use strict'
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
@@ -11,7 +10,9 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 
 import '../common/editor.scss';
 
-export type ChangePreviewer = (current: contentTypes.Html, next: contentTypes.Html) => contentTypes.Html;
+export type ChangePreviewer = (
+  current: contentTypes.Html, 
+  next: contentTypes.Html) => contentTypes.Html;
 
 export interface HtmlContentEditor {
   _onChange: (e: any) => void;
@@ -24,6 +25,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   inlineToolbar: any;
 
   blockToolbar: any;
+
+  inline?: boolean;
 
   editorStyles?: Object;
 
@@ -83,13 +86,15 @@ export class HtmlContentEditor
 
   render() : JSX.Element {
 
-    const classes = this.props.showBorder === undefined || !this.props.showBorder ? 'form-control' : '';
+    const classes = this.props.showBorder === undefined 
+      || !this.props.showBorder ? 'form-control' : '';
 
     return (
       <div className={classes}>
         
           <DraftWrapper
-            ref={(draft) => this.draft = draft}
+            ref={draft => this.draft = draft}
+            inlineOnlyMode={this.props.inline}
             activeItemId={this.props.activeItemId}
             changePreviewer={this.props.changePreviewer}
             editorStyles={this.props.editorStyles}
