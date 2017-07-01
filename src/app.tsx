@@ -11,12 +11,12 @@ import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
 
-import {} from 'redux-logger';
+import { createLogger } from 'redux-logger';
 
 // tslint:disable-next-line
 var Provider = (require('react-redux') as RR).Provider;
 // tslint:disable-next-line
-var createLogger = require('redux-logger');
+//var createLogger = require('redux-logger');
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
