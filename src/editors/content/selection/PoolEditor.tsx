@@ -46,8 +46,12 @@ export class PoolEditor
   }
 
   onRemoveQuestion(guid) {
-    this.props.onEdit(this.props.model.with( 
-      { questions: this.props.model.questions.delete(guid) }));
+
+    if (this.props.model.questions.size > 1) {
+      this.props.onEdit(this.props.model.with( 
+        { questions: this.props.model.questions.delete(guid) }));
+    }
+    
   }
 
   onEditQuestion(question: contentTypes.Question) {
