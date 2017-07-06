@@ -146,7 +146,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <div className="">
         {creationTitle}
         {this.renderCreation()}
-        <table className="table table-striped table-hover">
+        <table className="table table-sm table-striped table-hover">
           <thead>
           <tr>
             <th>Title</th>
