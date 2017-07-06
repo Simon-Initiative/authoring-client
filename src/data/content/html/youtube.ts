@@ -28,9 +28,9 @@ export type YouTubeParams = {
 
 const defaultContent = {
   contentType: 'YouTube',
-  id: createGuid(),
+  id: '',
   title: '',
-  src: '',
+  src: 'C0DPdy98e4c',
   width: '500',
   height: '300',
   popout: new Popout(),
@@ -131,7 +131,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
       youtube: {
         '@id': this.id,
         '@title': this.title,
-        '@src': this.src,
+        '@src': this.src === '' ? 'C0DPdy98e4c' : this.src,
         '@height': this.height,
         '@width': this.width,
         '#array': children,

@@ -144,11 +144,19 @@ export class Image extends Immutable.Record(defaultContent) {
       this.alternate.toPersistence(),
     ];
 
+    const clean = (v) => {
+      if (v === '') return '200';
+      if (v.endsWith('px')) return v.substr(0, v.indexOf('px'));
+      return v;
+    };
+
+    const size = clean(this.width) + 'x' + clean(this.height);
+
     return {
       image: {
         '@id': this.id,
         '@title': this.title,
-        '@src': this.src,
+        '@src': this.src === '' ? 'https://via.placeholder.com/' + size : this.src,
         '@alt': this.alt,
         '@width': this.width,
         '@height': this.height,

@@ -67,7 +67,7 @@ export class Ordering
     const count = this.props.itemModel.choices.size;
     const value = this.toLetter(count);
     
-    const choice = new contentTypes.Choice().with({ value });
+    const choice = new contentTypes.Choice().with({ value, guid: guid() });
     
     const itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) });

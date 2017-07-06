@@ -34,7 +34,7 @@ export type VideoParams = {
 
 const defaultContent = {
   contentType: 'Video',
-  id: createGuid(),
+  id: '',
   title: '',
   src: '',
   type: 'Video/mpeg',

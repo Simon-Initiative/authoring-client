@@ -89,12 +89,20 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onNodeRemove(guid: string) {
+
     let page = this.props.model.pages.get(this.state.current);
-    page = page.with({ nodes: page.nodes.delete(guid) });
 
-    const pages = this.props.model.pages.set(page.guid, page);
+    const supportedNodes = page.nodes.toArray().filter(n => n.contentType !== 'Unsupported');
 
-    this.handleEdit(this.props.model.with({ pages }));
+    if (supportedNodes.length > 1) {
+      
+      page = page.with({ nodes: page.nodes.delete(guid) });
+
+      const pages = this.props.model.pages.set(page.guid, page);
+
+      this.handleEdit(this.props.model.with({ pages }));
+    }
+
   }
 
   renderNode(n : models.Node) {

@@ -32,6 +32,13 @@ const styleContainers = {
   SUPERSCRIPT: () => ({ sup: { } }),
 };
 
+const inlineTerminalTags = {};
+inlineTerminalTags['m:math'] = true;
+inlineTerminalTags['#math'] = true;
+inlineTerminalTags['input_ref'] = true;
+inlineTerminalTags['image'] = true;
+
+
 type Container = Object[];
 type Stack = Container[];
 
@@ -1170,7 +1177,7 @@ function translateInline(
 
     const key = common.getKey(obj);
 
-    if (key === '#math') {
+    if (inlineTerminalTags[key]) {
       return obj;
     } else {
       if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
@@ -1271,6 +1278,13 @@ function input_ref(s : common.RawEntityRange, text : string, entityMap : common.
 
   const item = {};
   item[type] = data;
+
+  if (item[type]['#array'] !== undefined) {
+    delete item[type]['#array'];
+  }
+  if (item[type]['$type'] !== undefined) {
+    delete item[type]['$type'];
+  }
   
   return item;
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { returnType } from './utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -92,10 +93,15 @@ const resources = {
         'Question Pools',
         'x-oli-assessment2-pool',
         resource => resource.type === 'x-oli-assessment2-pool',
-        (title, type) => new models.PoolModel({
-          type,
-          pool: new contentTypes.Pool({ title: new contentTypes.Title({ text: title }) }),
-        })),
+        (title, type) => {
+          const q = new contentTypes.Question();
+          const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
+          return new models.PoolModel({
+            type,
+            pool: new contentTypes.Pool({ questions, 
+              title: new contentTypes.Title({ text: title }) }),
+          });
+        }),
 };
 
 function mapStateToProps(state: any) {

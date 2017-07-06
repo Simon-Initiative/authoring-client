@@ -28,7 +28,7 @@ export type IFrameParams = {
 
 const defaultContent = {
   contentType: 'IFrame',
-  id: createGuid(),
+  id: '',
   title: '',
   src: '',
   width: '500',

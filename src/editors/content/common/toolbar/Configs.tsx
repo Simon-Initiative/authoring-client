@@ -17,6 +17,7 @@ import { Xref } from '../../../../data/content/html/xref';
 import { Cite } from '../../../../data/content/html/cite';
 import { Activity } from '../../../../data/content/html/activity';
 
+import guid from '../../../../utils/guid';
 
 import * as commands from '../draft/commands';
 const math 
@@ -114,22 +115,34 @@ export function flowBlock() {
       command={new commands.SetBlockTypeCommand('formula')} 
       tooltip="Insert block formula" icon="plus"/>,
     <Button key="table" 
-      command={insertBlock(EntityTypes.table, 'IMMUTABLE', { table: new Table() })} 
+      command={insertBlock(
+        EntityTypes.table, 'IMMUTABLE', 
+        { table: new Table().with({ id: guid() }) })} 
       tooltip="Insert table" icon="table"/>,
     <Button key="image" 
-      command={insertBlock(EntityTypes.image, 'IMMUTABLE', { image: new ImageData() })} 
+      command={insertBlock(
+        EntityTypes.image, 'IMMUTABLE', 
+        { image: new ImageData().with({ id: guid() }) })} 
       tooltip="Insert image" icon="image"/>,
     <Button key="audio" 
-      command={insertBlock(EntityTypes.audio, 'IMMUTABLE', { audio: new Audio() })} 
+      command={insertBlock(
+        EntityTypes.audio, 'IMMUTABLE', 
+        { audio: new Audio().with({ id: guid() }) })} 
       tooltip="Insert audio clip" icon="music"/>,
     <Button key="video" 
-      command={insertBlock(EntityTypes.video, 'IMMUTABLE', { video: new Video() })} 
+      command={insertBlock(
+        EntityTypes.video, 'IMMUTABLE', 
+        { video: new Video().with({ id: guid() }) })} 
       tooltip="Insert video clip" icon="video-camera"/>,
     <Button key="youtube" 
-      command={insertBlock(EntityTypes.youtube, 'IMMUTABLE', { youtube: new YouTube() })} 
+      command={insertBlock(
+        EntityTypes.youtube, 'IMMUTABLE', 
+        { youtube: new YouTube().with({ id: guid() }) })} 
       tooltip="Insert YouTube Video" icon="youtube"/>,
     <Button key="iframe" 
-      command={insertBlock(EntityTypes.iframe, 'IMMUTABLE', { iframe: new IFrame() })} 
+      command={insertBlock(
+        EntityTypes.iframe, 'IMMUTABLE', 
+        { iframe: new IFrame().with({ id: guid() }) })} 
       tooltip="Insert page in iframe" icon="html5"/>,
   ];
 }

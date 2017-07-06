@@ -78,6 +78,15 @@ export abstract class QuestionEditor
       id: guid(),
     };
 
+    const createFillInTheBlank = () => {
+      const value = guid().replace('-', '');
+      const choice = new contentTypes.Choice({ value, guid: guid() });
+      
+      const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+    
+      return new contentTypes.FillInTheBlank().with({ choices });
+    };
+
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
@@ -85,7 +94,7 @@ export abstract class QuestionEditor
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.fillInTheBlankCommand 
-      = new InsertInputRefCommand(this, () => new contentTypes.FillInTheBlank(), 'FillInTheBlank');
+      = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
     this.numericCommand 
       = new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
     this.textCommand = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
@@ -187,8 +196,20 @@ export abstract class QuestionEditor
 
         question = question.with({ items: question.items.set(item.guid, item) });
 
+        let responses = Immutable.OrderedMap<string, contentTypes.Response>();
+        if (item.contentType === 'FillInTheBlank') {
+          
+          const feedback = new contentTypes.Feedback();
+          let response = new contentTypes.Response({ match: item.choices.first().value });
+          
+          response = response.with({ guid: guid(), 
+            feedback: response.feedback.set(feedback.guid, feedback) });
+          responses = responses
+            .set(response.guid, response);
+        }
+
         let part = new contentTypes.Part();
-        part = part.with({ guid: guid() });
+        part = part.with({ guid: guid(), responses });
         question = question.with({ parts: question.parts.set(part.guid, part) });
 
       }
@@ -209,12 +230,25 @@ export abstract class QuestionEditor
   onAddMultipleChoice(select) {
     
     let item = new contentTypes.MultipleChoice();
-    item = item.with({ guid: guid(), select });
+
+    const value = guid().replace('-', '');
+    const match = value; 
+    const choice = new contentTypes.Choice({ value, guid: guid() });
+    const feedback = new contentTypes.Feedback();
+    let response = new contentTypes.Response({ match });
+    response = response.with({ guid: guid(), 
+      feedback: response.feedback.set(feedback.guid, feedback) });
+
+    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+      .set(response.guid, response);
+
+    item = item.with({ guid: guid(), select, choices });
 
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
 
     let part = new contentTypes.Part();
-    part = part.with({ guid: guid() });
+    part = part.with({ guid: guid(), responses });
     model = model.with({ parts: model.parts.set(part.guid, part) });
 
     this.props.onEdit(model);
@@ -259,7 +293,11 @@ export abstract class QuestionEditor
   onAddOrdering(e) {
     e.preventDefault();
 
-    const item = new contentTypes.Ordering();
+    const value = 'A';
+    
+    const choice = new contentTypes.Choice().with({ value, guid: guid() });
+    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+    const item = new contentTypes.Ordering().with({ choices });
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
 
     const part = new contentTypes.Part();
