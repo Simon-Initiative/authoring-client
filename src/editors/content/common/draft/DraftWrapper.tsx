@@ -422,7 +422,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   setExpanderPosition() {
-    const topRect = getPosition();
+    let topRect = getPosition();
+
+    if (topRect === null) {
+      const position = getCursorPosition();
+      if (position !== null) {
+        topRect = {
+          top: position.y,
+          left: position.x,
+          bottom: 0,
+          right: 0,
+          height: 0,
+          width: 0,
+        };
+      }
+    }
 
     if (topRect !== null) {
       const divRect = this.container.getBoundingClientRect();
