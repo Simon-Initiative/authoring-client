@@ -1277,7 +1277,7 @@ function input_ref(s : common.RawEntityRange, text : string, entityMap : common.
   const { data, type } = entityMap[s.key];
 
   const item = {};
-  item[type] = data;
+  item[type] = Object.assign({}, data);
 
   if (item[type]['#array'] !== undefined) {
     delete item[type]['#array'];
