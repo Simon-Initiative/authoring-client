@@ -13,14 +13,19 @@ const log = (ss) => {
 }
 
 export function getCursorPosition() {
+  try {
     const selection = document.getSelection();
     const range = document.createRange();
     range.selectNode(selection.anchorNode);
     const rect = range.getBoundingClientRect();
     return {
       x: rect.left,
-      y: rect.top
+      y: rect.top,
     };
+  } catch (err) {
+    return null;
+  }
+    
   }
 
 export function getPosition() {

@@ -29,7 +29,7 @@ export type ChangePreviewer = (current: Html, next: Html) => Html;
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13; 
 const ALT_KEY = 18; 
-const PADDING = 30;
+const PADDING = 0;
 
 interface DraftWrapper {
   onChange: any;
@@ -54,6 +54,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   inlineToolbar: any;
   blockToolbar: any;
+  inlineInsertionToolbar: any;
   activeItemId: string;
   inlineOnlyMode: boolean;
   editorStyles?: Object;
@@ -67,8 +68,12 @@ interface DraftWrapperState {
   lockedByBlockRenderer: boolean;
   show: boolean;
   component: any;
+  blockToolbarShown: boolean;
+  blockY: number; 
+  blockX: number;
   x: number;
   y: number;
+  alignLeft: boolean;
 }
 
 const styles = {
@@ -320,6 +325,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this._onKeyDown = this.onKeyDown.bind(this);
     this._onKeyUp = this.onKeyUp.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.onClickExpand = this.onClickExpand.bind(this);
 
     const contentState = props.content.contentState;
     this.lastContent = contentState;
@@ -333,7 +339,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       show: false,
       x: null,
       y: null,
+      blockToolbarShown: false,
+      blockY: null,
+      blockX: null,
       component: null,
+      alignLeft: true,
     };
     
     this.onChange = (currentEditorState : EditorState) => {
@@ -411,45 +421,74 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
+  setExpanderPosition() {
+    const topRect = getPosition();
+
+    if (topRect !== null) {
+      const divRect = this.container.getBoundingClientRect();
+
+      const blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
+      const blockX = -27;
+      
+      this.setState({ blockY, blockX });
+      
+    }
+          
+  }
+
+
   handleSelectionChange(changeType, ss) {
-    
+
     if (changeType === SelectionChangeType.Selection) {  
+
       if (hasSelection(ss)) {
         const selection = document.getSelection();
         if (selection.rangeCount !== 0) {
           const topRect = getPosition();
 
           if (topRect === null) {
-            this.setState({ show: false, x: null, y: null });
+            this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
             return;
           }
           
           const divRect = this.container.getBoundingClientRect();
 
-          const y = topRect.top - PADDING;
+          const y = (topRect.top + window.scrollY - (divRect.top + window.scrollY)) - 25;
+
+          const alignLeft = topRect.left - divRect.left < divRect.width / 2;
+
+          const x = alignLeft
+            ? topRect.left - divRect.left
+            : (divRect.width - (topRect.left - divRect.left));
           
           if (topRect !== null) {
             const show = !this.shiftPressed;
 
-            this.setState({ show, x: topRect.left, y, component: this.props.inlineToolbar });
+            this.setState({ show, x, y, 
+              component: this.props.inlineToolbar, alignLeft, blockX: null, blockY: null });
             
           } else {
-            this.setState({ show: false, x: null, y: null });
+            this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
           }
         }
       } else {   
-        this.setState({ show: false, x: null, y: null });
+        this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
       }
       
+      this.setExpanderPosition();
       
     } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ show: false, x: null, y: null });
-    } 
+      this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
+      this.setExpanderPosition();
+    } else {
+      // this.setState({ blockToolbarShown: false, blockX: null, blockY: null });
+    }
   }
   
 
   dismissToolbar() {
-    this.setState({ show: false, x: null, y: null });
+    this.setState({ show: false, blockToolbarShown: false, x: null, 
+      y: null, blockX: null, blockY: null });
   }
 
   onKeyDown(e) {
@@ -475,32 +514,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         this.setState({ show: true });
       }
 
-    } else if (e.keyCode === ENTER_KEY) {
-      // Every time the user presses 'Enter', we display
-      // the block toolbar just below their cursor
-
-      // We do not display the toolbar if their cursor is in
-      // an inline context, or if the entire draft editor is set
-      // to be inline 
-      if (!this.props.inlineOnlyMode && containerPrecondition(
-        this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
-        [common.EntityTypes.title_begin, 
-          common.EntityTypes.pronunciation_begin, 
-          common.EntityTypes.translation_begin],
-        [common.EntityTypes.title_end, 
-          common.EntityTypes.pronunciation_end, 
-          common.EntityTypes.translation_end])) {
-
-        const point = getCursorPosition();
-        this.setState({
-          show: true, 
-          x: point.x, 
-          y: point.y + PADDING, 
-          component: this.props.blockToolbar,
-        }); 
-
-      }
-             
     } else if (e.keyCode === ALT_KEY) {
       this.setState({ show: false, x: null, y: null });
     }
@@ -784,9 +797,59 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
       
       const positionStyle = {
-        position: 'fixed',
-        top: this.state.y,
-        left: this.state.x,
+        position: 'absolute',
+        top: this.state.y + window.scrollY,
+      };
+
+      this.state.alignLeft
+        ? (positionStyle as any).left = this.state.x
+        : (positionStyle as any).right = this.state.x;
+
+      return <div style={positionStyle as any}>
+          {clonedToolbar}
+        </div>;
+      
+    } else {
+      return null;
+    }
+
+  }
+
+  isAtEmptyBlock() : boolean {
+    const ss = this.state.editorState.getSelection();
+
+    if (ss.getAnchorKey() === ss.getFocusKey()) {
+      if (ss.getAnchorOffset() === 0 && ss.getFocusOffset() === 0) {
+
+        const block = this.state.editorState.getCurrentContent().getBlockForKey(ss.getAnchorKey());
+        return block.type === 'unstyled' && block.text === '';
+      }
+    }
+
+    return false;
+  }
+
+  renderBlockToolbar() {
+    
+    if (this.state.blockToolbarShown) {
+      
+      const additionalProps = {
+        editorState: this.state.editorState,
+        commandProcessor: this, 
+        dismissToolbar: this._dismissToolbar,
+      };
+
+
+      const component = this.isAtEmptyBlock()
+        ? this.props.blockToolbar
+        : this.props.inlineInsertionToolbar;
+
+      const clonedToolbar = React.cloneElement(component, additionalProps);
+      
+      const positionStyle = {
+        top: this.state.blockY,
+        position: 'absolute',
+        left: this.state.blockX + 75,
       };
 
       return <div style={positionStyle as any}>
@@ -833,39 +896,106 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } 
   }
 
+  onClickExpand() {
+    this.setState({ blockToolbarShown: !this.state.blockToolbarShown });
+  }
+
+  shouldShowExpander() {
+
+    if (this.isAtEmptyBlock()) {
+      if (!this.props.inlineOnlyMode && containerPrecondition(
+        this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
+        [common.EntityTypes.title_begin, 
+          common.EntityTypes.pronunciation_begin, 
+          common.EntityTypes.translation_begin],
+        [common.EntityTypes.title_end, 
+          common.EntityTypes.pronunciation_end, 
+          common.EntityTypes.translation_end])) {
+
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+ 
+  }
+
+  renderExpander() {
+
+    if (this.state.blockX === null || !this.shouldShowExpander()) {
+      return null;
+    } else {
+
+      const iconClasses = this.state.blockToolbarShown
+        ? 'icon icon-minus'
+        : 'icon icon-plus';
+
+      const style = {
+        color: 'black',
+      };
+      const buttonStyle = {
+        backgroundColor: 'white',
+        top: this.state.blockY,
+        position: 'absolute',
+        left: this.state.blockX + 25,
+      };
+
+      return <button 
+          onClick={this.onClickExpand}
+          type="button" 
+          className="btn" 
+          style={buttonStyle as any}>
+          <i style={style} className={iconClasses}></i>
+        </button>;
+    }
+    
+  }
+
   render() {
 
     const editorStyle = this.props.editorStyles !== undefined 
       ? this.props.editorStyles 
       : styles.editor;
+
+    (editorStyle as any).paddingLeft = '50px';
+    (editorStyle as any).position = 'relative';
+    (editorStyle as any).top = '0px';
+    (editorStyle as any).left = '0px';
     
     return (
-      <div ref={(container => this.container = container)} 
-        onBlur={this.onBlur}
-        onKeyUp={this._onKeyUp}
-        onKeyDown={this._onKeyDown}
-        style={editorStyle} 
-        onClick={this.focus}>
+        <div ref={(container => this.container = container)} 
+          onBlur={this.onBlur}
+          onKeyUp={this._onKeyUp}
+          onKeyDown={this._onKeyDown}
+          style={editorStyle} 
+          onClick={this.focus}>
 
-        {this.renderToolbar()}
+          {this.renderExpander()}
 
-        <Editor ref="editor"
-          spellCheck={true}
-          stripPastedStyles={false}
-          handleCutFragment={this.handleCutFragment.bind(this)}
-          handlePastedText={this.handlePastedText.bind(this)}
-          handlePastedFragment={this.handlePastedFragment.bind(this)}
-          renderPostProcess={this.renderPostProcess.bind(this)}
-          customStyleMap={styleMap}
-          handleKeyCommand={this.handleKeyCommand}
-          blockRenderMap={blockRenderMap}
-          blockRendererFn={this.blockRenderer.bind(this)}
-          blockStyleFn={this.blockStyleFn.bind(this)}
-          editorState={this.state.editorState} 
-          readOnly={this.state.lockedByBlockRenderer || this.props.locked}
-          onChange={this.onChange} />
+          {this.renderToolbar()}
 
-      </div>);
+          {this.renderBlockToolbar()}
+
+          <Editor ref="editor"
+            spellCheck={true}
+            stripPastedStyles={false}
+            handleCutFragment={this.handleCutFragment.bind(this)}
+            handlePastedText={this.handlePastedText.bind(this)}
+            handlePastedFragment={this.handlePastedFragment.bind(this)}
+            renderPostProcess={this.renderPostProcess.bind(this)}
+            customStyleMap={styleMap}
+            handleKeyCommand={this.handleKeyCommand}
+            blockRenderMap={blockRenderMap}
+            blockRendererFn={this.blockRenderer.bind(this)}
+            blockStyleFn={this.blockStyleFn.bind(this)}
+            editorState={this.state.editorState} 
+            readOnly={this.state.lockedByBlockRenderer || this.props.locked}
+            onChange={this.onChange} />
+
+      </div>
+    );
   }
 
 }

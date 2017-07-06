@@ -70,6 +70,7 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 
 // Header
 .navbar{ 
+	height: 50px;
 	background-color: $color-offwhite!important;
 	border-bottom: 2px solid $color-blue;
 	color: $color-black;
@@ -199,21 +200,19 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 
 			&:hover {
 				background-color:transparent;
-				border: 2px solid $color-blue;
+				border: 0px solid $color-blue;
 				color: $color-blue;
+				text-decoration: underline;
 			}
 		}
 	}
 
 	.btn {
-		border-radius: 0px;
 		cursor: pointer;
 		background-color: transparent;
-		border: solid 2px transparent;
 		transition: none;
 		// border-bottom: 1px dotted $color-blue;
 		font-weight: 600;
-		padding-left: 0px;
 		color: $color-blue;
 
 		&.btn-primary {

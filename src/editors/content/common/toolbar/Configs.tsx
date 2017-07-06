@@ -80,6 +80,11 @@ export function flowInline() {
       tooltip="Unordered list" icon="list-ul"/>,
     <Separator key="sep3"/>,
 
+  ];
+}
+
+export function flowInsertion() {
+  return [
     <Button key="image" 
       command={insertInline(EntityTypes.image, 'IMMUTABLE', { image: new ImageData() })} 
       tooltip="Insert image" icon="image"/>,
@@ -88,8 +93,6 @@ export function flowInline() {
         EntityTypes.link, 'IMMUTABLE', 
         { link: new Link({ content: new ImageData() }) })} 
       tooltip="Insert a hyperlinked image" icon="file-image-o"/>,
-      
-
     <Button key="math" 
       command={insertInline(EntityTypes.math, 'IMMUTABLE', defaultMathML)} 
       tooltip="Math expression" icon="etsy"/>,

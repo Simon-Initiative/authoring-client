@@ -8,6 +8,7 @@ import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
+import InlineInsertionToolbar from './InlineInsertionToolbar';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
 import { Resource } from "../../../data/content/resource";
@@ -165,6 +166,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   render() {      
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
     const lolinker = this.createLinkerDialog ();
     const testArray = this.state.annotations;  
     let addLearningObj;        
@@ -206,6 +208,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
           <HtmlContentEditor 
               inlineToolbar={inlineToolbar}
+              inlineInsertionToolbar={insertionToolbar}
               blockToolbar={blockToolbar}
               editMode={this.props.editMode}
               services={this.props.services}

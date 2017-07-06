@@ -24,6 +24,8 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
   
   inlineToolbar: any;
 
+  inlineInsertionToolbar: any;
+
   blockToolbar: any;
 
   inline?: boolean;
@@ -99,6 +101,7 @@ export class HtmlContentEditor
             changePreviewer={this.props.changePreviewer}
             editorStyles={this.props.editorStyles}
             inlineToolbar={this.props.inlineToolbar}
+            inlineInsertionToolbar={this.props.inlineInsertionToolbar}
             blockToolbar={this.props.blockToolbar}
             onSelectionChange={this.onSelectionChange.bind(this)}
             services={this.props.services}

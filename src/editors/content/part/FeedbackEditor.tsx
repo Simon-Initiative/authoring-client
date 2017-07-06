@@ -9,6 +9,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import { InputLabel } from '../common/InputLabel';
 
@@ -56,6 +57,7 @@ export class FeedbackEditor
     
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;  
 
     const bodyStyle = {
       minHeight: '20px',
@@ -73,6 +75,7 @@ export class FeedbackEditor
               editorStyles={bodyStyle}
               inlineToolbar={inlineToolbar}
               blockToolbar={blockToolbar}
+              inlineInsertionToolbar={insertionToolbar}
               {...this.props}
               model={this.props.model.body}
               onEdit={this.onBodyEdit} 

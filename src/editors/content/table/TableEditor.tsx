@@ -11,6 +11,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
 import '../common/editor.scss';
@@ -123,7 +124,7 @@ export class TableEditor
   }
 
   renderCell(
-    rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, totalCells: number) {
+    rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, insertionToolbar: any, totalCells: number) {
 
     const width = ((1 / totalCells) * 100) + '%';
     const verticalAlign = 'top';
@@ -138,6 +139,7 @@ export class TableEditor
       editorStyles={bodyStyle}
       inlineToolbar={inlineToolbar}
       blockToolbar={blockToolbar}
+      inlineInsertionToolbar={insertionToolbar}
       {...this.props}
       model={new Html({ contentState: cell.content })}
       onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)} 
@@ -165,11 +167,13 @@ export class TableEditor
     }
   }
 
-  renderRow(row: Row, inlineToolbar: any, blockToolbar: any) {
+  renderRow(row: Row, inlineToolbar: any, blockToolbar: any, insertionToolbar: any) {
     return (
       <tr key={row.guid}>
         {row.cells.toArray().map(
-          c => this.renderCell(row.guid, c, inlineToolbar, blockToolbar, row.cells.size))}
+          c => this.renderCell(
+            row.guid, c, inlineToolbar, 
+            blockToolbar, insertionToolbar, row.cells.size))}
         <td><span className="closebtn input-group-addon" 
           onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
       </tr>
@@ -183,6 +187,7 @@ export class TableEditor
 
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
 
     return (
       <div className="itemWrapper">
@@ -197,7 +202,7 @@ export class TableEditor
         <table className="table table-bordered" style={ { width: '100%' } }>
           <tbody>
           {this.renderDeleteColumn()}
-          {rows.map(row => this.renderRow(row, inlineToolbar, blockToolbar))}
+          {rows.map(row => this.renderRow(row, inlineToolbar, blockToolbar, insertionToolbar))}
           </tbody>
         </table>
       </div>);

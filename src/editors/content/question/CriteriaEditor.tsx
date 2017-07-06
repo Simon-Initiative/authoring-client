@@ -11,6 +11,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { TextInput, InlineForm, Button, Checkbox, Select } from '../common/controls';
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
@@ -72,6 +73,7 @@ export class CriteriaEditor
     
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
 
     const bodyStyle = {
       minHeight: '30px',
@@ -101,6 +103,7 @@ export class CriteriaEditor
         <HtmlContentEditor 
           editorStyles={bodyStyle}
           inlineToolbar={inlineToolbar}
+          inlineInsertionToolbar={insertionToolbar}
           blockToolbar={blockToolbar}
           services={this.props.services}
           context={this.props.context}

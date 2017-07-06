@@ -10,6 +10,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
 
@@ -55,6 +56,7 @@ export class RichTextEditor
     
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
 
     const bodyStyle = {
       minHeight: '20px',
@@ -78,6 +80,7 @@ export class RichTextEditor
             editMode={this.props.editMode}
             editorStyles={bodyStyle}
             inlineToolbar={inlineToolbar}
+            inlineInsertionToolbar={insertionToolbar}
             blockToolbar={blockToolbar}
             model={new contentTypes.Html({ contentState: this.props.model })}
             onEdit={this.onEdit} 

@@ -6,6 +6,7 @@ import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState }
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
@@ -98,6 +99,7 @@ export abstract class FeedbackRow
   renderFeedback(response: contentTypes.Response) {
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
 
     const feedback = response.feedback.first();
 
@@ -112,6 +114,7 @@ export abstract class FeedbackRow
         editorStyles={bodyStyle}
         inlineToolbar={inlineToolbar}
         blockToolbar={blockToolbar}
+        inlineInsertionToolbar={insertionToolbar}
         {...this.props}
         model={feedback.body}
         onEdit={this.onBodyEdit} 

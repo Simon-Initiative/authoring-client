@@ -26,6 +26,8 @@ import { getHtmlDetails } from '../common/details';
 import { EntityTypes } from '../../../data/content/html/common';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
@@ -405,6 +407,11 @@ export abstract class QuestionEditor
     
     const inlineToolbar 
       = <InlineToolbar>
+          
+        </InlineToolbar>;
+
+    const insertionToolbar = 
+        <InlineInsertionToolbar>
           <HtmlToolbarButton 
             tooltip="Insert Fill In the Blank" key="server" 
             icon="server" command={this.fillInTheBlankCommand}/>
@@ -414,7 +421,7 @@ export abstract class QuestionEditor
           <HtmlToolbarButton 
             tooltip="Insert Text Input" key="i-cursor" 
             icon="i-cursor" command={this.textCommand}/>
-        </InlineToolbar>;
+        </InlineInsertionToolbar>;
 
     const blockToolbar = <BlockToolbar/>;
 
@@ -434,9 +441,9 @@ export abstract class QuestionEditor
           Add Item
         </button>
         <div className="dropdown-menu">
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single')}} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }} 
             className="dropdown-item">Multiple choice</a>
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple')}} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }} 
             className="dropdown-item">Check all that apply</a>
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
@@ -479,6 +486,7 @@ export abstract class QuestionEditor
                 activeItemId={this.state.activeItemId}
                 editorStyles={bodyStyle}
                 inlineToolbar={inlineToolbar}
+                inlineInsertionToolbar={insertionToolbar}
                 blockToolbar={blockToolbar}
                 model={this.props.model.body}
                 onEdit={this.onBodyEdit} 
