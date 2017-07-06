@@ -4,7 +4,7 @@ import './markers.scss';
 
 export const MeaningEnd = (props) => {
   return (
-    <span className="MeaningSentinel" onClick={handleInsertion.bind(undefined, props)}>
+    <span className="MeaningSentinel">
       meaning end
     </span>);
 };

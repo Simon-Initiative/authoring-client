@@ -686,8 +686,6 @@ function translateMaterial(
   const p = {
     material: {
       '#array': arr,
-      '@id': id, 
-      '@title': title,
     },
   };
 
