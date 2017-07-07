@@ -56,6 +56,16 @@ export class SourceEditor
     return false;
   }
 
+
+  adjust(path) {
+    const dirCount = this.props.context.resourcePath.split('\/').length;
+    let updated = path;
+    for (let i = 0; i < dirCount; i += 1) {
+      updated = '../' + updated;
+    }
+    return updated;
+  }
+
   onFileChange(e) {
     const file = e.target.files[0];
     const src = file.name;
@@ -64,7 +74,7 @@ export class SourceEditor
     .then((result) => {
       this.setState(
         { failure: false }, 
-        () => this.props.onEdit(this.props.model.with({ src: result })));
+        () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
     })
     .catch((err) => {
       this.setState({ failure: true });
