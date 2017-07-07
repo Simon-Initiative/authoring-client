@@ -159,6 +159,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         case 'concept':
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
+        case 'cmd:concept':
+          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
+          break;
+        
         case 'grading_criteria':
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
@@ -226,7 +230,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
       ...this.concepts
         .toArray()
-        .map(concept => ({ concept: { '#text': concept } })),
+        .map(concept => ({ 'cmd:concept': { '#text': concept } })),
 
       ...this.criteria
         .toArray()
