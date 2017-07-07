@@ -55,10 +55,10 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
   toPersistence() : Object {
 
     const body = this.body.toPersistence();
-    const criteria = { criteria: (body as any) };
+    const criteria = { grading_criteria: (body as any) };
 
-    criteria.criteria['@score'] = this.score;
-    criteria.criteria['@name'] = this.name;
+    criteria.grading_criteria['@score'] = this.score;
+    criteria.grading_criteria['@name'] = this.name;
 
     return criteria;
   }

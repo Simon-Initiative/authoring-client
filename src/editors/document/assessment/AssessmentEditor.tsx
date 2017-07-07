@@ -21,6 +21,7 @@ import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
+import { containsMultipartQuestions } from './utils';
 
 interface AssessmentEditor {
   
@@ -64,10 +65,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.props.context.courseModel.resources.map((value, id) => {        
       if (value.type === 'x-oli-skills_model') {
-        //console.log ('Found skills document, loading ...');  
+        // console.log ('Found skills document, loading ...');  
         persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {
-          //console.log ('Loaded skill document, assinging ...');  
+          // console.log ('Loaded skill document, assinging ...');  
           const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
           this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
         });
@@ -109,6 +110,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (n.contentType === 'Question') {
       return <QuestionEditor
               key={n.guid}
+              isParentAssessmentGraded={this.props.model.type === LegacyTypes.assessment2}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -130,6 +132,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     } else if (n.contentType === 'Selection') {
       return <SelectionEditor
               key={n.guid}
+              isParentAssessmentGraded={this.props.model.type === LegacyTypes.assessment2}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -232,7 +235,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   closeModal (newAnnotations:any) {
     console.log ('closeModal ()');  
     
-    //this.handleEdit(this.props.model.with({ annotations: newAnnotations }));      
+    // this.handleEdit(this.props.model.with({ annotations: newAnnotations }));      
   }     
 
   /**
@@ -253,7 +256,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       closeModal={this.closeModal.bind (this)} 
       sourceData={this.state.skillModel.skills} 
       modalIsOpen={this.state.modalIsOpen} 
-      targetAnnotations={new Array<Linkable>()} />);           
+      targetAnnotations={[]} />);           
   }  
 
   render() {
@@ -264,7 +267,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     let skilllinker;
             
     if (this.state.skillModel) {  
-      skilllinker= this.createLinkerDialog ();
+      skilllinker = this.createLinkerDialog ();
     }        
     
     return (
@@ -284,7 +287,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 <Select
                   value={this.props.model.resource.type}
                   label="Type:"
-                  editMode={this.props.editMode}
+                  editMode={this.props.editMode && !containsMultipartQuestions(this.props.model)}
                   onChange={this.onTypeChange}
                 >
                   <option value={LegacyTypes.assessment2}>Graded</option>

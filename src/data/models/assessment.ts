@@ -92,11 +92,11 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       assessment = a.doc.assessment;
     }
 
-    if (assessment['@recommendedAttempts'] !== undefined) {
-      model = model.with({ recommendedAttempts: assessment['@recommendedAttempts'] });
+    if (assessment['@recommended_attempts'] !== undefined) {
+      model = model.with({ recommendedAttempts: assessment['@recommended_attempts'] });
     }
-    if (assessment['@maxAttempts'] !== undefined) {
-      model = model.with({ maxAttempts: assessment['@maxAttempts'] });
+    if (assessment['@max_attempts'] !== undefined) {
+      model = model.with({ maxAttempts: assessment['@max_attempts'] });
     }
 
     assessment['#array'].forEach((item) => {
@@ -120,6 +120,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         case 'selection':
           model = model.with(
             { nodes: model.nodes.set(id, contentTypes.Selection.fromPersistence(item, id)) });
+          break;
+        case 'title':
           break;
         default:
           model = model.with(
@@ -159,8 +161,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
       doc = [{
         assessment: {
           '@id': this.resource.id,
-          '@recommendedAttempts': this.recommendedAttempts,
-          '@maxAttempts': this.maxAttempts,
+          '@recommended_attempts': this.recommendedAttempts,
+          '@max_attempts': this.maxAttempts,
           '#array': children,
         },
       }];

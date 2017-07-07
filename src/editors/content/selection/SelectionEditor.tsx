@@ -19,6 +19,7 @@ export interface SelectionEditor {
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
+  isParentAssessmentGraded?: boolean;
 }
 
 export interface SelectionState {

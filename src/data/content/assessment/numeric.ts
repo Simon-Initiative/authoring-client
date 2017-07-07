@@ -67,7 +67,6 @@ export class Numeric extends Immutable.Record(defaultContent) {
     return {
       numeric: {
         '@id': this.id,
-        '@name': this.name,
         '@size': this.inputSize,
         '@notation': this.notation,
       },

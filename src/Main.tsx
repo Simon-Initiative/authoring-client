@@ -98,7 +98,7 @@ const resources = {
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
           return new models.PoolModel({
             type,
-            pool: new contentTypes.Pool({ questions, 
+            pool: new contentTypes.Pool({ id: guid(), questions, 
               title: new contentTypes.Title({ text: title }) }),
           });
         }),

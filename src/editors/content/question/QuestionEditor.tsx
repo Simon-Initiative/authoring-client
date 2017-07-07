@@ -54,6 +54,7 @@ export interface QuestionEditor {
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
+  isParentAssessmentGraded?: boolean;
 }
 
 export interface QuestionEditorState {
@@ -120,17 +121,31 @@ export abstract class QuestionEditor
     }
   }
 
+  canInsertAnotherPart() : boolean {
+    const restricted = this.props.isParentAssessmentGraded 
+      === undefined || this.props.isParentAssessmentGraded;
+
+    return !restricted || this.props.model.items.size === 0;
+  }
+
   onInsertNumeric(e) {
     e.preventDefault();
-    this.htmlEditor.process(this.numericCommand);
+    if (this.canInsertAnotherPart()) {  
+      this.htmlEditor.process(this.numericCommand);
+    }
+    
   }
   onInsertText(e) {
     e.preventDefault();
-    this.htmlEditor.process(this.textCommand);
+    if (this.canInsertAnotherPart()) {  
+      this.htmlEditor.process(this.textCommand);
+    }
   }
   onInsertFillInTheBlank(e) {
     e.preventDefault();
-    this.htmlEditor.process(this.fillInTheBlankCommand);
+    if (this.canInsertAnotherPart()) {  
+      this.htmlEditor.process(this.fillInTheBlankCommand);
+    }
   }
 
   onConceptsEdit(concepts) {
@@ -228,6 +243,8 @@ export abstract class QuestionEditor
 
 
   onAddMultipleChoice(select) {
+
+    if (!this.canInsertAnotherPart()) return;
     
     let item = new contentTypes.MultipleChoice();
 
@@ -278,6 +295,10 @@ export abstract class QuestionEditor
 
   onAddShortAnswer(e) {
     e.preventDefault();
+
+    if (!this.canInsertAnotherPart()) return;
+    
+
     const item = new contentTypes.ShortAnswer();
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
 
@@ -292,7 +313,8 @@ export abstract class QuestionEditor
 
   onAddOrdering(e) {
     e.preventDefault();
-
+    if (!this.canInsertAnotherPart()) return;
+    
     const value = 'A';
     
     const choice = new contentTypes.Choice().with({ value, guid: guid() });

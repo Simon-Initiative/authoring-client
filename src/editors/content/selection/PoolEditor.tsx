@@ -19,6 +19,7 @@ export interface PoolEditor {
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
+  isParentAssessmentGraded?: boolean;
 }
 
 export interface PoolState {
