@@ -3,6 +3,7 @@ import { Html } from '../html';
 import { Title } from '../title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
+import { GradingCriteria } from './criteria';
 import { Hint } from './hint';
 import { getChildren, augment } from '../common';
 
@@ -18,6 +19,7 @@ export type PartParams = {
   concepts?: Immutable.List<string>;
   responses?: Immutable.OrderedMap<string, Response>;
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
+  criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
   explanation?: Html;
   guid?: string;
@@ -31,6 +33,7 @@ const defaultPartParams = {
   targets: '',
   title: new Title(),
   concepts: Immutable.List<string>(),
+  criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
@@ -47,6 +50,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   targets: string;
   title: Title;
   concepts: Immutable.List<string>;
+  criteria: Immutable.OrderedMap<string, GradingCriteria>;
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
@@ -86,6 +90,11 @@ export class Part extends Immutable.Record(defaultPartParams) {
       const id = createGuid();
 
       switch (key) {
+        case 'grading_criteria':
+          model = model.with(
+            { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
+          break;
+        
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
@@ -129,6 +138,10 @@ export class Part extends Immutable.Record(defaultPartParams) {
       ...this.responses
         .toArray()
         .map(response => response.toPersistence()),
+
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
 
       ...this.responseMult
         .toArray()

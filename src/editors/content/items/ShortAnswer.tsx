@@ -7,6 +7,7 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -41,6 +42,10 @@ export class ShortAnswer
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -52,6 +57,31 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
+  renderCriteria() {
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
+
+    return <Collapse caption="Grading Criteria" 
+        details=""
+        expanded={expandedCriteria}>
+
+          {this.props.partModel.criteria.toArray()
+            .map(c => <CriteriaEditor
+              onRemove={this.onCriteriaRemove}
+              model={c}
+              onEdit={this.onCriteriaEdit}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              />)}
+
+      </Collapse>;
+
+  }
+
   onWhitespaceChange(whitespace) {
     this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel);
   }
@@ -59,6 +89,22 @@ export class ShortAnswer
   onCaseSensitive(caseSensitive) {
     this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel);
   }
+
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.partModel.criteria.delete(guid);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
 
   onSizeChange(inputSize) {
     this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
@@ -94,6 +140,8 @@ export class ShortAnswer
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
         {controls}
+
+        {this.renderCriteria()}
 
         <Hints
             {...this.props}

@@ -7,6 +7,7 @@ import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
@@ -39,6 +40,10 @@ export class Essay
     
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -49,6 +54,47 @@ export class Essay
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
   }
+
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.partModel.criteria.delete(guid);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
+  renderCriteria() {
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
+
+    return <Collapse caption="Grading Criteria" 
+        details=""
+        expanded={expandedCriteria}>
+
+          {this.props.partModel.criteria.toArray()
+            .map(c => <CriteriaEditor
+              onRemove={this.onCriteriaRemove}
+              model={c}
+              onEdit={this.onCriteriaEdit}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              />)}
+
+      </Collapse>;
+
+  }
+
 
   render() : JSX.Element {
     
@@ -61,6 +107,8 @@ export class Essay
           editMode={this.props.editMode} 
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
+        {this.renderCriteria()}
+
         <Hints
             {...this.props}
             model={this.props.partModel}

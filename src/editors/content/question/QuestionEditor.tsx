@@ -17,7 +17,7 @@ import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
-import { CriteriaEditor } from './CriteriaEditor';
+
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { CommandProcessor, Command } from '../common/command';
@@ -108,9 +108,7 @@ export abstract class QuestionEditor
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
 
-    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
-    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
-    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
+    
     this.onGradingChange = this.onGradingChange.bind(this);
     this.lastBody = this.props.model.body;
   }
@@ -156,19 +154,6 @@ export abstract class QuestionEditor
     this.setState({ activeItemId });
   }
 
-  onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
-    const criteria = this.props.model.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.model.with({ criteria }));
-  }
-  onCriteriaRemove(guid) {
-    const criteria = this.props.model.criteria.delete(guid);
-    this.props.onEdit(this.props.model.with({ criteria }));
-  }
-  onCriteriaEdit(c) {
-    const criteria = this.props.model.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.model.with({ criteria }));
-  }
 
   onBodyEdit(body) {
 
@@ -438,17 +423,6 @@ export abstract class QuestionEditor
     }
   }
 
-  renderCriteria() {
-    return this.props.model.criteria.toArray()
-      .map(c => <CriteriaEditor
-        onRemove={this.onCriteriaRemove}
-        model={c}
-        onEdit={this.onCriteriaEdit}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        />);
-  }
 
   renderItemsAndParts() {
 
@@ -462,6 +436,8 @@ export abstract class QuestionEditor
 
     return toRender;
   }
+
+
 
   render() : JSX.Element {
     
@@ -522,11 +498,7 @@ export abstract class QuestionEditor
         </Select>
       </form>);
 
-    const expandedCriteria =
-      <form className="form-inline">
-        <Button editMode={this.props.editMode} 
-          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
-      </form>;
+    
 
     return (
     
@@ -552,13 +524,7 @@ export abstract class QuestionEditor
                 onEdit={this.onBodyEdit} 
                 />
 
-          <Collapse caption="Grading Criteria" 
-            details=""
-            expanded={expandedCriteria}>
-
-            {this.renderCriteria()}
-
-          </Collapse>
+          
 
 
           <ConceptsEditor 

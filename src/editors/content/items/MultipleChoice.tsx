@@ -8,6 +8,7 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -75,6 +76,31 @@ export class MultipleChoice
     this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
   }
 
+  renderCriteria() {
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
+
+    return <Collapse caption="Grading Criteria" 
+        details=""
+        expanded={expandedCriteria}>
+
+          {this.props.partModel.criteria.toArray()
+            .map(c => <CriteriaEditor
+              onRemove={this.onCriteriaRemove}
+              model={c}
+              onEdit={this.onCriteriaEdit}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              />)}
+
+      </Collapse>;
+
+  }
+
   onAddChoice() {
     const value = guid().replace('-', '');
     const match = value; 
@@ -90,6 +116,22 @@ export class MultipleChoice
 
     this.props.onEdit(itemModel, partModel);
   }
+
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.partModel.criteria.delete(guid);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
 
   onChoiceEdit(c) {
     this.props.onEdit(
@@ -220,6 +262,8 @@ export class MultipleChoice
         <ItemLabel label="Multiple Choice" editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
+        {this.renderCriteria()}
+
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

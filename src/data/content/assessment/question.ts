@@ -29,7 +29,6 @@ export type QuestionParams = {
   body?: Html;
   concepts?: Immutable.List<string>;
   grading?: string;
-  criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
   explanation?: Html;
@@ -42,7 +41,6 @@ const defaultQuestionParams = {
   body: new Html(),
   concepts: Immutable.List<string>(),
   grading: 'automatic',
-  criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
   explanation: new Html(),
@@ -122,7 +120,6 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   id: string;
   body: Html;
   concepts: Immutable.List<string>;
-  criteria: Immutable.OrderedMap<string, GradingCriteria>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
@@ -163,10 +160,6 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
         
-        case 'grading_criteria':
-          model = model.with(
-            { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
-          break;
         case 'body':
           model = model.with({ body: Html.fromPersistence(item, id) });
           break;
@@ -231,10 +224,6 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       ...this.concepts
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
-
-      ...this.criteria
-        .toArray()
-        .map(item => item.toPersistence()),
  
       ...itemsAndParts,
 

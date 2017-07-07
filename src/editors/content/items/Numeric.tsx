@@ -5,6 +5,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
@@ -42,6 +43,10 @@ export class Numeric
     this.onSizeChange = this.onSizeChange.bind(this);
     this.onNotationChange = this.onNotationChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -52,6 +57,47 @@ export class Numeric
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
   }
+
+  renderCriteria() {
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
+
+    return <Collapse caption="Grading Criteria" 
+        details=""
+        expanded={expandedCriteria}>
+
+          {this.props.partModel.criteria.toArray()
+            .map(c => <CriteriaEditor
+              onRemove={this.onCriteriaRemove}
+              model={c}
+              onEdit={this.onCriteriaEdit}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              />)}
+
+      </Collapse>;
+
+  }
+
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.partModel.criteria.delete(guid);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
 
   onSizeChange(inputSize) {
     this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
@@ -117,6 +163,8 @@ export class Numeric
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
         
         {controls}
+
+        {this.renderCriteria()}
 
         <Hints
             {...this.props}

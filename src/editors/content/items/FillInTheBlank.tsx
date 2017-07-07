@@ -8,6 +8,7 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
@@ -63,6 +64,10 @@ export class FillInTheBlank
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -72,6 +77,31 @@ export class FillInTheBlank
 
   onShuffleChange(e) {
     this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
+  }
+
+  renderCriteria() {
+    const expandedCriteria =
+      <form className="form-inline">
+        <Button editMode={this.props.editMode} 
+          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
+      </form>;
+
+    return <Collapse caption="Grading Criteria" 
+        details=""
+        expanded={expandedCriteria}>
+
+          {this.props.partModel.criteria.toArray()
+            .map(c => <CriteriaEditor
+              onRemove={this.onCriteriaRemove}
+              model={c}
+              onEdit={this.onCriteriaEdit}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              />)}
+
+      </Collapse>;
+
   }
 
   onAddChoice() {
@@ -96,6 +126,22 @@ export class FillInTheBlank
       { choices: this.props.itemModel.choices.set(c.guid, c) }), 
       this.props.partModel);
   }
+
+
+  onCriteriaAdd() {
+    const c = new contentTypes.GradingCriteria();
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaRemove(guid) {
+    const criteria = this.props.partModel.criteria.delete(guid);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+  onCriteriaEdit(c) {
+    const criteria = this.props.partModel.criteria.set(c.guid, c);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
     const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
@@ -237,6 +283,8 @@ export class FillInTheBlank
           editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
        
+        {this.renderCriteria()}
+
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
         </Collapse>
