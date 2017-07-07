@@ -22,7 +22,7 @@ export type PoolParams = {
 
 const defaultPoolParams = {
   contentType: 'Pool',
-  id: createGuid(),
+  id: '',
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
   title: new Title({ text: 'Pool Title' }),
   content: new Content(),

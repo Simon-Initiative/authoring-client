@@ -90,6 +90,8 @@ export class Video extends Immutable.Record(defaultContent) {
     
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });

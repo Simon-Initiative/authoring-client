@@ -17,5 +17,5 @@ export function createWebContent(courseId: string, file): Promise<string> {
   body.append('file', file);
 
   return authenticatedFetch({ method, url, headers, body })
-    .then(result => result.path);
+    .then(result => result[0].fileNode.pathTo);
 }

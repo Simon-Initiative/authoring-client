@@ -60,6 +60,8 @@ export class Table extends Immutable.Record(defaultContent) {
     
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (t['@summary'] !== undefined) {
       model = model.with({ summary: t['@summary'] });

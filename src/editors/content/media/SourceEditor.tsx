@@ -64,7 +64,7 @@ export class SourceEditor
     .then((result) => {
       this.setState(
         { failure: false }, 
-        () => this.props.onEdit(this.props.model.with({ src })));
+        () => this.props.onEdit(this.props.model.with({ src: result })));
     })
     .catch((err) => {
       this.setState({ failure: true });

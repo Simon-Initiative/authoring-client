@@ -55,6 +55,8 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
     
     if (cb['@id'] !== undefined) {
       model = model.with({ id: cb['@id'] });
+    } else {
+      model = model.with({ id: createGuid() });
     }
     if (cb['@title'] !== undefined) {
       model = model.with({ title: cb['@title'] });
