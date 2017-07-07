@@ -590,7 +590,6 @@ function translatePronunciation(
 
   const p = {
     pronunciation: {
-      '@src': src,
       '@type': type,
       '#array': arr,
       '@id': id, 

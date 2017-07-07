@@ -106,7 +106,7 @@ export function flowBlock() {
       command={
         insertBlock(
           EntityTypes.codeblock, 'IMMUTABLE', 
-          { codeblock: new CodeBlock({ source: 'Your code here...' }) })} 
+          { codeblock: new CodeBlock({ source: 'Your code here...' }).with({ id: guid() }) })} 
       tooltip="Code block" icon="code"/>,
     <Button key="quoteblock" 
       command={new commands.SetBlockTypeCommand('blockquote')} 
@@ -149,9 +149,6 @@ export function flowBlock() {
 
 export function bodyBlock() {
   return [
-    <Button key="activity_link" 
-      command={insertBlock(EntityTypes.activity, 'IMMUTABLE', { activity: new Activity() })} 
-      tooltip="Insert high stakes assessment" icon="check"/>,
     <Button key="pullout" command={new commands.InsertPulloutCommand()} 
       tooltip="Insert pullout" icon="external-link-square"/>,
     <Button key="example" command={new commands.InsertExampleCommand()} 

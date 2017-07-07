@@ -579,6 +579,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       contentState, 'insert-fragment', selection);
   }
 
+  getSingularKey(o) {
+    if (Object.keys(o).length === 1) {
+      return Object.keys(o)[0];
+    } else {
+      return null;
+    }
+  }
+
   cloneDuplicatedEntities(current: ContentState) : ContentState {
     
     let contentState = current;
@@ -592,8 +600,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       } else {
         // This is a duplicate, clone it
         
+        const copy = Object.assign({}, e.entity.data);
+
+        // If the data has an id, generate a new one to 
+        // avoid duplication 
+        if (copy.id !== undefined) {
+          copy.id = guid();
+        } else {
+          const key = this.getSingularKey(copy);
+          if (key !== null && copy[key].id !== undefined) {
+            copy[key] = copy[key].with({ id: guid() });
+          }
+        }
+
         contentState = contentState.createEntity(
-          e.entity.type, e.entity.mutability, Object.assign({}, e.entity.data));
+          e.entity.type, e.entity.mutability, copy);
         const createdKey = contentState.getLastCreatedEntityKey();
         const range = new SelectionState({
           anchorKey: e.range.contentBlock.key,
