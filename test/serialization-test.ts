@@ -31,17 +31,18 @@ it('AssessmentModel', () => {
   // A complete test of converting back and forth from
   // persistence to object model and back:
   let model = models.AssessmentModel.fromPersistence(assessment);
+  console.log('1')
   let persisted = model.toPersistence();
   
   model = models.AssessmentModel.fromPersistence(persisted);
   
   // Now verify that all the pieces and parts are present:
-
+  console.log('here')
   expect(model.title.text).toBe('Tutor');
   expect(model.nodes.size).toBe(0);
   expect(model.pages.size).toBe(1);
 
-  const node : models.Node = model.pages.first().nodes.toArray()[2];
+  const node : models.Node = model.pages.first().nodes.toArray()[1];
   expect(node.contentType).toBe('Question');
 
   const question : contentTypes.Question = (node as contentTypes.Question);

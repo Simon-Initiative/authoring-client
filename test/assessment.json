@@ -10,11 +10,6 @@
       "@id": "tutortest",
       "#array": [
         {
-          "title": {
-            "#text": "Tutor"
-          }
-        },
-        {
           "content": {
             "#text": "This is the content"
           }
