@@ -4,17 +4,39 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 
 /**
- * Determines if a given assessment contains any multi-part questions.
+ * Determines if the type of the assessment is restricted by the contents of
+ * of the assessment (aka the model)
  * @param model the assessment model
  */
-export function containsMultipartQuestions(model: models.AssessmentModel) : boolean {
+export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
 
   const questions = [];
 
-  model.pages.toArray()
-    .forEach(p => extractFromNodes(p.nodes, questions));
+  const pages = model.pages.toArray();
 
-  return questions.find(q => isMultipart(q)) !== undefined;
+  // The type of the assessment is restricted (i.e. cannot be changed) if
+  // it contains a selection or if it contains a question that has multiple parts
+
+  return (
+    pages.reduce(
+      (prev, page) => {
+        return prev || page.nodes.toArray().find(n => n.contentType === 'Selection') !== undefined;
+      }, 
+      false)
+
+        ||
+
+     pages.reduce(
+      (prev, page) => {
+        if (prev) return true;
+        const questions = [];
+        extractFromNodes(page.nodes, questions);
+        return questions.find(q => isMultipart(q)) !== undefined;
+      }, 
+      false)
+  );
+      
+  
 }
 
 function isMultipart(q: contentTypes.Question) {
@@ -41,3 +63,4 @@ function extractFromNodes(
     });
   
 } 
+

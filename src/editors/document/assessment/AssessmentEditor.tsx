@@ -21,7 +21,7 @@ import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
-import { containsMultipartQuestions } from './utils';
+import { typeRestrictedByModel } from './utils';
 
 interface AssessmentEditor {
   
@@ -110,7 +110,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (n.contentType === 'Question') {
       return <QuestionEditor
               key={n.guid}
-              isParentAssessmentGraded={this.props.model.type === LegacyTypes.assessment2}
+              isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -132,7 +132,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     } else if (n.contentType === 'Selection') {
       return <SelectionEditor
               key={n.guid}
-              isParentAssessmentGraded={this.props.model.type === LegacyTypes.assessment2}
+              isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -261,6 +261,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   render() {
 
+    const isInline = this.props.model.resource.type === LegacyTypes.inline;
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.current);
     const nodeEditors = page.nodes.toArray().map(n => this.renderNode(n));
@@ -287,7 +288,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 <Select
                   value={this.props.model.resource.type}
                   label="Type:"
-                  editMode={this.props.editMode && !containsMultipartQuestions(this.props.model)}
+                  editMode={this.props.editMode && !typeRestrictedByModel(this.props.model)}
                   onChange={this.onTypeChange}
                 >
                   <option value={LegacyTypes.assessment2}>Graded</option>
@@ -324,10 +325,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             <button disabled={!this.props.editMode} 
               type="button" className="btn btn-secondary" 
               onClick={this.onAddQuestion}>Add Question</button>
-            <button disabled={!this.props.editMode} 
+            <button 
+              disabled={!this.props.editMode || isInline} 
               type="button" className="btn btn-secondary" 
               onClick={this.onAddPool}>Add Pool</button>
-            <button disabled={!this.props.editMode} 
+            <button 
+              disabled={!this.props.editMode || isInline} 
               type="button" className="btn btn-secondary" 
               onClick={this.onAddPoolRef}>Add Pool Reference</button>
             <button disabled={!this.props.editMode} 
@@ -375,3 +378,4 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 }
 
 export default AssessmentEditor;
+
