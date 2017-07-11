@@ -157,7 +157,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
         case 'cmd:concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
+          model = model.with(
+            { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
           break;
         
         case 'body':
