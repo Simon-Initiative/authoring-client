@@ -87,7 +87,8 @@ class LearningObjectiveEditor extends AbstractEditor<models.LearningObjectiveMod
         if (value.type === 'x-oli-skills_model') {
           persistence.retrieveDocument(this.props.context.courseId, id).then((skillDocument) => {
             const skillModel: models.SkillModel = skillDocument.model as models.SkillModel;
-            this.setState({ skills: skillModel.skills });
+            const existingSkills = this.state.skills === null ? [] : this.state.skills;
+            this.setState({ skills: [...existingSkills, ...skillModel.skills] });
           });
         }
       });
