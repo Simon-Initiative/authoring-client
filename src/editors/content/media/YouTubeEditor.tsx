@@ -13,6 +13,11 @@ import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 
+import { Collapse } from '../common/collapse';
+import { Button } from '../common/Button';
+import { Select } from '../common/select';
+
+
 import '../common/editor.scss';
 
 
@@ -43,6 +48,8 @@ export class YouTubeEditor
     this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -82,64 +89,86 @@ export class YouTubeEditor
     this.props.onEdit(this.props.model.with({ width }));
   }
 
+
+  onTitleEdit(content: ContentState) {
+    const titleContent = this.props.model.titleContent.with({ content });
+    this.props.onEdit(this.props.model.with({ titleContent }));
+  }
+
+  onCaptionEdit(content: ContentState) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }));
+  }
+
+  row(text: string, width: string, control: any) {
+    const widthClass = 'col-' + width;
+    return (
+      <div className="form-group row">
+        <label className="col-1 col-form-label">{text}</label>
+        <div className={widthClass}>
+          {control}
+        </div>
+      </div>
+    );
+  }
+
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, popout, alternate } = this.props.model;
-
-    const labeled : LabeledType = {
-      titleContent,
-      caption,
-      cite,
-    };
+    const { titleContent, src, caption, cite, popout, alternate, height, width } = this.props.model;
 
     return (
-      <div className="itemWrapper">
-        <LabeledEditor 
-          {...this.props}
-          model={labeled} 
-          onEdit={this.onLabeledEdit}
-          />
+      <div className="itemWrapper container">
+        <br/>
 
-        <InputLabel label="Popout">
-          <TextInput width="100%" label="Popout content" 
-            editMode={this.props.editMode}
-            value={popout.content} 
-            type="text"
-            onEdit={this.onPopoutEdit}
-          />
-        </InputLabel>
+        <p>Enter the id of the YouTube video you wish to dispay:</p>
 
-        <RichTextEditor
-          label="Alternate"
-          {...this.props}
-          onEdit={this.onAlternateEdit}
-          model={alternate.content}
-        />
+        {this.row('', '9', <div className="input-group">
+            <span className="input-group-addon">https://youtube.com/watch?v=</span>
+            <input type="text" value={src} className="form-control"/>
+            </div>)}
 
-        <InputLabel label="Source">
-          <TextInput width="75px" label="Source" 
+        <Collapse caption="Additional properties">
+
+        {this.row('Height', '2', <div className="input-group input-group-sm">
+            <TextInput width="100%" label="" 
             editMode={this.props.editMode}
-            value={this.props.model.src} 
-            type="text"
-            onEdit={this.onSrcEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Height">
-          <TextInput width="75px" label="Height in pixels" 
-            editMode={this.props.editMode}
-            value={this.props.model.height} 
-            type="text"
+            value={height} 
+            type="number"
             onEdit={this.onHeightEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Width">
-          <TextInput width="75px" label="Width in pixels" 
+          /><span className="input-group-addon ">pixels</span></div>)}
+        
+        {this.row('Width', '2', <div className="input-group input-group-sm">
+           <TextInput width="100%" label="" 
             editMode={this.props.editMode}
-            value={this.props.model.width} 
-            type="text"
+            value={width} 
+            type="number"
             onEdit={this.onWidthEdit}
-          />
-        </InputLabel>
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
+        
+          {this.row('Popout', '8', <TextInput width="100%" label="" 
+              editMode={this.props.editMode}
+              value={popout.content} 
+              type="text"
+              onEdit={this.onPopoutEdit}
+            />)}
+
+          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
+          {...this.props}
+          model={titleContent.content}
+          editMode={this.props.editMode}
+          onEdit={this.onTitleEdit}
+          />)}
+
+
+          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {...this.props}
+          model={caption.content}
+          editMode={this.props.editMode}
+          onEdit={this.onCaptionEdit}
+          />)}
+
+        </Collapse>
+
       </div>);
   }
 
