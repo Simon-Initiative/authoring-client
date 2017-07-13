@@ -32,6 +32,7 @@ const ALT_KEY = 18;
 const PADDING = 0;
 
 interface DraftWrapper {
+  lastBlockY: number;
   onChange: any;
   focus: () => any; 
   lastSelectionState: SelectionState;
@@ -314,6 +315,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   constructor(props) {
     super(props);
 
+    this.lastBlockY = 0;
     this.focus = () => (this.refs as any).editor.focus();
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
     this.lastSelectionState = null;
@@ -325,6 +327,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this._onKeyDown = this.onKeyDown.bind(this);
     this._onKeyUp = this.onKeyUp.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.onFocus = this.onFocus.bind(this);
     this.onClickExpand = this.onClickExpand.bind(this);
 
     const contentState = props.content.contentState;
@@ -416,8 +419,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   onBlur(e) {
     e.stopPropagation();
-    if (this.state.show) {
-      setTimeout(() => this.setState({ show: false, x: null, y: null }), 200);
+    if (this.state.show || this.state.blockToolbarShown) {
+      setTimeout(
+        () => this.setState({ 
+          blockToolbarShown: false, 
+          show: false, x: null, y: null }), 
+        200);
     }
   }
 
@@ -441,13 +448,22 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (topRect !== null) {
       const divRect = this.container.getBoundingClientRect();
 
-      const blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
+      let blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
       const blockX = -27;
-      
+      console.log(blockY + ' ' + blockX);
+
+      if (blockY < 0) {
+        blockY = this.lastBlockY;
+      }
+
       this.setState({ blockY, blockX });
-      
+      this.lastBlockY = blockY;
     }
           
+  }
+
+  onFocus() {
+    this.setExpanderPosition();
   }
 
 
@@ -458,7 +474,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (hasSelection(ss)) {
         const selection = document.getSelection();
         if (selection.rangeCount !== 0) {
-          const topRect = getPosition();
+          let topRect = getPosition();
+
+          if (topRect === null) {
+            const position = getCursorPosition();
+            if (position !== null) {
+              topRect = {
+                top: position.y,
+                left: position.x,
+                bottom: 0,
+                right: 0,
+                height: 0,
+                width: 0,
+              };
+            }
+          }
 
           if (topRect === null) {
             this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
@@ -466,9 +496,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           }
           
           const divRect = this.container.getBoundingClientRect();
-
           const y = (topRect.top + window.scrollY - (divRect.top + window.scrollY)) - 25;
-
+      
           const alignLeft = topRect.left - divRect.left < divRect.width / 2;
 
           const x = alignLeft
@@ -833,7 +862,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       
       const positionStyle = {
         position: 'absolute',
-        top: this.state.y + window.scrollY,
+        top: this.state.y,
       };
 
       this.state.alignLeft
@@ -1002,6 +1031,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return (
         <div ref={(container => this.container = container)} 
           onBlur={this.onBlur}
+          onFocus={this.onFocus}
           onKeyUp={this._onKeyUp}
           onKeyDown={this._onKeyDown}
           style={editorStyle} 
