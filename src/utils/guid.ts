@@ -9,7 +9,7 @@ export default function guid() {
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
     d += performance.now(); // use high-precision timer if available
   }
-  return 'dxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[dxy]/g, (c) => {
+  return 'dxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[dxy]/g, (c) => {
     const r = (d + Math.random() * 16) % 16 | 0;
     d = Math.floor(d / 16);
 
