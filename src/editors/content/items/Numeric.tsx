@@ -130,6 +130,7 @@ export class Numeric
     } else {
       
       feedback = <TabularFeedback
+            input={this.props.itemModel.id}
             editMode={this.props.editMode}
             services={this.props.services}
             context={this.props.context}

@@ -109,7 +109,7 @@ export class FillInTheBlank
     const match = value; 
     const choice = new contentTypes.Choice().with({ value });
     const feedback = new contentTypes.Feedback();
-    let response = new contentTypes.Response().with({ match });
+    let response = new contentTypes.Response().with({ match, input: this.props.itemModel.id });
     response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
     const itemModel = this.props.itemModel.with(

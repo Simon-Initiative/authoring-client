@@ -10,6 +10,7 @@ export interface TabularFeedback {
 }
 
 export interface TabularFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
+  input?: string;
 }
 
 export interface TabularFeedbackState {
@@ -39,11 +40,15 @@ export abstract class TabularFeedback
     const feedback = new contentTypes.Feedback();
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
   
-    const response = new contentTypes.Response({
+    let response = new contentTypes.Response({
       score: '0',
       match: '*',
       feedback: feedbacks.set(feedback.guid, feedback)
-    })
+    });
+
+    if (this.props.input !== undefined) {
+      response = response.with({ input: this.props.input });
+    }
     const model = this.props.model.with({ responses: this.props.model.responses.set(response.guid, response)});
     this.props.onEdit(model);
   }
