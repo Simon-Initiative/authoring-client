@@ -33,8 +33,8 @@ const defaultContent = {
   title: '',
   src: '',
   alt: '',
-  width: '200px',
-  height: '200px',
+  width: '',
+  height: '',
   style: 'inline',
   valign: 'middle',
   popout: new Popout(),
@@ -146,26 +146,26 @@ export class Image extends Immutable.Record(defaultContent) {
       this.alternate.toPersistence(),
     ];
 
-    const clean = (v) => {
-      if (v === '') return '200';
-      if (v.endsWith('px')) return v.substr(0, v.indexOf('px'));
-      return v;
-    };
-
-    const size = clean(this.width) + 'x' + clean(this.height);
-
-    return {
+    const obj = {
       image: {
         '@id': this.id,
         '@title': this.title,
-        '@src': this.src === '' ? 'https://via.placeholder.com/' + size : this.src,
+        '@src': this.src === '' ? 'https://via.placeholder.com/400x300' 
+          + '?text=Click+to+edit+image' : this.src,
         '@alt': this.alt,
-        '@width': this.width,
-        '@height': this.height,
         '@style': this.style,
         '@valign': this.valign,
         '#array': children,
       }, 
     };
+
+    if (this.height.trim() !== '') {
+      obj.image['@height'] = this.height.trim();
+    }
+    if (this.width.trim() !== '') {
+      obj.image['@width'] = this.width.trim();
+    }
+
+    return obj;
   }
 }

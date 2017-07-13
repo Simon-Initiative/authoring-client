@@ -64,18 +64,31 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
     const { src, height, width } = this.props.data.image;
 
-    const fullSrc = buildUrl(
+    if (src === '') {
+
+      return (
+        <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
+          <div>
+            <img onClick={this.onClick} src="assets/400x300.png" width="400" height="300"/>
+          </div>
+          <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </div>);
+
+    } else {
+      const fullSrc = buildUrl(
         this.props.blockProps.context.baseUrl, 
         this.props.blockProps.context.courseId, 
         this.props.blockProps.context.resourcePath, 
         src);
-    return (
-      <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <div>
-          <img src={fullSrc} width={width} height={height}/>
-        </div>
-        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
-      </div>);
+      return (
+        <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
+          <div>
+            <img onClick={this.onClick} src={fullSrc} width={width} height={height}/>
+          </div>
+          <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </div>);
+    }
+    
   }
 }
 
