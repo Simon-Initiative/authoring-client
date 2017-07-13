@@ -98,7 +98,7 @@ export class Image extends Immutable.Record(defaultContent) {
       model = model.with({ width: t['@width'] });
     }
     if (t['@style'] !== undefined) {
-      model = model.with({ style: t['@stle'] });
+      model = model.with({ style: t['@style'] });
     }
     if (t['@valign'] !== undefined) {
       model = model.with({ valign: t['@valign'] });
