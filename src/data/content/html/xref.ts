@@ -77,7 +77,6 @@ export class Xref extends Immutable.Record(defaultContent) {
         '@idref': this.idref,
         '@target': this.target,
         '@page': this.page,
-        '#array': toPersistence(this.content)['#array'],
       },
     };
   }

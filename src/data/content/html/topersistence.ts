@@ -1223,10 +1223,9 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
   };
 }
 
+
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
-
   const { data } = entityMap[s.key];
-
   return data.link.toPersistence(toPersistence);
 }
 

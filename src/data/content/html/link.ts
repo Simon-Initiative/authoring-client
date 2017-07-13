@@ -6,17 +6,14 @@ import { getKey } from '../../common';
 import { Image } from './image';
 
 import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
-
-type LinkContent = ContentState | Image;
+import { Maybe, Nothing } from '../../../utils/types';
 
 export type LinkParams = {
   target?: string,
   href?: string,
   internal?: boolean,
   title?: string,
-  content?: LinkContent,
+  content?: Maybe<Image>,
   guid?: string,
 };
 
@@ -26,14 +23,14 @@ const defaultContent = {
   href: '',
   internal: false,
   title: '',
-  content: emptyContent,
+  content: Nothing,
   guid: '',
 };
 
 export class Link extends Immutable.Record(defaultContent) {
   
   contentType: 'Link';
-  content: LinkContent;
+  content: Maybe<Image>;
   target: string;
   href: string;
   internal: boolean;
@@ -73,13 +70,13 @@ export class Link extends Immutable.Record(defaultContent) {
       && children.length === 1 && (children[0] as any).image !== undefined) {
       model = model.with({ content: Image.fromPersistence(children[0], '', toDraft) });
     } else {
-      model = model.with({ content: toDraft(children) });
+      model = model.with({ content: Nothing });
     }
     
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence(toPersistence, text) : Object {
 
     const link = {
       link: {
@@ -92,9 +89,7 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (this.content instanceof Image) {
       link.link['#array'] = [this.content.toPersistence(toPersistence)];
-    } else {
-      link.link['#array'] = toPersistence(this.content)['#array'];
-    }
+    } 
 
     return link;
   }

@@ -76,7 +76,6 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
         '@idref': this.idref,
         '@target': this.target,
         '@purpose': this.purpose,
-        '#array': toPersistence(this.content)['#array'],
       },
     };
   }

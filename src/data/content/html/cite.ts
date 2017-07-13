@@ -70,7 +70,6 @@ export class Cite extends Immutable.Record(defaultContent) {
       cite: {
         '@title': this.title,
         '@id': this.id,
-        '#array': toPersistence(this.content)['#array'],
       },
     };
 
