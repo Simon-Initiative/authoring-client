@@ -65,6 +65,10 @@ export class MultipleChoice
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   onExplanation(explanation) {
