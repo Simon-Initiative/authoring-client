@@ -15,6 +15,8 @@ import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
+import { Select } from '../common/Select';
+import { Collapse } from '../common/Collapse';
 
 import '../common/editor.scss';
 
@@ -49,6 +51,8 @@ export class ImageEditor
     this.onAltEdit = this.onAltEdit.bind(this);
     this.onValignEdit = this.onValignEdit.bind(this);
     this.onFileChange = this.onFileChange.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
 
     this.state = {
       failure: false,
@@ -123,6 +127,16 @@ export class ImageEditor
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
+  onTitleEdit(content: ContentState) {
+    const titleContent = this.props.model.titleContent.with({ content });
+    this.props.onEdit(this.props.model.with({ titleContent }));
+  }
+
+  onCaptionEdit(content: ContentState) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }));
+  }
+
   onSetClick() {
     // TODO 
   }
@@ -132,7 +146,7 @@ export class ImageEditor
     return (
       <div className="form-group row">
         <label className="col-1 col-form-label">{text}</label>
-        <div className={widthClass} >
+        <div className={widthClass}>
           {control}
         </div>
       </div>
@@ -144,17 +158,13 @@ export class ImageEditor
     const { titleContent, caption, cite, popout, alternate,
       width, height, alt, valign } = this.props.model;
     
-    const labeled : LabeledType = {
-      titleContent,
-      caption,
-      cite,
-    };
-
     const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
-      srcDisplay = (src === '' || src.indexOf('via.placeholder.com') !== -1)
+      const contents = (src === '' || src.indexOf('via.placeholder.com') !== -1)
         ? '' : extractFileName(src);
+      srcDisplay = <input type="text" id="disabledTextInput" 
+        className="form-control" placeholder={contents} readOnly/>;
     } else {
       srcDisplay = 
         <div className="alert alert-danger" role="alert">
@@ -165,70 +175,98 @@ export class ImageEditor
 
     return (
       <div className="itemWrapper container">
-        
-        {this.row('Height', '3', <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
-            value={height} 
-            type="text"
-            onEdit={this.onHeightEdit}
-          />)}
-        {this.row('Width', '3', <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
-            value={width} 
-            type="text"
-            onEdit={this.onWidthEdit}
-          />)}
-        {this.row('Alt', '8', <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
-            value={alt} 
-            type="text"
-            onEdit={this.onAltEdit}
-          />)}
 
+        <br/>
 
-          
-
-        <InputLabel label="Source">
-          <input 
+        <input 
             id={id}
             style={ { display: 'none' } }
             accept="image/*"
             onChange={this.onFileChange} 
             type="file" 
           />
-          <div className="input-group">
+
+        {this.row('Image', '6', <div className="input-group">
             {srcDisplay}
             <span className="input-group-btn">
               <Button editMode={this.props.editMode}
             onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
             </span>
-          </div>
-        </InputLabel>
+          </div>)}
 
-        <InputLabel label="VAlign">
-          <TextInput width="100%" label="Popout content" 
+        {this.row('', '6', <span className="form-text text-muted">
+          Browse to and select an image file from your computer
+        </span>)}
+
+        <br/>
+
+        {this.row('Height', '2', <div className="input-group input-group-sm">
+            <TextInput width="100%" label="" 
             editMode={this.props.editMode}
-            value={valign} 
-            type="text"
-            onEdit={this.onValignEdit}
-          />
-        </InputLabel>
+            value={height} 
+            type="number"
+            onEdit={this.onHeightEdit}
+          /><span className="input-group-addon ">pixels</span></div>)}
+        {this.row('Width', '2', <div className="input-group input-group-sm">
+           <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
+            value={width} 
+            type="number"
+            onEdit={this.onWidthEdit}
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
+        
+        {this.row('', '6', <span className="form-text text-muted">
+          Leaving height and width empty will display the image at the image's native size
+        </span>)}
 
-        <LabeledEditor 
+
+        <Collapse caption="Additional properties">
+
+          {this.row('Align', '4', <Select label="" editMode={this.props.editMode}
+              value={valign} onChange={this.onValignEdit}>
+              <option value="top">Top</option>
+              <option value="middle">Middle</option>
+              <option value="baseline">Baseline</option>
+              <option value="bottom">Bottom</option>
+            </Select>)}
+
+          {this.row('Alt', '8', <TextInput width="100%" label="" 
+              editMode={this.props.editMode}
+              value={alt} 
+              type="text"
+              onEdit={this.onAltEdit}
+            />)}
+
+          {this.row('Popout', '8', <TextInput width="100%" label="" 
+              editMode={this.props.editMode}
+              value={popout.content} 
+              type="text"
+              onEdit={this.onPopoutEdit}
+            />)}
+
+          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
-          model={labeled} 
-          onEdit={this.onLabeledEdit}
-          />
+          model={titleContent.content}
+          editMode={this.props.editMode}
+          onEdit={this.onTitleEdit}
+          />)}
 
 
-        <InputLabel label="Popout">
-          <TextInput width="100%" label="Popout content" 
-            editMode={this.props.editMode}
-            value={popout.content} 
-            type="text"
-            onEdit={this.onPopoutEdit}
-          />
-        </InputLabel>
+          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {...this.props}
+          model={caption.content}
+          editMode={this.props.editMode}
+          onEdit={this.onCaptionEdit}
+          />)}
+
+        </Collapse>
+
+        
+
+
+        
+
+
 
       </div>);
   }

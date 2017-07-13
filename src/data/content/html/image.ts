@@ -100,8 +100,8 @@ export class Image extends Immutable.Record(defaultContent) {
     if (t['@style'] !== undefined) {
       model = model.with({ style: t['@style'] });
     }
-    if (t['@valign'] !== undefined) {
-      model = model.with({ valign: t['@valign'] });
+    if (t['@vertical-align'] !== undefined) {
+      model = model.with({ valign: t['@vertical-align'] });
     }
     
     
@@ -154,7 +154,7 @@ export class Image extends Immutable.Record(defaultContent) {
           + '?text=Click+to+edit+image' : this.src,
         '@alt': this.alt,
         '@style': this.style,
-        '@valign': this.valign,
+        '@vertical-align': this.valign,
         '#array': children,
       }, 
     };

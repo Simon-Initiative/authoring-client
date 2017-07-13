@@ -22,6 +22,7 @@ export interface RichTextEditor {
 
 export interface RichTextEditorProps extends AbstractContentEditorProps<ContentState> {
   label: string;
+  showLabel?: boolean;
   inline?: boolean;
 }
 
@@ -69,11 +70,7 @@ export class RichTextEditor
       width: '80px',
     };
 
-    return (
-      <div className="itemWrapper">
-
-      <InputLabel label={this.props.label} style="default">
-          <HtmlContentEditor 
+    const editor = <HtmlContentEditor 
             inline={this.props.inline}
             context={this.props.context}
             services={this.props.services}
@@ -84,10 +81,19 @@ export class RichTextEditor
             blockToolbar={blockToolbar}
             model={new contentTypes.Html({ contentState: this.props.model })}
             onEdit={this.onEdit} 
-            />
-        </InputLabel>
+            />;
 
-      </div>);
+    const display = this.props.showLabel === undefined || this.props.showLabel
+      ? <InputLabel label={this.props.label} style="default">
+        {editor}
+      </InputLabel>
+      : editor;
+
+    return (
+      <div className="itemWrapper">
+        {display}
+      </div>
+    );
   }
 
 }
