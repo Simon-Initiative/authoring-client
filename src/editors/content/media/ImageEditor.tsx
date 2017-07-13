@@ -127,6 +127,18 @@ export class ImageEditor
     // TODO 
   }
 
+  row(text: string, width: string, control: any) {
+    const widthClass = 'col-' + width;
+    return (
+      <div className="form-group row">
+        <label className="col-1 col-form-label">{text}</label>
+        <div className={widthClass} >
+          {control}
+        </div>
+      </div>
+    );
+  }
+
   render() : JSX.Element {
 
     const { titleContent, caption, cite, popout, alternate,
@@ -141,7 +153,8 @@ export class ImageEditor
     const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
-      srcDisplay = src === '' ? '<not set>' : extractFileName(src);
+      srcDisplay = (src === '' || src.indexOf('via.placeholder.com') !== -1)
+        ? '' : extractFileName(src);
     } else {
       srcDisplay = 
         <div className="alert alert-danger" role="alert">
@@ -151,7 +164,29 @@ export class ImageEditor
     const id : string = guid();
 
     return (
-      <div className="itemWrapper">
+      <div className="itemWrapper container">
+        
+        {this.row('Height', '3', <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
+            value={height} 
+            type="text"
+            onEdit={this.onHeightEdit}
+          />)}
+        {this.row('Width', '3', <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
+            value={width} 
+            type="text"
+            onEdit={this.onWidthEdit}
+          />)}
+        {this.row('Alt', '8', <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
+            value={alt} 
+            type="text"
+            onEdit={this.onAltEdit}
+          />)}
+
+
+          
 
         <InputLabel label="Source">
           <input 
@@ -161,36 +196,13 @@ export class ImageEditor
             onChange={this.onFileChange} 
             type="file" 
           />
-          <Button editMode={this.props.editMode}
-            onClick={this.openFileDialog.bind(this, id)}>Set</Button>
-          {srcDisplay}
-        </InputLabel>
-
-        <InputLabel label="Width">
-          <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
-            value={width} 
-            type="text"
-            onEdit={this.onWidthEdit}
-          />
-        </InputLabel>
-
-        <InputLabel label="Height">
-          <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
-            value={height} 
-            type="text"
-            onEdit={this.onHeightEdit}
-          />
-        </InputLabel>
-
-        <InputLabel label="Alt">
-          <TextInput width="100%" label="Popout content" 
-            editMode={this.props.editMode}
-            value={alt} 
-            type="text"
-            onEdit={this.onAltEdit}
-          />
+          <div className="input-group">
+            {srcDisplay}
+            <span className="input-group-btn">
+              <Button editMode={this.props.editMode}
+            onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
+            </span>
+          </div>
         </InputLabel>
 
         <InputLabel label="VAlign">
@@ -218,13 +230,6 @@ export class ImageEditor
           />
         </InputLabel>
 
-        <RichTextEditor
-          label="Alternate"
-          {...this.props}
-          onEdit={this.onAlternateEdit}
-          model={alternate.content}
-        />
-        
       </div>);
   }
 
