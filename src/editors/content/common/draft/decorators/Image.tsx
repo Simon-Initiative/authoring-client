@@ -4,6 +4,7 @@ import { EntityTypes } from '../../../../../data/content/html/common';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
+import { Button } from '../../Button';
 
 class Image extends React.PureComponent<any, any> {
 
@@ -13,6 +14,7 @@ class Image extends React.PureComponent<any, any> {
     super(props);
 
     this.onClick = this.onClick.bind(this);
+    
   }
 
   onClick() {
@@ -50,14 +52,20 @@ class Image extends React.PureComponent<any, any> {
   }
 
   render() : JSX.Element {
+
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const src = data.image.src;
-
-    const fullSrc = buildUrl(
-      this.props.context.baseUrl, 
-      this.props.context.courseId, 
-      this.props.context.resourcePath, 
-      src);
+    
+    let fullSrc;
+    if (src === '') {
+      fullSrc = 'assets/400x300.png';
+    } else {
+      fullSrc = buildUrl(
+        this.props.context.baseUrl, 
+        this.props.context.courseId, 
+        this.props.context.resourcePath, 
+        src);
+    }
     
     return (
       <span data-offset-key={this.props.offsetKey}>

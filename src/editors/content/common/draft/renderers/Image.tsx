@@ -19,7 +19,7 @@ export interface ImageProps extends InteractiveRendererProps {
 }
 
 export interface ImageState extends InteractiveRendererState {
-  
+  showEdit: boolean;
 }
 
 export interface ImageProps {
@@ -30,9 +30,12 @@ export interface ImageProps {
 class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
   constructor(props) {
-    super(props, {});
+    super(props, { showEdit: false });
 
     this.onClick = this.onClick.bind(this);
+
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
   }
 
   onClick() {
@@ -60,18 +63,43 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     );
   }
 
+  onMouseEnter() {
+    this.setState({ showEdit: true });
+  }
+
+  onMouseLeave() {
+    this.setState({ showEdit: false });
+  }
+
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.image;
 
-    if (src === '') {
+    const buttonDiv : any = {
+      position: 'absolute',
+      left: 10,
+      top: 10,
+    };
 
+    const button = this.state.showEdit
+      ? <div style={buttonDiv}><Button 
+          editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </div>
+      : null;
+
+
+    if (src === '') {
+      const parentDiv : any = {
+        position: 'relative',
+        width: '400px',
+      };
       return (
-        <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-          <div>
+        <div ref={c => this.focusComponent = c} 
+          onFocus={this.onFocus} onBlur={this.onBlur}>
+          <div style={parentDiv} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
             <img onClick={this.onClick} src="assets/400x300.png" width="400" height="300"/>
-          </div>
-          <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+            {button}
+          </div>  
         </div>);
 
     } else {
@@ -80,12 +108,19 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
         this.props.blockProps.context.courseId, 
         this.props.blockProps.context.resourcePath, 
         src);
+      const parentDiv : any = {
+        position: 'relative',
+        width,
+      };
       return (
-        <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-          <div>
+        <div ref={c => this.focusComponent = c} 
+          onFocus={this.onFocus} onBlur={this.onBlur}>
+          <div style={parentDiv} 
+            onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
             <img onClick={this.onClick} src={fullSrc} width={width} height={height}/>
+            {button}
           </div>
-          <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+          
         </div>);
     }
     
