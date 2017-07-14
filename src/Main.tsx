@@ -151,7 +151,7 @@ class Main extends React.Component<MainProps, MainState> {
 
   componentDidMount() {
     this.unlisten = history.listen((current) => {
-      this.setState({ current });
+      this.setState({ current }, () => window.scrollTo(0, 0));
     });
   }
 
