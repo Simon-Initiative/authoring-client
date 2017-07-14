@@ -28,8 +28,8 @@ export type PartParams = {
 const defaultPartParams = {
   contentType: 'Part',
   id: '',
-  correct: '0',
-  scoreOutOf: '0',
+  correct: '',
+  scoreOutOf: '',
   targets: '',
   title: new Title(),
   concepts: Immutable.List<string>(),
@@ -154,14 +154,21 @@ export class Part extends Immutable.Record(defaultPartParams) {
       { explanation },
     ];
 
-    return {
+    const part = {
       part: {
         '@id': this.id,
-        '@correct': this.correct.trim() === '' ? '0' : this.correct,
-        '@score_out_of': this.scoreOutOf.trim() === '' ? '0' : this.scoreOutOf,
         '@targets': this.targets,
         '#array': children,
       },
     };
+
+    if (this.correct.trim() !== '') {
+      part.part['@correct'] = this.correct.trim();
+    }
+    if (this.scoreOutOf.trim() !== '') {
+      part.part['@score_out_of'] = this.scoreOutOf.trim();
+    }
+
+    return part;
   }
 }
