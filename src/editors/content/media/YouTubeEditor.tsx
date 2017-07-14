@@ -13,9 +13,9 @@ import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 
-import { Collapse } from '../common/collapse';
+import { Collapse } from '../common/Collapse';
 import { Button } from '../common/Button';
-import { Select } from '../common/select';
+import { Select } from '../common/Select';
 
 
 import '../common/editor.scss';
