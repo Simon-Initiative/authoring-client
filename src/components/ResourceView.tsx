@@ -138,8 +138,6 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     const rows = this.state.resources.map(r =>
       <tr key={r.guid}>
         <td>{link(r.guid, r.title)}</td>
-        <td>{r.id}</td>
-        <td>{r.type}</td>
       </tr>);
 
     return (
@@ -150,8 +148,6 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
           <thead>
           <tr>
             <th>Title</th>
-            <th>Id</th>
-            <th>Type</th>
           </tr>
           </thead>
           <tbody>
