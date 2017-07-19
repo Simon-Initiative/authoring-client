@@ -23,6 +23,12 @@ import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { typeRestrictedByModel } from './utils';
 
+import { DraggableNode } from './DraggableNode';
+import { RepositionTarget } from './RepositionTarget';
+
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+
 interface AssessmentEditor {
   
 }
@@ -37,6 +43,7 @@ interface AssessmentEditorState extends AbstractEditorState {
   current: string;
 }
 
+@DragDropContext(HTML5Backend)
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps, 
   AssessmentEditorState>  {
@@ -58,6 +65,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
+
+    this.onReorderNode = this.onReorderNode.bind(this);
   }
 
   componentDidMount() {                    
@@ -259,12 +268,68 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       targetAnnotations={[]} />);           
   }  
 
+  renderDropTarget(index) {
+    return <RepositionTarget index={index} onDrop={this.onReorderNode}/>;
+  }
+
+  onReorderNode(id, index) {
+
+    let page = this.props.model.pages.get(this.state.current);
+    const arr = page.nodes.toArray();
+
+    // find the index of the source node
+    const sourceIndex = arr.findIndex(n => n.guid === id);
+
+    if (sourceIndex !== -1) {
+
+      let nodes = Immutable.OrderedMap<string, contentTypes.Node>();
+      const moved = page.nodes.get(id);
+      const indexToInsert = (sourceIndex < index) ? index - 1 : index;
+
+      arr.forEach((n, i) => {
+
+        if (i === index) {
+          nodes = nodes.set(moved.guid, moved);
+        }
+
+        if (n.guid !== id) {
+          nodes = nodes.set(n.guid, n);
+        } 
+      });
+
+      if (index === arr.length) {
+        nodes = nodes.set(moved.guid, moved);
+      }
+
+      page = page.with({ nodes });
+      const pages = this.props.model.pages.set(page.guid, page);
+      const model = this.props.model.with({ pages });
+
+      this.handleEdit(model);
+    }
+
+  }
+
+  renderNodes(page: contentTypes.Page) {
+    const elements = [];
+    const arr = page.nodes.toArray();
+    arr.forEach((node, index) => {
+      elements.push(this.renderDropTarget(index));
+      elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
+        {this.renderNode(node)}</DraggableNode>);
+    });
+
+    elements.push(this.renderDropTarget(arr.length));
+
+    return elements;
+  }
+
   render() {
 
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.current);
-    const nodeEditors = page.nodes.toArray().map(n => this.renderNode(n));
+    const nodeEditors = this.renderNodes(page);
     let skilllinker;
             
     if (this.state.skillModel) {  
@@ -303,6 +368,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 <form className="form-inline">
                 <PageSelection 
                   editMode={this.props.editMode}
+
                   pages={this.props.model.pages} 
                   current={this.props.model.pages.get(this.state.current)}
                   onChangeCurrent={current => this.setState({ current })}
