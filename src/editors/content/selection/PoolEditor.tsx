@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, 
@@ -10,6 +11,8 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
+import { DraggableNode } from '../../document/assessment/DraggableNode';
+import { RepositionTarget } from '../../document/assessment/RepositionTarget';
 
 import '../common/editor.scss';
 
@@ -40,6 +43,8 @@ export class PoolEditor
     this.onRemoveQuestion = this.onRemoveQuestion.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
+
+    this.onReorderNode = this.onReorderNode.bind(this);
     
   }
 
@@ -54,6 +59,59 @@ export class PoolEditor
         { questions: this.props.model.questions.delete(guid) }));
     }
     
+  }
+
+
+  renderDropTarget(index) {
+    return <RepositionTarget index={index} onDrop={this.onReorderNode}/>;
+  }
+
+  onReorderNode(id, index) {
+
+    const oldQuestions = this.props.model.questions;
+    const arr = this.props.model.questions.toArray();
+
+    // find the index of the source node
+    const sourceIndex = arr.findIndex(n => n.guid === id);
+
+    if (sourceIndex !== -1) {
+
+      let questions = Immutable.OrderedMap<string, contentTypes.Question>();
+      const moved = oldQuestions.get(id);
+      const indexToInsert = (sourceIndex < index) ? index - 1 : index;
+
+      arr.forEach((n, i) => {
+
+        if (i === index) {
+          questions = questions.set(moved.guid, moved);
+        }
+
+        if (n.guid !== id) {
+          questions = questions.set(n.guid, n);
+        } 
+      });
+
+      if (index === arr.length) {
+        questions = questions.set(moved.guid, moved);
+      }
+
+      this.props.onEdit(this.props.model.with({ questions }));
+    }
+
+  }
+
+  renderQuestions() {
+    const elements = [];
+    const arr = this.props.model.questions.toArray();
+    arr.forEach((node, index) => {
+      elements.push(this.renderDropTarget(index));
+      elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
+        {this.renderQuestion(node)}</DraggableNode>);
+    });
+
+    elements.push(this.renderDropTarget(arr.length));
+
+    return elements;
   }
 
   onEditQuestion(question: contentTypes.Question) {
@@ -79,7 +137,7 @@ export class PoolEditor
     
     return (
       <div>
-        {this.props.model.questions.toArray().map(q => this.renderQuestion(q))}
+        {this.renderQuestions()}
       </div>
     );
   }

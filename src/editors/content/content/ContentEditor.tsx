@@ -21,8 +21,8 @@ import { DragHandle } from '../../document/assessment/DragHandle';
 import '../common/editor.scss';
 
 type IdTypes = {
-  availability: string
-}
+  availability: string,
+};
 
 export interface ContentEditor {
   ids: IdTypes;
@@ -47,19 +47,19 @@ export class ContentEditor
     super(props);
 
     this.ids = {
-      availability: guid()
-    }
+      availability: guid(),
+    };
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onAvailability = this.onAvailability.bind(this);
   }
 
   onBodyEdit(body) {
-    const concept = this.props.model.with({body});
+    const concept = this.props.model.with({ body });
     this.props.onEdit(concept);
   }
 
   onAvailability(availability) {
-    this.props.onEdit(this.props.model.with({availability}));
+    this.props.onEdit(this.props.model.with({ availability }));
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -79,12 +79,12 @@ export class ContentEditor
       minHeight: '30px',
       borderStyle: 'none',
       borderWith: 1,
-      borderColor: '#AAAAAA'
-    }
+      borderColor: '#AAAAAA',
+    };
 
     const expanded = (
-      <InlineForm position='right'>
-        <Select onChange={this.onAvailability} label='Availability' 
+      <InlineForm position="right">
+        <Select onChange={this.onAvailability} label="Availability" 
           editMode={this.props.editMode}
           value={this.props.model.availability}>
           <option value="always">Always</option>
@@ -93,7 +93,7 @@ export class ContentEditor
           <option value="never">Never</option>
         </Select>
       </InlineForm>
-    )
+    );
 
     return (
       <RemovableContent 
@@ -104,7 +104,7 @@ export class ContentEditor
         <div style={ { position: 'relative' } }>
 
           <Collapse 
-            caption='Content' 
+            caption="Content"
             details={getHtmlDetails(this.props.model.body)}
             expanded={expanded}>
             

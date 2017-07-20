@@ -8,6 +8,9 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { PoolEditor as PoolContentEditor } from '../../content/selection/PoolEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+
 interface PoolEditor {
   
 }
@@ -20,6 +23,7 @@ interface PoolEditorState extends AbstractEditorState {
   
 }
 
+@DragDropContext(HTML5Backend)
 class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorProps, 
   PoolEditorState>  {

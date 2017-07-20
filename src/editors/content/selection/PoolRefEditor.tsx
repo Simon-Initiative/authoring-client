@@ -79,7 +79,7 @@ export class PoolRefEditor
     this.props.services.dismissModal();
 
     this.props.services.fetchIdByGuid(resource.id)
-    .then(idref => {
+    .then((idref) => {
       this.props.onEdit(this.props.model.with({ idref }));
     });
   }
@@ -121,7 +121,8 @@ export class PoolRefEditor
     
     return (
       <ul className="list-group">
-        <li style={{ paddingBottom: '0.25rem' }} className="list-group-item justify-content-between">
+        <li style={ { paddingBottom: '0.25rem' } } 
+          className="list-group-item justify-content-between">
           {details}
           <button disabled={!this.props.editMode} onClick={this.onClick} 
               className="btn btn-primary btn-sm" type="button">Select</button>
