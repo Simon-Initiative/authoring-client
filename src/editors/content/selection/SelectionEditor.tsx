@@ -9,6 +9,7 @@ import guid from '../../../utils/guid';
 import { PoolEditor } from './PoolEditor';
 import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
+import { DragHandle } from '../../document/assessment/DragHandle';
 
 import '../common/editor.scss';
 
@@ -20,6 +21,7 @@ export interface SelectionEditor {
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  connectDragSource?: any;
 }
 
 export interface SelectionState {
@@ -175,16 +177,24 @@ export class SelectionEditor
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
         associatedClasses="selection">
 
-        <Collapse caption={caption}
-          details={details}>
+        <div style={ { position: 'relative' } }>
 
-          {controls}
+          <Collapse caption={caption}
+            details={details}>
 
-          {titleEditor}
+            {controls}
 
-          {this.renderSource()}
+            {titleEditor}
 
-        </Collapse>
+            {this.renderSource()}
+
+          </Collapse>
+
+          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
+            <DragHandle connectDragSource={this.props.connectDragSource}/>
+          </div>
+
+        </div>
 
       </RemovableContent>
     );

@@ -37,6 +37,8 @@ import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/contr
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
+import { DragHandle } from '../../document/assessment/DragHandle';
+
 
 type Ids = {
   id: string,
@@ -55,6 +57,7 @@ export interface QuestionEditor {
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  connectDragSource?: any;
 }
 
 export interface QuestionEditorState {
@@ -506,41 +509,52 @@ export abstract class QuestionEditor
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
         associatedClasses="question">
 
-        <Collapse caption="Question" 
-          details={getHtmlDetails(this.props.model.body)}
-          expanded={expanded}>
+        <div style={ { position: 'relative' } }>
 
-          <HtmlContentEditor 
-                ref={c => this.htmlEditor = c}
-                editMode={this.props.editMode}
-                services={this.props.services}
-                context={this.props.context}
-                activeItemId={this.state.activeItemId}
-                editorStyles={bodyStyle}
-                inlineToolbar={inlineToolbar}
-                inlineInsertionToolbar={insertionToolbar}
-                blockToolbar={blockToolbar}
-                model={this.props.model.body}
-                onEdit={this.onBodyEdit} 
-                />
+          <Collapse caption="Question" 
+            details={getHtmlDetails(this.props.model.body)}
+            expanded={expanded}>
 
-          
+            <HtmlContentEditor 
+                  ref={c => this.htmlEditor = c}
+                  editMode={this.props.editMode}
+                  services={this.props.services}
+                  context={this.props.context}
+                  activeItemId={this.state.activeItemId}
+                  editorStyles={bodyStyle}
+                  inlineToolbar={inlineToolbar}
+                  inlineInsertionToolbar={insertionToolbar}
+                  blockToolbar={blockToolbar}
+                  model={this.props.model.body}
+                  onEdit={this.onBodyEdit} 
+                  />
+
+            
 
 
-          <ConceptsEditor 
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
-            courseId={this.props.context.courseId}
-            model={this.props.model.concepts}
-            onEdit={this.onConceptsEdit} 
-            title="Skills"
-            conceptType="skill"
-            />
+            <ConceptsEditor 
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              courseId={this.props.context.courseId}
+              model={this.props.model.concepts}
+              onEdit={this.onConceptsEdit} 
+              title="Skills"
+              conceptType="skill"
+              />
 
-          {this.renderItemsAndParts()}
+            {this.renderItemsAndParts()}
 
-        </Collapse>
+          </Collapse>
+
+          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
+
+            <DragHandle connectDragSource={this.props.connectDragSource}/>
+
+          </div>
+
+        </div>
+
       </RemovableContent>);
   }
 

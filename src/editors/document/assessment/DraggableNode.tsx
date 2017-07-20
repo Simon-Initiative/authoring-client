@@ -36,6 +36,7 @@ const NodeSource = {
  */
 @DragSource(DragTypes.AssessmentNode, NodeSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
+  connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging(),
 }))
 export class DraggableNode 
@@ -47,15 +48,20 @@ export class DraggableNode
 
   }
 
+
+
   render() {
 
     const isDragging = (this.props as any).isDragging;
+    const connectDragSource = (this.props as any).connectDragSource;
 
     const opacity = isDragging ? 0.4 : 1;
 
-    return (this.props as any).connectDragSource(
+    return (this.props as any).connectDragPreview(
       <div style={{ opacity }}>
-        {this.props.children}
+        {React.Children.map(
+          this.props.children, 
+          (child => React.cloneElement((child as any), { connectDragSource })))}
       </div>,
     ); 
   }

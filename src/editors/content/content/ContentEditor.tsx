@@ -16,6 +16,7 @@ import { TextInput, InlineForm, Button, Checkbox, Select } from '../common/contr
 import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 import { RemovableContent } from '../common/RemovableContent';
+import { DragHandle } from '../../document/assessment/DragHandle';
 
 import '../common/editor.scss';
 
@@ -29,6 +30,7 @@ export interface ContentEditor {
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
   onRemove: (guid: string) => void;
+  connectDragSource?: any;
 }
 
 export interface ContentEditorState {
@@ -98,21 +100,33 @@ export class ContentEditor
         editMode={this.props.editMode}
         onRemove={() => this.props.onRemove(this.props.model.guid)} 
         associatedClasses="content">
-        <Collapse 
-          caption='Content' 
-          details={getHtmlDetails(this.props.model.body)}
-          expanded={expanded}>
-          
-          <HtmlContentEditor 
-                editorStyles={bodyStyle}
-                inlineToolbar={inlineToolbar}
-                blockToolbar={blockToolbar}
-                inlineInsertionToolbar={insertionToolbar}
-                {...this.props}
-                model={this.props.model.body}
-                onEdit={this.onBodyEdit} 
-                />
-        </Collapse>
+
+        <div style={ { position: 'relative' } }>
+
+          <Collapse 
+            caption='Content' 
+            details={getHtmlDetails(this.props.model.body)}
+            expanded={expanded}>
+            
+            <HtmlContentEditor 
+                  editorStyles={bodyStyle}
+                  inlineToolbar={inlineToolbar}
+                  blockToolbar={blockToolbar}
+                  inlineInsertionToolbar={insertionToolbar}
+                  {...this.props}
+                  model={this.props.model.body}
+                  onEdit={this.onBodyEdit} 
+                  />
+          </Collapse>
+
+          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
+
+            <DragHandle connectDragSource={this.props.connectDragSource}/>
+
+          </div>
+
+        </div>
+
       </RemovableContent>);
   }
 

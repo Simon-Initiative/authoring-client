@@ -10,6 +10,7 @@ import guid from '../../../utils/guid';
 import { describePool } from './details';
 import { RemovableContent } from '../common/RemovableContent';
 import ResourceSelection from '../../../utils/selection/ResourceSelection';
+
 import '../common/editor.scss';
 
 
@@ -19,6 +20,7 @@ export interface PoolRefEditor {
 
 export interface PoolRefProps extends AbstractContentEditorProps<contentTypes.PoolRef> {
   onRemove: (guid: string) => void;
+  
 }
 
 export interface PoolRefState {

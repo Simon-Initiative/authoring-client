@@ -63,6 +63,7 @@ const boxTarget = {
       opacity,
       height: '10px',
       width: '100%',
+      marginBottom: '8px',
     };
 
     return (this.props as any).connectDropTarget(
