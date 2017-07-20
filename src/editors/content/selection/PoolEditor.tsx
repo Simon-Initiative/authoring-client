@@ -45,7 +45,7 @@ export class PoolEditor
     this.onContentEdit = this.onContentEdit.bind(this);
 
     this.onReorderNode = this.onReorderNode.bind(this);
-    
+    this.canAcceptId = this.canAcceptId.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -63,7 +63,8 @@ export class PoolEditor
 
 
   renderDropTarget(index) {
-    return <RepositionTarget index={index} onDrop={this.onReorderNode}/>;
+    return <RepositionTarget index={index} canAcceptId={this.canAcceptId} 
+      onDrop={this.onReorderNode}/>;
   }
 
   onReorderNode(id, index) {
@@ -98,6 +99,11 @@ export class PoolEditor
       this.props.onEdit(this.props.model.with({ questions }));
     }
 
+  }
+
+
+  canAcceptId(id) {
+    return this.props.model.questions.get(id) !== undefined;
   }
 
   renderQuestions() {

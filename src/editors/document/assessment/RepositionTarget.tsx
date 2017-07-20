@@ -10,6 +10,7 @@ export interface RepositionTarget {
 export interface RepositionTargetProps {
   index: number;
   onDrop: (id: string, index: number) => void;
+  canAcceptId: (id: string) => boolean;
 }
 
 export interface RepositionTargetState {
@@ -25,6 +26,9 @@ const boxTarget = {
     }
 
     props.onDrop(component.props.draggedItem.id, props.index);
+  },
+  canDrop(props, monitor) {
+    return props.canAcceptId(monitor.getItem().id);
   },
 };
 

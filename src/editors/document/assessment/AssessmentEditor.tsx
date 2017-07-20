@@ -67,6 +67,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onTypeChange = this.onTypeChange.bind(this);
 
     this.onReorderNode = this.onReorderNode.bind(this);
+
+    this.canHandleDrop = this.canHandleDrop.bind(this);
   }
 
   componentDidMount() {                    
@@ -268,8 +270,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       targetAnnotations={[]} />);           
   }  
 
+  canHandleDrop(id) {
+    const page = this.props.model.pages.get(this.state.current);
+    return page.nodes.get(id) !== undefined;
+  }
+
   renderDropTarget(index) {
-    return <RepositionTarget index={index} onDrop={this.onReorderNode}/>;
+    return <RepositionTarget index={index} 
+      canAcceptId={this.canHandleDrop}  onDrop={this.onReorderNode}/>;
   }
 
   onReorderNode(id, index) {
