@@ -33,6 +33,30 @@ export { Resource } from './content/resource';
 export { UserInfo } from './content/user_info';
 export { WebContent } from './content/webcontent';
 
+export { Before } from './content/org/before';
+export { Dependencies } from './content/org/dependencies';
+export { Dependency } from './content/org/dependency';
+export { Icon } from './content/org/icon';
+export { Include } from './content/org/include';
+export { Item } from './content/org/item';
+export { Labels } from './content/org/labels';
+export { Module } from './content/org/module';
+export { Precondition } from './content/org/precondition';
+export { Preconditions } from './content/org/preconditions';
+export { ProgressConstraint } from './content/org/progress_constraint';
+export { ProgressConstraints } from './content/org/progress_constraints';
+export { ResourceRef } from './content/org/resourceref';
+export { Schedule } from './content/org/schedule';
+export { Section } from './content/org/section';
+export { Sequence } from './content/org/sequence';
+export { Sequences } from './content/org/sequences';
+export { SupplementGroup } from './content/org/supplement_group';
+export { Supplement } from './content/org/supplement';
+export { Supplements } from './content/org/supplements';
+export { Unit } from './content/org/unit';
+export { Unordered } from './content/org/unordered';
+
+
 export { Linkable } from './content/linkable';
 export { LearningObjective } from './content/los';
 export { OrgContentTypes, OrgItem, OrgSection, 
@@ -48,7 +72,7 @@ import { MultipleChoice } from './content/assessment/multiple_choice';
 import { Numeric } from './content/assessment/numeric';
 import { Unsupported } from './content/unsupported';
 
-export type Item = 
+export type QuestionItem = 
   Essay |
   MultipleChoice | 
   FillInTheBlank | 

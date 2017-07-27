@@ -8,6 +8,7 @@ import { Preconditions } from './preconditions';
 import { Supplements } from './supplements';
 import { Dependencies } from './dependencies';
 import { Schedule } from './schedule';
+import { Unit } from './unit';
 import { Unordered } from './unordered';
 import { Item } from './item';
 import { Section } from './section';
@@ -25,7 +26,7 @@ export type SequenceParams = {
   dependencies?: Maybe<Dependencies>
   preconditions?: Maybe<Preconditions>,
   supplements?: Maybe<Supplements>,
-  children?: Immutable.OrderedMap<string, Module | Include | Item>,
+  children?: Immutable.OrderedMap<string, Unit | Module | Include | Item>,
   unordered?: Maybe<Unordered>,
   progressConstraintIdref?: Maybe<string>,
   category?: types.CategoryTypes,
@@ -42,7 +43,7 @@ const defaultContent = {
   dependences: Maybe.nothing<Dependencies>(),
   preconditions: Maybe.nothing<Preconditions>(),
   supplements: Maybe.nothing<Supplements>(),
-  children: Immutable.OrderedMap<string, Module | Include | Item>(),
+  children: Immutable.OrderedMap<string, Unit | Module | Include | Item>(),
   unordered: Maybe.nothing<Unordered>(),
   progressConstraintIdref: Maybe.nothing<string>(),
   duration: Maybe.nothing<string>(),
@@ -61,7 +62,7 @@ export class Sequence extends Immutable.Record(defaultContent) {
   dependencies: Maybe<Dependencies>;
   preconditions: Maybe<Preconditions>;
   supplements: Maybe<Supplements>;
-  children: Immutable.OrderedMap<string, Module | Include | Item>;
+  children: Immutable.OrderedMap<string, Unit | Module | Include | Item>;
   unordered: Maybe<Unordered>;
   progressConstraintIdref: Maybe<string>;
   duration: Maybe<string>;

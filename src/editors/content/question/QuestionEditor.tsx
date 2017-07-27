@@ -259,7 +259,7 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onRemove(itemModel: contentTypes.Item, partModel) {
+  onRemove(itemModel: contentTypes.QuestionItem, partModel) {
     
     const items = this.props.model.items.delete(itemModel.guid);
     const parts = this.props.model.parts.delete(partModel.guid);
@@ -316,7 +316,7 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  renderItemPartEditor(item: contentTypes.Item, part: contentTypes.Part) {
+  renderItemPartEditor(item: contentTypes.QuestionItem, part: contentTypes.Part) {
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return <MultipleChoice
         context={this.props.context}
