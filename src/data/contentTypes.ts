@@ -55,6 +55,8 @@ export { Supplement } from './content/org/supplement';
 export { Supplements } from './content/org/supplements';
 export { Unit } from './content/org/unit';
 export { Unordered } from './content/org/unordered';
+export { AudienceTypes, DependencyTypes, GrainSizes, 
+  ConditionTypes, PurposeTypes, ScoringModes, CategoryTypes } from './content/org/types';
 
 
 export { Linkable } from './content/linkable';
