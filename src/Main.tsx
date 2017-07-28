@@ -49,10 +49,10 @@ const resources = {
         'Organizations',
         'x-oli-organization',
         resource => resource.type === 'x-oli-organization',
-        (title, type) => new models.OrganizationModel({
+        (title, type) => new models.OrganizationModel().with({
           type,
           version: '1.0',
-          title: new contentTypes.Title({ text: title }),
+          title,
         })),
   assessments: res(
         'Assessments',

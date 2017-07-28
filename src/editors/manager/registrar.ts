@@ -2,7 +2,7 @@
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor';
 import AssessmentEditor from '../document/assessment/AssessmentEditor';
 import CourseEditor from '../document/course/CourseEditor';
-import OrganizationEditor from '../document/organization/OrganizationEditor';
+import OrgEditor from '../document/org/OrgEditor';
 import LearningObjectiveEditor from '../document/learningobjectives/LearningObjectiveEditor';
 import SkillEditor from '../document/skills/SkillEditor';
 import PoolEditor from '../document/pool/PoolEditor';
@@ -38,7 +38,7 @@ export default function initEditorRegistry() {
   });  
   register({
     name: ModelTypes.OrganizationModel, 
-    component: OrganizationEditor,
+    component: OrgEditor,
     persistenceStrategy: new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,

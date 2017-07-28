@@ -17,6 +17,7 @@ export type CourseModelParams = {
   options?: string,
   icon?: contentTypes.WebContent,
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
+  resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
   developers?: Immutable.OrderedMap<string, contentTypes.UserInfo>,
 };
@@ -35,9 +36,20 @@ const defaultCourseModel = {
   options: '',
   icon: new contentTypes.WebContent(),
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
+  resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
   developers: Immutable.OrderedMap<string, contentTypes.UserInfo>(),
 };
+
+function buildResourceMap(params: CourseModelParams) : CourseModelParams {
+    
+  if (params.resources !== undefined) {
+    let map = Immutable.OrderedMap<string, contentTypes.Resource>();
+    params.resources.forEach((value, key) => map = map.set(value.id, value));
+    params.resourcesById = map;
+  }
+  return params;
+}
 
 export class CourseModel extends Immutable.Record(defaultCourseModel) {
   modelType: 'CourseModel';
@@ -53,15 +65,16 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   options: string;
   icon: contentTypes.WebContent;
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
+  resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
   developers: Immutable.OrderedMap<string, contentTypes.UserInfo>;
 
   constructor(params?: CourseModelParams) {
-    params ? super(params) : super();
+    params ? super(buildResourceMap(params)) : super();
   }
 
   with(values: CourseModelParams) {
-    return this.merge(values) as this;
+    return this.merge(buildResourceMap(values)) as this;
   }
 
   static fromPersistence(json: Object): CourseModel {

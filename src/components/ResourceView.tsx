@@ -94,7 +94,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
         id: this.props.course.model.id + '_' +
         title.toLowerCase().split(' ')[0] + '_' + g.substring(g.lastIndexOf('-') + 1),
         version: '1.0',
-        title: new contentTypes.Title({ text: title }),
+        title,
       });
     }
 

@@ -1,0 +1,28 @@
+.item {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0);
+
+  &:hover {
+    border: 1px solid rgba(0, 0, 120, 255);
+    
+  }
+}
+
+.section {
+  border: 1px solid rgba(0, 0, 120, 255);
+  padding-left: 50px;
+  background-color: rgba(0,255,0,70);
+}
+
+
+.module {
+  border: 1px solid rgba(0, 0, 120, 255);
+  padding-left: 50px;
+  
+}
+
+.unit {
+  border: 1px solid rgba(0, 0, 120, 255);
+  padding-left: 50px;
+  background-color: rgba(255,0,0,70);
+}

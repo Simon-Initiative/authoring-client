@@ -26,7 +26,7 @@ export type SequenceParams = {
   dependencies?: Maybe<Dependencies>
   preconditions?: Maybe<Preconditions>,
   supplements?: Maybe<Supplements>,
-  children?: Immutable.OrderedMap<string, Unit | Module | Include | Item>,
+  children?: Immutable.OrderedMap<string, Unit | Module | Include>,
   unordered?: Maybe<Unordered>,
   progressConstraintIdref?: Maybe<string>,
   category?: types.CategoryTypes,
@@ -43,7 +43,7 @@ const defaultContent = {
   dependences: Maybe.nothing<Dependencies>(),
   preconditions: Maybe.nothing<Preconditions>(),
   supplements: Maybe.nothing<Supplements>(),
-  children: Immutable.OrderedMap<string, Unit | Module | Include | Item>(),
+  children: Immutable.OrderedMap<string, Unit | Module | Include>(),
   unordered: Maybe.nothing<Unordered>(),
   progressConstraintIdref: Maybe.nothing<string>(),
   duration: Maybe.nothing<string>(),
@@ -62,7 +62,7 @@ export class Sequence extends Immutable.Record(defaultContent) {
   dependencies: Maybe<Dependencies>;
   preconditions: Maybe<Preconditions>;
   supplements: Maybe<Supplements>;
-  children: Immutable.OrderedMap<string, Unit | Module | Include | Item>;
+  children: Immutable.OrderedMap<string, Unit | Module | Include>;
   unordered: Maybe<Unordered>;
   progressConstraintIdref: Maybe<string>;
   duration: Maybe<string>;
@@ -128,10 +128,6 @@ export class Sequence extends Immutable.Record(defaultContent) {
         case 'include':
           model = model.with(
             { children: model.children.set(id, Include.fromPersistence(item, id)) });
-          break;
-        case 'item':
-          model = model.with(
-            { children: model.children.set(id, Item.fromPersistence(item, id)) });
           break;
         case 'supplements':
           model = model.with(

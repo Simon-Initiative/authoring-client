@@ -58,6 +58,8 @@ export { Unordered } from './content/org/unordered';
 export { AudienceTypes, DependencyTypes, GrainSizes, 
   ConditionTypes, PurposeTypes, ScoringModes, CategoryTypes } from './content/org/types';
 
+export { ContentTypes as OrganizationContentTypes } from './content/org/types';
+
 
 export { Linkable } from './content/linkable';
 export { LearningObjective } from './content/los';

@@ -16,7 +16,7 @@ import { CourseModel } from './models/course';
 import { DefaultModel } from './models/default';
 import { MediaModel } from './models/media';
 import { LearningObjectiveModel } from './models/objective';
-import { OrganizationModel } from './models/organization';
+import { OrganizationModel } from './models/org';
 import { SkillModel } from './models/skill';
 import { WorkbookPageModel } from './models/workbook';
 
@@ -28,7 +28,7 @@ export { CourseModel } from './models/course';
 export { DefaultModel } from './models/default';
 export { MediaModel } from './models/media';
 export { LearningObjectiveModel } from './models/objective';
-export { OrganizationModel } from './models/organization';
+export { OrganizationModel } from './models/org';
 export { SkillModel } from './models/skill';
 export { WorkbookPageModel } from './models/workbook';
 
