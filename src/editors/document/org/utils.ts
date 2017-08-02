@@ -37,7 +37,9 @@ function filterChildren(
   children: Immutable.OrderedMap<string, any>) : Immutable.OrderedMap<string, any> {
 
   const filtered = children.filter(c => c.guid !== guidToRemove);
-  const mapped = filtered.map(c => c.children !== undefined ? c.with({ children: filterChildren(guidToRemove, c.children) }) : c);
+  const mapped = filtered
+    .map(c => c.children !== undefined 
+      ? c.with({ children: filterChildren(guidToRemove, c.children) }) : c);
 
   return mapped
     .toOrderedMap();
@@ -77,7 +79,9 @@ function insertChild(
 
     // Recurse if the current node has children
     return parentNode.children !== undefined && parentNode.children.size > 0
-      ? parentNode.with({ children: parentNode.children.map(insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() }) 
+      ? parentNode.with(
+        { children: parentNode.children.map(
+          insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() }) 
       : parentNode;
   }
 }

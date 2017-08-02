@@ -31,7 +31,7 @@ export class OrgCollapse extends React.PureComponent<OrgCollapseProps, OrgCollap
   }
 
   onClick() {
-    this.setState({ collapsed: !this.state.collapsed});
+    this.setState({ collapsed: !this.state.collapsed });
   }
 
   render() {
@@ -49,7 +49,8 @@ export class OrgCollapse extends React.PureComponent<OrgCollapseProps, OrgCollap
     return (
       <div style={ { display: 'inline-block' } }>
         
-        <button onClick={this.onClick} type="button" className="btn btn-link">{this.props.caption} {indicator}</button>
+        <button onClick={this.onClick} type="button" 
+          className="btn btn-link">{this.props.caption} {indicator}</button>
         {detailsOrExpanded}
         <div className={collapsedOrNot} id={this.id}>
           {this.props.children}
