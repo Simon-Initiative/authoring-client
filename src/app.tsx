@@ -10,6 +10,10 @@ import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
+import Perf from 'react-addons-perf'; 
+
+(window as any).React = React;
+(window as any).Perf = Perf;
 
 import { createLogger } from 'redux-logger';
 

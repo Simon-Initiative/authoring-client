@@ -21,6 +21,8 @@ import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { SequenceEditor } from '../../content/org/SequenceEditor';
 
+import { insertNode, removeNode } from './utils';
+
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
@@ -53,11 +55,21 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   renderChild(c: contentTypes.Sequence | contentTypes.Include) {
     if (c.contentType === contentTypes.OrganizationContentTypes.Sequence) {
       return <SequenceEditor model={c} onEdit={this.onSequenceEdit} 
-        context={this.props.context} 
+        context={this.props.context} labels={this.props.model.labels}
+        parentGuid={this.props.model.guid}
+        onReposition={this.onReposition.bind(this)}
         services={this.props.services} editMode={this.props.editMode} />;
     } else {
       return 'Include Editor';
     }
+  }
+
+  onReposition(sourceNode: Object, targetGuid: string, index: number) {
+
+    const removed = removeNode(this.props.model, (sourceNode as any).guid);
+    const inserted = insertNode(removed, targetGuid, sourceNode, index);
+
+    this.handleEdit(inserted);
   }
 
   render() {

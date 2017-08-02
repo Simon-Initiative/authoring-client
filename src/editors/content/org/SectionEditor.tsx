@@ -7,6 +7,8 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import guid from '../../../utils/guid';
 import { ItemEditor } from './ItemEditor';
 import { Collapse } from '../common/Collapse';
+import { renderDraggableNodes, canAcceptDrop, SourceNodeType } from './drag/utils';
+import { DragHandle } from './drag/DragHandle';
 
 import './org.scss';
 
@@ -16,7 +18,10 @@ export interface SectionEditor {
 }
 
 export interface SectionEditorProps extends AbstractContentEditorProps<contentTypes.Section> {
-  
+  labels: contentTypes.Labels;
+  onReposition: (sourceNode: Object, targetGuid: string, index: number) => void;
+  connectDragSource?: any;
+  parentGuid: string;
 }
 
 export interface SectionEditorState {
@@ -30,6 +35,7 @@ export class SectionEditor
     super(props);
 
     this.onItemEdit = this.onItemEdit.bind(this); 
+    this.canHandleDrop = this.canHandleDrop.bind(this);
   }
 
   onItemEdit(item: contentTypes.Item) {
@@ -43,12 +49,25 @@ export class SectionEditor
     return false;
   }
 
+  canHandleDrop(id, source, sourceIndex: number, destIndex: number, sourceParentGuid) {
+    const predicate = (source : SourceNodeType) => {
+      const t = source.contentType;
+      return t === contentTypes.OrganizationContentTypes.Section
+        || t === contentTypes.OrganizationContentTypes.Include
+        || t === contentTypes.OrganizationContentTypes.Item;
+    };
+      
+    return canAcceptDrop(
+      predicate, source, this.props.model, sourceIndex, destIndex, sourceParentGuid);
+  }
+
   renderChild(c: contentTypes.Section | contentTypes.Item) {
     if (c.contentType === contentTypes.OrganizationContentTypes.Section) {
-      return <SectionEditor {...this.props} model={c}/>;
+      return <SectionEditor {...this.props} parentGuid={this.props.model.guid} model={c}/>;
     } else {
       return <ItemEditor model={c} onEdit={this.onItemEdit} 
-        context={this.props.context} 
+        parentGuid={this.props.model.guid}
+        context={this.props.context} labels={this.props.labels}
         services={this.props.services} editMode={this.props.editMode}/>;
     }
   }
@@ -57,11 +76,16 @@ export class SectionEditor
 
     const caption = 'Section: ' + this.props.model.title;
 
+    const children = renderDraggableNodes(
+      this.props.model.children, this.renderChild.bind(this), 
+      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model.guid);
+
     return (
       <div className="section">
+        <DragHandle connectDragSource={this.props.connectDragSource}/>
         <Collapse caption={caption}>
           <div className="sectionChildren">
-            {this.props.model.children.map(c => this.renderChild(c))}
+            {children}
           </div>
         </Collapse>
       </div>);

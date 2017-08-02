@@ -18,7 +18,7 @@ export type SequencesParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Sequences,
-  supplements: Maybe.nothing<ProgressConstraints>(),
+  progressConstraints: Maybe.nothing<ProgressConstraints>(),
   children: Immutable.OrderedMap<string, Sequence | Include>(),
   guid: '',
 };

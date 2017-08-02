@@ -38,7 +38,7 @@ const defaultContent = {
   title: '',
   description: Maybe.nothing<string>(),
   metadata: Maybe.nothing<Object>(),
-  dependences: Maybe.nothing<Dependencies>(),
+  dependencies: Maybe.nothing<Dependencies>(),
   preconditions: Maybe.nothing<Preconditions>(),
   supplements: Maybe.nothing<Supplements>(),
   children: Immutable.OrderedMap<string, Module | Include | Item>(),
