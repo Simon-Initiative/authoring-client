@@ -19,7 +19,9 @@ export interface SequenceEditor {
 
 export interface SequenceEditorProps extends AbstractContentEditorProps<contentTypes.Sequence> {
   labels: contentTypes.Labels;
-  onReposition: (sourceNode: Object, targetGuid: string, index: number) => void;
+  onReposition: (
+    sourceNode: Object, sourceParentGuid: string, 
+    targetModel: any, index: number) => void;
   parentGuid: string;
 }
 
@@ -95,7 +97,7 @@ export class SequenceEditor
 
     const children = renderDraggableNodes(
       this.props.model.children, this.renderChild.bind(this), 
-      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model.guid);
+      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model);
 
     return (
       <div className="sequence">

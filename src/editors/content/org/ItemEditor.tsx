@@ -6,7 +6,7 @@ import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { DragHandle } from './drag/DragHandle';
-import { Collapse } from '../common/collapse';
+import { OrgCollapse } from './OrgCollapse';
 
 import './org.scss';
 
@@ -47,10 +47,16 @@ export class ItemEditor
     const resource = this.props.context.courseModel.resourcesById.get(
       this.props.model.resourceref.idref);
 
+    const caption = 'Resource: ' + resource.title;
+
     return (
       <div className="item">
         <DragHandle connectDragSource={this.props.connectDragSource}/>
-        {resource.title}
+        <OrgCollapse caption={caption}>
+          <div className="itemChildren">
+            Nothing yet
+          </div>
+        </OrgCollapse>
       </div>);
   }
 

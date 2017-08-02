@@ -64,10 +64,25 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     }
   }
 
-  onReposition(sourceNode: Object, targetGuid: string, index: number) {
+  onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
+
+    let adjustedIndex = index;
+    if (sourceParentGuid === targetModel.guid) {
+      // Find the item's original index to see if this is a move downward
+      let i = 0;
+      const arr = targetModel.children.toArray();
+      for (i = 0; i < arr.length; i += 1) {
+        if (arr[i].guid === (sourceNode as any).guid) {
+          break;
+        }
+      }
+      if (i < index) {
+        adjustedIndex = index - 1;
+      }
+    }
 
     const removed = removeNode(this.props.model, (sourceNode as any).guid);
-    const inserted = insertNode(removed, targetGuid, sourceNode, index);
+    const inserted = insertNode(removed, targetModel.guid, sourceNode, adjustedIndex);
 
     this.handleEdit(inserted);
   }
@@ -81,10 +96,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-          
-          <div className="container">
-            {this.props.model.sequences.children.toArray().map(c => this.renderChild(c))}
-          </div>
+         
+          {this.props.model.sequences.children.toArray().map(c => this.renderChild(c))}
+         
         </div>
       </div>);
     

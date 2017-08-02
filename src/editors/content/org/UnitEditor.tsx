@@ -8,7 +8,7 @@ import guid from '../../../utils/guid';
 import { ItemEditor } from './ItemEditor';
 import { SectionEditor } from './SectionEditor';
 import { ModuleEditor } from './ModuleEditor';
-import { Collapse } from '../common/Collapse';
+import { OrgCollapse } from './OrgCollapse';
 import { renderDraggableNodes, canAcceptDrop, SourceNodeType } from './drag/utils';
 import { DragHandle } from './drag/DragHandle';
 
@@ -21,7 +21,9 @@ export interface UnitEditor {
 
 export interface UnitEditorProps extends AbstractContentEditorProps<contentTypes.Unit> {
   labels: contentTypes.Labels;
-  onReposition: (sourceNode: Object, targetGuid: string, index: number) => void;
+  onReposition: (
+    sourceNode: Object, sourceParentGuid: string, 
+    targetModel: any, index: number) => void;
   connectDragSource?: any;
   parentGuid: string;
 }
@@ -91,16 +93,16 @@ export class UnitEditor
 
     const children = renderDraggableNodes(
       this.props.model.children, this.renderChild.bind(this), 
-      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model.guid);
+      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model);
 
     return (
       <div className="unit">
         <DragHandle connectDragSource={this.props.connectDragSource}/>
-        <Collapse caption={caption}>
+        <OrgCollapse caption={caption}>
           <div className="unitChildren">
             {children}
           </div>
-        </Collapse>
+        </OrgCollapse>
       </div>);
   }
 

@@ -9,9 +9,9 @@ export interface RepositionTarget {
 
 export interface RepositionTargetProps {
   index: number;
-  onDrop: (sourceModel: any, targetGuid: string, index: number) => void;
+  onDrop: (sourceModel: any, sourceParentGuid: string, targetGuid: string, index: number) => void;
   canAcceptId: (id: string) => boolean;
-  parentGuid: string;
+  parentModel: string;
 }
 
 export interface RepositionTargetState {
@@ -26,7 +26,9 @@ const boxTarget = {
       return;
     }
 
-    props.onDrop(component.props.draggedItem.source, props.parentGuid, props.index);
+    props.onDrop(
+      component.props.draggedItem.source, component.props.draggedItem.parentGuid, 
+      props.parentModel, props.index);
   },
   canDrop(props, monitor) {
     return props.canAcceptId(
@@ -59,18 +61,14 @@ const boxTarget = {
     const canDrop = (this.props as any).canDrop;
     const draggedItem = (this.props as any).draggedItem;
 
-    const delta =  draggedItem === null ? 0 : draggedItem.index - this.props.index;
-
-    const directlyAboveOrBelow = delta === 0 || delta === -1;
-
-    const opacity = (isOver && canDrop && !directlyAboveOrBelow) ? 1.0 : 0.0;
+    const opacity = (isOver && canDrop) ? 1.0 : 0.0;
 
     const style = {
       backgroundColor: '#f4bf42',
       opacity,
-      height: '10px',
+      height: '7px',
       width: '100%',
-      marginBottom: '8px',
+      marginBottom: '6px',
     };
 
     return (this.props as any).connectDropTarget(

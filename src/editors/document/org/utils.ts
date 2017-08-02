@@ -35,16 +35,9 @@ export function insertNode(
 function filterChildren(
   guidToRemove: string, 
   children: Immutable.OrderedMap<string, any>) : Immutable.OrderedMap<string, any> {
-  
 
   const filtered = children.filter(c => c.guid !== guidToRemove);
-
-  const f = filtered.toOrderedMap();
-
   const mapped = filtered.map(c => c.children !== undefined ? c.with({ children: filterChildren(guidToRemove, c.children) }) : c);
-
-
-  const m = mapped.toOrderedMap();
 
   return mapped
     .toOrderedMap();

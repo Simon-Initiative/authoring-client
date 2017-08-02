@@ -14,7 +14,7 @@ export interface DraggableNodeProps {
   editMode: boolean;
   index: number;
   source: SourceNodeType;
-  parentGuid: string;
+  parentModel: any;
 }
 
 export interface DraggableNodeState {
@@ -28,7 +28,8 @@ const NodeSource = {
   },
 
   beginDrag(props, monitor) {
-    return { id: props.id, index: props.index, source: props.source, parentGuid: props.parentGuid };
+    return { id: props.id, 
+      index: props.index, source: props.source, parentGuid: props.parentModel.guid };
   },
 };
 

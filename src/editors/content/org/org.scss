@@ -1,28 +1,36 @@
 .item {
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0);
-
+  
   &:hover {
-    border: 1px solid rgba(0, 0, 120, 255);
     
   }
 }
 
 .section {
-  border: 1px solid rgba(0, 0, 120, 255);
-  padding-left: 50px;
-  background-color: rgba(0,255,0,70);
+  width: 100%;
 }
 
 
 .module {
-  border: 1px solid rgba(0, 0, 120, 255);
-  padding-left: 50px;
-  
+  width: 100%;
 }
 
 .unit {
-  border: 1px solid rgba(0, 0, 120, 255);
-  padding-left: 50px;
-  
+ width: 100%;
+}
+
+.sectionChildren {
+  padding-left: 30px;
+}
+
+.moduleChildren {
+  padding-left: 30px;
+}
+
+.sequenceChildren {
+  padding-left: 30px;
+}
+
+.unitChildren {
+  padding-left: 30px;
 }

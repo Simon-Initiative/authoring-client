@@ -9,20 +9,20 @@ export type SourceNodeType = t.Sequence | t.Unit | t.Module | t.Section | t.Incl
 export type DestinationNodeType = t.Sequences | t.Sequence | t.Unit | t.Module | t.Section;
 
 export function renderDraggableNodes(
-  nodes: any, renderNode, canHandleDrop, onReorderNode, editMode, parentGuid) {
+  nodes: any, renderNode, canHandleDrop, onReorderNode, editMode, parentModel) {
 
   const elements = [];
   let index = 0;
 
   nodes.forEach((node) => {
-    elements.push(renderDropTarget(index, parentGuid, canHandleDrop, onReorderNode));
+    elements.push(renderDropTarget(index, parentModel, canHandleDrop, onReorderNode));
     elements.push(<DraggableNode id={node.guid} editMode={editMode} 
-      index={index} source={node} parentGuid={parentGuid}>
+      index={index} source={node} parentModel={parentModel}>
       {renderNode(node)}</DraggableNode>);
     index += 1;
   });
 
-  elements.push(renderDropTarget(nodes.length, parentGuid, canHandleDrop, onReorderNode));
+  elements.push(renderDropTarget(nodes.size, parentModel, canHandleDrop, onReorderNode));
 
   return elements;
 }
@@ -49,7 +49,7 @@ export function canAcceptDrop(
       // We do not accept the drop if it isn't repositioning. In other words,
       // one cannot drag and drop an item in the drop slots directly above and below
       // the item 
-      return delta !== 0 && delta !== -1;
+      return delta !== 0 && delta !== 1;
 
     } else {
       return true;
@@ -61,11 +61,11 @@ export function canAcceptDrop(
 
 }
 
-function renderDropTarget(index: number, parentGuid: string, canHandleDrop, onReorderNode) {
+function renderDropTarget(index: number, parentModel: any, canHandleDrop, onReorderNode) {
   return (
     <RepositionTarget 
       index={index} 
-      parentGuid={parentGuid}
+      parentModel={parentModel}
       canAcceptId={canHandleDrop}  
       onDrop={onReorderNode}/>
   );
