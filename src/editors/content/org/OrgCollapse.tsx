@@ -7,8 +7,6 @@ export interface OrgCollapse {
 
 export interface OrgCollapseProps {
   caption: string;
-  details?: string;
-  expanded?: any; // Component to display in place of details when expanded
   
 }
 
@@ -37,21 +35,17 @@ export class OrgCollapse extends React.PureComponent<OrgCollapseProps, OrgCollap
   render() {
 
     const collapsedOrNot = this.state.collapsed ? 'collapse' : 'collapse.show';
-    let detailsOrExpanded = null;
-    if (this.props.details !== undefined && this.state.collapsed) {
-      detailsOrExpanded = this.props.details;
-    } else if (this.props.expanded !== undefined && !this.state.collapsed) {
-      detailsOrExpanded = this.props.expanded;
-    }
+    
 
     const indicator = this.state.collapsed ? '+' : '-';
 
     return (
-      <div style={ { display: 'inline-block' } }>
+      <div style={ { display: 'inline-block', width: '100%' } }>
         
+
         <button onClick={this.onClick} type="button" 
           className="btn btn-link">{this.props.caption} {indicator}</button>
-        {detailsOrExpanded}
+        
         <div className={collapsedOrNot} id={this.id}>
           {this.props.children}
         </div>

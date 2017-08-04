@@ -9,11 +9,10 @@ import { ItemEditor } from './ItemEditor';
 import { SectionEditor } from './SectionEditor';
 import { OrgCollapse } from './OrgCollapse';
 import { DragHandle } from './drag/DragHandle';
-import { renderDraggableNodes, canAcceptDrop, SourceNodeType } from './drag/utils';
-
+import { canAcceptDrop, SourceNodeType } from './drag/utils';
+import { OrgTable } from './OrgTable';
 
 import './org.scss';
-
 
 export interface ModuleEditor {
   
@@ -89,16 +88,16 @@ export class ModuleEditor
   render() : JSX.Element {
     const caption = 'Module: ' + this.props.model.title;
 
-    const children = renderDraggableNodes(
-      this.props.model.children, this.renderChild.bind(this), 
-      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model);
+    const children = this.props.children;
 
     return (
       <div className="module">
         <DragHandle connectDragSource={this.props.connectDragSource}/>
         <OrgCollapse caption={caption}>
           <div className="moduleChildren">
-            {children}
+            <OrgTable>
+              {children}
+            </OrgTable>
           </div>
         </OrgCollapse>
       </div>);

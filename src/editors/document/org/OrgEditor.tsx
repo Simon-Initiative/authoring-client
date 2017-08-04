@@ -17,12 +17,17 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
+import { Command } from './commands/command';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { SequenceEditor } from '../../content/org/SequenceEditor';
-
+import { render } from './traversal';
+import { renderDraggableTreeNode, 
+  canAcceptDrop, SourceNodeType } from '../../content/org/drag/utils';
 import { insertNode, removeNode } from './utils';
-
+import { TreeNode } from './TreeNode';
+import { ActionDropdown } from './ActionDropdown';
+import { Row } from './Row';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
@@ -35,8 +40,9 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
 }
 
 interface OrgEditorState extends AbstractEditorState {
-
+  collapsed: Object;
 }
+
 
 @DragDropContext(HTML5Backend)
 class OrgEditor extends AbstractEditor<models.OrganizationModel,
@@ -44,25 +50,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorState>  {
 
   constructor(props) {
-    super(props, ({} as OrgEditorState));
-
+    super(props, ({ collapsed: {} } as OrgEditorState));
   }
 
-  onSequenceEdit(s : contentTypes.Sequence) {
-
-  }
-
-  renderChild(c: contentTypes.Sequence | contentTypes.Include) {
-    if (c.contentType === contentTypes.OrganizationContentTypes.Sequence) {
-      return <SequenceEditor model={c} onEdit={this.onSequenceEdit} 
-        context={this.props.context} labels={this.props.model.labels}
-        parentGuid={this.props.model.guid}
-        onReposition={this.onReposition.bind(this)}
-        services={this.props.services} editMode={this.props.editMode} />;
-    } else {
-      return 'Include Editor';
-    }
-  }
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
 
@@ -87,7 +77,50 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.handleEdit(inserted);
   }
 
+  toggleExpanded(guid) {
+    const collapsed = Object.assign({}, this.state.collapsed);
+    if (collapsed[guid] === undefined) {
+      collapsed[guid] = true;
+    } else {
+      collapsed[guid] = !collapsed[guid];
+    }
+    this.setState({ collapsed });
+  }
+
+  processCommand(model, command: Command) {
+
+    const delay = () => 
+      command.execute(this.props.model, model, this.props.context, this.props.services)
+        .then(org => this.handleEdit(org));
+
+    setTimeout(delay, 0);    
+  }
+
   render() {
+
+    const isExpanded = 
+      guid => this.state.collapsed[guid] === undefined ||  !this.state.collapsed[guid];
+
+    const renderNode = (node, parent, index, depth) => {
+      return <TreeNode 
+        model={node} 
+        parentModel={parent} 
+        editMode={this.props.editMode}
+        toggleExpanded={this.toggleExpanded.bind(this)} 
+        isExpanded={isExpanded(node.guid)}
+        onReposition={this.onReposition.bind(this)}
+        indexWithinParent={index} 
+        context={this.props.context} 
+        depth={depth}/>;
+    };
+    const wrapper = (model, element, i) => {
+      return (
+        <Row model={model} key={model.guid} isExpanded={isExpanded(model.guid)}
+          index={i} processCommand={this.processCommand.bind(this, model)}>
+          {element}
+        </Row>
+      );
+    };
 
     return (
       <div>
@@ -97,8 +130,22 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
          
-          {this.props.model.sequences.children.toArray().map(c => this.renderChild(c))}
-         
+          <table className="table table-sm table-striped">
+            <thead>
+            <tr key="header">
+              <th key="comp">Component</th>
+              <th key="action">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {render(
+              this.props.model.sequences, 
+              isExpanded,renderNode, wrapper)}
+  
+          </tbody>
+          </table>
+
         </div>
       </div>);
     

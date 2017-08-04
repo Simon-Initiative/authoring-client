@@ -27,13 +27,17 @@ const boxTarget = {
     }
 
     props.onDrop(
-      component.props.draggedItem.source, component.props.draggedItem.parentGuid, 
+      component.props.draggedItem.sourceModel, component.props.draggedItem.parentModel.guid, 
       props.parentModel, props.index);
   },
   canDrop(props, monitor) {
     return props.canAcceptId(
-      monitor.getItem().id, monitor.getItem().source, monitor.getItem().index, 
-      props.index, monitor.getItem().parentGuid);
+      monitor.getItem().id, 
+      monitor.getItem().sourceModel, 
+      monitor.getItem().parentModel, 
+      monitor.getItem().originalIndex, 
+      props.index, 
+      props.parentModel);
   },
 };
 

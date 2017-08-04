@@ -8,6 +8,8 @@
 
 .section {
   width: 100%;
+  padding-top: 4px;
+  padding-left: 6px;
 }
 
 
@@ -20,17 +22,21 @@
 }
 
 .sectionChildren {
+  width: 100%;
   padding-left: 30px;
 }
 
 .moduleChildren {
+  width: 100%;
   padding-left: 30px;
 }
 
 .sequenceChildren {
+  width: 100%;
   padding-left: 30px;
 }
 
 .unitChildren {
+  width: 100%;
   padding-left: 30px;
 }

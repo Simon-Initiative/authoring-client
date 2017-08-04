@@ -12,7 +12,7 @@ export interface DragHandle {
 }
 
 export interface DragHandleProps {
-  connectDragSource: any; 
+  connectDragSource?: any; 
 }
 
 export interface DragHandleState {

@@ -7,9 +7,9 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import guid from '../../../utils/guid';
 import { ItemEditor } from './ItemEditor';
 import { OrgCollapse } from './OrgCollapse';
-import { renderDraggableNodes, canAcceptDrop, SourceNodeType } from './drag/utils';
+import { canAcceptDrop, SourceNodeType } from './drag/utils';
 import { DragHandle } from './drag/DragHandle';
-
+import { OrgTable } from './OrgTable';
 import './org.scss';
 
 
@@ -78,16 +78,16 @@ export class SectionEditor
 
     const caption = 'Section: ' + this.props.model.title;
 
-    const children = renderDraggableNodes(
-      this.props.model.children, this.renderChild.bind(this), 
-      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model);
+    const children = this.props.children;
 
     return (
       <div className="section">
         <DragHandle connectDragSource={this.props.connectDragSource}/>
         <OrgCollapse caption={caption}>
           <div className="sectionChildren">
-            {children}
+            <OrgTable>
+              {children}
+            </OrgTable>
           </div>
         </OrgCollapse>
       </div>);

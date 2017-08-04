@@ -1,9 +1,8 @@
 import * as React from 'react';
-import guid from '../../../../utils/guid';
+import guid from '../../../utils/guid';
 import { DragSource } from 'react-dnd';
-import { DragTypes } from '../../../../utils/drag';
-
-import { SourceNodeType } from './utils';
+import { DragTypes } from '../../../utils/drag';
+import { SourceNodeType } from '../../content/org/drag/utils';
 
 export interface DraggableNode {
   
@@ -48,7 +47,7 @@ const NodeSource = {
   isDragging: monitor.isDragging(),
 }))
 export class DraggableNode 
-  extends React.Component<DraggableNodeProps, DraggableNodeState> {
+  extends React.PureComponent<DraggableNodeProps, DraggableNodeState> {
     
   constructor(props) {
     super(props);
@@ -62,7 +61,7 @@ export class DraggableNode
     const opacity = isDragging ? 0.4 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div style={{ opacity }}>
+      <div style={{ opacity, marginLeft: '5px' }}>
         {React.Children.map(
           this.props.children, 
           (child => React.cloneElement((child as any), { connectDragSource })))}

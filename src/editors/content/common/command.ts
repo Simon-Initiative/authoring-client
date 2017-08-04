@@ -10,7 +10,7 @@ export interface Command<DataType> {
   // Execute this command given state and context. 
   execute(state: DataType, context: AppContext, services: AppServices) : Promise<DataType>;
 
-  // Determines is the preconditions required for this command to be able
+  // Determines if the preconditions required for this command to be able
   // to be executed are met.  This can be used to determine, for example, if
   // a toolbar button that exposes a command should be enabled or disabled. 
   precondition(state: DataType, context: AppContext): boolean;

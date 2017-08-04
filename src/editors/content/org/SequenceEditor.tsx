@@ -8,8 +8,10 @@ import guid from '../../../utils/guid';
 import { ItemEditor } from './ItemEditor';
 import { UnitEditor } from './UnitEditor';
 import { ModuleEditor } from './ModuleEditor';
-import { Collapse } from '../common/Collapse';
-import { renderDraggableNodes, canAcceptDrop, SourceNodeType } from './drag/utils';
+import { OrgCollapse } from './OrgCollapse';
+import { canAcceptDrop, SourceNodeType } from './drag/utils';
+import { DragHandle } from './drag/DragHandle';
+import { OrgTable } from './OrgTable';
 
 import './org.scss';
 
@@ -23,6 +25,7 @@ export interface SequenceEditorProps extends AbstractContentEditorProps<contentT
     sourceNode: Object, sourceParentGuid: string, 
     targetModel: any, index: number) => void;
   parentGuid: string;
+  connectDragSource?: any;
 }
 
 export interface SequenceEditorState {
@@ -95,16 +98,20 @@ export class SequenceEditor
 
   render() : JSX.Element {
 
-    const children = renderDraggableNodes(
-      this.props.model.children, this.renderChild.bind(this), 
-      this.canHandleDrop, this.props.onReposition, this.props.editMode, this.props.model);
+    const children = this.props.children;
+
+    const caption = 'Sequence: ' + this.props.model.title;
 
     return (
       <div className="sequence">
-        {this.props.model.title}
-        <div className="sequenceChildren">
-          {children}
-        </div>
+        <DragHandle connectDragSource={this.props.connectDragSource}/>
+        <OrgCollapse caption={caption}>
+          <div className="sequenceChildren">
+            <OrgTable>
+              {children}
+            </OrgTable>
+          </div>
+        </OrgCollapse>
       </div>);
   }
 
