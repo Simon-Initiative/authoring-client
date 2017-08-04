@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { augment, getChildren } from '../common';
+import { defaultIdGuid, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Maybe } from 'tsmonad';
 import { ResourceRef } from './resourceref';
@@ -64,7 +64,7 @@ export class Module extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: ModuleParams) {
-    super(augment(params));
+    super(defaultIdGuid(params));
   }
 
   with(values: ModuleParams) {

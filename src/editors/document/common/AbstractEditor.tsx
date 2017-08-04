@@ -32,6 +32,10 @@ export interface AbstractEditorProps<ModelType> {
   
   editMode: boolean;
 
+  dispatch: any;
+
+  expanded: Immutable.Set<string>;
+
 }
 
 export interface AbstractEditorState {

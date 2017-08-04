@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { augment, getChildren } from '../common';
+import { defaultIdGuid, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Maybe } from 'tsmonad';
 import { ProgressConstraints } from './progress_constraints';
@@ -31,7 +31,7 @@ export class Sequences extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: SequencesParams) {
-    super(augment(params));
+    super(defaultIdGuid(params));
   }
 
   with(values: SequencesParams) {

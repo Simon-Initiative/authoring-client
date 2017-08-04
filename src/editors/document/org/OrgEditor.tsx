@@ -22,6 +22,7 @@ import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { SequenceEditor } from '../../content/org/SequenceEditor';
 import { render } from './traversal';
+import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { renderDraggableTreeNode, 
   canAcceptDrop, SourceNodeType } from '../../content/org/drag/utils';
 import { insertNode, removeNode } from './utils';
@@ -40,7 +41,7 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
 }
 
 interface OrgEditorState extends AbstractEditorState {
-  collapsed: Object;
+  
 }
 
 
@@ -50,7 +51,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorState>  {
 
   constructor(props) {
-    super(props, ({ collapsed: {} } as OrgEditorState));
+    super(props, ({} as OrgEditorState));
   }
 
 
@@ -78,13 +79,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   toggleExpanded(guid) {
-    const collapsed = Object.assign({}, this.state.collapsed);
-    if (collapsed[guid] === undefined) {
-      collapsed[guid] = true;
-    } else {
-      collapsed[guid] = !collapsed[guid];
-    }
-    this.setState({ collapsed });
+    const action = this.props.expanded.has(guid) ? collapseNodes : expandNodes;
+    this.props.dispatch(action(this.props.context.documentId, [guid]));
   }
 
   processCommand(model, command: Command) {
@@ -99,7 +95,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   render() {
 
     const isExpanded = 
-      guid => this.state.collapsed[guid] === undefined ||  !this.state.collapsed[guid];
+      guid => this.props.expanded.has(guid);
 
     const renderNode = (node, parent, index, depth) => {
       return <TreeNode 

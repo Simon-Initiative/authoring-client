@@ -18,3 +18,17 @@ export function augment(params) {
     return params;
   }
 }
+
+
+export function defaultIdGuid(params) {
+
+  const id = createGuid();
+
+  const defaults = {
+    id,
+    guid: id,
+  };
+
+  return Object.assign({}, defaults, params);
+}
+

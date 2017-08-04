@@ -24,7 +24,7 @@ export interface TreeNodeProps {
   isExpanded: boolean;
   context: AppContext;
   editMode: boolean;
-  toggleExpanded: (guid) => void;
+  toggleExpanded: (id) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -41,6 +41,14 @@ const Title = (props) => {
   );
 };
 
+function getExpandId(model: NodeTypes) : string {
+  if (model.contentType === contentTypes.OrganizationContentTypes.Include) {
+    return model.guid;
+  } else {
+    return model.id;
+  }
+}
+
 export class TreeNode 
   extends React.PureComponent<TreeNodeProps, TreeNodeState> {
     
@@ -49,6 +57,8 @@ export class TreeNode
 
     
   }
+
+  
 
 
   render() : JSX.Element {
@@ -71,11 +81,11 @@ export class TreeNode
     const contentType = this.props.model.contentType;
     let title;
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
-      title = <Title toggleExpanded={() => this.props.toggleExpanded(model.guid)}>
+      title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
         {contentType} - {this.props.context.courseModel
         .resourcesById.get(this.props.model.resourceref.idref).title}</Title>;
     } else {
-      title = <Title toggleExpanded={() => this.props.toggleExpanded(model.guid)}>
+      title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
         {icon} {contentType} - {this.props.model.title}</Title>;
     }
 

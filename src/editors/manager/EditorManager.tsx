@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
 import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
@@ -47,10 +47,12 @@ export interface EditorManagerState {
 function mapStateToProps(state: any) {
   const {
     titles,
+    expanded,
   } = state;
 
   return {
     titles,
+    expanded,
   };
 }
 
@@ -370,6 +372,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
       const childProps: AbstractEditorProps<any> = {
         model: this.state.document.model,
+        expanded: this.props.expanded.has(this.props.documentId) 
+          ? this.props.expanded.get(this.props.documentId) : Immutable.Set<string>(),
         context: {
           documentId: this.props.documentId,
           userId: this.props.userId,
@@ -379,6 +383,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           courseModel: this.props.course.model,
           undoRedoGuid: this.state.undoRedoGuid,
         },
+        dispatch: this.props.dispatch,
         onEdit: this._onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
         services: new DispatchBasedServices(
