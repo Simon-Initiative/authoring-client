@@ -6,6 +6,15 @@ export type IsNodeExpanded = (guid: string) => boolean;
 
 export type NodeTypes = t.Sequence | t.Unit | t.Module | t.Section | t.Item | t.Include;
 
+
+export function getExpandId(model: NodeTypes) : string {
+  if (model.contentType === t.OrganizationContentTypes.Include) {
+    return model.guid;
+  } else {
+    return model.id;
+  }
+}
+
 export function render(
   sequences: t.Sequences, isExpanded: IsNodeExpanded,
   nodeRenderers: any, elementWrapper: any) : React.Component[] {
@@ -36,7 +45,7 @@ export function renderHelper(
 
   elements.push(elementWrapper(node, nodeRenderers(node, parent, index, depth), index));
 
-  if (isExpanded(node.guid) 
+  if (isExpanded(getExpandId(node)) 
     && node.contentType !== t.OrganizationContentTypes.Item 
     && node.contentType !== t.OrganizationContentTypes.Include) {
 

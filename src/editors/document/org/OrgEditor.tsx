@@ -20,8 +20,7 @@ import guid from '../../../utils/guid';
 import { Command } from './commands/command';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
-import { SequenceEditor } from '../../content/org/SequenceEditor';
-import { render } from './traversal';
+import { render, getExpandId } from './traversal';
 import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { renderDraggableTreeNode, 
   canAcceptDrop, SourceNodeType } from '../../content/org/drag/utils';
@@ -92,7 +91,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     setTimeout(delay, 0);    
   }
 
+
+
   render() {
+
+    console.log('render');
 
     const isExpanded = 
       guid => this.props.expanded.has(guid);
@@ -103,7 +106,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         parentModel={parent} 
         editMode={this.props.editMode}
         toggleExpanded={this.toggleExpanded.bind(this)} 
-        isExpanded={isExpanded(node.guid)}
+        isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
         indexWithinParent={index} 
         context={this.props.context} 
@@ -111,7 +114,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
     const wrapper = (model, element, i) => {
       return (
-        <Row model={model} key={model.guid} isExpanded={isExpanded(model.guid)}
+        <Row model={model} key={model.guid} isExpanded={isExpanded(getExpandId(model))}
           index={i} processCommand={this.processCommand.bind(this, model)}>
           {element}
         </Row>

@@ -9,7 +9,7 @@ import { renderDraggableTreeNode, canAcceptDrop,
   SourceNodeType, renderDropTarget } from '../../content/org/drag/utils';
 import { DragHandle } from '../../content/org/drag/DragHandle';
 import { DraggableNode } from './DraggableNode';
-import { NodeTypes } from './traversal';
+import { NodeTypes, getExpandId } from './traversal';
 import { canHandleDrop } from './utils';
 
 export interface TreeNode {
@@ -41,13 +41,6 @@ const Title = (props) => {
   );
 };
 
-function getExpandId(model: NodeTypes) : string {
-  if (model.contentType === contentTypes.OrganizationContentTypes.Include) {
-    return model.guid;
-  } else {
-    return model.id;
-  }
-}
 
 export class TreeNode 
   extends React.PureComponent<TreeNodeProps, TreeNodeState> {
