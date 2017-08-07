@@ -2,9 +2,11 @@ import * as types from '../../data/types';
 
 import { modalActions } from '../../actions/modal';
 import * as persistence from '../../data/persistence';
+import * as contentTypes from '../../data/contentTypes';
 import * as view from '../../actions/view';
 import * as courseActions from '../../actions/course';
 import * as models from '../../data/models';
+
 import { TitleOracle } from './TitleOracle';
 
 /**
@@ -19,6 +21,10 @@ export interface AppServices {
 
   // Request to view a document with the specified document id.
   viewDocument: (documentId: types.DocumentId, courseId: string) => void;
+
+  createWorkbookPage: (title: string, courseId: string) => Promise<persistence.Document>;
+
+  createAssessment: (title: string, courseId: string) => Promise<persistence.Document>;
 
   // Display the given component in a modal dialog.
   displayModal: (component: any) => void;
@@ -63,6 +69,23 @@ export class DispatchBasedServices implements AppServices {
     view.viewDocument(documentId, courseId);
   }
 
+  createWorkbookPage(title: string, courseId: string) : Promise<persistence.Document> {
+
+    const resource = new models.WorkbookPageModel({
+      type: types.LegacyTypes.workbook_page,
+      head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
+    });
+    return this.createResource(courseId, resource);
+  }
+
+  createAssessment(title: string, courseId: string) : Promise<persistence.Document> {
+    const resource = new models.AssessmentModel({
+      type: types.LegacyTypes.assessment2,
+      title: new contentTypes.Title({ text: title }),
+    });
+    return this.createResource(courseId, resource);
+  }
+
   displayModal(component: any) {
     this.dispatch(modalActions.display(component));
   }
@@ -84,6 +107,32 @@ export class DispatchBasedServices implements AppServices {
   fetchTitleById(internalId: string) : Promise<string> {
     return this.fetchAttributesBy(['title'], 'id', internalId)
       .then(o => o.title);
+  }
+
+  createResource(courseId: string, resource) : Promise<persistence.Document> {
+
+    return new Promise((resolve, reject) => {
+
+      let creationResult : persistence.Document = null;
+      persistence.createDocument(courseId, resource)
+        .then((result: persistence.Document) => {
+          creationResult = result;
+          
+          return persistence.retrieveCoursePackage(courseId);
+
+        })
+        .then((document) => {
+          // Get an updated course content package payload
+          if (document.model.modelType === models.ModelTypes.CourseModel) {
+            this.dispatch(courseActions.courseChanged(document.model));
+          }
+          
+          resolve(creationResult);
+        });
+    });
+    
+
+    
   }
 
   fetchAttributesBy(

@@ -10,6 +10,7 @@ export interface Row {
 }
 
 export interface RowProps {
+  labels: contentTypes.Labels;
   model: NodeTypes;
   index: number;
   processCommand: (command: Command) => void;
@@ -43,13 +44,14 @@ export class Row
 
   render() : JSX.Element {
 
-    const { model, index, children, processCommand } = this.props;
+    const { model, index, children, processCommand, labels } = this.props;
 
     return (
       <tr key={model.guid}>
         <td key="content">{children}</td>
         <td key="actions">
-          <ActionDropdown model={model} processCommand={processCommand}/>
+          <ActionDropdown labels={labels} 
+            model={model} processCommand={processCommand}/>
         </td>
       </tr>
     );

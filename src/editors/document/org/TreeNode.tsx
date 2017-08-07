@@ -17,6 +17,7 @@ export interface TreeNode {
 }
 
 export interface TreeNodeProps {
+  labels: contentTypes.Labels;
   model: NodeTypes;
   parentModel: any;
   indexWithinParent: number;
@@ -51,7 +52,9 @@ export class TreeNode
     
   }
 
-  
+  getLabel(contentType: string) {
+    return this.props.labels[contentType.toLowerCase()];
+  }
 
 
   render() : JSX.Element {
@@ -71,12 +74,16 @@ export class TreeNode
 
     const icon = isExpanded ? hasShownChildren : hasHiddenChildren;
 
-    const contentType = this.props.model.contentType;
+    const contentType = this.getLabel(this.props.model.contentType);
     let title;
     if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Item) {
+
+      const resource = this.props.context.courseModel.resourcesById.get(
+        this.props.model.resourceref.idref);
+      const titleString = resource === undefined ? '' : resource.title;
+
       title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {contentType} - {this.props.context.courseModel
-        .resourcesById.get(this.props.model.resourceref.idref).title}</Title>;
+        {contentType} - {titleString}</Title>;
     } else {
       title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
         {icon} {contentType} - {this.props.model.title}</Title>;

@@ -12,12 +12,12 @@ export class AddSectionCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
     
-    const node = new t.Section().with({ title: 'New Section' });
+    const node = new t.Section().with({ title: 'New ' + org.labels.section });
 
     return Promise.resolve(insertNode(org, parent.guid, node, (parent as any).children.size));
   }
 
-  description() : string {
-    return 'Add new section';
+  description(labels: t.Labels) : string {
+    return 'Add new ' + labels.section.toLowerCase();
   }
 }

@@ -21,8 +21,8 @@ export class AddModuleCommand extends AbstractCommand {
 
   }
 
-  description() : string {
-    return 'Add new wodule';
+  description(labels: t.Labels) : string {
+    return 'Add new ' + labels.module.toLowerCase();
   }
 
   execute(
@@ -30,7 +30,7 @@ export class AddModuleCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
     
-    const module = new t.Module().with({ title: 'New Module' });
+    const module = new t.Module().with({ title: 'New ' + org.labels.module });
 
     return Promise.resolve(insertNode(org, parent.guid, module, (parent as any).children.size));
   }

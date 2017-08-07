@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { RepositionTarget } from './RepositionTarget';
-import { DraggableNode } from './DraggableNode';
 
 import * as t from '../../../../data/contentTypes';
+import { DraggableNode } from './DraggableNode';
 
 export type SourceNodeType = t.Sequence | t.Unit | t.Module | t.Section | t.Include | t.Item;
 

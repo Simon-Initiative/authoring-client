@@ -28,6 +28,8 @@ import { insertNode, removeNode } from './utils';
 import { TreeNode } from './TreeNode';
 import { ActionDropdown } from './ActionDropdown';
 import { Row } from './Row';
+import { Details } from './Details';
+import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
@@ -39,8 +41,15 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   
 }
 
+const enum TABS {
+  Content = 0,
+  Details = 1,
+  Labels = 2,
+  Constraints = 3,
+}
+
 interface OrgEditorState extends AbstractEditorState {
-  
+  currentTab: TABS;
 }
 
 
@@ -50,7 +59,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorState>  {
 
   constructor(props) {
-    super(props, ({} as OrgEditorState));
+    super(props, ({ currentTab: TABS.Content } as OrgEditorState));
+
+    this.onLabelsEdit = this.onLabelsEdit.bind(this);
   }
 
 
@@ -91,17 +102,14 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     setTimeout(delay, 0);    
   }
 
-
-
-  render() {
-
-    console.log('render');
+  renderContent() {
 
     const isExpanded = 
       guid => this.props.expanded.has(guid);
 
     const renderNode = (node, parent, index, depth) => {
       return <TreeNode 
+        labels={this.props.model.labels}
         model={node} 
         parentModel={parent} 
         editMode={this.props.editMode}
@@ -114,12 +122,85 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
     const wrapper = (model, element, i) => {
       return (
-        <Row model={model} key={model.guid} isExpanded={isExpanded(getExpandId(model))}
+        <Row model={model} labels={this.props.model.labels} 
+          key={model.guid} isExpanded={isExpanded(getExpandId(model))}
           index={i} processCommand={this.processCommand.bind(this, model)}>
           {element}
         </Row>
       );
     };
+
+    return (
+      <table className="table table-sm table-striped">
+        <thead>
+        <tr key="header">
+          <th key="comp">Component</th>
+          <th key="action">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {render(
+          this.props.model.sequences, 
+          isExpanded,renderNode, wrapper)}
+
+      </tbody>
+      </table>
+    );
+  }
+
+  renderDetails() {
+    return <Details editMode={this.props.editMode} 
+      model={this.props.model} onEdit={model => this.handleEdit(model)}/>;
+  }
+
+  onLabelsEdit(labels) {
+    this.handleEdit(this.props.model.with({ labels }));
+  }
+
+  renderLabels() {
+    return <LabelsEditor {...this.props} 
+      onEdit={this.onLabelsEdit} model={this.props.model.labels} />;
+  }
+
+  renderConstraints() {
+    return <p>TBD Constraint Editor</p>;
+  }
+
+  onTabClick(index: number) {
+    this.setState({ currentTab: index });
+  }
+
+  renderTabs() {
+
+    const tabs = ['Content', 'Details', 'Labels', 'Constraints']
+      .map((title, index) => {
+        const active = index === this.state.currentTab ? 'active' : '';
+        const classes = 'nav-link ' + active;
+        return <a className={classes} onClick={this.onTabClick.bind(this, index)}>{title}</a>;
+      });
+
+    return (
+      <ul className="nav nav-tabs">
+        {tabs}
+      </ul>
+    );
+  }
+
+  renderActiveTabContent() {
+    switch (this.state.currentTab) {
+      case TABS.Content:
+        return this.renderContent();
+      case TABS.Details:
+        return this.renderDetails();
+      case TABS.Labels:
+        return this.renderLabels();
+      case TABS.Constraints:
+        return this.renderConstraints();
+    }
+  }
+
+  render() {
 
     return (
       <div>
@@ -129,21 +210,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
          
-          <table className="table table-sm table-striped">
-            <thead>
-            <tr key="header">
-              <th key="comp">Component</th>
-              <th key="action">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+          {this.renderTabs()}
 
-            {render(
-              this.props.model.sequences, 
-              isExpanded,renderNode, wrapper)}
-  
-          </tbody>
-          </table>
+          <div style={ { marginTop: '30px' } }>
+            {this.renderActiveTabContent()}
+          </div>
 
         </div>
       </div>);

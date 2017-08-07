@@ -20,7 +20,7 @@ export interface Command {
     node: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context: AppContext): boolean;
 
-  description() : string;
+  description(labels: t.Labels) : string;
 }
 
 export abstract class AbstractCommand implements Command {
@@ -39,5 +39,5 @@ export abstract class AbstractCommand implements Command {
     return true;
   }
 
-  abstract description() : string;
+  abstract description(labels: t.Labels) : string;
 }

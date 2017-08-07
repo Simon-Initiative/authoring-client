@@ -12,12 +12,12 @@ export class AddSequenceCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
     
-    const node = new t.Sequence().with({ title: 'New Sequence' });
+    const node = new t.Sequence().with({ title: 'New ' + org.labels.sequence });
 
     return Promise.resolve(insertNode(org, parent.guid, node, (parent as any).children.size));
   }
 
-  description() : string {
-    return 'Add new sequence';
+  description(labels: t.Labels) : string {
+    return 'Add new ' + labels.sequence.toLowerCase();
   }
 }

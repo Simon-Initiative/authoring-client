@@ -21,8 +21,8 @@ export class AddUnitCommand extends AbstractCommand {
 
   }
 
-  description() : string {
-    return 'Add new unit';
+  description(labels: t.Labels) : string {
+    return 'Add new ' + labels.unit.toLowerCase();
   }
 
   execute(
@@ -30,7 +30,7 @@ export class AddUnitCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
     
-    const node = new t.Unit().with({ title: 'New Unit' });
+    const node = new t.Unit().with({ title: 'New ' + org.labels.unit });
 
     return Promise.resolve(insertNode(org, parent.guid, node, (parent as any).children.size));
   }

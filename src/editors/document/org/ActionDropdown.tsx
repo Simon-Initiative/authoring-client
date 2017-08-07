@@ -12,6 +12,7 @@ export interface ActionDropdown {
 
 export interface ActionDropdownProps {
   model: NodeTypes;
+  labels: contentTypes.Labels;
   processCommand: (command: Command) => void;
 }
 
@@ -20,13 +21,13 @@ export interface ActionDropdownState {
 }
 
 
-export function buildMenu(model, processCommand) {
+export function buildMenu(model, labels, processCommand) {
 
   return [
     ...VALID_COMMANDS[model.contentType].map(commandClass => new commandClass()), 
     new RemoveCommand(),
   ].map(command => <a className="dropdown-item" 
-    onClick={() => processCommand(command)}>{command.description()}</a>);
+    onClick={() => processCommand(command)}>{command.description(labels)}</a>);
 }
 
 export class ActionDropdown 
@@ -45,7 +46,7 @@ export class ActionDropdown
           Edit&nbsp;&nbsp;
         </button>
         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          {buildMenu(this.props.model, this.props.processCommand)}
+          {buildMenu(this.props.model, this.props.labels, this.props.processCommand)}
         </div>
       </div>
     );
