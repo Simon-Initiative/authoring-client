@@ -49,10 +49,6 @@ export class Row
     return (
       <tr key={model.guid}>
         <td key="content">{children}</td>
-        <td key="actions">
-          <ActionDropdown labels={labels} 
-            model={model} processCommand={processCommand}/>
-        </td>
       </tr>
     );
   }

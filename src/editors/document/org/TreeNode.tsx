@@ -11,6 +11,9 @@ import { DragHandle } from '../../content/org/drag/DragHandle';
 import { DraggableNode } from './DraggableNode';
 import { NodeTypes, getExpandId } from './traversal';
 import { canHandleDrop } from './utils';
+import { EditableCaption } from './EditableCaption';
+import { Caption } from './Caption';
+import { Command } from './commands/command';
 
 export interface TreeNode {
   
@@ -24,8 +27,10 @@ export interface TreeNodeProps {
   depth: number;
   isExpanded: boolean;
   context: AppContext;
+  onEdit: (model: NodeTypes) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
+  processCommand: (command: Command) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
 }
@@ -53,6 +58,11 @@ export class TreeNode
   }
 
   getLabel(contentType: string) {
+
+    if (contentType === 'Item') {
+      return 'Resource';
+    }
+
     return this.props.labels[contentType.toLowerCase()];
   }
 
@@ -64,12 +74,12 @@ export class TreeNode
     
     const hasHiddenChildren =
       <span>
-        <i className="icon icon-plus"></i>
+        <i className="icon icon-caret-right"></i>
       </span>;
 
     const hasShownChildren =
       <span>
-        <i className="icon icon-minus"></i>
+        <i className="icon icon-caret-down"></i>
       </span>;
 
     const icon = isExpanded ? hasShownChildren : hasHiddenChildren;
@@ -82,11 +92,28 @@ export class TreeNode
         this.props.model.resourceref.idref);
       const titleString = resource === undefined ? '' : resource.title;
 
+      title = <Caption 
+        labels={this.props.labels}
+        depth={0}
+        processCommand={this.props.processCommand}
+        editMode={this.props.editMode}
+        onEdit={this.props.onEdit}
+        model={this.props.model}
+        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+        {titleString}</Caption>;
+    } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {contentType} - {titleString}</Title>;
+        Include</Title>;
     } else {
-      title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {icon} {contentType} - {this.props.model.title}</Title>;
+      title = <EditableCaption 
+        labels={this.props.labels}
+        depth={0}
+        processCommand={this.props.processCommand}
+        editMode={this.props.editMode}
+        onEdit={this.props.onEdit}
+        model={this.props.model}
+        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+        {icon} {contentType} - {this.props.model.title}</EditableCaption>;
     }
 
     const finalDropTarget =
@@ -104,8 +131,9 @@ export class TreeNode
           canHandleDrop, onReposition, model.guid)}
         <DraggableNode id={model.guid} editMode={editMode} 
           index={indexWithinParent} source={model} parentModel={parentModel}>
+          <span style={ { marginLeft: (depth * 30) } }/>
           <DragHandle/>
-          <span style={ { marginLeft: (depth * 30) } }>{title}</span>
+          {title}
         </DraggableNode>
         {finalDropTarget}
       </div>

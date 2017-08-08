@@ -105,7 +105,7 @@ export function updateNode(
 
   return model.with({ sequences: model.sequences.with(
     { children: (model.sequences.children.map(
-      insertChild.bind(undefined, childToUpdate, childToUpdate)).toOrderedMap() as any), 
+      updateChild.bind(undefined, childToUpdate)).toOrderedMap() as any), 
     }) });
 }
 

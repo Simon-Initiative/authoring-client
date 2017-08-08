@@ -24,7 +24,7 @@ import { render, getExpandId } from './traversal';
 import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { renderDraggableTreeNode, 
   canAcceptDrop, SourceNodeType } from '../../content/org/drag/utils';
-import { insertNode, removeNode } from './utils';
+import { insertNode, removeNode, updateNode } from './utils';
 import { TreeNode } from './TreeNode';
 import { ActionDropdown } from './ActionDropdown';
 import { Row } from './Row';
@@ -45,7 +45,6 @@ const enum TABS {
   Content = 0,
   Details = 1,
   Labels = 2,
-  Constraints = 3,
 }
 
 interface OrgEditorState extends AbstractEditorState {
@@ -62,6 +61,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     super(props, ({ currentTab: TABS.Content } as OrgEditorState));
 
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
+    this.onNodeEdit = this.onNodeEdit.bind(this);
   }
 
 
@@ -102,6 +102,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     setTimeout(delay, 0);    
   }
 
+  onNodeEdit(node) {
+    this.handleEdit(updateNode(this.props.model, node));
+  }
+
   renderContent() {
 
     const isExpanded = 
@@ -112,7 +116,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         labels={this.props.model.labels}
         model={node} 
         parentModel={parent} 
+        onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
+        processCommand={this.processCommand.bind(this, node)}
         toggleExpanded={this.toggleExpanded.bind(this)} 
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
@@ -132,12 +138,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     return (
       <table className="table table-sm table-striped">
-        <thead>
-        <tr key="header">
-          <th key="comp">Component</th>
-          <th key="action">Actions</th>
-        </tr>
-      </thead>
       <tbody>
 
         {render(
@@ -173,7 +173,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   renderTabs() {
 
-    const tabs = ['Content', 'Details', 'Labels', 'Constraints']
+    const tabs = ['Content', 'Details', 'Labels']
       .map((title, index) => {
         const active = index === this.state.currentTab ? 'active' : '';
         const classes = 'nav-link ' + active;
@@ -195,8 +195,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         return this.renderDetails();
       case TABS.Labels:
         return this.renderLabels();
-      case TABS.Constraints:
-        return this.renderConstraints();
     }
   }
 
@@ -209,6 +207,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
+
+          <h3>Organization: {this.props.model.title}</h3>
          
           {this.renderTabs()}
 

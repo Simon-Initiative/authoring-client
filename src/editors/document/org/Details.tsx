@@ -2,6 +2,7 @@ import * as React from 'react';
 import guid from '../../../utils/guid';
 import * as models from '../../../data/models';
 import { TextInput } from '../../content/common/TextInput';
+import { Maybe } from 'tsmonad';
 
 export interface Details {
   
@@ -40,7 +41,19 @@ export class Details
     this.props.onEdit(this.props.model.with({ description }));
   }
 
+  onVersionEdit(version) {
+    this.props.onEdit(this.props.model.with({ version }));
+  }
+
+  onProductEdit(product) {
+    this.props.onEdit(this.props.model.with({ product: Maybe.just<string>(product) }));
+  }
+
+  
+
   render() {
+
+    const product = this.props.model.product.caseOf({ nothing: () => '', just: p => p });
 
     return (
       <div>
@@ -66,6 +79,22 @@ export class Details
             <TextInput editMode={this.props.editMode} 
               width="100%" label="" value={this.props.model.audience}
               onEdit={this.onAudienceEdit} type="text"/>
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-1 col-form-label">Version</label>
+          <div className="col-10">
+            <TextInput editMode={this.props.editMode} 
+              width="100%" label="" value={this.props.model.version}
+              onEdit={this.onVersionEdit} type="text"/>
+          </div>
+        </div>
+        <div className="form-group row">
+          <label className="col-1 col-form-label">Product</label>
+          <div className="col-10">
+            <TextInput editMode={this.props.editMode} 
+              width="100%" label="" value={product}
+              onEdit={this.onProductEdit} type="text"/>
           </div>
         </div>
       </div>

@@ -39,7 +39,7 @@ export class ActionDropdown
 
   render() : JSX.Element {
     return (
-      <div className="dropdown">
+      <div className="dropdown" style={ { display: 'inline' } }>
         <button className="btn btn-secondary dropdown-toggle" 
           type="button" id="dropdownMenuButton" data-toggle="dropdown" 
           aria-haspopup="true" aria-expanded="false">
