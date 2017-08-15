@@ -89,7 +89,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   toggleExpanded(guid) {
-    const action = this.props.expanded.has(guid) ? collapseNodes : expandNodes;
+
+    const action = this.props.expanded.caseOf({
+      just: set => set.has(guid) ? collapseNodes : expandNodes,
+      nothing: () => expandNodes,
+    }); 
     this.props.dispatch(action(this.props.context.documentId, [guid]));
   }
 
@@ -108,8 +112,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   renderContent() {
 
-    const isExpanded = 
-      guid => this.props.expanded.has(guid);
+    const isExpanded = guid => this.props.expanded.caseOf({
+      just: v => v.has(guid),
+      nothing: () => false,
+    });
 
     const renderNode = (node, parent, index, depth) => {
       return <TreeNode 
@@ -138,6 +144,18 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       </tbody>
       </table>
     );
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    this.props.expanded.caseOf({
+      just: v => false,
+      nothing: () => this.props.dispatch(
+        expandNodes(
+          this.props.context.documentId, 
+          this.props.model.sequences.children.toArray().map(s => getExpandId(s)))),
+    });
   }
 
   renderDetails() {

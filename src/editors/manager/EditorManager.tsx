@@ -17,6 +17,7 @@ import { onFailureCallback, onSaveCompletedCallback,
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from '../../data/content/resource';
+import { Maybe } from 'tsmonad';
 
 interface EditorManager {
 
@@ -373,7 +374,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       const childProps: AbstractEditorProps<any> = {
         model: this.state.document.model,
         expanded: this.props.expanded.has(this.props.documentId) 
-          ? this.props.expanded.get(this.props.documentId) : Immutable.Set<string>(),
+          ? Maybe.just<Immutable.Set<string>>(this.props.expanded.get(this.props.documentId)) 
+          : Maybe.nothing<Immutable.Set<string>>(),
         context: {
           documentId: this.props.documentId,
           userId: this.props.userId,

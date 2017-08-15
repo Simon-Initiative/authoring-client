@@ -7,6 +7,7 @@ import * as types from '../../../data/types';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import { handleKey, unhandleKey } from './keyhandlers';
+import { Maybe } from 'tsmonad'; 
 
 
 export interface AbstractEditor<ModelType, P extends AbstractEditorProps<ModelType>, S extends AbstractEditorState> {
@@ -34,7 +35,9 @@ export interface AbstractEditorProps<ModelType> {
 
   dispatch: any;
 
-  expanded: Immutable.Set<string>;
+  expanded: Maybe<Immutable.Set<string>>;
+
+
 
 }
 
