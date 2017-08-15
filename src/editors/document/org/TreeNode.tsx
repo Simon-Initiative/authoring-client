@@ -16,7 +16,7 @@ import { Caption } from './Caption';
 import { Command } from './commands/command';
 
 export interface TreeNode {
-  
+  timer: any;
 }
 
 export interface TreeNodeProps {
@@ -36,7 +36,7 @@ export interface TreeNodeProps {
 }
 
 export interface TreeNodeState {
- 
+  mouseOver: boolean;
 }
 
 // tslint:disable-next-line
@@ -54,7 +54,12 @@ export class TreeNode
   constructor(props) {
     super(props);
 
-    
+    this.timer = null;
+
+    this.onEnter = this.onEnter.bind(this);
+    this.onLeave = this.onLeave.bind(this);
+
+    this.state = { mouseOver: false };
   }
 
   getLabel(contentType: string) {
@@ -66,6 +71,22 @@ export class TreeNode
     return this.props.labels[contentType.toLowerCase()];
   }
 
+
+  onEnter() {
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
+    
+  }
+
+  onLeave() {
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    this.setState({ mouseOver: false });
+  }
 
   render() : JSX.Element {
 
@@ -95,6 +116,7 @@ export class TreeNode
       title = <Caption 
         labels={this.props.labels}
         depth={0}
+        isHoveredOver={this.state.mouseOver}
         processCommand={this.props.processCommand}
         editMode={this.props.editMode}
         onEdit={this.props.onEdit}
@@ -108,6 +130,7 @@ export class TreeNode
       title = <EditableCaption 
         labels={this.props.labels}
         depth={0}
+        isHoveredOver={this.state.mouseOver}
         processCommand={this.props.processCommand}
         editMode={this.props.editMode}
         onEdit={this.props.onEdit}
@@ -125,8 +148,9 @@ export class TreeNode
    
 
     return (
-      <div>
-        {renderDropTarget(
+      <tr key={model.guid} onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
+        <td key="content">
+          {renderDropTarget(
           indexWithinParent, parentModel, 
           canHandleDrop, onReposition, model.guid)}
         <DraggableNode id={model.guid} editMode={editMode} 
@@ -136,7 +160,8 @@ export class TreeNode
           {title}
         </DraggableNode>
         {finalDropTarget}
-      </div>
+        </td>
+      </tr>
     );
   }
 

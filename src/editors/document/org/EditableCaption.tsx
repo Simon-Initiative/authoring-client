@@ -23,13 +23,13 @@ export interface EditableCaptionProps {
   model: t.Sequence | t.Unit | t.Module | t.Section;
   depth: number;
   editMode: boolean;
+  isHoveredOver: boolean;
   onEdit: (model: t.Sequence | t.Unit | t.Module | t.Section) => void;
   toggleExpanded: (id) => void;
   processCommand: (command: Command) => void;
 }
 
 export interface EditableCaptionState {
-  mouseOver: boolean;
   isEditing: boolean;
   title: string;
 }
@@ -42,14 +42,13 @@ export class EditableCaption
   constructor(props) {
     super(props);
 
-    this.state = { mouseOver: false, isEditing: false, title: props.model.title };    
+    this.state = { isEditing: false, title: props.model.title };    
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onBeginEdit = this.onBeginEdit.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
-    this.onEnter = this.onEnter.bind(this);
-    this.onLeave = this.onLeave.bind(this);
+    
   }
 
   getLabel(contentType: string) {
@@ -80,21 +79,6 @@ export class EditableCaption
     this.setState({ title: e.target.value });
   }
 
-  onEnter() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-    
-  }
-
-  onLeave() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-    this.setState({ mouseOver: false });
-  }
 
   render() : JSX.Element {
 
@@ -120,7 +104,7 @@ export class EditableCaption
         </div>
       );
     } else {
-      const buttons = this.state.mouseOver 
+      const buttons = this.props.isHoveredOver
           ? [<button 
             onClick={this.onBeginEdit}
             type="button" 
@@ -131,7 +115,7 @@ export class EditableCaption
           : null;
       return (
         <div style={ { display: 'inline' } } 
-          onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
+          >
           <button onClick={() => this.props.toggleExpanded(getExpandId(model))} 
           type="button" className="btn btn-link">{this.props.children}</button>
           {buttons}

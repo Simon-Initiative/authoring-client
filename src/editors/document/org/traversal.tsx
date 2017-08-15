@@ -17,7 +17,7 @@ export function getExpandId(model: NodeTypes) : string {
 
 export function render(
   sequences: t.Sequences, isExpanded: IsNodeExpanded,
-  nodeRenderers: any, elementWrapper: any) : React.Component[] {
+  nodeRenderers: any) : React.Component[] {
 
   const elements = [];
 
@@ -31,7 +31,7 @@ export function render(
 
     return renderHelper(
       n, sequences, i, isExpanded, 
-      elements, nodeRenderers, elementWrapper, 0);
+      elements, nodeRenderers, 0);
 
   });
   
@@ -41,9 +41,9 @@ export function render(
 export function renderHelper(
   node : NodeTypes, parent: any, index: number, 
   isExpanded: IsNodeExpanded, elements: React.Component[],
-  nodeRenderers: any, elementWrapper: any, depth: number) {
+  nodeRenderers: any, depth: number) {
 
-  elements.push(elementWrapper(node, nodeRenderers(node, parent, index, depth), index));
+  elements.push(nodeRenderers(node, parent, index, depth));
 
   if (isExpanded(getExpandId(node)) 
     && node.contentType !== t.OrganizationContentTypes.Item 
@@ -59,7 +59,7 @@ export function renderHelper(
 
       return renderHelper(
         n, node, i, isExpanded, elements, 
-        nodeRenderers, elementWrapper, depth + 1);
+        nodeRenderers, depth + 1);
     });
   }
 }

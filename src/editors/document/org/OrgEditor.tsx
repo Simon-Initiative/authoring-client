@@ -126,23 +126,14 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         context={this.props.context} 
         depth={depth}/>;
     };
-    const wrapper = (model, element, i) => {
-      return (
-        <Row model={model} labels={this.props.model.labels} 
-          key={model.guid} isExpanded={isExpanded(getExpandId(model))}
-          index={i} processCommand={this.processCommand.bind(this, model)}>
-          {element}
-        </Row>
-      );
-    };
-
+    
     return (
       <table className="table table-sm table-striped">
       <tbody>
 
         {render(
           this.props.model.sequences, 
-          isExpanded,renderNode, wrapper)}
+          isExpanded,renderNode)}
 
       </tbody>
       </table>

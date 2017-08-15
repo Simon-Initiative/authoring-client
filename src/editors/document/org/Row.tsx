@@ -46,11 +46,7 @@ export class Row
 
     const { model, index, children, processCommand, labels } = this.props;
 
-    return (
-      <tr key={model.guid}>
-        <td key="content">{children}</td>
-      </tr>
-    );
+    return null;
   }
 
 }

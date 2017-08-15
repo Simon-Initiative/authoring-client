@@ -23,6 +23,7 @@ export interface CaptionProps {
   model: t.Item;
   depth: number;
   editMode: boolean;
+  isHoveredOver: boolean;
   onEdit: (model: t.Sequence | t.Unit | t.Module | t.Section) => void;
   toggleExpanded: (id) => void;
   processCommand: (command: Command) => void;

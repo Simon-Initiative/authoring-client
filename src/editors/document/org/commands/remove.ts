@@ -15,7 +15,7 @@ export class RemoveCommand extends AbstractCommand {
     return Promise.resolve(removeNode(org, node.guid));
   }
 
-  description() {
+  description(labels: t.Labels) {
     return 'Remove';
   }
 }
