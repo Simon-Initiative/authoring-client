@@ -20,6 +20,7 @@ export interface TreeNode {
 }
 
 export interface TreeNodeProps {
+  highlighted: boolean;
   labels: contentTypes.Labels;
   model: NodeTypes;
   parentModel: any;
@@ -146,9 +147,12 @@ export class TreeNode
          canHandleDrop, onReposition, '')
      : null;
    
+    const highlighted = this.props.highlighted ? 'table-info' : '';
 
     return (
-      <tr key={model.guid} onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
+      <tr key={model.guid} 
+        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave} 
+        className={highlighted}>
         <td key="content">
           {renderDropTarget(
           indexWithinParent, parentModel, 

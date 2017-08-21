@@ -34,7 +34,7 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 interface OrgEditor {
-  
+  pendingHighlightedNodes: Immutable.Set<string>;
 }
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
@@ -49,6 +49,7 @@ const enum TABS {
 
 interface OrgEditorState extends AbstractEditorState {
   currentTab: TABS;
+  highlightedNodes: Immutable.Set<string>;
 }
 
 
@@ -58,10 +59,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorState>  {
 
   constructor(props) {
-    super(props, ({ currentTab: TABS.Content } as OrgEditorState));
+    super(props, ({ currentTab: TABS.Content, 
+      highlightedNodes: Immutable.Set<string>() } as OrgEditorState));
 
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
+
+    this.pendingHighlightedNodes = null;
   }
 
 
@@ -85,7 +89,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     const removed = removeNode(this.props.model, (sourceNode as any).guid);
     const inserted = insertNode(removed, targetModel.guid, sourceNode, adjustedIndex);
 
+    this.highlightNode(sourceNode as any);
     this.handleEdit(inserted);
+
+  }
+
+  highlightNode(node: SourceNodeType) {
+    this.pendingHighlightedNodes = Immutable.Set<string>().add(node.guid);
   }
 
   toggleExpanded(guid) {
@@ -106,6 +116,19 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     setTimeout(delay, 0);    
   }
 
+  componentWillReceiveProps(nextProps) {
+    
+    if (this.pendingHighlightedNodes !== null) {
+      
+      const removeHighlight = () => this.setState({ highlightedNodes: Immutable.Set<string>() });
+      this.setState(
+        { highlightedNodes: this.pendingHighlightedNodes }, 
+        () => setTimeout(removeHighlight, 1000));
+
+      this.pendingHighlightedNodes = null;
+    }
+  }
+
   onNodeEdit(node) {
     this.handleEdit(updateNode(this.props.model, node));
   }
@@ -119,6 +142,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     const renderNode = (node, parent, index, depth) => {
       return <TreeNode 
+        highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
         model={node} 
         parentModel={parent} 
