@@ -67,10 +67,9 @@ const resources = {
         'Workbook Pages',
         'x-oli-workbook_page',
         resource => resource.type === 'x-oli-workbook_page',
-        (title, type) => new models.WorkbookPageModel({
-          type,
-          head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
-        })),
+        (title, type) => models.WorkbookPageModel.createNew(
+          guid(), title, 'This is a new page with empty content'),
+        ),
   objectives: res(
         'Learning Objectives',
         'x-oli-learning_objectives',

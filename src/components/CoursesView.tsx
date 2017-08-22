@@ -2,10 +2,12 @@ import * as React from 'react';
 
 import * as persistence from '../data/persistence';
 import * as viewActions from '../actions/view';
-
+import { LegacyTypes } from '../data/types';
 import * as models from '../data/models';
+import * as contentTypes from '../data/contentTypes';
 import * as courseActions from '../actions/course';
 import { hasRole } from '../actions/utils/keycloak';
+import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 
 interface CoursesView {
   onSelect: (id) => void;
@@ -47,6 +49,16 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     viewActions.viewCreateCourse();
   }
 
+  createPlaceholderPage(courseId: string) {
+
+    const resource = models.WorkbookPageModel.createNew(
+          PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty content');
+
+    persistence.createDocument(courseId, resource);
+    
+    return resource;
+  }
+
   componentDidMount() {
     persistence.getEditablePackages()
       .then((docs) => {
@@ -74,14 +86,34 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
       .catch(err => console.log(err));
   }
 
+  
+
   fetchDocument(courseId: string) {
-    console.log('fetchDocument (' + courseId + ')');
+    
     persistence.retrieveCoursePackage(courseId)
       .then((document) => {
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
-          this.props.dispatch(courseActions.courseChanged(document.model));
-          viewActions.viewDocument(courseId, courseId);
+            
+          const courseModel : models.CourseModel = document.model;
+
+          if (!document.model.resources.toArray().some(
+            resource => resource.id === PLACEHOLDER_ITEM_ID)) {
+
+            const placeholder = this.createPlaceholderPage(courseId);
+            const updatedModel = courseModel.with(
+              { resources: courseModel.resources.set(PLACEHOLDER_ITEM_ID, placeholder.resource) });
+
+            this.props.dispatch(courseActions.courseChanged(updatedModel));
+            viewActions.viewDocument(courseId, courseId);
+          
+          } else {
+            this.props.dispatch(courseActions.courseChanged(document.model));
+            viewActions.viewDocument(courseId, courseId);
+          }
+
+
+
         }
 
       })

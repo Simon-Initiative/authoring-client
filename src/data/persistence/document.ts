@@ -9,7 +9,8 @@ import { Resource } from '../content/resource';
  * @param courseId the course guid
  * @param documentId the document guid
  */
-export function retrieveDocument(courseId: CourseId, documentId: DocumentId): Promise<Document> {
+export function retrieveDocument(
+  courseId: CourseId, documentId: DocumentId): Promise<Document> {
   
   const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
   

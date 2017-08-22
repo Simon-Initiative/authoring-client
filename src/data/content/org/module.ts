@@ -12,6 +12,8 @@ import { Unordered } from './unordered';
 import { Item } from './item';
 import { Section } from './section';
 import { Include } from './include';
+import { PLACEHOLDER_ITEM } from './common';
+
 import createGuid from '../../../utils/guid';
 
 import * as types from './types';
@@ -149,7 +151,13 @@ export class Module extends Immutable.Record(defaultContent) {
     this.dependencies.lift(p => children.push(p.toPersistence()));
     this.preconditions.lift(p => children.push(p.toPersistence()));
     this.supplements.lift(p => children.push(p.toPersistence()));
-    this.children.toArray().forEach(c => children.push(c.toPersistence()));
+    
+    if (this.children.size === 0) {
+      children.push(PLACEHOLDER_ITEM.toPersistence());
+    } else {
+      this.children.toArray().forEach(c => children.push(c.toPersistence()));
+    }
+
     this.unordered.lift(p => children.push(p.toPersistence()));
     
     const s = { 

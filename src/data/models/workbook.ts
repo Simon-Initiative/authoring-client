@@ -3,7 +3,9 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isNullOrUndefined, isArray } from 'util';
+import { ContentState } from 'draft-js';
 
+const emptyContent = ContentState.createFromText('');
 
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
@@ -40,6 +42,16 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   with(values: WorkbookPageModelParams) {
     return this.merge(values) as this;
+  }
+
+  static createNew(id: string, title: string, body: string) {
+
+    return new WorkbookPageModel({
+      head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
+      resource: new contentTypes.Resource({ id, title }),
+      guid: id,
+      body: new contentTypes.Html({ contentState: ContentState.createFromText(body) }),
+    });
   }
 
   static fromPersistence(json: Object): WorkbookPageModel {
@@ -80,50 +92,21 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   }
 
   toPersistence(): Object {        
-    let resource: any = this.resource.toPersistence();
-    let doc = null;
-    if (isNullOrUndefined(this.guid) || this.guid === '') {
-      // Assume new workbook page created if guid is null
-      // Generate artificial id from title
-      try {
-        const title = this.head.title.text;
-        const g = guid();
-        const id = title.toLowerCase().split(' ')[0] + g.substring(g.lastIndexOf('-'));
-        resource = new contentTypes.Resource({ id, title });
-      } catch (err) {
-        console.log(err);
-        return null;
-      }
-      doc = [{
-        workbook_page: {
-          '@id': resource.id,
-          '#array': [
-            this.head.toPersistence(),
-            {
-              body: {
-                p: {
-                  '#text': '(This space intentionally left blank.)',
-                },
-              },
-            },
-          ],
-        },
-      }];
-    } else {
-      doc = [{
-        workbook_page: {
-          '@id': resource.id,
-          '#array': [
-            this.head.toPersistence(),
-            { body: this.body.toPersistence() },
-          ],
-        },
-      }];
-    }
+    
+    const doc = [{
+      workbook_page: {
+        '@id': this.resource.id,
+        '#array': [
+          this.head.toPersistence(),
+          { body: this.body.toPersistence() },
+        ],
+      },
+    }];
+    
     const root = {
       doc,
     };
       
-    return Object.assign({}, resource, root, this.lock.toPersistence());
+    return Object.assign({}, this.resource, root, this.lock.toPersistence());
   }
 }

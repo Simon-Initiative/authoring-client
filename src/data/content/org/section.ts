@@ -9,6 +9,8 @@ import { Supplements } from './supplements';
 import { Schedule } from './schedule';
 import { Unordered } from './unordered';
 import { Item } from './item';
+import { PLACEHOLDER_ITEM } from './common';
+
 import createGuid from '../../../utils/guid';
 
 import * as types from './types';
@@ -127,7 +129,13 @@ export class Section extends Immutable.Record(defaultContent) {
     this.metadata.lift(p => children.push(p));
     this.preconditions.lift(p => children.push(p.toPersistence()));
     this.supplements.lift(p => children.push(p.toPersistence()));
-    this.children.toArray().forEach(c => children.push(c.toPersistence()));
+    
+    if (this.children.size === 0) {
+      children.push(PLACEHOLDER_ITEM.toPersistence());
+    } else {
+      this.children.toArray().forEach(c => children.push(c.toPersistence()));
+    }
+
     this.unordered.lift(p => children.push(p.toPersistence()));
     
     const s = { 
