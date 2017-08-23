@@ -34,7 +34,8 @@ export interface EditableCaptionState {
   title: string;
 }
  
-
+const ESCAPE_KEYCODE = 27;
+const ENTER_KEYCODE = 13;
 
 export class EditableCaption 
   extends React.PureComponent<EditableCaptionProps, EditableCaptionState> {
@@ -48,7 +49,7 @@ export class EditableCaption
     this.onCancel = this.onCancel.bind(this);
     this.onBeginEdit = this.onBeginEdit.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
-    
+    this.onKeyUp = this.onKeyUp.bind(this);
   }
 
   getLabel(contentType: string) {
@@ -79,6 +80,14 @@ export class EditableCaption
     this.setState({ title: e.target.value });
   }
 
+  onKeyUp(e) {
+    if (e.keyCode === ESCAPE_KEYCODE) {
+      this.onCancel();
+    } else if (e.keyCode === ENTER_KEYCODE) {
+      this.onTitleEdit();
+    }
+  }
+
 
   render() : JSX.Element {
 
@@ -87,21 +96,22 @@ export class EditableCaption
     if (this.state.isEditing) {
       return (
         <div style={ { display: 'inline', marginLeft: '40px' } }>
-          <input ref={a => this.titleInput = a} type="text" onChange={this.onTextChange} 
-            value={this.state.title} style={ { width: '50%' } }/>
+          <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
+            onChange={this.onTextChange} 
+            value={this.state.title} style={ { width: '50%', paddingTop: '7px' } }/>
           <button 
             key="save"
             onClick={this.onTitleEdit}
             type="button" 
             className="btn btn-sm">
-            <i style={ { color: 'green' } } className="icon icon-check"></i>
+            Done
           </button>
           <button 
             key="cancel"
             onClick={this.onCancel}
             type="button" 
             className="btn btn-sm">
-            <i style={ { color: 'red' } } className="icon icon-times"></i>
+            Cancel
           </button>
         </div>
       );
