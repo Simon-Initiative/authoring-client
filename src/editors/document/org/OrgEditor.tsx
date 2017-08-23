@@ -40,20 +40,22 @@ function isNumberedNodeType(node: any) {
     || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
 }
 
-function calculatePositionsAtLevel(model: models.OrganizationModel) : Object {
+function calculatePositionsAtLevel(model: models.OrganizationModel, allNodeIds: string[]) : Object {
   
   const positions = {};
   const positionAtLevels = {};
 
   const arr = model.sequences.children.toArray();
 
-  arr.map((n, i) => calculatePositionsAtLevelHelper(n, i, 0, positions, positionAtLevels));
+  arr.map((n, i) => calculatePositionsAtLevelHelper(
+    n, i, 0, positions, positionAtLevels, allNodeIds));
   
   return positions;
 }
 
 function calculatePositionsAtLevelHelper(
-  node: any, index: number, level: number, positions: Object, positionAtLevels: Object) : void {
+  node: any, index: number, level: number, 
+  positions: Object, positionAtLevels: Object, allNodeIds: string[]) : void {
 
   if (positionAtLevels[level] === undefined) {
     positionAtLevels[level] = 1;
@@ -63,11 +65,13 @@ function calculatePositionsAtLevelHelper(
 
   positions[node.guid] = positionAtLevels[level];
 
+  allNodeIds.push(node.id);
+
   if (node.children !== undefined) {
     node.children.toArray()
       .filter(n => isNumberedNodeType(n))
       .map((n, i) => calculatePositionsAtLevelHelper(
-        n, i, level + 1, positions, positionAtLevels));
+        n, i, level + 1, positions, positionAtLevels, allNodeIds));
   }
 }
 
@@ -75,6 +79,7 @@ function calculatePositionsAtLevelHelper(
 interface OrgEditor {
   pendingHighlightedNodes: Immutable.Set<string>;
   positionsAtLevel: Object;
+  allNodeIds: string[];
 }
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
@@ -104,10 +109,14 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
+    this.onAddSequence = this.onAddSequence.bind(this);
+    this.onCollapse = this.onCollapse.bind(this);
+    this.onExpand = this.onExpand.bind(this);
 
     this.pendingHighlightedNodes = null;
 
-    this.positionsAtLevel = calculatePositionsAtLevel(this.props.model);
+    this.allNodeIds = [];
+    this.positionsAtLevel = calculatePositionsAtLevel(this.props.model, this.allNodeIds);
   }
 
 
@@ -175,7 +184,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     if (this.props.model !== nextProps.model) {
       // Recalculate the position of the nodes ad each level. Doing this here
       // avoids having to do this on ever render.
-      this.positionsAtLevel = calculatePositionsAtLevel(nextProps.model);
+      this.allNodeIds = [];
+      this.positionsAtLevel = calculatePositionsAtLevel(nextProps.model, this.allNodeIds);
     }
   }
 
@@ -211,15 +221,19 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
     
     return (
-      <table className="table table-sm table-striped">
-      <tbody>
+      <div>
+        {this.renderActionBar()}
 
-        {render(
-          this.props.model.sequences, 
-          isExpanded,renderNode, this.positionsAtLevel)}
+        <table className="table table-sm table-striped">
+        <tbody>
 
-      </tbody>
-      </table>
+          {render(
+            this.props.model.sequences, 
+            isExpanded,renderNode, this.positionsAtLevel)}
+
+        </tbody>
+        </table>
+      </div>
     );
   }
 
@@ -251,6 +265,36 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   renderConstraints() {
     return <p>TBD Constraint Editor</p>;
+  }
+
+  renderActionBar() {
+    return (
+      <div>
+        <button className="btn btn-link" onClick={this.onAddSequence}>
+          Add {this.props.model.labels.sequence}</button>
+        <button className="btn btn-link" onClick={this.onExpand}>Expand all</button>
+        <button className="btn btn-link" onClick={this.onCollapse}>Collapse all</button>
+      </div>
+    );
+  }
+
+  onAddSequence() {
+    const s : contentTypes.Sequence = new contentTypes.Sequence()
+      .with({ title: 'New ' + this.props.model.labels.sequence });
+    const sequences = this.props.model.sequences
+      .with({ children: this.props.model.sequences.children.set(s.guid, s) });
+
+    this.handleEdit(this.props.model.with({ sequences }));
+  }
+
+  onExpand() {
+    this.props.dispatch(
+      expandNodes(this.props.context.documentId, this.allNodeIds));
+  }
+
+  onCollapse() {
+    this.props.dispatch(
+      collapseNodes(this.props.context.documentId, this.allNodeIds));
   }
 
   onTabClick(index: number) {
@@ -295,7 +339,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
 
           <h3>Organization: {this.props.model.title}</h3>
-         
+
           {this.renderTabs()}
 
           <div style={ { marginTop: '30px' } }>

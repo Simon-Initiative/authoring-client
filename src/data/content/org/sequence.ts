@@ -158,7 +158,12 @@ export class Sequence extends Immutable.Record(defaultContent) {
     this.dependencies.lift(p => children.push(p.toPersistence()));
     this.preconditions.lift(p => children.push(p.toPersistence()));
     this.supplements.lift(p => children.push(p.toPersistence()));
-    this.children.toArray().forEach(c => children.push(c.toPersistence()));
+
+    if (this.children.size === 0) {
+      children.push(new Unit().with({ title: 'Placeholder' }).toPersistence());
+    } else {
+      this.children.toArray().forEach(c => children.push(c.toPersistence()));
+    }
     this.unordered.lift(p => children.push(p.toPersistence()));
     
     const s = { 
