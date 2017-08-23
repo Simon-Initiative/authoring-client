@@ -33,8 +33,48 @@ import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
+function isNumberedNodeType(node: any) {
+  return (node.contentType === contentTypes.OrganizationContentTypes.Unit
+    || node.contentType === contentTypes.OrganizationContentTypes.Module
+    || node.contentType === contentTypes.OrganizationContentTypes.Section
+    || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
+}
+
+function calculatePositionsAtLevel(model: models.OrganizationModel) : Object {
+  
+  const positions = {};
+  const positionAtLevels = {};
+
+  const arr = model.sequences.children.toArray();
+
+  arr.map((n, i) => calculatePositionsAtLevelHelper(n, i, 0, positions, positionAtLevels));
+  
+  return positions;
+}
+
+function calculatePositionsAtLevelHelper(
+  node: any, index: number, level: number, positions: Object, positionAtLevels: Object) : void {
+
+  if (positionAtLevels[level] === undefined) {
+    positionAtLevels[level] = 1;
+  } else {
+    positionAtLevels[level] = positionAtLevels[level] + 1;
+  }
+
+  positions[node.guid] = positionAtLevels[level];
+
+  if (node.children !== undefined) {
+    node.children.toArray()
+      .filter(n => isNumberedNodeType(n))
+      .map((n, i) => calculatePositionsAtLevelHelper(
+        n, i, level + 1, positions, positionAtLevels));
+  }
+}
+
+
 interface OrgEditor {
   pendingHighlightedNodes: Immutable.Set<string>;
+  positionsAtLevel: Object;
 }
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
@@ -66,7 +106,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.onNodeEdit = this.onNodeEdit.bind(this);
 
     this.pendingHighlightedNodes = null;
+
+    this.positionsAtLevel = calculatePositionsAtLevel(this.props.model);
   }
+
+
 
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
@@ -127,7 +171,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
       this.pendingHighlightedNodes = null;
     }
+
+    if (this.props.model !== nextProps.model) {
+      // Recalculate the position of the nodes ad each level. Doing this here
+      // avoids having to do this on ever render.
+      this.positionsAtLevel = calculatePositionsAtLevel(nextProps.model);
+    }
   }
+
+
 
   onNodeEdit(node) {
     this.handleEdit(updateNode(this.props.model, node));
@@ -140,8 +192,9 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       nothing: () => false,
     });
 
-    const renderNode = (node, parent, index, depth) => {
+    const renderNode = (node, parent, index, depth, numberAtLevel) => {
       return <TreeNode 
+        numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
         model={node} 
@@ -163,7 +216,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
         {render(
           this.props.model.sequences, 
-          isExpanded,renderNode)}
+          isExpanded,renderNode, this.positionsAtLevel)}
 
       </tbody>
       </table>

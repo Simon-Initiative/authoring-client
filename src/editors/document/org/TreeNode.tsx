@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
+import * as models from '../../../data/models';
 import { Maybe } from 'tsmonad';
 import { AppServices } from '../../common/AppServices';
 import guid from '../../../utils/guid';
@@ -20,14 +21,15 @@ export interface TreeNode {
 }
 
 export interface TreeNodeProps {
-  highlighted: boolean;
-  labels: contentTypes.Labels;
-  model: NodeTypes;
-  parentModel: any;
-  indexWithinParent: number;
-  depth: number;
-  isExpanded: boolean;
-  context: AppContext;
+  numberAtLevel: number;      // 1-based position of this node at this level of the tree
+  highlighted: boolean;       // Whether the node is highlighted or not
+  labels: contentTypes.Labels; // Current state of custom labels
+  model: NodeTypes;           // Model for this node
+  parentModel: any;           // The parent model
+  indexWithinParent: number;  // index position of this node within parent's children
+  depth: number;              // Current depth within tree
+  isExpanded: boolean;        // Is node expanded or not
+  context: AppContext;  
   onEdit: (model: NodeTypes) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
@@ -89,6 +91,14 @@ export class TreeNode
     this.setState({ mouseOver: false });
   }
 
+  getAdaptiveNumber() {
+    if (this.props.parentModel.contentType !== contentTypes.OrganizationContentTypes.Section) {
+      return this.props.numberAtLevel;
+    } else {
+      return '';
+    }
+  }
+
   render() : JSX.Element {
 
     const { model, parentModel, indexWithinParent, 
@@ -128,6 +138,9 @@ export class TreeNode
       title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
         Include</Title>;
     } else {
+
+      const number = this.getAdaptiveNumber();
+
       title = <EditableCaption 
         labels={this.props.labels}
         depth={0}
@@ -137,7 +150,7 @@ export class TreeNode
         onEdit={this.props.onEdit}
         model={this.props.model}
         toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {icon} {contentType} - {this.props.model.title}</EditableCaption>;
+        {icon} {contentType} {number}: {this.props.model.title}</EditableCaption>;
     }
 
     const finalDropTarget =
