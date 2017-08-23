@@ -90,12 +90,14 @@ export class EditableCaption
           <input ref={a => this.titleInput = a} type="text" onChange={this.onTextChange} 
             value={this.state.title} style={ { width: '50%' } }/>
           <button 
+            key="save"
             onClick={this.onTitleEdit}
             type="button" 
             className="btn btn-sm">
             <i style={ { color: 'green' } } className="icon icon-check"></i>
           </button>
           <button 
+            key="cancel"
             onClick={this.onCancel}
             type="button" 
             className="btn btn-sm">
@@ -116,7 +118,7 @@ export class EditableCaption
       return (
         <div style={ { display: 'inline' } } 
           >
-          <button onClick={() => this.props.toggleExpanded(getExpandId(model))} 
+          <button key="itemClick" onClick={() => this.props.toggleExpanded(getExpandId(model))} 
           type="button" className="btn btn-link">{this.props.children}</button>
           {buttons}
         </div>

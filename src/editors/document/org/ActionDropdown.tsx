@@ -26,7 +26,7 @@ export function buildMenu(model, labels, processCommand) {
   return [
     ...VALID_COMMANDS[model.contentType].map(commandClass => new commandClass()), 
     new RemoveCommand(),
-  ].map(command => <a className="dropdown-item" 
+  ].map(command => <a className="dropdown-item" key={command.description(labels)}
     onClick={() => processCommand(command)}>{command.description(labels)}</a>);
 }
 

@@ -33,6 +33,7 @@ export interface TreeNodeProps {
   onEdit: (model: NodeTypes) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
+  onViewEdit: (id) => void;
   processCommand: (command: Command) => void;
   onReposition: (
     sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) => void;
@@ -125,6 +126,7 @@ export class TreeNode
       const titleString = resource === undefined ? '' : resource.title;
 
       title = <Caption 
+        onViewEdit={() => this.props.onViewEdit(resource.id)}
         labels={this.props.labels}
         depth={0}
         isHoveredOver={this.state.mouseOver}

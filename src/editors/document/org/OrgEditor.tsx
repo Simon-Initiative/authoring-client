@@ -13,6 +13,7 @@ import { TextInput } from '../../content/common/TextInput';
 import { Linkable } from '../../../data/content/linkable';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/content/resource';
+import { viewDocument } from '../../../actions/view';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
@@ -112,6 +113,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.onAddSequence = this.onAddSequence.bind(this);
     this.onCollapse = this.onCollapse.bind(this);
     this.onExpand = this.onExpand.bind(this);
+    this.onViewEdit = this.onViewEdit.bind(this);
 
     this.pendingHighlightedNodes = null;
 
@@ -189,7 +191,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     }
   }
 
-
+  onViewEdit(id) {
+    this.props.services.fetchGuidById(id)
+      .then(guid => this.props.dispatch(viewDocument(guid, this.props.context.courseId)));
+  }
 
   onNodeEdit(node) {
     this.handleEdit(updateNode(this.props.model, node));
@@ -204,6 +209,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
       return <TreeNode 
+        onViewEdit={this.onViewEdit}
         numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}

@@ -27,6 +27,7 @@ export interface CaptionProps {
   onEdit: (model: t.Sequence | t.Unit | t.Module | t.Section) => void;
   toggleExpanded: (id) => void;
   processCommand: (command: Command) => void;
+  onViewEdit: () => void;
 }
 
 export interface CaptionState {
@@ -68,7 +69,7 @@ export class Caption
   }
 
   onViewEdit() {
-
+    this.props.onViewEdit();
   }
 
   onLeave() {
@@ -101,8 +102,6 @@ export class Caption
         {buttons}
       </div>
     );
-    
-
     
   }
 
