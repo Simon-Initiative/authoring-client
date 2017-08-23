@@ -212,12 +212,13 @@ class Main extends React.Component<MainProps, MainState> {
 
     return (
         <div>
-            {modalDisplay}
+            
             <Header dispatch={this.props.dispatch} logoutUrl={logoutUrl}/>
 
             {currentView}
 
             <Footer dispatch={this.props.dispatch}/>
+            {modalDisplay}
         </div>
     );
   }

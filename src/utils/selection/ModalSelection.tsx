@@ -27,8 +27,8 @@ const customStyles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-    zIndex: 1000 // otherwise we're behind the left most nav bar
+    backgroundColor: 'rgba(70, 70, 70, 0.75)',
+    zIndex: 10001, // otherwise we're behind the left most nav bar
   },
   content: {
     position: 'absolute',
@@ -36,36 +36,35 @@ const customStyles = {
     left: '140px',
     right: '140px',
     bottom: '140px',
-    border: '1px solid #444444',
+    border: '0px solid #444444',
     background: '#fff',
     overflow: 'auto',
     WebkitOverflowScrolling: 'touch',
     borderRadius: '4px',
     outline: 'none',
     padding: '20px',
-    display : "flex", 
-    flexDirection : 'column'  
+    zIndex: 10000,
   },
-  messagePanel: {
-    height: "150px",
-    lineHeight: "150px",
-    border: "1px solid black",
-    margin: "auto"
-  },
-  messageSpan : {
-    fontSize: "24pt",  
-    display: "inline-block",
-    verticalAlign: "middle",
-    lineHeight: "24pt"
-  }  
 };
 
 class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 
   render() {
 
+    const bottom: any = {
+      position: 'absolute',
+      bottom: '30px',
+      right: '30px',
+    };
     const okLabel = this.props.okLabel !== undefined ? this.props.okLabel : 'Insert';
     const cancelLabel = this.props.cancelLabel !== undefined ? this.props.cancelLabel : 'Cancel';
+
+    const height = window.innerHeight - 280 - 200;
+
+    const container : any = {
+      maxHeight: height,
+      overflow: 'scroll',
+    };
 
     return (  
       <Modal
@@ -74,12 +73,23 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
         style={customStyles}>
           <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
             <h2>{this.props.title}</h2>
-            <a className="nav-link" onClick={e => { e.preventDefault(); this.props.onCancel()} }>{cancelLabel}</a>
-            <a className="nav-link" onClick={e => { e.preventDefault(); this.props.onInsert()} }>{okLabel}</a>
           </nav>
-          <div style={tempnavstyle.objectContainer}>
+
+          <div style={container}>
             {this.props.children}                 
           </div>
+          
+            
+          <div style={bottom}>
+            
+            <button className="btn btn-primary"
+              onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }>
+                {okLabel}</button>
+            <button className="btn" 
+              onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }>
+                {cancelLabel}</button>
+            </div>
+          
       </Modal>);
 
   }
