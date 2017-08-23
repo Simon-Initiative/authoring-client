@@ -15,18 +15,30 @@ export class RemoveCommand extends AbstractCommand {
     node: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services : AppServices) : Promise<models.OrganizationModel> {
     
-    return new Promise((resolve, reject) => {
+    // Prompt the user to confirm the removal if the node in question has sub components
 
-      const modal = <ModalPrompt 
-        text="Are you sure you wish to remove this organization component?"
-        onInsert={() => { services.dismissModal(); resolve(removeNode(org, node.guid));}}
-        onCancel={() => services.dismissModal()}
-        okLabel="Yes"
-        cancelLabel="No"
-        />;
+    const anyNode = node as any;
+    if (anyNode.children !== undefined && anyNode.children.size > 0) {
 
-      services.displayModal(modal);
-    });
+      return new Promise((resolve, reject) => {
+
+        const text = 'Are you sure you wish to remove this '
+          + 'organization component?';
+
+        const modal = <ModalPrompt 
+          text={text}
+          onInsert={() => { services.dismissModal(); resolve(removeNode(org, node.guid));}}
+          onCancel={() => services.dismissModal()}
+          okLabel="Yes"
+          cancelLabel="No"
+          />;
+
+        services.displayModal(modal);
+      });
+
+    } else {
+      return Promise.resolve(removeNode(org, node.guid));
+    }
 
   }
 
