@@ -41,22 +41,28 @@ function isNumberedNodeType(node: any) {
     || node.contentType === contentTypes.OrganizationContentTypes.Sequence);
 }
 
-function calculatePositionsAtLevel(model: models.OrganizationModel, allNodeIds: string[]) : Object {
+function calculatePositionsAtLevel(
+  model: models.OrganizationModel, allNodeIds: string[], 
+  idMap: Object, parentMap: Object) : Object {
   
   const positions = {};
   const positionAtLevels = {};
 
   const arr = model.sequences.children.toArray();
 
-  arr.map((n, i) => calculatePositionsAtLevelHelper(
-    n, i, 0, positions, positionAtLevels, allNodeIds));
+  arr.map((n, i) => {
+    parentMap[n.guid] = model.sequences;
+    calculatePositionsAtLevelHelper(
+      n, i, 0, positions, positionAtLevels, allNodeIds, idMap, parentMap);
+  });
   
   return positions;
 }
 
 function calculatePositionsAtLevelHelper(
   node: any, index: number, level: number, 
-  positions: Object, positionAtLevels: Object, allNodeIds: string[]) : void {
+  positions: Object, positionAtLevels: Object, allNodeIds: string[], 
+  idMap: Object, parentMap: Object) : void {
 
   if (positionAtLevels[level] === undefined) {
     positionAtLevels[level] = 1;
@@ -66,21 +72,33 @@ function calculatePositionsAtLevelHelper(
 
   positions[node.guid] = positionAtLevels[level];
 
+  idMap[node.id] = node;
+
   allNodeIds.push(node.id);
 
   if (node.children !== undefined) {
+    
+    node.children.toArray()
+      .map(c => parentMap[c.guid] = node);
+
     node.children.toArray()
       .filter(n => isNumberedNodeType(n))
       .map((n, i) => calculatePositionsAtLevelHelper(
-        n, i, level + 1, positions, positionAtLevels, allNodeIds));
+        n, i, level + 1, positions, positionAtLevels, allNodeIds, idMap, parentMap));
   }
 }
 
+function identifyNewNodes(last: string[], current: string[]) : string[] {
+  const lastMap = last.reduce((p, c) => { p[c] = true; return p; }, {});
+  return current.filter(c => lastMap[c] === undefined);
+}
 
 interface OrgEditor {
   pendingHighlightedNodes: Immutable.Set<string>;
   positionsAtLevel: Object;
   allNodeIds: string[];
+  idMap: Object;
+  parentMap: Object;
 }
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
@@ -118,7 +136,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.pendingHighlightedNodes = null;
 
     this.allNodeIds = [];
-    this.positionsAtLevel = calculatePositionsAtLevel(this.props.model, this.allNodeIds);
+    this.idMap = {};
+    this.parentMap = {};
+    this.positionsAtLevel = calculatePositionsAtLevel(
+      this.props.model, this.allNodeIds, this.idMap, this.parentMap);
   }
 
 
@@ -172,10 +193,44 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   componentWillReceiveProps(nextProps) {
-    
+
+    if (this.props.model !== nextProps.model) {
+      // Recalculate the position of the nodes ad each level. Doing this here
+      // avoids having to do this on ever render.
+      
+      const lastAllNodes = this.allNodeIds;
+      this.allNodeIds = [];
+      this.idMap = {};
+      this.parentMap = {};
+
+      this.positionsAtLevel = calculatePositionsAtLevel(
+        nextProps.model, this.allNodeIds, this.idMap, this.parentMap);
+ 
+      const newNodes = identifyNewNodes(lastAllNodes, this.allNodeIds);
+      if (newNodes.length > 0) {
+
+        if (this.pendingHighlightedNodes === null) {
+          this.pendingHighlightedNodes 
+            = Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid));
+        } else {
+          this.pendingHighlightedNodes = this.pendingHighlightedNodes
+            .union(Immutable.Set.of(...newNodes.map(id => this.idMap[id].guid)));
+        }
+
+        // As long as the new nodes were not the result of an undo or redo,
+        // expand their parent node so that the new nodes are visible
+        if (this.props.context.undoRedoGuid === nextProps.context.undoRedoGuid) {
+          this.props.dispatch(
+            expandNodes(this.props.context.documentId, newNodes
+              .map(id => this.parentMap[this.idMap[id].guid].id)));
+        }
+      }
+    }
+
     if (this.pendingHighlightedNodes !== null) {
       
       const removeHighlight = () => this.setState({ highlightedNodes: Immutable.Set<string>() });
+
       this.setState(
         { highlightedNodes: this.pendingHighlightedNodes }, 
         () => setTimeout(removeHighlight, 1000));
@@ -183,12 +238,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       this.pendingHighlightedNodes = null;
     }
 
-    if (this.props.model !== nextProps.model) {
-      // Recalculate the position of the nodes ad each level. Doing this here
-      // avoids having to do this on ever render.
-      this.allNodeIds = [];
-      this.positionsAtLevel = calculatePositionsAtLevel(nextProps.model, this.allNodeIds);
-    }
   }
 
   onViewEdit(id) {
@@ -209,11 +258,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     const renderNode = (node, parent, index, depth, numberAtLevel) => {
       return <TreeNode 
+        key={node.guid}
         onViewEdit={this.onViewEdit}
         numberAtLevel={numberAtLevel}
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
         model={node} 
+        org={this.props.model} context={this.props.context}
         parentModel={parent} 
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
@@ -222,7 +273,6 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
         indexWithinParent={index} 
-        context={this.props.context} 
         depth={depth}/>;
     };
     
@@ -276,10 +326,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   renderActionBar() {
     return (
       <div>
-        <button className="btn btn-link" onClick={this.onAddSequence}>
+        <button key="add" className="btn btn-link" onClick={this.onAddSequence}>
           Add {this.props.model.labels.sequence}</button>
-        <button className="btn btn-link" onClick={this.onExpand}>Expand all</button>
-        <button className="btn btn-link" onClick={this.onCollapse}>Collapse all</button>
+        <button key="expand" className="btn btn-link" onClick={this.onExpand}>Expand all</button>
+        <button key="collapse" className="btn btn-link" 
+          onClick={this.onCollapse}>Collapse all</button>
       </div>
     );
   }
@@ -313,7 +364,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       .map((title, index) => {
         const active = index === this.state.currentTab ? 'active' : '';
         const classes = 'nav-link ' + active;
-        return <a className={classes} onClick={this.onTabClick.bind(this, index)}>{title}</a>;
+        return <a key={title} className={classes} 
+          onClick={this.onTabClick.bind(this, index)}>{title}</a>;
       });
 
     return (

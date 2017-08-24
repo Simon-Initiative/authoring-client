@@ -30,6 +30,7 @@ export interface TreeNodeProps {
   depth: number;              // Current depth within tree
   isExpanded: boolean;        // Is node expanded or not
   context: AppContext;  
+  org: models.OrganizationModel;
   onEdit: (model: NodeTypes) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
@@ -129,6 +130,7 @@ export class TreeNode
         onViewEdit={() => this.props.onViewEdit(resource.id)}
         labels={this.props.labels}
         depth={0}
+        org={this.props.org} context={this.props.context}
         isHoveredOver={this.state.mouseOver}
         processCommand={this.props.processCommand}
         editMode={this.props.editMode}
@@ -146,6 +148,7 @@ export class TreeNode
       title = <EditableCaption 
         labels={this.props.labels}
         depth={0}
+        org={this.props.org} context={this.props.context}
         isHoveredOver={this.state.mouseOver}
         processCommand={this.props.processCommand}
         editMode={this.props.editMode}

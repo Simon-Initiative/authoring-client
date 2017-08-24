@@ -4,6 +4,7 @@ import * as t from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
 import { Maybe } from 'tsmonad';
 import { AppServices } from '../../common/AppServices';
+import * as models from '../../../data/models';
 import guid from '../../../utils/guid';
 import { DragHandle } from '../../content/org/drag/DragHandle';
 import { DraggableNode } from './DraggableNode';
@@ -21,6 +22,8 @@ export interface Caption {
 export interface CaptionProps {
   labels: t.Labels;
   model: t.Item;
+  org: models.OrganizationModel;
+  context: AppContext;
   depth: number;
   editMode: boolean;
   isHoveredOver: boolean;
@@ -92,6 +95,7 @@ export class Caption
           className="btn btn-sm">
           View
         </button>, <ActionDropdown labels={this.props.labels} 
+          org={this.props.org} context={this.props.context}
           model={model} processCommand={this.props.processCommand}/>]
         : null;
     return (

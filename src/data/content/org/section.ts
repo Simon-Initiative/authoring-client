@@ -9,7 +9,7 @@ import { Supplements } from './supplements';
 import { Schedule } from './schedule';
 import { Unordered } from './unordered';
 import { Item } from './item';
-import { PLACEHOLDER_ITEM } from './common';
+import { createPlaceholderItem } from './common';
 
 import createGuid from '../../../utils/guid';
 
@@ -131,7 +131,7 @@ export class Section extends Immutable.Record(defaultContent) {
     this.supplements.lift(p => children.push(p.toPersistence()));
     
     if (this.children.size === 0) {
-      children.push(PLACEHOLDER_ITEM.toPersistence());
+      children.push(createPlaceholderItem().toPersistence());
     } else {
       this.children.toArray().forEach(c => children.push(c.toPersistence()));
     }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as t from '../../../data/contentTypes';
+import * as models from '../../../data/models';
 import { AppContext } from '../../common/AppContext';
 import { Maybe } from 'tsmonad';
 import { AppServices } from '../../common/AppServices';
@@ -20,6 +21,8 @@ export interface EditableCaption {
 
 export interface EditableCaptionProps {
   labels: t.Labels;
+  org: models.OrganizationModel;
+  context: AppContext;
   model: t.Sequence | t.Unit | t.Module | t.Section;
   depth: number;
   editMode: boolean;
@@ -118,11 +121,13 @@ export class EditableCaption
     } else {
       const buttons = this.props.isHoveredOver
           ? [<button 
+            key="rename"
             onClick={this.onBeginEdit}
             type="button" 
             className="btn btn-sm">
             Rename
-          </button>, <ActionDropdown labels={this.props.labels} 
+          </button>, <ActionDropdown key="actions" labels={this.props.labels} 
+            org={this.props.org} context={this.props.context}
             model={model} processCommand={this.props.processCommand}/>]
           : null;
       return (
