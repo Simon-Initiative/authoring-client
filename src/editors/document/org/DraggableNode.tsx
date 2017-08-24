@@ -61,7 +61,7 @@ export class DraggableNode
     const opacity = isDragging ? 0.4 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div style={{ opacity, marginLeft: '5px' }}>
+      <div style={{ opacity, marginLeft: '5px', verticalAlign: 'middle' }}>
         {React.Children.map(
           this.props.children, 
           (child => React.cloneElement((child as any), { connectDragSource })))}

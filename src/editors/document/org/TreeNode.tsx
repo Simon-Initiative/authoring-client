@@ -167,21 +167,39 @@ export class TreeNode
    
     const highlighted = this.props.highlighted ? 'table-info' : '';
 
+
+    const outerStyle : any = { position: 'relative', height: '28px', overflow: 'visible' };
+    const nodeStyle : any = { position: 'absolute', top: 0, height: '28px', width: '100%' };
+    const topDrop : any = { position: 'absolute', top: '-15', height: '15px', width: '100%' };
+    const bottomDrop : any = { position: 'absolute', top: '20', height: '15px', width: '100%' };
+
     return (
       <tr key={model.guid} 
         onMouseEnter={this.onEnter} onMouseLeave={this.onLeave} 
         className={highlighted}>
         <td key="content">
-          {renderDropTarget(
-          indexWithinParent, parentModel, 
-          canHandleDrop, onReposition, model.guid)}
-        <DraggableNode id={model.guid} editMode={editMode} 
-          index={indexWithinParent} source={model} parentModel={parentModel}>
-          <span style={ { marginLeft: (depth * 30) } }/>
-          <DragHandle/>
-          {title}
-        </DraggableNode>
-        {finalDropTarget}
+
+          <div style={outerStyle}>
+            <div style={topDrop}>
+              {renderDropTarget(
+              indexWithinParent, parentModel, 
+              canHandleDrop, onReposition, model.guid)}
+            </div>
+          
+            <div style={nodeStyle}>
+              <DraggableNode id={model.guid} editMode={editMode} 
+                index={indexWithinParent} source={model} parentModel={parentModel}>
+                <span style={ { marginLeft: (depth * 30) } }/>
+                <DragHandle/>
+                {title}
+              </DraggableNode>
+            </div>
+          
+            <div style={bottomDrop}>
+              {finalDropTarget}
+            </div>
+          </div>
+        
         </td>
       </tr>
     );

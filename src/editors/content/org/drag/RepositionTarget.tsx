@@ -70,9 +70,8 @@ const boxTarget = {
     const style = {
       backgroundColor: '#f4bf42',
       opacity,
-      height: '7px',
+      height: '100%',
       width: '100%',
-      marginBottom: '6px',
     };
 
     return (this.props as any).connectDropTarget(

@@ -25,16 +25,6 @@ export interface ActionDropdownState {
 }
 
 
-export function buildMenu(org, model, labels, processCommand, context) {
-
-  return [
-    ...VALID_COMMANDS[model.contentType].map(commandClass => new commandClass()), 
-    new RemoveCommand(),
-  ].map(command => <button className="dropdown-item" key={command.description(labels)}
-    disabled={!command.precondition(org, model, context)}
-    onClick={() => processCommand(command)}>{command.description(labels)}</button>);
-}
-
 export class ActionDropdown 
   extends React.PureComponent<ActionDropdownProps, ActionDropdownState> {
     
@@ -51,9 +41,7 @@ export class ActionDropdown
           Edit&nbsp;&nbsp;
         </button>
         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          {buildMenu(
-            this.props.org, this.props.model, 
-            this.props.labels, this.props.processCommand, this.props.context)}
+          
         </div>
       </div>
     );

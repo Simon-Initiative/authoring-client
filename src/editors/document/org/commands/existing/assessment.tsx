@@ -28,7 +28,7 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
   }
 
   description() : string {
-    return 'Add existing assessment';
+    return 'Assessment';
   }
 
   execute(

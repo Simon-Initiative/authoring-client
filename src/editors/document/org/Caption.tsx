@@ -13,6 +13,7 @@ import { canHandleDrop } from './utils';
 import { Command } from './commands/command';
 import { ActionDropdown } from './ActionDropdown';
 import { TextInput } from '../../content/common/TextInput';
+import { Remove } from './Remove';
 
 export interface Caption {
   titleInput: any;
@@ -48,8 +49,6 @@ export class Caption
 
     this.state = { mouseOver: false };    
 
-    this.onEnter = this.onEnter.bind(this);
-    this.onLeave = this.onLeave.bind(this);
     this.onViewEdit = this.onViewEdit.bind(this);
   }
 
@@ -62,48 +61,34 @@ export class Caption
     return this.props.labels[contentType.toLowerCase()];
   }
 
-
-  onEnter() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-    
-  }
-
   onViewEdit() {
     this.props.onViewEdit();
-  }
-
-  onLeave() {
-    if (this.timer !== null) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-    this.setState({ mouseOver: false });
   }
 
   render() : JSX.Element {
 
     const { model, depth, editMode } = this.props;
     
+    const linkStyle : any = {
+      color: 'black',
+      fontWeight: 'normal',
+    };
     
-    const buttons = this.state.mouseOver 
+    const buttons = this.props.isHoveredOver
         ? [<button 
           onClick={this.onViewEdit}
           type="button" 
           className="btn btn-sm">
           View
-        </button>, <ActionDropdown labels={this.props.labels} 
-          org={this.props.org} context={this.props.context}
-          model={model} processCommand={this.props.processCommand}/>]
+        </button>,
+          <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>]
         : null;
     return (
-      <div style={ { display: 'inline' } } 
-        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
-        <button onClick={() => this.props.toggleExpanded(getExpandId(model))} 
+      <div style={ { display: 'inline' } }>
+        <button style={linkStyle} onClick={() => this.props.toggleExpanded(getExpandId(model))} 
         type="button" className="btn btn-link">{this.props.children}</button>
         {buttons}
+        
       </div>
     );
     

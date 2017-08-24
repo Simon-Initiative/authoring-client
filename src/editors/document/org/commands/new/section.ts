@@ -18,6 +18,6 @@ export class AddSectionCommand extends AbstractCommand {
   }
 
   description(labels: t.Labels) : string {
-    return 'Add new ' + labels.section.toLowerCase();
+    return labels.section;
   }
 }

@@ -15,16 +15,16 @@ export const VALID_COMMANDS = {
   [t.OrganizationContentTypes.Sequence]: [AddUnitCommand, AddModuleCommand],
   
   [t.OrganizationContentTypes.Unit]: [AddModuleCommand, 
-    AddExistingWorkbookPageCommand, CreateNewAssessmentCommand, 
-    AddExistingAssessmentCommand, CreateNewWorkbookPageCommand],
+    AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
   
   [t.OrganizationContentTypes.Module]: [AddSectionCommand,
-    AddExistingWorkbookPageCommand, CreateNewAssessmentCommand, 
-    AddExistingAssessmentCommand, CreateNewWorkbookPageCommand],
+    AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
   
   [t.OrganizationContentTypes.Section]: [AddSectionCommand, 
-    AddExistingWorkbookPageCommand, CreateNewAssessmentCommand, 
-    AddExistingAssessmentCommand, CreateNewWorkbookPageCommand],
+    AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
   
   [t.OrganizationContentTypes.Item]: [],
   

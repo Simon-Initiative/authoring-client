@@ -30,7 +30,7 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
   }
 
   description() : string {
-    return 'Add existing workbook page';
+    return 'Page';
   }
 
   execute(

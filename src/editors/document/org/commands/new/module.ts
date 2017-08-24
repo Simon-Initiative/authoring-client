@@ -22,7 +22,7 @@ export class AddModuleCommand extends AbstractCommand {
   }
 
   description(labels: t.Labels) : string {
-    return 'Add new ' + labels.module.toLowerCase();
+    return labels.module;
   }
 
   execute(

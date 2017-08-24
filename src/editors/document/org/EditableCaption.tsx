@@ -13,6 +13,9 @@ import { canHandleDrop } from './utils';
 import { Command } from './commands/command';
 import { ActionDropdown } from './ActionDropdown';
 import { TextInput } from '../../content/common/TextInput';
+import { Remove } from './Remove';
+import { VALID_COMMANDS } from './commands/map';
+import { RemoveCommand } from './commands/remove';
 
 export interface EditableCaption {
   titleInput: any;
@@ -39,6 +42,35 @@ export interface EditableCaptionState {
  
 const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
+
+
+function buildCommandButtons(org, model, labels, processCommand, context) : Object[] {
+
+  const slash : any = {
+    fontFamily: 'sans-serif',
+    lineHeight: 1.25,
+    position: 'relative',
+    top: '-4',
+    color: '#606060',
+  };
+  const buttonStyle : any = {
+    padding: '0 5 0 5',
+  };
+
+  const buttons = VALID_COMMANDS[model.contentType].map(commandClass => new commandClass())
+    .map(command => <button 
+      style={buttonStyle}
+      className="btn btn-link btn-sm" key={command.description(labels)}
+      disabled={!command.precondition(org, model, context)}
+      onClick={() => processCommand(command)}>{command.description(labels)}</button>)
+    .map(button => [button, <span style={slash}>/</span>])
+    .reduce((p, c) => p.concat(c), []);
+  
+  buttons.pop();
+
+  return buttons;
+}
+
 
 export class EditableCaption 
   extends React.PureComponent<EditableCaptionProps, EditableCaptionState> {
@@ -101,7 +133,7 @@ export class EditableCaption
         <div style={ { display: 'inline', marginLeft: '40px' } }>
           <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
             onChange={this.onTextChange} 
-            value={this.state.title} style={ { width: '50%', paddingTop: '7px' } }/>
+            value={this.state.title} style={ { width: '50%', paddingTop: '2px' } }/>
           <button 
             key="save"
             onClick={this.onTitleEdit}
@@ -119,22 +151,40 @@ export class EditableCaption
         </div>
       );
     } else {
+      const linkStyle : any = {
+        color: 'black',
+        fontWeight: 'normal',
+      };
+      const label : any = {
+        fontFamily: 'sans-serif',
+        lineHeight: 1.25,
+        fontSize: '12',
+        position: 'relative',
+        top: '-6',
+        color: '#606060',
+      };
       const buttons = this.props.isHoveredOver
           ? [<button 
-            key="rename"
-            onClick={this.onBeginEdit}
-            type="button" 
-            className="btn btn-sm">
-            Rename
-          </button>, <ActionDropdown key="actions" labels={this.props.labels} 
-            org={this.props.org} context={this.props.context}
-            model={model} processCommand={this.props.processCommand}/>]
+              key="rename"
+              onClick={this.onBeginEdit}
+              type="button" 
+              className="btn btn-sm">
+              Rename
+            </button>, 
+
+            <span style={label}>Insert:</span>,
+
+            ...buildCommandButtons(
+              this.props.org, this.props.model, this.props.labels,
+              this.props.processCommand, this.props.context),
+
+            <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>]
           : null;
       return (
         <div style={ { display: 'inline' } } 
           >
           <button key="itemClick" onClick={() => this.props.toggleExpanded(getExpandId(model))} 
-          type="button" className="btn btn-link">{this.props.children}</button>
+          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
           {buttons}
         </div>
       );

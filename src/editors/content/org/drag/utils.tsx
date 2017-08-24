@@ -15,20 +15,43 @@ export function renderDraggableTreeNode(
 
   const elements = [];
   const key = parentModel.guid + '-draggable-' + model.guid;
-  elements.push(renderDropTarget(
-    indexWithinParent, parentModel, 
-    canHandleDrop, onReorderNode, model.guid));
-  elements.push(<DraggableNode key={key} id={model.guid} editMode={editMode} 
-    index={indexWithinParent} source={model} parentModel={parentModel}>
-    {renderedNode}</DraggableNode>);
 
-  if (indexWithinParent === parentModel.children.size - 1) {
-    elements.push(renderDropTarget(
-    indexWithinParent + 1, parentModel, 
-    canHandleDrop, onReorderNode, ''));
-  }
-   
-  return elements;
+  const bottomTarget = indexWithinParent === parentModel.children.size - 1
+    ? <RepositionTarget 
+      key={key}
+      index={indexWithinParent + 1} 
+      parentModel={parentModel}
+      canAcceptId={canHandleDrop}  
+      onDrop={onReorderNode}/>
+    : null;
+
+  const outerStyle : any = { position: 'relative', height: '50px' };
+  const node : any = { position: 'absolute', top: 0, bottom: 0, width: '100%' };
+  const topDrop : any = { position: 'absolute', top: '0', bottom: '30' };
+  const bottomDrop : any = { position: 'absolute', top: '30', bottom: '0' };
+
+  return (
+    <div style={outerStyle}>
+
+      <div style={node}>
+      <DraggableNode key={key} id={model.guid} editMode={editMode} 
+        index={indexWithinParent} source={model} parentModel={parentModel}>
+        {renderedNode}</DraggableNode>
+      </div>
+
+      <div style={topDrop}>
+        <RepositionTarget 
+          key={key}
+          index={indexWithinParent} 
+          parentModel={parentModel}
+          canAcceptId={canHandleDrop}  
+          onDrop={onReorderNode}/>
+      </div>
+      <div style={bottomDrop}>
+        {bottomTarget}
+      </div>
+    </div>
+  );
 }
 
 export type TypePredicate = (droppedType : SourceNodeType) => boolean;

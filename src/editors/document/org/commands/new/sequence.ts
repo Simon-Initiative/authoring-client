@@ -18,6 +18,6 @@ export class AddSequenceCommand extends AbstractCommand {
   }
 
   description(labels: t.Labels) : string {
-    return 'Add new ' + labels.sequence.toLowerCase();
+    return labels.sequence;
   }
 }

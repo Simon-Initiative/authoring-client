@@ -114,7 +114,7 @@ function updateChild(
   child: any, 
   parentNode: any) {
   
-  if (parentNode.children.get(child.guid) !== undefined) {
+  if (parentNode.children !== undefined && parentNode.children.get(child.guid) !== undefined) {
     return parentNode.with({ children: parentNode.children.set(child.guid, child) });
 
   } else {

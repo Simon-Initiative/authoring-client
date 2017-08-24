@@ -31,6 +31,6 @@ export class CreateNewAssessmentCommand extends AbstractCommand {
   }
 
   description() : string {
-    return 'Add new assessment';
+    return 'Assessment';
   }
 }

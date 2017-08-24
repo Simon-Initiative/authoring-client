@@ -29,6 +29,6 @@ export class CreateNewWorkbookPageCommand extends AbstractCommand {
   }
 
   description(labels: t.Labels) : string {
-    return 'Add new workbook page';
+    return 'Page';
   }
 }

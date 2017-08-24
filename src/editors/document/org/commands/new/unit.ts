@@ -22,7 +22,7 @@ export class AddUnitCommand extends AbstractCommand {
   }
 
   description(labels: t.Labels) : string {
-    return 'Add new ' + labels.unit.toLowerCase();
+    return labels.unit;
   }
 
   execute(
