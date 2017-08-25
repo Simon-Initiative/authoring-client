@@ -62,7 +62,7 @@ export { ContentTypes as OrganizationContentTypes } from './content/org/types';
 
 
 export { Linkable } from './content/linkable';
-export { LearningObjective } from './content/los';
+export { LearningObjective } from './content/objectives/objective';
 export { OrgContentTypes, OrgItem, OrgSection, 
   OrgModule, OrgUnit, OrgSequence, OrgOrganization } from './content/org';
 export { Skill } from './content/skills';
