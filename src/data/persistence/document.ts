@@ -93,7 +93,7 @@ export function createDocument(courseId: CourseId,
   
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
-      const packageGuid = content.type === 'x-oli-package' ? json.guid : courseId;
+      const packageGuid = (content as any).type === 'x-oli-package' ? json.guid : courseId;
       return new Document({
         _courseId: packageGuid,
         _id: json.guid,
@@ -106,7 +106,7 @@ export function createDocument(courseId: CourseId,
 export function persistDocument(doc: Document): Promise<Document> {
 
   let url = null;
-  if (doc.model.type === 'x-oli-package') {
+  if ((doc.model as any).type === 'x-oli-package') {
     url = `${configuration.baseUrl}/packages/${doc._courseId}`;
   } else {
     url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;

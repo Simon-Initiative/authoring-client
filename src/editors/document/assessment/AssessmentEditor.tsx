@@ -39,7 +39,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 
 interface AssessmentEditorState extends AbstractEditorState {
   modalIsOpen : boolean;
-  skillModel: models.SkillModel;
+  skillModel: models.SkillsModel;
   current: string;
 }
 
@@ -80,7 +80,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         persistence.retrieveDocument (this.props.context.courseId,id)
         .then((skillDocument) => {
           // console.log ('Loaded skill document, assinging ...');  
-          const aSkillModel:models.SkillModel = skillDocument.model as models.SkillModel;   
+          const aSkillModel:models.SkillsModel = skillDocument.model as models.SkillsModel;   
           this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
         });
       }          

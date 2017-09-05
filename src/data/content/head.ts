@@ -9,22 +9,22 @@ export type HeadParams = {
   title?: Title,
   guid?: string,
   ref?: string,
-  annotations?: Array<Linkable>;
+  objrefs?: Immutable.List<string>;
 };
 
 const defaultContent = {
   contentType: 'Head', 
   guid: '', 
   title: new Title(),
-  annotations: new Array ()
-}
+  objrefs: Immutable.List<string>(),
+};
 
 export class Head extends Immutable.Record(defaultContent) {
   
-  contentType: 'Title';
+  contentType: 'Head';
   title: Title;
   guid: string;
-  annotations: Array<Linkable>;
+  objrefs: Immutable.List<string>;
   
   constructor(params?: HeadParams) {
     super(augment(params));
@@ -36,7 +36,7 @@ export class Head extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Head {
     let model = new Head().with({ guid });
-    const tAnnotations = [];
+    let objrefs = Immutable.List<string>();
     const head = (root as any).head;
 
     getChildren(head).forEach((item) => {
@@ -46,35 +46,28 @@ export class Head extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'objref':
-          tAnnotations.push(new Linkable ((item as any).objref['@idref']));        
+          objrefs = objrefs.push(((item as any).objref['@idref']));        
           break;  
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id)});
+          model = model.with({ title: Title.fromPersistence(item, id) });
           break;            
         default:
       }
     });
 
-    model = model.with ({annotations: tAnnotations});  
+    model = model.with ({ objrefs });  
       
     return model;
   }
   
   toPersistence() : Object {
-    console.log ("Head: toPersistence ()");
-      
-    let tempArray:Array<Object>=new Array <Object>();        
-        
-    tempArray.push (this.title.toPersistence());  
-
-    this.annotations.map ((annotation) => {          
-      tempArray.push ({"objref": { "@idref": annotation.id}});        
-    });            
-        
     return {
-      "head": {
-        "#array": tempArray
-      }
-    }
+      head: {
+        '#array': [
+          this.title.toPersistence(),
+          ...this.objrefs.toArray().map(o => ({ objref: { '@idref': o } })),
+        ],
+      },
+    };
   }
 }

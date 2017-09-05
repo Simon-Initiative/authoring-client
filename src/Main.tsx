@@ -19,6 +19,7 @@ import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
+import { ObjectiveSkillView } from './components/objectives/ObjectiveSKillView';
 
 type ResourceList = {
   title: string, 
@@ -70,24 +71,6 @@ const resources = {
         (title, type) => models.WorkbookPageModel.createNew(
           guid(), title, 'This is a new page with empty content'),
         ),
-  objectives: res(
-        'Learning Objectives',
-        'x-oli-learning_objectives',
-        resource => resource.type === 'x-oli-learning_objectives',
-        (title, type) => new models.LearningObjectiveModel({
-          type,
-          title,
-          id:title.split(' ')[0] + guid(),
-        })),
-  skills: res(
-        'Skills',
-        'x-oli-skills_model',
-        resource => resource.type === 'x-oli-skills_model',
-        (title, type) => new models.SkillModel({
-          type,
-          title: new contentTypes.Title({ text: title }),
-          resource: new contentTypes.Resource({ id:title.split(' ')[0] + guid(), title }),
-        })),
   pools: res(
         'Question Pools',
         'x-oli-assessment2-pool',
@@ -172,6 +155,11 @@ class Main extends React.Component<MainProps, MainState> {
       return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;
     } else if (url === '/create') {
       return <CreateCourseView dispatch={this.props.dispatch}/>;
+
+    } else if (url.startsWith('/objectives-')) {
+      return <ObjectiveSkillView dispatch={this.props.dispatch} 
+        course={this.props.course} userName={this.props.user.user}/>;
+
     } else {
 
       const firstPart = url.substr(1, url.indexOf('-') - 1);

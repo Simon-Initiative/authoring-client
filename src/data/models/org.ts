@@ -4,6 +4,7 @@ import guid from '../../utils/guid';
 import { Maybe } from 'tsmonad';
 import { getKey } from '../common';
 
+import { LegacyTypes } from '../types';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,
@@ -24,7 +25,7 @@ export type OrganizationModelParams = {
 };
 const defaultOrganizationModelParams = {
   modelType: 'OrganizationModel',
-  type: '',
+  type: LegacyTypes.organization,
   resource: new contentTypes.Resource(),
   guid: '',
   id: '',

@@ -1,5 +1,3 @@
-'use strict'
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
@@ -11,27 +9,27 @@ import BlockToolbar  from './BlockToolbar';
 import InlineInsertionToolbar from './InlineInsertionToolbar';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
-import { Resource } from "../../../data/content/resource";
-import { Linkable } from '../../../data/content/linkable';
-import { LOTypes, LearningObjective } from '../../../data/content/los';
+import { Resource } from '../../../data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
+import { ObjectiveSelection } from '../../../utils/selection/ObjectiveSelection';
 
 import * as models from '../../../data/models';
-
+import * as contentTypes from '../../../data/contentTypes';
+import { LegacyTypes } from '../../../data/types';
 
 const styles = {  
   loContainer : {
-    "border": "1px solid grey",
-    "background": "#ffffff",  
-    "height": "125px",
-    "overflowX": "auto",
-    "overflowY": "scroll",
-    "marginBottom" : "10px",
-    "padding" : "4px"
-  }
-}
+    border: '1px solid grey',
+    background: '#ffffff',  
+    height: '125px',
+    overflowX: 'auto',
+    overflowY: 'scroll',
+    marginBottom : '10px',
+    padding : '4px',
+  },
+};
 
 interface WorkbookPageEditor {
   
@@ -42,9 +40,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
-  modalIsOpen : boolean;
-  los: Array <Linkable>;
-  annotations: Array <Linkable>;  
+  objectiveTitles: Immutable.List<string>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
@@ -52,136 +48,82 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorState> {
     
   constructor(props) {
-    super(props, {modalIsOpen: false, los: new Array()});
+    super(props, { objectiveTitles: Immutable.Map<string, string>() });
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
+
+    this.fetchObjectiveTitles(this.props.model.head.objrefs);
   }
 
-  componentDidMount() {              
-    super.componentDidMount();              
-    this.loadLearningObjectives ();
+  fetchObjectiveTitles(objrefs: Immutable.List<string>) {
+    this.props.services.titleOracle.getTitles(
+      this.props.context.courseId, 
+      objrefs.toArray(),
+      LegacyTypes.learning_objectives)
+
+      .then((titles) => {
+        this.setState({ objectiveTitles: Immutable.List<string>(titles) });
+      });
   }
-
-  /**
-   * 
-   */
-  loadLearningObjectives () : void {
-     
-    console.log ("loadLearningObjectives ()");  
-      
-    persistence.bulkFetchDocuments (this.props.context.courseId,["x-oli-learning_objectives"],"byTypes").then (loDocuments => {
-      if (loDocuments.length!=0) {          
-        var tempLOArray:Array<Linkable>=new Array ();
-        var mergedAnnotations:Array<Linkable>=new Array ();
-
-        for (let i=0;i<loDocuments.length;i++) {
-          let loModel:models.LearningObjectiveModel=loDocuments [i].model as models.LearningObjectiveModel; 
-          let loFlat:Array<Linkable>=models.LearningObjectiveModel.toFlat (loModel.los,new Array<Linkable>());            
-          for (let j=0;j<loFlat.length;j++) {              
-            tempLOArray.push (loFlat [j]);
-          }  
-        }
-        
-        this.setState ({los: tempLOArray}, () => {  
-          // Map the objrefs from the serialized workbook page back to proper Linkable objects ...            
-          let testIndex:number=0;  
-            
-          this.props.model.head.annotations.map ((annotation) => {            
-            for(let k=0;k<tempLOArray.length;k++) {
-              let testLO:Linkable=tempLOArray [k];
-              if (testLO.id==annotation.id) {
-               
-                //console.log ("Found LO to map: " + JSON.stringify (testLO));
-                let linkable:Linkable=new Linkable ();
-                linkable.id=testLO.id;
-                linkable.title=testLO.title;                      
-                mergedAnnotations.push (linkable);
-              }    
-            }
-             
-            testIndex++;  
-          });
-            
-          //console.log ("Assinging reconstituted LO Linkables:" + JSON.stringify (mergedAnnotations));  
-         
-          this.setState ({annotations: mergedAnnotations});
-        });    
-      } else {
-        console.log ("Error: no learning objectives retrieved!");  
-      }         
-    });   
-  }   
 
   onTitleEdit(title) {
     const head = this.props.model.head.with({ title });
     this.handleEdit(this.props.model.with({ head }));
   }
 
+  onBodyEdit(content : any) {
+    const model = this.props.model.with({ body: content });
+    this.handleEdit(model);
+  }
 
+  onObjectivesEdit(objectives: Immutable.Set<contentTypes.LearningObjective>) {
 
-  onEdit(property : string, content : any) {
+    this.props.services.dismissModal();
 
-    console.log ("onEdit ()");  
-      
-    let model; 
-
-    if (property === 'annotations') {
-      const head = this.props.model.head.with({ annotations: content });    
-      this.handleEdit(this.props.model.with({ head }));        
-    } else {      
-      model = this.props.model.with({ body: content });
-      this.handleEdit(model);
-    }
+    const head = this.props.model.head.with(
+      { objrefs: objectives.map(o => o.id).toList() });
+    this.handleEdit(this.props.model.with({ head }));
   }
     
-  /**
-   * 
-   */
-  closeModal (newAnnotations:any) {
-    this.setState ({modalIsOpen: false},function () {
-      this.setState ({annotations:newAnnotations}, () =>{  
-       this.onEdit ("annotations",newAnnotations);
-      });    
-    });      
-  }     
-
-  /**
-   * 
-   */
-  linkLO() {        
-    this.setState ({modalIsOpen: true});
+  renderObjectives() {
+    const objectives = this.state.objectiveTitles
+      .toArray()
+      .map((title) => {
+        return <li key={title}>{title}</li>;
+      });
+    return (
+      <ol>
+        {objectives}
+      </ol>
+    );
   }
 
-  /**
-   * 
-   */
-  createLinkerDialog () {           
-    if (this.state.los!=null) {            
-      return (<LearningObjectiveLinker title="Available Learning Objectives" closeModal={this.closeModal.bind (this)} sourceData={models.LearningObjectiveModel.toFlat (this.state.los,new Array<Linkable>())} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.state.annotations} />);
-    } 
-                   
-    return (<LearningObjectiveLinker title="Error" errorMessage="No learning objectives available, did you create a Learning Objectives document?" closeModal={this.closeModal.bind (this)} sourceData={[]} modalIsOpen={this.state.modalIsOpen} targetAnnotations={this.props.model.head.annotations} />);           
+  componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
+    if (nextProps.model !== this.props.model) {
+      this.setState({ objectiveTitles: Immutable.List<string>() });
+      this.fetchObjectiveTitles(nextProps.model.head.objrefs);
+    }
   }
-       
+
+  selectObjectives() {
+    const component = <ObjectiveSelection 
+      onInsert={this.onObjectivesEdit}
+      onCancel={() => this.props.services.dismissModal()}
+      courseId={this.props.context.courseId}
+      titleOracle={this.props.services.titleOracle}/>;
+      
+    this.props.services.displayModal(component);
+  }
+
   render() {      
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
-    const lolinker = this.createLinkerDialog ();
-    const testArray = this.state.annotations;  
-    let addLearningObj;        
-    let listItems; 
-    let loDisplay      
-    
-    if (testArray) {  
-      listItems = testArray.map(lo => <li>{lo.title}</li>); 
-      loDisplay = (testArray as any).size === 0
-        ? <p>No learning objectives currently linked</p>
-        : <ul>{listItems}</ul>;
-    }    
 
-    addLearningObj = <button className="btn btn-link" onClick={e => { e.preventDefault(); this.linkLO (); }}>Edit Learning Objectives</button>
-
+    const addLearningObj = <button 
+      className="btn btn-link" 
+      onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
       <div>
@@ -196,14 +138,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             model={this.props.model.head.title}
             onEdit={this.onTitleEdit} 
             />
-                
           
-          {lolinker}        
-
           <Collapse 
             caption="Learning Objectives" 
             expanded={addLearningObj}>
-            {loDisplay}
+
+            {this.renderObjectives()}
+          
           </Collapse>
 
           <HtmlContentEditor 
@@ -214,7 +155,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               services={this.props.services}
               context={this.props.context}
               model={this.props.model.body}
-              onEdit={c => this.onEdit('body', c)} 
+              onEdit={c => this.onBodyEdit(c)} 
               />
       </div>
     );

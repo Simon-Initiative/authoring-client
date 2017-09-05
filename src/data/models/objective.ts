@@ -3,6 +3,7 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { Maybe } from 'tsmonad';
 import { getKey } from '../common';
+import { LegacyTypes } from '../types';
 
 
 export type LearningObjectivesModelParams = {
@@ -15,6 +16,7 @@ export type LearningObjectivesModelParams = {
 };
 const defaultLearningObjectivesModelParams = {
   modelType: 'LearningObjectivesModel',
+  type: LegacyTypes.learning_objectives,
   resource: new contentTypes.Resource(),
   guid: '',
   id: '',
@@ -29,6 +31,7 @@ export class LearningObjectivesModel
 
   modelType: 'LearningObjectivesModel';
   resource: contentTypes.Resource;
+  type: string;
   guid: string;
   lock: contentTypes.Lock;
   id: string;

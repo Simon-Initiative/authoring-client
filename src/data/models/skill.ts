@@ -1,118 +1,130 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
+import { Maybe } from 'tsmonad';
 import { getKey } from '../common';
-import { isNullOrUndefined, isArray } from 'util';
 
+import { LegacyTypes } from '../types';
 
-export type SkillModelParams = {
+export type SkillsModelParams = {
   resource?: contentTypes.Resource,
   guid?: string,
-  type?: string,
   lock?: contentTypes.Lock,
-  title?: contentTypes.Title,
-  skills?: Object[],
+  id?: string,
+  title?: string,
+  skills?: Immutable.OrderedMap<string, contentTypes.Skill>,
 };
-
-const defaultSkillModel = {
-  modelType: 'SkillModel',
+const defaultSkillsModelParams = {
+  modelType: 'SkillsModel',
   resource: new contentTypes.Resource(),
   guid: '',
-  type: 'x-oli-skills_model',
+  id: '',
+  type: LegacyTypes.skills_model,
   lock: new contentTypes.Lock(),
-  title: new contentTypes.Title(),
-  skillDefaults: contentTypes.Skill,
-  skills: [],
+  title: 'New Skills',
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>(),
 };
 
-export class SkillModel extends Immutable.Record(defaultSkillModel) {
-  modelType: 'SkillModel';
+
+export class SkillsModel 
+  extends Immutable.Record(defaultSkillsModelParams) {
+
+  modelType: 'SkillsModel';
   resource: contentTypes.Resource;
   guid: string;
-  type: string;
   lock: contentTypes.Lock;
-  title: contentTypes.Title;
-  skillDefaults: contentTypes.Skill;
-  skills: Object[];
+  id: string;
+  type: string;
+  title: string;
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>;
 
-  constructor(params?: SkillModelParams) {  
-    params ? super(params) : super(); 
+  constructor(params?: SkillsModelParams) {
+    params ? super(params) : super();
   }
 
-  with(values: SkillModelParams) {
+  with(values: SkillsModelParams): SkillsModel {
     return this.merge(values) as this;
   }
 
+  static fromPersistence(json: Object): SkillsModel {
 
-  static updateModel(oldSkillModel: SkillModel, newSkillModel: any): SkillModel {
-    let newModel = new SkillModel({ skills: newSkillModel });
-    newModel = newModel.with({ resource: oldSkillModel.resource });
-    newModel = newModel.with({ guid: oldSkillModel.guid });
-    newModel = newModel.with({ type: oldSkillModel.type });
-    newModel = newModel.with({ title: oldSkillModel.title });
-    if (!isNullOrUndefined(oldSkillModel.lock)) {
-      newModel = newModel.with({ lock: oldSkillModel.lock });
+    let model = new SkillsModel();
+
+    const a = (json as any);
+    model = model.with({ 
+      resource: contentTypes.Resource.fromPersistence(a),
+      guid: a.guid,
+      title: a.title,
+    });
+
+    if (a.lock !== undefined && a.lock !== null) {
+      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
     }
-    return newModel;
+    let org = null;
+
+
+    if (a.doc instanceof Array) {
+      org = a.doc[0];
+    } else {
+      org = a.doc;
+    }
+
+    if (org.skills_model !== undefined) {
+      
+      if (org.skills_model['@id'] !== undefined) {
+        model = model.with({ id: org['@id'] });
+      }
+      const container = org.skills_model.skills === undefined 
+        ? org.skills_model['#array'] : org.skills_model.skills;
+        
+      container.forEach((skill) => {
+
+        const thisGuid = guid();
+        const id = skill['@id'];
+        const title = skill['@title'];
+        const obj = new contentTypes.Skill().with({ id, guid: thisGuid, title });
+        model = model.with({ skills: model.skills.set(obj.guid, obj) });
+      });
+
+    } else {
+
+      org.skills['#array'].forEach((item) => {
+
+        const key = getKey(item);
+        const id = guid();
+
+        switch (key) {
+          case 'skill':
+            const obj = contentTypes.Skill.fromPersistence(item, id);
+            model = model.with({ skills: model.skills.set(obj.guid, obj) });
+            break;
+          default:
+            
+        }
+      });
+    }
+
+    return model;
   }
-    
+
   toPersistence(): Object {
+    const children : Object[] = [
+      { title: { '#text': this.title } }];
     
-    const resource: any = this.resource.toPersistence();
-    let doc = [{
-      skills_model: {
-        '@id': this.resource.id,        
-        '#array': this.skills,
+    this.skills.toArray().forEach(o => children.push(o.toPersistence()));
+
+    const resource = this.resource.toPersistence();
+    const doc = [{
+      skills: {
+        '@id': this.resource.id,
+        '#array': children,
       },
     }];
 
-    // Add the title object to the array where we have the skills in
-    // a very clumsy way.
-    let titleObj=new Object ();
-    titleObj ["title"]=new Object ();  
-    titleObj ["title"]["#text"]=this.title.text;    
-
-    doc [0]["skills_model"]["#array"] = [titleObj, ...doc [0]["skills_model"]["#array"]];  
-      
     const root = {
       doc,
     };
 
     return Object.assign({}, resource, root, this.lock.toPersistence());
   }
-
-  static fromPersistence(json: Object): SkillModel {      
-    const a = (json as any);
-    let replacementSkills = [];  
-    const skillData: Array<contentTypes.Skill> = 
-      a.doc.skills_model.skills !== undefined
-      ? a.doc.skills_model.skills
-      : a.doc.skills_model['#array'];
-     
-    let extractedTitle:contentTypes.Title = new contentTypes.Title().with({ text: 'Unassigned' });  
-
-    for (let i = 0; i < skillData.length; i++) {
-      const newSkill: contentTypes.Skill = new contentTypes.Skill();
-      let testSkillObj:Object=skillData [i];
-        
-      if (testSkillObj ["title"]) {
-        extractedTitle=new contentTypes.Title ({text : testSkillObj ["title"]["#text"]});
-      } else {                
-        newSkill.fromJSONObject(testSkillObj as contentTypes.Skill);
-        replacementSkills.push(newSkill);          
-      }    
-    }
-
-    let model = new SkillModel({ skills: replacementSkills });
-    model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
-    model = model.with({ guid: a.guid });
-    model = model.with({ type: a.type });
-    model = model.with({ title: extractedTitle });
-    if (!isNullOrUndefined(a.lock)) {
-      model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
-    }
-      
-    return model;
-  }
 }
-

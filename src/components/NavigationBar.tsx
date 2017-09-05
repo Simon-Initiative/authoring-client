@@ -176,12 +176,12 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         staticContent: false,
         onclick: this.placeholderMenuHandler,
       },
-      skills: {
-        label: 'Skills',
-        icon: 'A',
-        staticContent: false,
-        onclick: this.placeholderMenuHandler,
-      },
+      // skills: {
+      //   label: 'Skills',
+      //   icon: 'A',
+      //   staticContent: false,
+      //   onclick: this.placeholderMenuHandler,
+      // },
       //assets: {
       //  label: 'Assets',
       //  staticContent: true,
@@ -264,7 +264,6 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     this.opts.get('workBookPages').onclick = view.viewPages.bind(undefined, courseId);
     this.opts.get('activities').onclick = view.viewAssessments.bind(undefined, courseId);
     this.opts.get('objectives').onclick = view.viewObjectives.bind(undefined, courseId);
-    this.opts.get('skills').onclick = view.viewSkills.bind(undefined, courseId);
     this.opts.get('pools').onclick = view.viewPools.bind(undefined, courseId);
 
     if (this.state.closed === true) {

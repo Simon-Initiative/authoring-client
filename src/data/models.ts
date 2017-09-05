@@ -15,9 +15,9 @@ import { AssessmentModel } from './models/assessment';
 import { CourseModel } from './models/course';
 import { DefaultModel } from './models/default';
 import { MediaModel } from './models/media';
-import { LearningObjectiveModel } from './models/objective';
+import { LearningObjectivesModel } from './models/objective';
 import { OrganizationModel } from './models/org';
-import { SkillModel } from './models/skill';
+import { SkillsModel } from './models/skill';
 import { WorkbookPageModel } from './models/workbook';
 
 
@@ -27,9 +27,9 @@ export { AssessmentModel } from './models/assessment';
 export { CourseModel } from './models/course';
 export { DefaultModel } from './models/default';
 export { MediaModel } from './models/media';
-export { LearningObjectiveModel } from './models/objective';
+export { LearningObjectivesModel } from './models/objective';
 export { OrganizationModel } from './models/org';
-export { SkillModel } from './models/skill';
+export { SkillsModel } from './models/skill';
 export { WorkbookPageModel } from './models/workbook';
 
 
@@ -71,9 +71,9 @@ export function createModel(object: any): ContentModel {
     case 'x-oli-organization':
       return OrganizationModel.fromPersistence(object);
     case 'x-oli-learning_objectives':
-      return LearningObjectiveModel.fromPersistence(object);
+      return LearningObjectivesModel.fromPersistence(object);
     case 'x-oli-skills_model':
-      return SkillModel.fromPersistence(object);
+      return SkillsModel.fromPersistence(object);
     case 'x-oli-webcontent':
       return MediaModel.fromPersistence(object);
     case 'x-oli-assessment2-pool':
@@ -97,8 +97,8 @@ export type ContentModel =
   MediaModel |
   WorkbookPageModel |
   OrganizationModel |
-  LearningObjectiveModel |
-  SkillModel |
+  LearningObjectivesModel |
+  SkillsModel |
   PoolModel |
   DefaultModel;
 

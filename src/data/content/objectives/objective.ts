@@ -1,9 +1,10 @@
 import * as Immutable from 'immutable';
 
 import { Maybe } from 'tsmonad';
-import { augment } from '../common';
+import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { KnowledgeCategory, LearningProcess } from './types';
+import createGuid from '../../../utils/guid';
 
 
 export type LearningObjectiveParams = {
@@ -12,6 +13,7 @@ export type LearningObjectiveParams = {
   title?: string,
   category?: Maybe<KnowledgeCategory>,
   process?: Maybe<LearningProcess>,
+  skills?: Immutable.List<string>,
 };
 
 const defaultContent = {
@@ -21,6 +23,7 @@ const defaultContent = {
   title: '',
   category: Maybe.nothing<KnowledgeCategory>(),
   process: Maybe.nothing<LearningProcess>(),
+  skills: Immutable.List<string>(),
 };
 
 export class LearningObjective extends Immutable.Record(defaultContent) {
@@ -31,6 +34,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
   title: string;
   category: Maybe<KnowledgeCategory>;
   process: Maybe<LearningProcess>;
+  skills: Immutable.List<string>;
   
   constructor(params?: LearningObjectiveParams) {
     super(augment(params));
@@ -55,6 +59,22 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
       model = model.with({ category: Maybe.just<KnowledgeCategory>(o['@category']) });
     }
     
+    getChildren(o).forEach((item) => {
+      
+      const key = getKey(item);
+      const id = createGuid();
+     
+      switch (key) {
+        case 'skillref':
+          model = model.with({ skills: model.skills.push(item['skillref']['@idref']) });
+          break;
+        case '#text':
+          model = model.with({ title: item['#text'] });
+          break;
+        default:
+          
+      }
+    });
     
     return model;
   }
@@ -63,7 +83,8 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
     const o = { 
       objective: {
         '@id': this.id,
-        '#array': [{ '#text': this.title }],
+        '#array': [{ '#text': this.title }, 
+          ...this.skills.toArray().map(s => ({ skillref: { '@idref': s } }))],
       }, 
     };
 
