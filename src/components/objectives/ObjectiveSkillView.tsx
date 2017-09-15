@@ -198,9 +198,36 @@ export class ObjectiveSkillView
 
   onAddExistingSkill(model: contentTypes.LearningObjective) {
 
+    const usedSkills = [];
+
+    const skillsById = this.state.skills.skills
+      .toArray()
+      .reduce(
+        (map, skill) => {
+          map[skill.id] = skill;
+          return map;
+        }, 
+        {});
+
+    this.state.objectives.objectives
+      .toArray()
+      .forEach((objective: contentTypes.LearningObjective) => {
+
+        objective.skills.forEach((skillId) => {
+
+          const skill = skillsById[skillId];
+          if (skill !== undefined) {
+            usedSkills.push(skill);
+          }
+        });
+
+      });
+
+    const skills = Immutable.Set<contentTypes.Skill>(usedSkills);
+
     // Allow the user to choose the skills to attach
     this.services.displayModal(<ExistingSkillSelection
-      skills={this.state.skills.skills.toList()}
+      skills={skills.toList()}
       onInsert={this.onExistingSkillInsert.bind(this, model)}
       onCancel={() => this.services.dismissModal()} />);
 
@@ -376,6 +403,8 @@ export class ObjectiveSkillView
     const objectives = (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
       .objectives.set(obj.id, obj);
 
+    
+
     const model =
       (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
       .with({ objectives });
@@ -388,6 +417,7 @@ export class ObjectiveSkillView
 
     unified.documents[index] = document;
     unified.objectives = unified.objectives.set(obj.id, obj);
+    unified.mapping = unified.mapping.set(obj.id, document);
     unified.newBucket = document;
 
     this.setState({ objectives: unified });
