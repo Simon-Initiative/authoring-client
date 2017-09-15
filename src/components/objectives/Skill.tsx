@@ -6,6 +6,8 @@ import * as models from '../../data/models';
 import { Maybe } from 'tsmonad';
 import { Title } from './Title';
 import { AppServices } from '../../editors/common/AppServices';
+import { Remove } from './Remove';
+
 import guid from '../../utils/guid';
 
 
@@ -16,6 +18,7 @@ export interface Skill {
 export interface SkillProps {
   isExpanded: boolean;        // Is node expanded or not
   onEdit: (model: contentTypes.Skill) => void;
+  onRemove: (model: contentTypes.Skill) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: contentTypes.Skill;
@@ -45,13 +48,21 @@ export class Skill
 
     const { model, editMode, mouseOver, isExpanded } = this.props;
 
+    const remove = mouseOver
+      ? <Remove editMode={this.props.editMode} 
+              onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
+      : null;
+
+    const title = 'Skill: ' + this.props.model.title;
+
     return (
-      <div>
+      <div style={ { marginLeft: '45px' } }>
         <Title title={model.title} 
           editMode={editMode} 
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver} 
-          onEdit={this.onTitleEdit}>{model.title}</Title>
+          onEdit={this.onTitleEdit}>{title}</Title>
+        {remove}
       </div>
     );
   }

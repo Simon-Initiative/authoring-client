@@ -91,12 +91,14 @@ function mapStateToProps(state: any) {
     user,
     modal,
     course,
+    expanded,
   } = state;
 
   return {
     user,
     modal,
     course,
+    expanded,
   };
 }
 
@@ -157,8 +159,11 @@ class Main extends React.Component<MainProps, MainState> {
       return <CreateCourseView dispatch={this.props.dispatch}/>;
 
     } else if (url.startsWith('/objectives-')) {
-      return <ObjectiveSkillView dispatch={this.props.dispatch} 
-        course={this.props.course} userName={this.props.user.user}/>;
+      return <ObjectiveSkillView 
+          course={this.props.course} 
+          dispatch={this.props.dispatch}
+          expanded={this.props.expanded}
+          userName={this.props.user.user}/>;
 
     } else {
 

@@ -17,6 +17,9 @@ export interface Row {
 export interface RowProps {
   isExpanded: boolean;        // Is node expanded or not
   onEdit: (model: RowType) => void;
+  onAddNewSkill: (model: contentTypes.LearningObjective) => void;
+  onAddExistingSkill: (model: contentTypes.LearningObjective) => void;
+  onRemove: (model: RowType) => void;
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: RowType;
@@ -37,7 +40,9 @@ export class Row
 
     this.onEnter = this.onEnter.bind(this);
     this.onLeave = this.onLeave.bind(this);
-
+    this.onObjectiveRemove = this.onObjectiveRemove.bind(this);
+    this.onSkillRemove = this.onSkillRemove.bind(this);
+    
     this.state = { mouseOver: false };
   }
 
@@ -57,18 +62,30 @@ export class Row
     this.setState({ mouseOver: false });
   }
 
+  onObjectiveRemove(model: contentTypes.LearningObjective) {
+    this.props.onRemove(model);
+  }
+
+  onSkillRemove(model: contentTypes.Skill) {
+    this.props.onRemove(model);
+  }
+
   render() : JSX.Element {
 
     const { model, editMode, isExpanded } = this.props;
     
     const item = this.props.model.contentType === 'LearningObjective'
       ? <Objective {...this.props} mouseOver={this.state.mouseOver} 
+        onRemove={this.onObjectiveRemove}
+        onAddExistingSkill={() => this.props.onAddExistingSkill(
+          this.props.model as contentTypes.LearningObjective)}
+        onAddNewSkill={() => this.props.onAddNewSkill(
+          this.props.model as contentTypes.LearningObjective)}
         model={this.props.model as contentTypes.LearningObjective}/>
       : <Skill {...this.props} mouseOver={this.state.mouseOver} 
+        onRemove={this.onSkillRemove}
         model={this.props.model as contentTypes.Skill}/>;
 
-
-   
     const highlighted = this.props.highlighted ? 'table-info' : '';
 
     return (

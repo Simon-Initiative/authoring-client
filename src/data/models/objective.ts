@@ -93,8 +93,17 @@ export class LearningObjectivesModel
     const children : Object[] = [
       { title: { '#text': this.title } }];
     
-    this.objectives.toArray().forEach(o => children.push(o.toPersistence()));
-
+    if (this.objectives.size === 0) {
+      const id = guid();
+      const o = new contentTypes.LearningObjective().with({
+        title: 'Default objective',
+        id,
+      });
+      children.push(o.toPersistence());
+    } else {
+      this.objectives.toArray().forEach(o => children.push(o.toPersistence()));
+    }
+    
     const resource = this.resource.toPersistence();
     const doc = [{
       objectives: {

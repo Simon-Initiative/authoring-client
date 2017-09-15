@@ -111,8 +111,17 @@ export class SkillsModel
     const children : Object[] = [
       { title: { '#text': this.title } }];
     
-    this.skills.toArray().forEach(o => children.push(o.toPersistence()));
-
+    if (this.skills.size === 0) {
+      const id = guid();
+      const o = new contentTypes.Skill().with({
+        title: 'Default skill',
+        id,
+      });
+      children.push(o.toPersistence());
+    } else {
+      this.skills.toArray().forEach(o => children.push(o.toPersistence()));
+    }
+    
     const resource = this.resource.toPersistence();
     const doc = [{
       skills: {
