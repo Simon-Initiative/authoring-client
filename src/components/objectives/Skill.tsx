@@ -48,7 +48,7 @@ export class Skill
 
     const { model, editMode, mouseOver, isExpanded } = this.props;
 
-    const remove = mouseOver
+    const remove = mouseOver && editMode
       ? <Remove editMode={this.props.editMode} 
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
       : null;

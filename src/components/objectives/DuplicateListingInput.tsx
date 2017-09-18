@@ -103,6 +103,7 @@ export class DuplicateListingInput
           <button 
             type="button"
             className="btn btn-sm btn-primary"
+            disabled={!this.props.editMode}
             onClick={() => this.props.onClick(this.state.value)}>
             {this.props.buttonLabel}
           </button>

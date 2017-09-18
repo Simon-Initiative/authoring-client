@@ -77,7 +77,7 @@ export class Objective
       color: '#606060',
     };
 
-    const skillButtons = this.props.mouseOver
+    const skillButtons = this.props.mouseOver && this.props.editMode
           ? <div style={ { display: 'inline', marginLeft: '50px' } }>
               <span style={label}>Add Skill:</span>
               <button 

@@ -112,7 +112,7 @@ export class Title
         top: '-6',
         color: '#606060',
       };
-      const renameButton = this.props.isHoveredOver
+      const renameButton = this.props.isHoveredOver && this.props.editMode
           ? <button 
               key="rename"
               onClick={this.onBeginEdit}
