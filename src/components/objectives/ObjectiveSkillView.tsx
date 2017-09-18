@@ -71,6 +71,13 @@ export class ObjectiveSkillView
     this.buildModels();
   }
 
+  componentWillUnmount() {
+    if (this.state.aggregateModel.isLocked) {
+      [...this.state.objectives.documents, ...this.state.skills.documents]
+        .forEach(d => persistence.releaseLock(this.props.course.model.guid, d._id));
+    }
+  }
+
   buildModels() {
 
     const courseId = this.props.course.model.guid;
