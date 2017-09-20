@@ -20,7 +20,7 @@ function fetchSkillTitles(courseId: string, titleOracle)
     courseId, ['x-oli-skills_model'],'byTypes')
     .then ((skills) => {
       skills
-        .map(doc => (doc.model as any).skills)
+        .map(doc => (doc.model as any).skills.toArray())
         .reduce((p, c) => [...p, ...c])
         .forEach(r => titleOracle.putTitle(r.id, r.title));
     });
@@ -33,7 +33,7 @@ function fetchObjectiveTitles(courseId: string, titleOracle)
     courseId, ['x-oli-learning_objectives'],'byTypes')
     .then ((objectives) => {
       objectives
-        .map(doc => (doc.model as any).objectives)
+        .map(doc => (doc.model as any).objectives.toArray())
         .reduce((p, c) => [...p, ...c])
         .forEach(r => titleOracle.putTitle(r.id, r.title));
     });

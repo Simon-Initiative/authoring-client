@@ -1,16 +1,13 @@
 
 import * as persistence from '../../../data/persistence';
-
+import { LockDetails } from '../../../utils/lock';
 import { ChangeRequest } from '../../../data/models';
 
 export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 
 export type onFailureCallback = (result: any) => void;
 
-export type LockDetails = {
-  lockedBy: string;
-  lockedAt: number;
-};
+
 
 export interface PersistenceStrategy {
   

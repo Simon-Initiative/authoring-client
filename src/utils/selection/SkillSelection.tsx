@@ -48,7 +48,7 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
       .then ((skills) => {
         
         const resources = skills
-            .map(doc => (doc.model as any).skills)
+            .map(doc => (doc.model as any).skills.toArray())
             .reduce((p, c) => [...p, ...c])
             .map(skill => ({ id: skill.id, title: skill.title }));
         

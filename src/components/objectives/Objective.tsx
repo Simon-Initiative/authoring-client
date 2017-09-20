@@ -51,20 +51,25 @@ export class Objective
     let title = null;
 
     if (this.props.model.skills.size === 0) {
-      title = 'Objective: ' + this.props.model.title;
+      title = <div style={ { marginLeft: '10px' } }>
+            <span>
+              <i className="icon"></i>
+            </span>&nbsp;
+          <b>Objective:</b> {this.props.model.title}
+          </div>;
     } else if (isExpanded) {
       title = <div>
-                <span>
+                <span >
                 <i className="icon icon-caret-down"></i>
                 </span>&nbsp;
-                Objective: {this.props.model.title}
+                <b>Objective:</b> {this.props.model.title}
               </div>;
     } else {
       title = <div>
-                <span>
+                <span >
                 <i className="icon icon-caret-right"></i>
                 </span>&nbsp;
-                Objective: {this.props.model.title}
+                <b>Objective:</b> {this.props.model.title}
               </div>;
     }
 

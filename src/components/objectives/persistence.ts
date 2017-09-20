@@ -5,6 +5,7 @@ import * as contentTypes from '../../data/contentTypes';
 import { Resource } from '../../data/content/resource';
 import guid from '../../utils/guid';
 import { LegacyTypes } from '../../data/types';
+import { LockDetails } from '../../utils/lock';
 
 const NEW_BUCKET_TITLE = 'Created In Editor';
 
@@ -125,7 +126,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
             // can assume that we can safely lock all others.
             return persistence.acquireLock(courseId, results[0].doc._id);
           })
-          .then((lockResult) => {
+          .then((lockResult: LockDetails) => {
 
             if ((lockResult as any).lockedBy === userName) {
               return Promise.all([...objectives, ...skills]
@@ -134,6 +135,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
               resolve({ 
                 objectives, 
                 skills, 
+                lockDetails: lockResult,
                 isLocked: false, 
                 objectiveBucket, 
                 skillBucket,
@@ -141,10 +143,11 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
             }
             
           })
-          .then((lockResults) => {
+          .then((lockResults: LockDetails[]) => {
             resolve({ 
               objectives, 
-              skills, 
+              skills,
+              lockDetails: lockResults[0],
               isLocked: true, 
               objectiveBucket, 
               skillBucket,
@@ -228,6 +231,7 @@ export type AggregateModel = {
   skills: persistence.Document[];
   skillBucket: persistence.Document;
   isLocked: boolean;
+  lockDetails: LockDetails;
 };
 
 

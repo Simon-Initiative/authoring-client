@@ -8,6 +8,7 @@ import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
 
+import { LockDetails, renderLocked } from '../../utils/lock';
 import NavigationBar from '../NavigationBar';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
 import * as viewActions from '../../actions/view';
@@ -464,13 +465,23 @@ export class ObjectiveSkillView
     return <h3>Learning Objectives and Skills</h3>;
   }
 
-  render() {
+  renderLockDisplay() {
 
-    console.log('rendering');
+    if (this.state.aggregateModel !== null) {
+      return this.state.aggregateModel.isLocked ? null : 
+        renderLocked(this.state.aggregateModel.lockDetails);
+    } else {
+      return null;
+    }
+  }
+
+  render() {
 
     const content = this.state.aggregateModel === null
       ? <p>Loading...</p>
       : this.renderContent();
+
+    const lockDisplay = this.renderLockDisplay();
 
     return (
       <div className="container-fluid new">
@@ -480,6 +491,7 @@ export class ObjectiveSkillView
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
+                 
                   {this.renderTitle()}
                   {this.renderCreation()}
                   {content}

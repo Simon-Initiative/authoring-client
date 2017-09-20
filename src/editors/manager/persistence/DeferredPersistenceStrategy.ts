@@ -48,10 +48,13 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
   }
 
   queueSave() {
-    const startTimer = () => setTimeout(() => {
-      this.timer = null;
-      this.persist();
-    }, this.quietPeriodInMs);
+    const startTimer = 
+      () => setTimeout(
+        () => {
+          this.timer = null;
+          this.persist();
+        }, 
+        this.quietPeriodInMs);
 
     if (this.timer !== null) {
       

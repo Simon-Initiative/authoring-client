@@ -53,7 +53,7 @@ export class Skill
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
       : null;
 
-    const title = 'Skill: ' + this.props.model.title;
+    const title = <span><b>Skill: </b>{this.props.model.title}</span>;
 
     return (
       <div style={ { marginLeft: '45px' } }>

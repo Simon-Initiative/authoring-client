@@ -13,7 +13,8 @@ import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices, DispatchBasedServices } from '../common/AppServices';
 
 import { onFailureCallback, onSaveCompletedCallback, 
-    PersistenceStrategy, LockDetails} from './persistence/PersistenceStrategy';
+    PersistenceStrategy } from './persistence/PersistenceStrategy';
+import { LockDetails, renderLocked } from '../../utils/lock';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from '../../data/content/resource';
@@ -280,27 +281,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     //     })
   }
 
-  renderLocked(lockDetails: LockDetails) {
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-2">
-            &nbsp;
-          </div>
-          <div className="col-8">
-            <div className="alert alert-warning" role="alert">
-              <strong>Read Only</strong>&nbsp;&nbsp; 
-              The contents of this page is being edited by {lockDetails.lockedBy}
-            </div>
-          </div>
-          <div className="col-2">
-            &nbsp;
-          </div>
-        </div>
-        
-      </div>
-    );
-  }
 
   renderWaiting() {
     return (
@@ -400,7 +380,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       return (
         <div>
           {this.state.editingAllowed ? null : 
-            this.renderLocked(
+            renderLocked(
               this.persistenceStrategy.getLockDetails())}
           {editor}
         </div>
