@@ -6,9 +6,11 @@ import NavigationBar from './NavigationBar';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';
+import { compareDates, relativeToNow } from '../utils/date';
 import { Resource } from '../data/content/resource';
 import * as courseActions from '../actions/course';
 import * as contentTypes from '../data/contentTypes';
+import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
 import guid from '../utils/guid';
 
@@ -131,30 +133,50 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       creationTitle = <h2>Available Learning Objective Models</h2>;
     }
 
-    const link = (id, title) =>
-      <button onClick={this.clickResource.bind(this, id)}
-              className="btn btn-link">{title}</button>;
+    const link = resource =>
+      <button onClick={this.clickResource.bind(this, resource.guid)}
+              className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r =>
-      <tr key={r.guid}>
-        <td>{link(r.guid, r.title)}</td>
-      </tr>);
+    const rows = this.state.resources.map(r => ({ 
+      key: r.guid,
+      data: r,
+    }));
+
+    const labels = [
+      'Title',
+      'Created',
+      'Last Updated',
+    ];
+
+    const comparators = [
+      (direction, a, b) => direction === SortDirection.Ascending 
+        ? a.title.localeCompare(b.title) 
+        : b.title.localeCompare(a.title),
+      (direction, a, b) => direction === SortDirection.Ascending 
+        ? compareDates(a.dateCreated, b.dateCreated) 
+        : compareDates(b.dateCreated, a.dateCreated),
+      (direction, a, b) => direction === SortDirection.Ascending 
+        ? compareDates(a.dateUpdated, b.dateUpdated)  
+        : compareDates(b.dateUpdated, a.dateUpdated),
+    ];
+
+    const renderers = [
+      r => link(r),
+      r => <span>{relativeToNow(r.dateCreated)}</span>,
+      r => <span>{relativeToNow(r.dateUpdated)}</span>,
+    ];
 
     return (
       <div className="">
         {creationTitle}
         {this.renderCreation()}
-        <table className="table table-sm table-striped table-hover">
-          <thead>
-          <tr>
-            <th>Title</th>
-          </tr>
-          </thead>
-          <tbody>
-          {rows}
-          </tbody>
-        </table>
-      </div>);
+        <SortableTable 
+          model={rows}
+          columnComparators={comparators}
+          columnRenderers={renderers}
+          columnLabels={labels}/>
+      </div>
+    );
   }
 
   renderCreation() {

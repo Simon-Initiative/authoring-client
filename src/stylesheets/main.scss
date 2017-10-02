@@ -429,12 +429,13 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 
 	thead {
 		text-transform: uppercase;
-		background-color: $color-white;
+		background-color: rgba(125, 167, 207, 0.85);
 
 		th {
 			font-weight: 100;
-			font-size: 13px;
-			color: $color-grey;
+			font-size: 15px;
+			color: black;
+			min-height: 30px;
 		}
 	}
 
