@@ -20,3 +20,7 @@ export {
   createDocument,
   persistDocument,
 } from './persistence/document';
+
+export { 
+  fetchServerTime,
+} from './persistence/time';

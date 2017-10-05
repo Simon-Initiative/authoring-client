@@ -6,7 +6,7 @@ import NavigationBar from './NavigationBar';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';
-import { compareDates, relativeToNow } from '../utils/date';
+import { compareDates, relativeToNow, adjustForSkew } from '../utils/date';
 import { Resource } from '../data/content/resource';
 import * as courseActions from '../actions/course';
 import * as contentTypes from '../data/contentTypes';
@@ -20,6 +20,7 @@ interface ResourceView {
 export interface ResourceViewOwnProps {
   // course: any;
   dispatch: any;
+  serverTimeSkewInMs: number;
   title: string;
   resourceType: string;
   filterFn: (resource: Resource) => boolean;
@@ -162,8 +163,10 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
     const renderers = [
       r => link(r),
-      r => <span>{relativeToNow(r.dateCreated)}</span>,
-      r => <span>{relativeToNow(r.dateUpdated)}</span>,
+      r => <span>{relativeToNow(
+        adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
+      r => <span>{relativeToNow(
+        adjustForSkew(r.dateUpdated, this.props.serverTimeSkewInMs))}</span>,
     ];
 
     return (

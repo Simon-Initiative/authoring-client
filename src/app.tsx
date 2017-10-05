@@ -29,7 +29,7 @@ import Main from './Main';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { CachingTitleOracle } from './editors/common/TitleOracle';
-
+import { setServerTimeSkew } from './actions/server';
 
 // Stylesheets
 import './stylesheets/main.scss';
@@ -101,12 +101,16 @@ function tryLogin() : Promise<UserInfo> {
 }
 
 function render(store, current) {
+  
   // Now do the initial rendering
   ReactDOM.render(
       <Provider store={store}>
         <Main location={current}/>
       </Provider>, 
       document.getElementById('app')); 
+
+  // Fire off the async request to determine server time skew
+  setServerTimeSkew();
 }
 
 

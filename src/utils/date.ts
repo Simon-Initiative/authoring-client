@@ -1,5 +1,19 @@
 // Date related utils
 
+import { fetchServerTime } from '../data/persistence';
+
+
+export function determineServerTimeSkewInMs() : Promise<number> {
+
+  return new Promise((resolve, reject) => {
+    fetchServerTime()
+      .then(serverDate => resolve(serverDate.getTime() - Date.now()))
+      .catch((err) => {
+        console.log(err);
+        resolve(0);
+      });
+  });
+}
  
 export function compareDates(a: Date, b: Date) : number {
   return a.valueOf() - b.valueOf();
@@ -7,6 +21,12 @@ export function compareDates(a: Date, b: Date) : number {
 
 export function relativeToNow(a: Date) : string {
   return relativeTo(a, new Date());
+}
+
+// Take a date and return a new date taking into account
+// some amount of time skew
+export function adjustForSkew(a: Date, skewInMs: number) : Date {
+  return new Date(a.getTime() + skewInMs);
 }
 
 /**

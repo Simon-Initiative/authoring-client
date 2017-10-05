@@ -92,6 +92,7 @@ function mapStateToProps(state: any) {
     modal,
     course,
     expanded,
+    server,
   } = state;
 
   return {
@@ -99,6 +100,7 @@ function mapStateToProps(state: any) {
     modal,
     course,
     expanded,
+    server,
   };
 }
 
@@ -145,6 +147,7 @@ class Main extends React.Component<MainProps, MainState> {
 //// course={this.props.course}
   renderResource(resource: ResourceList) {
     return <ResourceView
+              serverTimeSkewInMs={this.props.server.timeSkewInMs}
               title={resource.title}
               resourceType={resource.resourceType}
               filterFn={resource.filterFn}

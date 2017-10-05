@@ -6,7 +6,7 @@ import { modal } from './reducers/modal';
 import { requests } from './reducers/requests';
 import { titles } from './reducers/titles';
 import { expanded } from './reducers/expanded';
-
+import { server } from './reducers/server';
 
 const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
@@ -15,6 +15,7 @@ const reducers = combineReducers({
   titles,         // titles of course resources
   requests,       // the current pending async requests
   expanded,       // preserves expaned state of tree UIs
+  server,         // server specific info (time skew, etc)
 });
 
 export default reducers;
