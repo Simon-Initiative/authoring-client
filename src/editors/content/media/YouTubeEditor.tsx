@@ -120,7 +120,7 @@ export class YouTubeEditor
       <div className="itemWrapper container">
         <br/>
 
-        <p>Enter the id of the YouTube video you wish to dispay:</p>
+        <p>Enter the id of the YouTube video you wish to display:</p>
 
         {this.row('', '9', <div className="input-group">
             <span className="input-group-addon">https://youtube.com/watch?v=</span>
