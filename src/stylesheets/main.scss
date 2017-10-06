@@ -428,12 +428,11 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 	background-color: $color-white;
 
 	thead {
-		text-transform: uppercase;
-		background-color: rgba(125, 167, 207, 0.85);
+		background-color: rgba(190, 193, 197, 0.85);
 
 		th {
-			font-weight: 100;
-			font-size: 15px;
+			font-weight: 200;
+			font-size: 16px;
 			color: black;
 			min-height: 30px;
 		}
