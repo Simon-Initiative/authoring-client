@@ -66,12 +66,10 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   fetchTitles(model: models.CourseModel, filterFn: any) {
     const resources = model.resources.toArray().filter(filterFn);
-    console.log('resources length: ' + resources.length);
     this.setState({ resources });
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('received new props');
     this.fetchTitles(nextProps.course.model, nextProps.filterFn);
   }
 

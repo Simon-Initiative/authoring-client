@@ -17,6 +17,8 @@ import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { Collapse } from '../common/Collapse';
+import { Checkbox } from '../common/Checkbox';
+import { TabContainer } from '../common/TabContainer';
 
 import '../common/editor.scss';
 
@@ -31,7 +33,9 @@ export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
 export interface ImageEditorState {
   failure: boolean;
+  isDefaultSizing: boolean;
 }
+ 
 
 /**
  * The content editor for Table.
@@ -56,6 +60,7 @@ export class ImageEditor
 
     this.state = {
       failure: false,
+      isDefaultSizing: this.props.model.height === '' && this.props.model.width === '',
     };
   }
 
@@ -76,6 +81,8 @@ export class ImageEditor
     if (nextProps.model !== this.props.model) {
       return true;
     } else if (nextState.failure !== this.state.failure) {
+      return true;
+    } else if (nextState.isDefaultSizing !== this.state.isDefaultSizing) {
       return true;
     }
     return false;
@@ -144,8 +151,9 @@ export class ImageEditor
   row(text: string, width: string, control: any) {
     const widthClass = 'col-' + width;
     return (
-      <div className="form-group row">
-        <label className="col-1 col-form-label">{text}</label>
+      <div className="row justify-content-start">
+        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
+          className="col-1 col-form-label">{text}</label>
         <div className={widthClass}>
           {control}
         </div>
@@ -153,7 +161,7 @@ export class ImageEditor
     );
   }
 
-  render() : JSX.Element {
+  renderSource() {
 
     const { titleContent, caption, cite, popout, alternate,
       width, height, alt, valign } = this.props.model;
@@ -174,55 +182,96 @@ export class ImageEditor
     const id : string = guid();
 
     return (
-      <div className="itemWrapper container">
-
-        <br/>
-
-        <input 
+      <div style={ { marginTop: '70px' } }>
+        
+        {this.row('Image', '6', <div className="input-group">
+          <input 
             id={id}
             style={ { display: 'none' } }
             accept="image/*"
             onChange={this.onFileChange} 
             type="file" 
           />
-
-        {this.row('Image', '6', <div className="input-group">
-            {srcDisplay}
-            <span className="input-group-btn">
-              <Button editMode={this.props.editMode}
-            onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
-            </span>
-          </div>)}
+          {srcDisplay}
+          <span className="input-group-btn">
+            <Button editMode={this.props.editMode}
+          onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
+          </span>
+        </div>)}
 
         {this.row('', '6', <span className="form-text text-muted">
-          Browse to and select an image file from your computer
+          Browse to and select an image file from your computer to upload
         </span>)}
+        
+      </div>
+    );
+  }
 
+  changeSizing(isDefaultSizing) {
+    this.setState({ isDefaultSizing });
+
+    if (isDefaultSizing) {
+      this.props.onEdit(this.props.model.with({ width: '', height: '' }));
+    }
+  }
+
+  renderSizing() {
+    const { titleContent, caption, cite, popout, alternate,
+      width, height, alt, valign } = this.props.model;
+    
+    return (
+      <div style={ { marginTop: '70px', marginLeft: '75px' } }>
+
+        <div className="form-check">
+          <label className="form-check-label">
+            <input className="form-check-input" 
+              name="sizingOptions"
+              value="native"
+              defaultChecked={this.state.isDefaultSizing}
+              onChange={this.changeSizing.bind(this, true)}
+              type="radio"/>&nbsp;
+              Display the image at the image's native width and height
+          </label>
+        </div>
         <br/>
+        <div className="form-check" style={ { marginBottom: '30px' } }>
+          <label className="form-check-label">
+            <input className="form-check-input" 
+              name="sizingOptions"
+              onChange={this.changeSizing.bind(this, false)}
+              value="custom"
+              defaultChecked={!this.state.isDefaultSizing}
+              type="radio"/>&nbsp;
+              Display the image at a custom width and height
+          </label>
+        </div>
 
-        {this.row('Height', '2', <div className="input-group input-group-sm">
-            <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
+        {this.row('Height', '1', <div className="input-group input-group-sm">
+            <TextInput width="100px" label="" 
+            editMode={this.props.editMode && !this.state.isDefaultSizing}
             value={height} 
             type="number"
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
-        {this.row('Width', '2', <div className="input-group input-group-sm">
-           <TextInput width="100%" label="" 
-            editMode={this.props.editMode}
+        {this.row('Width', '1', <div className="input-group input-group-sm">
+           <TextInput width="100px" label="" 
+            editMode={this.props.editMode && !this.state.isDefaultSizing}
             value={width} 
             type="number"
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
         
-        {this.row('', '6', <span className="form-text text-muted">
-          Leaving height and width empty will display the image at the image's native size
-        </span>)}
+      </div>
+    );
+  }
 
-
-        <Collapse caption="Additional properties">
-
-          {this.row('Align', '4', <Select label="" editMode={this.props.editMode}
+  renderOther() {
+    const { titleContent, caption, cite, popout, alternate,
+      width, height, alt, valign } = this.props.model;
+    
+    return (
+      <div style={ { marginTop: '30px' } }>
+        {this.row('Align', '4', <Select label="" editMode={this.props.editMode}
               value={valign} onChange={this.onValignEdit}>
               <option value="top">Top</option>
               <option value="middle">Middle</option>
@@ -258,16 +307,24 @@ export class ImageEditor
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
           />)}
-
-        </Collapse>
-
         
+      </div>
+    );
+  }
 
+  render() : JSX.Element {
 
-        
+    return (
+      <div className="itemWrapper">
 
+        <br/>
 
-
+        <TabContainer labels={['Source', 'Sizing', 'Other']}>
+          {this.renderSource()}
+          {this.renderSizing()}
+          {this.renderOther()}          
+        </TabContainer>
+    
       </div>);
   }
 
