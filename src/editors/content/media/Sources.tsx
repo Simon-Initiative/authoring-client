@@ -76,9 +76,8 @@ export class Sources
 
     return (
       <div>
-        <span>Sources</span>
         <button onClick={this.onAddClick} type="button" 
-          className="btn btn-secondary btn-sm">Add Source</button>
+          className="btn btn-link btn-sm">Add Source</button>
         <table className="table table-sm">
           <thead>
             <tr>

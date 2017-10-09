@@ -110,7 +110,7 @@ export class SourceEditor
             type="file" 
           />
           <Button editMode={this.props.editMode}
-            onClick={this.openFileDialog.bind(this, id)}>Set</Button>
+            onClick={this.openFileDialog.bind(this, id)}>Edit</Button>
         </td>
         <td>
           {srcDisplay}

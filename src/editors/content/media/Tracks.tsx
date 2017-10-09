@@ -76,9 +76,8 @@ export class Tracks
 
     return (
       <div>
-        <span>Tracks</span>
         <button onClick={this.onAddClick} type="button" 
-          className="btn btn-secondary btn-sm">Add Track</button>
+          className="btn btn-link btn-sm">Add Track</button>
         <table className="table table-sm">
           <thead>
             <tr>
