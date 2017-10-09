@@ -199,14 +199,6 @@ export class AudioEditor
 
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, sources, tracks, popout, alternate } = this.props.model;
-    
-    const labeled : LabeledType = {
-      titleContent,
-      caption,
-      cite,
-    };
-
     return (
       <div className="itemWrapper">
     

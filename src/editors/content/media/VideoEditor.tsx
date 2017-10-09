@@ -205,8 +205,6 @@ export class VideoEditor
     
 
   render() : JSX.Element {
-
-    const { titleContent, caption, cite, sources, tracks, popout, alternate } = this.props.model;
     
     return (
       <div className="itemWrapper">

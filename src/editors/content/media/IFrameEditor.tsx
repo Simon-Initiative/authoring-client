@@ -197,14 +197,6 @@ export class IFrameEditor
 
   render() : JSX.Element {
 
-    const { titleContent, caption, cite, popout, alternate } = this.props.model;
-
-    const labeled : LabeledType = {
-      titleContent,
-      caption,
-      cite,
-    };
-
     return (
       <div className="itemWrapper">
     
