@@ -18,7 +18,7 @@ import './wbinline.scss';
 
 type Data = {
   wbinline: WbInlineType;
-}
+};
 
 export interface WbInlineProps extends InteractiveRendererProps {
   data: Data;
