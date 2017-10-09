@@ -63,7 +63,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
   }
 
   onPurposeEdit(purpose) {
-    this.props.blockProps.onEdit({wbinline: this.props.data.wbinline.with({purpose})});
+    this.props.blockProps.onEdit({ wbinline: this.props.data.wbinline.with({ purpose }) });
   }
 
   onCancel() {
@@ -118,18 +118,20 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   render() : JSX.Element {
     return (
-      <div className='wbinline' 
-        ref={(c) => this.focusComponent = c} onFocus={this.onFocus} 
+      <div className="wbinline" 
+        ref={c => this.focusComponent = c} onFocus={this.onFocus} 
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
         <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button" 
           className="btn btn-link">{this.title}</button>
         <Button editMode={this.props.blockProps.editMode} 
-          onClick={this.onSelectActivity}>Set</Button>
-        <Select editMode={this.props.blockProps.editMode} 
-          label='Purpose' value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
-          {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-        </Select>
+          onClick={this.onSelectActivity}>Edit</Button>
+        <div style={ { float: 'right' } }>
+          <Select editMode={this.props.blockProps.editMode}
+            label="Purpose" value={this.props.data.wbinline.purpose} onChange={this.onPurposeEdit}>
+            {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </Select>
+        </div>
       </div>);
   }
-};
+}

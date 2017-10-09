@@ -13,6 +13,8 @@ import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 
+import { TabContainer } from '../common/TabContainer';
+
 import '../common/editor.scss';
 
 
@@ -37,12 +39,12 @@ export class IFrameEditor
   constructor(props) {
     super(props);
     
-    this.onLabeledEdit = this.onLabeledEdit.bind(this);
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -52,22 +54,20 @@ export class IFrameEditor
     return false;
   }
 
-  onLabeledEdit(model: LabeledType) {
-
-    const { titleContent, cite, caption } = model;
-    const updated = this.props.model.with({ titleContent, cite, caption });
-   
-    this.props.onEdit(updated);
-  }
 
   onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentState) {
-    const alternate = this.props.model.alternate.with({ content });
-    this.props.onEdit(this.props.model.with({ alternate }));
+  onTitleEdit(content: ContentState) {
+    const titleContent = this.props.model.titleContent.with({ content });
+    this.props.onEdit(this.props.model.with({ titleContent }));
+  }
+
+  onCaptionEdit(content: ContentState) {
+    const caption = this.props.model.caption.with({ content });
+    this.props.onEdit(this.props.model.with({ caption }));
   }
 
   onSrcEdit(src: string) {
@@ -82,6 +82,119 @@ export class IFrameEditor
     this.props.onEdit(this.props.model.with({ width }));
   }
 
+
+  row(text: string, width: string, control: any) {
+    const widthClass = 'col-' + width;
+    return (
+      <div className="row justify-content-start">
+        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
+          className="col-1 col-form-label">{text}</label>
+        <div className={widthClass}>
+          {control}
+        </div>
+      </div>
+    );
+  }
+
+  renderSource() {
+    
+    const { titleContent, caption, cite, popout, alternate,
+      width, height } = this.props.model;
+    
+    const { src } = this.props.model;
+    
+    const id : string = guid();
+
+    return (
+      <div style={ { marginTop: '70px' } }>
+        
+        {this.row('URL', '6', <div className="input-group">
+          <TextInput width="100%" label="" 
+            editMode={this.props.editMode}
+            value={src} 
+            type="text"
+            onEdit={this.onSrcEdit}
+          />
+        </div>)}
+
+        {this.row('', '6', <span className="form-text text-muted">
+          Enter a publicly resolvable URL (e.g. "https://www.google.com")
+        </span>)}
+        
+      </div>
+    );
+  }
+
+  changeSizing(isDefaultSizing) {
+    this.setState({ isDefaultSizing });
+
+    if (isDefaultSizing) {
+      this.props.onEdit(this.props.model.with({ width: '', height: '' }));
+    }
+  }
+
+  renderSizing() {
+    const { titleContent, caption, cite, popout, alternate,
+      width, height } = this.props.model;
+    
+    return (
+      <div style={ { marginTop: '70px', marginLeft: '75px' } }>
+
+        {this.row('Height', '1', <div className="input-group input-group-sm">
+            <TextInput width="100px" label="" 
+            editMode={this.props.editMode}
+            value={height} 
+            type="number"
+            onEdit={this.onHeightEdit}
+          /><span className="input-group-addon ">pixels</span></div>)}
+        {this.row('Width', '1', <div className="input-group input-group-sm">
+            <TextInput width="100px" label="" 
+            editMode={this.props.editMode}
+            value={width} 
+            type="number"
+            onEdit={this.onWidthEdit}
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
+        
+      </div>
+    );
+  }
+
+  renderOther() {
+    const { titleContent, caption, cite, popout, alternate,
+      width, height } = this.props.model;
+    
+    return (
+      <div style={ { marginTop: '30px' } }>
+        
+          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
+          {...this.props}
+          model={titleContent.content}
+          editMode={this.props.editMode}
+          onEdit={this.onTitleEdit}
+          />)}
+
+          <br/>
+
+          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {...this.props}
+          model={caption.content}
+          editMode={this.props.editMode}
+          onEdit={this.onCaptionEdit}
+          />)}
+
+          <br/>
+
+          {this.row('Popout', '8', <TextInput width="100%" label="" 
+              editMode={this.props.editMode}
+              value={popout.content} 
+              type="text"
+              onEdit={this.onPopoutEdit}
+            />)}
+        
+      </div>
+    );
+  }
+
   render() : JSX.Element {
 
     const { titleContent, caption, cite, popout, alternate } = this.props.model;
@@ -94,53 +207,18 @@ export class IFrameEditor
 
     return (
       <div className="itemWrapper">
-        <LabeledEditor 
-          {...this.props}
-          model={labeled} 
-          onEdit={this.onLabeledEdit}
-          />
+    
+        <br/>
+    
+        <TabContainer labels={['Source', 'Sizing', 'Other']}>
+          {this.renderSource()}
+          {this.renderSizing()}
+          {this.renderOther()}          
+        </TabContainer>
+    
+      </div>
+    );
 
-        <InputLabel label="Popout">
-          <TextInput width="100%" label="Popout content"
-            editMode={this.props.editMode} 
-            value={popout.content} 
-            type="text"
-            onEdit={this.onPopoutEdit}
-          />
-        </InputLabel>
-
-        <RichTextEditor
-          label="Alternate"
-          {...this.props}
-          onEdit={this.onAlternateEdit}
-          model={alternate.content}
-        />
-
-        <InputLabel label="Source">
-          <TextInput width="75px" label="Source" 
-            editMode={this.props.editMode}
-            value={this.props.model.src} 
-            type="text"
-            onEdit={this.onSrcEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Height">
-          <TextInput width="75px" label="Height in pixels" 
-            editMode={this.props.editMode}
-            value={this.props.model.height} 
-            type="text"
-            onEdit={this.onHeightEdit}
-          />
-        </InputLabel>
-        <InputLabel label="Width">
-          <TextInput width="75px" label="Width in pixels" 
-            editMode={this.props.editMode}
-            value={this.props.model.width} 
-            type="text"
-            onEdit={this.onWidthEdit}
-          />
-        </InputLabel>
-      </div>);
   }
 
 }
