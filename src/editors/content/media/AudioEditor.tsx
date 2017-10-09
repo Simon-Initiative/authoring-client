@@ -121,6 +121,19 @@ export class AudioEditor
     
     return (
       <div style={ { marginTop: '30px' } }>
+
+          {this.row('', '8', <label className="form-check-label">
+            &nbsp;&nbsp;&nbsp;
+            <input type="checkbox" 
+              onClick={this.onControlEdit}
+              className="form-check-input"
+              checked={this.props.model.controls}
+              value="option1"/>&nbsp;&nbsp;
+            Display audio controls
+          </label>)}
+
+          <br/>
+
         
           {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
