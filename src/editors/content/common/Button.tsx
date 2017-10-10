@@ -15,8 +15,6 @@ export const Button = (props: ButtonProps) => {
       disabled={!props.editMode} 
       onClick={props.onClick} 
       type="button" 
-      className={classes}>
-        {props.children}
-    </button>
+      className={classes}>{props.children}</button>
   );
 }; 

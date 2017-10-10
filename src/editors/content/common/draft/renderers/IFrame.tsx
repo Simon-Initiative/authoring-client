@@ -7,6 +7,7 @@ import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { IFrameEditor } from '../../../media/IFrameEditor';
 import { buildUrl } from '../../../../../utils/path';
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
@@ -33,6 +34,7 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
     super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   onClick() {
@@ -60,6 +62,10 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
     );
   }
 
+  onRemove() {
+
+  }
+
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.iframe;
@@ -71,10 +77,11 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <div>
+        <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
+          editMode={this.props.blockProps.editMode} >
           <iframe src={fullSrc} height={height} width={width}/>
-        </div>
-        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </AutoHideEditRemove>
+        
       </div>);
   }
 }

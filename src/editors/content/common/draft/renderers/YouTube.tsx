@@ -6,6 +6,7 @@ import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { YouTubeEditor } from '../../../media/YouTubeEditor';
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
@@ -32,6 +33,7 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
     super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   onClick() {
@@ -59,6 +61,10 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
     );
   }
 
+  onRemove() {
+    
+  }
+
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.youtube;
@@ -67,10 +73,11 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <div>
+        <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
+          editMode={this.props.blockProps.editMode} >
           <iframe src={fullSrc} height={height} width={width}/>
-        </div>
-        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </AutoHideEditRemove>
+        
       </div>);
   }
 }

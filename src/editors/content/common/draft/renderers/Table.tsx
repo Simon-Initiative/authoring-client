@@ -12,6 +12,7 @@ import { BlockProps } from './properties';
 import { Button } from '../../Button';
 import ModalTableEditor from '../../../table/ModalTableEditor';
 import { Html } from '../../../../../data/content/html';
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 type Data = {
   table: TableType;
@@ -52,6 +53,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
     super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   onEdit(model) {
@@ -75,7 +77,9 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
       }/>);
   }
 
+  onRemove() {
 
+  }
 
   render() : JSX.Element {
 
@@ -86,7 +90,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
     const renderCell = (cell) => {
       let colspan = 1;
       if (cell.colspan !== '') {
-        colspan = parseInt(cell.colspan);
+        colspan = parseInt(cell.colspan, 10);
       }
       if (cell instanceof CellHeader) {
         
@@ -96,7 +100,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
         return <td colSpan={colspan} key={cell.guid}>
           {getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
       }
-    }
+    };
     
     if (rows.length > 0) {
       renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.map(renderCell)}</tr>);
@@ -106,13 +110,14 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <table className="table table-bordered" style={ { width: '50%' } }>
-          <tbody>
-            {renderedRows}
-          </tbody>
-        </table>
-        <Button editMode={this.props.blockProps.editMode} 
-          onClick={this.onClick}>Edit Table</Button> 
+        <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
+          editMode={this.props.blockProps.editMode} >
+          <table className="table table-bordered" style={ { width: '50%' } }>
+            <tbody>
+              {renderedRows}
+            </tbody>
+          </table>
+        </AutoHideEditRemove>
       </div>);
   }
 }

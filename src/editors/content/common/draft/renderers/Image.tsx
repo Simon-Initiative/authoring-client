@@ -7,6 +7,7 @@ import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
@@ -19,7 +20,7 @@ export interface ImageProps extends InteractiveRendererProps {
 }
 
 export interface ImageState extends InteractiveRendererState {
-  showEdit: boolean;
+  
 }
 
 export interface ImageProps {
@@ -30,12 +31,14 @@ export interface ImageProps {
 class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
   constructor(props) {
-    super(props, { showEdit: false });
+    super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+  }
 
-    this.onMouseEnter = this.onMouseEnter.bind(this);
-    this.onMouseLeave = this.onMouseLeave.bind(this);
+  onRemove() {
+
   }
 
   onClick() {
@@ -63,66 +66,40 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     );
   }
 
-  onMouseEnter() {
-    this.setState({ showEdit: true });
-  }
-
-  onMouseLeave() {
-    this.setState({ showEdit: false });
-  }
-
   render() : JSX.Element {
 
     const { src, height, width } = this.props.data.image;
 
-    const buttonDiv : any = {
-      position: 'absolute',
-      left: 10,
-      top: 10,
-    };
-
-    const button = this.state.showEdit
-      ? <div style={buttonDiv}><Button 
-          editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
-        </div>
-      : null;
-
+    let imageComponent = null;
 
     if (src === '') {
-      const parentDiv : any = {
-        position: 'relative',
-        width: '400px',
-      };
-      return (
-        <div ref={c => this.focusComponent = c} 
-          onFocus={this.onFocus} onBlur={this.onBlur}>
-          <div style={parentDiv} onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
-            <img onClick={this.onClick} src="assets/400x300.png" width="400" height="300"/>
-            {button}
-          </div>  
-        </div>);
-
+      imageComponent = <img onClick={this.onClick} 
+        src="assets/400x300.png" width="400" height="300"/>;
+           
     } else {
+
       const fullSrc = buildUrl(
         this.props.blockProps.context.baseUrl, 
         this.props.blockProps.context.courseId, 
         this.props.blockProps.context.resourcePath, 
         src);
-      const parentDiv : any = {
-        position: 'relative',
-        width,
-      };
-      return (
-        <div ref={c => this.focusComponent = c} 
-          onFocus={this.onFocus} onBlur={this.onBlur}>
-          <div style={parentDiv} 
-            onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
-            <img onClick={this.onClick} src={fullSrc} width={width} height={height}/>
-            {button}
-          </div>
-          
-        </div>);
+
+      imageComponent =
+        <img onClick={this.onClick} src={fullSrc} width={width} height={height}/>;
     }
+
+    return (
+      <div ref={c => this.focusComponent = c} 
+        onFocus={this.onFocus} onBlur={this.onBlur}>
+        <AutoHideEditRemove 
+          editMode={this.props.blockProps.editMode} 
+          onEdit={this.onClick}
+          onRemove={this.onRemove}
+          >
+          {imageComponent}
+        </AutoHideEditRemove>
+      </div>
+    );
     
   }
 }

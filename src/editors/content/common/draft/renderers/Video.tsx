@@ -7,7 +7,7 @@ import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { VideoEditor } from '../../../media/VideoEditor';
 import { buildUrl } from '../../../../../utils/path';
-
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
@@ -34,6 +34,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
     super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   onClick() {
@@ -61,6 +62,10 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
     );
   }
 
+  onRemove() {
+
+  }
+
   render() : JSX.Element {
 
     const { sources, controls } = this.props.data.video;
@@ -77,10 +82,10 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
     
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <div>
+        <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
+          editMode={this.props.blockProps.editMode} >
           <video src={fullSrc} controls={controls}/>
-        </div>
-        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </AutoHideEditRemove>
       </div>);
   }
 }

@@ -271,6 +271,7 @@ export class ImageEditor
     
     return (
       <div style={ { marginTop: '30px' } }>
+      
         {this.row('Align', '4', <Select label="" editMode={this.props.editMode}
               value={valign} onChange={this.onValignEdit}>
               <option value="top">Top</option>

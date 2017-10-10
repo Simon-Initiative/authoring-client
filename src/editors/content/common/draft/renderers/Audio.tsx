@@ -7,6 +7,7 @@ import { Button } from '../../Button';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { AudioEditor } from '../../../media/AudioEditor';
 import { buildUrl } from '../../../../../utils/path';
+import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
@@ -33,6 +34,7 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     super(props, {});
 
     this.onClick = this.onClick.bind(this);
+    this.onRemove = this.onRemove.bind(this);
   }
 
   onClick() {
@@ -60,6 +62,10 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     );
   }
 
+  onRemove() {
+
+  }
+
   render() : JSX.Element {
 
     console.log(this.props);
@@ -78,10 +84,10 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-        <div>
+        <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
+          editMode={this.props.blockProps.editMode} >
           <audio src={fullSrc} controls={controls}/>
-        </div>
-        <Button editMode={this.props.blockProps.editMode} onClick={this.onClick}>Edit</Button>
+        </AutoHideEditRemove>
       </div>);
   }
 }
