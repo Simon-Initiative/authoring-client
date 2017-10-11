@@ -63,7 +63,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
   }
 
   onRemove() {
-
+    this.props.blockProps.onRemove();
   }
 
   render() : JSX.Element {

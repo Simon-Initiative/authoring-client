@@ -18,6 +18,9 @@ export type BlockProps = {
 
   onEdit: (data: any) => void;
 
+  // Callback to indicate that this block should be removed
+  onRemove: () => void;
+
   // Callback to indicate that a new, empty block should be
   // inserted following the block specified by key
   onInsertBlock: (key: string) => void;

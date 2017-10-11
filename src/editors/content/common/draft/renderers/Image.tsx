@@ -38,7 +38,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
   }
 
   onRemove() {
-
+    this.props.blockProps.onRemove();
   }
 
   onClick() {

@@ -63,12 +63,10 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
   }
 
   onRemove() {
-
+    this.props.blockProps.onRemove();
   }
 
   render() : JSX.Element {
-
-    console.log(this.props);
 
     const { sources, controls } = this.props.data.audio;
 

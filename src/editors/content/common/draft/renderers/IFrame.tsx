@@ -63,7 +63,7 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
   }
 
   onRemove() {
-
+    this.props.blockProps.onRemove();
   }
 
   render() : JSX.Element {

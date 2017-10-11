@@ -78,7 +78,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
   }
 
   onRemove() {
-
+    this.props.blockProps.onRemove();
   }
 
   render() : JSX.Element {

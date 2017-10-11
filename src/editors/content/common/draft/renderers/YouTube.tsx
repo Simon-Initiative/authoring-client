@@ -62,8 +62,8 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
   }
 
   onRemove() {
-    
-  }
+    this.props.blockProps.onRemove();
+  } 
 
   render() : JSX.Element {
 

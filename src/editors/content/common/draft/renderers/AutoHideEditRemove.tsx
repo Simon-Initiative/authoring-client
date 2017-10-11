@@ -59,7 +59,7 @@ class AutoHideEditRemove
         <button 
           key="removeButton"
           disabled={!this.props.editMode} 
-          onClick={this.props.onRemove} 
+          onClick={() => setTimeout(() => this.props.onRemove(), 0)} 
           type="button" 
           className="animatedButton">Remove</button>]
       : [];

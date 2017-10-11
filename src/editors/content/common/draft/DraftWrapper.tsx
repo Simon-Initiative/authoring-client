@@ -450,8 +450,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       let blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
       const blockX = -27;
-      console.log(blockY + ' ' + blockX);
-
+      
       if (blockY < 0) {
         blockY = this.lastBlockY;
       }
@@ -578,6 +577,30 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   }
 
+  removeBlock(block) {
+
+    const contentState = this.state.editorState.getCurrentContent();
+    const blockMap = contentState.getBlockMap();
+    const toRemove = blockMap.get(block.key);
+  
+    const blocksBefore = blockMap.toSeq().takeUntil(v => v === toRemove);
+    const blocksAfter = blockMap.toSeq().skipUntil(v => v === toRemove).rest();
+    const newBlocks = blocksBefore.concat(blocksAfter).toOrderedMap();
+  
+    const updated = contentState.merge({ blockMap: newBlocks });
+
+    this.forceContentChange(updated, 'remove-range');
+
+    // Workaround to 'unfreeze' the editor
+    setTimeout(
+      () => {
+        this.setState(
+          { lockedByBlockRenderer: true }, 
+          () => this.setState({ lockedByBlockRenderer: false }));
+      }, 
+      100);
+  }
+
   insertEmptyBlockAfter(key) {
 
     const emptyCharList = Immutable.List().push(new CharacterMetadata());
@@ -678,6 +701,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           onInsertBlock: (key) => {
             this.insertEmptyBlockAfter(key);
+          },
+          onRemove: () => {
+            this.removeBlock(block);
           },
           editMode: !this.props.locked,
           services: this.props.services,
