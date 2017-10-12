@@ -22,7 +22,7 @@ import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
 import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { typeRestrictedByModel } from './utils';
-
+import { Collapse } from '../../content/common/Collapse';
 import { DraggableNode } from './DraggableNode';
 import { RepositionTarget } from './RepositionTarget';
 
@@ -209,22 +209,21 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       { pages: this.props.model.pages.set(page.guid, page) }));
   }
 
-  onRemovePage() {
+  onRemovePage(page: contentTypes.Page) {
+
     if (this.props.model.pages.size > 1) {
 
-      const guid = this.state.current;
+      const guid = page.guid;
+      const removed = this.props.model.with({ pages: this.props.model.pages.delete(guid) });
 
-      let newCurrent = this.props.model.pages.first().guid;
-      if (guid === newCurrent) {
-        newCurrent = this.props.model.pages.last().guid;
+      if (guid === this.state.current) {
+        this.setState(
+          { current: removed.last().guid },
+          () => this.handleEdit(removed));
+      } else {
+        this.handleEdit(removed);
       }
-
-      this.setState(
-        { current: newCurrent },
-        () => {
-          this.handleEdit(this.props.model.with(
-            { pages: this.props.model.pages.delete(guid) }));
-        });
+      
     }
   }
 
@@ -332,6 +331,84 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     return elements;
   }
 
+  renderSettings() {
+    return (
+      <Collapse caption="Settings">
+        <div style={ { marginLeft: '25px' } }>
+          <form>
+            <div className="form-group row">
+              <label className="col-2 col-form-label">Type:</label>
+              <Select
+                value={this.props.model.resource.type}
+                label=""
+                editMode={this.props.editMode && !typeRestrictedByModel(this.props.model)}
+                onChange={this.onTypeChange}>
+                <option value={LegacyTypes.assessment2}>Graded</option>
+                <option value={LegacyTypes.inline}>Not Graded</option>
+              </Select>
+            </div>
+
+            <div className="form-group row">
+              <label className="col-2 col-form-label">Recommended attempts:</label>
+              <TextInput
+                editMode={this.props.editMode}
+                width="50px"
+                label=""
+                type="number"
+                value={this.props.model.recommendedAttempts}
+                onEdit={
+                  recommendedAttempts => this.handleEdit(
+                    this.props.model.with({ recommendedAttempts }))}
+              />
+            </div>
+
+            <div className="form-group row">
+              <label className="col-2 col-form-label">Maximum attempts:</label>
+              <TextInput
+                editMode={this.props.editMode}
+                width="50px"
+                label=""
+                type="number"
+                value={this.props.model.maxAttempts}
+                onEdit={
+                  maxAttempts => this.handleEdit(
+                    this.props.model.with({ maxAttempts }))}
+              />
+            </div>
+          </form>
+        </div>
+      </Collapse>
+    );
+  }
+
+  renderPagination() {
+
+    const addButton = <button disabled={!this.props.editMode} 
+      type="button" className="btn btn-secondary" 
+      onClick={this.onAddPage}>Add Page</button>;
+
+
+    return (
+      
+      <Collapse caption="Pagination" expanded={addButton}>
+
+        <div style={ { marginLeft: '25px' } }>
+          
+          <PageSelection 
+            onRemove={this.onRemovePage}
+            editMode={this.props.editMode}
+            pages={this.props.model.pages} 
+            current={this.props.model.pages.get(this.state.current)}
+            onChangeCurrent={current => this.setState({ current })}
+            onEdit={this.onPageEdit}/>
+          
+        </div>
+      </Collapse>
+    
+    );
+
+  }
+
   render() {
 
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
@@ -347,50 +424,22 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     return (
       <div>
         <div className="docHead">
+
           <UndoRedoToolbar 
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
           
-          <div className="container">
-            <div className="row">
-              <div className="col-8">
-                {titleEditor}
-              </div>
-              <div className="col-4">
-                <Select
-                  value={this.props.model.resource.type}
-                  label="Type:"
-                  editMode={this.props.editMode && !typeRestrictedByModel(this.props.model)}
-                  onChange={this.onTypeChange}
-                >
-                  <option value={LegacyTypes.assessment2}>Graded</option>
-                  <option value={LegacyTypes.inline}>Not Graded</option>
-                  
-                </Select>
-              </div>
-            </div>
-            <div className="row">
-              
-              <div className="col">
-                <form className="form-inline">
-                <PageSelection 
-                  editMode={this.props.editMode}
+          {titleEditor}
 
-                  pages={this.props.model.pages} 
-                  current={this.props.model.pages.get(this.state.current)}
-                  onChangeCurrent={current => this.setState({ current })}
-                  onEdit={this.onPageEdit}/>
-                <button disabled={!this.props.editMode} 
-                  type="button" className="btn btn-secondary" 
-                  onClick={this.onAddPage}>Add</button>
-                <button disabled={!this.props.editMode} 
-                  type="button" className="btn btn-secondary" 
-                  onClick={this.onRemovePage}>Remove</button>
-                </form>
-              </div>
-            </div>
+          <div style={ { marginTop: '20px' } }/>
+
+          <div className="componentWrapper content">
+            {this.renderSettings()}
+            {this.renderPagination()}         
           </div>
+
+          <div style={ { marginTop: '40px' } }/>
 
           <div>
             <button disabled={!this.props.editMode} 
@@ -407,41 +456,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               disabled={!this.props.editMode || isInline} 
               type="button" className="btn btn-secondary" 
               onClick={this.onAddPoolRef}>Add Pool Reference</button>
-            <button disabled={!this.props.editMode} 
-              type="button" className="btn btn-secondary" 
-              onClick={e => this.linkSkills (e)}>Add Skills</button>
+      
           </div>
           
-          
-          {skilllinker} 
-
-          <div className="componentWrapper">
-            <form className="form-inline">
-              <label>Recommended attempts</label>
-              <TextInput
-                editMode={this.props.editMode}
-                width="50px"
-                label=""
-                type="number"
-                value={this.props.model.recommendedAttempts}
-                onEdit={
-                  recommendedAttempts => this.handleEdit(
-                    this.props.model.with({ recommendedAttempts }))}
-              />&nbsp;&nbsp;&nbsp;&nbsp;
-              <label>Max attempts</label>
-              <TextInput
-                editMode={this.props.editMode}
-                width="50px"
-                label=""
-                type="number"
-                value={this.props.model.maxAttempts}
-                onEdit={
-                  maxAttempts => this.handleEdit(
-                    this.props.model.with({ maxAttempts }))}
-              />
-            </form>
-          </div>
-
           {nodeEditors}
 
         </div>

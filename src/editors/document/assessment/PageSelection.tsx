@@ -3,10 +3,12 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 
 import { TextInput } from '../../content/common/TextInput';
+import { RemovableContent } from '../../content/common/RemovableContent';
 
 export interface PageSelectionProps {  
   onChangeCurrent: (guid: string) => void;
   onEdit: (page: contentTypes.Page) => void;
+  onRemove: (page: contentTypes.Page) => void;
   editMode: boolean;
   pages: Immutable.OrderedMap<string, contentTypes.Page>;
   current: contentTypes.Page;
@@ -16,66 +18,95 @@ export interface PageSelection {
   
 }
 
-export class PageSelection extends React.PureComponent<PageSelectionProps, { text }> {
+export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      text: this.props.current.title.text,
-    };
-
-    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
   onChange(page: contentTypes.Page) {
     this.props.onChangeCurrent(page.guid);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      text: nextProps.current.title.text,
-    });
+  onTitleEdit(page: contentTypes.Page, text: string) {
+    this.props.onEdit(page.with({ title: new contentTypes.Title({ text }) }));
   }
 
-  onTitleEdit(text) {
-    this.setState(
-      { text }, 
-      () => this.props.onEdit(this.props.current.with(
-        { title: this.props.current.title.with({ text }) })));
+  renderPage(page: contentTypes.Page, pageNumber: number) {
+
+    const isCurrent = page === this.props.current;
+
+    const pageLabel = isCurrent
+      ? <b>Page {pageNumber}</b>
+      : 'Page ' + pageNumber;
+
+    const linkStyle = {
+      color: '#0067cb',
+      cursor: 'pointer',
+    };
+
+    return (
+      <tr>  
+
+        <td style={ { minWidth: '75px' } }>
+          <a style={linkStyle} onClick={this.onChange.bind(this, page)}>
+            {pageLabel}
+          </a>
+        </td>
+
+        <td style={ { width: '100%' } }>
+          
+          <TextInput
+            editMode={this.props.editMode}
+            value={page.title.text}
+            onEdit={this.onTitleEdit.bind(this, page)}
+            type="text"
+            width="100%"
+            label=""
+            />
+          
+        </td>
+
+        <td>
+          <span>
+            <button 
+              disabled={!this.props.editMode} 
+              onClick={this.props.onRemove.bind(this, page)} 
+              type="button" 
+              className="btn btn-sm btn-outline-secondary">
+              <i className="icon icon-remove"></i>
+            </button>
+          </span>
+        </td>
+      </tr>
+    );
+    
   }
 
-  renderPage(page: contentTypes.Page) {
-    return <a key={page.guid} className="dropdown-item" 
-      onClick={this.onChange.bind(this, page)}>{page.title.text}</a>;
+  renderRows() {
+    return this.props.pages.toArray().map((page, index) => this.renderPage(page, index + 1));
   }
   
   render() {
-    return (
-      <div className="input-group">
-        <TextInput
-          editMode={this.props.editMode}
-          value={this.props.current.title.text}
-          onEdit={this.onTitleEdit}
-          type="text"
-          width="300px"
-          label=""
-          />
-        
-        <div className="dropdown">
-          <button className="btn btn-secondary dropdown-toggle" 
-            disabled={!this.props.editMode}
-            type="button" id="dropdownMenuButton" 
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Select
-          </button>
 
-          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {this.props.pages.toArray().map(p => this.renderPage(p))}
-          </div>
-        </div>
+    const headStyle = {
+      backgroundColor: 'white',
+    };
+
+    return (
+      <table className="table table-sm">
+        <thead style={headStyle}>
+          <tr>
+            <th></th>
+            <th>Title</th>
+            <th></th>
+          </tr>
           
-      </div>
+        </thead>
+        <tbody>
+          {this.renderRows()}
+        </tbody>
+      </table>
     );
   }
 
