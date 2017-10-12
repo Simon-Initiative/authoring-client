@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
+import { Maybe } from 'tsmonad';
+
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
   ContentBlock, CharacterMetadata, 
   convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
@@ -22,6 +24,8 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { insertBlocksAfter, containerPrecondition } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
+
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
@@ -62,7 +66,10 @@ export interface DraftWrapperProps {
   changePreviewer?: ChangePreviewer;
 }
 
-
+type ExpanderPosition = {
+  x: number,
+  y: number,
+};
 
 interface DraftWrapperState {
   editorState: EditorState;
@@ -70,8 +77,7 @@ interface DraftWrapperState {
   show: boolean;
   component: any;
   blockToolbarShown: boolean;
-  blockY: number; 
-  blockX: number;
+  expanderPosition: Maybe<ExpanderPosition>;
   x: number;
   y: number;
   alignLeft: boolean;
@@ -343,8 +349,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       x: null,
       y: null,
       blockToolbarShown: false,
-      blockY: null,
-      blockX: null,
+      expanderPosition: Maybe.nothing(),
       component: null,
       alignLeft: true,
     };
@@ -455,7 +460,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         blockY = this.lastBlockY;
       }
 
-      this.setState({ blockY, blockX });
+      this.setState({ expanderPosition: Maybe.just({ x: blockX, y: blockY }) });
       this.lastBlockY = blockY;
     }
           
@@ -490,7 +495,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           }
 
           if (topRect === null) {
-            this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
+            this.setState({ show: false, x: null, y: null, 
+              expanderPosition: Maybe.nothing<ExpanderPosition>() });
             return;
           }
           
@@ -507,20 +513,24 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             const show = !this.shiftPressed;
 
             this.setState({ show, x, y, 
-              component: this.props.inlineToolbar, alignLeft, blockX: null, blockY: null });
+              component: this.props.inlineToolbar, alignLeft, 
+              expanderPosition: Maybe.nothing<ExpanderPosition>() });
             
           } else {
-            this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
+            this.setState({ show: false, x: null, y: null, 
+              expanderPosition: Maybe.nothing<ExpanderPosition>() });
           }
         }
       } else {   
-        this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
+        this.setState({ show: false, x: null, y: null, 
+          expanderPosition: Maybe.nothing<ExpanderPosition>() });
       }
       
       this.setExpanderPosition();
       
     } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ show: false, x: null, y: null, blockX: null, blockY: null });
+      this.setState({ show: false, x: null, y: null, 
+        expanderPosition: Maybe.nothing<ExpanderPosition>() });
       this.setExpanderPosition();
     } else {
       // this.setState({ blockToolbarShown: false, blockX: null, blockY: null });
@@ -530,7 +540,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   dismissToolbar() {
     this.setState({ show: false, blockToolbarShown: false, x: null, 
-      y: null, blockX: null, blockY: null });
+      y: null, expanderPosition: Maybe.nothing<ExpanderPosition>() });
   }
 
   onKeyDown(e) {
@@ -923,6 +933,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     
     if (this.state.blockToolbarShown) {
       
+      const position = this.state.expanderPosition.caseOf({
+        just: position => position,
+        nothing: () => ({ x: 0, y: 0 }),
+      });
+
       const additionalProps = {
         editorState: this.state.editorState,
         commandProcessor: this, 
@@ -937,9 +952,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const clonedToolbar = React.cloneElement(component, additionalProps);
       
       const positionStyle = {
-        top: this.state.blockY,
+        top: position.y,
         position: 'absolute',
-        left: this.state.blockX + 75,
+        left: position.x + 75,
       };
 
       return <div style={positionStyle as any}>
@@ -1014,33 +1029,48 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   renderExpander() {
 
-    if (this.state.blockX === null || !this.shouldShowExpander()) {
-      return null;
-    } else {
+    const expander = this.state.expanderPosition.caseOf({
+      just: (position) => {
+        if (this.shouldShowExpander()) {
 
-      const iconClasses = this.state.blockToolbarShown
-        ? 'icon icon-minus'
-        : 'icon icon-plus';
-
-      const style = {
-        color: 'black',
-      };
-      const buttonStyle = {
-        backgroundColor: 'white',
-        top: this.state.blockY,
-        position: 'absolute',
-        left: this.state.blockX + 25,
-      };
-
-      return <button 
-          onClick={this.onClickExpand}
-          type="button" 
-          className="btn" 
-          style={buttonStyle as any}>
-          <i style={style} className={iconClasses}></i>
-        </button>;
-    }
+          const iconClasses = this.state.blockToolbarShown
+            ? 'icon icon-minus'
+            : 'icon icon-plus';
+  
+          const style = {
+            color: 'black',
+          };
+          const buttonStyle = {
+            backgroundColor: 'white',
+            top: position.y,
+            position: 'absolute',
+            color: '#cccccc',
+            left: position.x + 25,
+          };
     
+          return (
+            <button 
+              onClick={this.onClickExpand}
+              type="button" 
+              className="btn" 
+              style={buttonStyle as any}>
+              <i style={style} className={iconClasses}></i>
+            </button>
+          );
+
+        } else {
+          return null;
+        }
+      },
+      nothing: () => null,
+    });
+    
+    return (
+      <ReactCSSTransitionGroup transitionName="expander"
+        transitionEnterTimeout={700} transitionLeave={false}>
+        {expander}
+      </ReactCSSTransitionGroup>  
+    );
   }
 
   render() {

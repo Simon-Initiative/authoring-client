@@ -28,3 +28,12 @@
 .gutter {
   width: 50px;
 }
+
+.expander-enter {
+  opacity: 0;
+}
+
+.expander-enter.editRemove-enter-active {
+  opacity: 1;  
+  transition: opacity 700ms ease-in;
+}
