@@ -98,8 +98,9 @@ export class Part extends Immutable.Record(defaultPartParams) {
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
-        case 'concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
+        case 'cmd:concept':
+          model = model.with({ concepts: model.concepts.push((item as any)
+            ['cmd:concept']['#text']) });
           break;
         case 'response':
           model = model.with(
@@ -133,7 +134,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       ...this.concepts
         .toArray()
-        .map(concept => ({ concept: { '#text': concept } })),
+        .map(concept => ({ 'cmd:concept': { '#text': concept } })),
 
       ...this.responses
         .toArray()

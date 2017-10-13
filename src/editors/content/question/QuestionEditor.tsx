@@ -65,6 +65,40 @@ export interface QuestionEditorState {
   activeItemId: string;
 }
 
+function getLabelForQuestion(question: contentTypes.Question) : string {
+
+  if (question.items.size === 0) {
+    return 'Multipart Question';
+  } else {
+
+    // Look at first item and base label off of that
+    const item = question.items.first();
+
+    switch (item.contentType) {
+
+      case 'MultipleChoice':
+        if (item.select === 'single') {
+          return 'Multiple Choice Question';
+        } else {
+          return 'Check All That Apply Question';
+        }
+      case 'Ordering':
+        return 'Ordering Question';
+      case 'Essay':
+        return 'Essay Question';
+      case 'ShortAnswer':
+        return 'Short Answer Question';
+      case 'Text':
+      case 'Numeric':
+      case 'FillInTheBlank':
+        return 'Multipart Question';
+      default:
+        return 'Question';
+    }
+  }
+
+}
+
 /**
  * The content editor for HtmlContent.
  */
@@ -96,7 +130,7 @@ export abstract class QuestionEditor
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    
     this.fillInTheBlankCommand 
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
     this.numericCommand 
@@ -149,9 +183,6 @@ export abstract class QuestionEditor
     }
   }
 
-  onConceptsEdit(concepts) {
-    this.props.onEdit(this.props.model.with({ concepts }));
-  }
 
   onFocusChange(activeItemId: string) {
     this.setState({ activeItemId });
@@ -433,8 +464,8 @@ export abstract class QuestionEditor
     const parts = this.props.model.parts.toArray();
     const toRender = [];
     for (let i = 0; i < items.length; i += 1) {
-      toRender.push(<div key={items[i].guid} 
-        className="itemPart">{this.renderItemPartEditor(items[i], parts[i])}</div>);
+      toRender.push(<div key={items[i].guid}>
+        {this.renderItemPartEditor(items[i], parts[i])}</div>);
     }
 
     return toRender;
@@ -443,23 +474,32 @@ export abstract class QuestionEditor
 
 
   render() : JSX.Element {
+
+    const isMultipart = this.props.model.items.size === 0
+      || this.props.model.items.first().contentType === 'Text'
+      || this.props.model.items.first().contentType === 'Numeric'
+      || this.props.model.items.first().contentType === 'FillInTheBlank';
     
     const inlineToolbar 
       = <InlineToolbar>
           
         </InlineToolbar>;
 
+    const multipartButtons = isMultipart
+      ? [<HtmlToolbarButton 
+        tooltip="Insert Dropdown" key="server" 
+        icon="server" command={this.fillInTheBlankCommand}/>,
+        <HtmlToolbarButton 
+          tooltip="Insert Numeric Input" key="info" 
+          icon="info" command={this.numericCommand}/>,
+        <HtmlToolbarButton 
+          tooltip="Insert Text Input" key="i-cursor" 
+          icon="i-cursor" command={this.textCommand}/>]
+        : [];
+
     const insertionToolbar = 
         <InlineInsertionToolbar>
-          <HtmlToolbarButton 
-            tooltip="Insert Fill In the Blank" key="server" 
-            icon="server" command={this.fillInTheBlankCommand}/>
-          <HtmlToolbarButton 
-            tooltip="Insert Numeric Input" key="info" 
-            icon="info" command={this.numericCommand}/>
-          <HtmlToolbarButton 
-            tooltip="Insert Text Input" key="i-cursor" 
-            icon="i-cursor" command={this.textCommand}/>
+          {multipartButtons}
         </InlineInsertionToolbar>;
 
     const blockToolbar = <BlockToolbar/>;
@@ -471,27 +511,31 @@ export abstract class QuestionEditor
       borderColor: '#AAAAAA',
     };
 
+    const addPart = 
+      this.props.model.items.size === 0
+       || this.props.model.items.first().contentType === 'Text'
+       || this.props.model.items.first().contentType === 'Numeric'
+       || this.props.model.items.first().contentType === 'FillInTheBlank'
+
+       ? <div className="dropdown" style={ { display: 'inline' } }>
+          <button disabled={!this.props.editMode} 
+            className="btn btn-secondary btn-link dropdown-toggle" 
+            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Add Item
+          </button>
+          <div className="dropdown-menu">
+            <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
+            <a onClick={this.onInsertText} className="dropdown-item">Text</a>
+            <a onClick={this.onInsertFillInTheBlank} 
+              className="dropdown-item">Dropdown</a>
+          </div>
+        </div>
+      : null;
+      
+
     const expanded = (
       <form className="inline">
-      <div className="dropdown" style={ { display: 'inline' } }>
-        <button disabled={!this.props.editMode} 
-          className="btn btn-secondary btn-link dropdown-toggle" 
-          type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Add Item
-        </button>
-        <div className="dropdown-menu">
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }} 
-            className="dropdown-item">Multiple choice</a>
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }} 
-            className="dropdown-item">Check all that apply</a>
-          <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
-          <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
-          <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
-          <a onClick={this.onInsertText} className="dropdown-item">Text</a>
-          <a onClick={this.onInsertFillInTheBlank} 
-            className="dropdown-item">Fill in the Blank</a>
-        </div>
-        </div>
+        {addPart}
         <Select editMode={this.props.editMode} 
           label="Grading" value={this.props.model.grading} 
           onChange={this.onGradingChange}>
@@ -511,7 +555,7 @@ export abstract class QuestionEditor
 
         <div style={ { position: 'relative' } }>
 
-          <Collapse caption="Question" 
+          <Collapse caption={getLabelForQuestion(this.props.model)}
             details={getHtmlDetails(this.props.model.body)}
             expanded={expanded}>
 
@@ -528,20 +572,6 @@ export abstract class QuestionEditor
                   model={this.props.model.body}
                   onEdit={this.onBodyEdit} 
                   />
-
-            
-
-
-            <ConceptsEditor 
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              courseId={this.props.context.courseId}
-              model={this.props.model.concepts}
-              onEdit={this.onConceptsEdit} 
-              title="Skills"
-              conceptType="skill"
-              />
 
             {this.renderItemsAndParts()}
 

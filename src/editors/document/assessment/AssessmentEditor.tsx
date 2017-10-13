@@ -38,8 +38,6 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-  modalIsOpen : boolean;
-  skillModel: models.SkillsModel;
   current: string;
 }
 
@@ -50,17 +48,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   constructor(props) {
     super(props, ({
-      modalIsOpen: false, 
-      skillModel: null,
       current: props.model.pages.first().guid,
     } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
-    this.onAddQuestion = this.onAddQuestion.bind(this);
     this.onAddPool = this.onAddPool.bind(this);
     this.onAddPoolRef = this.onAddPoolRef.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
+
+    this.onAddOrdering = this.onAddOrdering.bind(this);
+    this.onAddMultipart = this.onAddMultipart.bind(this);
+    this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
 
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
@@ -70,22 +69,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.canHandleDrop = this.canHandleDrop.bind(this);
   }
-
-  componentDidMount() {                    
-    super.componentDidMount();
-
-    this.props.context.courseModel.resources.map((value, id) => {        
-      if (value.type === 'x-oli-skills_model') {
-        // console.log ('Found skills document, loading ...');  
-        persistence.retrieveDocument (this.props.context.courseId,id)
-        .then((skillDocument) => {
-          // console.log ('Loaded skill document, assinging ...');  
-          const aSkillModel:models.SkillsModel = skillDocument.model as models.SkillsModel;   
-          this.setState ({ skillModel: aSkillModel.with (this.state.skillModel) });
-        });
-      }          
-    });      
-  }     
         
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
@@ -180,9 +163,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.addNode(content);
   }
 
-  onAddQuestion() {
-    let content = new contentTypes.Question();
-    content = content.with({ guid: guid() });
+  addQuestion(question: contentTypes.Question) {
+    const content = question.with({ guid: guid() });
     this.addNode(content);
   }
 
@@ -238,36 +220,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
     this.addNode(pool);
   }
-
-  /**
-   * 
-   */
-  closeModal (newAnnotations:any) {
-    console.log ('closeModal ()');  
-    
-    // this.handleEdit(this.props.model.with({ annotations: newAnnotations }));      
-  }     
-
-  /**
-   * 
-   */
-  linkSkills (e:any) {        
-    console.log ('linkSkills ()');
-                 
-    this.setState({ modalIsOpen: true });
-  }
-
-  /**
-   * 
-   */
-  createLinkerDialog () {
-    return (<LearningObjectiveLinker 
-      title="Available Skills" 
-      closeModal={this.closeModal.bind (this)} 
-      sourceData={this.state.skillModel.skills} 
-      modalIsOpen={this.state.modalIsOpen} 
-      targetAnnotations={[]} />);           
-  }  
 
   canHandleDrop(id) {
     const page = this.props.model.pages.get(this.state.current);
@@ -329,6 +281,100 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     elements.push(this.renderDropTarget(arr.length));
 
     return elements;
+  }
+
+  onAddMultipleChoice(select: string) {
+
+    let model = new contentTypes.Question();
+    let item = new contentTypes.MultipleChoice();
+    
+    const value = guid().replace('-', '');
+    const match = select ? 'A' : value; 
+    const choice = new contentTypes.Choice({ value, guid: guid() });
+    const feedback = new contentTypes.Feedback();
+    let response = new contentTypes.Response({ match });
+    response = response.with({ guid: guid(), 
+      feedback: response.feedback.set(feedback.guid, feedback) });
+
+    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+      .set(response.guid, response);
+
+    item = item.with({ guid: guid(), select, choices });
+
+    model = model.with({ items: model.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    part = part.with({ guid: guid(), responses });
+    model = model.with({ parts: model.parts.set(part.guid, part) });
+    
+    this.addQuestion(model);
+  }
+
+  onAddOrdering() {
+
+    const value = 'A';
+    
+    let question = new contentTypes.Question();
+
+    const choice = new contentTypes.Choice().with({ value, guid: guid() });
+    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+    const item = new contentTypes.Ordering().with({ choices });
+    question = question.with({ items: question.items.set(item.guid, item) });
+
+    const part = new contentTypes.Part();
+    question = question.with({ parts: question.parts.set(part.guid, part) });
+
+    this.addQuestion(question);
+  }
+
+  onAddShortAnswer() {
+
+    const item = new contentTypes.ShortAnswer();
+
+    const response = new contentTypes.Response({ match: '*', score: '1' });
+
+    const part = new contentTypes.Part()
+      .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(response.guid, response),
+      });
+
+    const question = new contentTypes.Question()
+        .with({
+          items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
+            .set(item.guid, item),
+          parts: Immutable.OrderedMap<string, contentTypes.Part>()
+            .set(part.guid, part),
+        });
+
+    this.addQuestion(question);
+  }
+
+  onAddMultipart() {
+    this.addQuestion(new contentTypes.Question());
+  }
+
+  renderAddQuestion() {
+    return (
+      <div className="dropdown" style={ { display: 'inline' } }>
+        <button disabled={!this.props.editMode} 
+          className="btn btn-secondary btn-link dropdown-toggle" 
+          type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <b>Question</b>
+        </button>
+        <div className="dropdown-menu">
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }} 
+            className="dropdown-item">Multiple choice</a>
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }} 
+            className="dropdown-item">Check all that apply</a>
+          <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
+          <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
+          <a onClick={this.onAddMultipart} 
+            className="dropdown-item">Multi-part (Text, Numeric, Dropdown)</a>
+        </div>
+      </div>
+    );
+    
   }
 
   renderSettings() {
@@ -409,18 +455,64 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
 
-  render() {
-
+  renderAdd() {
+    
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
+
+    const slash : any = {
+      fontFamily: 'sans-serif',
+      lineHeight: 1.25,
+      position: 'relative',
+      top: '-4',
+      color: '#606060',
+    };
+
+    const label : any = {
+      fontFamily: 'sans-serif',
+      lineHeight: 1.25,
+      fontSize: '13',
+      position: 'relative',
+      top: '-6',
+      color: '#606060',
+    };
+
+    return (
+      <div>
+
+      <span style={label}>Insert new: </span> 
+      
+      <button disabled={!this.props.editMode} 
+        type="button" className="btn btn-secondary btn-sm" 
+        onClick={this.onAddContent}>Content</button>
+
+      <span style={slash}>/</span>
+
+      {this.renderAddQuestion()}
+
+      <span style={slash}>/</span>
+      
+      <button 
+        disabled={!this.props.editMode || isInline} 
+        type="button" className="btn btn-secondary btn-sm" 
+        onClick={this.onAddPool}>Pool</button>
+
+        <span style={slash}>/</span>
+
+      <button 
+        disabled={!this.props.editMode || isInline} 
+        type="button" className="btn btn-secondary btn-sm" 
+        onClick={this.onAddPoolRef}>Pool Reference</button>
+
+      </div>
+    );
+  }
+
+  render() {
+    
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.current);
     const nodeEditors = this.renderNodes(page);
-    let skilllinker;
-            
-    if (this.state.skillModel) {  
-      skilllinker = this.createLinkerDialog ();
-    }        
-    
+
     return (
       <div>
         <div className="docHead">
@@ -441,23 +533,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           <div style={ { marginTop: '40px' } }/>
 
-          <div>
-            <button disabled={!this.props.editMode} 
-              type="button" className="btn btn-secondary" 
-              onClick={this.onAddContent}>Add Content</button>
-            <button disabled={!this.props.editMode} 
-              type="button" className="btn btn-secondary" 
-              onClick={this.onAddQuestion}>Add Question</button>
-            <button 
-              disabled={!this.props.editMode || isInline} 
-              type="button" className="btn btn-secondary" 
-              onClick={this.onAddPool}>Add Pool</button>
-            <button 
-              disabled={!this.props.editMode || isInline} 
-              type="button" className="btn btn-secondary" 
-              onClick={this.onAddPoolRef}>Add Pool Reference</button>
-      
-          </div>
+          {this.renderAdd()}
           
           {nodeEditors}
 

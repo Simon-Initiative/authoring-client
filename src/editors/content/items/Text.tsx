@@ -10,6 +10,7 @@ import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
+import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
@@ -47,6 +48,8 @@ export class Text
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
+
+    this.onConceptsEdit = this.onConceptsEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -116,6 +119,9 @@ export class Text
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
   }
 
+  onConceptsEdit(concepts) {
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
+  }
 
   render() : JSX.Element {
     
@@ -164,7 +170,8 @@ export class Text
       </div>);
 
     return (
-      <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
+      <div className="itemPart"
+        onFocus={() => this.props.onFocus(this.props.itemModel.id)}
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
@@ -172,6 +179,18 @@ export class Text
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
 
         {controls}
+
+
+        <ConceptsEditor 
+          editMode={this.props.editMode}
+          services={this.props.services}
+          context={this.props.context}
+          courseId={this.props.context.courseId}
+          model={this.props.partModel.concepts}
+          onEdit={this.onConceptsEdit} 
+          title="Skills"
+          conceptType="skill"
+          />
 
         {this.renderCriteria()}
 

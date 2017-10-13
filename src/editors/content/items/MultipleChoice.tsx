@@ -9,6 +9,7 @@ import { FeedbackEditor } from '../part/FeedbackEditor';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
+import { ConceptsEditor } from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -69,6 +70,8 @@ export class MultipleChoice
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
+
+    this.onConceptsEdit = this.onConceptsEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -241,6 +244,10 @@ export class MultipleChoice
     return rendered;
   }
 
+  onConceptsEdit(concepts) {
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
+  }
+
   render() : JSX.Element {
     
     const bodyStyle = {
@@ -263,9 +270,20 @@ export class MultipleChoice
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-        <ItemLabel label="Multiple Choice" editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
-       
+
+
+        <ConceptsEditor 
+          editMode={this.props.editMode}
+          services={this.props.services}
+          context={this.props.context}
+          courseId={this.props.context.courseId}
+          model={this.props.partModel.concepts}
+          onEdit={this.onConceptsEdit} 
+          title="Skills"
+          conceptType="skill"
+          />
+
+
         {this.renderCriteria()}
 
         <Collapse caption="Choices" expanded={expanded}>
