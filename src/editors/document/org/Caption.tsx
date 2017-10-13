@@ -79,7 +79,7 @@ export class Caption
           onClick={this.onViewEdit}
           type="button" 
           className="btn btn-sm">
-          View
+          Edit
         </button>,
           <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>]
         : null;
