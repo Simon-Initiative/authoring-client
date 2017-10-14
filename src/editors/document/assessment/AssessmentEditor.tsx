@@ -382,20 +382,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       <Collapse caption="Settings">
         <div style={ { marginLeft: '25px' } }>
           <form>
+            
             <div className="form-group row">
-              <label className="col-2 col-form-label">Type:</label>
-              <Select
-                value={this.props.model.resource.type}
-                label=""
-                editMode={this.props.editMode && !typeRestrictedByModel(this.props.model)}
-                onChange={this.onTypeChange}>
-                <option value={LegacyTypes.assessment2}>Graded</option>
-                <option value={LegacyTypes.inline}>Not Graded</option>
-              </Select>
-            </div>
-
-            <div className="form-group row">
-              <label className="col-2 col-form-label">Recommended attempts:</label>
+              <label className="col-3 col-form-label">Recommended attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
                 width="50px"
@@ -409,7 +398,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
 
             <div className="form-group row">
-              <label className="col-2 col-form-label">Maximum attempts:</label>
+              <label className="col-3 col-form-label">Maximum attempts:</label>
               <TextInput
                 editMode={this.props.editMode}
                 width="50px"
@@ -527,7 +516,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           <div style={ { marginTop: '20px' } }/>
 
           <div className="componentWrapper content">
-            {this.renderSettings()}
+            {this.props.model.type === LegacyTypes.assessment2
+              ? this.renderSettings() : null}
             {this.renderPagination()}         
           </div>
 
