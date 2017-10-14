@@ -1,5 +1,6 @@
 import history from '../utils/history';
 
+
 export function viewCreateCourse(): void {
   history.push('/create');
 }
@@ -16,8 +17,12 @@ export function viewPages(courseId: string) : void {
   history.push('/pages-' + courseId);
 }
 
-export function viewAssessments(courseId: string) : void {
-  history.push('/assessments-' + courseId);
+export function viewFormativeAssessments(courseId: string) : void {
+  history.push('/formativeassessments-' + courseId);
+}
+
+export function viewSummativeAssessments(courseId: string) : void {
+  history.push('/summativeassessments-' + courseId);
 }
 
 export function viewOrganizations(courseId: string) : void {

@@ -131,7 +131,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         <h1>{title}</h1>
         <br/>
         <ul className="nav nav-pills flex-column">
-          
+
           <Content label="Content Package"
             onClick={() => view.viewDocument(courseId, courseId)}/>
 
@@ -145,9 +145,9 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
           
           <Section label="Assessments"/>
           <Content label="Formative"
-            onClick={view.viewAssessments.bind(undefined, courseId)}/>
+            onClick={view.viewFormativeAssessments.bind(undefined, courseId)}/>
           <Content label="Summative"
-            onClick={view.viewAssessments.bind(undefined, courseId)}/>
+            onClick={view.viewSummativeAssessments.bind(undefined, courseId)}/>
           <Content label="Question Pools"
             onClick={view.viewPools.bind(undefined, courseId)}/>
           

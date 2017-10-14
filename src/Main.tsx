@@ -55,15 +55,22 @@ const resources = {
           version: '1.0',
           title,
         })),
-  assessments: res(
-        'Assessments',
-        'x-oli-assessment',
-        resource => resource.type === 'x-oli-inline-assessment'
-        || resource.type === 'x-oli-assessment2',
+  formativeassessments: res(
+        'Formative Assessments',
+        'x-oli-inline-assessment',
+        resource => resource.type === 'x-oli-inline-assessment',
         (title, type) => new models.AssessmentModel({
           type,
           title: new contentTypes.Title({ text: title }),
         })),
+  summativeassessments: res(
+    'Summative Assessments',
+    'x-oli-assessment2',
+    resource => resource.type === 'x-oli-assessment2',
+    (title, type) => new models.AssessmentModel({
+      type,
+      title: new contentTypes.Title({ text: title }),
+    })),
   pages: res(
         'Workbook Pages',
         'x-oli-workbook_page',
