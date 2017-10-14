@@ -118,19 +118,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
 
   renderResources() {
 
-    let creationTitle = <h2>{this.props.title}</h2>;
-
-    // This is temporary patch. For some of the document titles we
-    // need to translate and map to a more appropriate title.  
-    if (this.props.title === 'Skills') {
-      creationTitle = <h2>Available Skill Models</h2>;
-    }
-
-    // This is temporary patch. For some of the document titles we
-    // need to translate and map to a more appropriate title.      
-    if (this.props.title === 'Learning Objectives') {
-      creationTitle = <h2>Available Learning Objective Models</h2>;
-    }
+    const creationTitle = <h2>{this.props.title}</h2>;
 
     const link = resource =>
       <button onClick={this.clickResource.bind(this, resource.guid)}

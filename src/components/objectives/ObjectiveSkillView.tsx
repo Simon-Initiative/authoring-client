@@ -462,7 +462,7 @@ export class ObjectiveSkillView
   }
 
   renderTitle() {
-    return <h3>Learning Objectives and Skills</h3>;
+    return <h2>Learning Objectives and Skills</h2>;
   }
 
   renderLockDisplay() {
