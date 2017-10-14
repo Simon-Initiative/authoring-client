@@ -108,9 +108,7 @@ function render(store, current) {
         <Main location={current}/>
       </Provider>, 
       document.getElementById('app')); 
-
-  // Fire off the async request to determine server time skew
-  setServerTimeSkew();
+  
 }
 
 

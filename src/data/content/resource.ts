@@ -13,6 +13,43 @@ export type ResourceParams = {
   fileNode?: FileNode,
 };
 
+const monthsToOrdinal = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
+
+function convertHour(hour: number, isPM: boolean) : number {
+  if (isPM) {
+    return hour === 12 ? 12 : hour + 12;
+  } else {
+    return hour === 12 ? 0 : hour;
+  }
+}
+
+function parseDate(value: string) : Date {
+  
+  const p = value.split(' ');
+  const t = p[3].split(':');
+
+  return new Date(Date.UTC(
+    parseInt(p[2], 10), monthsToOrdinal[p[0]],
+    parseInt(p[1].substr(0, p[1].indexOf(',')), 10),
+    convertHour(parseInt(t[0], 10), p[4] === 'PM'),
+    parseInt(t[1], 10),
+    parseInt(t[2], 10),
+    ));
+}
+
 export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
   dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
   
@@ -38,10 +75,10 @@ export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, g
     let a = (root as any);
     let model = new Resource({rev: a.rev, guid: a.guid, id: a.id, type: a.type, title: a.title});
     if(!isNullOrUndefined(a.dateCreated)){
-      model = model.with({dateCreated : new Date(a.dateCreated)});
+      model = model.with({dateCreated : parseDate(a.dateCreated)});
     }
     if(!isNullOrUndefined(a.dateUpdated)){
-      model = model.with({dateUpdated: new Date(a.dateUpdated)});
+      model = model.with({dateUpdated: parseDate(a.dateUpdated)});
     }
     if(!isNullOrUndefined(a.fileNode)){
       model = model.with({fileNode: FileNode.fromPersistence(a.fileNode)});

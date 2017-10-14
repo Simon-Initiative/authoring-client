@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { returnType } from './utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
+import { setServerTimeSkew } from './actions/server';
 import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
 import * as viewActions from './actions/view';
@@ -146,6 +146,11 @@ class Main extends React.Component<MainProps, MainState> {
     this.unlisten = history.listen((current) => {
       this.setState({ current }, () => window.scrollTo(0, 0));
     });
+
+
+    // Fire off the async request to determine server time skew
+    this.props.dispatch(setServerTimeSkew());
+  
   }
 
   componentWillUnmount() {
