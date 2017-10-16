@@ -242,7 +242,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   onViewEdit(id) {
     this.props.services.fetchGuidById(id)
-      .then(guid => this.props.dispatch(viewDocument(guid, this.props.context.courseId)));
+      .then(guid => viewDocument(guid, this.props.context.courseId));
   }
 
   onNodeEdit(node) {
