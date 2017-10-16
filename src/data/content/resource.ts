@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
-import {FileNode} from "./file_node";
-import {isNullOrUndefined} from "util";
+import { FileNode } from './file_node';
+import { isNullOrUndefined } from 'util';
 
 export type ResourceParams = {
   rev?: number,
@@ -50,8 +50,9 @@ function parseDate(value: string) : Date {
     ));
 }
 
-export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
-  dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
+export class Resource extends Immutable.Record(
+  {contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
+    dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
   
   contentType: 'Resource';
   rev: number;
@@ -72,30 +73,31 @@ export class Resource extends Immutable.Record({contentType: 'Resource',rev:0, g
   }
 
   static fromPersistence(root: Object) : Resource {
-    let a = (root as any);
-    let model = new Resource({rev: a.rev, guid: a.guid, id: a.id, type: a.type, title: a.title});
-    if(!isNullOrUndefined(a.dateCreated)){
-      model = model.with({dateCreated : parseDate(a.dateCreated)});
-    }
-    if(!isNullOrUndefined(a.dateUpdated)){
-      model = model.with({dateUpdated: parseDate(a.dateUpdated)});
-    }
-    if(!isNullOrUndefined(a.fileNode)){
-      model = model.with({fileNode: FileNode.fromPersistence(a.fileNode)});
-    }
+    const a = (root as any);
+    const model = new Resource({
+      rev: a.rev, 
+      guid: a.guid, 
+      id: a.id, 
+      type: a.type, 
+      title: a.title,
+      dateCreated: isNullOrUndefined(a.dateCreated) ? new Date() : parseDate(a.dateCreated),
+      dateUpdated: isNullOrUndefined(a.dateUpdated) ? new Date() : parseDate(a.dateUpdated),
+      fileNode: isNullOrUndefined(a.fileNode) 
+        ? new FileNode() : FileNode.fromPersistence(a.fileNode),
+    });
     
     return model;
   }
 
   toPersistence() : Object {
     return {
-      "rev": this.rev,
-      "guid": this.guid,
-      "id": this.id,
-      "type": this.type,
-      "title": this.title,
-      "dateCreated": JSON.stringify(this.dateCreated),
-      "dateUpdated": JSON.stringify(this.dateUpdated)
-    }
+      rev: this.rev,
+      guid: this.guid,
+      id: this.id,
+      type: this.type,
+      title: this.title,
+      dateCreated: JSON.stringify(this.dateCreated),
+      dateUpdated: JSON.stringify(this.dateUpdated),
+    };
   }
 }

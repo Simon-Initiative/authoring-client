@@ -41,6 +41,17 @@ const defaultCourseModel = {
   developers: Immutable.OrderedMap<string, contentTypes.UserInfo>(),
 };
 
+function toKV(arr, deserialize) {
+  return arr.reduce(
+    (p, c) => {
+      const id = c.guid;
+      p[id] = deserialize(c);
+      return p;
+    },
+    {},
+  );
+}
+
 function buildResourceMap(params: CourseModelParams) : CourseModelParams {
     
   if (params.resources !== undefined) {
@@ -78,47 +89,52 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   }
 
   static fromPersistence(json: Object): CourseModel {
-    let model = new CourseModel();
+    
     const c = json as any;
-    model = model.with({ rev: c.rev });
-    model = model.with({ guid: c.guid });
-    model = model.with({ id: c.id });
-    model = model.with({ version: c.version });
-    model = model.with({ title: c.title });
-    model = model.with({ type: c.type });
-    model = model.with({ description: c.description });
-    model = model.with({ buildStatus: c.buildStatus });
-    model = model.with({ options: JSON.stringify(c.options) });
-    if (!isNullOrUndefined(c.metadata.jsonObject)) {
-      model = model.with(
-        { metadata: contentTypes.MetaData.fromPersistence(c.metadata.jsonObject) });
-    }
-    if (!isNullOrUndefined(c.icon)) {
-      model = model.with({ icon: contentTypes.WebContent.fromPersistence(c.icon) });
-    }
-    if (!isNullOrUndefined(c.resources)) {
-      c.resources.forEach((item) => {
-        const id = item.guid;
-        model = model.with(
-          { resources: model.resources.set(id, contentTypes.Resource.fromPersistence(item)) });
-      });
-    }
-    if (!isNullOrUndefined(c.webContents)) {
-      c.webContents.forEach((item) => {
-        const id = item.guid;
-        model = model.with(
-          { webContents: model.webContents.set(
-            id, contentTypes.WebContent.fromPersistence(item)) });
-      });
-    }
-    if (!isNullOrUndefined(c.developers)) {
-      c.developers.forEach((item) => {
-        const userName = item.userName;
-        model = model.with(
-          { developers: model.developers.set(
-            userName, contentTypes.UserInfo.fromPersistence(item)) });
-      });
-    }
+
+    const metadata =
+      isNullOrUndefined(c.metadata.jsonObject)
+        ? new contentTypes.MetaData()
+        : contentTypes.MetaData.fromPersistence(c.metadata.jsonObject);
+
+    const resources =
+      isNullOrUndefined(c.resources)
+        ? Immutable.OrderedMap<string, contentTypes.Resource>()
+        : Immutable.OrderedMap<string, contentTypes.Resource>(
+          toKV(c.resources, contentTypes.Resource.fromPersistence),
+        );
+
+    const webContents =
+    isNullOrUndefined(c.webContents)
+      ? Immutable.OrderedMap<string, contentTypes.WebContent>()
+      : Immutable.OrderedMap<string, contentTypes.WebContent>(
+        toKV(c.webContents, contentTypes.WebContent.fromPersistence),
+      );
+
+    const developers =
+    isNullOrUndefined(c.developers)
+      ? Immutable.OrderedMap<string, contentTypes.UserInfo>()
+      : Immutable.OrderedMap<string, contentTypes.UserInfo>(
+        toKV(c.developers, contentTypes.UserInfo.fromPersistence),
+      );
+    
+    const model = new CourseModel({
+      rev: c.rev,
+      guid: c.guid,
+      id: c.id,
+      version: c.version,
+      title: c.title,
+      type: c.type,
+      description: c.description,
+      buildStatus: c.buildStatus,
+      options: JSON.stringify(c.options),
+      icon: new contentTypes.WebContent(),
+      metadata,
+      resources,
+      webContents,
+      developers,
+    });
+    
     return model;
   }
 
