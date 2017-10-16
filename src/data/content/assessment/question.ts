@@ -114,6 +114,29 @@ function ensureResponsesExist(model: Question) {
   return updated;
 }
 
+// If skills are found only at the question level, duplicate them
+// at the part level
+function migrateSkillsToParts(model: Question) : Question {
+
+  const partsArray = model.parts.toArray();
+  let updated = model;
+
+  const noSkillsAtParts : boolean = partsArray.every(p => p.concepts.size === 0);
+  const skillsAtQuestion : boolean = model.concepts.size > 0;
+
+  if (skillsAtQuestion && noSkillsAtParts) {
+
+    const { concepts } = model;
+
+    updated = model.with({
+      parts: model.parts.map(p => p.with({ concepts })).toOrderedMap(),
+    });
+  }
+  
+  return updated;
+
+}
+
 export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
@@ -203,7 +226,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       }
     });
 
-    return ensureResponsesExist(tagInputRefsWithType(model));
+    return ensureResponsesExist(tagInputRefsWithType(migrateSkillsToParts(model)));
   }
 
   toPersistence() : Object {
