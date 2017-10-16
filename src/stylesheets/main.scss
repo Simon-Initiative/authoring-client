@@ -622,9 +622,9 @@ h1 {
 }
 .itemPart {
 	background-color: transparent;
-	margin: 10px;
-	border: 2px solid $color-blue;
-	padding: 15px;
+	margin: 8px;
+	border: 1px solid #CCCCCC;
+	padding: 12px;
 	border-radius: 4px;
 }
 // .ChoiceFeedback {
@@ -644,7 +644,7 @@ h1 {
 	float:right;
 	font-size: 0.8rem;
 	text-transform: uppercase;
-	color: $color-grey;
+	color: black;
 
 	span {
 		margin-right: 10px;
