@@ -1195,6 +1195,12 @@ function translateInlineStyle(
 
   if (common.emStyles[mappedStyle] !== undefined) {
     return { em: { '@style': mappedStyle, '#text': substr } };
+  } else if (mappedStyle !== undefined && mappedStyle !== null) {
+
+    const value = {};
+    value[mappedStyle] = { '#text': substr };
+    return value;
+
   } else {
     return { em: { '@style': 'bold', '#text': substr } };
   }

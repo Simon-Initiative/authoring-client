@@ -20,7 +20,7 @@ export type LinkParams = {
 const defaultContent = {
   contentType: 'Link',
   target: 'self',
-  href: '',
+  href: 'www.google.com',
   internal: false,
   title: '',
   content: Nothing,

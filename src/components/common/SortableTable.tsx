@@ -123,7 +123,7 @@ export class SortableTable
       .map((row) => {
         return (
           <tr key={row.key}>
-            {this.props.columnRenderers.map(renderer => <td>{renderer(row.data)}</td>)}
+            {this.props.columnRenderers.map((renderer, i) => <td key={i}>{renderer(row.data)}</td>)}
           </tr>
         );
       });

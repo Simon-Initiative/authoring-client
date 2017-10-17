@@ -99,6 +99,9 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           resolve(result);
         })
         .catch((err) => {
+          console.log('Save err');
+          console.log(err);
+
           this.inFlight = null;
           if (this.failureCallback !== null) {
             this.failureCallback(err);
