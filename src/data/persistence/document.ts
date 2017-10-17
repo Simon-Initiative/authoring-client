@@ -111,19 +111,27 @@ export function persistDocument(doc: Document): Promise<Document> {
   } else {
     url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;
   }
-  const toPersist = doc.model.toPersistence();
-  const body = JSON.stringify(toPersist);
-  const method = 'PUT';
 
-  return (authenticatedFetch({ url, body, method }) as any)
-    .then((json) => {
-      const newDocument = new Document({
-        _courseId: doc._courseId,
-        _id: json.guid,
-        _rev: json.rev,
-        model: doc.model,
+  try {
+
+    const toPersist = doc.model.toPersistence();
+    const body = JSON.stringify(toPersist);
+    const method = 'PUT';
+
+    return (authenticatedFetch({ url, body, method }) as any)
+      .then((json) => {
+        const newDocument = new Document({
+          _courseId: doc._courseId,
+          _id: json.guid,
+          _rev: json.rev,
+          model: doc.model,
+        });
+
+        return newDocument;
       });
+  } catch (err) {
 
-      return newDocument;
-    });
+    return Promise.reject(err);
+  }
+
 }

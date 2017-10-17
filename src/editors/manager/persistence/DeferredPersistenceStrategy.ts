@@ -41,13 +41,15 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
   save(doc: persistence.Document) {
     
     this.pending = doc;
-    
+    console.log('save init');
     if (this.inFlight === null) {
       this.queueSave();
     }
   }
 
   queueSave() {
+
+    console.log('save queued');
     const startTimer = 
       () => setTimeout(
         () => {
@@ -81,6 +83,8 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
       persistence.persistDocument(this.inFlight)
         .then((result) => {
 
+          console.log('persist finished');
+
           if (this.flushResolve !== null) {
             this.flushResolve();
             return;
@@ -93,6 +97,7 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           this.inFlight = null;
           
           if (this.pending !== null) {
+            console.log('there was a pending save');
             this.pending = this.pending.with({ _rev: result._rev });
             this.queueSave();
           }

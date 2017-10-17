@@ -602,8 +602,16 @@ function translatePronunciation(
   // Get the content of the pronunciation
   let block = iterator.next();
 
-  // Process the content
-  translatePureInline(block.rawBlock, block.block, entityMap, arr);
+  if (block.rawBlock.type === 'atomic' 
+    && entityMap[
+      block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
+
+    arr.push({ '#text': ' ' });
+
+  } else {
+    // Process the content
+    translatePureInline(block.rawBlock, block.block, entityMap, arr);
+  }
 
   // Move past the pronunciation_end block
   block = iterator.peek();
@@ -627,7 +635,7 @@ function translatePureInline(
     && rawBlock.entityRanges.length === 0) {
     container.push({ '#text': rawBlock.text });
   } else {
-    translateTextBlock(block.rawBlock, block.block, entityMap, container);
+    translateTextBlock(rawBlock, block, entityMap, container);
 
   }
 
@@ -656,8 +664,16 @@ function translateTranslation(
   // Get the content of the translation
   let block = iterator.next();
 
-  // Process the content
-  translatePureInline(block.rawBlock, block.block, entityMap, arr);
+  if (block.rawBlock.type === 'atomic' 
+    && entityMap[
+      block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
+
+    arr.push({ '#text': ' ' });
+
+  } else {
+    // Process the content
+    translatePureInline(block.rawBlock, block.block, entityMap, arr);
+  }
 
   // Move past the translation_end block
   block = iterator.peek();
