@@ -46,7 +46,7 @@ const ENTER_KEYCODE = 13;
 
 function buildCommandButtons(
   prefix, commands, org, model, 
-  labels, processCommand, context) : Object[] {
+  labels, processCommand, context, editMode) : Object[] {
 
   const slash : any = {
     fontFamily: 'sans-serif',
@@ -63,7 +63,7 @@ function buildCommandButtons(
     .map(command => <button 
       style={buttonStyle}
       className="btn btn-link btn-sm" key={prefix + command.description(labels)}
-      disabled={!command.precondition(org, model, context)}
+      disabled={!command.precondition(org, model, context) || !editMode}
       onClick={() => processCommand(command)}>{command.description(labels)}</button>)
     .map(button => [button, <span style={slash}>/</span>])
     .reduce((p, c) => p.concat(c), []);
@@ -143,7 +143,7 @@ export class EditableCaption
         'addexisting',
         ADD_EXISTING_COMMANDS,
         this.props.org, this.props.model, this.props.labels,
-        this.props.processCommand, this.props.context);
+        this.props.processCommand, this.props.context, this.props.editMode);
   
       return [
         <span style={label}>Add existing:</span>,
@@ -174,7 +174,7 @@ export class EditableCaption
           'addnew',
           ADD_NEW_COMMANDS,
           this.props.org, this.props.model, this.props.labels,
-          this.props.processCommand, this.props.context)];
+          this.props.processCommand, this.props.context, this.props.editMode)];
 
     } else {
       return [];
@@ -223,6 +223,7 @@ export class EditableCaption
         buttons.push(<button 
           key="rename"
           onClick={this.onBeginEdit}
+          disabled={!this.props.editMode}
           type="button" 
           className="btn btn-sm">
           Rename

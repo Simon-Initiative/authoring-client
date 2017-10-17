@@ -331,7 +331,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   renderActionBar() {
     return (
       <div>
-        <button key="add" className="btn btn-link" onClick={this.onAddSequence}>
+        <button key="add" className="btn btn-link" 
+          disabled={!this.props.editMode} onClick={this.onAddSequence}>
           Add {this.props.model.labels.sequence}</button>
         <button key="expand" className="btn btn-link" onClick={this.onExpand}>Expand all</button>
         <button key="collapse" className="btn btn-link" 

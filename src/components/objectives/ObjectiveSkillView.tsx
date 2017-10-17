@@ -492,7 +492,7 @@ export class ObjectiveSkillView
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
-                 
+                  {lockDisplay}
                   {this.renderTitle()}
                   {this.renderCreation()}
                   {content}

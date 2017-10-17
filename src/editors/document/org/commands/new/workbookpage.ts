@@ -15,6 +15,7 @@ export class CreateNewWorkbookPageCommand extends AbstractCommand {
     context, services: AppServices) : Promise<models.OrganizationModel> {
     
     return new Promise((resolve, reject) => {
+      
       services.createWorkbookPage('New Workbook Page', context.courseId)
         .then((doc) => {
           const id = createGuid();
