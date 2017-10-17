@@ -30,7 +30,7 @@ export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> 
 }
 
 export interface YouTubeEditorState {
-  
+  src: string;
 }
 
 /**
@@ -50,6 +50,10 @@ export class YouTubeEditor
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+
+    this.state = {
+      src: this.props.model.src,
+    };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -58,6 +62,8 @@ export class YouTubeEditor
     }
     return false;
   }
+
+
 
   onLabeledEdit(model: LabeledType) {
 
@@ -77,8 +83,10 @@ export class YouTubeEditor
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onSrcEdit(src: string) {
-    this.props.onEdit(this.props.model.with({ src }));
+  onSrcEdit(e) {
+    const src = e.target.value;
+    this.setState(
+      { src }, () => this.props.onEdit(this.props.model.with({ src })));
   }
 
   onHeightEdit(height: string) {
@@ -124,7 +132,8 @@ export class YouTubeEditor
 
         {this.row('', '9', <div className="input-group">
             <span className="input-group-addon">https://youtube.com/watch?v=</span>
-            <input type="text" value={src} className="form-control"/>
+            <input type="text" value={this.state.src} 
+              onChange={this.onSrcEdit.bind(this)} className="form-control"/>
             </div>)}
 
         <Collapse caption="Additional properties">
