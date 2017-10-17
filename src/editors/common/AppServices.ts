@@ -6,6 +6,7 @@ import * as contentTypes from '../../data/contentTypes';
 import * as view from '../../actions/view';
 import * as courseActions from '../../actions/course';
 import * as models from '../../data/models';
+import guid from '../../utils/guid';
 
 import { TitleOracle } from './TitleOracle';
 
@@ -71,10 +72,7 @@ export class DispatchBasedServices implements AppServices {
 
   createWorkbookPage(title: string, courseId: string) : Promise<persistence.Document> {
 
-    const resource = new models.WorkbookPageModel({
-      type: types.LegacyTypes.workbook_page,
-      head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
-    });
+    const resource = models.WorkbookPageModel.createNew(guid(), 'New Page', 'Empty contents');
     return this.createResource(courseId, resource);
   }
 

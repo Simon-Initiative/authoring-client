@@ -14,7 +14,7 @@ import { Command } from './commands/command';
 import { ActionDropdown } from './ActionDropdown';
 import { TextInput } from '../../content/common/TextInput';
 import { Remove } from './Remove';
-import { VALID_COMMANDS } from './commands/map';
+import { ADD_NEW_COMMANDS, ADD_EXISTING_COMMANDS } from './commands/map';
 import { RemoveCommand } from './commands/remove';
 
 export interface EditableCaption {
@@ -44,7 +44,9 @@ const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
 
 
-function buildCommandButtons(org, model, labels, processCommand, context) : Object[] {
+function buildCommandButtons(
+  prefix, commands, org, model, 
+  labels, processCommand, context) : Object[] {
 
   const slash : any = {
     fontFamily: 'sans-serif',
@@ -57,10 +59,10 @@ function buildCommandButtons(org, model, labels, processCommand, context) : Obje
     padding: '0 5 0 5',
   };
 
-  const buttons = VALID_COMMANDS[model.contentType].map(commandClass => new commandClass())
+  const buttons = commands[model.contentType].map(commandClass => new commandClass())
     .map(command => <button 
       style={buttonStyle}
-      className="btn btn-link btn-sm" key={command.description(labels)}
+      className="btn btn-link btn-sm" key={prefix + command.description(labels)}
       disabled={!command.precondition(org, model, context)}
       onClick={() => processCommand(command)}>{command.description(labels)}</button>)
     .map(button => [button, <span style={slash}>/</span>])
@@ -123,6 +125,62 @@ export class EditableCaption
     }
   }
 
+  renderInsertExisting() {
+
+    if (ADD_EXISTING_COMMANDS[this.props.model.contentType].length > 0) {
+
+      const label : any = {
+        fontFamily: 'sans-serif',
+        lineHeight: 1.25,
+        fontSize: '12',
+        position: 'relative',
+        marginLeft: '30px',
+        top: '-6',
+        color: '#606060',
+      };
+
+      const buttons = buildCommandButtons(
+        'addexisting',
+        ADD_EXISTING_COMMANDS,
+        this.props.org, this.props.model, this.props.labels,
+        this.props.processCommand, this.props.context);
+  
+      return [
+        <span style={label}>Add existing:</span>,
+        ...buttons,
+      ];
+    } else {
+      return [];
+    }
+    
+  }
+
+  renderInsertNew() {
+
+    if (ADD_NEW_COMMANDS[this.props.model.contentType].length > 0) {
+
+      const label : any = {
+        fontFamily: 'sans-serif',
+        lineHeight: 1.25,
+        fontSize: '12',
+        position: 'relative',
+        top: '-6',
+        color: '#606060',
+      };
+
+      return [
+        <span style={label}>Add new:</span>,
+        ...buildCommandButtons(
+          'addnew',
+          ADD_NEW_COMMANDS,
+          this.props.org, this.props.model, this.props.labels,
+          this.props.processCommand, this.props.context)];
+
+    } else {
+      return [];
+    }
+  }
+
 
   render() : JSX.Element {
 
@@ -155,31 +213,28 @@ export class EditableCaption
         color: 'black',
         fontWeight: 'normal',
       };
-      const label : any = {
-        fontFamily: 'sans-serif',
-        lineHeight: 1.25,
-        fontSize: '12',
-        position: 'relative',
-        top: '-6',
-        color: '#606060',
-      };
-      const buttons = this.props.isHoveredOver
-          ? [<button 
-              key="rename"
-              onClick={this.onBeginEdit}
-              type="button" 
-              className="btn btn-sm">
-              Rename
-            </button>, 
 
-            <span style={label}>Insert:</span>,
+      let buttons = null;
 
-            ...buildCommandButtons(
-              this.props.org, this.props.model, this.props.labels,
-              this.props.processCommand, this.props.context),
+      if (this.props.isHoveredOver) {
 
-            <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>]
-          : null;
+        buttons = [];
+
+        buttons.push(<button 
+          key="rename"
+          onClick={this.onBeginEdit}
+          type="button" 
+          className="btn btn-sm">
+          Rename
+        </button>);
+
+        this.renderInsertNew().forEach(e => buttons.push(e));
+        this.renderInsertExisting().forEach(e => buttons.push(e));
+        
+        buttons.push(<Remove editMode={this.props.editMode} 
+          processCommand={this.props.processCommand}/>);
+      }
+      
       return (
         <div style={ { display: 'inline' } } 
           >

@@ -11,20 +11,38 @@ import { CreateNewWorkbookPageCommand } from './new/workbookpage';
 import { AddExistingWorkbookPageCommand } from './existing/workbookpage';
 import { AddExistingAssessmentCommand } from './existing/assessment';
 
-export const VALID_COMMANDS = {
+export const ADD_EXISTING_COMMANDS = {
+  [t.OrganizationContentTypes.Sequence]: [],
+  
+  [t.OrganizationContentTypes.Unit]: [AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
+  
+  [t.OrganizationContentTypes.Module]: [AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
+  
+  [t.OrganizationContentTypes.Section]: [AddExistingWorkbookPageCommand, 
+    AddExistingAssessmentCommand],
+  
+  [t.OrganizationContentTypes.Item]: [],
+  
+  [t.OrganizationContentTypes.Include]: [],
+};
+
+
+export const ADD_NEW_COMMANDS = {
   [t.OrganizationContentTypes.Sequence]: [AddUnitCommand, AddModuleCommand],
   
   [t.OrganizationContentTypes.Unit]: [AddModuleCommand, 
-    AddExistingWorkbookPageCommand, 
-    AddExistingAssessmentCommand],
+    CreateNewWorkbookPageCommand, 
+    CreateNewAssessmentCommand],
   
   [t.OrganizationContentTypes.Module]: [AddSectionCommand,
-    AddExistingWorkbookPageCommand, 
-    AddExistingAssessmentCommand],
+    CreateNewWorkbookPageCommand, 
+    CreateNewAssessmentCommand],
   
   [t.OrganizationContentTypes.Section]: [AddSectionCommand, 
-    AddExistingWorkbookPageCommand, 
-    AddExistingAssessmentCommand],
+    CreateNewWorkbookPageCommand, 
+    CreateNewAssessmentCommand],
   
   [t.OrganizationContentTypes.Item]: [],
   

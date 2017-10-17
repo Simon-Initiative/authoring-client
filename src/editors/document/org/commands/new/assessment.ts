@@ -17,7 +17,7 @@ export class CreateNewAssessmentCommand extends AbstractCommand {
     return new Promise((resolve, reject) => {
       services.createAssessment('New Assessment', context.courseId)
         .then((document) => {
-          console.log(document);
+          
           const id = createGuid();
           if (document.model.modelType === models.ModelTypes.AssessmentModel) {
             const resourceref = new t.ResourceRef().with({ idref: document.model.resource.id });
