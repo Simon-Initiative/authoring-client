@@ -41,7 +41,6 @@ export class ShortAnswer
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
-    this.onSizeChange = this.onSizeChange.bind(this);
     this.onExplanation = this.onExplanation.bind(this);
 
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
@@ -108,11 +107,6 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
   }
 
-
-  onSizeChange(inputSize) {
-    this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
-  }
-
   onConceptsEdit(concepts) {
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
   }
@@ -126,12 +120,6 @@ export class ShortAnswer
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
-        </Select>
-        <Select editMode={this.props.editMode}
-          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
-          <option value="small">small</option>
-          <option value="medium">medium</option>
-          <option value="large">large</option>
         </Select>
         
         <Checkbox editMode={this.props.editMode}

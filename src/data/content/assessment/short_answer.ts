@@ -9,7 +9,6 @@ export type ShortAnswerParams = {
   name? : string,
   caseSensitive?: boolean;
   whitespace?: string;
-  inputSize?: string;
   guid?: string
 };
 
@@ -18,7 +17,6 @@ const defaultContent = {
   name: '',
   caseSensitive: false,
   whitespace: 'trim',
-  inputSize: 'medium',
   guid: '',
   contentType: 'ShortAnswer',
 };
@@ -30,7 +28,6 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
   name : string;
   caseSensitive: boolean;
   whitespace: string;
-  inputSize: string;
   guid: string;
   
   constructor(params?: ShortAnswerParams) {
@@ -58,9 +55,6 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
     if (n['@case_sensitive'] !== undefined) {
       model = model.with({ caseSensitive: n['@case_sensitive'] });
     }
-    if (n['@size'] !== undefined) {
-      model = model.with({ inputSize: n['@size'] });
-    }
     
     return model;
 
@@ -72,7 +66,6 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
       short_answer: {
         '@id': this.id,
         '@name': this.name,
-        '@size': this.inputSize,
         '@whitespace': this.whitespace,
         '@case_sensitive': this.caseSensitive,
       },
