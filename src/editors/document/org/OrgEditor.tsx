@@ -64,13 +64,15 @@ function calculatePositionsAtLevelHelper(
   positions: Object, positionAtLevels: Object, allNodeIds: string[], 
   idMap: Object, parentMap: Object) : void {
 
-  if (positionAtLevels[level] === undefined) {
-    positionAtLevels[level] = 1;
-  } else {
-    positionAtLevels[level] = positionAtLevels[level] + 1;
-  }
+  if (isNumberedNodeType(node)) {
+    if (positionAtLevels[level] === undefined) {
+      positionAtLevels[level] = 1;
+    } else {
+      positionAtLevels[level] = positionAtLevels[level] + 1;
+    }
 
-  positions[node.guid] = positionAtLevels[level];
+    positions[node.guid] = positionAtLevels[level];    
+  }
 
   idMap[node.id] = node;
 
@@ -82,13 +84,16 @@ function calculatePositionsAtLevelHelper(
       .map(c => parentMap[c.guid] = node);
 
     node.children.toArray()
-      .filter(n => isNumberedNodeType(n))
       .map((n, i) => calculatePositionsAtLevelHelper(
         n, i, level + 1, positions, positionAtLevels, allNodeIds, idMap, parentMap));
   }
 }
 
 function identifyNewNodes(last: string[], current: string[]) : string[] {
+
+  console.log('last size: ' + last.length);
+  console.log('current size: ' + current.length);
+  
   const lastMap = last.reduce((p, c) => { p[c] = true; return p; }, {});
   return current.filter(c => lastMap[c] === undefined);
 }
