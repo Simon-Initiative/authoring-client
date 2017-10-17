@@ -5,7 +5,7 @@ import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
 import { Hint } from './hint';
-import { getChildren, augment } from '../common';
+import { getChildren, defaultIdGuid } from '../common';
 
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
@@ -58,7 +58,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   guid: string;
   
   constructor(params?: PartParams) {
-    super(augment(params));
+    super(defaultIdGuid(params));
   }
 
   with(values: PartParams) {
