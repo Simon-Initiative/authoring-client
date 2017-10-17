@@ -119,7 +119,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   initPersistence(document: persistence.Document) {
 
-    this.persistenceStrategy = lookUpByName(document.model.modelType).persistenceStrategy;
+    this.persistenceStrategy = lookUpByName(document.model.modelType)
+      .persistenceStrategyFactory();
 
     this.persistenceStrategy.initialize(
       document, this.props.userName,

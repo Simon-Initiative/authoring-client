@@ -7,7 +7,7 @@ export const REGISTRY = {};
 export type RegisteredEditor = {
   name: string;
   component: Object;
-  persistenceStrategy: PersistenceStrategy;
+  persistenceStrategyFactory: () => PersistenceStrategy;
   listeningApproach: ListeningApproach;
   protected: boolean;
 };
