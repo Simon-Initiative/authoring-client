@@ -156,28 +156,29 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   render() {
     return (
       <div>
-        <UndoRedoToolbar 
-            undoEnabled={this.state.undoStackSize > 0}
-            redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-        <TitleContentEditor 
-            services={this.props.services}
+        <div className="docHead">
+          <UndoRedoToolbar 
+              undoEnabled={this.state.undoStackSize > 0}
+              redoEnabled={this.state.redoStackSize > 0}
+              onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
+          <TitleContentEditor 
+              services={this.props.services}
+              context={this.props.context}
+              editMode={this.props.editMode}
+              model={this.props.model.pool.title}
+              onEdit={this.onTitleEdit} 
+              />
+          <div>
+            {this.renderAddQuestion()}
+          </div>
+          <PoolContentEditor
             context={this.props.context}
+            services={this.props.services}
             editMode={this.props.editMode}
-            model={this.props.model.pool.title}
-            onEdit={this.onTitleEdit} 
-            />
-        <div>
-          {this.renderAddQuestion()}
+            onRemove={() => null}
+            model={this.props.model.pool}
+            onEdit={this.onEdit}/>
         </div>
-        <PoolContentEditor
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={() => null}
-          model={this.props.model.pool}
-          onEdit={this.onEdit}/>
-        
       </div>
     );    
   }
