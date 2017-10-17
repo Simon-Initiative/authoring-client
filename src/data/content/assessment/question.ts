@@ -176,6 +176,15 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const id = createGuid();
 
       switch (key) {
+        case 'responses':
+          // read weird legacy format where individual response elements are under a 
+          // 'responses' element instead of a 'part'
+          const copy = Object.assign({}, item);
+          copy['part'] = copy['responses'];
+
+          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
+
+          break;
         case 'concept':
           model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
