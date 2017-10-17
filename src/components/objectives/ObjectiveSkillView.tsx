@@ -171,6 +171,7 @@ export class ObjectiveSkillView
     const index = unified.documents.indexOf(this.state.skills.newBucket);
 
     unified.documents[index] = updatedDocument;
+    unified.mapping = unified.mapping.set(id, updatedDocument);
     unified.skills = unified.skills.set(skill.id, skill);
     unified.newBucket = updatedDocument;
     

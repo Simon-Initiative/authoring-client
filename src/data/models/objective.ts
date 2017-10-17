@@ -71,6 +71,8 @@ export class LearningObjectivesModel
       model = model.with({ id: org['@id'] });
     }
 
+    const objById = {};
+
     org['#array'].forEach((item) => {
 
       const key = getKey(item);
@@ -79,7 +81,19 @@ export class LearningObjectivesModel
       switch (key) {
         case 'objective':
           const obj = contentTypes.LearningObjective.fromPersistence(item, id);
+          objById[obj.id] = obj;
           model = model.with({ objectives: model.objectives.set(obj.guid, obj) });
+          break;
+        case 'objective_skills':
+          const objskills = contentTypes.ObjectiveSkills.fromPersistence(item, id);
+
+          // Find the objective and update it's skills
+          const o = objById[objskills.idref];
+          if (o !== undefined) {
+            const updated = o.with({ skills: objskills.skills });
+            model = model.with({ objectives: model.objectives.set(updated.guid, updated) });
+          }
+
           break;
         default:
           
@@ -101,8 +115,26 @@ export class LearningObjectivesModel
       });
       children.push(o.toPersistence());
     } else {
-      this.objectives.toArray().forEach(o => children.push(o.toPersistence()));
+
+      const objectiveSkills = [];
+
+      // Create ephemeral ObjectiveSkill objects that contain the objective
+      // skills and serialize them as separate elements in the data 
+      this.objectives.toArray().forEach((o) => {
+        children.push(o.toPersistence());
+
+        if (o.skills.size > 0) {
+          objectiveSkills.push(
+            (new contentTypes.ObjectiveSkills().with({ idref: o.id, skills: o.skills }))
+              .toPersistence());
+        }
+      });
+
+      objectiveSkills.forEach(os => children.push(os));
+
     }
+
+
     
     const resource = this.resource.toPersistence();
     const doc = [{

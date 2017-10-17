@@ -65,9 +65,6 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
       const id = createGuid();
      
       switch (key) {
-        case 'skillref':
-          model = model.with({ skills: model.skills.push(item['skillref']['@idref']) });
-          break;
         case '#text':
           model = model.with({ title: item['#text'] });
           break;
@@ -83,8 +80,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
     const o = { 
       objective: {
         '@id': this.id,
-        '#array': [{ '#text': this.title }, 
-          ...this.skills.toArray().map(s => ({ skillref: { '@idref': s } }))],
+        '#array': [{ '#text': this.title }],
       }, 
     };
 
