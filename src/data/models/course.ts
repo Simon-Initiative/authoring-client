@@ -44,8 +44,9 @@ const defaultCourseModel = {
 function toKV(arr, deserialize) {
   return arr.reduce(
     (p, c) => {
-      const id = c.guid;
-      p[id] = deserialize(c);
+      const obj = deserialize(c);
+      const id = obj.guid;
+      p[id] = obj;
       return p;
     },
     {},
@@ -111,12 +112,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         toKV(c.webContents, contentTypes.WebContent.fromPersistence),
       );
 
-    const developers =
-    isNullOrUndefined(c.developers)
-      ? Immutable.OrderedMap<string, contentTypes.UserInfo>()
-      : Immutable.OrderedMap<string, contentTypes.UserInfo>(
-        toKV(c.developers, contentTypes.UserInfo.fromPersistence),
-      );
+    let developers = Immutable.OrderedMap<string, contentTypes.UserInfo>();
+    if (c.developers !== undefined && c.developers !== null) {
+      c.developers.forEach((d) => {
+        const deserialized = contentTypes.UserInfo.fromPersistence(d);
+        developers = developers.set(deserialized.userName, deserialized);
+      });
+    }
     
     const model = new CourseModel({
       rev: c.rev,
