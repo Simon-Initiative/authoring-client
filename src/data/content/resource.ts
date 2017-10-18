@@ -80,8 +80,10 @@ export class Resource extends Immutable.Record(
       id: a.id, 
       type: a.type, 
       title: a.title,
-      dateCreated: isNullOrUndefined(a.dateCreated) ? new Date() : parseDate(a.dateCreated),
-      dateUpdated: isNullOrUndefined(a.dateUpdated) ? new Date() : parseDate(a.dateUpdated),
+      dateCreated: a.dateCreated === undefined || a.dateCreate === null 
+        ? new Date() : parseDate(a.dateCreated),
+      dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null 
+        ? new Date() : parseDate(a.dateUpdated),
       fileNode: isNullOrUndefined(a.fileNode) 
         ? new FileNode() : FileNode.fromPersistence(a.fileNode),
     });
