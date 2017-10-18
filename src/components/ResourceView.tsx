@@ -73,10 +73,12 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
         }
         return res;
       });
+    console.log('set state with resources');
     this.setState({ resources });
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('received props');
     this.fetchTitles(nextProps.course.model, nextProps.filterFn);
   }
 
@@ -190,6 +192,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   render() {
+    console.log('render');
     return (
       <div className="container-fluid new">
         <div className="row">

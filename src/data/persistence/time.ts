@@ -7,5 +7,5 @@ export function fetchServerTime(): Promise<Date> {
   const url = `${configuration.baseUrl}/polls/server/time`;
   
   return authenticatedFetch({ url })
-    .then(result => new Date(result.serverTime));
+    .then((result : any) => new Date(result.serverTime));
 }

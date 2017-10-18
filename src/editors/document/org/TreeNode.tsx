@@ -124,7 +124,11 @@ export class TreeNode
 
       const resource = this.props.context.courseModel.resourcesById.get(
         this.props.model.resourceref.idref);
-      const titleString = resource === undefined ? '' : resource.title;
+      const titleString = resource === undefined 
+        ? 'Unknown Resource' 
+        : resource.title === null
+          ? 'Empty Title'
+          : resource.title;
 
       title = <Caption 
         onViewEdit={() => this.props.onViewEdit(resource.id)}

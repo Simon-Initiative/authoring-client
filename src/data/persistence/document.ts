@@ -15,7 +15,7 @@ export function retrieveDocument(
   const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
   
   return authenticatedFetch({ url })
-    .then((json) => {
+    .then((json : any) => {
       json.courseId = courseId;
       return new Document({
         _courseId: courseId,
@@ -35,7 +35,7 @@ export function bulkFetchDocuments(
   const method = 'POST';
 
   return authenticatedFetch({ url, body, method })
-    .then((json) => {
+    .then((json : any) => {
       const documents = [];
       if (json instanceof Array) {
         json.forEach(item => documents.push(new Document({

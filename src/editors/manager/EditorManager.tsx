@@ -323,7 +323,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
               <pre>{this.props.documentId}</pre>
 
               <p className="mb-0">Error:</p>
-              <pre className="mb-0">{(this.state.failure as any).stack}</pre>
+              <pre className="mb-0">{this.state.failure}</pre>
             </div>
           </div>
           <div className="col-2">

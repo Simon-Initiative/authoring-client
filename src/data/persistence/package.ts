@@ -9,7 +9,7 @@ export function getEditablePackages(): Promise<models.CourseModel[]> {
   const url = `${configuration.baseUrl}/packages/editable`;
   
   return authenticatedFetch({ url })
-    .then(json => json.map(m => models.createModel(m)));
+    .then((json : any) => json.map(m => models.createModel(m)));
 }
 
 export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
@@ -17,7 +17,7 @@ export function retrieveCoursePackage(courseId: CourseId): Promise<Document> {
   const url = `${configuration.baseUrl}/packages/${courseId}/details`;
 
   return authenticatedFetch({ url })
-    .then(json => new Document({
+    .then((json : any) => new Document({
       _courseId: courseId,
       _id: json.guid,
       _rev: json.rev,
@@ -31,7 +31,7 @@ export function deleteCoursePackage(courseId: CourseId): Promise<string> {
   const method = 'DELETE';
 
   return authenticatedFetch({ url, method })
-    .then(json => json.message);
+    .then((json : any) => json.message);
 }
 
 

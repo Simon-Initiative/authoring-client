@@ -11,13 +11,11 @@ const fetch = (window as any).fetch;
 
 import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
 
-function handleError(err) {
+function handleError(err, reject) {
   if (err.message && err.message === 'Unauthorized') {
-    console.log('forcing login');
     forceLogin();
   } else {
-    console.log('unhandled err');
-    console.log(err);
+    reject(err);
   }
 }
 
@@ -36,13 +34,16 @@ export function authenticatedFetch(params: HttpRequestParams) {
   const hasTextResult = params.hasTextResult ? params.hasTextResult : false;
   
   const { body, url } = params;
-  
-  return refreshTokenIfInvalid()
+
+  return new Promise((resolve, reject) => {
+
+    refreshTokenIfInvalid()
     .then((tokenIsValid) => {
 
       if (!tokenIsValid) {
-        console.log('token was not valid');
-        throw Error('Unauthorized');
+        forceLogin();
+        return;
+
       } else {
         return fetch(url, {
           method,
@@ -53,11 +54,17 @@ export function authenticatedFetch(params: HttpRequestParams) {
     })
     .then((response) => {
       if (!response.ok) {
-        throw Error(response.statusText);
+        reject(response.statusText);
+      } else {
+        resolve(hasTextResult ? response.text() : response.json());
       }
-      return hasTextResult ? response.text() : response.json();
     })
-    .catch(err => handleError(err));
+    .catch((err) => {
+      handleError(err, reject);
+    });
+
+  });
+  
 }
 
 export type RevisionId = string;
