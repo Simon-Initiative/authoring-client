@@ -26,6 +26,7 @@ import { Row } from './Row';
 export interface ObjectiveSkillView {
   viewActions: Object;
   services: AppServices;
+  unmounted: boolean;
 }
 
 export interface ObjectiveSkillViewProps {
@@ -53,7 +54,7 @@ export class ObjectiveSkillView
       skills: null,
       objectives: null,
     };
-    
+    this.unmounted = false;
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
     this.createNew = this.createNew.bind(this);
     this.onObjectiveEdit = this.onObjectiveEdit.bind(this);
@@ -73,10 +74,21 @@ export class ObjectiveSkillView
   }
 
   componentWillUnmount() {
-    if (this.state.aggregateModel.isLocked) {
-      [...this.state.objectives.documents, ...this.state.skills.documents]
-        .forEach(d => persistence.releaseLock(this.props.course.model.guid, d._id));
+
+    this.unmounted = true;
+
+    if (this.state.aggregateModel !== null
+      && this.state.aggregateModel.isLocked) {
+
+      this.releaseAllLocks([...this.state.objectives.documents, 
+        ...this.state.skills.documents]);
+        
     }
+  }
+
+  releaseAllLocks(documents) {
+    documents.forEach(
+      d => persistence.releaseLock(this.props.course.model.guid, d._id));
   }
 
   buildModels() {
@@ -87,11 +99,21 @@ export class ObjectiveSkillView
     buildAggregateModel(courseId, userName)
       .then((aggregateModel) => {
 
-        this.setState({
-          aggregateModel,
-          objectives: unifyObjectives(aggregateModel),
-          skills: unifySkills(aggregateModel),
-        });
+        // We need to check to see if the component has unmounted
+        // before buildAggregateModel completed.  This can happen if
+        // the user clicks on this view and immediately clicks on 
+        // another.  In this case we need to release the locks that
+        // were just acquired by buildAggregateModel
+        if (this.unmounted) {
+          this.releaseAllLocks([...aggregateModel.objectives, ...aggregateModel.skills]);
+
+        } else {
+          this.setState({
+            aggregateModel,
+            objectives: unifyObjectives(aggregateModel),
+            skills: unifySkills(aggregateModel),
+          });
+        }
 
       });
   }
