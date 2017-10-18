@@ -26,7 +26,9 @@ it('WorkbookPageModel', () => {
   
 });
 
-it('AssessmentModel', () => {
+const dont = (s, f) => { return 1; };
+
+dont('AssessmentModel', () => {
 
   // A complete test of converting back and forth from
   // persistence to object model and back:
