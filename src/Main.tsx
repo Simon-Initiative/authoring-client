@@ -19,7 +19,7 @@ import DocumentView from './components/DocumentView';
 import LoginView from './components/LoginView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
-import { ObjectiveSkillView } from './components/objectives/ObjectiveSKillView';
+import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 
 type ResourceList = {
   title: string, 
