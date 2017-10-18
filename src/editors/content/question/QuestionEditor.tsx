@@ -68,7 +68,7 @@ export interface QuestionEditorState {
 function getLabelForQuestion(question: contentTypes.Question) : string {
 
   if (question.items.size === 0) {
-    return 'Multipart Question';
+    return 'Input Question';
   } else {
 
     // Look at first item and base label off of that
@@ -91,7 +91,7 @@ function getLabelForQuestion(question: contentTypes.Question) : string {
       case 'Text':
       case 'Numeric':
       case 'FillInTheBlank':
-        return 'Multipart Question';
+        return 'Input Question';
       default:
         return 'Question';
     }
@@ -269,7 +269,7 @@ export abstract class QuestionEditor
 
     const value = select === 'multiple' ? 'A' : guid().replace('-', '');
     const match = select === 'multiple' ? 'A' : value; 
-    
+
     const choice = new contentTypes.Choice({ value, guid: guid() });
     const feedback = new contentTypes.Feedback();
     let response = new contentTypes.Response({ match });
