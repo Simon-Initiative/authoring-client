@@ -370,7 +370,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
           <a onClick={this.onAddMultipart} 
-            className="dropdown-item">Multi-part (Text, Numeric, Dropdown)</a>
+            className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         </div>
       </div>
     );

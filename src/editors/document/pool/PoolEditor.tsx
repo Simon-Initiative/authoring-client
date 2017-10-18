@@ -65,7 +65,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     
     const value = select === 'multiple' ? 'A' : guid().replace('-', '');
     const match = select === 'multiple' ? 'A' : value; 
-    
+
     const choice = new contentTypes.Choice({ value, guid: guid() });
     const feedback = new contentTypes.Feedback();
     let response = new contentTypes.Response({ match });
@@ -146,7 +146,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
           <a onClick={this.onAddMultipart} 
-            className="dropdown-item">Multi-part (Text, Numeric, Dropdown)</a>
+            className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         </div>
       </div>
     );
