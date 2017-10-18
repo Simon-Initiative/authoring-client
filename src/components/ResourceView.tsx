@@ -65,7 +65,14 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   fetchTitles(model: models.CourseModel, filterFn: any) {
-    const resources = model.resources.toArray().filter(filterFn);
+    const resources = model.resources.toArray()
+      .filter(filterFn)
+      .map((res) => {
+        if (res.title === null) {
+          return res.with({ title: 'Empty title' });
+        }
+        return res;
+      });
     this.setState({ resources });
   }
 
