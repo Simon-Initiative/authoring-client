@@ -75,6 +75,10 @@ export class Sequences extends Immutable.Record(defaultContent) {
 
     this.progressConstraints.lift(p => children.push(p.toPersistence()));
     this.children.toArray().forEach(c => children.push(c.toPersistence()));
+
+    if (children.length === 0) {
+      children.push(new Sequence().with({ title: 'Placeholder' }).toPersistence());
+    } 
     
     const s = { 
       sequences: {

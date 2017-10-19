@@ -92,21 +92,8 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     if (isNullOrUndefined(title) || title === '') {
       return;
     }
-    let type = this.props.resourceType;
-    if (type === 'x-oli-assessment') {
-      type = 'x-oli-inline-assessment';
-    }
-    let resource = this.props.createResourceFn(title, type);
-    if (type === 'x-oli-organization') {
-      const g = guid();
-      resource = new models.OrganizationModel({
-        type,
-        id: this.props.course.model.id + '_' +
-        title.toLowerCase().split(' ')[0] + '_' + g.substring(g.lastIndexOf('-') + 1),
-        version: '1.0',
-        title,
-      });
-    }
+    const type = this.props.resourceType;
+    const resource = this.props.createResourceFn(title, type);
 
     (this.refs['title'] as any).value = '';
 

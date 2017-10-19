@@ -45,16 +45,23 @@ function getPathName(pathname: string): string {
   }
 }
 
+const createOrg = (title, type) => {
+  const id = guid();
+  return new models.OrganizationModel().with({
+    resource: new contentTypes.Resource().with({ id, guid: id, title }),
+    type,
+    id,
+    version: '1.0',
+    title,
+  });
+};
+
 const resources = {
   organizations: res(
         'Organizations',
         'x-oli-organization',
         resource => resource.type === 'x-oli-organization',
-        (title, type) => new models.OrganizationModel().with({
-          type,
-          version: '1.0',
-          title,
-        })),
+        createOrg),
   formativeassessments: res(
         'Formative Assessments',
         'x-oli-inline-assessment',
