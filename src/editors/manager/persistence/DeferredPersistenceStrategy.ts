@@ -104,21 +104,13 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           resolve(result);
         })
         .catch((err) => {
-          console.log('Save err');
-          console.log(err);
-
+          
           this.inFlight = null;
           if (this.failureCallback !== null) {
+            this.lockDetails = null;
             this.failureCallback(err);
           }
 
-          // TODO: revisit this logic.  We are at a state where we may
-          // have encountered an error due to a conflict, so scheduling
-          // another save without properly rebasing the revsion could be
-          // futile. 
-          if (this.pending !== null) {
-            this.queueSave();
-          }
           reject(err);
         });
     });

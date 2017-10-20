@@ -97,7 +97,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     };
 
     this.onSaveFailure = (reason: any) => {
-
+      if (reason === 'Forbidden') {
+        this.setState({ editingAllowed: false });
+      }
     };
   }
 

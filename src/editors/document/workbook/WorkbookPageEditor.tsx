@@ -150,8 +150,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   render() {      
 
-    console.log('WBPage RENDER');
-
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
