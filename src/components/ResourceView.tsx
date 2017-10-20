@@ -78,7 +78,6 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('received props');
     this.fetchTitles(nextProps.course.model, nextProps.filterFn);
   }
 
