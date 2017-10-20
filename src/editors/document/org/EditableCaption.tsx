@@ -52,7 +52,7 @@ function buildCommandButtons(
     fontFamily: 'sans-serif',
     lineHeight: 1.25,
     position: 'relative',
-    top: '-4',
+    top: -4,
     color: '#606060',
   };
   const buttonStyle : any = {
@@ -60,12 +60,13 @@ function buildCommandButtons(
   };
 
   const buttons = commands[model.contentType].map(commandClass => new commandClass())
-    .map(command => <button 
+    .map(command => [<button 
       style={buttonStyle}
       className="btn btn-link btn-sm" key={prefix + command.description(labels)}
       disabled={!command.precondition(org, model, context) || !editMode}
-      onClick={() => processCommand(command)}>{command.description(labels)}</button>)
-    .map(button => [button, <span style={slash}>/</span>])
+      onClick={() => processCommand(command)}>{command.description(labels)}</button>,
+      <span 
+      key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
     .reduce((p, c) => p.concat(c), []);
   
   buttons.pop();
@@ -132,10 +133,10 @@ export class EditableCaption
       const label : any = {
         fontFamily: 'sans-serif',
         lineHeight: 1.25,
-        fontSize: '12',
+        fontSize: '12pt',
         position: 'relative',
         marginLeft: '30px',
-        top: '-6',
+        top: -6,
         color: '#606060',
       };
 
@@ -146,7 +147,7 @@ export class EditableCaption
         this.props.processCommand, this.props.context, this.props.editMode);
   
       return [
-        <span style={label}>Add existing:</span>,
+        <span key="add-existing" style={label}>Add existing:</span>,
         ...buttons,
       ];
     } else {
@@ -162,14 +163,14 @@ export class EditableCaption
       const label : any = {
         fontFamily: 'sans-serif',
         lineHeight: 1.25,
-        fontSize: '12',
+        fontSize: '12pt',
         position: 'relative',
-        top: '-6',
+        top: -6,
         color: '#606060',
       };
 
       return [
-        <span style={label}>Add new:</span>,
+        <span key="add-new" style={label}>Add new:</span>,
         ...buildCommandButtons(
           'addnew',
           ADD_NEW_COMMANDS,
@@ -232,7 +233,7 @@ export class EditableCaption
         this.renderInsertNew().forEach(e => buttons.push(e));
         this.renderInsertExisting().forEach(e => buttons.push(e));
         
-        buttons.push(<Remove editMode={this.props.editMode} 
+        buttons.push(<Remove key="remove" editMode={this.props.editMode} 
           processCommand={this.props.processCommand}/>);
       }
       

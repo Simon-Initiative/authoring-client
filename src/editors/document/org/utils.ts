@@ -103,6 +103,13 @@ export function updateNode(
   model: models.OrganizationModel,
   childToUpdate: any) : models.OrganizationModel {
 
+  // If the child is a top level sequence just handle it
+  // explicitly 
+  if (model.sequences.children.has(childToUpdate.guid)) {
+    return model.with({ sequences: model.sequences.with(
+      { children: model.sequences.children.set(childToUpdate.guid, childToUpdate) })});
+  }
+
   return model.with({ sequences: model.sequences.with(
     { children: (model.sequences.children.map(
       updateChild.bind(undefined, childToUpdate)).toOrderedMap() as any), 

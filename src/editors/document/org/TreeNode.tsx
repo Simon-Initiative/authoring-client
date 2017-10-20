@@ -174,8 +174,8 @@ export class TreeNode
 
     const outerStyle : any = { position: 'relative', height: '28px', overflow: 'visible' };
     const nodeStyle : any = { position: 'absolute', top: 0, height: '28px', width: '100%' };
-    const topDrop : any = { position: 'absolute', top: '-15', height: '15px', width: '100%' };
-    const bottomDrop : any = { position: 'absolute', top: '20', height: '15px', width: '100%' };
+    const topDrop : any = { position: 'absolute', top: 15, height: '15px', width: '100%' };
+    const bottomDrop : any = { position: 'absolute', top: 20, height: '15px', width: '100%' };
 
     return (
       <tr key={model.guid} 

@@ -64,7 +64,12 @@ export class DraggableNode
       <div style={{ opacity, marginLeft: '5px', verticalAlign: 'middle' }}>
         {React.Children.map(
           this.props.children, 
-          (child => React.cloneElement((child as any), { connectDragSource })))}
+          ((child) => {
+
+            const additionalProps = (child as any).type === 'span'
+              ? {} : { connectDragSource };
+            return React.cloneElement((child as any), additionalProps);
+          }))}
       </div>,
     ); 
   }
