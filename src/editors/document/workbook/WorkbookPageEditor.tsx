@@ -56,6 +56,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.fetchObjectiveTitles(this.props.model.head.objrefs);
   }
 
+  shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
+    
+    if (this.props.model !== nextProps.model) {
+      return true;
+    }
+    if (this.props.editMode !== nextProps.editMode) {
+      return true;
+    }
+
+    return false;
+  }
+
   fetchObjectiveTitles(objrefs: Immutable.List<string>) {
     this.props.services.titleOracle.getTitles(
       this.props.context.courseId, 
@@ -100,9 +112,29 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-    if (nextProps.model !== this.props.model) {
+
+    const updateObjectiveTitles = () => {
       this.setState({ objectiveTitles: Immutable.List<string>() });
-      this.fetchObjectiveTitles(nextProps.model.head.objrefs);
+
+      if (nextProps.model.head.objrefs.size > 0) {
+        this.fetchObjectiveTitles(nextProps.model.head.objrefs);
+      }
+    };
+  
+
+    if (nextProps.model !== this.props.model) {
+
+      if (nextProps.model.head.objrefs.size !== this.props.model.head.objrefs.size) {
+        updateObjectiveTitles();
+      } else {
+        for (let i = 0; i < nextProps.model.head.objrefs.size; i += 1) {
+          if (nextProps.model.head.objrefs.get(i) !== this.props.model.head.objrefs.get(i)) {
+            updateObjectiveTitles();
+            break;
+          }
+        }
+      }
+      
     }
   }
 
@@ -117,6 +149,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   render() {      
+
+    console.log('WBPage RENDER');
+
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
