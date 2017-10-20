@@ -70,6 +70,22 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.canHandleDrop = this.canHandleDrop.bind(this);
   }
         
+  shouldComponentUpdate(nextProps: AssessmentEditorProps) : boolean {
+
+    if (this.props.model !== nextProps.model) {
+      return true;
+    }
+    if (this.props.expanded !== nextProps.expanded) {
+      return true;
+    }
+    if (this.props.editMode !== nextProps.editMode) {
+      return true;
+    }
+
+    return false;
+  }
+
+
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
     this.handleEdit(this.props.model.with({ pages }));
@@ -497,7 +513,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   render() {
-    
+
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.current);
     const nodeEditors = this.renderNodes(page);

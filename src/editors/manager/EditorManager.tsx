@@ -94,10 +94,6 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
     this.onSaveCompleted = (doc: persistence.Document) => {
 
-      if (!this.componentDidUnmount) {
-        this.setState({ document: doc });
-      }
-
     };
 
     this.onSaveFailure = (reason: any) => {
