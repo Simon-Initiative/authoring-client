@@ -16,7 +16,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
-import LoginView from './components/LoginView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
 import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';

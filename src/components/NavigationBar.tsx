@@ -21,8 +21,6 @@ export interface NavigationBarOwnProps {
   viewActions: any;
 }
 
-
-// Nick, do whatever you feel you have to here
 const navbarStyles =
   {
     openMenu: {

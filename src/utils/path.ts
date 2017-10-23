@@ -1,4 +1,4 @@
-
+// Centralizes the construction of URLs for webcontent resources
 export function buildUrl(
   baseUrl: string,
   courseId: string,
