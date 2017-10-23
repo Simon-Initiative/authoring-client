@@ -1,20 +1,9 @@
 version: '2'
 
 services:
-  couch:
-    container_name: couch
-    build: couch
-    volumes:
-      - ./couch/data:/opt/couchdb/data
-    ports:
-      - "5984:5984"
-    networks:
-      - simonnet      
   editor:
     container_name: editor
     build: .
-    depends_on: 
-      - couch
     ports:
       - "9000:9000"
     volumes:
@@ -23,17 +12,7 @@ services:
       - /app/node_modules
     command: gulp dev
     networks:
-      - simonnet    
-  proxy:
-    container_name: proxy
-    build: proxy/haproxy
-    depends_on:
-      - couch
-      - editor
-    ports:
-      - "8888:80"
-    networks:
-      - simonnet      
+      - simonnet       
 networks:
   simonnet:
     driver: bridge
