@@ -47,9 +47,6 @@ class Header extends React.PureComponent<HeaderProps, {}> {
             <li className="nav-item">
               <a className="nav-link active" href={this.props.logoutUrl}>Logout</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" onClick={this._onClickCreate}>Create a Course</a>
-            </li>
           </ul>
         </div>
       </nav>
