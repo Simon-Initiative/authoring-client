@@ -9,6 +9,10 @@ import { LockDetails } from '../../utils/lock';
 
 const NEW_BUCKET_TITLE = 'Created In Editor';
 
+// Routines mainly to support the unified data model of LOs and skills
+
+
+
 function retrieveObjectives(courseId: string) : Promise<persistence.Document[]> {
   return persistence.bulkFetchDocuments(
       courseId, [LegacyTypes.learning_objectives], 'byTypes');

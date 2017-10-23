@@ -42,6 +42,14 @@ interface ObjectiveSkillViewState {
   objectives: UnifiedObjectivesModel;
 }
 
+// The Learning Objectives and Skills documents require specialized handling
+// because we need to present a unified view to the end user.  Different
+// from workbook pages, assessments, and organizations, LOs and skills are
+// not edited on a per-document basis.  We tried that first and the 
+// multilevel UI was confusing and cumbersome for users.  So instead we
+// abstract away the presence of multiple documents and present a single,
+// unified UI where the user can create and edit LOs and skills.  
+
 
 export class ObjectiveSkillView 
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
