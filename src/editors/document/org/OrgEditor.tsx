@@ -20,7 +20,6 @@ import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import { Command } from './commands/command';
 import * as persistence from '../../../data/persistence';
-import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { render, getExpandId } from './traversal';
 import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { renderDraggableTreeNode, 

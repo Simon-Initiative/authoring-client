@@ -11,7 +11,6 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as persistence from '../../../data/persistence';
 import { Resource } from '../../../data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
-import LearningObjectiveLinker from '../../../components/LinkerDialog';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { ObjectiveSelection } from '../../../utils/selection/ObjectiveSelection';
 
