@@ -1,3 +1,4 @@
+// Helper UI function for rendering the lock display for any type of editor
 
 export type LockDetails = {
   lockedBy: string;

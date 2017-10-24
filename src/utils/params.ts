@@ -1,3 +1,5 @@
+// Extracting information from query parameter strings
+
 
 export function getQueryVariable(variable: string) : string {
   const query = window.location.search.substring(1);
