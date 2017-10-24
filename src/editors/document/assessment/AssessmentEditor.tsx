@@ -302,8 +302,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     let model = new contentTypes.Question();
     let item = new contentTypes.MultipleChoice();
     
-    const value = guid().replace('-', '');
-    const match = select ? 'A' : value; 
+    const value = select === 'multiple' ? 'A' : guid().replace('-', '');
+    const match = select === 'multiple' ? 'A' : value; 
+    
     const choice = new contentTypes.Choice({ value, guid: guid() });
     const feedback = new contentTypes.Feedback();
     let response = new contentTypes.Response({ match });
