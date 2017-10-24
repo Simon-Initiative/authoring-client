@@ -44,8 +44,13 @@ function getPathName(pathname: string): string {
   }
 }
 
-const createOrg = (title, type) => {
-  const id = guid();
+const createOrg = (courseId, title, type) => {
+
+  const g = guid();
+  const id = courseId + '_' +
+    title.toLowerCase().split(' ')[0] + '_' 
+    + g.substring(g.lastIndexOf('-') + 1);
+
   return new models.OrganizationModel().with({
     resource: new contentTypes.Resource().with({ id, guid: id, title }),
     type,
@@ -65,7 +70,7 @@ const resources = {
         'Formative Assessments',
         'x-oli-inline-assessment',
         resource => resource.type === 'x-oli-inline-assessment',
-        (title, type) => new models.AssessmentModel({
+        (courseId, title, type) => new models.AssessmentModel({
           type,
           title: new contentTypes.Title({ text: title }),
         })),
@@ -73,7 +78,7 @@ const resources = {
     'Summative Assessments',
     'x-oli-assessment2',
     resource => resource.type === 'x-oli-assessment2',
-    (title, type) => new models.AssessmentModel({
+    (courseId, title, type) => new models.AssessmentModel({
       type,
       title: new contentTypes.Title({ text: title }),
     })),
@@ -81,14 +86,14 @@ const resources = {
         'Workbook Pages',
         'x-oli-workbook_page',
         resource => resource.type === 'x-oli-workbook_page',
-        (title, type) => models.WorkbookPageModel.createNew(
+        (courseId, title, type) => models.WorkbookPageModel.createNew(
           guid(), title, 'This is a new page with empty content'),
         ),
   pools: res(
         'Question Pools',
         'x-oli-assessment2-pool',
         resource => resource.type === 'x-oli-assessment2-pool',
-        (title, type) => {
+        (courseId, title, type) => {
           const q = new contentTypes.Question();
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
           return new models.PoolModel({

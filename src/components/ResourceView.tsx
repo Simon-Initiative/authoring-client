@@ -24,7 +24,9 @@ export interface ResourceViewOwnProps {
   title: string;
   resourceType: string;
   filterFn: (resource: Resource) => boolean;
-  createResourceFn: (title: string, courseId: string) => models.ContentModel;
+  createResourceFn: (
+    courseId: string, 
+    title: string, type: string) => models.ContentModel;
 }
 
 
@@ -92,7 +94,8 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       return;
     }
     const type = this.props.resourceType;
-    const resource = this.props.createResourceFn(title, type);
+    const resource = this.props.createResourceFn(
+      this.props.course.model.guid, title, type);
 
     (this.refs['title'] as any).value = '';
 
