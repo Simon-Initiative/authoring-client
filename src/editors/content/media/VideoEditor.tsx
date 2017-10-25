@@ -50,7 +50,8 @@ export class VideoEditor
     this.onControlEdit = this.onControlEdit.bind(this);
     this.onSourcesEdit = this.onSourcesEdit.bind(this);
     this.onTracksEdit = this.onTracksEdit.bind(this);
-
+    this.onHeightEdit = this.onHeightEdit.bind(this);
+    this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
@@ -102,6 +103,14 @@ export class VideoEditor
 
   onTracksEdit(tracks) {
     this.props.onEdit(this.props.model.with({ tracks }));
+  }
+
+  onHeightEdit(height: string) {
+    this.props.onEdit(this.props.model.with({ height }));
+  }
+
+  onWidthEdit(width: string) {
+    this.props.onEdit(this.props.model.with({ width }));
   }
 
   renderTracks() {
@@ -184,6 +193,33 @@ export class VideoEditor
     );
   }
 
+
+  renderSizing() {
+    const { titleContent, caption, cite, popout, alternate,
+      width, height } = this.props.model;
+    
+    return (
+      <div style={ { marginTop: '70px', marginLeft: '75px' } }>
+
+        {this.row('Height', '1', <div className="input-group input-group-sm">
+            <TextInput width="100px" label="" 
+            editMode={this.props.editMode}
+            value={height} 
+            type="number"
+            onEdit={this.onHeightEdit}
+          /><span className="input-group-addon ">pixels</span></div>)}
+        {this.row('Width', '1', <div className="input-group input-group-sm">
+            <TextInput width="100px" label="" 
+            editMode={this.props.editMode}
+            value={width} 
+            type="number"
+            onEdit={this.onWidthEdit}
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
+        
+      </div>
+    );
+  }
+
   renderSources() {
     
     const { sources } = this.props.model;
@@ -211,10 +247,11 @@ export class VideoEditor
     
         <br/>
     
-        <TabContainer labels={['Sources', 'Tracks', 'Other']}>
+        <TabContainer labels={['Sources', 'Tracks', 'Sizing', 'Other']}>
           {this.renderSources()}
           {this.renderTracks()}
-          {this.renderOther()}          
+          {this.renderSizing()}
+          {this.renderOther()}   
         </TabContainer>
     
       </div>
