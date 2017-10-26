@@ -38,6 +38,10 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
     return toPersistence(this.contentState);
   }
 
+  static fromText(text: string) : Html {
+    return new Html().with({ contentState: ContentState.createFromText(text) });
+  }
+
   static fromPersistence(json: Object, guid: string) : Html {
     return new Html().with({ contentState: toDraft(json), guid });
   }

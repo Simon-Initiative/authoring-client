@@ -37,6 +37,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onAddMultipart = this.onAddMultipart.bind(this);
+    this.onAddEssay = this.onAddEssay.bind(this);
   }
     
   onEdit(pool: contentTypes.Pool) {
@@ -57,6 +58,28 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.handleEdit(updated);
   }
 
+
+  onAddEssay() {
+    
+    const item = new contentTypes.Essay();
+
+    const response = new contentTypes.Response({ match: '*', score: '1' });
+
+    const part = new contentTypes.Part()
+      .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(response.guid, response),
+      });
+
+    const question = new contentTypes.Question()
+        .with({
+          items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
+            .set(item.guid, item),
+          parts: Immutable.OrderedMap<string, contentTypes.Part>()
+            .set(part.guid, part),
+        });
+
+    this.addQuestion(question);
+  }
 
   onAddMultipleChoice(select: string) {
     
@@ -131,6 +154,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   renderAddQuestion() {
+
     return (
       <div className="dropdown" style={ { display: 'inline' } }>
         <button disabled={!this.props.editMode} 
@@ -145,6 +169,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             className="dropdown-item">Check all that apply</a>
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
+          <a onClick={this.onAddEssay} className="dropdown-item">Essay</a>
           <a onClick={this.onAddMultipart} 
             className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         </div>

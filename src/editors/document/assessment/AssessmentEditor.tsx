@@ -58,6 +58,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddMultipart = this.onAddMultipart.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
+    this.onAddEssay = this.onAddEssay.bind(this);
 
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
@@ -68,7 +69,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.canHandleDrop = this.canHandleDrop.bind(this);
   }
         
-  shouldComponentUpdate(nextProps: AssessmentEditorProps) : boolean {
+  shouldComponentUpdate(
+    nextProps: AssessmentEditorProps, 
+    nextState: AssessmentEditorState) : boolean {
 
     if (this.props.model !== nextProps.model) {
       return true;
@@ -79,6 +82,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (this.props.editMode !== nextProps.editMode) {
       return true;
     }
+    if (this.state.current !== nextState.current) {
+      return true;
+    }
+    if (this.state.undoStackSize !== nextState.undoStackSize) {
+      return true;
+    }
+    if (this.state.redoStackSize !== nextState.redoStackSize) {
+      return true;
+    }
+    
 
     return false;
   }
@@ -365,11 +378,38 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.addQuestion(question);
   }
 
+  onAddEssay() {
+    
+    const item = new contentTypes.Essay();
+
+    const response = new contentTypes.Response({ match: '*', score: '1' });
+
+    const part = new contentTypes.Part()
+      .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(response.guid, response),
+      });
+
+    const question = new contentTypes.Question()
+        .with({
+          items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
+            .set(item.guid, item),
+          parts: Immutable.OrderedMap<string, contentTypes.Part>()
+            .set(part.guid, part),
+        });
+
+    this.addQuestion(question);
+  }
+
   onAddMultipart() {
     this.addQuestion(new contentTypes.Question());
   }
 
   renderAddQuestion() {
+
+    const essayOrNot = this.props.model.type === LegacyTypes.assessment2
+      ? <a onClick={this.onAddEssay} className="dropdown-item">Essay</a>
+      : null;
+
     return (
       <div className="dropdown" style={ { display: 'inline' } }>
         <button disabled={!this.props.editMode} 
@@ -384,6 +424,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             className="dropdown-item">Check all that apply</a>
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
+          {essayOrNot}
           <a onClick={this.onAddMultipart} 
             className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         </div>
