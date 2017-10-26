@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 
 import { Html } from '../html';
 import { augment } from '../common';
+
 import { getKey } from '../../common';
 
 export type ChoiceParams = {
@@ -18,6 +19,26 @@ const defaultContent = {
   body: new Html(),
   guid: '',
 };
+
+function simplifyBody(body: Object) : Object {
+
+  if (body['#array'] !== undefined) {
+    const arr = body['#array'];
+    if (arr.length === 1) {
+      if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
+        return { '#text': arr[0].p['#text'] };
+      } else if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+        const c = arr[0].p;
+        delete c['@id'];
+        delete c['@title'];
+        return c;
+      }
+    }
+  } 
+
+  return body;
+  
+}
 
 export class Choice extends Immutable.Record(defaultContent) {
   
@@ -58,8 +79,15 @@ export class Choice extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
     const body = this.body.toPersistence();
-    const root = { choice: body };
+
+    // Ensure that single paragraph responses are not wrapped with a p tag.
+    // While this doesn't violate the DTD, it leads to an undesirable effect
+    // when questions are rendered in legacy OLI
+    const simplifiedBody = simplifyBody(body);
+
+    const root = { choice: simplifiedBody };
 
     root.choice['@value'] = this.value;
     root.choice['@color'] = this.color;
