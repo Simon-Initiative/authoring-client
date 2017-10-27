@@ -111,6 +111,19 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
   
   constructor(props) {
     super(props);
+
+    this.feedback = null;
+  }
+
+  feedback: any;
+
+
+  componentDidMount() {
+    (window as any).$(this.feedback).tooltip();
+  }
+
+  componentWillUnmount() {
+    (window as any).$(this.feedback).tooltip('hide');
   }
 
   render() {
@@ -153,6 +166,14 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
           <Content label="Objectives"
             onClick={view.viewObjectives.bind(undefined, courseId)}/>
         </ul>
+
+        <ul className="nav nav-pills flex-column feedback">
+          <li><a target="_blank" 
+            ref={a => this.feedback = a}
+            data-toggle="tooltip" title="Report a problem or suggest improvements"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfrkoCCe2cX5KFKcdzmtbLVNPkTSQeiJ4w0mEBqCNrT6hfceA/viewform?usp=sf_link">Feedback</a></li>
+        </ul>
+
       </nav>
     );
   }
