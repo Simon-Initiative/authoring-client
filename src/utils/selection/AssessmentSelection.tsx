@@ -7,12 +7,19 @@ import * as contentTypes from '../../data/contentTypes';
 import ModalSelection from './ModalSelection';
 import guid from '../guid';
 
-interface AssessmentSelection {
+export enum AssessmentsToDisplay {
+  Formative,
+  Summative,
+  Both,
+}
+
+export interface AssessmentSelection {
 
 }
 
 export interface AssessmentSelectionProps {
   courseId: string;
+  toDisplay: AssessmentsToDisplay;
   onInsert: (item: SelectableAssessment) => void;
   onCancel: () => void;
 }
@@ -27,7 +34,7 @@ export interface AssessmentSelectionState {
   selected: SelectableAssessment;
 }
 
-class AssessmentSelection 
+export class AssessmentSelection 
   extends React.PureComponent<AssessmentSelectionProps, AssessmentSelectionState> {
 
   constructor(props) {
@@ -48,8 +55,16 @@ class AssessmentSelection
     .then((resources) => {
       this.setState({
         assessments: resources
-          .filter(d => d.type === types.LegacyTypes.assessment2 
-            || d.type === types.LegacyTypes.inline)
+          .filter((d) => {
+            if (this.props.toDisplay === AssessmentsToDisplay.Both) {
+              return d.type === types.LegacyTypes.assessment2
+                || d.type === types.LegacyTypes.inline;
+            } else if (this.props.toDisplay === AssessmentsToDisplay.Formative) {
+              return d.type === types.LegacyTypes.inline;
+            } else if (this.props.toDisplay === AssessmentsToDisplay.Summative) {
+              return d.type === types.LegacyTypes.assessment2;
+            }
+          })
           .map(d => ({ id: d._id, title: d.title })),
       });
     });
@@ -121,8 +136,4 @@ class AssessmentSelection
   }
 
 }
-
-export default AssessmentSelection;
-
-
 

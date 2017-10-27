@@ -2,7 +2,8 @@ import { AbstractCommand } from '../command';
 import * as Immutable from 'immutable';
 import * as models from '../../../../../data/models';
 import * as t from '../../../../../data/contentTypes';
-import AssessmentSelection from '../../../../../utils/selection/AssessmentSelection';
+import { AssessmentSelection, AssessmentsToDisplay } 
+  from '../../../../../utils/selection/AssessmentSelection';
 import createGuid from '../../../../../utils/guid';
 
 import { insertNode } from '../../utils';
@@ -39,6 +40,7 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
+          toDisplay={AssessmentsToDisplay.Summative}
           courseId={context.courseId}
           onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)} 
           onCancel={this.onCancel.bind(this, services)}/>);

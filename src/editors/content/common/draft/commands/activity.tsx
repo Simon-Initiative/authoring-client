@@ -4,7 +4,8 @@ import { EntityTypes } from '../../../../../data/content/html/common';
 import { Activity } from '../../../../../data/content/html/activity';
 import { AppServices } from '../../../../common/AppServices';
 import { AppContext } from '../../../../common/AppContext';
-import AssessmentSelection from '../../../../../utils/selection/AssessmentSelection';
+import { AssessmentSelection, AssessmentsToDisplay } 
+  from '../../../../../utils/selection/AssessmentSelection';
 import { InsertBlockEntityCommand } from '../../draft/commands/insert';
 import { AbstractCommand } from '../../command';
 import { EditorState } from 'draft-js';
@@ -38,6 +39,7 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
+          toDisplay={AssessmentsToDisplay.Summative}
           courseId={context.courseId}
           onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)} 
           onCancel={this.onCancel.bind(this, services)}/>);
