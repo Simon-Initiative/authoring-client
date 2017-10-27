@@ -174,6 +174,8 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
             onClick={view.viewObjectives.bind(undefined, courseId)}/>
         </ul>
 
+        <br/>
+
         <ul className="nav nav-pills flex-column feedback">
           <li><a target="_blank" 
             ref={a => this.feedback = a}
