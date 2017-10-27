@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import * as models from '../data/models';
 import * as contentTypes from '../data/contentTypes';
 import { Resource } from '../data/content/resource';
+import { buildFeedbackFromCurrent } from '../utils/feedback';
 import guid from '../utils/guid';
 import * as view from '../actions/view';
 /**
@@ -91,10 +92,12 @@ function mapStateToProps(state: any) {
 
   const {
     course,
+    user,
   } = state;
 
   return {
     course,
+    user,
   };
 }
 
@@ -129,6 +132,10 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
   render() {
     
     const courseId = this.props.course.model.guid;
+
+    const formUrl = buildFeedbackFromCurrent(
+      this.props.user.profile.firstName + ' ' + this.props.user.profile.lastName,
+      this.props.user.profile.email);
     
     const title = this.props.course === null 
       || this.props.course === undefined
@@ -171,7 +178,7 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
           <li><a target="_blank" 
             ref={a => this.feedback = a}
             data-toggle="tooltip" title="Report a problem or suggest improvements"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSfrkoCCe2cX5KFKcdzmtbLVNPkTSQeiJ4w0mEBqCNrT6hfceA/viewform?usp=sf_link">Feedback</a></li>
+            href={formUrl}>Feedback</a></li>
         </ul>
 
       </nav>

@@ -2,6 +2,23 @@ import { credentials, getHeaders } from './credentials';
 import { configuration } from './config';
 const keyCloak = require('keycloak-js');
 
+export type UserProfile = {
+  attributes: Object,
+  createdTimestamp: number,
+  disableableCredentialTypes: string[],
+  email: string,
+  emailVerified: boolean,
+  enabled: boolean,
+  firstName: string,
+  id: string,
+  lastName: string,
+  requiredActions: Object[],
+  totp: boolean,
+  username: string,
+};
+
+export type LoginSuccessCallback = 
+  (profile: UserProfile, logoutUrl: string, managementUrl: string) => void;
 
 const keycloakConfig = {
   url: configuration.protocol + configuration.hostname + '/auth',
@@ -11,11 +28,11 @@ const keycloakConfig = {
 
 let kc = null; 
 let onLoginFailure = null;
-let onLoginSuccess = null;
+let onLoginSuccess : LoginSuccessCallback = null;
 let redirectUri = null;
 
 export function initialize(
-  onLoginSuccessFunc, onLoginFailureFunc, redirectUriStr) {
+  onLoginSuccessFunc : LoginSuccessCallback, onLoginFailureFunc, redirectUriStr) {
 
   onLoginFailure = onLoginFailureFunc;
   onLoginSuccess = onLoginSuccessFunc;
@@ -40,7 +57,7 @@ export function login() {
       credentials.token = kc.token;
 
       // Also, request asynchronously the user's profile from keycloak
-      kc.loadUserProfile().success((profile) => {
+      kc.loadUserProfile().success((profile: UserProfile) => {
 
         const logoutUrl = kc.createLogoutUrl({ redirectUri });
         const accountManagementUrl = kc.createAccountUrl();

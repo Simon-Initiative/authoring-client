@@ -1,10 +1,9 @@
-var fetch = (window as any).fetch;
-
 import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
-import { initialize } from './utils/keycloak';
+import { initialize, UserProfile } from './utils/keycloak';
+export { UserProfile } from './utils/keycloak';
 import guid from '../utils/guid';
 
 export module user {
@@ -19,31 +18,33 @@ export module user {
     type: LOGIN_SUCCESS,
     username: string,
     userId: string,
-    profile: Object,
+    profile: UserProfile,
     logoutUrl: string,
-    accountManagementUrl: string
-  }
+    accountManagementUrl: string,
+  };
 
   export type loginFailureAction = {
-    type: LOGIN_FAILURE
-  }
+    type: LOGIN_FAILURE,
+  };
 
-  export function loginSuccess(username: string, userId: string,
-    profile: Object, logoutUrl: string, accountManagementUrl: string) : loginSuccessAction {
+  export function loginSuccess(
+    username: string, userId: string,
+    profile: UserProfile, logoutUrl: string, accountManagementUrl: string) : loginSuccessAction {
+    
     return {
       type: LOGIN_SUCCESS,
       username,
       userId,
       profile,
       logoutUrl,
-      accountManagementUrl
-    }
+      accountManagementUrl,
+    };
   }
 
   export function loginFailure() : loginFailureAction {
     return {
-      type: LOGIN_FAILURE
-    }
+      type: LOGIN_FAILURE,
+    };
   }
 
   export function initAuthenticationProvider() {

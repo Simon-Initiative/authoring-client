@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
 import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
-
+import { UserProfile } from '../../actions/user';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as courseActions from '../../actions/course';
@@ -11,7 +11,7 @@ import guid from '../../utils/guid';
 import { configuration } from '../../actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices, DispatchBasedServices } from '../common/AppServices';
-
+import { buildFeedbackFromCurrent } from '../../utils/feedback';
 import { onFailureCallback, onSaveCompletedCallback, 
     PersistenceStrategy } from './persistence/PersistenceStrategy';
 import { LockDetails, renderLocked } from '../../utils/lock';
@@ -65,6 +65,8 @@ interface EditorManagerOwnProps {
   userId: string;
 
   userName: string;
+
+  profile: UserProfile;
 
   course: any;
 }
@@ -304,9 +306,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   renderError() {
 
-    const url = 'https://docs.google.com/forms/d/e/1FAIpQLSfrkoCCe2cX5KFKcdzmtb'
-      + 'LVNPkTSQeiJ4w0mEBqCNrT6hfceA/viewform?entry.1045781291='
-      + encodeURIComponent((window as any).location.href);
+    const url = buildFeedbackFromCurrent(
+      this.props.profile.firstName + ' ' + this.props.profile.lastName,
+      this.props.profile.email);
 
     return (
       <div className="container">

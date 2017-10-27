@@ -94,7 +94,7 @@ function tryLogin() : Promise<UserInfo> {
   return new Promise<UserInfo>((resolve, reject) => {
     initialize(
       (profile, logoutUrl, accountManagementUrl) => 
-        resolve({ user: profile.username, userId: profile.id, logoutUrl }),
+        resolve({ user: profile.username, profile, userId: profile.id, logoutUrl }),
       err => reject(err),
       configuration.protocol + configuration.hostname);
   });

@@ -200,6 +200,7 @@ class Main extends React.Component<MainProps, MainState> {
       } else {
         const documentId = firstPart;
         return <DocumentView
+              profile={this.props.user.profile}
               dispatch={this.props.dispatch}
               course={this.props.course}
               userId={this.props.user.userId}
