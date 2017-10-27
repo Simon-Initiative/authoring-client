@@ -20,7 +20,7 @@ const defaultPoolModel = {
   resource: new contentTypes.Resource(),
   guid: '',
   id: '',
-  type: 'x-oli-assessment2-pool',
+  type: types.LegacyTypes.assessment2_pool,
   icon: new contentTypes.WebContent(),
   lock: new contentTypes.Lock(),
   pool: new contentTypes.Pool({ id: guid() }),

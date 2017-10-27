@@ -4,6 +4,7 @@ import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isNullOrUndefined, isArray } from 'util';
 import { ContentState } from 'draft-js';
+import { LegacyTypes } from '../types';
 
 const emptyContent = ContentState.createFromText('');
 
@@ -20,7 +21,7 @@ const defaultWorkbookPageModelParams = {
   modelType: 'WorkbookPageModel',
   resource: new contentTypes.Resource(),
   guid: '',
-  type: 'x-oli-workbook_page',
+  type: LegacyTypes.workbook_page,
   head: new contentTypes.Head(),
   body: new contentTypes.Html(),
   lock: new contentTypes.Lock(),

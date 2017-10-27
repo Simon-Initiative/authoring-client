@@ -1,6 +1,6 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId } from '../types';
+import { CourseId, DocumentId , LegacyTypes } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 
@@ -83,7 +83,7 @@ export function createDocument(courseId: CourseId,
                                content: models.ContentModel): Promise<Document> {
 
   let url = null;
-  if (content.type === 'x-oli-package') {
+  if (content.type === LegacyTypes.package) {
     url = `${configuration.baseUrl}/packages/`;
   } else {
     url = `${configuration.baseUrl}/${courseId}/resources?resourceType=${content.type}`;
@@ -93,7 +93,7 @@ export function createDocument(courseId: CourseId,
   
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
-      const packageGuid = (content as any).type === 'x-oli-package' ? json.guid : courseId;
+      const packageGuid = (content as any).type === LegacyTypes.package ? json.guid : courseId;
       return new Document({
         _courseId: packageGuid,
         _id: json.guid,
@@ -106,7 +106,7 @@ export function createDocument(courseId: CourseId,
 export function persistDocument(doc: Document): Promise<Document> {
 
   let url = null;
-  if ((doc.model as any).type === 'x-oli-package') {
+  if ((doc.model as any).type === LegacyTypes.package) {
     url = `${configuration.baseUrl}/packages/${doc._courseId}`;
   } else {
     url = `${configuration.baseUrl}/${doc._courseId}/resources/${doc._id}`;

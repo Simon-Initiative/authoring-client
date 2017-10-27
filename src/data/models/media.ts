@@ -17,7 +17,7 @@ const defaultMediaModelParams = {
   modelType: 'MediaModel',
   webContent: new contentTypes.WebContent(),
   guid: '',
-  type: 'x-oli-webcontent',
+  type: types.LegacyTypes.webcontent,
   name: '',
   _attachments: {},
   referencingDocuments: Immutable.List<types.DocumentId>(),

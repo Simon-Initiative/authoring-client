@@ -17,7 +17,7 @@ function fetchSkillTitles(courseId: string, titleOracle)
   : Promise<any> {
   
   return persistence.bulkFetchDocuments(
-    courseId, ['x-oli-skills_model'],'byTypes')
+    courseId, [LegacyTypes.skills_model],'byTypes')
     .then ((skills) => {
       skills
         .map(doc => (doc.model as any).skills.toArray())
@@ -30,7 +30,7 @@ function fetchObjectiveTitles(courseId: string, titleOracle)
   : Promise<any> {
   
   return persistence.bulkFetchDocuments(
-    courseId, ['x-oli-learning_objectives'],'byTypes')
+    courseId, [LegacyTypes.learning_objectives],'byTypes')
     .then ((objectives) => {
       objectives
         .map(doc => (doc.model as any).objectives.toArray())

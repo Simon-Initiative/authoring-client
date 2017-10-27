@@ -32,8 +32,6 @@ export { OrganizationModel } from './models/org';
 export { SkillsModel } from './models/skill';
 export { WorkbookPageModel } from './models/workbook';
 
-
-
 export type EmptyModel = 'EmptyModel';
 // tslint:disable-next-line
 export const EmptyModel: EmptyModel = 'EmptyModel';
@@ -60,23 +58,23 @@ export function isLockable(model: ContentModel) {
 
 export function createModel(object: any): ContentModel {
   switch (object.type) {
-    case 'x-oli-package':
+    case types.LegacyTypes.package:
       return CourseModel.fromPersistence(object);
-    case 'x-oli-workbook_page':
+    case types.LegacyTypes.workbook_page:
       return WorkbookPageModel.fromPersistence(object);
-    case 'x-oli-assessment2':
+    case types.LegacyTypes.assessment2:
       return AssessmentModel.fromPersistence(object);
-    case 'x-oli-inline-assessment':
+    case types.LegacyTypes.inline:
       return AssessmentModel.fromPersistence(object);
-    case 'x-oli-organization':
+    case types.LegacyTypes.organization:
       return OrganizationModel.fromPersistence(object);
-    case 'x-oli-learning_objectives':
+    case types.LegacyTypes.learning_objectives:
       return LearningObjectivesModel.fromPersistence(object);
-    case 'x-oli-skills_model':
+    case types.LegacyTypes.skills_model:
       return SkillsModel.fromPersistence(object);
-    case 'x-oli-webcontent':
+    case types.LegacyTypes.webcontent:
       return MediaModel.fromPersistence(object);
-    case 'x-oli-assessment2-pool':
+    case types.LegacyTypes.assessment2_pool:
       return PoolModel.fromPersistence(object);
     default:
       return DefaultModel.fromPersistence(object);

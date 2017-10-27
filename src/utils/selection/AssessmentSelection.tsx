@@ -77,7 +77,7 @@ export class AssessmentSelection
     const title = (this.refs['title'] as any).value;
     // :TODO: get a real id value from user ui input field?
     const id = title.split(' ')[0] + guid();
-    const resource = { id, type: 'x-oli-assessment', title };
+    const resource = { id, type: types.LegacyTypes.inline, title };
     const res = contentTypes.Resource.fromPersistence(resource);
     const assessment = new models.AssessmentModel({
       resource: res,

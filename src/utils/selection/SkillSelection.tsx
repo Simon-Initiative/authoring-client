@@ -44,7 +44,7 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
 
   fetchResources() {
     persistence.bulkFetchDocuments(
-      this.props.courseId, ['x-oli-skills_model'],'byTypes')
+      this.props.courseId, [types.LegacyTypes.skills_model],'byTypes')
       .then ((skills) => {
         
         const resources = skills

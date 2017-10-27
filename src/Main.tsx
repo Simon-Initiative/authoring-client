@@ -10,7 +10,7 @@ import * as viewActions from './actions/view';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
-
+import { LegacyTypes } from './data/types';
 import history from './utils/history';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -63,36 +63,36 @@ const createOrg = (courseId, title, type) => {
 const resources = {
   organizations: res(
         'Organizations',
-        'x-oli-organization',
-        resource => resource.type === 'x-oli-organization',
+        LegacyTypes.organization,
+        resource => resource.type === LegacyTypes.organization,
         createOrg),
   formativeassessments: res(
         'Formative Assessments',
-        'x-oli-inline-assessment',
-        resource => resource.type === 'x-oli-inline-assessment',
+        LegacyTypes.inline,
+        resource => resource.type === LegacyTypes.inline,
         (courseId, title, type) => new models.AssessmentModel({
           type,
           title: new contentTypes.Title({ text: title }),
         })),
   summativeassessments: res(
     'Summative Assessments',
-    'x-oli-assessment2',
-    resource => resource.type === 'x-oli-assessment2',
+    LegacyTypes.assessment2,
+    resource => resource.type === LegacyTypes.assessment2,
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: new contentTypes.Title({ text: title }),
     })),
   pages: res(
         'Workbook Pages',
-        'x-oli-workbook_page',
-        resource => resource.type === 'x-oli-workbook_page',
+        LegacyTypes.workbook_page,
+        resource => resource.type === LegacyTypes.workbook_page,
         (courseId, title, type) => models.WorkbookPageModel.createNew(
           guid(), title, 'This is a new page with empty content'),
         ),
   pools: res(
         'Question Pools',
-        'x-oli-assessment2-pool',
-        resource => resource.type === 'x-oli-assessment2-pool',
+        LegacyTypes.assessment2_pool,
+        resource => resource.type === LegacyTypes.assessment2_pool,
         (courseId, title, type) => {
           const q = new contentTypes.Question();
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);

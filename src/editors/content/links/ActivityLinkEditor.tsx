@@ -9,6 +9,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
+import { LegacyTypes } from '../../../data/types';
 
 import '../common/editor.scss';
 
@@ -54,7 +55,7 @@ export class ActivityLinkEditor
       console.log(resources);
       return resources;
     })
-    .then(resources => resources.filter(r => r.type === 'x-oli-inline-assessment'))
+    .then(resources => resources.filter(r => r.type === LegacyTypes.inline))
     .then(activities => this.setState({ activities }));
   }
 

@@ -10,6 +10,7 @@ import guid from '../../../utils/guid';
 import { describePool } from './details';
 import { RemovableContent } from '../common/RemovableContent';
 import ResourceSelection from '../../../utils/selection/ResourceSelection';
+import { LegacyTypes } from '../../../data/types';
 
 import '../common/editor.scss';
 
@@ -96,7 +97,7 @@ export class PoolRefEditor
 
     const predicate =
       (res: persistence.CourseResource) : boolean => {
-        return res.type === 'x-oli-assessment2-pool';
+        return res.type === LegacyTypes.assessment2_pool;
       };
 
     this.props.services.displayModal(
