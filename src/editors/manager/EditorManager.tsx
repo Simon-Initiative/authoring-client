@@ -304,6 +304,10 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
   renderError() {
 
+    const url = 'https://docs.google.com/forms/d/e/1FAIpQLSfrkoCCe2cX5KFKcdzmtb'
+      + 'LVNPkTSQeiJ4w0mEBqCNrT6hfceA/viewform?entry.1045781291='
+      + encodeURIComponent((window as any).location.href);
+
     return (
       <div className="container">
         <div className="row">
@@ -322,6 +326,9 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
               <p className="mb-0">Error:</p>
               <pre className="mb-0">{this.state.failure}</pre>
+              <br/>
+              <br/>
+              <a target="_blank" href={url}>Report this Error</a>
             </div>
           </div>
           <div className="col-2">
