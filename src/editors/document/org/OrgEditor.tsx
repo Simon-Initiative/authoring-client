@@ -90,9 +90,6 @@ function calculatePositionsAtLevelHelper(
 
 function identifyNewNodes(last: string[], current: string[]) : string[] {
 
-  console.log('last size: ' + last.length);
-  console.log('current size: ' + current.length);
-  
   const lastMap = last.reduce((p, c) => { p[c] = true; return p; }, {});
   return current.filter(c => lastMap[c] === undefined);
 }

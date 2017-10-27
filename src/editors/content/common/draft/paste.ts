@@ -42,10 +42,7 @@ function satisifiesConstraints(parent: string, child: string) : boolean {
 
   if (schema[parent] !== undefined) {
     return schema[parent].find(e => e === child) !== undefined;
-
-  } else {
-    console.log('WARNING: encountered unexpected sentinel type: ' + parent);
-  }
+  } 
 
 }
 

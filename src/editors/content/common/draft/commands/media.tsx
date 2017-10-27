@@ -47,7 +47,6 @@ export class InsertMediaCommand extends AbstractCommand<EditorState> {
         services.dismissModal();
 
         reject(err);
-        console.log(err);
       });
             
    

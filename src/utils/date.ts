@@ -9,7 +9,6 @@ export function determineServerTimeSkewInMs() : Promise<number> {
     fetchServerTime()
       .then(serverDate => resolve(serverDate.getTime() - Date.now()))
       .catch((err) => {
-        console.log(err);
         resolve(0);
       });
   });

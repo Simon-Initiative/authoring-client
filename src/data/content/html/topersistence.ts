@@ -185,9 +185,7 @@ const top = (stack : Stack) => {
     push: (o) => {
       if (s !== undefined) {
         s.push(o);
-      } else {
-        console.log('Count not push onto context');
-      }
+      } 
     },
   };
     
@@ -919,7 +917,6 @@ function translateOverlappingGroup(
         const container = styleContainers[s];
         let style;
         if (container === undefined) {
-          console.log('undefined style: ' + s);
           style = Object.assign({}, styleContainers.BOLD());
         } else {
           style = Object.assign({}, container());

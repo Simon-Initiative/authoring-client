@@ -150,7 +150,6 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
         const id = assessment.assessment['@id'];
         resource = new contentTypes.Resource({ id, title: this.title.text });
       } catch (err) {
-        console.log(err);
         return null;
       }
       doc = [

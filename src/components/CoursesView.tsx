@@ -45,7 +45,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
   }
 
   createCourse() {
-    console.log('createCourse called');
     viewActions.viewCreateCourse();
   }
 

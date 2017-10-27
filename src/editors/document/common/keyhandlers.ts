@@ -5,7 +5,6 @@ export function handleKey(
   invoke: () => void) {
 
   (keyBinder as any).key(keyToBind, (event, handler) => {
-    console.log('trapped');
     if (canInvoke()) {
       invoke();
     }

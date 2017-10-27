@@ -21,8 +21,6 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
   constructor(props) {
     super(props);
 
-    console.log('isMathJaxReady: ' + MathJax.isReady);
-
     this.state = {
       isMathJaxReady: MathJax.isReady,
     };

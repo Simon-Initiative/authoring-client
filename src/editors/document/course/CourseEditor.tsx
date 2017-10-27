@@ -30,19 +30,20 @@ class CourseEditor extends AbstractEditor<models.CourseModel, CourseEditorProps,
       .then(result => {
         let devs = this.props.model.developers;
         result.forEach(item => {
-          console.log(JSON.stringify(item));
+          
           const userName = item.userName;
           devs = devs.set(userName, item);
         });
         this.setState(
           {failure: false},
           () => this.props.onEdit(this.props.model.with({developers: devs})));
-        console.log(JSON.stringify(this.props.model.developers));
+        
       })
       .catch(err => {
         this.setState(
           {failure: true});
-        console.log(err)});
+        
+      });
   }
 
   renderResources() {

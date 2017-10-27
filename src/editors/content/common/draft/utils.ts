@@ -9,7 +9,7 @@ export enum SelectionChangeType {
 }
 
 const log = (ss) => {
-  console.log(ss.getAnchorKey() + '(' + ss.getAnchorOffset() + ') - ' + ss.getFocusKey() + '(' + ss.getFocusOffset() + ')');
+  // console.log(ss.getAnchorKey() + '(' + ss.getAnchorOffset() + ') - ' + ss.getFocusKey() + '(' + ss.getFocusOffset() + ')');
 }
 
 export function getCursorPosition() {

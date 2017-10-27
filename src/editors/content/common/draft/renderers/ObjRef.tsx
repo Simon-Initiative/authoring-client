@@ -45,7 +45,6 @@ export class ObjRef extends InteractiveRenderer<ObjRefProps, ObjRefState> {
       'objective',
     )
     .then((title) => {
-      console.log(title);
       this.setState({ title });
     });
   }

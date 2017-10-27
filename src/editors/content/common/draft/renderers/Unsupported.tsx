@@ -33,7 +33,7 @@ class Unsupported extends InteractiveRenderer<UnsupportedProps, UnsupportedState
       const obj = JSON.parse(data.src);
       this.props.blockProps.onEdit(obj);
     } catch (err) {
-      console.log('error in parsing JSON');
+      // Do not allow persistence of invalid JSON
     }
     
   }

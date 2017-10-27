@@ -119,7 +119,6 @@ export class TitleContentEditor
   }
 
   render() : JSX.Element {
-    console.log('render title');
     if (this.props.editMode) {
       return this.renderEdit();
     } else {

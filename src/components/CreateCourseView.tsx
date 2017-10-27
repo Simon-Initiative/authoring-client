@@ -47,7 +47,6 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       })
       .catch((err) => {
         this.setState({ waiting: false, error: true });
-        console.log(err);
       });
   }
 

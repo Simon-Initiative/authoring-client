@@ -52,7 +52,6 @@ export class ActivityLinkEditor
   componentDidMount() {
     persistence.fetchCourseResources(this.props.context.courseId)
     .then((resources) => {
-      console.log(resources);
       return resources;
     })
     .then(resources => resources.filter(r => r.type === LegacyTypes.inline))
