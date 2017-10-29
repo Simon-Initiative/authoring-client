@@ -19,6 +19,7 @@ import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
 import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
+import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 
 type ResourceList = {
   title: string, 
@@ -85,7 +86,8 @@ const resources = {
   pages: res(
         'Workbook Pages',
         LegacyTypes.workbook_page,
-        resource => resource.type === LegacyTypes.workbook_page,
+        resource => resource.type === LegacyTypes.workbook_page
+          && resource.id !== PLACEHOLDER_ITEM_ID,
         (courseId, title, type) => models.WorkbookPageModel.createNew(
           guid(), title, 'This is a new page with empty content'),
         ),
