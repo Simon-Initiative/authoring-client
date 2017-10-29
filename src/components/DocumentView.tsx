@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './NavigationBar';
+import NavigationBar from './navigation/NavigationBar';
 import { UserProfile } from '../actions/user';
 import EditorManager from '../editors/manager/EditorManager';
 import { AppServices, DispatchBasedServices } from '../editors/common/AppServices';

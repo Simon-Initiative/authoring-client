@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
 
 import { LockDetails, renderLocked } from '../../utils/lock';
-import NavigationBar from '../NavigationBar';
+import NavigationBar from '../navigation/NavigationBar';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
 import * as viewActions from '../../actions/view';
 import { DuplicateListingInput } from './DuplicateListingInput';

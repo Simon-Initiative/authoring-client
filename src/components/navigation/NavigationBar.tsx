@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { returnType } from '../utils/types';
+import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
-import * as models from '../data/models';
-import * as contentTypes from '../data/contentTypes';
-import { Resource } from '../data/content/resource';
-import { buildFeedbackFromCurrent } from '../utils/feedback';
-import guid from '../utils/guid';
-import * as view from '../actions/view';
+import * as models from '../../data/models';
+import * as contentTypes from '../../data/contentTypes';
+import { Resource } from '../../data/content/resource';
+import { buildFeedbackFromCurrent } from '../../utils/feedback';
+import guid from '../../utils/guid';
+import * as view from '../../actions/view';
+import { Content } from './Content';
+
 /**
  *
  */
@@ -76,18 +78,6 @@ const Section = (props) => {
   return <h2 key={props.label}>{props.label}</h2>;
 };
 
-// tslint:disable-next-line
-const Content = (props) => {
-  return (
-    <li key={props.label} className="nav-item">
-      <a className="nav-link" onClick={props.onClick}>
-        {props.label}
-      </a>
-    </li>
-  );
-};
-
-
 function mapStateToProps(state: any) {
 
   const {
@@ -151,26 +141,33 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
         <ul className="nav nav-pills flex-column">
 
           <Content label="Content Package"
+            tooltip="Access course properties and permissions"
             onClick={() => view.viewDocument(courseId, courseId)}/>
 
           <Section label="Sequencing"/>
           <Content label="Organizations"
+            tooltip="Arrange content for different applications"
             onClick={view.viewOrganizations.bind(undefined, courseId)}/>
 
           <Section label="Content"/>
           <Content label="Pages"
+            tooltip="Create course learning material"
             onClick={view.viewPages.bind(undefined, courseId)}/>
           
           <Section label="Assessments"/>
           <Content label="Formative"
+            tooltip="Create activities to monitor learning and provide feedback"
             onClick={view.viewFormativeAssessments.bind(undefined, courseId)}/>
           <Content label="Summative"
+            tooltip="Create activities that evaluate student learning"
             onClick={view.viewSummativeAssessments.bind(undefined, courseId)}/>
           <Content label="Question Pools"
+            tooltip="Create reusable collections of questions"
             onClick={view.viewPools.bind(undefined, courseId)}/>
           
           <Section label="Learning"/>
           <Content label="Objectives"
+            tooltip="Define outcomes that students will reach"
             onClick={view.viewObjectives.bind(undefined, courseId)}/>
         </ul>
 
