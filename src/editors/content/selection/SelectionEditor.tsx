@@ -7,6 +7,7 @@ import { PoolTitleEditor } from './PoolTitleEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { PoolEditor } from './PoolEditor';
+import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
@@ -89,22 +90,13 @@ export class SelectionEditor
     }
   }
 
-  onAddQuestion() {
+  onAddQuestion(question: contentTypes.Question) {
     if (this.props.model.source.contentType === 'Pool') {
-      const q = new contentTypes.Question();
       const source = this.props.model.source.with( 
-        { questions: this.props.model.source.questions.set(q.guid, q) });
+        { questions: this.props.model.source.questions
+          .set(question.guid, question) });
       const updated = this.props.model.with({ source });
       this.props.onEdit(updated);
-    }
-  }
-
-  renderAddQuestion() {
-    if (this.props.model.source.contentType === 'Pool') {
-      return <button type="button" className="btn btn-secondary" 
-            onClick={this.onAddQuestion}>Add Question</button>;
-    } else {
-      return null;
     }
   }
 
@@ -116,41 +108,60 @@ export class SelectionEditor
   }
 
   render() : JSX.Element {
+
+    const label : any = {
+      fontFamily: 'sans-serif',
+      lineHeight: 1.25,
+      fontSize: '13',
+      position: 'relative',
+      top: '-6',
+      color: '#606060',
+    };
+
+   
+
+      
     
     const controls = (
-      <form className="form-inline">
-        {this.renderAddQuestion()}
-        <Select editMode={this.props.editMode} 
-          label="Strategy" value={this.props.model.strategy} 
-          onChange={this.onStrategyChange}>
-          <option value="random">Random</option>
-          <option value="random_with_replace">Random with replace</option>
-          <option value="ordered">Ordered</option>
-        </Select>
-        <Select editMode={this.props.editMode} 
-          label="Exhaustion" value={this.props.model.exhaustion} 
-          onChange={this.onExhaustionChange}>
-          <option value="reuse">Reuse</option>
-          <option value="skip">Skip</option>
-          <option value="fail">Fail</option>
-        </Select>
-        <Select editMode={this.props.editMode} 
-          label="Scope" value={this.props.model.scope} 
-          onChange={this.onScopeChange}>
-          <option value="section">Section</option>
-          <option value="resource">Resource</option>
-        </Select>
+      <div>
+        <span style={label}>Insert new: </span> 
+        <AddQuestion 
+          editMode={this.props.editMode}
+          onQuestionAdd={this.onAddQuestion.bind(this)}
+          isSummative={true}/>
+        <form className="form-inline">  
+          <Select editMode={this.props.editMode} 
+            label="Strategy" value={this.props.model.strategy} 
+            onChange={this.onStrategyChange}>
+            <option value="random">Random</option>
+            <option value="random_with_replace">Random with replace</option>
+            <option value="ordered">Ordered</option>
+          </Select>
+          <Select editMode={this.props.editMode} 
+            label="Exhaustion" value={this.props.model.exhaustion} 
+            onChange={this.onExhaustionChange}>
+            <option value="reuse">Reuse</option>
+            <option value="skip">Skip</option>
+            <option value="fail">Fail</option>
+          </Select>
+          <Select editMode={this.props.editMode} 
+            label="Scope" value={this.props.model.scope} 
+            onChange={this.onScopeChange}>
+            <option value="section">Section</option>
+            <option value="resource">Resource</option>
+          </Select>
 
-        Count:&nbsp;&nbsp;&nbsp;
-        <TextInput
-          editMode={this.props.editMode} 
-          width="75px"
-          label="Count"
-          value={this.props.model.selectionCount}
-          type="number"
-          onEdit={this.onCountEdit}
-        />
-      </form>);
+          Count:&nbsp;&nbsp;&nbsp;
+          <TextInput
+            editMode={this.props.editMode} 
+            width="75px"
+            label="Count"
+            value={this.props.model.selectionCount}
+            type="number"
+            onEdit={this.onCountEdit}
+          />
+        </form>
+      </div>);
 
     const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
 
