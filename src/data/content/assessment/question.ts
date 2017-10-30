@@ -91,24 +91,26 @@ function ensureResponsesExist(model: Question) {
     let part = partsArray[i];
 
     if (item.contentType === 'MultipleChoice') {
-      // Make sure that there are n responses for n choices
-      const choiceCount = item.choices.size;
-      const responseCount = part.responses.size;
+      if (item.select === 'single') {
+        
+        // Make sure that there are n responses for n choices
+        const choiceCount = item.choices.size;
+        const responseCount = part.responses.size;
 
-      let difference = choiceCount - responseCount;
-      while (difference > 0) {
+        let difference = choiceCount - responseCount;
+        while (difference > 0) {
 
-        const f = new Feedback();
-        const feedback = Immutable.OrderedMap<string, Feedback>();
-        const response = new Response().with({ feedback: feedback.set(f.guid, f) });
-        part = part.with({ responses: part.responses.set(response.guid, response) });
-        difference -= 1;
+          const f = new Feedback();
+          const feedback = Immutable.OrderedMap<string, Feedback>();
+          const response = new Response().with({ feedback: feedback.set(f.guid, f) });
+          part = part.with({ responses: part.responses.set(response.guid, response) });
+          difference -= 1;
 
-      }
-      if (choiceCount - responseCount > 0) {
-        updated = updated.with({ parts: updated.parts.set(part.guid, part) });
-      }
-      
+        }
+        if (choiceCount - responseCount > 0) {
+          updated = updated.with({ parts: updated.parts.set(part.guid, part) });
+        }
+      }      
     }
   }
   return updated;
