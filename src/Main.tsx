@@ -6,6 +6,10 @@ import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
 import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
+import { CurrentCourse } from './reducers/course';
+import { ServerInformation } from './reducers/server';
+import { UserInfo } from './reducers/user';
+import { TitleOracle } from './editors/common/TitleOracle';
 import * as viewActions from './actions/view';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
@@ -124,6 +128,9 @@ function mapStateToProps(state: any) {
   };
 }
 
+/**
+ * declare interfaces and types
+ */
 interface Main {
   modalActions: Object;
   viewActions: Object;
@@ -138,12 +145,20 @@ interface MainState {
   current: any;
 }
 
-const stateGeneric = returnType(mapStateToProps);
-type MainReduxProps = typeof stateGeneric;
+interface MainReduxProps {
+  course: CurrentCourse;
+  expanded: TitleOracle;
+  modal: Immutable.Stack<any>;
+  server: ServerInformation;
+  user: UserInfo;
+}
+
 type MainProps = MainReduxProps & MainOwnProps & { dispatch };
 
+/**
+ * Main React Component
+ */
 class Main extends React.Component<MainProps, MainState> {
-
   constructor(props) {
     super(props);
 
@@ -160,7 +175,6 @@ class Main extends React.Component<MainProps, MainState> {
       this.setState({ current }, () => window.scrollTo(0, 0));
     });
 
-
     // Fire off the async request to determine server time skew
     this.props.dispatch(setServerTimeSkew());
   
@@ -169,7 +183,7 @@ class Main extends React.Component<MainProps, MainState> {
   componentWillUnmount() {
     this.unlisten();
   }
-//// course={this.props.course}
+
   renderResource(resource: ResourceList) {
     return <ResourceView
               serverTimeSkewInMs={this.props.server.timeSkewInMs}
@@ -213,9 +227,7 @@ class Main extends React.Component<MainProps, MainState> {
  
   }
 
-
-  render(): JSX.Element {
-
+  render() {
     if (this.props.user === null) {
       return null;
     }
@@ -229,19 +241,15 @@ class Main extends React.Component<MainProps, MainState> {
     }
     
     const currentView = this.getView(getPathName(this.state.current.pathname));
-
     const logoutUrl = this.props.user !== null ? this.props.user.logoutUrl : '';
 
     return (
-        <div>
-            
-            <Header dispatch={this.props.dispatch} logoutUrl={logoutUrl}/>
-
-            {currentView}
-
-            <Footer dispatch={this.props.dispatch}/>
-            {modalDisplay}
-        </div>
+      <div>
+        <Header dispatch={this.props.dispatch} logoutUrl={logoutUrl}/>
+        {currentView}
+        <Footer dispatch={this.props.dispatch}/>
+        {modalDisplay}
+      </div>
     );
   }
 

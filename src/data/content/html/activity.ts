@@ -4,7 +4,7 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Image } from './image';
-import { Maybe, Nothing } from '../../../utils/types';
+import { Maybe } from 'tsmonad';
 
 export type ActivityParams = {
   idref?: string,
@@ -16,12 +16,11 @@ export type ActivityParams = {
 const defaultContent = {
   idref: '',
   purpose: 'checkpoint',
-  image: Nothing,
+  image: Maybe.nothing<Image>(),
   guid: '',
 };
 
 export class Activity extends Immutable.Record(defaultContent) {
-  
   contentType: 'Activity';
   idref: string;
   purpose: string;
@@ -37,7 +36,6 @@ export class Activity extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(root: Object, guid: string, toDraft) : Activity {
-
     const t = (root as any).activity;
 
     let model = new Activity({ guid });
@@ -56,7 +54,7 @@ export class Activity extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'image':
-          model = model.with({ image: Image.fromPersistence(item, id, toDraft) });
+          model = model.with({ image: Maybe.just(Image.fromPersistence(item, id, toDraft)) });
           break;
         default:
       }
@@ -70,7 +68,10 @@ export class Activity extends Immutable.Record(defaultContent) {
       activity: {
         '@idref': this.idref,
         '@purpose': this.purpose,
-        '#array': this.image === Nothing ? [] : [this.image.toPersistence],
+        '#array': this.image.caseOf({
+          just: i => [i.toPersistence],
+          nothing: () => [],
+        }),
       },
     };
   }

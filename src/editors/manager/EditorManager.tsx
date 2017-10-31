@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
-import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
 import { UserProfile } from '../../actions/user';
+import { TitleOracle } from '../common/TitleOracle';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as courseActions from '../../actions/course';
@@ -20,32 +20,6 @@ import { lookUpByName } from './registry';
 import { Resource } from '../../data/content/resource';
 import { Maybe } from 'tsmonad';
 
-interface EditorManager {
-
-  componentDidUnmount: boolean;
-
-  persistenceStrategy: PersistenceStrategy;
-
-  onSaveCompleted: onSaveCompletedCallback;
-
-  onSaveFailure: onFailureCallback;
-
-  stopListening: boolean;
-
-  _onEdit: (model: models.ContentModel) => void;
-
-  waitBufferTimer: any;
-}
-
-export interface EditorManagerState {
-  editingAllowed: boolean;
-  document: persistence.Document;
-  failure: string;
-  waitBufferElapsed: boolean;
-  activeSubEditorKey: string;
-  undoRedoGuid: string;
-}
-
 function mapStateToProps(state: any) {
   const {
     titles,
@@ -58,23 +32,46 @@ function mapStateToProps(state: any) {
   };
 }
 
+/**
+ * declare interfaces and types
+ */
+interface EditorManager {
+  componentDidUnmount: boolean;
+  persistenceStrategy: PersistenceStrategy;
+  onSaveCompleted: onSaveCompletedCallback;
+  onSaveFailure: onFailureCallback;
+  stopListening: boolean;
+  _onEdit: (model: models.ContentModel) => void;
+  waitBufferTimer: any;
+}
+
+export interface EditorManagerState {
+  editingAllowed: boolean;
+  document: persistence.Document;
+  failure: string;
+  waitBufferElapsed: boolean;
+  activeSubEditorKey: string;
+  undoRedoGuid: string;
+}
+
 interface EditorManagerOwnProps {
-
   documentId: string;
-
   userId: string;
-
   userName: string;
-
   profile: UserProfile;
-
   course: any;
 }
 
-const stateGeneric = returnType(mapStateToProps);
-type EditorManagerReduxProps = typeof stateGeneric;
+interface EditorManagerReduxProps {
+  expanded: Immutable.Map<string, Immutable.Set<string>>;
+  titles: TitleOracle;
+}
+
 type EditorManagerProps = EditorManagerReduxProps & EditorManagerOwnProps & { dispatch };
 
+/**
+ * EditorManager React Component
+ */
 class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
 
   constructor(props) {

@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
@@ -6,14 +7,13 @@ import { getKey } from '../../common';
 import { Image } from './image';
 
 import { ContentState } from 'draft-js';
-import { Maybe, Nothing } from '../../../utils/types';
 
 export type LinkParams = {
   target?: string,
   href?: string,
   internal?: boolean,
   title?: string,
-  content?: Maybe<Image>,
+  content?: Maybe<Image>;
   guid?: string,
 };
 
@@ -23,12 +23,11 @@ const defaultContent = {
   href: 'www.google.com',
   internal: false,
   title: '',
-  content: Nothing,
+  content: Maybe.nothing<Image>(),
   guid: '',
 };
 
 export class Link extends Immutable.Record(defaultContent) {
-  
   contentType: 'Link';
   content: Maybe<Image>;
   target: string;
@@ -68,9 +67,9 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array 
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Image.fromPersistence(children[0], '', toDraft) });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
     } else {
-      model = model.with({ content: Nothing });
+      model = model.with({ content: Maybe.nothing<Image>() });
     }
     
     return model;
@@ -87,9 +86,10 @@ export class Link extends Immutable.Record(defaultContent) {
       },
     };
 
-    if (this.content instanceof Image) {
-      link.link['#array'] = [this.content.toPersistence(toPersistence)];
-    } 
+    link.link['#array'] = this.content.caseOf({
+      just: c => [c.toPersistence(toPersistence)],
+      nothing: () => [],
+    });
 
     return link;
   }
