@@ -20,7 +20,7 @@ export interface AssessmentSelection {
 export interface AssessmentSelectionProps {
   courseId: string;
   toDisplay: AssessmentsToDisplay;
-  onInsert: (item: SelectableAssessment) => void;
+  onInsert: (assessment: models.AssessmentModel) => void;
   onCancel: () => void;
 }
 
@@ -44,6 +44,8 @@ export class AssessmentSelection
       assessments: [],
       selected: { id: '', title: '' },
     };
+
+    this.onInsert = this.onInsert.bind(this);
   }
 
   componentDidMount() {
@@ -77,18 +79,24 @@ export class AssessmentSelection
     const title = (this.refs['title'] as any).value;
     // :TODO: get a real id value from user ui input field?
     const id = title.split(' ')[0] + guid();
-    const resource = { id, type: types.LegacyTypes.inline, title };
+    const type = this.props.toDisplay === AssessmentsToDisplay.Formative
+    ? types.LegacyTypes.inline
+    : types.LegacyTypes.assessment2;
+
+    const resource = { 
+      id, 
+      type,
+      title,
+    };
     const res = contentTypes.Resource.fromPersistence(resource);
     const assessment = new models.AssessmentModel({
       resource: res,
+      type,
       title: new contentTypes.Title({ text: resource.title }),
     });
 
     persistence.createDocument(this.props.courseId, assessment)
-    .then(result => this.setState({
-      assessments: [...this.state.assessments, { id: result._id, title }],
-      selected: { id: result._id, title },
-    }));
+    .then(result => this.props.onInsert(result.model as models.AssessmentModel));
   }
 
   clickAssessment(selected) {
@@ -108,10 +116,15 @@ export class AssessmentSelection
     });
   }
 
+  onInsert(id: string) {
+    persistence.retrieveDocument(this.props.courseId, id)
+    .then(result => this.props.onInsert(result.model as models.AssessmentModel));
+  }
+
   render() {
     return (
         <ModalSelection title="Select Assessment" onCancel={this.props.onCancel}
-                        onInsert={() => this.props.onInsert(this.state.selected)}>
+                        onInsert={() => this.onInsert(this.state.selected.id)}>
           <table className="table table-hover table-sm">
             <thead>
             <tr>

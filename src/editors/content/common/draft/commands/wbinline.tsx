@@ -16,12 +16,8 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
   onInsert(editorState: EditorState, context, services, resolve, reject, assessment) {
    
     services.dismissModal();
-
-    const resources = context.courseModel.resources.toArray();
-
-    const found = resources.find(r => r.guid === assessment.id);
     
-    const data = { wbinline: new WbInline({ idRef: found.id }) };
+    const data = { wbinline: new WbInline({ idRef: assessment.resource.id }) };
 
     const delegate = new InsertBlockEntityCommand(EntityTypes.wb_inline, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)

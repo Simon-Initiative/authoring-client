@@ -14,11 +14,8 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
    
     services.dismissModal();
     
-    const resources = context.courseModel.resources.toArray();
-    const found = resources.find(r => r.guid === assessment.id);
-    
     const id = createGuid();
-    const resourceref = new t.ResourceRef().with({ idref: found.id });
+    const resourceref = new t.ResourceRef().with({ idref: assessment.resource.id });
     const item = new t.Item().with({ resourceref, id });
     
     resolve(insertNode(org, parent.guid, item, parent.children.size));
