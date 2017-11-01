@@ -45,7 +45,6 @@ export class Link extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(root: Object, guid: string, toDraft) : Link {
-
     const t = (root as any).link;
 
     let model = new Link({ guid });
@@ -74,9 +73,9 @@ export class Link extends Immutable.Record(defaultContent) {
     
     return model;
   }
+ 
 
   toPersistence(toPersistence, text) : Object {
-
     const link = {
       link: {
         '@title': this.title,
@@ -86,10 +85,14 @@ export class Link extends Immutable.Record(defaultContent) {
       },
     };
 
-    link.link['#array'] = this.content.caseOf({
+    const imageContent: Image = this.content.caseOf({
       just: c => [c.toPersistence(toPersistence)],
-      nothing: () => [],
+      nothing: () => undefined,
     });
+
+    if (imageContent) {
+      link.link['#array'] = [imageContent];
+    }
 
     return link;
   }
