@@ -13,7 +13,7 @@ export type LinkParams = {
   href?: string,
   internal?: boolean,
   title?: string,
-  content?: Maybe<Image>;
+  content?: Image,
   guid?: string,
 };
 
@@ -27,6 +27,11 @@ const defaultContent = {
   guid: '',
 };
 
+const contentMaybe = (content: Image): Maybe<Image> => {
+  // convert content param to Maybe
+  return content ? Maybe.just(content) : Maybe.nothing<Image>();
+};
+
 export class Link extends Immutable.Record(defaultContent) {
   contentType: 'Link';
   content: Maybe<Image>;
@@ -37,11 +42,21 @@ export class Link extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: LinkParams) {
-    super(augment(params));
+    // convert content to Maybe
+    const linkParams = (params as any);
+    linkParams.content = contentMaybe(params.content);
+    
+    super(augment(linkParams));
   }
 
   with(values: LinkParams) {
-    return this.merge(values) as this;
+    const newValues = (values as any);
+    if (values && values.content) {
+      // convert content to Maybe
+      newValues.content = contentMaybe(values.content);
+    }
+
+    return this.merge(newValues) as this;
   }
 
   static fromPersistence(root: Object, guid: string, toDraft) : Link {
@@ -66,14 +81,13 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array 
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
+      model = model.with({ content: Image.fromPersistence(children[0], '', toDraft) });
     } else {
-      model = model.with({ content: Maybe.nothing<Image>() });
+      model = model.with({ content: null });
     }
     
     return model;
   }
- 
 
   toPersistence(toPersistence, text) : Object {
     const link = {
@@ -91,7 +105,7 @@ export class Link extends Immutable.Record(defaultContent) {
     });
 
     if (imageContent) {
-      link.link['#array'] = [imageContent];
+      link.link['#array'] = imageContent;
     }
 
     return link;
