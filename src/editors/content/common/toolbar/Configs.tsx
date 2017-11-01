@@ -93,7 +93,7 @@ export function flowInsertion() {
     <Button key="imageLink" 
       command={insertInline(
         EntityTypes.link, 'IMMUTABLE', 
-        { link: new Link({ content: new ImageData() }) })}
+        { link: new Link({ content: Maybe.just(new ImageData()) }) })}
       tooltip="Insert a hyperlinked image" icon="file-image-o"/>,
     <Button key="math" 
       command={insertInline(EntityTypes.math, 'IMMUTABLE', defaultMathML)} 

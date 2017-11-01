@@ -13,7 +13,7 @@ export type LinkParams = {
   href?: string,
   internal?: boolean,
   title?: string,
-  content?: Image,
+  content?: Maybe<Image>,
   guid?: string,
 };
 
@@ -27,11 +27,6 @@ const defaultContent = {
   guid: '',
 };
 
-const contentMaybe = (content: Image): Maybe<Image> => {
-  // convert content param to Maybe
-  return content ? Maybe.just(content) : Maybe.nothing<Image>();
-};
-
 export class Link extends Immutable.Record(defaultContent) {
   contentType: 'Link';
   content: Maybe<Image>;
@@ -42,23 +37,11 @@ export class Link extends Immutable.Record(defaultContent) {
   guid: string;
   
   constructor(params?: LinkParams) {
-    // convert content to Maybe
-    const linkParams = (params as any);
-    if (params) {
-      linkParams.content = contentMaybe(params.content);
-    }
-    
-    super(augment(linkParams));
+    super(augment(params));
   }
 
   with(values: LinkParams) {
-    const newValues = (values as any);
-    if (values && values.content !== undefined) {
-      // convert content to Maybe
-      newValues.content = contentMaybe(values.content);
-    }
-
-    return this.merge(newValues) as this;
+    return this.merge(values) as this;
   }
 
   static fromPersistence(root: Object, guid: string, toDraft) : Link {
@@ -83,9 +66,7 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array 
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Image.fromPersistence(children[0], '', toDraft) });
-    } else {
-      model = model.with({ content: null });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
     }
     
     return model;
