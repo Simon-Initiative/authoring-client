@@ -44,14 +44,16 @@ export class Link extends Immutable.Record(defaultContent) {
   constructor(params?: LinkParams) {
     // convert content to Maybe
     const linkParams = (params as any);
-    linkParams.content = contentMaybe(params.content);
+    if (params) {
+      linkParams.content = contentMaybe(params.content);
+    }
     
     super(augment(linkParams));
   }
 
   with(values: LinkParams) {
     const newValues = (values as any);
-    if (values && values.content) {
+    if (values && values.content !== undefined) {
       // convert content to Maybe
       newValues.content = contentMaybe(values.content);
     }
