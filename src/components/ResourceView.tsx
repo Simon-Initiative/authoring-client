@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { returnType } from '../utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import NavigationBar from './navigation/NavigationBar';
@@ -14,11 +13,24 @@ import { SortableTable, DataRow, ColumnComparator, SortDirection } from './commo
 import { isNullOrUndefined } from 'util';
 import guid from '../utils/guid';
 
+function mapStateToProps(state: any) {
+  const {
+    course,
+  } = state;
+
+  return {
+    course,
+  };
+}
+
+/**
+ * declare interfaces and types
+ */
 interface ResourceView {
   viewActions: any;
 }
+
 export interface ResourceViewOwnProps {
-  // course: any;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
@@ -29,26 +41,19 @@ export interface ResourceViewOwnProps {
     title: string, type: string) => models.ContentModel;
 }
 
-
 interface ResourceViewState {
   resources: Resource[];
 }
 
-function mapStateToProps(state: any) {
-
-  const {
-    course,
-  } = state;
-
-  return {
-    course,
-  };
+interface ResourceViewReduxProps {
+  course: any;
 }
 
-const stateGeneric = returnType(mapStateToProps);
-type ResourceViewReduxProps = typeof stateGeneric;
 type ResourceViewProps = ResourceViewReduxProps & ResourceViewOwnProps & { dispatch };
 
+/**
+ * ResourceView React Component
+ */
 class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
 
   constructor(props) {

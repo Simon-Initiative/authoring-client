@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
@@ -9,20 +8,6 @@ import { buildFeedbackFromCurrent } from '../../utils/feedback';
 import guid from '../../utils/guid';
 import * as view from '../../actions/view';
 import { Content } from './Content';
-
-/**
- *
- */
-interface NavigationBarState {
-  
-}
-
-/**
- *
- */
-export interface NavigationBarOwnProps {
-  viewActions: any;
-}
 
 const navbarStyles =
   {
@@ -79,7 +64,6 @@ const Section = (props) => {
 };
 
 function mapStateToProps(state: any) {
-
   const {
     course,
     user,
@@ -91,25 +75,44 @@ function mapStateToProps(state: any) {
   };
 }
 
+/**
+ * declare interfaces and types
+ */
+interface NavigationBarState {}
 
-const stateGeneric = returnType(mapStateToProps);
-type NavigationBarReduxProps = typeof stateGeneric;
+interface NavigationBarReduxProps {
+  user: {
+    profile: {
+      firstName: string,
+      lastName: string,
+      email: string,
+    },
+  };
+  course: {
+    model: {
+      guid: string,
+      title: string,
+    },
+  };
+}
+
+export interface NavigationBarOwnProps {
+  viewActions: any;
+}
+
 type NavigationBarProps = NavigationBarReduxProps & NavigationBarOwnProps & { dispatch };
 
-
 /**
- *
+ * NavigationBar React Component
  */
 class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> {
+  feedback: any;
   
   constructor(props) {
     super(props);
 
     this.feedback = null;
   }
-
-  feedback: any;
-
 
   componentDidMount() {
     (window as any).$(this.feedback).tooltip();
@@ -120,7 +123,6 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
   }
 
   render() {
-    
     const courseId = this.props.course.model.guid;
 
     const formUrl = buildFeedbackFromCurrent(

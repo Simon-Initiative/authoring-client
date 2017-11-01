@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
@@ -6,7 +7,6 @@ import { getKey } from '../../common';
 import { Image } from './image';
 
 import { ContentState } from 'draft-js';
-import { Maybe, Nothing } from '../../../utils/types';
 
 export type LinkParams = {
   target?: string,
@@ -23,12 +23,11 @@ const defaultContent = {
   href: 'www.google.com',
   internal: false,
   title: '',
-  content: Nothing,
+  content: Maybe.nothing<Image>(),
   guid: '',
 };
 
 export class Link extends Immutable.Record(defaultContent) {
-  
   contentType: 'Link';
   content: Maybe<Image>;
   target: string;
@@ -46,7 +45,6 @@ export class Link extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(root: Object, guid: string, toDraft) : Link {
-
     const t = (root as any).link;
 
     let model = new Link({ guid });
@@ -68,16 +66,13 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array 
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Image.fromPersistence(children[0], '', toDraft) });
-    } else {
-      model = model.with({ content: Nothing });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
     }
     
     return model;
   }
 
   toPersistence(toPersistence, text) : Object {
-
     const link = {
       link: {
         '@title': this.title,
@@ -87,9 +82,14 @@ export class Link extends Immutable.Record(defaultContent) {
       },
     };
 
-    if (this.content instanceof Image) {
-      link.link['#array'] = [this.content.toPersistence(toPersistence)];
-    } 
+    const imageContent: Image = this.content.caseOf({
+      just: c => [c.toPersistence(toPersistence)],
+      nothing: () => undefined,
+    });
+
+    if (imageContent) {
+      link.link['#array'] = imageContent;
+    }
 
     return link;
   }

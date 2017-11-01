@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
-import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
 
