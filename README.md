@@ -2,4 +2,4 @@
 
 NextGen course editor.
 
-Full documentation in dev-docs repository.
+Full documentation currently located in dev-docs repository.
