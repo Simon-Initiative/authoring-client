@@ -3,7 +3,6 @@ import { Title } from './title';
 import { augment, getChildren } from './common';
 import createGuid from '../../utils/guid';
 import { getKey } from '../common';
-import { Linkable } from './linkable';
 
 export type HeadParams = {
   title?: Title,
