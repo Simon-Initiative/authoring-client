@@ -17,8 +17,8 @@ import guid from '../../utils/guid';
 import { RowType } from './types';
 import { ExistingSkillSelection } from './ExistingSkillSelection';
 
-import { AggregateModel, 
-  UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel, 
+import { AggregateModel,
+  UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
 
 import { Row } from './Row';
@@ -45,13 +45,13 @@ interface ObjectiveSkillViewState {
 // The Learning Objectives and Skills documents require specialized handling
 // because we need to present a unified view to the end user.  Different
 // from workbook pages, assessments, and organizations, LOs and skills are
-// not edited on a per-document basis.  We tried that first and the 
+// not edited on a per-document basis.  We tried that first and the
 // multilevel UI was confusing and cumbersome for users.  So instead we
 // abstract away the presence of multiple documents and present a single,
-// unified UI where the user can create and edit LOs and skills.  
+// unified UI where the user can create and edit LOs and skills.
 
 
-export class ObjectiveSkillView 
+export class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
 
   constructor(props) {
@@ -73,8 +73,9 @@ export class ObjectiveSkillView
     this.onToggleExpanded = this.onToggleExpanded.bind(this);
 
     this.services = new DispatchBasedServices(
-          this.props.dispatch, 
-          this.props.course.model, null);
+      this.props.dispatch,
+      this.props.course.model,
+    );
   }
 
   componentDidMount() {
@@ -88,9 +89,9 @@ export class ObjectiveSkillView
     if (this.state.aggregateModel !== null
       && this.state.aggregateModel.isLocked) {
 
-      this.releaseAllLocks([...this.state.objectives.documents, 
+      this.releaseAllLocks([...this.state.objectives.documents,
         ...this.state.skills.documents]);
-        
+
     }
   }
 
@@ -109,7 +110,7 @@ export class ObjectiveSkillView
 
         // We need to check to see if the component has unmounted
         // before buildAggregateModel completed.  This can happen if
-        // the user clicks on this view and immediately clicks on 
+        // the user clicks on this view and immediately clicks on
         // another.  In this case we need to release the locks that
         // were just acquired by buildAggregateModel
         if (this.unmounted) {
@@ -127,9 +128,9 @@ export class ObjectiveSkillView
   }
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
-    
+
     const originalDocument = this.state.objectives.mapping.get(obj.id);
-    
+
     const objectives = (originalDocument.model as models.LearningObjectivesModel)
       .objectives.set(obj.guid, obj);
     const model =
@@ -139,12 +140,12 @@ export class ObjectiveSkillView
     const updatedDocument = originalDocument.with({ model });
 
     const unified = Object.assign({}, this.state.objectives);
-    
+
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
     unified.objectives = unified.objectives.set(obj.id, obj);
-    
+
     if (originalDocument === unified.newBucket) {
       unified.newBucket = updatedDocument;
     }
@@ -157,7 +158,7 @@ export class ObjectiveSkillView
   onSkillEdit(model: contentTypes.Skill) {
 
     const originalDocument = this.state.skills.mapping.get(model.id);
-    
+
     const skills = (originalDocument.model as models.SkillsModel)
       .skills.set(model.guid, model);
     const updatedModel =
@@ -167,12 +168,12 @@ export class ObjectiveSkillView
     const updatedDocument = originalDocument.with({ model: updatedModel });
 
     const unified = Object.assign({}, this.state.skills);
-    
+
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
     unified.skills = unified.skills.set(model.id, model);
-    
+
     if (originalDocument === unified.newBucket) {
       unified.newBucket = updatedDocument;
     }
@@ -197,14 +198,14 @@ export class ObjectiveSkillView
     const updatedDocument = this.state.skills.newBucket.with({ model: updatedModel });
 
     const unified = Object.assign({}, this.state.skills);
-    
+
     const index = unified.documents.indexOf(this.state.skills.newBucket);
 
     unified.documents[index] = updatedDocument;
     unified.mapping = unified.mapping.set(id, updatedDocument);
     unified.skills = unified.skills.set(skill.id, skill);
     unified.newBucket = updatedDocument;
-    
+
     this.setState({ skills: unified });
 
     persistence.persistDocument(updatedDocument);
@@ -245,7 +246,7 @@ export class ObjectiveSkillView
         (map, skill) => {
           map[skill.id] = skill;
           return map;
-        }, 
+        },
         {});
 
     this.state.objectives.objectives
@@ -278,7 +279,7 @@ export class ObjectiveSkillView
       this.removeObjective(model);
     } else {
       this.removeSkill(model);
-    } 
+    }
   }
 
   removeSkill(model: contentTypes.Skill) {
@@ -301,7 +302,7 @@ export class ObjectiveSkillView
 
     // Update the skills
     const originalDocument = this.state.skills.mapping.get(model.id);
-    
+
     const skills = (originalDocument.model as models.SkillsModel)
       .skills.delete(model.guid);
     const updatedModel =
@@ -311,12 +312,12 @@ export class ObjectiveSkillView
     const updatedDocument = originalDocument.with({ model: updatedModel });
 
     const unified = Object.assign({}, this.state.skills);
-    
+
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
     unified.skills = unified.skills.delete(model.id);
-    
+
     if (originalDocument === unified.newBucket) {
       unified.newBucket = updatedDocument;
     }
@@ -328,7 +329,7 @@ export class ObjectiveSkillView
 
   removeObjective(obj: contentTypes.LearningObjective) {
     const originalDocument = this.state.objectives.mapping.get(obj.id);
-    
+
     const objectives = (originalDocument.model as models.LearningObjectivesModel)
       .objectives.delete(obj.guid);
     const model =
@@ -338,12 +339,12 @@ export class ObjectiveSkillView
     const updatedDocument = originalDocument.with({ model });
 
     const unified = Object.assign({}, this.state.objectives);
-    
+
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
     unified.objectives = unified.objectives.delete(obj.id);
-    
+
     if (originalDocument === unified.newBucket) {
       unified.newBucket = updatedDocument;
     }
@@ -376,7 +377,7 @@ export class ObjectiveSkillView
         (map, skill) => {
           map[skill.id] = skill;
           return map;
-        }, 
+        },
         {});
 
     const isExpanded = (guid) => {
@@ -392,41 +393,41 @@ export class ObjectiveSkillView
       .toArray()
       .forEach((objective: contentTypes.LearningObjective) => {
 
-        rows.push(<Row 
+        rows.push(<Row
           key={objective.id}
           onAddExistingSkill={this.onAddExistingSkill}
           onRemove={this.onRemove}
           onAddNewSkill={this.onAddNewSkill}
           highlighted={false}
           model={objective}
-          isExpanded={isExpanded(objective.id)} 
+          isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
-          editMode={this.state.aggregateModel.isLocked} 
+          editMode={this.state.aggregateModel.isLocked}
           onEdit={this.onObjectiveEdit} />);
 
         if (isExpanded(objective.id)) {
-            
+
           objective.skills.forEach((skillId) => {
 
             const skill = skillsById[skillId];
             if (skill !== undefined) {
 
-              rows.push(<Row 
+              rows.push(<Row
                 key={objective.id + '-' + skill.id}
                 onAddExistingSkill={this.onAddExistingSkill}
                 onAddNewSkill={this.onAddNewSkill}
                 onRemove={this.onRemove}
                 highlighted={false}
                 model={skill}
-                isExpanded={false} 
+                isExpanded={false}
                 toggleExpanded={this.onToggleExpanded}
-                editMode={this.state.aggregateModel.isLocked} 
+                editMode={this.state.aggregateModel.isLocked}
                 onEdit={this.onSkillEdit} />);
             }
           });
         }
 
-        
+
       });
 
     return rows;
@@ -442,7 +443,7 @@ export class ObjectiveSkillView
     const objectives = (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
       .objectives.set(obj.id, obj);
 
-    
+
 
     const model =
       (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
@@ -451,7 +452,7 @@ export class ObjectiveSkillView
     const document = this.state.objectives.newBucket.with({ model });
 
     const unified = this.state.objectives;
-    
+
     const index = unified.documents.indexOf(unified.newBucket);
 
     unified.documents[index] = document;
@@ -485,7 +486,7 @@ export class ObjectiveSkillView
         width={600}
         value=""
         placeholder="Enter title for new objective"
-        existing={this.state.objectives === null ? Immutable.List<string>() 
+        existing={this.state.objectives === null ? Immutable.List<string>()
           : this.state.objectives.objectives.toList().map(o => o.title).toList()}
         onClick={this.createNew}
       />
@@ -499,7 +500,7 @@ export class ObjectiveSkillView
   renderLockDisplay() {
 
     if (this.state.aggregateModel !== null) {
-      return this.state.aggregateModel.isLocked ? null : 
+      return this.state.aggregateModel.isLocked ? null :
         renderLocked(this.state.aggregateModel.lockDetails);
     } else {
       return null;

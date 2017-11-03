@@ -12,7 +12,11 @@
         "inlineSourceMap": false,
         "noEmitHelpers": false,
         "alwaysStrict": true,
-        "outDir": "./dev"
+        "outDir": "./dev",
+        "baseUrl": ".",
+        "paths": {
+          "app/*": ["src/*"]
+        }
     },
   "exclude": [
     "node_modules",

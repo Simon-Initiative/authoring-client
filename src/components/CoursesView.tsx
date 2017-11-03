@@ -54,7 +54,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
           PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty content');
 
     persistence.createDocument(courseId, resource);
-    
+
     return resource;
   }
 
@@ -85,15 +85,15 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
       .catch(err => console.log(err));
   }
 
-  
+
 
   fetchDocument(courseId: string) {
-    
+
     persistence.retrieveCoursePackage(courseId)
       .then((document) => {
         // Notify that the course has changed when a user views a course
         if (document.model.modelType === models.ModelTypes.CourseModel) {
-            
+
           const courseModel : models.CourseModel = document.model;
 
           if (!document.model.resources.toArray().some(
@@ -105,7 +105,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
             this.props.dispatch(courseActions.courseChanged(updatedModel));
             viewActions.viewDocument(courseId, courseId);
-          
+
           } else {
             this.props.dispatch(courseActions.courseChanged(document.model));
             viewActions.viewDocument(courseId, courseId);

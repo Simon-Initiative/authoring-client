@@ -2,14 +2,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, 
+import { AbstractItemPartEditor,
   AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import { ConceptsEditor } from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
 import { ItemLabel } from './ItemLabel';
 import guid from '../../../utils/guid';
@@ -36,9 +36,9 @@ export interface OrderingState {
 /**
  * The content editor for HtmlContent.
  */
-export class Ordering 
+export class Ordering
   extends AbstractItemPartEditor<contentTypes.Ordering, OrderingProps, OrderingState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -73,11 +73,11 @@ export class Ordering
   renderCriteria() {
     const expandedCriteria =
       <form className="form-inline">
-        <Button editMode={this.props.editMode} 
+        <Button editMode={this.props.editMode}
           onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
       </form>;
 
-    return <Collapse caption="Grading Criteria" 
+    return <Collapse caption="Grading Criteria"
         details=""
         expanded={expandedCriteria}>
 
@@ -99,19 +99,19 @@ export class Ordering
 
     const count = this.props.itemModel.choices.size;
     const value = this.toLetter(count);
-    
+
     const choice = new contentTypes.Choice().with({ value, guid: guid() });
-    
+
     const itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) });
-    
+
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
   onChoiceEdit(c) {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }), 
+      { choices: this.props.itemModel.choices.set(c.guid, c) }),
       this.props.partModel);
   }
 
@@ -136,14 +136,14 @@ export class Ordering
   }
 
   renderChoice(choice: contentTypes.Choice, index: number) {
-    return <Choice 
+    return <Choice
               key={choice.guid}
               label={'Choice ' + this.toLetter(index)}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}
               model={choice}
-              onEdit={this.onChoiceEdit} 
+              onEdit={this.onChoiceEdit}
               onRemove={this.onRemoveChoice.bind(this, choice)}
               />;
   }
@@ -153,32 +153,32 @@ export class Ordering
   }
 
   updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
-    
-    // For each response, adjust matches that may have 
+
+    // For each response, adjust matches that may have
     // utilized the removedValue...
-    
+
     return partModel;
   }
 
   updateChoiceValues(itemModel: contentTypes.Ordering) : contentTypes.Ordering {
-    
+
     const choices = itemModel.choices.toArray();
     let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
-    
+
     choices.forEach((choice, index) => {
       const value = this.toLetter(index);
       const updated = choice.with({ value });
       newChoices = newChoices.set(updated.guid, updated);
     });
-    
+
     return itemModel.with({ choices: newChoices });
   }
 
   onRemoveChoice(choice: contentTypes.Choice) {
     let itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.delete(choice.guid) });
-    
-    itemModel = this.updateChoiceValues(itemModel); 
+
+    itemModel = this.updateChoiceValues(itemModel);
     const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
 
     this.props.onEdit(itemModel, partModel);
@@ -200,7 +200,7 @@ export class Ordering
   }
 
   render() : JSX.Element {
-    
+
     const bodyStyle = {
       minHeight: '75px',
       borderStyle: 'solid',
@@ -221,13 +221,13 @@ export class Ordering
         onBlur={() => this.props.onBlur(this.props.itemModel.id)}
         >
 
-          <ConceptsEditor 
+          <ConceptsEditor
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           courseId={this.props.context.courseId}
           model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit} 
+          onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill"
           />

@@ -14,42 +14,27 @@ import { SortableTable, DataRow, ColumnComparator, SortDirection } from './commo
 import { isNullOrUndefined } from 'util';
 import guid from '../utils/guid';
 
-interface ResourceView {
-  viewActions: any;
-}
-export interface ResourceViewOwnProps {
-  // course: any;
+export interface ResourceViewProps {
+  course: any;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
   resourceType: string;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
-    courseId: string, 
+    courseId: string,
     title: string, type: string) => models.ContentModel;
 }
-
 
 interface ResourceViewState {
   resources: Resource[];
 }
 
-function mapStateToProps(state: any) {
-
-  const {
-    course,
-  } = state;
-
-  return {
-    course,
-  };
+export default interface ResourceView {
+  viewActions: any;
 }
 
-const stateGeneric = returnType(mapStateToProps);
-type ResourceViewReduxProps = typeof stateGeneric;
-type ResourceViewProps = ResourceViewReduxProps & ResourceViewOwnProps & { dispatch };
-
-class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
+export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
 
   constructor(props) {
     super(props);
@@ -121,7 +106,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r => ({ 
+    const rows = this.state.resources.map(r => ({
       key: r.guid,
       data: r,
     }));
@@ -133,14 +118,14 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     ];
 
     const comparators = [
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? a.title.localeCompare(b.title) 
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? a.title.localeCompare(b.title)
         : b.title.localeCompare(a.title),
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? compareDates(a.dateCreated, b.dateCreated) 
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? compareDates(a.dateUpdated, b.dateUpdated)  
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? compareDates(a.dateUpdated, b.dateUpdated)
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
@@ -156,7 +141,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <div className="">
         {creationTitle}
         {this.renderCreation()}
-        <SortableTable 
+        <SortableTable
           model={rows}
           columnComparators={comparators}
           columnRenderers={renderers}
@@ -180,7 +165,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   render() {
-    
+
     return (
       <div className="container-fluid new">
         <div className="row">
@@ -200,6 +185,3 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
 }
-
-export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>
-(mapStateToProps)(ResourceView);

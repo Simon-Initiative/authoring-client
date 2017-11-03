@@ -8,20 +8,21 @@ import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
 import InlineInsertionToolbar from './InlineInsertionToolbar';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
-import * as persistence from '../../../data/persistence';
-import { Resource } from '../../../data/content/resource';
+import * as persistence from 'app/data/persistence';
+import { Resource } from 'app/data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import { ObjectiveSelection } from '../../../utils/selection/ObjectiveSelection';
+import { AuthoringActionsHandler, AuthoringActions } from 'app/actions/authoring';
+import { ObjectiveSelection } from 'app/utils/selection/ObjectiveSelection';
 
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
-import { LegacyTypes } from '../../../data/types';
+import * as models from 'app/data/models';
+import * as contentTypes from 'app/data/contentTypes';
+import { LegacyTypes } from 'app/data/types';
+import { Title } from 'app/types/course';
 
-const styles = {  
+const styles = {
   loContainer : {
     border: '1px solid grey',
-    background: '#ffffff',  
+    background: '#ffffff',
     height: '125px',
     overflowX: 'auto',
     overflowY: 'scroll',
@@ -30,24 +31,22 @@ const styles = {
   },
 };
 
-interface WorkbookPageEditor {
-  
-}
+interface WorkbookPageEditor {}
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
-  
+  onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
+  objectiveTitles: any;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {
-  objectiveTitles: Immutable.List<string>;
 }
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
-  WorkbookPageEditorProps, 
+  WorkbookPageEditorProps,
   WorkbookPageEditorState> {
-    
+
   constructor(props) {
-    super(props, { objectiveTitles: Immutable.Map<string, string>() });
+    super(props, {});
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
@@ -56,7 +55,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
-    
     if (this.props.model !== nextProps.model) {
       return true;
     }
@@ -68,14 +66,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   fetchObjectiveTitles(objrefs: Immutable.List<string>) {
-    this.props.services.titleOracle.getTitles(
-      this.props.context.courseId, 
-      objrefs.toArray(),
-      LegacyTypes.learning_objectives)
-
-      .then((titles) => {
-        this.setState({ objectiveTitles: Immutable.List<string>(titles) });
-      });
+    const { courseId } = this.props.context;
+    this.props.onGetTitles(courseId, objrefs.toArray(), LegacyTypes.learning_objectives);
   }
 
   onTitleEdit(title) {
@@ -89,17 +81,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onObjectivesEdit(objectives: Immutable.Set<contentTypes.LearningObjective>) {
-
     this.props.services.dismissModal();
 
     const head = this.props.model.head.with(
       { objrefs: objectives.map(o => o.id).toList() });
     this.handleEdit(this.props.model.with({ head }));
   }
-    
+
   renderObjectives() {
-    const objectives = this.state.objectiveTitles
-      .toArray()
+    const objectives = this.props.objectiveTitles
       .map((title) => {
         return <li key={title}>{title}</li>;
       });
@@ -111,15 +101,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-
     const updateObjectiveTitles = () => {
-      this.setState({ objectiveTitles: Immutable.List<string>() });
-
       if (nextProps.model.head.objrefs.size > 0) {
         this.fetchObjectiveTitles(nextProps.model.head.objrefs);
       }
     };
-  
+
 
     if (nextProps.model !== this.props.model) {
 
@@ -133,53 +120,50 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
           }
         }
       }
-      
+
     }
   }
 
   selectObjectives() {
-    const component = <ObjectiveSelection 
+    const component = <ObjectiveSelection
       onInsert={this.onObjectivesEdit}
       onCancel={() => this.props.services.dismissModal()}
-      courseId={this.props.context.courseId}
-      titleOracle={this.props.services.titleOracle}/>;
-      
+      courseId={this.props.context.courseId} />;
+
     this.props.services.displayModal(component);
   }
 
-  render() {      
+  render() {
+    const inlineToolbar = <InlineToolbar />;
+    const blockToolbar = <BlockToolbar />;
+    const insertionToolbar = <InlineInsertionToolbar />;
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
-    const addLearningObj = <button 
-      className="btn btn-link" 
+    const addLearningObj = <button
+      className="btn btn-link"
       onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
       <div>
-          <UndoRedoToolbar 
+          <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-          <TitleContentEditor 
+            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)} />
+          <TitleContentEditor
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.head.title}
-            onEdit={this.onTitleEdit} 
-            />
-          
-          <Collapse 
-            caption="Learning Objectives" 
+            onEdit={this.onTitleEdit} />
+
+          <Collapse
+            caption="Learning Objectives"
             expanded={addLearningObj}>
 
             {this.renderObjectives()}
-          
+
           </Collapse>
 
-          <HtmlContentEditor 
+          <HtmlContentEditor
               inlineToolbar={inlineToolbar}
               inlineInsertionToolbar={insertionToolbar}
               blockToolbar={blockToolbar}
@@ -187,8 +171,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               services={this.props.services}
               context={this.props.context}
               model={this.props.model.body}
-              onEdit={c => this.onBodyEdit(c)} 
-              />
+              onEdit={c => this.onBodyEdit(c)} />
       </div>
     );
   }

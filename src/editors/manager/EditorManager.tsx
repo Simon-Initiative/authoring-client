@@ -1,23 +1,23 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
-import { returnType } from '../../utils/types';
+import { returnType } from 'app/utils/types';
 import { connect } from 'react-redux';
-import { UserProfile } from '../../actions/user';
-import * as persistence from '../../data/persistence';
-import * as models from '../../data/models';
-import * as courseActions from '../../actions/course';
-import guid from '../../utils/guid';
-import { configuration } from '../../actions/utils/config';
+import { UserProfile } from 'app/actions/user';
+import * as persistence from 'app/data/persistence';
+import * as models from 'app/data/models';
+import * as courseActions from 'app/actions/course';
+import guid from 'app/utils/guid';
+import { configuration } from 'app/actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices, DispatchBasedServices } from '../common/AppServices';
-import { buildFeedbackFromCurrent } from '../../utils/feedback';
-import { onFailureCallback, onSaveCompletedCallback, 
+import { buildFeedbackFromCurrent } from 'app/utils/feedback';
+import { onFailureCallback, onSaveCompletedCallback,
     PersistenceStrategy } from './persistence/PersistenceStrategy';
-import { LockDetails, renderLocked } from '../../utils/lock';
+import { LockDetails, renderLocked } from 'app/utils/lock';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
-import { Resource } from '../../data/content/resource';
+import { Resource } from 'app/data/content/resource';
 import { Maybe } from 'tsmonad';
 
 interface EditorManager {
@@ -67,7 +67,6 @@ interface EditorManagerOwnProps {
   userName: string;
 
   profile: UserProfile;
-
   course: any;
 }
 
@@ -130,7 +129,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         if (!this.componentDidUnmount) {
           this.setState({ editingAllowed });
 
-          const listeningApproach: ListeningApproach 
+          const listeningApproach: ListeningApproach
             = lookUpByName(document.model.modelType).listeningApproach;
 
           if ((!editingAllowed && listeningApproach === ListeningApproach.WhenReadOnly) ||
@@ -147,15 +146,15 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
 
   fetchDocument(courseId: string, documentId: string) {
-    
+
     if (this.waitBufferTimer !== null) {
       clearTimeout(this.waitBufferTimer);
     }
     this.waitBufferTimer = setTimeout(
       () => {
         this.waitBufferTimer = null;
-        this.setState({ waitBufferElapsed: true });  
-      }, 
+        this.setState({ waitBufferElapsed: true });
+      },
       200);
 
     persistence.retrieveDocument(courseId, documentId)
@@ -181,12 +180,12 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
       })
       .catch((failure) => {
         this.setState({ failure });
-        
+
       });
   }
 
   componentWillReceiveProps(nextProps) {
-    
+
     if (this.props.documentId !== nextProps.documentId) {
 
       this.stopListening = true;
@@ -209,7 +208,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         }
         this.setState({ document, failure: null, waitBufferElapsed: false });
       } else {
-        this.setState({ document: null, editingAllowed: null, 
+        this.setState({ document: null, editingAllowed: null,
           failure: null, waitBufferElapsed: false });
         if (nextProps.course) {
           this.fetchDocument(nextProps.course.model.guid, nextProps.documentId);
@@ -242,6 +241,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         this.fetchDocument(this.props.course.model.guid, this.props.documentId);
       }
     }
+
+    this.loadCourseTitles();
   }
 
 
@@ -250,6 +251,14 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
     this.componentDidUnmount = true;
     if (this.persistenceStrategy !== null) {
       this.persistenceStrategy.destroy();
+    }
+  }
+
+  loadCourseTitles() {
+    const { dispatch, course } = this.props;
+
+    if (this.props.course) {
+      dispatch(courseActions.fetchObjectiveTitles(this.props.course.model.guid));
     }
   }
 
@@ -292,14 +301,14 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           </div>
           <div className="col-8">
             <div className="alert alert-info" role="alert">
-              <strong>Please wait.</strong> Loading the course material. 
+              <strong>Please wait.</strong> Loading the course material.
             </div>
           </div>
           <div className="col-2">
             &nbsp;
           </div>
         </div>
-        
+
       </div>
     );
   }
@@ -321,7 +330,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
               <h4 className="alert-heading">Problem encountered!</h4>
               <p>
                 A problem was encountered while trying to render the
-                course material.  
+                course material.
               </p>
               <p className="mb-0">Resource id:</p>
               <pre>{this.props.documentId}</pre>
@@ -339,20 +348,20 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
         </div>
       </div>
     );
-    
+
   }
 
   render(): JSX.Element {
     if (this.state.failure !== null) {
       return this.renderError();
     } else if (this.state.document === null || this.state.editingAllowed === null) {
-      
+
       if (this.state.waitBufferElapsed) {
         return this.renderWaiting();
       } else {
         return null;
       }
-      
+
     } else {
 
       const courseId = (this.props.course.model as models.CourseModel).guid;
@@ -361,8 +370,8 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
       const childProps: AbstractEditorProps<any> = {
         model: this.state.document.model,
-        expanded: this.props.expanded.has(this.props.documentId) 
-          ? Maybe.just<Immutable.Set<string>>(this.props.expanded.get(this.props.documentId)) 
+        expanded: this.props.expanded.has(this.props.documentId)
+          ? Maybe.just<Immutable.Set<string>>(this.props.expanded.get(this.props.documentId))
           : Maybe.nothing<Immutable.Set<string>>(),
         context: {
           documentId: this.props.documentId,
@@ -372,13 +381,15 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
           baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
           courseModel: this.props.course.model,
           undoRedoGuid: this.state.undoRedoGuid,
+          titles: this.props.titles,
         },
         dispatch: this.props.dispatch,
         onEdit: this._onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
         services: new DispatchBasedServices(
-          this.props.dispatch, 
-          this.props.course.model, this.props.titles),
+          this.props.dispatch,
+          this.props.course.model,
+        ),
         editMode: this.state.editingAllowed,
       };
 
@@ -387,7 +398,7 @@ class EditorManager extends React.Component<EditorManagerProps, EditorManagerSta
 
       return (
         <div>
-          {this.state.editingAllowed ? null : 
+          {this.state.editingAllowed ? null :
             renderLocked(
               this.persistenceStrategy.getLockDetails())}
           {editor}

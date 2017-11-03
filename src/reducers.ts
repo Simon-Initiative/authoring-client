@@ -10,7 +10,7 @@ import { server } from './reducers/server';
 
 const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
-  course,         // Information about current course, null if no current course
+  course,         // Information about current course
   modal,          // modal display state
   titles,         // titles of course resources
   requests,       // the current pending async requests

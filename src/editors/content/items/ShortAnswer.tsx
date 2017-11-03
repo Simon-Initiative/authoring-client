@@ -1,14 +1,17 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import {
+  AbstractItemPartEditor,
+  AbstractItemPartEditorProps,
+} from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import { ConceptsEditor } from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -17,7 +20,7 @@ import './MultipleChoice.scss';
 
 
 export interface ShortAnswer {
-  
+
 }
 
 export interface ShortAnswerProps extends AbstractItemPartEditorProps<contentTypes.ShortAnswer> {
@@ -32,12 +35,12 @@ export interface ShortAnswerState {
 /**
  * The content editor for HtmlContent.
  */
-export class ShortAnswer 
+export class ShortAnswer
   extends AbstractItemPartEditor<contentTypes.ShortAnswer, ShortAnswerProps, ShortAnswerState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
@@ -51,7 +54,7 @@ export class ShortAnswer
   }
 
   onExplanation(explanation) {
-    const part = this.props.partModel.with({explanation});
+    const part = this.props.partModel.with({ explanation });
     this.props.onEdit(this.props.itemModel, part);
   }
 
@@ -62,11 +65,11 @@ export class ShortAnswer
   renderCriteria() {
     const expandedCriteria =
       <form className="form-inline">
-        <Button editMode={this.props.editMode} 
+        <Button editMode={this.props.editMode}
           onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
       </form>;
 
-    return <Collapse caption="Grading Criteria" 
+    return <Collapse caption="Grading Criteria"
         details=""
         expanded={expandedCriteria}>
 
@@ -112,18 +115,24 @@ export class ShortAnswer
   }
 
   render() : JSX.Element {
-    
+
     const controls = (
-      <div style={{display: 'inline'}}>
-        <Select editMode={this.props.editMode}
-          label='Whitespace' value={this.props.itemModel.whitespace} onChange={this.onWhitespaceChange}>
+      <div style={{ display: 'inline' }}>
+        <Select
+          editMode={this.props.editMode}
+          label="Whitespace"
+          value={this.props.itemModel.whitespace}
+          onChange={this.onWhitespaceChange}>
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
         </Select>
-        
-        <Checkbox editMode={this.props.editMode}
-          label='Case Sensitive' value={this.props.itemModel.caseSensitive} onEdit={this.onCaseSensitive}/>
+
+        <Checkbox
+          editMode={this.props.editMode}
+          label="Case Sensitive"
+          value={this.props.itemModel.caseSensitive}
+          onEdit={this.onCaseSensitive} />
       </div>);
 
     return (
@@ -132,18 +141,18 @@ export class ShortAnswer
         >
 
         {controls}
-        
-        <ConceptsEditor 
+
+        <ConceptsEditor
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           courseId={this.props.context.courseId}
           model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit} 
+          onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill"
           />
-        
+
         {this.renderCriteria()}
 
         <Hints
@@ -156,7 +165,7 @@ export class ShortAnswer
             model={this.props.partModel.explanation}
             onEdit={this.onExplanation}
           />
-        
+
       </div>);
   }
 

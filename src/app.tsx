@@ -10,7 +10,7 @@ import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
-import Perf from 'react-addons-perf'; 
+import Perf from 'react-addons-perf';
 
 (window as any).React = React;
 (window as any).Perf = Perf;
@@ -28,8 +28,7 @@ import rootReducer from './reducers';
 import Main from './Main';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { CachingTitleOracle } from './editors/common/TitleOracle';
-import { setServerTimeSkew } from './actions/server';
+import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';
 
 // Stylesheets
 import './stylesheets/main.scss';
@@ -40,7 +39,7 @@ interface RR {
 }
 
 function initStore() {
-  
+
   const loggerMiddleware = (createLogger as any)();
 
   const createStoreWithMiddleware = applyMiddleware(
@@ -54,7 +53,7 @@ function initStore() {
 function initStoreWithState(state) {
   const loggerMiddleware = (createLogger as any)();
   const store = createStore(
-    rootReducer, state, 
+    rootReducer, state,
     applyMiddleware(thunkMiddleware, loggerMiddleware),
   );
 
@@ -70,7 +69,7 @@ function initStoreWithState(state) {
 }
 
 function historyRequiresCourseLoad() {
-  return window.location.hash !== '' 
+  return window.location.hash !== ''
     && window.location.hash.indexOf('-') !== -1;
 }
 
@@ -87,13 +86,13 @@ function loadCourse() : Promise<models.CourseModel> {
     })
     .catch(err => reject(err));
   });
-  
+
 }
 
 function tryLogin() : Promise<UserInfo> {
   return new Promise<UserInfo>((resolve, reject) => {
     initialize(
-      (profile, logoutUrl, accountManagementUrl) => 
+      (profile, logoutUrl, accountManagementUrl) =>
         resolve({ user: profile.username, profile, userId: profile.id, logoutUrl }),
       err => reject(err),
       configuration.protocol + configuration.hostname);
@@ -101,34 +100,34 @@ function tryLogin() : Promise<UserInfo> {
 }
 
 function render(store, current) {
-  
+
   // Now do the initial rendering
   ReactDOM.render(
       <Provider store={store}>
         <Main location={current}/>
-      </Provider>, 
-      document.getElementById('app')); 
-  
+      </Provider>,
+      document.getElementById('app'));
+
 }
 
 
 function main() {
-
   // Application specific initialization
   initRegistry();
   initEditorRegistry();
 
   let userInfo = null;
-  
+
   const redirectFragment = getQueryVariable('redirect_fragment');
   const current = {
     hash: '',
     pathname: '/' + (redirectFragment === null ? '' : redirectFragment),
     search: '',
   };
-  
+
   tryLogin()
     .then((user) => {
+      // initialize user data
       if (historyRequiresCourseLoad()) {
         userInfo = user;
         return loadCourse();
@@ -138,18 +137,18 @@ function main() {
       }
     })
     .then((model) => {
-      render(
-        initStoreWithState({ 
-          user: userInfo, 
-          course: { model },
-          titles: new CachingTitleOracle(model.guid),
-        }), 
-        current);
+      const store = initStoreWithState({ user: userInfo });
+      render(store, current);
+
+      // initialize course and title data
+      store.dispatch(courseChanged(model));
+      store.dispatch(fetchSkillTitles(model.guid));
+      store.dispatch(fetchObjectiveTitles(model.guid));
     })
     .catch((err) => {
       render(initStoreWithState({ user: userInfo }), current);
     });
-  
+
 }
 
 main();

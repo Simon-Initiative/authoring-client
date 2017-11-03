@@ -1,5 +1,5 @@
 
-import * as models from '../../data/models';
+import * as models from 'app/data/models';
 
 export type AppContext = {
   userId: string;
@@ -9,4 +9,5 @@ export type AppContext = {
   resourcePath: string;
   courseModel: models.CourseModel;
   undoRedoGuid: string;
+  titles: object;
 };

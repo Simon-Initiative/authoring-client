@@ -13,12 +13,17 @@ module.exports = {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ["", ".ts", ".tsx", ".js"]
+        extensions: ["", ".ts", ".tsx", ".js"],
+        extensions: ["", ".ts", ".tsx", ".js"],
+        // Add webpack aliases for top level imports
+        alias: {
+            app: path.resolve(__dirname, 'src'),
+        },
     },
     plugins: [
       new webpack.DefinePlugin({
-        "process.env": { 
-            NODE_ENV: JSON.stringify("production") 
+        "process.env": {
+            NODE_ENV: JSON.stringify("production")
         }
       })
     ],
