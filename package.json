@@ -88,7 +88,13 @@
       "js"
     ],
     "moduleNameMapper": {
-      "^app/(.*)": "<rootDir>/src/$1"
+      "^actions/(.*)": "<rootDir>/src/actions/$1",
+      "^components/(.*)": "<rootDir>/src/components/$1",
+      "^data/(.*)": "<rootDir>/src/data/$1",
+      "^editors/(.*)": "<rootDir>/src/editors/$1",
+      "^reducers/(.*)": "<rootDir>/src/reducers/$1",
+      "^types/(.*)": "<rootDir>/src/types/$1",
+      "^utils/(.*)": "<rootDir>/src/utils/$1"
     },
     "transform": {
       ".*": "<rootDir>/preprocessor.js"

@@ -2,8 +2,8 @@ import { Map } from 'immutable';
 import {
   ReceiveTitlesAction,
   RECEIVE_TITLES,
-} from 'app/actions/course';
-import * as models from 'app/data/models';
+} from 'actions/course';
+import * as models from 'data/models';
 import { OtherAction } from './utils';
 
 type CourseActions = ReceiveTitlesAction | OtherAction;

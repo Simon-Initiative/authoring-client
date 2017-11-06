@@ -1,16 +1,16 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import * as contentTypes from 'app/data/contentTypes';
-import { Skill } from 'app/types/course';
+import * as contentTypes from 'data/contentTypes';
+import { Skill } from 'types/course';
 import {
   AbstractContentEditor,
   AbstractContentEditorProps,
-} from 'app/editors/content/common/AbstractContentEditor';
+} from 'editors/content/common/AbstractContentEditor';
 import Concept from './Concept.controller';
-import { SkillSelection } from 'app/utils/selection/SkillSelection';
-import { Collapse } from 'app/editors/content/common/Collapse';
-import { TextInput, InlineForm, Button, Checkbox } from 'app/editors/content/common/controls';
+import { SkillSelection } from 'utils/selection/SkillSelection';
+import { Collapse } from 'editors/content/common/Collapse';
+import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
 /* tslint:disable */
 const Spacer = props => <span>&nbsp;&nbsp;</span>; // There is probably a better way...

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import * as types from 'app/data/types';
-import { Skill } from 'app/types/course';
-import * as persistence from 'app/data/persistence';
+import * as types from 'data/types';
+import { Skill } from 'types/course';
+import * as persistence from 'data/persistence';
 
 import ModalSelection from './ModalSelection';
 

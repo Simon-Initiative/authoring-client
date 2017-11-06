@@ -1,5 +1,5 @@
 
-import * as models from 'app/data/models';
+import * as models from 'data/models';
 
 export type AppContext = {
   userId: string;

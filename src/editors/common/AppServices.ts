@@ -1,12 +1,12 @@
-import * as types from 'app/data/types';
+import * as types from 'data/types';
 
-import { modalActions } from 'app/actions/modal';
-import * as persistence from 'app/data/persistence';
-import * as contentTypes from 'app/data/contentTypes';
-import * as view from 'app/actions/view';
-import * as courseActions from 'app/actions/course';
-import * as models from 'app/data/models';
-import guid from 'app/utils/guid';
+import { modalActions } from 'actions/modal';
+import * as persistence from 'data/persistence';
+import * as contentTypes from 'data/contentTypes';
+import * as view from 'actions/view';
+import * as courseActions from 'actions/course';
+import * as models from 'data/models';
+import guid from 'utils/guid';
 
 /**
  * An interface that defines the  'services' that are available to

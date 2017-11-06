@@ -1,7 +1,7 @@
-import * as persistence from 'app/data/persistence';
-import { CourseModel } from 'app/data/models';
-import { LegacyTypes } from 'app/data/types';
-import { Skill, Title } from 'app/types/course';
+import * as persistence from 'data/persistence';
+import { CourseModel } from 'data/models';
+import { LegacyTypes } from 'data/types';
+import { Skill, Title } from 'types/course';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';

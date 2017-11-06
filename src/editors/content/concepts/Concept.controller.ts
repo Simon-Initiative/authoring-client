@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Concept from './Concept';
-import { getTitle } from 'app/actions/course';
-import { Title } from 'app/types/course';
+import { getTitle } from 'actions/course';
+import { Title } from 'types/course';
 
 interface StateProps {
   title: string;

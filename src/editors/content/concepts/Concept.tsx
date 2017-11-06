@@ -3,8 +3,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import * as contentTypes from 'app/data/contentTypes';
-import { Title } from 'app/types/course';
+import * as contentTypes from 'data/contentTypes';
+import { Title } from 'types/course';
 import './Concept.scss';
 
 export interface ConceptProps {

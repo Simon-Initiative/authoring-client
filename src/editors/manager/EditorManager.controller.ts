@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import EditorManager from './EditorManager';
-import { courseChanged, fetchObjectiveTitles } from 'app/actions/course';
-import { CourseModel } from 'app/data/models';
-import { UserProfile } from 'app/types/user';
+import { courseChanged, fetchObjectiveTitles } from 'actions/course';
+import { CourseModel } from 'data/models';
+import { UserProfile } from 'types/user';
 
 interface StateProps {
   expanded: any;

@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { List } from 'immutable';
 import WorkbookPageEditor from './WorkbookPageEditor';
-import { getTitles } from 'app/actions/course';
-import { Title } from 'app/types/course';
+import { getTitles } from 'actions/course';
+import { Title } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
-import { WorkbookPageModel } from 'app/data/models';
+import { WorkbookPageModel } from 'data/models';
 
 interface StateProps {
   objectiveTitles: any;

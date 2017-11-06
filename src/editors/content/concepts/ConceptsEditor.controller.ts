@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import { List } from 'immutable';
 import ConceptsEditor from './ConceptsEditor';
-import { fetchSkillTitles } from 'app/actions/course';
+import { fetchSkillTitles } from 'actions/course';
 import {
   AbstractContentEditorProps,
-} from 'app/editors/content/common/AbstractContentEditor';
+} from 'editors/content/common/AbstractContentEditor';
 
 interface StateProps {}
 

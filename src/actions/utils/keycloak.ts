@@ -1,4 +1,4 @@
-import { UserProfile } from 'app/types/user';
+import { UserProfile } from 'types/user';
 import { credentials, getHeaders } from './credentials';
 import { configuration } from './config';
 const keyCloak = require('keycloak-js');

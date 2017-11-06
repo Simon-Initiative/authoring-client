@@ -1,26 +1,26 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
-import { returnType } from 'app/utils/types';
+import { returnType } from 'utils/types';
 import { connect } from 'react-redux';
-import { UserProfile } from 'app/types/user';
-import * as persistence from 'app/data/persistence';
-import * as models from 'app/data/models';
-import * as courseActions from 'app/actions/course';
-import guid from 'app/utils/guid';
-import { configuration } from 'app/actions/utils/config';
+import { UserProfile } from 'types/user';
+import * as persistence from 'data/persistence';
+import * as models from 'data/models';
+import * as courseActions from 'actions/course';
+import guid from 'utils/guid';
+import { configuration } from 'actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices, DispatchBasedServices } from '../common/AppServices';
-import { buildFeedbackFromCurrent } from 'app/utils/feedback';
+import { buildFeedbackFromCurrent } from 'utils/feedback';
 import {
   onFailureCallback,
   onSaveCompletedCallback,
   PersistenceStrategy,
 } from './persistence/PersistenceStrategy';
-import { LockDetails, renderLocked } from 'app/utils/lock';
+import { LockDetails, renderLocked } from 'utils/lock';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
-import { Resource } from 'app/data/content/resource';
+import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 
 export interface EditorManagerProps {

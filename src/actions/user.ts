@@ -3,7 +3,7 @@ import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
 import { initialize } from './utils/keycloak';
-import { UserProfile } from 'app/types/user';
+import { UserProfile } from 'types/user';
 import guid from '../utils/guid';
 
 export module user {

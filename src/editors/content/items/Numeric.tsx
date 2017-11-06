@@ -1,7 +1,7 @@
 'use strict';
 
 import * as React from 'react';
-import * as contentTypes from 'app/data/contentTypes';
+import * as contentTypes from 'data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
@@ -14,7 +14,7 @@ import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
-import guid from 'app/utils/guid';
+import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import '../common/editor.scss';

@@ -8,16 +8,16 @@ import InlineToolbar  from './InlineToolbar';
 import BlockToolbar  from './BlockToolbar';
 import InlineInsertionToolbar from './InlineInsertionToolbar';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
-import * as persistence from 'app/data/persistence';
-import { Resource } from 'app/data/content/resource';
+import * as persistence from 'data/persistence';
+import { Resource } from 'data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
-import { AuthoringActionsHandler, AuthoringActions } from 'app/actions/authoring';
-import { ObjectiveSelection } from 'app/utils/selection/ObjectiveSelection';
+import { AuthoringActionsHandler, AuthoringActions } from 'actions/authoring';
+import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
 
-import * as models from 'app/data/models';
-import * as contentTypes from 'app/data/contentTypes';
-import { LegacyTypes } from 'app/data/types';
-import { Title } from 'app/types/course';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import { LegacyTypes } from 'data/types';
+import { Title } from 'types/course';
 
 const styles = {
   loContainer : {

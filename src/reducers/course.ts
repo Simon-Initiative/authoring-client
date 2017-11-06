@@ -2,11 +2,11 @@ import { Map } from 'immutable';
 import { Maybe } from 'tsmonad';
 import {
   CourseModel,
-} from 'app/data/models';
+} from 'data/models';
 import {
   CourseChangedAction,
   COURSE_CHANGED,
-} from 'app/actions/course';
+} from 'actions/course';
 import { OtherAction } from './utils';
 
 type ActionTypes = CourseChangedAction | OtherAction;

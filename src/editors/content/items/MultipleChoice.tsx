@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as contentTypes from 'app/data/contentTypes';
+import * as contentTypes from 'data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
@@ -13,7 +13,7 @@ import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
-import guid from 'app/utils/guid';
+import guid from 'utils/guid';
 
 import '../common/editor.scss';
 import './MultipleChoice.scss';

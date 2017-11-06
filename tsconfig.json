@@ -15,7 +15,13 @@
         "outDir": "./dev",
         "baseUrl": ".",
         "paths": {
-          "app/*": ["src/*"]
+          "actions/*": ["src/actions"],
+          "components/*": ["src/components"],
+          "data/*": ["src/data"],
+          "editors/*": ["src/editors"],
+          "reducers/*": ["src/reducers"],
+          "types/*": ["src/types"],
+          "utils/*": ["src/utils"]
         }
     },
   "exclude": [

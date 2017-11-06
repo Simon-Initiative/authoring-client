@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as types from 'app/data/types';
-import * as persistence from 'app/data/persistence';
-import * as contentTypes from 'app/data/contentTypes';
-import { retrieveAllObjectives } from 'app/components/objectives/persistence';
+import * as types from 'data/types';
+import * as persistence from 'data/persistence';
+import * as contentTypes from 'data/contentTypes';
+import { retrieveAllObjectives } from 'components/objectives/persistence';
 
 import ModalSelection from './ModalSelection';
 

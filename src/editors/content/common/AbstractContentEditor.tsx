@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
-import * as models from 'app/data/models';
-import { AppServices } from 'app/editors/common/AppServices';
-import { AppContext } from 'app/editors/common/AppContext';
+import * as models from 'data/models';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
   S extends AbstractContentEditorState> {}
