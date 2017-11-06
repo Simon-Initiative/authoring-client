@@ -63,8 +63,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   fetchObjectiveTitles(objrefs: Immutable.List<string>) {
-    const { courseId } = this.props.context;
-    this.props.onGetTitles(courseId, objrefs.toArray(), LegacyTypes.learning_objectives);
+    const { context, onGetTitles } = this.props;
+    onGetTitles(context.courseId, objrefs.toArray(), LegacyTypes.learning_objectives);
   }
 
   onTitleEdit(title) {
