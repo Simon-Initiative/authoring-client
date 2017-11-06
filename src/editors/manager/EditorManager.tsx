@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { bindActionCreators } from 'redux';
-import { returnType } from 'utils/types';
 import { connect } from 'react-redux';
 import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';

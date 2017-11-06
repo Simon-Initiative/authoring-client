@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { returnType } from './utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
 import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
+import { ServerInformation } from './reducers/server';
+import { UserInfo } from './reducers/user';
 import * as viewActions from './actions/view';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';

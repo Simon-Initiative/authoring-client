@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { returnType } from '../../utils/types';
 import { connect } from 'react-redux';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';

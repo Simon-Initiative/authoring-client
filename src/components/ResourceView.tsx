@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { returnType } from '../utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import NavigationBar from './navigation/NavigationBar.controller';
