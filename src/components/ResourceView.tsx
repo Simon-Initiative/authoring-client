@@ -2,7 +2,7 @@ import * as React from 'react';
 import { returnType } from '../utils/types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar';
+import NavigationBar from './navigation/NavigationBar.controller';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';

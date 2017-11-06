@@ -10,20 +10,6 @@ import guid from '../../utils/guid';
 import * as view from '../../actions/view';
 import { Content } from './Content';
 
-/**
- *
- */
-interface NavigationBarState {
-
-}
-
-/**
- *
- */
-export interface NavigationBarOwnProps {
-  viewActions: any;
-}
-
 const navbarStyles =
   {
     openMenu: {
@@ -78,38 +64,26 @@ const Section = (props) => {
   return <h2 key={props.label}>{props.label}</h2>;
 };
 
-function mapStateToProps(state: any) {
-
-  const {
-    course,
-    user,
-  } = state;
-
-  return {
-    course,
-    user,
-  };
+export interface NavigationBarProps {
+  course: any;
+  user: any;
+  viewActions: any;
+  onDispatch: (...args: any[]) => any;
 }
 
-
-const stateGeneric = returnType(mapStateToProps);
-type NavigationBarReduxProps = typeof stateGeneric;
-type NavigationBarProps = NavigationBarReduxProps & NavigationBarOwnProps & { dispatch };
-
+export interface NavigationBarState {}
 
 /**
- *
+ * NavigationBar React Component
  */
-class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> {
+export default class NavigationBar extends React.Component<NavigationBarProps, NavigationBarState> {
+  feedback: any;
 
   constructor(props) {
     super(props);
 
     this.feedback = null;
   }
-
-  feedback: any;
-
 
   componentDidMount() {
     (window as any).$(this.feedback).tooltip();
@@ -120,13 +94,16 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
   }
 
   render() {
-    const courseId = this.props.course.model && this.props.course.model.guid;
+    const { course, user } = this.props;
+
+    const courseId = course.model && course.model.guid;
 
     const formUrl = buildFeedbackFromCurrent(
-      this.props.user.profile.firstName + ' ' + this.props.user.profile.lastName,
-      this.props.user.profile.email);
+      user.profile.firstName + ' ' + user.profile.lastName,
+      user.profile.email,
+    );
 
-    const title = this.props.course.model && this.props.course.model.title || '';
+    const title = course.model && course.model.title || '';
 
     return (
       <nav style={navbarStyles.sidebar as any}
@@ -180,6 +157,3 @@ class NavigationBar extends React.Component<NavigationBarProps, NavigationBarSta
     );
   }
 }
-
-export default connect<NavigationBarReduxProps, {}, NavigationBarOwnProps>
-  (mapStateToProps)(NavigationBar);

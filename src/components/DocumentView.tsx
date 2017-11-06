@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar';
+import NavigationBar from './navigation/NavigationBar.controller';
 import { UserProfile } from 'types/user';
-import EditorManager from '../editors/manager/EditorManager.controller';
-import { AppServices, DispatchBasedServices } from '../editors/common/AppServices';
-import * as viewActions from '../actions/view';
+import EditorManager from 'editors/manager/EditorManager.controller';
+import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
+import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
   dispatch: any;
