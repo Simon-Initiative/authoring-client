@@ -1,7 +1,7 @@
 import * as persistence from 'app/data/persistence';
 import { CourseModel } from 'app/data/models';
 import { LegacyTypes } from 'app/data/types';
-import { Skill } from 'app/types/course';
+import { Skill, Title } from 'app/types/course';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
@@ -23,24 +23,19 @@ export const courseChanged = (model: CourseModel): CourseChangedAction => ({
   model,
 });
 
-export type CourseTitle = {
-  id: string,
-  title: string,
-};
-
 export type RECEIVE_TITLES = 'course/RECEIVE_TITLES';
 export const RECEIVE_TITLES: RECEIVE_TITLES = 'course/RECEIVE_TITLES';
 
 export type ReceiveTitlesAction = {
   type: RECEIVE_TITLES,
-  titles: CourseTitle[],
+  titles: Title[],
 };
 
 /**
  * Receive titles action builder
  * @param titles - titles received
  */
-export const receiveTitles = (titles: CourseTitle[]): ReceiveTitlesAction => ({
+export const receiveTitles = (titles: Title[]): ReceiveTitlesAction => ({
   type: RECEIVE_TITLES,
   titles,
 });
@@ -73,7 +68,7 @@ export const fetchSkillTitles = (courseId: string) => (
   (dispatch, getState): Promise<Skill[]> => {
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.skills_model], 'byTypes')
       .then ((skills) => {
-        const titles: CourseTitle[] = skills
+        const titles: Title[] = skills
           .map(doc => (doc.model as any).skills.toArray())
           .reduce((p, c) => [...p, ...c]);
 
@@ -92,7 +87,7 @@ export const fetchObjectiveTitles = (courseId: string) => (
   (dispatch, getState): Promise<any> => {
     return persistence.bulkFetchDocuments(courseId, [LegacyTypes.learning_objectives], 'byTypes')
       .then ((objectives) => {
-        const titles: CourseTitle[] = objectives
+        const titles: Title[] = objectives
           .map(doc => (doc.model as any).objectives.toArray())
           .reduce((p, c) => [...p, ...c]);
 

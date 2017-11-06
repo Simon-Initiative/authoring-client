@@ -8,6 +8,7 @@ import { Title } from 'app/types/course';
 import './Concept.scss';
 
 export interface ConceptProps {
+  title: string;
   editMode: boolean;
   conceptId: string;
   conceptType: string;
@@ -16,9 +17,7 @@ export interface ConceptProps {
   onRemove: (id: string, type: string) => void;
 }
 
-export interface ConceptState {
-  title: string;
-}
+export interface ConceptState {}
 
 export default interface Concept {}
 
@@ -26,36 +25,33 @@ export default interface Concept {}
  * Concept React Component
  */
 export default class Concept extends React.PureComponent<ConceptProps, ConceptState> {
-
   constructor(props) {
     super(props);
-
-    this.state = { title: 'Waiting...' };
 
     this.onClick = this.onClick.bind(this);
   }
 
   componentDidMount() {
-    this.props.onGetTitle(this.props.courseId, this.props.conceptId, this.props.conceptType)
-      .then((t: Title) => {
-        this.setState({
-          title: t.title,
-        });
-      });
+    const { courseId, conceptId, conceptType, onGetTitle } = this.props;
+
+    onGetTitle(courseId, conceptId, conceptType);
   }
 
   onClick() {
-    if (this.props.editMode) {
-      this.props.onRemove(this.props.conceptId, this.props.conceptType);
+    const { editMode, conceptId, conceptType, onRemove } = this.props;
+
+    if (editMode) {
+      onRemove(conceptId, conceptType);
     }
   }
 
   render() : JSX.Element {
+    const { title } = this.props;
+
     return (
     <div className="chip">
-      {this.state.title}
+      {title || 'Waiting...'}
       <span className="closebtn" onClick={this.onClick}>&times;</span>
     </div>);
   }
 }
-

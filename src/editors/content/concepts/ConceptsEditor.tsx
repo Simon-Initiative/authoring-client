@@ -7,7 +7,7 @@ import {
   AbstractContentEditor,
   AbstractContentEditorProps,
 } from 'app/editors/content/common/AbstractContentEditor';
-import Concept from './Concept';
+import Concept from './Concept.controller';
 import { SkillSelection } from 'app/utils/selection/SkillSelection';
 import { Collapse } from 'app/editors/content/common/Collapse';
 import { TextInput, InlineForm, Button, Checkbox } from 'app/editors/content/common/controls';

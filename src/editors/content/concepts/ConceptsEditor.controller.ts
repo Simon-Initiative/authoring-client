@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { List } from 'immutable';
-import ConceptsEditorView from './ConceptsEditorView';
+import ConceptsEditor from './ConceptsEditor';
 import { fetchSkillTitles } from 'app/actions/course';
 import {
   AbstractContentEditorProps,
@@ -31,4 +31,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(ConceptsEditorView);
+  (mapStateToProps, mapDispatchToProps)(ConceptsEditor);

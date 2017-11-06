@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { List } from 'immutable';
-import WorkbookPageEditorView from './WorkbookPageEditorView';
+import WorkbookPageEditor from './WorkbookPageEditor';
 import { getTitles } from 'app/actions/course';
 import { Title } from 'app/types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
@@ -32,4 +32,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(WorkbookPageEditorView);
+  (mapStateToProps, mapDispatchToProps)(WorkbookPageEditor);

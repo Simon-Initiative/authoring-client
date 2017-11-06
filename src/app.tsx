@@ -25,7 +25,7 @@ import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
-import Main from './Main';
+import Main from './Main.controller';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';

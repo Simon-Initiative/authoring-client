@@ -1,7 +1,6 @@
 import { Map } from 'immutable';
 import {
   ReceiveTitlesAction,
-  CourseTitle,
   RECEIVE_TITLES,
 } from 'app/actions/course';
 import * as models from 'app/data/models';

@@ -2,15 +2,14 @@ import * as persistence from '../data/persistence';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { configuration } from './utils/config';
-import { initialize, UserProfile } from './utils/keycloak';
-export { UserProfile } from './utils/keycloak';
+import { initialize } from './utils/keycloak';
+import { UserProfile } from 'app/types/user';
 import guid from '../utils/guid';
 
 export module user {
-  
   export type LOGIN_SUCCESS = 'LOGIN_SUCCESS';
   export const LOGIN_SUCCESS : LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-  
+
   export type LOGIN_FAILURE = 'LOGIN_FAILURE';
   export const LOGIN_FAILURE : LOGIN_FAILURE = 'LOGIN_FAILURE';
 
@@ -30,7 +29,7 @@ export module user {
   export function loginSuccess(
     username: string, userId: string,
     profile: UserProfile, logoutUrl: string, accountManagementUrl: string) : loginSuccessAction {
-    
+
     return {
       type: LOGIN_SUCCESS,
       username,
@@ -50,12 +49,11 @@ export module user {
   export function initAuthenticationProvider() {
     return function (dispatch) {
       initialize(
-        (profile, logoutUrl, accountManagementUrl) => 
+        (profile, logoutUrl, accountManagementUrl) =>
           dispatch(loginSuccess(
             profile.username, profile.id, profile, logoutUrl, accountManagementUrl)),
         () => dispatch(loginFailure()),
         configuration.protocol + configuration.hostname);
     };
   }
-
 }

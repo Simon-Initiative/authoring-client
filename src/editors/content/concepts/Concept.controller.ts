@@ -1,9 +1,11 @@
 import { connect } from 'react-redux';
-import ConceptView from './ConceptView';
+import Concept from './Concept';
 import { getTitle } from 'app/actions/course';
 import { Title } from 'app/types/course';
 
-interface StateProps {}
+interface StateProps {
+  title: string;
+}
 
 interface DispatchProps {
   onGetTitle: (courseId: string, conceptId: string, conceptType: string) => any;
@@ -17,8 +19,10 @@ interface OwnProps {
   onRemove: (id: string, type: string) => void;
 }
 
-const mapStateToProps = (state): StateProps => {
-  return {};
+const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+  return {
+    title: state.titles.get(ownProps.conceptId),
+  };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
@@ -30,4 +34,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(ConceptView);
+  (mapStateToProps, mapDispatchToProps)(Concept);

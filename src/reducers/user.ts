@@ -2,9 +2,9 @@ import { user as userActions } from '../actions/user';
 import { OtherAction } from './utils';
 
 // tslint:disable-next-line
-import { UserProfile } from '../actions/user';
+import { UserProfile } from 'app/types/user';
 
-type UserAction = 
+type UserAction =
   userActions.loginSuccessAction |
   OtherAction;
 
@@ -18,10 +18,10 @@ export type UserInfo = {
 export function user(state : UserInfo = null, action: UserAction) : UserInfo {
   switch (action.type) {
     case userActions.LOGIN_SUCCESS:
-      return { 
+      return {
         profile: action.profile,
-        user: action.username, 
-        userId: action.userId, 
+        user: action.username,
+        userId: action.userId,
         logoutUrl: action.logoutUrl,
       };
     default:

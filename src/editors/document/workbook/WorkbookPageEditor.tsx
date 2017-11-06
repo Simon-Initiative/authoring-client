@@ -38,13 +38,10 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   objectiveTitles: any;
 }
 
-interface WorkbookPageEditorState extends AbstractEditorState {
-}
+interface WorkbookPageEditorState extends AbstractEditorState {}
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
-  WorkbookPageEditorProps,
-  WorkbookPageEditorState> {
-
+  WorkbookPageEditorProps, WorkbookPageEditorState> {
   constructor(props) {
     super(props, {});
 

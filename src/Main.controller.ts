@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import MainView from './MainView';
+import Main from './Main';
 
 interface StateProps {
   user: any;
@@ -47,4 +47,4 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(MainView);
+  (mapStateToProps, mapDispatchToProps)(Main);

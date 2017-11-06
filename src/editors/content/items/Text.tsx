@@ -13,7 +13,7 @@ import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
@@ -56,7 +56,7 @@ export class Text
   }
 
   onExplanation(explanation) {
-    const part = this.props.partModel.with({explanation});
+    const part = this.props.partModel.with({ explanation });
     this.props.onEdit(this.props.itemModel, part);
   }
 
@@ -154,35 +154,39 @@ export class Text
 
 
     const controls = (
-      <div style={{display: 'inline'}}>
-        <Select editMode={this.props.editMode}
-          label='Whitespace' value={this.props.itemModel.whitespace} onChange={this.onWhitespaceChange}>
+      <div style={{ display: 'inline' }}>
+        <Select
+          editMode={this.props.editMode}
+          label="Whitespace"
+          value={this.props.itemModel.whitespace}
+          onChange={this.onWhitespaceChange}>
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
         </Select>
         <Select editMode={this.props.editMode}
-          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+          label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
           <option value="small">small</option>
           <option value="medium">medium</option>
           <option value="large">large</option>
         </Select>
 
         <Checkbox editMode={this.props.editMode}
-          label='Case Sensitive' value={this.props.itemModel.caseSensitive} onEdit={this.onCaseSensitive}/>
+          label="Case Sensitive"
+          value={this.props.itemModel.caseSensitive}
+          onEdit={this.onCaseSensitive} />
       </div>);
 
     return (
       <div className="itemPart"
         onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
-        >
-
-        <ItemLabel label='Text' editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
+          <ItemLabel
+          label="Text"
+          editMode={this.props.editMode}
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)} />
 
         {controls}
-
 
         <ConceptsEditor
           editMode={this.props.editMode}
@@ -200,17 +204,14 @@ export class Text
         <Hints
             {...this.props}
             model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
+            onEdit={this.onPartEdit} />
 
         {feedback}
 
         <ExplanationEditor
             {...this.props}
             model={this.props.partModel.explanation}
-            onEdit={this.onExplanation}
-          />
-
+            onEdit={this.onExplanation} />
       </div>);
   }
 

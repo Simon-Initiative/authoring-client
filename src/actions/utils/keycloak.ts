@@ -1,23 +1,9 @@
+import { UserProfile } from 'app/types/user';
 import { credentials, getHeaders } from './credentials';
 import { configuration } from './config';
 const keyCloak = require('keycloak-js');
 
-export type UserProfile = {
-  attributes: Object,
-  createdTimestamp: number,
-  disableableCredentialTypes: string[],
-  email: string,
-  emailVerified: boolean,
-  enabled: boolean,
-  firstName: string,
-  id: string,
-  lastName: string,
-  requiredActions: Object[],
-  totp: boolean,
-  username: string,
-};
-
-export type LoginSuccessCallback = 
+export type LoginSuccessCallback =
   (profile: UserProfile, logoutUrl: string, managementUrl: string) => void;
 
 const keycloakConfig = {
@@ -26,7 +12,7 @@ const keycloakConfig = {
   clientId: 'content_client',
 };
 
-let kc = null; 
+let kc = null;
 let onLoginFailure = null;
 let onLoginSuccess : LoginSuccessCallback = null;
 let redirectUri = null;
@@ -46,13 +32,13 @@ export function forceLogin() {
 }
 
 export function login() {
-  
+
   kc = keyCloak(keycloakConfig);
 
   kc.init({ onLoad: 'login-required', checkLoginIframe: false }).success((authenticated) => {
     if (authenticated) {
 
-      // Once we are authenticationed, store the token so that it can 
+      // Once we are authenticationed, store the token so that it can
       // be injected into the headers of outgoing API HTTP requests
       credentials.token = kc.token;
 
@@ -65,9 +51,9 @@ export function login() {
         continuallyRefreshToken();
 
         onLoginSuccess(profile, logoutUrl, accountManagementUrl);
-      
+
       }).error(() => onLoginFailure());
-      
+
     } else {
       // Requires inserting "http://<hostname>/*" in the Valid Redirect URIs entry
       // of the Content_client settings in the KeyCloak admin UI
@@ -82,14 +68,14 @@ function continuallyRefreshToken() {
     () => {
       refreshTokenIfInvalid(60)
         .then(validToken => validToken ? continuallyRefreshToken() : forceLogin());
-    }, 
+    },
     30000);
 }
 
 const WITHIN_FIVE_SECONDS = 5;
 
 export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Promise<any> {
-  
+
   if (kc.isTokenExpired(within)) {
     return new Promise((resolve, reject) => {
       kc.updateToken(within).success((refreshed) => {
