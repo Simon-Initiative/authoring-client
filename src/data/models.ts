@@ -36,21 +36,17 @@ export type EmptyModel = 'EmptyModel';
 // tslint:disable-next-line
 export const EmptyModel: EmptyModel = 'EmptyModel';
 
-// tslint:disable-next-line
-export const ModelTypes = types.strEnum([
-  'CourseModel',
-  'WorkbookPageModel',
-  'AssessmentModel',
-  'MediaModel',
-  'OrganizationModel',
-  'LearningObjectiveModel',
-  'SkillModel',
-  'PoolModel',
-  'DefaultModel',
-]);
-
-// Create an actual type
-export type ModelTypes = keyof typeof ModelTypes;
+export enum ModelTypes {
+  CourseModel = 'CourseModel',
+  WorkbookPageModel = 'WorkbookPageModel',
+  AssessmentModel = 'AssessmentModel',
+  MediaModel = 'MediaModel',
+  OrganizationModel = 'OrganizationModel',
+  LearningObjectiveModel = 'LearningObjectiveModel',
+  SkillModel = 'SkillModel',
+  PoolModel = 'PoolModel',
+  DefaultModel = 'DefaultModel',
+}
 
 export function isLockable(model: ContentModel) {
   return model.has('lock');

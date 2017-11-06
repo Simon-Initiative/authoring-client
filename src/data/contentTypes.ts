@@ -60,12 +60,8 @@ export { AudienceTypes, DependencyTypes, GrainSizes,
 
 export { ContentTypes as OrganizationContentTypes } from './content/org/types';
 
-
-export { Linkable } from './content/linkable';
 export { LearningObjective } from './content/objectives/objective';
 export { ObjectiveSkills } from './content/objectives/objective_skills';
-export { OrgContentTypes, OrgItem, OrgSection, 
-  OrgModule, OrgUnit, OrgSequence, OrgOrganization } from './content/org';
 export { Skill } from './content/objectives/skill';
 
 import { Essay } from './content/assessment/essay';

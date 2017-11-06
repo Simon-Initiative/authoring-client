@@ -10,7 +10,6 @@ import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { Select } from '../../content/common/Select';
 import { TextInput } from '../../content/common/TextInput';
-import { Linkable } from '../../../data/content/linkable';
 import * as models from '../../../data/models';
 import { Resource } from '../../../data/content/resource';
 import { viewDocument } from '../../../actions/view';

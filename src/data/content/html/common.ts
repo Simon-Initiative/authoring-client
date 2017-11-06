@@ -5,6 +5,7 @@ export type PurposeType = {
   label: string,
 };
 
+// tslint:disable-next-line
 export const PurposeTypes : PurposeType[] = [
   { value: 'checkpoint', label: 'Checkpoint' },
   { value: 'lab', label: 'Lab' },
@@ -18,64 +19,62 @@ export const PurposeTypes : PurposeType[] = [
   { value: 'didigetthis', label: 'Did I get this?' },
 ];
 
-export const EntityTypes = types.strEnum([
+export enum EntityTypes {
 
   // Block Sentinels
-  'pullout_begin',
-  'pullout_end',
-  'example_begin',
-  'example_end',
-  'figure_begin',
-  'figure_end',
-  'section_begin',
-  'section_end',
-  'title_begin',
-  'title_end',
-  'definition_begin',
-  'definition_end',
-  'pronunciation_begin',
-  'pronunciation_end',
-  'translation_begin',
-  'translation_end',
-  'meaning_begin',
-  'meaning_end',
-  'material_begin',
-  'material_end',
+  pullout_begin = 'pullout_begin',
+  pullout_end = 'pullout_end',
+  example_begin = 'example_begin',
+  example_end = 'example_end',
+  figure_begin = 'figure_begin',
+  figure_end = 'figure_end',
+  section_begin = 'section_begin',
+  section_end = 'section_end',
+  title_begin = 'title_begin',
+  title_end = 'title_end',
+  definition_begin = 'definition_begin',
+  definition_end = 'definition_end',
+  pronunciation_begin = 'pronunciation_begin',
+  pronunciation_end = 'pronunciation_end',
+  translation_begin = 'translation_begin',
+  translation_end = 'translation_end',
+  meaning_begin = 'meaning_begin',
+  meaning_end = 'meaning_end',
+  material_begin = 'material_begin',
+  material_end = 'material_end',
 
   // Inline sentinels
-  'formula_begin',
-  'formula_end',
+  formula_begin = 'formula_begin',
+  formula_end = 'formula_end',
 
   // Inline entities
-  'activity_link',
-  'link',
-  'image_link',
-  'image_activity_link',
-  'code',
-  'formula',
-  'math',
-  'quote',
-  'bdo',
-  'xref',
-  'wb_manual',
-  'cite',
-  'image',
-  'input_ref',
+  activity_link = 'activity_link',
+  link = 'link',
+  image_link = 'image_link',
+  image_activity_link = 'image_activity_link',
+  code = 'code',
+  formula = 'formula',
+  math = 'math',
+  quote = 'quote',
+  bdo = 'bdo',
+  xref = 'xref',
+  wb_manula = 'wb_manual',
+  cite = 'cite',
+  image = 'image',
+  input_ref = 'input_ref',
   
   // Block entities
-  'codeblock',
-  'objref',
-  'wb_inline',
-  'table',
-  'audio',
-  'video',
-  'youtube',
-  'unsupported',
-  'iframe',
-  'activity',
-]);
-
-export type EntityTypes = keyof typeof EntityTypes;
+  codeblock = 'codeblock',
+  objref = 'objref',
+  wb_inline = 'wb_inline',
+  table = 'table',
+  audio = 'audio',
+  video = 'video',
+  youtube = 'youtube',
+  unsupported = 'unsupported',
+  iframe = 'iframe',
+  activity = 'activity',
+}
 
 export type BlockData = 
   PulloutBegin | PulloutEnd | 
