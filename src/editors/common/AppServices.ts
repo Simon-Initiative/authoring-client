@@ -1,22 +1,20 @@
-import * as types from '../../data/types';
+import * as types from 'data/types';
 
-import { modalActions } from '../../actions/modal';
-import * as persistence from '../../data/persistence';
-import * as contentTypes from '../../data/contentTypes';
-import * as view from '../../actions/view';
-import * as courseActions from '../../actions/course';
-import * as models from '../../data/models';
-import guid from '../../utils/guid';
-
-import { TitleOracle } from './TitleOracle';
+import { modalActions } from 'actions/modal';
+import * as persistence from 'data/persistence';
+import * as contentTypes from 'data/contentTypes';
+import * as view from 'actions/view';
+import * as courseActions from 'actions/course';
+import * as models from 'data/models';
+import guid from 'utils/guid';
 
 /**
- * An interface that defines the  'services' that are available to 
+ * An interface that defines the  'services' that are available to
  * an editor.  'Services' can be thought of as any application level
  * function or facility. Largely this abstraction exists to allow
  * us to define document and content editors that are completely unaware
  * of the Redux dispatcher.  The service implementation (see below)
- * can effectively hide the presence and invocation of dispatch.  
+ * can effectively hide the presence and invocation of dispatch.
  */
 export interface AppServices {
 
@@ -30,7 +28,7 @@ export interface AppServices {
   // Display the given component in a modal dialog.
   displayModal: (component: any) => void;
 
-  // Dismiss the modal dialog. 
+  // Dismiss the modal dialog.
   dismissModal: () => void;
 
   // Fetch a title by id
@@ -46,24 +44,17 @@ export interface AppServices {
   // returns an object whose keys are the attributes requested
   fetchAttributesBy(
     attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any>;
-
-  // Provides titles for strongly identified items. 
-  titleOracle: TitleOracle;
-
 }
 
 export interface DispatchBasedServices {
   dispatch;
   courseModel: models.CourseModel;
-  titleOracle: TitleOracle;
 }
 
 export class DispatchBasedServices implements AppServices {
-  
-  constructor(dispatch, courseModel, titleOracle) {
+  constructor(dispatch, courseModel) {
     this.dispatch = dispatch;
     this.courseModel = courseModel;
-    this.titleOracle = titleOracle;
   }
 
   viewDocument(documentId: string, courseId: string) {
@@ -71,7 +62,6 @@ export class DispatchBasedServices implements AppServices {
   }
 
   createWorkbookPage(title: string, courseId: string) : Promise<persistence.Document> {
-
     const resource = models.WorkbookPageModel.createNew(guid(), 'New Page', 'Empty contents');
     return this.createResource(courseId, resource);
   }
@@ -87,7 +77,7 @@ export class DispatchBasedServices implements AppServices {
   displayModal(component: any) {
     this.dispatch(modalActions.display(component));
   }
-  
+
   dismissModal() {
     this.dispatch(modalActions.dismiss());
   }
@@ -108,14 +98,13 @@ export class DispatchBasedServices implements AppServices {
   }
 
   createResource(courseId: string, resource) : Promise<persistence.Document> {
-
     return new Promise((resolve, reject) => {
 
       let creationResult : persistence.Document = null;
       persistence.createDocument(courseId, resource)
         .then((result: persistence.Document) => {
           creationResult = result;
-          
+
           return persistence.retrieveCoursePackage(courseId);
 
         })
@@ -124,18 +113,15 @@ export class DispatchBasedServices implements AppServices {
           if (document.model.modelType === models.ModelTypes.CourseModel) {
             this.dispatch(courseActions.courseChanged(document.model));
           }
-          
+
           resolve(creationResult);
         });
     });
-    
-
-    
   }
 
   fetchAttributesBy(
     attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any> {
-    
+
     const find = (model) => {
       return model.resources
         .toArray()
@@ -147,7 +133,7 @@ export class DispatchBasedServices implements AppServices {
         (p, c) => {
           p[c[0]] = c[1];
           return p;
-        }, 
+        },
         {});
 
     const found = find(this.courseModel);

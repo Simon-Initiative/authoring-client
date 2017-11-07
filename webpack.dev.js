@@ -19,11 +19,22 @@ module.exports = {
     devServer: {
         contentBase: './dev',
         historyApiFallback: {
-          index: 'index.html'  
+          index: 'index.html'
         }
     },
     resolve: {
-        extensions: ["", ".ts", ".tsx", ".js"]
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: ["", ".ts", ".tsx", ".js"],
+        // Add webpack aliases for top level imports
+        alias: {
+            actions: path.resolve(__dirname, 'src/actions'),
+            components: path.resolve(__dirname, 'src/components'),
+            data: path.resolve(__dirname, 'src/data'),
+            editors: path.resolve(__dirname, 'src/editors'),
+            reducers: path.resolve(__dirname, 'src/reducers'),
+            types: path.resolve(__dirname, 'src/types'),
+            utils: path.resolve(__dirname, 'src/utils'),
+        },
     },
     module: {
         unknownContextCritical: false,

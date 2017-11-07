@@ -5,10 +5,8 @@ import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
 import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
-import { CurrentCourse } from './reducers/course';
 import { ServerInformation } from './reducers/server';
 import { UserInfo } from './reducers/user';
-import { TitleOracle } from './editors/common/TitleOracle';
 import * as viewActions from './actions/view';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
@@ -25,8 +23,8 @@ import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 
 type ResourceList = {
-  title: string, 
-  resourceType: string, 
+  title: string,
+  resourceType: string,
   filterFn: any,
   createResourceFn: any,
 };
@@ -49,10 +47,9 @@ function getPathName(pathname: string): string {
 }
 
 const createOrg = (courseId, title, type) => {
-
   const g = guid();
   const id = courseId + '_' +
-    title.toLowerCase().split(' ')[0] + '_' 
+    title.toLowerCase().split(' ')[0] + '_'
     + g.substring(g.lastIndexOf('-') + 1);
 
   return new models.OrganizationModel().with({
@@ -103,80 +100,57 @@ const resources = {
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
           return new models.PoolModel({
             type,
-            pool: new contentTypes.Pool({ id: guid(), questions, 
+            pool: new contentTypes.Pool({ id: guid(), questions,
               title: new contentTypes.Title({ text: title }) }),
           });
         }),
 };
 
-function mapStateToProps(state: any) {
-  const {
-    user,
-    modal,
-    course,
-    expanded,
-    server,
-  } = state;
-
-  return {
-    user,
-    modal,
-    course,
-    expanded,
-    server,
-  };
-}
-
-/**
- * declare interfaces and types
- */
-interface Main {
-  modalActions: Object;
-  viewActions: Object;
-  unlisten: any;
-}
-
-interface MainOwnProps {
+interface MainProps {
   location: any;
+  user: any;
+  modal: any;
+  course: any;
+  expanded: any;
+  server: any;
+  onDispatch: (...args: any[]) => any;
 }
 
 interface MainState {
   current: any;
 }
 
-interface MainReduxProps {
-  course: CurrentCourse;
-  expanded: TitleOracle;
-  modal: Immutable.Stack<any>;
-  server: ServerInformation;
-  user: UserInfo;
+export default interface Main {
+  modalActions: Object;
+  viewActions: Object;
+  unlisten: any;
 }
-
-type MainProps = MainReduxProps & MainOwnProps & { dispatch };
 
 /**
  * Main React Component
  */
-class Main extends React.Component<MainProps, MainState> {
+export default class Main extends React.Component<MainProps, MainState> {
   constructor(props) {
     super(props);
+    const { location, onDispatch } = this.props;
 
-    this.modalActions = bindActionCreators((modalActions as any), this.props.dispatch);
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
-    
+    this.modalActions = bindActionCreators((modalActions as any), onDispatch);
+    this.viewActions = bindActionCreators((viewActions as any), onDispatch);
+
     this.state = {
-      current: this.props.location,
+      current: location,
     };
   }
 
   componentDidMount() {
+    const { onDispatch } = this.props;
+
     this.unlisten = history.listen((current) => {
       this.setState({ current }, () => window.scrollTo(0, 0));
     });
 
     // Fire off the async request to determine server time skew
-    this.props.dispatch(setServerTimeSkew());
-  
+    onDispatch(setServerTimeSkew());
   }
 
   componentWillUnmount() {
@@ -184,74 +158,84 @@ class Main extends React.Component<MainProps, MainState> {
   }
 
   renderResource(resource: ResourceList) {
-    return <ResourceView
-              serverTimeSkewInMs={this.props.server.timeSkewInMs}
-              title={resource.title}
-              resourceType={resource.resourceType}
-              filterFn={resource.filterFn}
-              createResourceFn={resource.createResourceFn}
-              dispatch={this.props.dispatch}/>;
+    const { onDispatch, server, course } = this.props;
+
+    return (
+      <ResourceView
+        serverTimeSkewInMs={server.timeSkewInMs}
+        course={course}
+        title={resource.title}
+        resourceType={resource.resourceType}
+        filterFn={resource.filterFn}
+        createResourceFn={resource.createResourceFn}
+        dispatch={onDispatch}/>
+    );
   }
 
   getView(url: string): JSX.Element {
+    const { onDispatch, expanded, user, course } = this.props;
+
     if (url === '/') {
-      return <CoursesView dispatch={this.props.dispatch} userId={this.props.user.userId}/>;
+      return <CoursesView dispatch={onDispatch} userId={user.userId}/>;
     } else if (url === '/create') {
-      return <CreateCourseView dispatch={this.props.dispatch}/>;
+      return <CreateCourseView dispatch={onDispatch}/>;
 
-    } else if (url.startsWith('/objectives-')) {
-      return <ObjectiveSkillView 
-          course={this.props.course} 
-          dispatch={this.props.dispatch}
-          expanded={this.props.expanded}
-          userName={this.props.user.user}/>;
+    } else if (url.startsWith('/objectives-') && course.model) {
+      return <ObjectiveSkillView
+          course={course}
+          dispatch={onDispatch}
+          expanded={expanded}
+          userName={user.user}/>;
+    } else if (course.model) {
+      const documentId = url.substr(1, url.indexOf('-') - 1);
 
-    } else {
-
-      const firstPart = url.substr(1, url.indexOf('-') - 1);
-
-      if (resources[firstPart] !== undefined) {
-        return this.renderResource(resources[firstPart]);
+      if (resources[documentId] !== undefined) {
+        return this.renderResource(resources[documentId]);
       } else {
-        const documentId = firstPart;
-        return <DocumentView
-              profile={this.props.user.profile}
-              dispatch={this.props.dispatch}
-              course={this.props.course}
-              userId={this.props.user.userId}
-              userName={this.props.user.user}
-              documentId={documentId}/>;
+        return (
+          <DocumentView
+            profile={user.profile}
+            dispatch={onDispatch}
+            course={course}
+            userId={user.userId}
+            userName={user.user}
+            documentId={documentId} />
+        );
       }
+    } else {
+      return undefined;
     }
- 
   }
 
-  render() {
-    if (this.props.user === null) {
+
+  render(): JSX.Element {
+    const { modal, user, onDispatch } = this.props;
+
+    if (user === null) {
       return null;
     }
 
     let modalDisplay = null;
-    if (this.props.modal.peek() !== undefined) {
-      modalDisplay = this.props.modal
+    if (modal.peek() !== undefined) {
+      modalDisplay = modal
         .toArray()
         .reverse()
         .map((component, i) => <div key={i}>{component}</div>);
     }
-    
+
     const currentView = this.getView(getPathName(this.state.current.pathname));
-    const logoutUrl = this.props.user !== null ? this.props.user.logoutUrl : '';
+
+    const logoutUrl = user !== null ? user.logoutUrl : '';
 
     return (
-      <div>
-        <Header dispatch={this.props.dispatch} logoutUrl={logoutUrl}/>
-        {currentView}
-        <Footer dispatch={this.props.dispatch}/>
-        {modalDisplay}
-      </div>
+        <div>
+          <Header dispatch={onDispatch} logoutUrl={logoutUrl}/>
+
+          {currentView}
+
+          <Footer dispatch={onDispatch}/>
+          {modalDisplay}
+        </div>
     );
   }
-
 }
-
-export default connect<MainReduxProps, {}, MainOwnProps>(mapStateToProps)(Main);

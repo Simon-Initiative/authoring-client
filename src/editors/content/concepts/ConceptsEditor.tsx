@@ -1,35 +1,36 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Concept } from './Concept';
-import { SkillSelection } from '../../../utils/selection/SkillSelection';
-import { Collapse } from '../common/Collapse';
-import { TextInput, InlineForm, Button, Checkbox } from '../common/controls';
-
-export interface ConceptsEditor {
-
-}
-
-export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
-  conceptType: string;
-  courseId: string;
-  title: string;
-}
-
-export interface ConceptstEditorState {
-
-}
+import * as contentTypes from 'data/contentTypes';
+import { Skill } from 'types/course';
+import {
+  AbstractContentEditor,
+  AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
+import Concept from './Concept.controller';
+import { SkillSelection } from 'utils/selection/SkillSelection';
+import { Collapse } from 'editors/content/common/Collapse';
+import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
 /* tslint:disable */
 const Spacer = props => <span>&nbsp;&nbsp;</span>; // There is probably a better way...
 /* tslint:enable */
 
+export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
+  conceptType: string;
+  courseId: string;
+  title: string;
+  onFetchSkillTitles: (courseId: string) => Promise<Skill[]>;
+}
+
+export interface ConceptstEditorState {}
+
+export default interface ConceptsEditor {}
+
 /**
- * Concepts editor 
+ * Concepts editor
  */
-export class ConceptsEditor 
+export default class ConceptsEditor
   extends AbstractContentEditor<Immutable.List<string>, ConceptsEditorProps, ConceptstEditorState> {
 
   constructor(props) {
@@ -52,20 +53,22 @@ export class ConceptsEditor
 
   renderConcepts() {
     return this.props.model.toArray()
-      .map(c => <Concept key={'concept' + c} 
-         courseId={this.props.context.courseId}
-         editMode={this.props.editMode}
-         titleOracle={this.props.services.titleOracle} 
-         conceptId={c} conceptType={this.props.conceptType} 
-         onRemove={this.onRemove}/>)
+      .map(c => (
+        <Concept
+          key={'concept' + c}
+          courseId={this.props.context.courseId}
+          editMode={this.props.editMode}
+          conceptId={c} conceptType={this.props.conceptType}
+          onRemove={this.onRemove} />
+      ))
       .map((c, i) => [c, <Spacer key={i}/>])
       .reduce((p, c) => p.concat(c), []);
   }
 
   render() : JSX.Element {
 
-    const expanded = 
-        <Button editMode={this.props.editMode} 
+    const expanded =
+        <Button editMode={this.props.editMode}
           type="link" onClick={this.onAddConcept}>Add Skill</Button>;
 
     return (
@@ -74,21 +77,21 @@ export class ConceptsEditor
           {this.renderConcepts()}
         </div>
       </Collapse>);
-  
+
   }
 
   onAddConcept() {
     this.props.services.displayModal(
         <SkillSelection
-          titleOracle={this.props.services.titleOracle} 
           courseId={this.props.courseId}
           onInsert={(item) => {
             this.props.services.dismissModal();
-            return this.props.onEdit(this.props.model.push(item.id));   
-          }} 
+            return this.props.onEdit(this.props.model.push(item.id));
+          }}
           onCancel={() => {
-            this.props.services.dismissModal();  
-          }}/>,
+            this.props.services.dismissModal();
+          }}
+          onFetchSkillTitles={this.props.onFetchSkillTitles} />,
     );
   }
 

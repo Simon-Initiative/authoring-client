@@ -1,18 +1,20 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
+import * as contentTypes from 'data/contentTypes';
 import * as Immutable from 'immutable';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, 
-  AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import {
+  AbstractItemPartEditor,
+  AbstractItemPartEditorProps,
+} from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import { ConceptsEditor } from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
-import guid from '../../../utils/guid';
+import guid from 'utils/guid';
 
 import '../common/editor.scss';
 import './MultipleChoice.scss';
@@ -25,22 +27,19 @@ export interface CheckAllThatApply {
   ids: IdTypes;
 }
 
-export interface CheckAllThatApplyProps 
+export interface CheckAllThatApplyProps
   extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
-
 }
 
-export interface CheckAllThatApplyState {
-
-}
+export interface CheckAllThatApplyState {}
 
 /**
  * The content editor for HtmlContent.
  */
-export class CheckAllThatApply 
-  extends AbstractItemPartEditor<contentTypes.MultipleChoice, 
+export class CheckAllThatApply
+  extends AbstractItemPartEditor<contentTypes.MultipleChoice,
     CheckAllThatApplyProps, CheckAllThatApplyState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -73,26 +72,25 @@ export class CheckAllThatApply
   }
 
   onAddChoice() {
-    
     const count = this.props.itemModel.choices.size;
     const value = String.fromCharCode(65 + count);
-    
+
     const choice = new contentTypes.Choice().with({ value });
-    
+
     const itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) });
-    
+
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
   renderCriteria() {
     const expandedCriteria =
       <form className="form-inline">
-        <Button editMode={this.props.editMode} 
+        <Button editMode={this.props.editMode}
           onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
       </form>;
 
-    return <Collapse caption="Grading Criteria" 
+    return <Collapse caption="Grading Criteria"
         details=""
         expanded={expandedCriteria}>
 
@@ -105,7 +103,6 @@ export class CheckAllThatApply
               services={this.props.services}
               editMode={this.props.editMode}
               />)}
-
       </Collapse>;
 
   }
@@ -113,7 +110,7 @@ export class CheckAllThatApply
   onChoiceEdit(c) {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }), 
+      { choices: this.props.itemModel.choices.set(c.guid, c) }),
       this.props.partModel);
   }
 
@@ -123,12 +120,12 @@ export class CheckAllThatApply
 
   renderChoice(choice: contentTypes.Choice, index: number) {
     return (
-      <Choice 
+      <Choice
         key={choice.guid}
         label={'Choice ' + this.toLetter(index)}
         {...this.props}
         model={choice}
-        onEdit={this.onChoiceEdit} 
+        onEdit={this.onChoiceEdit}
         onRemove={this.onRemoveChoice.bind(this, choice)}
         />
     );
@@ -139,33 +136,33 @@ export class CheckAllThatApply
   }
 
   updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
-    
-    // For each response, adjust matches that may have 
+
+    // For each response, adjust matches that may have
     // utilized the removedValue...
-    
+
     return partModel;
   }
 
   updateChoiceValues(itemModel: contentTypes.MultipleChoice) : contentTypes.MultipleChoice {
-    
+
     const choices = itemModel.choices.toArray();
     let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
-    
+
     choices.forEach((choice, index) => {
       const value = this.toLetter(index);
       const updated = choice.with({ value });
       newChoices = newChoices.set(updated.guid, updated);
     });
-    
+
     return itemModel.with({ choices: newChoices });
   }
 
   onRemoveChoice(choice: contentTypes.Choice) {
     let itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.delete(choice.guid) });
-    
+
     itemModel = this.updateChoiceValues(itemModel);
-    
+
     const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
 
     this.props.onEdit(itemModel, partModel);
@@ -181,7 +178,6 @@ export class CheckAllThatApply
       .toArray()
       .map((c, i) => this.renderChoice(c, i));
   }
-
 
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
@@ -204,7 +200,6 @@ export class CheckAllThatApply
 
 
   render() : JSX.Element {
-    
     const bodyStyle = {
       minHeight: '75px',
       borderStyle: 'solid',
@@ -214,27 +209,24 @@ export class CheckAllThatApply
 
     const expanded = (
       <div style={{ display: 'inline' }}>
-        <Button editMode={this.props.editMode} 
+        <Button editMode={this.props.editMode}
           type="link" onClick={this.onAddChoice}>Add Choice</Button>
-        <Checkbox editMode={this.props.editMode} 
-          label="Shuffle" value={this.props.itemModel.shuffle} 
+        <Checkbox editMode={this.props.editMode}
+          label="Shuffle" value={this.props.itemModel.shuffle}
           onEdit={this.onShuffleEdit}/>
       </div>);
 
     return (
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
-        >
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
 
-
-
-        <ConceptsEditor 
+        <ConceptsEditor
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           courseId={this.props.context.courseId}
           model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit} 
+          onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill"
           />
@@ -260,7 +252,8 @@ export class CheckAllThatApply
             model={this.props.partModel.explanation}
             onEdit={this.onExplanation}
           />
-      </div>);
+      </div>
+    );
   }
 
 }

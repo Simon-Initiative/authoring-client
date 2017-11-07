@@ -1,16 +1,19 @@
-'use strict'
+'use strict';
 
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor, AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import {
+  AbstractItemPartEditor,
+  AbstractItemPartEditorProps,
+} from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import { ConceptsEditor } from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
@@ -19,7 +22,7 @@ import './MultipleChoice.scss';
 
 
 export interface Text {
-  
+
 }
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
@@ -34,12 +37,12 @@ export interface TextState {
 /**
  * The content editor for HtmlContent.
  */
-export class Text 
+export class Text
   extends AbstractItemPartEditor<contentTypes.Text, TextProps, TextState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
@@ -53,7 +56,7 @@ export class Text
   }
 
   onExplanation(explanation) {
-    const part = this.props.partModel.with({explanation});
+    const part = this.props.partModel.with({ explanation });
     this.props.onEdit(this.props.itemModel, part);
   }
 
@@ -72,11 +75,11 @@ export class Text
   renderCriteria() {
     const expandedCriteria =
       <form className="form-inline">
-        <Button editMode={this.props.editMode} 
+        <Button editMode={this.props.editMode}
           onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
       </form>;
 
-    return <Collapse caption="Grading Criteria" 
+    return <Collapse caption="Grading Criteria"
         details=""
         expanded={expandedCriteria}>
 
@@ -124,7 +127,7 @@ export class Text
   }
 
   render() : JSX.Element {
-    
+
     let feedback;
 
     if (this.props.partModel.responseMult.size > 0) {
@@ -138,7 +141,7 @@ export class Text
           onEdit={this.onEditMult.bind(this)}
         />);
     } else {
-      
+
       feedback = <TabularFeedback
             input={this.props.itemModel.id}
             editMode={this.props.editMode}
@@ -147,47 +150,51 @@ export class Text
             model={this.props.partModel}
             onEdit={this.onPartEdit}
           />;
-    } 
+    }
 
 
     const controls = (
-      <div style={{display: 'inline'}}>
-        <Select editMode={this.props.editMode}
-          label='Whitespace' value={this.props.itemModel.whitespace} onChange={this.onWhitespaceChange}>
+      <div style={{ display: 'inline' }}>
+        <Select
+          editMode={this.props.editMode}
+          label="Whitespace"
+          value={this.props.itemModel.whitespace}
+          onChange={this.onWhitespaceChange}>
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
         </Select>
         <Select editMode={this.props.editMode}
-          label='Size' value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+          label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
           <option value="small">small</option>
           <option value="medium">medium</option>
           <option value="large">large</option>
         </Select>
-        
+
         <Checkbox editMode={this.props.editMode}
-          label='Case Sensitive' value={this.props.itemModel.caseSensitive} onEdit={this.onCaseSensitive}/>
+          label="Case Sensitive"
+          value={this.props.itemModel.caseSensitive}
+          onEdit={this.onCaseSensitive} />
       </div>);
 
     return (
       <div className="itemPart"
         onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
-        >
-
-        <ItemLabel label='Text' editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
+          <ItemLabel
+          label="Text"
+          editMode={this.props.editMode}
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)} />
 
         {controls}
 
-
-        <ConceptsEditor 
+        <ConceptsEditor
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           courseId={this.props.context.courseId}
           model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit} 
+          onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill"
           />
@@ -197,17 +204,14 @@ export class Text
         <Hints
             {...this.props}
             model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
-        
+            onEdit={this.onPartEdit} />
+
         {feedback}
 
         <ExplanationEditor
             {...this.props}
             model={this.props.partModel.explanation}
-            onEdit={this.onExplanation}
-          />
-        
+            onEdit={this.onExplanation} />
       </div>);
   }
 

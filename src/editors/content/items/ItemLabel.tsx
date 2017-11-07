@@ -12,10 +12,10 @@ export const ItemLabel = (props: ItemLabelProps) => {
       <span>
         {props.label}
       </span>
-      <button disabled={!props.editMode} onClick={props.onClick} 
+      <button disabled={!props.editMode} onClick={props.onClick}
         type="button" className="btn btn-sm btn-outline-secondary">
-        <i className='icon icon-remove'></i>
+        <i className="icon icon-remove"></i>
       </button>
     </div>
   );
-}; 
+};

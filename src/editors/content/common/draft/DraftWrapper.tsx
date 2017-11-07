@@ -4,13 +4,13 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
 import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
-  ContentBlock, CharacterMetadata, 
+  ContentBlock, CharacterMetadata,
   convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
 import { CommandProcessor, Command } from '../command';
 
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
-import { determineChangeType, SelectionChangeType, 
+import { determineChangeType, SelectionChangeType,
   getCursorPosition, hasSelection, getPosition } from './utils';
 import { BlockProps } from './renderers/properties';
 import { AuthoringActions } from '../../../../actions/authoring';
@@ -31,20 +31,20 @@ export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 
 const SHIFT_KEY = 16;
-const ENTER_KEY = 13; 
-const ALT_KEY = 18; 
+const ENTER_KEY = 13;
+const ALT_KEY = 18;
 const PADDING = 0;
 
 interface DraftWrapper {
   lastBlockY: number;
   onChange: any;
-  focus: () => any; 
+  focus: () => any;
   lastSelectionState: SelectionState;
   lastContent: ContentState;
   container: any;
   _onKeyDown: () => void;
   _onKeyUp: () => void;
-  mouseDown: boolean; 
+  mouseDown: boolean;
   shiftPressed: boolean;
   _dismissToolbar: () => void;
 }
@@ -180,7 +180,7 @@ function splitBlockInContentState(
   contentState: ContentState,
   selectionState: SelectionState,
 ): ContentState {
-  
+
   const key = selectionState.getAnchorKey();
   const offset = selectionState.getAnchorOffset();
   const blockMap = contentState.getBlockMap();
@@ -195,16 +195,16 @@ function splitBlockInContentState(
   });
 
   const dataAbove = blockAbove.data.toJSON();
-  
+
   const toPreserve = Object.keys(dataAbove)
     .filter(key => key.startsWith('oli') || key === 'semanticContext')
     .reduce(
       (o, key) => {
         o[key] = dataAbove[key];
         return o;
-      }, 
+      },
       {});
-  
+
   const keyBelow = common.generateRandomKey();
   const blockBelow = blockAbove.merge({
     key: keyBelow,
@@ -246,7 +246,7 @@ function appendText(contentBlock, contentState, text) {
     contentState,
     targetRange,
     text);
-    
+
 }
 
 function updateData(contentBlock, contentState, blockData) {
@@ -262,17 +262,17 @@ function updateData(contentBlock, contentState, blockData) {
     contentState,
     targetRange,
     blockData);
-    
+
 }
 
 function addSpaceAfterEntity(editorState, block) {
-    
+
   const blockKey = block.key;
   const characterList = block.characterList;
   if (block.type !== 'atomic' && (!characterList.isEmpty() && characterList.last().getEntity())) {
     const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
     return EditorState.push(editorState, modifiedContent, editorState.getLastChangeType());
-    
+
   } else {
     return editorState;
   }
@@ -281,7 +281,7 @@ function addSpaceAfterEntity(editorState, block) {
 type StateAndSeen = { editorState: EditorState, seenIds: Object };
 
 function deDupeIds(stateAndSeen: StateAndSeen, block) {
-    
+
   const { editorState, seenIds } = stateAndSeen;
 
   const blockKey = block.key;
@@ -299,12 +299,12 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
       .set('type', '');
 
     const modifiedContent = updateData(block, editorState.getCurrentContent(), blockData);
-    return { 
+    return {
       editorState: EditorState.push(
         editorState, modifiedContent, editorState.getLastChangeType()),
       seenIds,
     };
-    
+
   } else if (id !== undefined) {
     seenIds[id] = true;
     return { editorState, seenIds };
@@ -338,7 +338,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const contentState = props.content.contentState;
     this.lastContent = contentState;
-    
+
     const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
 
@@ -353,25 +353,25 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       component: null,
       alignLeft: true,
     };
-    
+
     this.onChange = (currentEditorState : EditorState) => {
-    
+
       // You wouldn't think that this check would be necessary, but I was seeing
       // change notifications fired from Draft even when it was not in edit mode.
       if (!this.props.locked) {
-        
+
         let editorState = currentEditorState;
 
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
-        this.lastSelectionState = ss; 
+        this.lastSelectionState = ss;
         this.handleSelectionChange(changeType, ss);
 
         let contentState = editorState.getCurrentContent();
         const contentChange = contentState !== this.lastContent;
-        
+
         if (contentChange) {
-          
+
           contentState = this.cloneDuplicatedEntities(contentState);
 
           editorState = EditorState.push(editorState, contentState);
@@ -390,15 +390,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         } else {
           this.setState({ editorState });
         }
-        
-        
+
+
       }
     };
   }
 
   forceContentChangeWithSelection(contentState, changeType, selection) {
     this.lastContent = contentState;
-    
+
     const es = EditorState.push(this.state.editorState, contentState, changeType);
     const editorState = EditorState.forceSelection(
       EditorState.set(es, { allowUndo: false }), selection);
@@ -412,7 +412,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
-    
+
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
     this.setState({ editorState }, () => {
       this.props.onEdit(new Html({ contentState }));
@@ -420,15 +420,15 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     });
   }
 
-  
+
 
   onBlur(e) {
     e.stopPropagation();
     if (this.state.show || this.state.blockToolbarShown) {
       setTimeout(
-        () => this.setState({ 
-          blockToolbarShown: false, 
-          show: false, x: null, y: null }), 
+        () => this.setState({
+          blockToolbarShown: false,
+          show: false, x: null, y: null }),
         200);
     }
   }
@@ -455,7 +455,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       let blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
       const blockX = -27;
-      
+
       if (blockY < 0) {
         blockY = this.lastBlockY;
       }
@@ -463,7 +463,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       this.setState({ expanderPosition: Maybe.just({ x: blockX, y: blockY }) });
       this.lastBlockY = blockY;
     }
-          
+
   }
 
   onFocus() {
@@ -473,7 +473,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   handleSelectionChange(changeType, ss) {
 
-    if (changeType === SelectionChangeType.Selection) {  
+    if (changeType === SelectionChangeType.Selection) {
 
       if (hasSelection(ss)) {
         const selection = document.getSelection();
@@ -495,51 +495,51 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           }
 
           if (topRect === null) {
-            this.setState({ show: false, x: null, y: null, 
+            this.setState({ show: false, x: null, y: null,
               expanderPosition: Maybe.nothing<ExpanderPosition>() });
             return;
           }
-          
+
           const divRect = this.container.getBoundingClientRect();
           const y = (topRect.top + window.scrollY - (divRect.top + window.scrollY)) - 25;
-      
+
           const alignLeft = topRect.left - divRect.left < divRect.width / 2;
 
           const x = alignLeft
             ? topRect.left - divRect.left
             : (divRect.width - (topRect.left - divRect.left));
-          
+
           if (topRect !== null) {
             const show = !this.shiftPressed;
 
-            this.setState({ show, x, y, 
-              component: this.props.inlineToolbar, alignLeft, 
+            this.setState({ show, x, y,
+              component: this.props.inlineToolbar, alignLeft,
               expanderPosition: Maybe.nothing<ExpanderPosition>() });
-            
+
           } else {
-            this.setState({ show: false, x: null, y: null, 
+            this.setState({ show: false, x: null, y: null,
               expanderPosition: Maybe.nothing<ExpanderPosition>() });
           }
         }
-      } else {   
-        this.setState({ show: false, x: null, y: null, 
+      } else {
+        this.setState({ show: false, x: null, y: null,
           expanderPosition: Maybe.nothing<ExpanderPosition>() });
       }
-      
+
       this.setExpanderPosition();
-      
+
     } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ show: false, x: null, y: null, 
+      this.setState({ show: false, x: null, y: null,
         expanderPosition: Maybe.nothing<ExpanderPosition>() });
       this.setExpanderPosition();
     } else {
       // this.setState({ blockToolbarShown: false, blockX: null, blockY: null });
     }
   }
-  
+
 
   dismissToolbar() {
-    this.setState({ show: false, blockToolbarShown: false, x: null, 
+    this.setState({ show: false, blockToolbarShown: false, x: null,
       y: null, expanderPosition: Maybe.nothing<ExpanderPosition>() });
   }
 
@@ -549,16 +549,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } else if (e.keyCode === ALT_KEY) {
       const point = getCursorPosition();
       this.setState({
-        show: true, 
-        x: point.x, 
-        y: point.y, 
+        show: true,
+        x: point.x,
+        y: point.y,
         component: this.props.blockToolbar,
-      });        
+      });
     }
   }
 
   onKeyUp(e) {
-    
+
     if (e.keyCode === SHIFT_KEY) {
       this.shiftPressed = false;
 
@@ -572,7 +572,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   getXOffset() {
-    const position = this.container.getBoundingClientRect();  
+    const position = this.container.getBoundingClientRect();
     return position.left;
   }
 
@@ -592,11 +592,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const contentState = this.state.editorState.getCurrentContent();
     const blockMap = contentState.getBlockMap();
     const toRemove = blockMap.get(block.key);
-  
+
     const blocksBefore = blockMap.toSeq().takeUntil(v => v === toRemove);
     const blocksAfter = blockMap.toSeq().skipUntil(v => v === toRemove).rest();
     const newBlocks = blocksBefore.concat(blocksAfter).toOrderedMap();
-  
+
     const updated = contentState.merge({ blockMap: newBlocks });
 
     this.forceContentChange(updated, 'remove-range');
@@ -605,20 +605,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     setTimeout(
       () => {
         this.setState(
-          { lockedByBlockRenderer: true }, 
+          { lockedByBlockRenderer: true },
           () => this.setState({ lockedByBlockRenderer: false }));
-      }, 
+      },
       100);
   }
 
   insertEmptyBlockAfter(key) {
 
     const emptyCharList = Immutable.List().push(new CharacterMetadata());
-  
+
     const blocks = [
-      new ContentBlock({ 
-        type: 'unstyled',  
-        text: ' ', 
+      new ContentBlock({
+        type: 'unstyled',
+        text: ' ',
         key: common.generateRandomKey(),
         characterList: emptyCharList,
       }),
@@ -650,10 +650,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   cloneDuplicatedEntities(current: ContentState) : ContentState {
-    
+
     let contentState = current;
     const entities = getAllEntities(contentState);
-    
+
     // Find any duplicated entities and clone them
     const seenKeys = {};
     entities.forEach((e) => {
@@ -661,11 +661,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         seenKeys[e.entityKey] = e;
       } else {
         // This is a duplicate, clone it
-        
+
         const copy = Object.assign({}, e.entity.data);
 
-        // If the data has an id, generate a new one to 
-        // avoid duplication 
+        // If the data has an id, generate a new one to
+        // avoid duplication
         if (copy.id !== undefined) {
           copy.id = guid();
         } else {
@@ -728,7 +728,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   handleKeyCommand(command) {
 
     const editorState = this.state.editorState;
-    
+
     if (command === 'backspace') {
       if (handleBackspace(editorState, this.onChange) === 'handled') {
         return 'handled';
@@ -736,18 +736,18 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       // Do not allow users to press enter and create a new block when
       // their cursor is within titles, pronunciations, or translations
-    } else if (command === 'split-block' && 
+    } else if (command === 'split-block' &&
         !containerPrecondition(
           editorState.getSelection(), editorState.getCurrentContent(),
-          [common.EntityTypes.title_begin, 
-            common.EntityTypes.pronunciation_begin, 
+          [common.EntityTypes.title_begin,
+            common.EntityTypes.pronunciation_begin,
             common.EntityTypes.translation_begin],
-          [common.EntityTypes.title_end, 
-            common.EntityTypes.pronunciation_end, 
+          [common.EntityTypes.title_end,
+            common.EntityTypes.pronunciation_end,
             common.EntityTypes.translation_end])) {
 
       return 'handled';
-    
+
     // In 'inlineOnlyMode' we do not allow the user to create additional
     // blocks
     } else if (command === 'split-block' && this.props.inlineOnlyMode) {
@@ -761,61 +761,61 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } else {
       return 'not-handled';
     }
-    
-  }
-  
 
-  
+  }
+
+
+
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
     if (this.props.activeItemId !== nextProps.activeItemId) {
       setTimeout(() => this.forceRender(), 100);
-      
+
     } else if (this.props.content.contentState !== nextProps.content.contentState) {
 
       const current = this.state.editorState.getCurrentContent();
 
-      if (nextProps.content.contentState !== current 
+      if (nextProps.content.contentState !== current
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
-        
+
         const selection = nextProps.content.contentState.getSelectionBefore();
         this.lastContent = nextProps.content.contentState;
         const newEditorState = EditorState.push(
           this.state.editorState, nextProps.content.contentState);
-        
+
         this.setState({
           editorState: newEditorState,
         });
-      } 
-      
+      }
+
     }
   }
 
   renderPostProcess(components, blocks) {
-    
+
     const updated = [];
-    let children = []; 
+    let children = [];
     let current = updated;
 
     const content =  this.state.editorState.getCurrentContent();
     let currentWrapper : ContentWrapper = null;
-    
+
     for (let i = 0; i < components.length; i += 1) {
-      
+
       const comp = components[i];
       const block = content.getBlockForKey(comp.key);
 
       // Block will be undefined when what we have encountered is a Draft
       // block level wrapper such as a ol or a ul that is wrapping a series
-      // of li blocks.  
+      // of li blocks.
       if (block === undefined) {
         if (currentWrapper === null) {
           updated.push(comp);
         } else {
           current.push(comp);
         }
-        
+
         continue;
       }
 
@@ -823,7 +823,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         const foundWrapperBegin = wrappers.find(w => w.isBeginBlock(block, content));
         if (foundWrapperBegin !== undefined) {
-          
+
           currentWrapper = foundWrapperBegin;
 
           children = [];
@@ -840,7 +840,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         children.push(components[i]);
         updated.push(
           React.createElement(
-            currentWrapper.component, 
+            currentWrapper.component,
             { key: 'block-' + block.key }, children));
         // tslint:disable-next-line
         current = updated;
@@ -849,7 +849,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       } else {
         current.push(components[i]);
       }
-      
+
     }
 
     return updated;
@@ -868,9 +868,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
-    const compositeDecorator = buildCompositeDecorator({ 
-      activeItemId: this.props.activeItemId, services: this.props.services, 
-      context: this.props.context, onEdit: onDecoratorEdit, 
+    const compositeDecorator = buildCompositeDecorator({
+      activeItemId: this.props.activeItemId, services: this.props.services,
+      context: this.props.context, onEdit: onDecoratorEdit,
     });
     return compositeDecorator;
   }
@@ -879,23 +879,23 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const editorState = this.state.editorState;
     const content = editorState.getCurrentContent();
-    
+
     const es = EditorState.createWithContent(content, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({ editorState: newEditorState });
   }
 
   renderToolbar() {
-    
+
     if (this.state.show) {
-      
+
       const additionalProps = {
         editorState: this.state.editorState,
-        commandProcessor: this, 
+        commandProcessor: this,
         dismissToolbar: this._dismissToolbar,
       };
       const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
-      
+
       const positionStyle = {
         position: 'absolute',
         top: this.state.y,
@@ -908,7 +908,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       return <div style={positionStyle as any}>
           {clonedToolbar}
         </div>;
-      
+
     } else {
       return null;
     }
@@ -930,9 +930,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   renderBlockToolbar() {
-    
+
     if (this.state.blockToolbarShown) {
-      
+
       const position = this.state.expanderPosition.caseOf({
         just: position => position,
         nothing: () => ({ x: 0, y: 0 }),
@@ -940,7 +940,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       const additionalProps = {
         editorState: this.state.editorState,
-        commandProcessor: this, 
+        commandProcessor: this,
         dismissToolbar: this._dismissToolbar,
       };
 
@@ -950,7 +950,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         : this.props.inlineInsertionToolbar;
 
       const clonedToolbar = React.cloneElement(component, additionalProps);
-      
+
       const positionStyle = {
         top: position.y,
         position: 'absolute',
@@ -960,7 +960,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       return <div style={positionStyle as any}>
           {clonedToolbar}
         </div>;
-      
+
     } else {
       return null;
     }
@@ -990,7 +990,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   handlePastedFragment(fragment, editorState) {
     if (this.props.inlineOnlyMode || wouldViolateSchema(fragment, editorState)) {
       return true;
-    } 
+    }
   }
 
   // Prevent cut operations that would leave the document in
@@ -998,7 +998,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   handleCutFragment(fragment, editorState, previewEditorState) {
     if (!validateSchema(previewEditorState.getCurrentContent())) {
       return true;
-    } 
+    }
   }
 
   onClickExpand() {
@@ -1010,11 +1010,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (this.isAtEmptyBlock()) {
       if (!this.props.inlineOnlyMode && containerPrecondition(
         this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
-        [common.EntityTypes.title_begin, 
-          common.EntityTypes.pronunciation_begin, 
+        [common.EntityTypes.title_begin,
+          common.EntityTypes.pronunciation_begin,
           common.EntityTypes.translation_begin],
-        [common.EntityTypes.title_end, 
-          common.EntityTypes.pronunciation_end, 
+        [common.EntityTypes.title_end,
+          common.EntityTypes.pronunciation_end,
           common.EntityTypes.translation_end])) {
 
         return true;
@@ -1024,7 +1024,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     } else {
       return true;
     }
- 
+
   }
 
   renderExpander() {
@@ -1036,7 +1036,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           const iconClasses = this.state.blockToolbarShown
             ? 'icon icon-minus'
             : 'icon icon-plus';
-  
+
           const style = {
             color: 'black',
           };
@@ -1047,12 +1047,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             color: '#cccccc',
             left: position.x + 25,
           };
-    
+
           return (
-            <button 
+            <button
               onClick={this.onClickExpand}
-              type="button" 
-              className="btn" 
+              type="button"
+              className="btn"
               style={buttonStyle as any}>
               <i style={style} className={iconClasses}></i>
             </button>
@@ -1064,33 +1064,33 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       },
       nothing: () => null,
     });
-    
+
     return (
       <ReactCSSTransitionGroup transitionName="expander"
         transitionEnterTimeout={700} transitionLeave={false}>
         {expander}
-      </ReactCSSTransitionGroup>  
+      </ReactCSSTransitionGroup>
     );
   }
 
   render() {
 
-    const editorStyle = this.props.editorStyles !== undefined 
-      ? this.props.editorStyles 
+    const editorStyle = this.props.editorStyles !== undefined
+      ? this.props.editorStyles
       : styles.editor;
 
     (editorStyle as any).paddingLeft = '50px';
     (editorStyle as any).position = 'relative';
     (editorStyle as any).top = '0px';
     (editorStyle as any).left = '0px';
-    
+
     return (
-        <div ref={(container => this.container = container)} 
+        <div ref={(container => this.container = container)}
           onBlur={this.onBlur}
           onFocus={this.onFocus}
           onKeyUp={this._onKeyUp}
           onKeyDown={this._onKeyDown}
-          style={editorStyle} 
+          style={editorStyle}
           onClick={this.focus}>
 
           {this.renderExpander()}
@@ -1111,7 +1111,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             blockRenderMap={blockRenderMap}
             blockRendererFn={this.blockRenderer.bind(this)}
             blockStyleFn={this.blockStyleFn.bind(this)}
-            editorState={this.state.editorState} 
+            editorState={this.state.editorState}
             readOnly={this.state.lockedByBlockRenderer || this.props.locked}
             onChange={this.onChange} />
 

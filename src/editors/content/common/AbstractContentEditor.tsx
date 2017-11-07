@@ -1,41 +1,32 @@
-'use strict'
+'use strict';
 
 import * as React from 'react';
 
-import * as models from '../../../data/models';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
-import { TitleOracle } from '../../common/TitleOracle';
+import * as models from 'data/models';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
 
-export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState> {
-  
-}
+export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
+  S extends AbstractContentEditorState> {}
 
 export interface AbstractContentEditorProps<ModelType> {
-
-  model: ModelType,
-
+  model: ModelType;
   onEdit: (updated: ModelType) => void;
-
   context: AppContext;
-
   services: AppServices;
-
   editMode: boolean;
-    
   styles?: any;
 }
 
-export interface AbstractContentEditorState {
-
-
-}
+export interface AbstractContentEditorState {}
 
 /**
- * The abstract content editor. 
+ * The abstract content editor.
  */
-export abstract class AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>, S extends AbstractContentEditorState>
-  extends React.Component<P, S> {
+export abstract class
+  AbstractContentEditor
+    <ModelType, P extends AbstractContentEditorProps<ModelType>,
+    S extends AbstractContentEditorState> extends React.Component<P, S> {
 
   constructor(props) {
     super(props);
@@ -45,4 +36,3 @@ export abstract class AbstractContentEditor<ModelType, P extends AbstractContent
   abstract shouldComponentUpdate(nextProps, nextState);
 
 }
-

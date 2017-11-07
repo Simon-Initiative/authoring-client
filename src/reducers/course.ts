@@ -1,24 +1,32 @@
-import * as courseActions from '../actions/course';
-import * as models from '../data/models';
+import { Map } from 'immutable';
+import { Maybe } from 'tsmonad';
+import {
+  CourseModel,
+} from 'data/models';
+import {
+  CourseChangedAction,
+  COURSE_CHANGED,
+} from 'actions/course';
 import { OtherAction } from './utils';
 
+type ActionTypes = CourseChangedAction | OtherAction;
+type CourseState = Map<any, any>;
 
+const initialState: CourseState = Map({
+  model: Maybe.nothing<CourseModel>(),
+});
 
-type CourseActions =
-    courseActions.courseChangedAction |
-    OtherAction;
-
-export type CurrentCourse = {
-  model: models.CourseModel,
-};
-
-export function course(state = null, action: CourseActions): CurrentCourse {
+export const course = (
+  state: CourseState = initialState,
+  action: ActionTypes,
+): CourseState => {
   switch (action.type) {
-    case courseActions.COURSE_CHANGED:
-      return {
-        model: action.model,
-      };
+    case COURSE_CHANGED:
+      return state.set(
+        'model',
+        action.model ? Maybe.just(action.model) : Maybe.nothing<CourseModel>(),
+      );
     default:
       return state;
   }
-}
+};

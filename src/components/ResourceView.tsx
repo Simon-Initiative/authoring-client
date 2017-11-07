@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar';
+import NavigationBar from './navigation/NavigationBar.controller';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';
@@ -13,31 +13,15 @@ import { SortableTable, DataRow, ColumnComparator, SortDirection } from './commo
 import { isNullOrUndefined } from 'util';
 import guid from '../utils/guid';
 
-function mapStateToProps(state: any) {
-  const {
-    course,
-  } = state;
-
-  return {
-    course,
-  };
-}
-
-/**
- * declare interfaces and types
- */
-interface ResourceView {
-  viewActions: any;
-}
-
-export interface ResourceViewOwnProps {
+export interface ResourceViewProps {
+  course: any;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
   resourceType: string;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
-    courseId: string, 
+    courseId: string,
     title: string, type: string) => models.ContentModel;
 }
 
@@ -45,16 +29,11 @@ interface ResourceViewState {
   resources: Resource[];
 }
 
-interface ResourceViewReduxProps {
-  course: any;
+export default interface ResourceView {
+  viewActions: any;
 }
 
-type ResourceViewProps = ResourceViewReduxProps & ResourceViewOwnProps & { dispatch };
-
-/**
- * ResourceView React Component
- */
-class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
+export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
 
   constructor(props) {
     super(props);
@@ -126,7 +105,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r => ({ 
+    const rows = this.state.resources.map(r => ({
       key: r.guid,
       data: r,
     }));
@@ -138,14 +117,14 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
     ];
 
     const comparators = [
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? a.title.localeCompare(b.title) 
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? a.title.localeCompare(b.title)
         : b.title.localeCompare(a.title),
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? compareDates(a.dateCreated, b.dateCreated) 
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
-      (direction, a, b) => direction === SortDirection.Ascending 
-        ? compareDates(a.dateUpdated, b.dateUpdated)  
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? compareDates(a.dateUpdated, b.dateUpdated)
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
@@ -161,7 +140,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
       <div className="">
         {creationTitle}
         {this.renderCreation()}
-        <SortableTable 
+        <SortableTable
           model={rows}
           columnComparators={comparators}
           columnRenderers={renderers}
@@ -185,7 +164,7 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
   render() {
-    
+
     return (
       <div className="container-fluid new">
         <div className="row">
@@ -205,6 +184,3 @@ class ResourceView extends React.Component<ResourceViewProps, ResourceViewState>
   }
 
 }
-
-export default connect<ResourceViewReduxProps, {}, ResourceViewOwnProps>
-(mapStateToProps)(ResourceView);

@@ -1,14 +1,10 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar';
-import { UserProfile } from '../actions/user';
-import EditorManager from '../editors/manager/EditorManager';
-import { AppServices, DispatchBasedServices } from '../editors/common/AppServices';
-import * as viewActions from '../actions/view';
-
-interface DocumentView {  
-  viewActions: Object;
-}
+import NavigationBar from './navigation/NavigationBar.controller';
+import { UserProfile } from 'types/user';
+import EditorManager from 'editors/manager/EditorManager.controller';
+import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
+import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
   dispatch: any;
@@ -19,15 +15,24 @@ export interface DocumentViewProps {
   course: any;
 }
 
-class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
+export interface DocumentViewState {}
 
+export default interface DocumentView {
+  viewActions: Object;
+}
+
+export default class DocumentView
+  extends React.PureComponent<DocumentViewProps, DocumentViewState> {
   constructor(props) {
     super(props);
-    
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
+    const { dispatch } = this.props;
+
+    this.viewActions = bindActionCreators((viewActions as any), dispatch);
   }
 
   render() {
+    const { course, documentId, profile, userId, userName } = this.props;
+
     return (
       <div className="container-fluid">
         <div className="row">
@@ -36,12 +41,12 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
               <div className="container-fluid editor">
                 <div className="row">
                   <div className="col-12">
-                    <EditorManager 
-                      course={this.props.course}
-                      profile={this.props.profile}
-                      userId={this.props.userId} 
-                      userName={this.props.userName}
-                      documentId={this.props.documentId}/>
+                    <EditorManager
+                      course={course}
+                      profile={profile}
+                      userId={userId}
+                      userName={userName}
+                      documentId={documentId} />
                   </div>
                 </div>
               </div>
@@ -50,7 +55,4 @@ class DocumentView extends React.PureComponent<DocumentViewProps, {}> {
       </div>
     );
   }
-  
 }
-
-export default DocumentView;

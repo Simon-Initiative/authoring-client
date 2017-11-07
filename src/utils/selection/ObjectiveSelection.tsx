@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as types from '../../data/types';
-import * as persistence from '../../data/persistence';
-import * as contentTypes from '../../data/contentTypes';
-import { retrieveAllObjectives } from '../../components/objectives/persistence';
+import * as types from 'data/types';
+import * as persistence from 'data/persistence';
+import * as contentTypes from 'data/contentTypes';
+import { retrieveAllObjectives } from 'components/objectives/persistence';
 
 import ModalSelection from './ModalSelection';
 
@@ -13,7 +13,6 @@ export interface ObjectiveSelection {
 }
 
 export interface ObjectiveSelectionProps {
-  titleOracle: any;
   onInsert: (objectives: Immutable.Set<contentTypes.LearningObjective>) => void;
   onCancel: () => void;
   courseId: string;
@@ -21,10 +20,10 @@ export interface ObjectiveSelectionProps {
 
 export interface ObjectiveSelectionState {
   objectives: Immutable.List<contentTypes.LearningObjective>;
-  selected: Immutable.Set<contentTypes.LearningObjective>; 
+  selected: Immutable.Set<contentTypes.LearningObjective>;
 }
 
-export class ObjectiveSelection 
+export class ObjectiveSelection
   extends React.PureComponent<ObjectiveSelectionProps, ObjectiveSelectionState> {
 
   constructor(props) {
@@ -50,8 +49,8 @@ export class ObjectiveSelection
   }
 
   renderRows() {
-    const link = (obj: contentTypes.LearningObjective) => 
-      <button onClick={this.clickResource.bind(this, obj)} 
+    const link = (obj: contentTypes.LearningObjective) =>
+      <button onClick={this.clickResource.bind(this, obj)}
         className="btn btn-link">{obj.title}</button>;
 
     return this.state.objectives.toArray().map((r) => {
@@ -64,8 +63,8 @@ export class ObjectiveSelection
 
   render() {
     return (
-      <ModalSelection title="Select Learning Objective" 
-        onCancel={this.props.onCancel} 
+      <ModalSelection title="Select Learning Objective"
+        onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}>
         <table className="table table-hover table-sm">
           <thead>
@@ -77,7 +76,7 @@ export class ObjectiveSelection
             {this.renderRows()}
           </tbody>
         </table>
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
 

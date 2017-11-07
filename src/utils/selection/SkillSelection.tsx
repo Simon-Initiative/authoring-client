@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import * as types from '../../data/types';
-import * as persistence from '../../data/persistence';
+import * as types from 'data/types';
+import { Skill } from 'types/course';
+import * as persistence from 'data/persistence';
 
 import ModalSelection from './ModalSelection';
 
@@ -11,20 +12,15 @@ export interface SkillSelection {
 }
 
 export interface SkillSelectionProps {
-  titleOracle: any;
   onInsert: (item: Skill) => void;
   onCancel: () => void;
+  onFetchSkillTitles: (courseId: string) => Promise<Skill[]>;
   courseId: string;
 }
 
-export type Skill = {
-  id: types.DocumentId,
-  title: string,
-};
-
 export interface SkillSelectionState {
   resources: Skill[];
-  selected: Skill; 
+  selected: Skill;
 }
 
 export class SkillSelection extends React.PureComponent<SkillSelectionProps, SkillSelectionState> {
@@ -43,19 +39,10 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
   }
 
   fetchResources() {
-    persistence.bulkFetchDocuments(
-      this.props.courseId, [types.LegacyTypes.skills_model],'byTypes')
-      .then ((skills) => {
-        
-        const resources = skills
-            .map(doc => (doc.model as any).skills.toArray())
-            .reduce((p, c) => [...p, ...c])
-            .map(skill => ({ id: skill.id, title: skill.title }));
-        
-        resources.forEach(r => this.props.titleOracle.putTitle(r.id, r.title));
-
+    this.props.onFetchSkillTitles(this.props.courseId)
+      .then ((titles) => {
         this.setState({
-          resources,
+          resources: titles,
         });
       });
   }
@@ -65,8 +52,8 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
   }
 
   renderRows() {
-    const link = (r: Skill) => 
-      <button onClick={this.clickResource.bind(this, r)} 
+    const link = (r: Skill) =>
+      <button onClick={this.clickResource.bind(this, r)}
         className="btn btn-link">{r.title}</button>;
 
     return this.state.resources.map((r) => {
@@ -79,8 +66,8 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
 
   render() {
     return (
-      <ModalSelection title="Select Skill" 
-        onCancel={this.props.onCancel} 
+      <ModalSelection title="Select Skill"
+        onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}>
         <table className="table table-hover table-sm">
           <thead>
@@ -92,7 +79,7 @@ export class SkillSelection extends React.PureComponent<SkillSelectionProps, Ski
             {this.renderRows()}
           </tbody>
         </table>
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
 

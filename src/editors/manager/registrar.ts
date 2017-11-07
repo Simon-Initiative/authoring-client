@@ -1,5 +1,5 @@
 
-import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor';
+import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor.controller';
 import AssessmentEditor from '../document/assessment/AssessmentEditor';
 import CourseEditor from '../document/course/CourseEditor';
 import OrgEditor from '../document/org/OrgEditor';
@@ -14,39 +14,39 @@ import { register } from './registry';
 
 export default function initEditorRegistry() {
   register({
-    name: ModelTypes.WorkbookPageModel, 
-    component: WorkbookPageEditor, 
+    name: ModelTypes.WorkbookPageModel,
+    component: WorkbookPageEditor,
     persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,
   });
   register({
-    name: ModelTypes.CourseModel, 
+    name: ModelTypes.CourseModel,
     component: CourseEditor,
     persistenceStrategyFactory: () => new ImmediatePersistenceStrategy(),
     listeningApproach: ListeningApproach.Never,
     protected: false,
   });
   register({
-    name: ModelTypes.AssessmentModel, 
+    name: ModelTypes.AssessmentModel,
     component: AssessmentEditor,
     persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,
-  });  
+  });
   register({
-    name: ModelTypes.OrganizationModel, 
+    name: ModelTypes.OrganizationModel,
     component: OrgEditor,
     persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,
   });
   register({
-    name: ModelTypes.PoolModel, 
+    name: ModelTypes.PoolModel,
     component: PoolEditor,
     persistenceStrategyFactory: () => new DeferredPersistenceStrategy(),
     listeningApproach: ListeningApproach.WhenReadOnly,
     protected: true,
   });
-  
+
 }
