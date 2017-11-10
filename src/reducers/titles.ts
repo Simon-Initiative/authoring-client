@@ -18,7 +18,12 @@ export const titles = (
   switch (action.type) {
     case RECEIVE_TITLES:
       // convert received titles from list to map and merge with current state
-      const titlesMap = action.titles.reduce((val, acc) => acc[val.id] = val.title && acc);
+      const titlesMap = action.titles.reduce(
+        (acc, val) => {
+          acc[val.id] = val.title;
+          return acc;
+        },
+        {});
       return state.merge(titlesMap);
     default:
       return state;
