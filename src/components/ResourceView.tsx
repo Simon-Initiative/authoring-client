@@ -2,16 +2,16 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import NavigationBar from './navigation/NavigationBar.controller';
-import * as persistence from '../data/persistence';
-import * as models from '../data/models';
-import * as viewActions from '../actions/view';
-import { compareDates, relativeToNow, adjustForSkew } from '../utils/date';
-import { Resource } from '../data/content/resource';
-import * as courseActions from '../actions/course';
-import * as contentTypes from '../data/contentTypes';
+import * as persistence from 'data/persistence';
+import * as models from 'data/models';
+import * as viewActions from 'actions/view';
+import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
+import { Resource } from 'data/content/resource';
+import * as courseActions from 'actions/course';
+import * as contentTypes from 'data/contentTypes';
 import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
-import guid from '../utils/guid';
+import guid from 'utils/guid';
 
 export interface ResourceViewProps {
   course: any;

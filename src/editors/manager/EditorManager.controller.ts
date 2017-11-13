@@ -11,7 +11,6 @@ interface StateProps {
 
 interface DispatchProps {
   onCourseChanged: (model: CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -36,9 +35,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onCourseChanged: (model: CourseModel) => {
       dispatch(courseChanged(model));
-    },
-    onLoadCourseTitles: (courseId) => {
-      dispatch(fetchObjectiveTitles(courseId));
     },
     onDispatch: dispatch,
   };

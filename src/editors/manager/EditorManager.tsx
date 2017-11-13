@@ -31,7 +31,6 @@ export interface EditorManagerProps {
   expanded: any;
   titles: any;
   onCourseChanged: (model: models.CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -193,7 +192,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   }
 
   componentDidMount() {
-    const { course, documentId, onLoadCourseTitles } = this.props;
+    const { course, documentId } = this.props;
 
     // Special handling for CourseModel  - don't call fetchDocument
     if (course && course.model.guid === documentId) {
@@ -215,7 +214,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       this.setState({ document });
     } else if (course) {
       this.fetchDocument(course.model.guid, documentId);
-      onLoadCourseTitles(course.model.guid);
     }
   }
 

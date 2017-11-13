@@ -19,7 +19,7 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
-import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
+import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 
 type ResourceList = {
