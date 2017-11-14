@@ -85,7 +85,7 @@ class ImportCourseView extends React.PureComponent<ImportCourseViewProps, Import
               <br/>
               <p className="mb-0">After you initiate an import, you will
               be taken to the
-              &quot;My Course Packages&quot; page, where you can see status
+              &quot;My Course Packages&quot; page, where you can see the status
               of the course package that you are importing.
               </p>
             </div>
