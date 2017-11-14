@@ -13,7 +13,7 @@ export interface ModalSelectionProps {
   onCancel: () => void;
 }
 
-const tempnavstyle : any = {   
+const tempnavstyle : any = {
   objectContainer: {
     marginTop: '10px',
     overflow: 'auto',
@@ -32,17 +32,14 @@ const customStyles = {
   },
   content: {
     position: 'absolute',
-    top: '140px',
-    left: '140px',
-    right: '140px',
-    bottom: '140px',
+    top: '40px',
+    left: '40px',
+    right: '40px',
     border: '0px solid #444444',
     background: '#fff',
-    overflow: 'auto',
-    WebkitOverflowScrolling: 'touch',
     borderRadius: '4px',
     outline: 'none',
-    padding: '20px',
+    padding: '5px',
     zIndex: 10000,
   },
 };
@@ -62,11 +59,10 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
     const height = window.innerHeight - 280 - 200;
 
     const container : any = {
-      maxHeight: height,
       overflow: 'scroll',
     };
 
-    return (  
+    return (
       <Modal
         isOpen={true}
         contentLabel={this.props.title}
@@ -76,20 +72,20 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
           </nav>
 
           <div style={container}>
-            {this.props.children}                 
+            {this.props.children}
           </div>
-          
-            
+
+
           <div style={bottom}>
-            
+
             <button className="btn btn-primary"
               onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }>
                 {okLabel}</button>
-            <button className="btn" 
+            <button className="btn"
               onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }>
                 {cancelLabel}</button>
             </div>
-          
+
       </Modal>);
 
   }

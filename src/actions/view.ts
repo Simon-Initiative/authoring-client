@@ -5,6 +5,10 @@ export function viewCreateCourse(): void {
   history.push('/create');
 }
 
+export function viewImportCourse(): void {
+  history.push('/import');
+}
+
 export function viewDocument(documentId: string, courseId: string): void {
   history.push('/' + documentId + '-' + courseId);
 }
