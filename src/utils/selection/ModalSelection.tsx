@@ -32,14 +32,17 @@ const customStyles = {
   },
   content: {
     position: 'absolute',
-    top: '40px',
-    left: '40px',
-    right: '40px',
+    top: '140px',
+    left: '140px',
+    right: '140px',
+    bottom: '140px',
     border: '0px solid #444444',
     background: '#fff',
+    overflow: 'auto',
+    WebkitOverflowScrolling: 'touch',
     borderRadius: '4px',
     outline: 'none',
-    padding: '5px',
+    padding: '20px',
     zIndex: 10000,
   },
 };
@@ -59,6 +62,7 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
     const height = window.innerHeight - 280 - 200;
 
     const container : any = {
+      maxHeight: height,
       overflow: 'scroll',
     };
 
@@ -93,6 +97,3 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 }
 
 export default ModalSelection;
-
-
-
