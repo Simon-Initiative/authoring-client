@@ -1,13 +1,9 @@
 import * as React from 'react';
-import guid from '../utils/guid';
-import * as persistence from '../data/persistence';
-import * as models from '../data/models';
-import * as courseActions from '../actions/course';
-import * as viewActions from '../actions/view';
-
-interface ImportCourseView {
-
-}
+import guid from 'utils/guid';
+import * as persistence from 'data/persistence';
+import * as models from 'data/models';
+import * as courseActions from 'actions/course';
+import * as viewActions from 'actions/view';
 
 export interface ImportCourseViewProps {
   dispatch: any;
@@ -17,7 +13,8 @@ export interface ImportCourseViewState {
 
 }
 
-class ImportCourseView extends React.PureComponent<ImportCourseViewProps, ImportCourseViewState> {
+export class ImportCourseView
+  extends React.PureComponent<ImportCourseViewProps, ImportCourseViewState> {
 
   constructor(props) {
     super(props);
@@ -95,5 +92,3 @@ class ImportCourseView extends React.PureComponent<ImportCourseViewProps, Import
     );
   }
 }
-
-export default ImportCourseView;

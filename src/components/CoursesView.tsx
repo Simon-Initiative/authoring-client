@@ -161,7 +161,9 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
             disabled={!isReady}
             type="button" className="btn btn-link" key={guid}
             onClick={this.onSelect.bind(this, guid)}>
-            {title +  ' - v' + version + (isReady ? '' : ' (Import in process)')}
+            <b>
+              {title +  ' - v' + version + (isReady ? '' : ' (Import in process)')}
+            </b>
           </button>;
 
         return (
