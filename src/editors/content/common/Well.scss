@@ -1,7 +1,7 @@
-@import '../../../stylesheets/abstracts/variables';
+@import 'oli/colors';
 
-.Well {
-  background-color: $color-grey;
+.well {
+  background-color: $grey;
   padding: 5px;
   min-height: 40px;
 }

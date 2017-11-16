@@ -4,13 +4,7 @@ import * as t from '../../data/contentTypes';
 import * as models from '../../data/models';
 import { Maybe } from 'tsmonad';
 import guid from '../../utils/guid';
-
 import { TextInput } from '../../editors/content/common/TextInput';
-
-
-export interface Title {
-  titleInput: any;
-}
 
 export interface TitleProps {
   title: string;
@@ -24,19 +18,18 @@ export interface TitleState {
   isEditing: boolean;
   title: string;
 }
- 
+
 const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
 
-
-
-export class Title 
+export class Title
   extends React.PureComponent<TitleProps, TitleState> {
-    
+  titleInput: any;
+
   constructor(props) {
     super(props);
 
-    this.state = { isEditing: false, title: props.title };    
+    this.state = { isEditing: false, title: props.title };
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCancel = this.onCancel.bind(this);
@@ -48,7 +41,7 @@ export class Title
   onTitleEdit() {
     const title = this.titleInput.value;
     this.setState(
-      { isEditing: false }, 
+      { isEditing: false },
       () => this.props.onEdit(title));
   }
 
@@ -76,24 +69,24 @@ export class Title
   render() : JSX.Element {
 
     const { title, editMode } = this.props;
-    
+
     if (this.state.isEditing) {
       return (
         <div style={ { display: 'inline', marginLeft: '40px' } }>
           <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
-            onChange={this.onTextChange} 
+            onChange={this.onTextChange}
             value={this.state.title} style={ { width: '50%', paddingTop: '2px' } }/>
-          <button 
+          <button
             key="save"
             onClick={this.onTitleEdit}
-            type="button" 
+            type="button"
             className="btn btn-sm">
             Done
           </button>
-          <button 
+          <button
             key="cancel"
             onClick={this.onCancel}
-            type="button" 
+            type="button"
             className="btn btn-sm">
             Cancel
           </button>
@@ -113,26 +106,26 @@ export class Title
         color: '#606060',
       };
       const renameButton = this.props.isHoveredOver && this.props.editMode
-          ? <button 
+          ? <button
               key="rename"
               onClick={this.onBeginEdit}
-              type="button" 
-              className="btn btn-sm">
+              type="button"
+              className="btn btn-link btn-sm">
               Rename
             </button>
           : null;
 
       return (
-        <div style={ { display: 'inline' } } 
+        <div style={ { display: 'inline' } }
           >
-          <button key="itemClick" onClick={() => this.props.onToggleExpanded()} 
+          <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
           type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
           {renameButton}
         </div>
       );
     }
 
-    
+
   }
 
 }

@@ -9,11 +9,7 @@ import * as courseActions from '../actions/course';
 import { hasRole } from '../actions/utils/keycloak';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 
-interface CoursesView {
-  onSelect: (id) => void;
-  _deleteCourse: (id) => void;
-  _createCourse: () => void;
-}
+import './CoursesView.scss';
 
 type CourseDescription = {
   guid: string,
@@ -30,16 +26,18 @@ export interface CoursesViewProps {
 }
 
 class CoursesView extends React.PureComponent<CoursesViewProps, { courses: CourseDescription[] }> {
+  onSelect: (id) => void;
+  deleteCourse: (id) => void;
 
   constructor(props) {
     super(props);
 
     this.state = { courses: [] };
-    this._createCourse = this.createCourse.bind(this);
+    this.createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
       this.fetchDocument(id);
     };
-    this._deleteCourse = (id) => {
+    this.deleteCourse = (id) => {
       this.removeCourse(id);
     };
   }
@@ -163,7 +161,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
                   {hasRole('admin') &&
                   <div className="row">
                     <button type="button" className="btn btn-remove" key={guid}
-                            onClick={this._deleteCourse.bind(this, guid)}>
+                            onClick={this.deleteCourse.bind(this, guid)}>
                       Remove
                     </button>
                   </div>}
@@ -184,8 +182,8 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     });
 
     return (
-      <div>
-        <div className="createCourse">
+      <div className="courses-view">
+        <div className="create-course">
           <div className="container">
             <div className="row">
               <div className="col-6 offset-1">
@@ -196,7 +194,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
                 </p>
               </div>
               <div className="col-4">
-                <button onClick={this._createCourse}
+                <button onClick={this.createCourse}
                         className="btn btn-secondary btn-lg btn-block outline serif">
                   <img src="assets/icon-book.png" width="42" height="42"
                        className="d-inline-block align-middle" alt=""/>
@@ -206,7 +204,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
             </div>
           </div>
         </div>
-        <div className="container courseView editor">
+        <div className="container course-view editor">
           <h2>Course Packages</h2>
           {rows}
         </div>

@@ -1,8 +1,8 @@
-@import '../../../stylesheets/abstracts/variables';
+@import 'oli/colors';
 
 .InputLabel-primary {
-  background-color: $color-blue;
-  color: $color-white;
+  background-color: $blue;
+  color: $white;
   width: 100px;
   max-width: 100px;
   min-width: 100px;
@@ -12,4 +12,17 @@
   width: 100px;
   max-width: 100px;
   min-width: 100px;
+}
+
+.closebtn {
+  padding-left: 10px;
+  color: #888;
+  font-weight: bold;
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  color: #000;
 }

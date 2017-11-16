@@ -10,30 +10,23 @@ import { InputLabel } from '../common/InputLabel';
 import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 
-import '../common/editor.scss';
-
-
-export interface CiteEditor {
-  
-}
-
 export interface CiteEditorProps extends AbstractContentEditorProps<Cite> {
-  
+
 }
 
 export interface CiteEditorState {
-  
+
 }
 
 /**
  * The content editor for Table.
  */
-export class CiteEditor 
+export class CiteEditor
   extends AbstractContentEditor<Cite, CiteEditorProps, CiteEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onEntryEdit = this.onEntryEdit.bind(this);
 
   }
@@ -41,7 +34,7 @@ export class CiteEditor
   shouldComponentUpdate(nextProps, nextState: CiteEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } 
+    }
     return false;
   }
 
@@ -52,19 +45,19 @@ export class CiteEditor
   render() : JSX.Element {
 
     const { entry } = this.props.model;
-    
+
     return (
       <div className="itemWrapper">
 
         <InputLabel label="Entry">
-          <TextInput width="100%" label="" 
+          <TextInput width="100%" label=""
             editMode={this.props.editMode}
-            value={entry} 
+            value={entry}
             type="text"
             onEdit={this.onEntryEdit}
           />
         </InputLabel>
-        
+
       </div>);
   }
 

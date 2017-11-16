@@ -1,0 +1,102 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+.navigation-bar {
+  .open-menu {
+    width: '200px';
+    display: 'flex';
+    flex-direction: 'column';
+    justify-content: 'space-between';
+    align-items: 'stretch';
+    align-content: 'stretch';
+    height: 'inherit';
+    border-right: '1px solid grey';
+  }
+
+  .closedMenu {
+    width: '64px';
+    display: 'flex';
+    flex-direction: 'column';
+    justify-content: 'space-between';
+    align-items: 'stretch';
+    align-content: 'stretch';
+    height: 'inherit';
+    border-right: '1px solid grey';
+  }
+
+  .mainMenu {
+    flex: 'none';
+    flex-grow: 1;
+    order: 0;
+    border: '0px solid #c4c0c0';
+    padding: '0px';
+    margin: '0 0 0 0';
+  }
+
+  .verticalMenu {
+    list-style-type: 'none';
+  }
+
+  .bottomMenu {
+    margin: '0 0 0 14px';
+    height: '24px';
+  }
+
+  &.sidebar {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: '20px';
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    overflow-x: 'hidden';
+    overflow-y: 'auto';
+    background-color: $blue;
+    color: $white;
+    font-size: 16px;
+    font-weight: 600;
+    min-height: 78vh;
+
+    h1 {
+      margin: 0px;
+        font-size: 1.5em;
+        padding: 30px 1.3em 0.4em 0.7em;
+        font-family: $serif-font;
+        color: $white;
+    }
+
+    h2 {
+      margin: 0px;
+        font-size: 12px;
+        text-transform: uppercase;
+        padding: 30px 1.3em 0.4em 1.3em;
+        font-weight: 600;
+        color: $lblue;
+    }
+
+    a {
+      cursor: pointer;
+      padding: .1em 1em;
+
+      &:hover {
+          text-decoration: underline !important;
+        }
+    }
+
+    .feedback {
+      margin-top: 25px;
+      a {
+        display: block;
+          text-align: center;
+          background: #fff;
+          width: 85%;
+          margin: 0 auto;
+          padding: 10px;
+      }
+    }
+
+    .nav-link {
+      border-radius: 0px;
+    }
+  }
+}

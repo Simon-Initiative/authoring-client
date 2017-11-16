@@ -1,0 +1,93 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+.main {
+  .editor {
+    margin: 3em auto;
+
+    blockquote {
+      background: #f9f9f9;
+      border-left: 10px solid #ccc;
+      margin: 1.5em 10px;
+      padding: 0.5em 10px;
+    }
+
+    .formulaDiv {
+      background: #f9f9f9;
+      border-left: 10px solid #7130c0;
+      margin: 1.5em 10px;
+      padding: 0.5em 10px;
+      font-family: monospace;
+      font-size: 13px;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: 400;
+      line-height: 18.5714px;
+    }
+
+    .codeDiv {
+      font-family: monospace;
+      font-size: 13px;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: 400;
+      line-height: 18.5714px;
+      background-color: #CCCCCC;
+      width: '100%';
+    }
+
+
+    h2 {
+      font-family: $serif-font;
+      margin: 0em 1em 0em auto;
+      display: inline-block;
+    }
+
+    .editor-link {
+      color: $blue !important;
+      cursor: pointer;
+      &.active {
+        color: $blue !important;
+      }
+    }
+
+    .btn {
+      cursor: pointer;
+      background-color: transparent;
+      transition: none;
+      // border-bottom: 1px dotted $blue;
+      font-weight: 600;
+      color: $blue;
+
+      &.btn-primary {
+        background-color: $blue;
+        color: #FFF !important;
+      }
+
+      &.btn-remove {
+        background-color: $grey;
+        color: #FFF !important;
+        padding-left: 15px !important;
+      }
+
+      &.outline {
+        background-color: transparent;
+        border: 2px solid $white;
+      }
+
+      &.serif {
+        font-family: $serif-font;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+        outline: none;
+      }
+
+      &:active {
+        box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+        outline: none;
+      }
+    }
+  }
+}

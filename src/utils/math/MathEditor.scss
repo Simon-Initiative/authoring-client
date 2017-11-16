@@ -1,0 +1,19 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+.math-editor {
+  .mathPreview {
+    & > span {
+      display: block;
+      text-align: center;
+      background-color: transparent;
+    }
+
+    .preview {
+      display: block;
+      color: $grey;
+      text-align: center;
+      font-family: $serif-font;
+    }
+  }
+}

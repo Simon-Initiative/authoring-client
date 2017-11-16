@@ -1,0 +1,10 @@
+.editable-caption {
+  display: flex;
+  flex-direction: row;
+
+  .caption-btn {
+    color: black;
+    font-weight: normal;
+    margin-right: 20px;
+  }
+}

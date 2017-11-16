@@ -17,10 +17,7 @@ import { Remove } from './Remove';
 import { ADD_NEW_COMMANDS, ADD_EXISTING_COMMANDS } from './commands/map';
 import { RemoveCommand } from './commands/remove';
 
-export interface EditableCaption {
-  titleInput: any;
-  timer: any;
-}
+import './EditableCaption.scss';
 
 export interface EditableCaptionProps {
   labels: t.Labels;
@@ -39,49 +36,43 @@ export interface EditableCaptionState {
   isEditing: boolean;
   title: string;
 }
- 
+
 const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
 
 
 function buildCommandButtons(
-  prefix, commands, org, model, 
+  prefix, commands, org, model,
   labels, processCommand, context, editMode) : Object[] {
 
   const slash : any = {
     fontFamily: 'sans-serif',
-    lineHeight: 1.25,
     position: 'relative',
-    top: -4,
     color: '#606060',
-  };
-  const buttonStyle : any = {
-    padding: '0 5 0 5',
   };
 
   const buttons = commands[model.contentType].map(commandClass => new commandClass())
-    .map(command => [<button 
-      style={buttonStyle}
+    .map(command => [<button
       className="btn btn-link btn-sm" key={prefix + command.description(labels)}
       disabled={!command.precondition(org, model, context) || !editMode}
       onClick={() => processCommand(command)}>{command.description(labels)}</button>,
-      <span 
-      key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
+      <span key={prefix + command.description(labels) + 'slash'} style={slash}>/</span>])
     .reduce((p, c) => p.concat(c), []);
-  
+
   buttons.pop();
 
   return buttons;
 }
 
-
-export class EditableCaption 
+export class EditableCaption
   extends React.PureComponent<EditableCaptionProps, EditableCaptionState> {
-    
+  titleInput: any;
+  timer: any;
+
   constructor(props) {
     super(props);
 
-    this.state = { isEditing: false, title: props.model.title };    
+    this.state = { isEditing: false, title: props.model.title };
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCancel = this.onCancel.bind(this);
@@ -102,7 +93,7 @@ export class EditableCaption
   onTitleEdit() {
     const title = this.titleInput.value;
     this.setState(
-      { isEditing: false }, 
+      { isEditing: false },
       () => this.props.onEdit((this.props.model as any).with({ title })));
   }
 
@@ -132,11 +123,9 @@ export class EditableCaption
 
       const label : any = {
         fontFamily: 'sans-serif',
-        lineHeight: 1.25,
         fontSize: '12pt',
         position: 'relative',
         marginLeft: '30px',
-        top: -6,
         color: '#606060',
       };
 
@@ -145,7 +134,7 @@ export class EditableCaption
         ADD_EXISTING_COMMANDS,
         this.props.org, this.props.model, this.props.labels,
         this.props.processCommand, this.props.context, this.props.editMode);
-  
+
       return [
         <span key="add-existing" style={label}>Add existing:</span>,
         ...buttons,
@@ -153,7 +142,7 @@ export class EditableCaption
     } else {
       return [];
     }
-    
+
   }
 
   renderInsertNew() {
@@ -162,10 +151,8 @@ export class EditableCaption
 
       const label : any = {
         fontFamily: 'sans-serif',
-        lineHeight: 1.25,
         fontSize: '12pt',
         position: 'relative',
-        top: -6,
         color: '#606060',
       };
 
@@ -186,68 +173,70 @@ export class EditableCaption
   render() : JSX.Element {
 
     const { model, depth, editMode } = this.props;
-    
+
     if (this.state.isEditing) {
       return (
         <div style={ { display: 'inline', marginLeft: '40px' } }>
           <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
-            onChange={this.onTextChange} 
+            onChange={this.onTextChange}
             value={this.state.title} style={ { width: '50%', paddingTop: '2px' } }/>
-          <button 
+          <button
             key="save"
             onClick={this.onTitleEdit}
-            type="button" 
-            className="btn btn-sm">
+            type="button"
+            className="btn btn-link btn-sm">
             Done
           </button>
-          <button 
+          <button
             key="cancel"
             onClick={this.onCancel}
-            type="button" 
-            className="btn btn-sm">
+            type="button"
+            className="btn btn-link btn-sm">
             Cancel
           </button>
         </div>
       );
     } else {
-      const linkStyle : any = {
-        color: 'black',
-        fontWeight: 'normal',
-      };
-
       let buttons = null;
 
       if (this.props.isHoveredOver) {
 
         buttons = [];
 
-        buttons.push(<button 
-          key="rename"
-          onClick={this.onBeginEdit}
-          disabled={!this.props.editMode}
-          type="button" 
-          className="btn btn-sm">
-          Rename
-        </button>);
+        buttons.push(
+          <button
+            key="rename"
+            onClick={this.onBeginEdit}
+            disabled={!this.props.editMode}
+            type="button"
+            className="btn btn-link btn-sm">
+            Rename
+          </button>,
+        );
 
         this.renderInsertNew().forEach(e => buttons.push(e));
         this.renderInsertExisting().forEach(e => buttons.push(e));
-        
-        buttons.push(<Remove key="remove" editMode={this.props.editMode} 
+
+        buttons.push(<span className="flex-spacer"/>);
+
+        buttons.push(<Remove key="remove" editMode={this.props.editMode}
           processCommand={this.props.processCommand}/>);
       }
-      
+
       return (
-        <div style={ { display: 'inline' } } 
-          >
-          <button key="itemClick" onClick={() => this.props.toggleExpanded(getExpandId(model))} 
-          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
+        <div className="editable-caption">
+          <button
+            className="caption-btn btn btn-link"
+            onClick={() => this.props.toggleExpanded(getExpandId(model))}>
+            {this.props.children}
+          </button>
+
           {buttons}
         </div>
       );
     }
 
-    
+
   }
 
 }

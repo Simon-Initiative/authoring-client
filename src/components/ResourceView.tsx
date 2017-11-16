@@ -13,6 +13,8 @@ import { SortableTable, DataRow, ColumnComparator, SortDirection } from './commo
 import { isNullOrUndefined } from 'util';
 import guid from '../utils/guid';
 
+import './ResourceView.scss';
+
 export interface ResourceViewProps {
   course: any;
   dispatch: any;
@@ -29,11 +31,8 @@ interface ResourceViewState {
   resources: Resource[];
 }
 
-export default interface ResourceView {
-  viewActions: any;
-}
-
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
+  viewActions: any;
 
   constructor(props) {
     super(props);
@@ -151,22 +150,24 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   renderCreation() {
     return (
-      <div className="input-group col-4 float-right">
+      <div className="table-toolbar input-group">
+        <div className="flex-spacer"/>
         <form className="form-inline">
           <input type="text" ref="title"
                  className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-                 placeholder="Title"></input>
+                 placeholder="New Title"></input>
           <button onClick={this.createResource.bind(this)}
                   className="btn btn-primary">Create
           </button>
         </form>
-      </div>);
+      </div>
+    );
   }
 
   render() {
 
     return (
-      <div className="container-fluid new">
+      <div className="resource-view container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 col-md-10 document">

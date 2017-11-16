@@ -12,10 +12,10 @@ export const RemovableContent = (props: RemovableContentProps) => {
   return (
     <div className={classes}>
       <span style={ { float: 'right' } }>
-        <button 
-          disabled={!props.editMode} 
-          onClick={props.onRemove} 
-          type="button" 
+        <button
+          disabled={!props.editMode}
+          onClick={props.onRemove}
+          type="button"
           className="btn btn-sm btn-outline-secondary">
           <i className="icon icon-remove"></i>
         </button>

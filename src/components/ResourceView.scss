@@ -1,0 +1,11 @@
+@import 'oli/layout';
+
+.resource-view {
+  .table-toolbar {
+    @extend .flex-row
+  }
+
+  .document {
+    padding-top: 30px;
+  }
+}

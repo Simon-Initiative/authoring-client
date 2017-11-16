@@ -1,0 +1,22 @@
+.table {
+  background-color: $white;
+
+  thead {
+    background-color: rgba(190, 193, 197, 0.85);
+
+    th {
+      font-weight: 200;
+      font-size: 16px;
+      color: black;
+      min-height: 30px;
+    }
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  th {
+    vertical-align: middle;
+  }
+}

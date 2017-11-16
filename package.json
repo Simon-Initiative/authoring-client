@@ -93,6 +93,7 @@
       "^data/(.*)": "<rootDir>/src/data/$1",
       "^editors/(.*)": "<rootDir>/src/editors/$1",
       "^reducers/(.*)": "<rootDir>/src/reducers/$1",
+      "^stylesheets/(.*)": "<rootDir>/src/stylesheets/$1",
       "^types/(.*)": "<rootDir>/src/types/$1",
       "^utils/(.*)": "<rootDir>/src/utils/$1"
     },

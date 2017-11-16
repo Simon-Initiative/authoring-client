@@ -10,7 +10,7 @@ import guid from '../../utils/guid';
 import { Remove } from './Remove';
 
 export interface Objective {
-  
+
 }
 
 export interface ObjectiveProps {
@@ -27,12 +27,12 @@ export interface ObjectiveProps {
 }
 
 export interface ObjectiveState {
- 
+
 }
 
-export class Objective 
+export class Objective
   extends React.PureComponent<ObjectiveProps, ObjectiveState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -85,35 +85,35 @@ export class Objective
     const skillButtons = this.props.mouseOver && this.props.editMode
           ? <div style={ { display: 'inline', marginLeft: '50px' } }>
               <span style={label}>Add Skill:</span>
-              <button 
+              <button
               key="new"
               onClick={this.props.onAddNewSkill}
-              type="button" 
-              className="btn btn-sm">
+              type="button"
+              className="btn btn-link btn-sm">
               New
             </button>
             /
-            <button 
+            <button
               key="existing"
               onClick={this.props.onAddExistingSkill}
-              type="button" 
-              className="btn btn-sm">
+              type="button"
+              className="btn btn-link btn-sm">
               Existing
             </button>
-            <Remove editMode={this.props.editMode} 
+            <Remove editMode={this.props.editMode}
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
           </div>
           : null;
 
     return (
       <div>
-        <Title title={model.title} 
-          editMode={editMode} 
+        <Title title={model.title}
+          editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
-          isHoveredOver={mouseOver} 
+          isHoveredOver={mouseOver}
           onEdit={this.onTitleEdit}>{title}</Title>
         {skillButtons}
-        
+
       </div>
     );
   }

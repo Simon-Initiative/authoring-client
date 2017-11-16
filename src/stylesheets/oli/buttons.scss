@@ -1,0 +1,51 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+.btn {
+	border-radius: 0px;
+	cursor: pointer;
+	background-color: transparent;
+	border: none;
+
+	&.btn-primary {
+		background-color: $blue;
+	}
+
+	&.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show > .btn-secondary.dropdown-toggle {
+		color: $blue;
+		font-weight: 500;
+		font-size: 0.9rem;
+		background-color: transparent;
+		border: none;
+	}
+
+	&.outline {
+		background-color: transparent;
+		border: 2px solid $white;
+	}
+
+	&.serif {
+		font-family: $serif-font;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
+
+	&:active {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
+	&.btn-link {
+		&.focus {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
+
+		.active {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
+	}
+}

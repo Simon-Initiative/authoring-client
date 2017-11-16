@@ -22,6 +22,8 @@ import CreateCourseView from './components/CreateCourseView';
 import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 
+import './Main.scss';
+
 type ResourceList = {
   title: string,
   resourceType: string,
@@ -120,16 +122,14 @@ interface MainState {
   current: any;
 }
 
-export default interface Main {
-  modalActions: Object;
-  viewActions: Object;
-  unlisten: any;
-}
-
 /**
  * Main React Component
  */
 export default class Main extends React.Component<MainProps, MainState> {
+  modalActions: Object;
+  viewActions: Object;
+  unlisten: any;
+
   constructor(props) {
     super(props);
     const { location, onDispatch } = this.props;

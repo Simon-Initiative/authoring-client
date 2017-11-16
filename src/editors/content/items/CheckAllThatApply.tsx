@@ -16,16 +16,9 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
 import guid from 'utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
 type IdTypes = {
   shuffle: string,
 };
-
-export interface CheckAllThatApply {
-  ids: IdTypes;
-}
 
 export interface CheckAllThatApplyProps
   extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
@@ -39,6 +32,7 @@ export interface CheckAllThatApplyState {}
 export class CheckAllThatApply
   extends AbstractItemPartEditor<contentTypes.MultipleChoice,
     CheckAllThatApplyProps, CheckAllThatApplyState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);

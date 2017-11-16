@@ -12,30 +12,23 @@ import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 
-import '../common/editor.scss';
-
-
-export interface Sources {
-  
-}
-
-export interface SourcesProps 
+export interface SourcesProps
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Source>> {
   mediaType: string;
   accept: string;
 }
 
 export interface SourcesState {
-  
+
 }
 
 
-export class Sources 
+export class Sources
   extends AbstractContentEditor<Immutable.OrderedMap<string, Source>, SourcesProps, SourcesState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onAddClick = this.onAddClick.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onEdit = this.onEdit.bind(this);
@@ -76,7 +69,7 @@ export class Sources
 
     return (
       <div>
-        <button onClick={this.onAddClick} type="button" 
+        <button onClick={this.onAddClick} type="button"
           className="btn btn-link btn-sm">Add Source</button>
         <table className="table table-sm">
           <thead>

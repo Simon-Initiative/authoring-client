@@ -6,7 +6,7 @@ import * as models from '../../../data/models';
 import { Maybe } from 'tsmonad';
 import { AppServices } from '../../common/AppServices';
 import guid from '../../../utils/guid';
-import { renderDraggableTreeNode, canAcceptDrop, 
+import { renderDraggableTreeNode, canAcceptDrop,
   SourceNodeType, renderDropTarget } from '../../content/org/drag/utils';
 import { DragHandle } from '../../content/org/drag/DragHandle';
 import { DraggableNode } from './DraggableNode';
@@ -16,9 +16,7 @@ import { EditableCaption } from './EditableCaption';
 import { Caption } from './Caption';
 import { Command } from './commands/command';
 
-export interface TreeNode {
-  timer: any;
-}
+import './TreeNode.scss';
 
 export interface TreeNodeProps {
   numberAtLevel: number;      // 1-based position of this node at this level of the tree
@@ -29,7 +27,7 @@ export interface TreeNodeProps {
   indexWithinParent: number;  // index position of this node within parent's children
   depth: number;              // Current depth within tree
   isExpanded: boolean;        // Is node expanded or not
-  context: AppContext;  
+  context: AppContext;
   org: models.OrganizationModel;
   onEdit: (model: NodeTypes) => void;
   editMode: boolean;
@@ -47,15 +45,16 @@ export interface TreeNodeState {
 // tslint:disable-next-line
 const Title = (props) => {
   return (
-    <button onClick={() => props.toggleExpanded()} 
+    <button onClick={() => props.toggleExpanded()}
         type="button" className="btn btn-link">{props.children}</button>
   );
 };
 
 
-export class TreeNode 
+export class TreeNode
   extends React.PureComponent<TreeNodeProps, TreeNodeState> {
-    
+  timer: any;
+
   constructor(props) {
     super(props);
 
@@ -82,7 +81,7 @@ export class TreeNode
       clearTimeout(this.timer);
     }
     this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-    
+
   }
 
   onLeave() {
@@ -103,9 +102,9 @@ export class TreeNode
 
   render() : JSX.Element {
 
-    const { model, parentModel, indexWithinParent, 
+    const { model, parentModel, indexWithinParent,
       depth, context, editMode, onReposition, isExpanded } = this.props;
-    
+
     const hasHiddenChildren =
       <span>
         <i className="icon icon-caret-right"></i>
@@ -124,13 +123,13 @@ export class TreeNode
 
       const resource = this.props.context.courseModel.resourcesById.get(
         this.props.model.resourceref.idref);
-      const titleString = resource === undefined 
-        ? 'Unknown Resource' 
+      const titleString = resource === undefined
+        ? 'Unknown Resource'
         : resource.title === null
           ? 'Empty Title'
           : resource.title;
 
-      title = <Caption 
+      title = <Caption
         onViewEdit={() => this.props.onViewEdit(resource.id)}
         labels={this.props.labels}
         depth={0}
@@ -149,61 +148,59 @@ export class TreeNode
 
       const number = this.getAdaptiveNumber();
 
-      title = <EditableCaption 
-        labels={this.props.labels}
-        depth={0}
-        org={this.props.org} context={this.props.context}
-        isHoveredOver={this.state.mouseOver}
-        processCommand={this.props.processCommand}
-        editMode={this.props.editMode}
-        onEdit={this.props.onEdit}
-        model={this.props.model}
-        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {icon} {contentType} {number}: {this.props.model.title}</EditableCaption>;
+      title = (
+        <EditableCaption
+          labels={this.props.labels}
+          depth={0}
+          org={this.props.org}
+          context={this.props.context}
+          isHoveredOver={this.state.mouseOver}
+          processCommand={this.props.processCommand}
+          editMode={this.props.editMode}
+          onEdit={this.props.onEdit}
+          model={this.props.model}
+          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+
+          {icon} {contentType} {number}: {this.props.model.title}
+        </EditableCaption>
+      );
     }
 
     const finalDropTarget =
      (indexWithinParent === parentModel.children.size - 1)
      ? renderDropTarget(
-         indexWithinParent + 1, parentModel, 
+         indexWithinParent + 1, parentModel,
          canHandleDrop, onReposition, '')
      : null;
-   
-    const highlighted = this.props.highlighted ? 'table-info' : '';
-
-
-    const outerStyle : any = { position: 'relative', height: '28px', overflow: 'visible' };
-    const nodeStyle : any = { position: 'absolute', top: 0, height: '28px', width: '100%' };
-    const topDrop : any = { position: 'absolute', top: -15, height: '15px', width: '100%' };
-    const bottomDrop : any = { position: 'absolute', top: 20, height: '15px', width: '100%' };
 
     return (
-      <tr key={model.guid} 
-        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave} 
-        className={highlighted}>
-        <td key="content">
-
-          <div style={outerStyle}>
-            <div style={topDrop}>
-              {renderDropTarget(
-              indexWithinParent, parentModel, 
-              canHandleDrop, onReposition, model.guid)}
-            </div>
-          
-            <div style={nodeStyle}>
-              <DraggableNode id={model.guid} editMode={editMode} 
-                index={indexWithinParent} source={model} parentModel={parentModel}>
-                <span style={ { marginLeft: (depth * 30) } }/>
-                <DragHandle/>
-                {title}
-              </DraggableNode>
-            </div>
-          
-            <div style={bottomDrop}>
-              {finalDropTarget}
-            </div>
+      <tr
+        className={`tree-node ${this.props.highlighted ? 'table-info' : ''}`}
+        key={model.guid}
+        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}>
+        <td className="content">
+          <div className="top-drop">
+            {renderDropTarget(
+            indexWithinParent, parentModel,
+            canHandleDrop, onReposition, model.guid)}
           </div>
-        
+
+          <div className="node">
+            <DraggableNode
+              id={model.guid}
+              editMode={editMode}
+              index={indexWithinParent}
+              source={model}
+              parentModel={parentModel}>
+              <span style={ { marginLeft: (depth * 30) } }/>
+              <DragHandle/>
+              {title}
+            </DraggableNode>
+          </div>
+
+          <div className="bottom-drop">
+            {finalDropTarget}
+          </div>
         </td>
       </tr>
     );

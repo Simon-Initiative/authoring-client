@@ -1,0 +1,76 @@
+@import 'oli/colors';
+
+.course-editor {
+  .info {
+    .row {
+      [class*="col-"] {
+          padding-top: 1rem;
+          padding-bottom: 1rem;
+          background-color: white;
+          border-bottom: 1px solid rgba(86,61,124,.2);
+
+          .btn-primary {
+            padding-left: 15px;
+            color: white;
+          }
+      }
+    }
+  }
+
+  .users {
+    .user {
+      background-color: white;
+      border-bottom: 1px solid rgba(86,61,124,.2);
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+
+      .profile {
+        height: 60px;
+        width: 60px;
+        float: left;
+        margin-right: 25px;
+        background-color: #eaeaea;
+        border-radius: 45px;
+      }
+
+      .name {
+        font-weight: 700;
+        font-size: 1.1em;
+        display: block;
+      }
+
+      .inst {
+        font-size: 0.9em;
+        display: block;
+        line-height: 1.2em;
+      }
+
+      .email {
+        font-size: 0.9em;
+        display: block;
+        line-height: 1.2em;
+      }
+
+      .btn {
+        color: white;
+        padding-left: 15px;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .btn-remove {
+        color: white;
+        float: right;
+        background-color: $remove;
+        border-color: $remove;
+      }
+
+      .btn-add {
+        color: white;
+        float: right;
+        background-color: $add;
+        border-color: $add;
+      }
+    }
+  }
+}
