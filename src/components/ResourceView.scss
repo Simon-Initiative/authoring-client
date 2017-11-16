@@ -2,7 +2,8 @@
 
 .resource-view {
   .table-toolbar {
-    @extend .flex-row
+    display: flex;
+    flex-direction: row;
   }
 
   .document {

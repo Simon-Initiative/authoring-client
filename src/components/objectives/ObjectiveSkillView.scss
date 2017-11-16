@@ -7,7 +7,8 @@
   }
 
   .table-toolbar {
-    @extend .flex-row;
+    display: flex;
+    flex-direction: row;
   }
 
   .rst__node .rst__nodeContent h2 {
