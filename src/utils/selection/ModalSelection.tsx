@@ -18,6 +18,10 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
     (window as any).$(this.modal).modal('show');
   }
 
+  componentWillUnmount() {
+    (window as any).$(this.modal).modal('hide');
+  }
+
   render() {
 
     const okLabel = this.props.okLabel !== undefined
