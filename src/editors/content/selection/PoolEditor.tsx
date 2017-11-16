@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { QuestionEditor } from '../question/QuestionEditor';
 import { ContentEditor } from '../content/ContentEditor';
@@ -11,14 +11,14 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
-import { DraggableNode } from '../../document/assessment/DraggableNode';
-import { RepositionTarget } from '../../document/assessment/RepositionTarget';
+import { DraggableNode } from 'editors/common/tree/DraggableNode';
+import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 import '../common/editor.scss';
 
 
 export interface PoolEditor {
-  
+
 }
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
@@ -34,12 +34,12 @@ export interface PoolState {
 /**
  * The content editor for HtmlContent.
  */
-export class PoolEditor 
+export class PoolEditor
   extends AbstractContentEditor<contentTypes.Pool, PoolProps, PoolState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onRemoveQuestion = this.onRemoveQuestion.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
@@ -55,15 +55,15 @@ export class PoolEditor
   onRemoveQuestion(guid) {
 
     if (this.props.model.questions.size > 1) {
-      this.props.onEdit(this.props.model.with( 
+      this.props.onEdit(this.props.model.with(
         { questions: this.props.model.questions.delete(guid) }));
     }
-    
+
   }
 
 
   renderDropTarget(index) {
-    return <RepositionTarget index={index} canAcceptId={this.canAcceptId} 
+    return <RepositionTarget index={index} canAcceptId={this.canAcceptId}
       onDrop={this.onReorderNode}/>;
   }
 
@@ -89,7 +89,7 @@ export class PoolEditor
 
         if (n.guid !== id) {
           questions = questions.set(n.guid, n);
-        } 
+        }
       });
 
       if (index === arr.length) {
@@ -140,7 +140,7 @@ export class PoolEditor
   }
 
   render() : JSX.Element {
-    
+
     return (
       <div>
         {this.renderQuestions()}

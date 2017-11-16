@@ -4,9 +4,10 @@ import { NodeId, NodeState, Nodes,
   ChildrenAccessor, ChildrenMutator,
   InitialExpansionStrategy, TreeRenderer } from './types';
 
+// Recursive manipulation routines for our
+// immutable tree representation
 
-// Tree data manipulation routines.
-
+// Remove a node from the tree.
 export function removeNode<NodeType>(
   idToRemove: NodeId,
   nodes: Nodes<NodeType>,
@@ -22,7 +23,7 @@ export function removeNode<NodeType>(
     // Otherwise, we need to look at the children of
     // each of these nodes, recursively, and attempt to
     // remove the node deeper in the tree.
-    nodes
+    return nodes
       .map(node => getChildren(node).caseOf({
         just: nodes =>
           setChildren(node, removeNode(idToRemove, nodes, getChildren, setChildren)),
@@ -65,7 +66,8 @@ export function insertNode<NodeType>(
     return nodes.set(targetParentId, updatedParent);
 
   } else {
-    nodes
+
+    return nodes
     .map(node => getChildren(node).caseOf({
       just: nodes =>
         setChildren(node, insertNode(
@@ -77,40 +79,29 @@ export function insertNode<NodeType>(
 
 }
 
+export function updateNode<NodeType>(
+  idToUpdate: NodeId,
+  newNode: NodeType,
+  currentNodes: Nodes<NodeType>,
+  getChildren: ChildrenAccessor<NodeType>,
+  setChildren: ChildrenMutator<NodeType>) : Nodes<NodeType> {
 
-export function updateNode(
-  model: models.OrganizationModel,
-  childToUpdate: any) : models.OrganizationModel {
-
-  // If the child is a top level sequence just handle it
-  // explicitly
-  if (model.sequences.children.has(childToUpdate.guid)) {
-    return model.with({ sequences: model.sequences.with(
-      { children: model.sequences.children.set(childToUpdate.guid, childToUpdate) })});
-  }
-
-  return model.with({ sequences: model.sequences.with(
-    { children: (model.sequences.children.map(
-      updateChild.bind(undefined, childToUpdate)).toOrderedMap() as any),
-    }) });
-}
-
-
-function updateChild(
-  child: any,
-  parentNode: any) {
-
-  if (parentNode.children !== undefined && parentNode.children.get(child.guid) !== undefined) {
-    return parentNode.with({ children: parentNode.children.set(child.guid, child) });
-
+  // If the node to update is in this set of children,
+  // just simply update it and we are done.
+  if (currentNodes.has(idToUpdate)) {
+    return currentNodes.set(idToUpdate, newNode);
   } else {
 
-    // Recurse if the current node has children
-    return parentNode.children !== undefined && parentNode.children.size > 0
-      ? parentNode.with(
-        { children: parentNode.children.map(
-          updateChild.bind(undefined, child)).toOrderedMap() })
-      : parentNode;
+    // Otherwise, we need to look at the children of
+    // each of these nodes, recursively, and attempt to
+    // update the node deeper in the tree.
+    return currentNodes
+      .map(node => getChildren(node).caseOf({
+        just: nodes =>
+          setChildren(node, updateNode(idToUpdate, node, nodes, getChildren, setChildren)),
+        nothing: () => node,
+      }))
+      .toOrderedMap();
   }
 }
 

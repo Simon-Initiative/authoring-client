@@ -48,7 +48,9 @@ it('second-level remove', () => {
   };
 
   const get : ChildrenAccessor<TestNode> = (n) => {
-    return Maybe.just(children[n]);
+
+    const c = children[n];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
   };
 
   const set : ChildrenMutator<TestNode> = (n, nodes) => {

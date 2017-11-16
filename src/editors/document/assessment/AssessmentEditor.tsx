@@ -21,8 +21,6 @@ import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
 import { typeRestrictedByModel } from './utils';
 import { Collapse } from '../../content/common/Collapse';
-import { DraggableNode } from './DraggableNode';
-import { RepositionTarget } from './RepositionTarget';
 import { AddQuestion } from '../../content/question/AddQuestion';
 
 interface AssessmentEditor {
@@ -246,8 +244,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   renderDropTarget(index) {
-    return <RepositionTarget index={index}
-      canAcceptId={this.canHandleDrop}  onDrop={this.onReorderNode}/>;
+    return null;
+    // <RepositionTarget index={index}
+    //  canAcceptId={this.canHandleDrop}  onDrop={this.onReorderNode}/>;
   }
 
   onReorderNode(id, index) {
@@ -293,8 +292,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const arr = page.nodes.toArray();
     arr.forEach((node, index) => {
       elements.push(this.renderDropTarget(index));
-      elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
-        {this.renderNode(node)}</DraggableNode>);
+      // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
+      //  {this.renderNode(node)}</DraggableNode>);
     });
 
     elements.push(this.renderDropTarget(arr.length));
