@@ -57,7 +57,7 @@ class CourseEditor
         <div className="col-2">
           <button
             type="button"
-            className={d.isDeveloper ? 'btn btn-remove' : 'btn btn-add'}
+            className={d.isDeveloper ? 'btn btn-remove' : 'btn btn-primary'}
             onClick={e => this.registration(d.userName, d.isDeveloper ? 'remove' : 'add')}>
             {d.isDeveloper ? 'Remove' : 'Add'}
           </button>

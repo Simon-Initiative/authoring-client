@@ -6,6 +6,8 @@ import * as courseActions from '../actions/course';
 import * as viewActions from '../actions/view';
 import { isNullOrUndefined } from 'util';
 
+import './CreateCourseView.scss';
+
 export interface CreateCourseViewProps {
   dispatch: any;
 }
@@ -70,7 +72,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
           Create Course
         </button>
         <button onClick={this.onClickCancel}
-                className="btn btn-secondary btn-lg btn-block serif">
+                className="btn btn-cancel btn-lg btn-block serif">
           Cancel
         </button>
       </div>

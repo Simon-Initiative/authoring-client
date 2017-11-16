@@ -8,7 +8,7 @@
   .questionContentWrapper {
 
     margin-left: 20px;
-    background-color: $lblue;
+    background-color: $blue-light;
   }
 
   .componentWrapper {
@@ -46,7 +46,7 @@
         border-color: transparent;
 
         &:hover {
-          border-color: $grey;
+          border-color: $gray-lighter;
         }
       }
     }
@@ -58,11 +58,11 @@
 
       .form-control {
         &:first-child {
-          border-color: $grey;
+          border-color: $gray-lighter;
         }
 
         &:hover {
-          border-color: $grey;
+          border-color: $gray-lighter;
         }
       }
 

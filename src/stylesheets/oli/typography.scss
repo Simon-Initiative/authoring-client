@@ -1,4 +1,17 @@
 /** OLI Typography */
+@import 'oli/colors';
 
 $serif-font: 'Roboto Slab', serif;
 $sans-font: 'Open Sans', sans-serif;
+
+a, .text-link {
+  color: $primary;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:active {
+    color: $selection;
+  }
+}
