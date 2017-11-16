@@ -68,3 +68,66 @@ it('second-level remove', () => {
   expect(children[2].has('22')).toBe(false);
 
 });
+
+
+it('top level insert', () => {
+
+  const get : ChildrenAccessor<TestNode> = n => Maybe.nothing<Nodes<TestNode>>();
+  const set : ChildrenMutator<TestNode> = (n, nodes) => n;
+
+  const nodes : Nodes<TestNode> = buildNodes(1, 4);
+
+  const child = 7;
+
+  let added = insertNode<TestNode>(
+    Maybe.nothing<NodeId>(), '7', child, 0, nodes, get, set);
+
+  expect(added.has('7')).toBe(true);
+  expect(added.size).toBe(5);
+  expect(added.first()).toBe(7);
+  expect(nodes.has('7')).toBe(false);
+  expect(nodes.size).toBe(4);
+
+  added = insertNode<TestNode>(
+    Maybe.nothing<NodeId>(), '7', child, 1, nodes, get, set);
+  expect(added.toArray()[1]).toBe(7);
+
+  added = insertNode<TestNode>(
+    Maybe.nothing<NodeId>(), '7', child, 4, nodes, get, set);
+  expect(added.toArray()[4]).toBe(7);
+
+});
+
+
+it('recursive insert', () => {
+
+  const children = {
+    1: buildNodes(10, 4),
+    10: buildNodes(20, 4),
+    20: buildNodes(30, 4),
+  };
+
+  const get : ChildrenAccessor<TestNode> = (n) => {
+
+    const c = children[n];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
+  };
+
+  const set : ChildrenMutator<TestNode> = (n, nodes) => {
+    children[n] = nodes;
+    return n;
+  };
+
+  const nodes : Nodes<TestNode> = buildNodes(1, 4);
+
+  const inserted = insertNode<TestNode>(
+    Maybe.just('20'), '50', 50, 0, nodes, get, set);
+
+  expect(inserted.size).toBe(4);
+  expect(nodes.size).toBe(4);
+  expect(children[20].size).toBe(5);
+  expect(children[20].has('50')).toBe(true);
+
+});
+
+

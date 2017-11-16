@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import { NodeId, NodeState, Nodes,
   ChildrenAccessor, ChildrenMutator,
@@ -47,7 +48,7 @@ function insert<NodeType>(
 }
 
 export function insertNode<NodeType>(
-  targetParentId: NodeId,
+  targetParentId: Maybe<NodeId>,
   childId: NodeId,
   childToAdd: NodeType,
   index: number,
@@ -55,28 +56,34 @@ export function insertNode<NodeType>(
   getChildren: ChildrenAccessor<NodeType>,
   setChildren: ChildrenMutator<NodeType>) : Nodes<NodeType> {
 
-  if (nodes.has(targetParentId)) {
+  return targetParentId.caseOf({
+    just: (parentId) => {
+      if (nodes.has(parentId)) {
 
-    const parent = nodes.get(targetParentId);
-    const updatedParent = getChildren(parent).caseOf({
-      just: nodes => setChildren(parent, insert(nodes, childId, childToAdd, index)),
-      nothing: () => parent,
-    });
+        const parent = nodes.get(parentId);
+        const updatedParent = getChildren(parent).caseOf({
+          just: nodes => setChildren(parent, insert(nodes, childId, childToAdd, index)),
+          nothing: () => parent,
+        });
 
-    return nodes.set(targetParentId, updatedParent);
+        return nodes.set(parentId, updatedParent);
 
-  } else {
+      } else {
 
-    return nodes
-    .map(node => getChildren(node).caseOf({
-      just: nodes =>
-        setChildren(node, insertNode(
-          targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
-      nothing: () => node,
-    }))
-    .toOrderedMap();
-  }
-
+        return nodes
+        .map(node => getChildren(node).caseOf({
+          just: nodes =>
+            setChildren(node, insertNode(
+              targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
+          nothing: () => node,
+        }))
+        .toOrderedMap();
+      }
+    },
+    nothing: () => {
+      return insert(nodes, childId, childToAdd, index);
+    },
+  });
 }
 
 export function updateNode<NodeType>(
