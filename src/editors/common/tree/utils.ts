@@ -8,7 +8,13 @@ import { NodeId, NodeState, Nodes,
 // Recursive manipulation routines for our
 // immutable tree representation
 
-// Remove a node from the tree.
+/**
+ * Remove a node from the tree.
+ * @param idToRemove the node to remove
+ * @param nodes the current nodes
+ * @param getChildren the accessor to get node children
+ * @param setChildren the mutator to use to set node children
+ */
 export function removeNode<NodeType>(
   idToRemove: NodeId,
   nodes: Nodes<NodeType>,
@@ -34,7 +40,7 @@ export function removeNode<NodeType>(
   }
 }
 
-
+// Helper insertion function.
 function insert<NodeType>(
   nodes: Nodes<NodeType>, childId: NodeId, childToAdd: NodeType, index: number) : Nodes<NodeType> {
 
@@ -47,6 +53,16 @@ function insert<NodeType>(
   return Immutable.OrderedMap<NodeId, NodeType>(arr);
 }
 
+/**
+ * Insert a node at any point in a tree.
+ * @param targetParentId Just the parent node id, or nothing to insert at root
+ * @param childId the id of the node to insert
+ * @param childToAdd the node to insert
+ * @param index the index position within the parent as to where to insert it
+ * @param nodes the current nodes
+ * @param getChildren the get accessor for node children
+ * @param setChildren the mutator to set node children
+ */
 export function insertNode<NodeType>(
   targetParentId: Maybe<NodeId>,
   childId: NodeId,
@@ -86,6 +102,14 @@ export function insertNode<NodeType>(
   });
 }
 
+/**
+ * Update an existing node within the tree.
+ * @param idToUpdate the id of the node to update
+ * @param newNode the new state for the node
+ * @param currentNodes the current nodes
+ * @param getChildren the get accessor to access node children
+ * @param setChildren the mutator used to set node children
+ */
 export function updateNode<NodeType>(
   idToUpdate: NodeId,
   newNode: NodeType,
@@ -96,6 +120,7 @@ export function updateNode<NodeType>(
   // If the node to update is in this set of children,
   // just simply update it and we are done.
   if (currentNodes.has(idToUpdate)) {
+    console.log(idToUpdate + ' ' + newNode);
     return currentNodes.set(idToUpdate, newNode);
   } else {
 
@@ -105,7 +130,7 @@ export function updateNode<NodeType>(
     return currentNodes
       .map(node => getChildren(node).caseOf({
         just: nodes =>
-          setChildren(node, updateNode(idToUpdate, node, nodes, getChildren, setChildren)),
+          setChildren(node, updateNode(idToUpdate, newNode, nodes, getChildren, setChildren)),
         nothing: () => node,
       }))
       .toOrderedMap();

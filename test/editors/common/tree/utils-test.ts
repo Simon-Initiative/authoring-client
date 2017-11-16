@@ -131,3 +131,50 @@ it('recursive insert', () => {
 });
 
 
+it('top level update', () => {
+
+  const get : ChildrenAccessor<TestNode> = n => Maybe.nothing<Nodes<TestNode>>();
+  const set : ChildrenMutator<TestNode> = (n, nodes) => n;
+
+  const nodes : Nodes<TestNode> = buildNodes(1, 4);
+
+  const updated = updateNode<TestNode>('2', 10, nodes, get, set);
+
+  expect(updated.has('2')).toBe(true);
+  expect(updated.get('2')).toBe(10);
+  expect(nodes.has('2')).toBe(true);
+  expect(nodes.get('2')).toBe(2);
+
+});
+
+
+
+it('recursive update', () => {
+
+  const children = {
+    1: buildNodes(10, 4),
+    10: buildNodes(20, 4),
+    20: buildNodes(30, 4),
+  };
+
+  const get : ChildrenAccessor<TestNode> = (n) => {
+
+    const c = children[n];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
+  };
+
+  const set : ChildrenMutator<TestNode> = (n, nodes) => {
+    children[n] = nodes;
+    return n;
+  };
+
+  const nodes : Nodes<TestNode> = buildNodes(1, 4);
+
+  const inserted = updateNode<TestNode>(
+    '31', 50, nodes, get, set);
+
+  expect(inserted.size).toBe(4);
+  expect(nodes.size).toBe(4);
+  expect(children[20].get('31')).toBe(50);
+
+});
