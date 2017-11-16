@@ -5,11 +5,11 @@ import { DragTypes } from '../../../utils/drag';
 
 
 export interface DraggableNode {
-  
+
 }
 
 export interface DraggableNodeProps {
-  id: string; 
+  id: string;
   editMode: boolean;
   index: number;
 }
@@ -32,23 +32,21 @@ const NodeSource = {
 
 
 /**
- * Isolate the drag and drop assessment node reordering. 
+ * Isolate the drag and drop assessment node reordering.
  */
 @DragSource(DragTypes.AssessmentNode, NodeSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging(),
 }))
-export class DraggableNode 
+export class DraggableNode
   extends React.Component<DraggableNodeProps, DraggableNodeState> {
-    
+
   constructor(props) {
     super(props);
-    
+
 
   }
-
-
 
   render() {
 
@@ -60,10 +58,10 @@ export class DraggableNode
     return (this.props as any).connectDragPreview(
       <div style={{ opacity }}>
         {React.Children.map(
-          this.props.children, 
+          this.props.children,
           (child => React.cloneElement((child as any), { connectDragSource })))}
       </div>,
-    ); 
+    );
   }
 
 }
