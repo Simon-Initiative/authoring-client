@@ -1,6 +1,16 @@
 import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 
+
+export type RenderedNode = {
+  nodeId: NodeId,
+  depth: number,
+  component: JSX.Element,
+};
+
+export type NodeRenderer<NodeType>
+  = (node: NodeType, nodeState: NodeState<NodeType>) => JSX.Element;
+
 // What we use to uniquely identify a tree node.
 export type NodeId = string;
 
@@ -43,11 +53,3 @@ export type TreeRenderer = {
   renderNode: (depth: number, isSelected: boolean, renderedNode) => JSX.Element,
 };
 
-// The method used to set the initial expansion state,
-// in the case that the expandedNodes property is
-// Nothing
-export enum InitialExpansionStrategy {
-  All,
-  None,
-  FirstLevel,
-}

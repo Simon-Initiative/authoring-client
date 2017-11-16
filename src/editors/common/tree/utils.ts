@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 
 import { NodeId, NodeState, Nodes,
   ChildrenAccessor, ChildrenMutator,
-  InitialExpansionStrategy, TreeRenderer } from './types';
+  TreeRenderer } from './types';
 
 // Recursive manipulation routines for our
 // immutable tree representation

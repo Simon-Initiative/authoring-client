@@ -5,8 +5,11 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Maybe } from 'tsmonad';
 
 import { NodeId, Nodes, NodeState,
+  RenderedNode, NodeRenderer,
   ChildrenAccessor, ChildrenMutator,
-  InitialExpansionStrategy, TreeRenderer } from './types';
+  TreeRenderer } from './types';
+
+import { renderVisibleNodes } from './render';
 
 const listGroupTreeRenderer : TreeRenderer = {
 
@@ -19,15 +22,6 @@ const listGroupTreeRenderer : TreeRenderer = {
     </li>,
 };
 
-type RenderedNode = {
-  nodeId: NodeId,
-  depth: number,
-  component: JSX.Element,
-};
-
-function test<NodeType>(t: NodeType) : boolean {
-  return true;
-}
 
 export interface TreeState {
 
@@ -50,15 +44,10 @@ export interface TreeProps<NodeType> {
   // the default state where the tree will apply its
   // initialExpansionStrategy to determine which nodes should
   // be expanded
-  expandedNodes: Maybe<Immutable.Set<NodeId>>;
+  expandedNodes: Immutable.Set<NodeId>;
 
   // The identifier of the currently active, or selected node
   selected: NodeId;
-
-  // Optional. How the tree should expand (or not expand) the nodes
-  // initially. If not specified the strategy defaults to expanding
-  // the tree fully.
-  initialExpansionStrategy?: InitialExpansionStrategy;
 
   // Optional. How the tree should render itself and it's nodes. The
   // mechanism, if this property is left unset is to render the
@@ -81,7 +70,7 @@ export interface TreeProps<NodeType> {
   onSelect: (id: NodeId) => void;
 
   // Called by the tree when a need is to be rendered.
-  renderNodeComponent: (node: NodeType, nodeState: NodeState<NodeType>) => JSX.Element;
+  renderNodeComponent: NodeRenderer<NodeType>;
 
   // Called by the tree when a potential drop is initiated.
   canHandleDrop: (
@@ -106,7 +95,8 @@ export class Tree<NodeType>
 
   render() {
 
-    const { selected, treeRenderer } = this.props;
+    const { selected, treeRenderer, nodes,
+      expandedNodes, getChildren, renderNodeComponent } = this.props;
 
     // Use the list-group tree structure by default if no other one specified
     const actualTreeRenderer = treeRenderer === undefined
@@ -116,10 +106,11 @@ export class Tree<NodeType>
     // Walk the nodes of the tree in-order, rendering each node, but being
     // careful to only render nodes that are visible (i.e. their parent is
     // is in an expanded state)
-    const renderedNodes : RenderedNode[] = [];
+    const renderedNodes : RenderedNode[] = renderVisibleNodes(
+      nodes, getChildren, renderNodeComponent, expandedNodes, Immutable.Set(selected));
 
     // Now simply render the tree structure, wrapping the tree and each rendered
-    // node with our treeStructureFactory
+    // node using the tree renderer
     return actualTreeRenderer.renderTree(
       renderedNodes.map(r =>
         actualTreeRenderer.renderNode(r.depth, r.nodeId === selected, r.component)),
