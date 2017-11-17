@@ -13,7 +13,7 @@
     }
 
     .node {
-      flex: 1;
+      flex: 1 0 0;
       height: 40px;
 
       .draggable-node {
@@ -29,7 +29,7 @@
         }
 
         .editable-caption, .caption {
-          flex: 1;
+          flex: 1 0 0;
           margin: 0 10px;
 
           button, span {
