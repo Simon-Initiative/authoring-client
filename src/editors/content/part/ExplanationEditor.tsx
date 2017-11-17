@@ -11,12 +11,6 @@ import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import { Collapse } from '../common/controls';
 
-import '../common/editor.scss';
-
-export interface ExplanationEditor {
-  
-}
-
 export interface ExplanationEditorProps extends AbstractContentEditorProps<contentTypes.Html> {
   onEdit: (model: contentTypes.Html) => void;
 }
@@ -27,9 +21,9 @@ export interface ExplanationEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class ExplanationEditor 
+export class ExplanationEditor
   extends AbstractContentEditor<contentTypes.Html, ExplanationEditorProps, ExplanationEditorState> {
-    
+
   constructor(props) {
     super(props);
   }
@@ -42,7 +36,7 @@ export class ExplanationEditor
   }
 
   render() : JSX.Element {
-    
+
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
@@ -51,22 +45,20 @@ export class ExplanationEditor
       minHeight: '20px',
       borderStyle: 'none',
       borderWith: 1,
-      borderColor: '#AAAAAA'
-    }
+      borderColor: '#AAAAAA',
+    };
 
     return (
-      <Collapse caption='Explanation'>
-        <HtmlContentEditor 
+      <Collapse caption="Explanation">
+        <HtmlContentEditor
           editorStyles={bodyStyle}
           inlineToolbar={inlineToolbar}
           blockToolbar={blockToolbar}
           inlineInsertionToolbar={insertionToolbar}
           {...this.props}
           model={this.props.model}
-          onEdit={this.props.onEdit} 
+          onEdit={this.props.onEdit}
           />
       </Collapse>);
   }
-
 }
-

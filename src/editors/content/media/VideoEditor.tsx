@@ -19,30 +19,23 @@ import { Button } from '../common/Button';
 
 import { TabContainer } from '../common/TabContainer';
 
-import '../common/editor.scss';
-
-
-export interface VideoEditor {
-  
-}
-
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
-  
+
 }
 
 export interface VideoEditorState {
-  
+
 }
 
 /**
  * The content editor for Table.
  */
-export class VideoEditor 
+export class VideoEditor
   extends AbstractContentEditor<Video, VideoEditorProps, VideoEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
@@ -94,7 +87,7 @@ export class VideoEditor
   }
 
   onSetClick() {
-    // TODO 
+    // TODO
   }
 
   onSourcesEdit(sources) {
@@ -114,12 +107,12 @@ export class VideoEditor
   }
 
   renderTracks() {
-    
+
     const { tracks } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '5px' } }>
-        
+
         <Tracks
           {...this.props}
           mediaType="video"
@@ -127,20 +120,20 @@ export class VideoEditor
           model={tracks}
           onEdit={this.onTracksEdit}
         />
-        
+
       </div>
     );
   }
 
   renderOther() {
     const { titleContent, caption, cite, popout, alternate } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '30px' } }>
 
           {this.row('', '8', <label className="form-check-label">
             &nbsp;&nbsp;&nbsp;
-            <input type="checkbox" 
+            <input type="checkbox"
               onClick={this.onControlEdit}
               className="form-check-input"
               checked={this.props.model.controls}
@@ -150,7 +143,7 @@ export class VideoEditor
 
           <br/>
 
-        
+
           {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
           model={titleContent.content}
@@ -169,13 +162,13 @@ export class VideoEditor
 
           <br/>
 
-          {this.row('Popout', '8', <TextInput width="100%" label="" 
+          {this.row('Popout', '8', <TextInput width="100%" label=""
               editMode={this.props.editMode}
-              value={popout.content} 
+              value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}
-        
+
       </div>
     );
   }
@@ -197,36 +190,36 @@ export class VideoEditor
   renderSizing() {
     const { titleContent, caption, cite, popout, alternate,
       width, height } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '70px', marginLeft: '75px' } }>
 
         {this.row('Height', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label="" 
+            <TextInput width="100px" label=""
             editMode={this.props.editMode}
-            value={height} 
+            value={height}
             type="number"
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
         {this.row('Width', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label="" 
+            <TextInput width="100px" label=""
             editMode={this.props.editMode}
-            value={width} 
+            value={width}
             type="number"
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
-        
+
       </div>
     );
   }
 
   renderSources() {
-    
+
     const { sources } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '5px' } }>
-        
+
         <Sources
           {...this.props}
           mediaType="video"
@@ -234,26 +227,26 @@ export class VideoEditor
           model={sources}
           onEdit={this.onSourcesEdit}
         />
-        
+
       </div>
     );
   }
-    
+
 
   render() : JSX.Element {
-    
+
     return (
       <div className="itemWrapper">
-    
+
         <br/>
-    
+
         <TabContainer labels={['Sources', 'Tracks', 'Sizing', 'Other']}>
           {this.renderSources()}
           {this.renderTracks()}
           {this.renderSizing()}
-          {this.renderOther()}   
+          {this.renderOther()}
         </TabContainer>
-    
+
       </div>
     );
 

@@ -13,25 +13,12 @@ import { Resource } from 'data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
 import { AuthoringActionsHandler, AuthoringActions } from 'actions/authoring';
 import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
-
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import { Title } from 'types/course';
 
-const styles = {
-  loContainer : {
-    border: '1px solid grey',
-    background: '#ffffff',
-    height: '125px',
-    overflowX: 'auto',
-    overflowY: 'scroll',
-    marginBottom : '10px',
-    padding : '4px',
-  },
-};
-
-interface WorkbookPageEditor {}
+import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
@@ -140,7 +127,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
-      <div>
+      <div className="workbookpage-editor">
           <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}

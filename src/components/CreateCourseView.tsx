@@ -6,9 +6,7 @@ import * as courseActions from '../actions/course';
 import * as viewActions from '../actions/view';
 import { isNullOrUndefined } from 'util';
 
-interface CreateCourseView {
-  _onClickCancel: () => void;
-}
+import './CreateCourseView.scss';
 
 export interface CreateCourseViewProps {
   dispatch: any;
@@ -23,7 +21,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   constructor(props) {
     super(props);
-    this._onClickCancel = this.onClickCancel.bind(this);
+    this.onClickCancel = this.onClickCancel.bind(this);
 
     this.state = {
       waiting: false,
@@ -40,7 +38,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       .then((document) => {
         // Get an updated course content package payload
         if (document.model.modelType === models.ModelTypes.CourseModel) {
-          
+
           this.props.dispatch(courseActions.courseChanged((document.model as any)));
           viewActions.viewDocument(document._courseId, document._courseId);
         }
@@ -52,12 +50,12 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   createCourse(e) {
     e.preventDefault();
-    
+
     const title = (this.refs['title'] as any).value;
     if (isNullOrUndefined(title) || title === '') {
       return;
     }
-    
+
     this.setState({ waiting: true }, () => this.startCreation(title));
   }
 
@@ -73,8 +71,8 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
                 className="btn btn-secondary btn-lg btn-block outline serif">
           Create Course
         </button>
-        <button onClick={this._onClickCancel}
-                className="btn btn-secondary btn-lg btn-block serif">
+        <button onClick={this.onClickCancel}
+                className="btn btn-cancel btn-lg btn-block serif">
           Cancel
         </button>
       </div>
@@ -97,7 +95,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
         <div className="alert alert-danger" role="alert">
           <h4 className="alert-heading">Error!</h4>
           <p>A problem was encountered trying to create the new course</p>
-          <p className="mb-0">Please try again, if the problem persists please 
+          <p className="mb-0">Please try again, if the problem persists please
             contact support.
           </p>
         </div>
@@ -105,7 +103,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     );
 
     return (
-      <div className="createCourse full container-fluid">
+      <div className="create-course-view full container-fluid">
         <div className="row">
           <div className="col-md-12">
             <h1>Create a new course content package</h1>
@@ -120,8 +118,8 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
           </fieldset>
         </div>
         <div className="row">
-          {this.state.waiting 
-            ? waiting 
+          {this.state.waiting
+            ? waiting
             : this.state.error
               ? error
               : inputs }

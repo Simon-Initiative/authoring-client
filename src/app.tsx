@@ -1,5 +1,4 @@
 import 'babel-polyfill';
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as persistence from './data/persistence';
@@ -11,16 +10,7 @@ import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
 import Perf from 'react-addons-perf';
-
-(window as any).React = React;
-(window as any).Perf = Perf;
-
 import { createLogger } from 'redux-logger';
-
-// tslint:disable-next-line
-var Provider = (require('react-redux') as RR).Provider;
-// tslint:disable-next-line
-//var createLogger = require('redux-logger');
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
@@ -30,9 +20,15 @@ import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';
 
-// Stylesheets
-import './stylesheets/main.scss';
-import './stylesheets/sortabletree.scss';
+// import redux provider
+const Provider = (require('react-redux') as RR).Provider;
+
+// attach global variables to window
+(window as any).React = React;
+(window as any).Perf = Perf;
+
+// import application styles
+import 'stylesheets/index.scss';
 
 interface RR {
   Provider: any;

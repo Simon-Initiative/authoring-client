@@ -13,20 +13,14 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import { RichTextEditor } from '../common/RichTextEditor';
 
-import '../common/editor.scss';
-
 export type LabeledType = {
   titleContent: Title,
   caption: Caption,
   cite: Cite,
 };
 
-export interface LabeledEditor {
-  
-}
-
 export interface LabeledEditorProps extends AbstractContentEditorProps<LabeledType> {
-  
+
 }
 
 export interface LabeledEditorState {
@@ -36,12 +30,12 @@ export interface LabeledEditorState {
 /**
  * The content editor for Table.
  */
-export class LabeledEditor 
+export class LabeledEditor
   extends AbstractContentEditor<LabeledType, LabeledEditorProps, LabeledEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.onCiteEdit = this.onCiteEdit.bind(this);

@@ -1,5 +1,3 @@
-'use strict';
-
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
@@ -17,13 +15,6 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
-
-export interface Text {
-
-}
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 

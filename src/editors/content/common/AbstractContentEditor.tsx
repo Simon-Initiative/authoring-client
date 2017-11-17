@@ -1,5 +1,3 @@
-'use strict';
-
 import * as React from 'react';
 
 import * as models from 'data/models';

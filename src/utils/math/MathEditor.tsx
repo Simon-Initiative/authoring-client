@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Math } from './Math';
-import guid from '../../utils/guid'; 
+import guid from '../../utils/guid';
+
+import './MathEditor.scss';
 
 type GeneratedIds = {
   mathEditor: string,
@@ -14,11 +16,11 @@ export interface MathEditor {
 
 export interface MathEditorProps {
   content: string;
-  onChange: (content: string) => void; 
+  onChange: (content: string) => void;
 }
 
 export interface MathEditorState {
-  content: string; 
+  content: string;
 }
 
 export class MathEditor extends React.Component<MathEditorProps, MathEditorState> {
@@ -40,20 +42,20 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
   onChange(e) {
     const content = e.target.value;
     this.setState({ content }, () => this.props.onChange(content));
-  } 
+  }
 
   render() {
     return (
-      <form>
+      <form className="math-editor">
         <div className="form-group">
-          <textarea onChange={this._onChange} className="form-control" 
+          <textarea onChange={this._onChange} className="form-control"
             id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
         </div>
         <div className="form-group mathPreview">
           <label className="preview" htmlFor={this.ids.preview}>Preview</label>
           <Math inline>{this.state.content}</Math>
         </div>
-        
+
       </form>
     );
   }

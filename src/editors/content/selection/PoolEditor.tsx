@@ -14,13 +14,6 @@ import guid from '../../../utils/guid';
 import { DraggableNode } from 'editors/common/tree/DraggableNode';
 import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
-import '../common/editor.scss';
-
-
-export interface PoolEditor {
-
-}
-
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;

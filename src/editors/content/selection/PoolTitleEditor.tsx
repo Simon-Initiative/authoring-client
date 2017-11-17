@@ -1,25 +1,18 @@
 import * as React from 'react';
-
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
-import '../common/editor.scss';
-
-export interface PoolTitleEditor {
-  _onChange: (e: any) => void;
-}
 
 export interface PoolTitleEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
 
 }
 
-export class PoolTitleEditor 
+export class PoolTitleEditor
   extends AbstractContentEditor<contentTypes.Title, PoolTitleEditorProps, { text }> {
 
   constructor(props) {
     super(props);
 
-    this._onChange = this.onChange.bind(this);
+    this.onChange = this.onChange.bind(this);
 
     this.state = {
       text: this.props.model.text,
@@ -30,7 +23,7 @@ export class PoolTitleEditor
 
     const text = ((this.refs as any).text as any).innerHTML;
     this.setState(
-      { text }, 
+      { text },
       () => {
         const updatedContent : contentTypes.Title = this.props.model.with({ text });
         this.props.onEdit(updatedContent);
@@ -44,8 +37,8 @@ export class PoolTitleEditor
   renderView(): JSX.Element {
     if (this.props.styles) {
       return <div style={this.props.styles}>{this.props.model.text}</div>;
-    }    
-      
+    }
+
     return <div>{this.props.model.text}</div>;
   }
 
@@ -56,8 +49,8 @@ export class PoolTitleEditor
       padding: '10px',
       fontSize: '12pt',
     };
-    return <h5 
-        ref="text" onInput={this._onChange} 
+    return <h5
+        ref="text" onInput={this.onChange}
         style={ styles }
         contentEditable dangerouslySetInnerHTML={html}>
       </h5>;

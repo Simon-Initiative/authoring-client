@@ -3,7 +3,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 import * as models from '../../../data/models';
 import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Button, Well, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
@@ -12,16 +12,13 @@ import { RemovableContent } from '../common/RemovableContent';
 import ResourceSelection from '../../../utils/selection/ResourceSelection';
 import { LegacyTypes } from '../../../data/types';
 
-import '../common/editor.scss';
-
-
 export interface PoolRefEditor {
   guid: string;
 }
 
 export interface PoolRefProps extends AbstractContentEditorProps<contentTypes.PoolRef> {
   onRemove: (guid: string) => void;
-  
+
 }
 
 export interface PoolRefState {
@@ -32,12 +29,12 @@ export interface PoolRefState {
 /**
  * The content editor for HtmlContent.
  */
-export class PoolRefEditor 
+export class PoolRefEditor
   extends AbstractContentEditor<contentTypes.PoolRef, PoolRefProps, PoolRefState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onInsert = this.onInsert.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -49,7 +46,7 @@ export class PoolRefEditor
   }
 
   fetchTitlePoolById(id) {
-    
+
     this.props.services.fetchAttributesBy(['title', 'guid'], 'id', id)
     .then((o) => {
       const { title, guid } = o;
@@ -61,7 +58,7 @@ export class PoolRefEditor
   componentDidMount() {
     this.fetchTitlePoolById(this.props.model.idref);
   }
-  
+
   shouldComponentUpdate(nextProps, nextState) {
     return (nextProps.model !== this.props.model || nextState.title !== this.state.title);
   }
@@ -90,7 +87,7 @@ export class PoolRefEditor
       this.props.services.viewDocument(
         this.guid,
         this.props.context.courseId);
-    } 
+    }
   }
 
   onClick() {
@@ -104,7 +101,7 @@ export class PoolRefEditor
         <ResourceSelection
           filterPredicate={predicate}
           courseId={this.props.context.courseId}
-          onInsert={this.onInsert} 
+          onInsert={this.onInsert}
           onCancel={this.onCancel}/>);
   }
 
@@ -116,16 +113,16 @@ export class PoolRefEditor
     } else if (this.state.title === null) {
       details = '';
     } else {
-      details = <button onClick={this.onViewPool} 
+      details = <button onClick={this.onViewPool}
               className="btn btn-link" type="button">{this.state.title}</button>;
     }
-    
+
     return (
       <ul className="list-group">
-        <li style={ { paddingBottom: '0.25rem' } } 
+        <li style={ { paddingBottom: '0.25rem' } }
           className="list-group-item justify-content-between">
           {details}
-          <button disabled={!this.props.editMode} onClick={this.onClick} 
+          <button disabled={!this.props.editMode} onClick={this.onClick}
               className="btn btn-primary btn-sm" type="button">Select</button>
         </li>
       </ul>

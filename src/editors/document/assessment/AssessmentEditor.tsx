@@ -24,9 +24,7 @@ import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from './Outline';
 
-interface AssessmentEditor {
-
-}
+import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
 
@@ -362,7 +360,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderPagination() {
 
     const addButton = <button disabled={!this.props.editMode}
-      type="button" className="btn btn-secondary"
+      type="button" className="btn btn-link btn-sm"
       onClick={this.onAddPage}>Add Page</button>;
 
 
@@ -409,34 +407,34 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     };
 
     return (
-      <div>
+      <div className="add-menu">
 
-      <span style={label}>Insert new: </span>
+        <span className="label">Insert new: </span>
 
-      <button disabled={!this.props.editMode}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddContent}>Content</button>
+        <button disabled={!this.props.editMode}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddContent}>Content</button>
 
-      <span style={slash}>/</span>
+        <span className="slash">/</span>
 
-      <AddQuestion
-        editMode={this.props.editMode}
-        onQuestionAdd={this.addQuestion.bind(this)}
-        isSummative={this.props.model.type === LegacyTypes.assessment2}/>
+        <AddQuestion
+          editMode={this.props.editMode}
+          onQuestionAdd={this.addQuestion.bind(this)}
+          isSummative={this.props.model.type === LegacyTypes.assessment2}/>
 
-      <span style={slash}>/</span>
+        <span className="slash">/</span>
 
-      <button
-        disabled={!this.props.editMode || isInline}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddPool}>Pool</button>
+        <button
+          disabled={!this.props.editMode || isInline}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddPool}>Pool</button>
 
-        <span style={slash}>/</span>
+          <span className="slash">/</span>
 
-      <button
-        disabled={!this.props.editMode || isInline}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddPoolRef}>Pool Reference</button>
+        <button
+          disabled={!this.props.editMode || isInline}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddPoolRef}>Pool Reference</button>
 
       </div>
     );
@@ -450,8 +448,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
     return (
-      <div>
-        <div >
+      <div className="assessment-editor">
+        <div className="docHead">
 
           <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}

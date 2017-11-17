@@ -8,7 +8,7 @@ import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import '../common/editor.scss';
+
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
@@ -39,20 +39,11 @@ import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
 
+import './QuestionEditor.scss';
 
 type Ids = {
   id: string,
 };
-
-export interface QuestionEditor {
-  ids: Ids;
-  lastBody: contentTypes.Html;
-  itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand;
-  numericCommand: InsertInputRefCommand;
-  textCommand: InsertInputRefCommand;
-  htmlEditor: CommandProcessor<EditorState>;
-}
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
@@ -103,6 +94,13 @@ function getLabelForQuestion(question: contentTypes.Question) : string {
  */
 export abstract class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
+  ids: Ids;
+  lastBody: contentTypes.Html;
+  itemToAdd: any;
+  fillInTheBlankCommand: InsertInputRefCommand;
+  numericCommand: InsertInputRefCommand;
+  textCommand: InsertInputRefCommand;
+  htmlEditor: CommandProcessor<EditorState>;
 
   constructor(props) {
     super(props);
@@ -544,8 +542,6 @@ export abstract class QuestionEditor
           <option value="hybrid">Hybrid</option>
         </Select>
       </form>);
-
-
 
     return (
 

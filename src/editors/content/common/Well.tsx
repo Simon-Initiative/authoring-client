@@ -8,8 +8,8 @@ export type WellProps = {
 
 export const Well = (props: WellProps) => {
   return (
-    <div className="Well">
+    <div className="well">
       {props.children}
     </div>
   );
-}; 
+};

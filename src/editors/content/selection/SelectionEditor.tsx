@@ -12,13 +12,6 @@ import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
 
-import '../common/editor.scss';
-
-
-export interface SelectionEditor {
-
-}
-
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
@@ -184,19 +177,19 @@ export class SelectionEditor
     }
 
     return (
-      <RemovableContent editMode={this.props.editMode}
+      <RemovableContent
+        editMode={this.props.editMode}
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
         associatedClasses="selection">
+        />
 
-        <div style={ { position: 'relative' } }>
+        <h4>{caption}</h4>
 
-          <h4>{caption}</h4>
+          {controls}
 
-            {controls}
+          {titleEditor}
 
-            {titleEditor}
-
-        </div>
+          {this.renderSource()}
 
       </RemovableContent>
     );

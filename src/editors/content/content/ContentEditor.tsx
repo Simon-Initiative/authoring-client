@@ -18,15 +18,9 @@ import { getHtmlDetails } from '../common/details';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
 
-import '../common/editor.scss';
-
 type IdTypes = {
   availability: string,
 };
-
-export interface ContentEditor {
-  ids: IdTypes;
-}
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
   onRemove: (guid: string) => void;
@@ -41,6 +35,7 @@ export interface ContentEditorState {
  */
 export class ContentEditor
   extends AbstractContentEditor<contentTypes.Content, ContentEditorProps, ContentEditorState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);
@@ -101,19 +96,18 @@ export class ContentEditor
           </Select>
 
           <HtmlContentEditor
-                editorStyles={bodyStyle}
-                inlineToolbar={inlineToolbar}
-                blockToolbar={blockToolbar}
-                inlineInsertionToolbar={insertionToolbar}
-                {...this.props}
-                model={this.props.model.body}
-                onEdit={this.onBodyEdit}
-                />
+            editorStyles={bodyStyle}
+            inlineToolbar={inlineToolbar}
+            blockToolbar={blockToolbar}
+            inlineInsertionToolbar={insertionToolbar}
+            {...this.props}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit}
+            />
 
         </div>
 
       </RemovableContent>);
   }
-
 }
 
