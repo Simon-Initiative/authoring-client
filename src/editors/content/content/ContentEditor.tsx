@@ -81,19 +81,6 @@ export class ContentEditor
       borderColor: '#AAAAAA',
     };
 
-    const expanded = (
-      <InlineForm position="right">
-        <Select onChange={this.onAvailability} label="Availability"
-          editMode={this.props.editMode}
-          value={this.props.model.availability}>
-          <option value="always">Always</option>
-          <option value="instructor_only">Instructor Only</option>
-          <option value="feedback_only">Feedback Only</option>
-          <option value="never">Never</option>
-        </Select>
-      </InlineForm>
-    );
-
     return (
       <RemovableContent
         editMode={this.props.editMode}
@@ -102,21 +89,26 @@ export class ContentEditor
 
         <div style={ { position: 'relative' } }>
 
-          <Collapse
-            caption="Content"
-            details={getHtmlDetails(this.props.model.body)}
-            expanded={expanded}>
+          <h4>Content</h4>
 
-            <HtmlContentEditor
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  blockToolbar={blockToolbar}
-                  inlineInsertionToolbar={insertionToolbar}
-                  {...this.props}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit}
-                  />
-          </Collapse>
+          <Select onChange={this.onAvailability} label="Availability"
+            editMode={this.props.editMode}
+            value={this.props.model.availability}>
+            <option value="always">Always</option>
+            <option value="instructor_only">Instructor Only</option>
+            <option value="feedback_only">Feedback Only</option>
+            <option value="never">Never</option>
+          </Select>
+
+          <HtmlContentEditor
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                blockToolbar={blockToolbar}
+                inlineInsertionToolbar={insertionToolbar}
+                {...this.props}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit}
+                />
 
         </div>
 

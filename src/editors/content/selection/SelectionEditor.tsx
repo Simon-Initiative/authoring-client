@@ -162,7 +162,8 @@ export class SelectionEditor
         </form>
       </div>);
 
-    const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
+    const caption = this.props.model.source.contentType === 'Pool'
+      ? 'Embedded Pool' : 'External Pool';
 
     let details = '';
     let titleEditor = null;
@@ -189,17 +190,11 @@ export class SelectionEditor
 
         <div style={ { position: 'relative' } }>
 
-          <Collapse caption={caption}
-            details={details}>
+          <h4>{caption}</h4>
 
             {controls}
 
             {titleEditor}
-
-            {this.renderSource()}
-
-          </Collapse>
-
 
         </div>
 

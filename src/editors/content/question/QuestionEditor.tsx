@@ -555,29 +555,25 @@ export abstract class QuestionEditor
 
         <div style={ { position: 'relative' } }>
 
-          <Collapse caption={getLabelForQuestion(this.props.model)}
-            details={getHtmlDetails(this.props.model.body)}
-            expanded={expanded}>
+          <h4>{getLabelForQuestion(this.props.model)}</h4>
 
-            <HtmlContentEditor
-                  ref={c => this.htmlEditor = c}
-                  editMode={this.props.editMode}
-                  services={this.props.services}
-                  context={this.props.context}
-                  activeItemId={this.state.activeItemId}
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  inlineInsertionToolbar={insertionToolbar}
-                  blockToolbar={blockToolbar}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit}
-                  />
+          {expanded}
 
-            {this.renderItemsAndParts()}
+          <HtmlContentEditor
+                ref={c => this.htmlEditor = c}
+                editMode={this.props.editMode}
+                services={this.props.services}
+                context={this.props.context}
+                activeItemId={this.state.activeItemId}
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                inlineInsertionToolbar={insertionToolbar}
+                blockToolbar={blockToolbar}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit}
+                />
 
-          </Collapse>
-
-
+          {this.renderItemsAndParts()}
 
         </div>
 

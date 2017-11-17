@@ -395,7 +395,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       fontFamily: 'sans-serif',
       lineHeight: 1.25,
       position: 'relative',
-      top: '-4',
+      top: '0',
       color: '#606060',
     };
 
@@ -404,7 +404,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       lineHeight: 1.25,
       fontSize: '13',
       position: 'relative',
-      top: '-6',
+      top: '0',
       color: '#606060',
     };
 
@@ -451,7 +451,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div>
-        <div className="docHead">
+        <div >
 
           <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}
@@ -460,29 +460,29 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           {titleEditor}
 
-          <div style={ { marginTop: '20px' } }/>
+          <div style={ { marginTop: '10px' } }/>
 
-          <div className="componentWrapper content">
+          <div>
             {this.props.model.type === LegacyTypes.assessment2
               ? this.renderSettings() : null}
             {this.renderPagination()}
           </div>
 
-          <div style={ { marginTop: '40px' } }/>
+          <div style={ { marginTop: '5px' } }/>
 
           {this.renderAdd()}
 
-          <div className="container">
-            <div className="row">
+          <div className="container-fluid">
+            <div className="row no-gutters">
               <div className="col-3">
-              <Outline
-                nodes={page.nodes}
-                expandedNodes={expanded}
-                selected={this.state.currentNode}
-                onEdit={this.onEditNodes.bind(this)}
-                onChangeExpansion={this.onChangeExpansion.bind(this)}
-                onSelect={this.onSelect.bind(this)}
-                />
+                <Outline
+                  nodes={page.nodes}
+                  expandedNodes={expanded}
+                  selected={this.state.currentNode}
+                  onEdit={this.onEditNodes.bind(this)}
+                  onChangeExpansion={this.onChangeExpansion.bind(this)}
+                  onSelect={this.onSelect.bind(this)}
+                  />
               </div>
               <div className="col-9">
                 {this.renderNode(this.props.model.pages
