@@ -238,6 +238,7 @@ export default class Main extends React.Component<MainProps, MainState> {
           {currentView}
 
           <Footer dispatch={onDispatch}/>
+
           {modalDisplay}
         </div>
     );
