@@ -19,6 +19,8 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
+import { ImportCourseView } from './components/ImportCourseView';
+
 import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 
@@ -179,6 +181,8 @@ export default class Main extends React.Component<MainProps, MainState> {
       return <CoursesView dispatch={onDispatch} userId={user.userId}/>;
     } else if (url === '/create') {
       return <CreateCourseView dispatch={onDispatch}/>;
+    } else if (url === '/import') {
+      return <ImportCourseView dispatch={onDispatch}/>;
 
     } else if (url.startsWith('/objectives-') && course.model) {
       return <ObjectiveSkillView

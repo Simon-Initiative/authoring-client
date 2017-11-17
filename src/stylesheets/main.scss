@@ -37,6 +37,10 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 		background-color: $color-blue;
 	}
 
+	&.btn-danger {
+		background-color: $color-blue;
+	}
+
 	&.outline {
 		background-color: transparent;
 		border: 2px solid $color-white;
@@ -219,6 +223,11 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 			color: #FFF !important;
 		}
 
+		&.btn-danger {
+			background-color: rgba(255, 0, 0, 0.723);
+			color: #FFF !important;
+		}
+
 		&.btn-remove {
 			background-color: $color-grey;
 			color: #FFF !important;
@@ -256,23 +265,11 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
     background-position-y: 40%;
 	padding-top: 4rem;
     padding-bottom: 4rem;
-    margin-bottom: 3rem;
+		padding-left: 4rem;
     text-align: left;
     color: $color-white;
 
-    button {
-    	color: $color-white;
-    	margin-top:2rem;
 
-    	img {
-    		margin-right: 0.5rem;
-    	}
-
-    	&:hover {
-    		background-color: $color-white;
-    		color: $color-blue;
-    	}
-    }
 
     &.full {
     	height: 100vh;
@@ -370,16 +367,15 @@ body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webki
 		    }
 
 		    .btn {
-				margin-top: 2px;
-				border-radius: 0px;
-				font-size: 13px;
-				text-transform: uppercase;
-				//padding: 1.4em 1em;
-				font-weight:600;
-				cursor: pointer;
-				color: $color-white;
-			}
-
+          margin-top: 2px;
+          border-radius: 0px;
+          font-size: 13px;
+          text-transform: uppercase;
+          //padding: 1.4em 1em;
+          font-weight:600;
+          cursor: pointer;
+          color: $color-white;
+        }
     	}
 	}
 
