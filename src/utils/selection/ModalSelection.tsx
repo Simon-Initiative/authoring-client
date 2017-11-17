@@ -13,7 +13,7 @@ export interface ModalSelectionProps {
   onCancel: () => void;
 }
 
-const tempnavstyle : any = {   
+const tempnavstyle : any = {
   objectContainer: {
     marginTop: '10px',
     overflow: 'auto',
@@ -66,7 +66,7 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
       overflow: 'scroll',
     };
 
-    return (  
+    return (
       <Modal
         isOpen={true}
         contentLabel={this.props.title}
@@ -76,20 +76,20 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
           </nav>
 
           <div style={container}>
-            {this.props.children}                 
+            {this.props.children}
           </div>
-          
-            
+
+
           <div style={bottom}>
-            
+
             <button className="btn btn-primary"
               onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }>
                 {okLabel}</button>
-            <button className="btn" 
+            <button className="btn"
               onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }>
                 {cancelLabel}</button>
             </div>
-          
+
       </Modal>);
 
   }
@@ -97,6 +97,3 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 }
 
 export default ModalSelection;
-
-
-
