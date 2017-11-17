@@ -228,7 +228,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     const logoutUrl = user !== null ? user.logoutUrl : '';
 
     return (
-        <div>
+        <div className="main">
           <Header dispatch={onDispatch} logoutUrl={logoutUrl}/>
 
           {currentView}

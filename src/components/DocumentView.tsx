@@ -6,8 +6,6 @@ import EditorManager from 'editors/manager/EditorManager.controller';
 import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
 import * as viewActions from 'actions/view';
 
-import './DocumentView.scss';
-
 export interface DocumentViewProps {
   dispatch: any;
   documentId: string;
