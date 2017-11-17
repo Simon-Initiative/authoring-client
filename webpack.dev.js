@@ -32,6 +32,7 @@ module.exports = {
             data: path.resolve(__dirname, 'src/data'),
             editors: path.resolve(__dirname, 'src/editors'),
             reducers: path.resolve(__dirname, 'src/reducers'),
+            stylesheets: path.resolve(__dirname, 'src/stylesheets'),
             types: path.resolve(__dirname, 'src/types'),
             utils: path.resolve(__dirname, 'src/utils'),
         },
@@ -39,10 +40,10 @@ module.exports = {
     module: {
         unknownContextCritical: false,
         loaders: [
-            { test: /\.css$/, loader: "style-loader!css-loader" },
+            { test: /\.css$/, loader: "style-loader!css-loader?sourceMap=true" },
             {
               test: /\.scss$/,
-              loaders: ["style-loader", "css-loader", "sass-loader"]
+              loaders: ["style-loader", "css-loader?sourceMap=true", "sass-loader"]
             },
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, loader: 'file-loader' },
@@ -50,6 +51,12 @@ module.exports = {
             { test: /\.tsx$/, loaders: [ 'react-hot', 'babel', 'ts-loader'], exclude: /node_modules/ }
         ]
 
+    },
+    sassLoader: {
+        includePaths: [
+            path.join(__dirname, 'src/stylesheets'),
+        ],
+        sourceMap: true
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin()

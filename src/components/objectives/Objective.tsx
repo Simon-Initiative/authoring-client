@@ -90,7 +90,7 @@ export class Objective
               key="new"
               onClick={this.props.onAddNewSkill}
               type="button"
-              className="btn btn-sm">
+              className="btn btn-link btn-sm">
               New
             </button>
             /
@@ -98,7 +98,7 @@ export class Objective
               key="existing"
               onClick={this.props.onAddExistingSkill}
               type="button"
-              className="btn btn-sm">
+              className="btn btn-link btn-sm">
               Existing
             </button>
             <Remove editMode={this.props.editMode}

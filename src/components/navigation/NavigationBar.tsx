@@ -9,54 +9,7 @@ import guid from '../../utils/guid';
 import * as view from '../../actions/view';
 import { Content } from './Content';
 
-const navbarStyles =
-  {
-    openMenu: {
-      width: '200px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      alignContent: 'stretch',
-      height: 'inherit',
-      borderRight: '1px solid grey',
-    },
-    closedMenu: {
-      width: '64px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      alignContent: 'stretch',
-      height: 'inherit',
-      borderRight: '1px solid grey',
-    },
-    mainMenu: {
-      flex: 'none',
-      flexGrow: 1,
-      order: 0,
-      border: '0px solid #c4c0c0',
-      padding: '0px',
-      margin: '0 0 0 0',
-    },
-    verticalMenu: {
-      listStyleType: 'none',
-    },
-    bottomMenu: {
-      margin: '0 0 0 14px',
-      height: '24px',
-    },
-    sidebar: {
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingBottom: '20px',
-      bottom: 0,
-      left: 0,
-      zIndex: 1000,
-      overflowX: 'hidden',
-      overflowY: 'auto',
-    },
-  };
+import './NavigationBar.scss';
 
 // tslint:disable-next-line
 const Section = (props) => {
@@ -105,13 +58,10 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
     const title = course.model && course.model.title || '';
 
     return (
-      <nav style={navbarStyles.sidebar as any}
-        className="col-sm-3 col-md-2 hidden-xs-down sidebar">
-
+      <nav className="navigation-bar col-sm-3 col-md-2 hidden-xs-down sidebar">
         <h1>{title}</h1>
         <br/>
         <ul className="nav nav-pills flex-column">
-
           <Content label="Content Package"
             tooltip="Access course properties and permissions"
             onClick={() => view.viewDocument(courseId, courseId)}/>
@@ -151,7 +101,6 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
             data-toggle="tooltip" title="Report a problem or suggest improvements"
             href={formUrl}>Feedback</a></li>
         </ul>
-
       </nav>
     );
   }

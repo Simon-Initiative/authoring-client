@@ -15,17 +15,10 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from 'utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
 type IdTypes = {
   select: string,
   shuffle: string,
 };
-
-export interface MultipleChoice {
-  ids: IdTypes;
-}
 
 export interface MultipleChoiceProps
   extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {}
@@ -35,7 +28,7 @@ export interface MultipleChoiceState {}
 // tslint:disable-next-line
 const ChoiceFeedback = (props) => {
   return (
-    <div className="ChoiceFeedback clearfix">
+    <div className="choice-feedback clearfix">
       {props.children}
     </div>
   );
@@ -47,6 +40,7 @@ const ChoiceFeedback = (props) => {
 export class MultipleChoice
   extends AbstractItemPartEditor<contentTypes.MultipleChoice,
     MultipleChoiceProps, MultipleChoiceState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);

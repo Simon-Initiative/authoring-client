@@ -14,13 +14,6 @@ import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 
-import '../common/editor.scss';
-
-
-export interface SourceEditor {
-  
-}
-
 export interface SourceEditorProps extends AbstractContentEditorProps<Source> {
   onRemove: (guid: string) => void;
   mediaType: string;
@@ -34,12 +27,12 @@ export interface SourceEditorState {
 /**
  * The content editor for Table.
  */
-export class SourceEditor 
+export class SourceEditor
   extends AbstractContentEditor<Source, SourceEditorProps, SourceEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onFileChange = this.onFileChange.bind(this);
 
     this.state = {
@@ -69,11 +62,11 @@ export class SourceEditor
   onFileChange(e) {
     const file = e.target.files[0];
     const src = file.name;
-    
+
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {
       this.setState(
-        { failure: false }, 
+        { failure: false },
         () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
     })
     .catch((err) => {
@@ -92,7 +85,7 @@ export class SourceEditor
     if (!this.state.failure) {
       srcDisplay = src === '' ? '<not set>' : extractFileName(src);
     } else {
-      srcDisplay = 
+      srcDisplay =
         <div className="alert alert-danger" role="alert">
           <strong>Failed</strong> Rename the file and try again
         </div>;
@@ -101,13 +94,13 @@ export class SourceEditor
 
     return (
       <tr>
-        <td>    
-          <input 
+        <td>
+          <input
             id={id}
             style={ { display: 'none' } }
             accept={this.props.accept}
-            onChange={this.onFileChange} 
-            type="file" 
+            onChange={this.onFileChange}
+            type="file"
           />
           <Button editMode={this.props.editMode}
             onClick={this.openFileDialog.bind(this, id)}>Edit</Button>
@@ -116,8 +109,8 @@ export class SourceEditor
           {srcDisplay}
         </td>
         <td style={ { width: '50px' } }>
-          <span 
-            className="closebtn input-group-addon" 
+          <span
+            className="closebtn input-group-addon"
             onClick={() => this.props.onRemove(this.props.model.guid)}>
             &times;
           </span>

@@ -22,6 +22,8 @@ import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 
+import './EditorManager.scss';
+
 export interface EditorManagerProps {
   documentId: string;
   userId: string;
@@ -43,16 +45,14 @@ export interface EditorManagerState {
   undoRedoGuid: string;
 }
 
-export default interface EditorManager {
+export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   componentDidUnmount: boolean;
   persistenceStrategy: PersistenceStrategy;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
   waitBufferTimer: any;
-}
 
-export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   constructor(props) {
     super(props);
 
@@ -366,7 +366,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       const editor = React.createElement((registeredEditor.component as any), childProps);
 
       return (
-        <div>
+        <div className="editor-manager">
           {editingAllowed ?
             null
             : renderLocked(this.persistenceStrategy.getLockDetails())

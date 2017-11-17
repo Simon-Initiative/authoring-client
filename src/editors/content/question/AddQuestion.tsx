@@ -5,7 +5,7 @@ import guid from '../../../utils/guid';
 
 
 export interface AddQuestion {
-  
+
 }
 
 export interface AddQuestionProps {
@@ -29,9 +29,9 @@ export interface AddQuestionState {
  * Reusable component for adding new questions to a question
  * container (pool, assessment, etc)
  */
-export class AddQuestion 
+export class AddQuestion
   extends React.Component<AddQuestionProps, AddQuestionState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -43,17 +43,17 @@ export class AddQuestion
   }
 
   onAddMultipleChoice(select: string) {
-    
+
     let model = new contentTypes.Question();
     let item = new contentTypes.MultipleChoice();
-    
+
     const value = select === 'multiple' ? 'A' : guid().replace('-', '');
-    const match = select === 'multiple' ? 'A' : value; 
-    
+    const match = select === 'multiple' ? 'A' : value;
+
     const choice = new contentTypes.Choice({ value, guid: guid() });
     const feedback = new contentTypes.Feedback();
     let response = new contentTypes.Response({ match });
-    response = response.with({ guid: guid(), 
+    response = response.with({ guid: guid(),
       feedback: response.feedback.set(feedback.guid, feedback) });
 
     const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
@@ -67,14 +67,14 @@ export class AddQuestion
     let part = new contentTypes.Part();
     part = part.with({ guid: guid(), responses });
     model = model.with({ parts: model.parts.set(part.guid, part) });
-    
+
     this.props.onQuestionAdd(model);
   }
 
   onAddOrdering() {
 
     const value = 'A';
-    
+
     let question = new contentTypes.Question();
 
     const choice = new contentTypes.Choice().with({ value, guid: guid() });
@@ -111,7 +111,7 @@ export class AddQuestion
   }
 
   onAddEssay() {
-    
+
     const item = new contentTypes.Essay();
 
     const response = new contentTypes.Response({ match: '*', score: '1' });
@@ -135,34 +135,34 @@ export class AddQuestion
   onAddMultipart() {
     this.props.onQuestionAdd(new contentTypes.Question());
   }
-    
+
   render() {
-    
+
     const essayOrNot = this.props.isSummative
       ? <a onClick={this.onAddEssay} className="dropdown-item">Essay</a>
       : null;
 
     return (
       <div className="dropdown" style={ { display: 'inline' } }>
-        <button disabled={!this.props.editMode} 
-          className="btn btn-secondary btn-link dropdown-toggle" 
+        <button disabled={!this.props.editMode}
+          className="btn btn-link dropdown-toggle"
           type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <b>Question</b>
         </button>
         <div className="dropdown-menu">
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
             className="dropdown-item">Multiple choice</a>
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }} 
+          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }}
             className="dropdown-item">Check all that apply</a>
           <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
           {essayOrNot}
-          <a onClick={this.onAddMultipart} 
+          <a onClick={this.onAddMultipart}
             className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         </div>
       </div>
     );
-    
+
   }
 
 }

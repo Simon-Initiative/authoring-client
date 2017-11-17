@@ -15,14 +15,6 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
-
-export interface ShortAnswer {
-
-}
-
 export interface ShortAnswerProps extends AbstractItemPartEditorProps<contentTypes.ShortAnswer> {
 
 }

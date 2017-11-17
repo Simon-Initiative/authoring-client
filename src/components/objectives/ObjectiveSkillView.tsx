@@ -6,7 +6,6 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
-
 import { LockDetails, renderLocked } from '../../utils/lock';
 import NavigationBar from '../navigation/NavigationBar.controller';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
@@ -16,18 +15,12 @@ import guid from '../../utils/guid';
 import { RowType } from './types';
 import { ExistingSkillSelection } from './ExistingSkillSelection';
 import { CourseModel } from 'data/models';
-
 import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
-
 import { Row } from './Row';
 
-export interface ObjectiveSkillView {
-  viewActions: Object;
-  services: AppServices;
-  unmounted: boolean;
-}
+import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -57,6 +50,9 @@ interface ObjectiveSkillViewState {
 
 export class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
+  viewActions: Object;
+  services: AppServices;
+  unmounted: boolean;
 
   constructor(props) {
     super(props);
@@ -500,16 +496,18 @@ export class ObjectiveSkillView
 
   renderCreation() {
     return (
-      <DuplicateListingInput
-        editMode={this.state.aggregateModel === null ? false : this.state.aggregateModel.isLocked}
-        buttonLabel="Create new"
-        width={600}
-        value=""
-        placeholder="Enter title for new objective"
-        existing={this.state.objectives === null ? Immutable.List<string>()
-          : this.state.objectives.objectives.toList().map(o => o.title).toList()}
-        onClick={this.createNew}
-      />
+      <div className="table-toolbar input-group">
+        <div className="flex-spacer"/>
+        <DuplicateListingInput
+          editMode={this.state.aggregateModel === null ? false : this.state.aggregateModel.isLocked}
+          buttonLabel="Create"
+          width={600}
+          value=""
+          placeholder="New Objective Title"
+          existing={this.state.objectives === null ? Immutable.List<string>()
+            : this.state.objectives.objectives.toList().map(o => o.title).toList()}
+          onClick={this.createNew} />
+      </div>
     );
   }
 
@@ -536,7 +534,7 @@ export class ObjectiveSkillView
     const lockDisplay = this.renderLockDisplay();
 
     return (
-      <div className="container-fluid new">
+      <div className="objective-skill-view container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 col-md-10 document">

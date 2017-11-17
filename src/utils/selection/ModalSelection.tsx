@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Modal from 'react-modal';
 
 interface ModalSelection {
   modal: any;
@@ -13,7 +12,7 @@ export interface ModalSelectionProps {
   onCancel: () => void;
 }
 
-const tempnavstyle : any = {   
+const tempnavstyle : any = {
   objectContainer: {
     marginTop: '10px',
     overflow: 'auto',
@@ -49,54 +48,49 @@ const customStyles = {
 
 class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 
+  componentDidMount() {
+    (window as any).$(this.modal).modal('show');
+  }
+
+  componentWillUnmount() {
+    (window as any).$(this.modal).modal('hide');
+  }
+
   render() {
 
-    const bottom: any = {
-      position: 'absolute',
-      bottom: '30px',
-      right: '30px',
-    };
-    const okLabel = this.props.okLabel !== undefined ? this.props.okLabel : 'Insert';
-    const cancelLabel = this.props.cancelLabel !== undefined ? this.props.cancelLabel : 'Cancel';
+    const okLabel = this.props.okLabel !== undefined
+      ? this.props.okLabel : 'Insert';
+    const cancelLabel = this.props.cancelLabel !== undefined
+      ? this.props.cancelLabel : 'Cancel';
 
-    const height = window.innerHeight - 280 - 200;
-
-    const container : any = {
-      maxHeight: height,
-      overflow: 'scroll',
-    };
-
-    return (  
-      <Modal
-        isOpen={true}
-        contentLabel={this.props.title}
-        style={customStyles}>
-          <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-            <h2>{this.props.title}</h2>
-          </nav>
-
-          <div style={container}>
-            {this.props.children}                 
-          </div>
-          
-            
-          <div style={bottom}>
-            
-            <button className="btn btn-primary"
-              onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }>
-                {okLabel}</button>
-            <button className="btn" 
-              onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }>
-                {cancelLabel}</button>
+    return (
+      <div ref={(modal) => { this.modal = modal; }}
+        data-backdrop="static" className="modal">
+        <div className="modal-dialog modal-lg" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{this.props.title}</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-          
-      </Modal>);
-
+            <div className="modal-body">
+              {this.props.children}
+            </div>
+            <div className="modal-footer">
+              <button type="button"
+                onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }
+                className="btn btn-primary">{okLabel}</button>
+              <button type="button" className="btn btn-secondary"
+                onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }
+                data-dismiss="modal">{cancelLabel}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
 }
 
 export default ModalSelection;
-
-
-
