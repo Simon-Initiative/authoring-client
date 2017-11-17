@@ -22,6 +22,7 @@ import * as persistence from '../../../data/persistence';
 import { typeRestrictedByModel } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
+import { Outline } from './Outline';
 
 interface AssessmentEditor {
 
@@ -32,7 +33,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-  current: string;
+  currentPage: string;
+  currentNode: string;
 }
 
 
@@ -42,7 +44,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   constructor(props) {
     super(props, ({
-      current: props.model.pages.first().guid,
+      currentPage: props.model.pages.first().guid,
+      currentNode: props.model.pages.first().nodes.first().guid,
     } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
@@ -72,7 +75,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (this.props.editMode !== nextProps.editMode) {
       return true;
     }
-    if (this.state.current !== nextState.current) {
+    if (this.state.currentPage !== nextState.currentPage) {
+      return true;
+    }
+    if (this.state.currentNode !== nextState.currentNode) {
       return true;
     }
     if (this.state.undoStackSize !== nextState.undoStackSize) {
@@ -100,9 +106,21 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({ title: content }));
   }
 
+  onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
+
+  }
+
+  onChangeExpansion(nodes: Immutable.Set<string>) {
+
+  }
+
+  onSelect(nodeId: string) {
+    this.setState({ currentNode: nodeId });
+  }
+
   onNodeRemove(guid: string) {
 
-    let page = this.props.model.pages.get(this.state.current);
+    let page = this.props.model.pages.get(this.state.currentPage);
 
     const supportedNodes = page.nodes.toArray().filter(n => n.contentType !== 'Unsupported');
 
@@ -191,7 +209,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page = this.props.model.pages.get(this.state.current);
+    let page = this.props.model.pages.get(this.state.currentPage);
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
     const pages = this.props.model.pages.set(page.guid, page);
@@ -215,9 +233,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       const guid = page.guid;
       const removed = this.props.model.with({ pages: this.props.model.pages.delete(guid) });
 
-      if (guid === this.state.current) {
+      if (guid === this.state.currentPage) {
         this.setState(
-          { current: removed.last().guid },
+          { currentPage: removed.last().guid },
           () => this.handleEdit(removed));
       } else {
         this.handleEdit(removed);
@@ -239,7 +257,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   canHandleDrop(id) {
-    const page = this.props.model.pages.get(this.state.current);
+    const page = this.props.model.pages.get(this.state.currentPage);
     return page.nodes.get(id) !== undefined;
   }
 
@@ -251,7 +269,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onReorderNode(id, index) {
 
-    let page = this.props.model.pages.get(this.state.current);
+    let page = this.props.model.pages.get(this.state.currentPage);
     const arr = page.nodes.toArray();
 
     // find the index of the source node
@@ -293,7 +311,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     arr.forEach((node, index) => {
       elements.push(this.renderDropTarget(index));
       // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
-      //  {this.renderNode(node)}</DraggableNode>);
+      //  {}</DraggableNode>);
     });
 
     elements.push(this.renderDropTarget(arr.length));
@@ -358,8 +376,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}
-            current={this.props.model.pages.get(this.state.current)}
-            onChangeCurrent={current => this.setState({ current })}
+            current={this.props.model.pages.get(this.state.currentPage)}
+            onChangeCurrent={currentPage => this.setState({ currentPage })}
             onEdit={this.onPageEdit}/>
 
         </div>
@@ -427,8 +445,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const titleEditor = this.renderTitle();
-    const page = this.props.model.pages.get(this.state.current);
+    const page = this.props.model.pages.get(this.state.currentPage);
     const nodeEditors = this.renderNodes(page);
+    const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
     return (
       <div>
@@ -453,8 +472,24 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           {this.renderAdd()}
 
-          {nodeEditors}
-
+          <div className="container">
+            <div className="row">
+              <div className="col-3">
+              <Outline
+                nodes={page.nodes}
+                expandedNodes={expanded}
+                selected={this.state.currentNode}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect.bind(this)}
+                />
+              </div>
+              <div className="col-9">
+                {this.renderNode(this.props.model.pages
+                  .get(this.state.currentPage).nodes.get(this.state.currentNode))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>);
 

@@ -8,8 +8,14 @@ export type RenderedNode = {
   component: JSX.Element,
 };
 
+export type Handlers = {
+  onSelect: (nodeId: NodeId) => void,
+  onExpand: (nodeId: NodeId) => void,
+  onCollapse: (nodeId: NodeId) => void,
+};
+
 export type NodeRenderer<NodeType>
-  = (node: NodeType, nodeState: NodeState<NodeType>) => JSX.Element;
+  = (node: NodeType, nodeState: NodeState<NodeType>, handlers: Handlers) => JSX.Element;
 
 // What we use to uniquely identify a tree node.
 export type NodeId = string;
@@ -23,8 +29,6 @@ export type ChildrenAccessor<NodeType>
 export type ChildrenMutator<NodeType>
   = (node: NodeType, children: Nodes<NodeType>) => NodeType;
 
-
-
 // Metadata regarding a node
 export type NodeState<NodeType> = {
   depth: number,
@@ -32,24 +36,10 @@ export type NodeState<NodeType> = {
   parentNode: Maybe<NodeType>,
 };
 
-// A type that clients can implement to pass in to the
-// tree a custom way to render the tree.
-export type TreeRenderer = {
-
-  // Renders the base components of the tree.  In a table-based
-  // renderer, for instance, this would be something like:
-  //
-  // <table><tbody>{children}</tbody></table>
-  //
-  renderTree: (children) => JSX.Element,
-
-  // Renders the wrapper around the already rendered tree node
-  // In a table-based renderer, this would be the row:
-  //
-  // <tr><td>{renderedNode}</td></tr>
-  //
-  // Either this function, or the node renderer itself can
-  // take care of indentation based on the current depth.
-  renderNode: (depth: number, isSelected: boolean, renderedNode) => JSX.Element,
-};
+// Renders the base components of the tree.  In a table-based
+// renderer, for instance, this would be something like:
+//
+// <table><tbody>{children}</tbody></table>
+//
+export type TreeRenderer = (children) => JSX.Element;
 

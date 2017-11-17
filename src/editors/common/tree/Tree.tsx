@@ -5,27 +5,12 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Maybe } from 'tsmonad';
 
 import { NodeId, Nodes, NodeState,
-  RenderedNode, NodeRenderer,
+  RenderedNode, NodeRenderer, Handlers,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from './types';
 
 import { renderVisibleNodes } from './render';
 
-const listGroupTreeRenderer : TreeRenderer = {
-
-  renderTree: children =>
-    <ul className="list-group">{children}</ul>,
-
-  renderNode: (depth: number, isSelected: boolean, nodeComponent) =>
-    <li className="list-group-item" style={ { marginLeft: (depth * 10) + 'px' } }>
-      {nodeComponent}
-    </li>,
-};
-
-
-export interface TreeState {
-
-}
 
 export interface TreeProps<NodeType> {
 
@@ -49,13 +34,8 @@ export interface TreeProps<NodeType> {
   // The identifier of the currently active, or selected node
   selected: NodeId;
 
-  // Optional. How the tree should render itself and it's nodes. The
-  // mechanism, if this property is left unset is to render the
-  // tree as a bootstrap list-group with the nodes as indented
-  // list items.  Via this property, clients have complete
-  // control over how the tree renders - likely implementations
-  // could be table based, or bootstrap grid based.
-  treeRenderer?: TreeRenderer;
+  // How the tree should render itself.
+  treeRenderer: TreeRenderer;
 
   // Function to execute to report that the tree data has been edited.
   // This likely includes removals and reorders.
@@ -87,34 +67,36 @@ export interface TreeProps<NodeType> {
  */
 @DragDropContext(HTML5Backend)
 export class Tree<NodeType>
-  extends React.PureComponent<TreeProps<NodeType>, TreeState> {
+  extends React.PureComponent<TreeProps<NodeType>, {}> {
 
   constructor(props) {
     super(props);
   }
+
+
 
   render() {
 
     const { selected, treeRenderer, nodes,
       expandedNodes, getChildren, renderNodeComponent } = this.props;
 
-    // Use the list-group tree structure by default if no other one specified
-    const actualTreeRenderer = treeRenderer === undefined
-      ? listGroupTreeRenderer
-      : treeRenderer;
+    const handlers : Handlers = {
+      onSelect: nodeId => this.props.onSelect(nodeId),
+      onCollapse: nodeId =>
+        this.props.onChangeExpansion(this.props.expandedNodes.subtract([nodeId])),
+      onExpand: nodeId =>
+        this.props.onChangeExpansion(this.props.expandedNodes.add(nodeId)),
+    };
 
     // Walk the nodes of the tree in-order, rendering each node, but being
     // careful to only render nodes that are visible (i.e. their parent is
     // is in an expanded state)
     const renderedNodes : RenderedNode[] = renderVisibleNodes(
-      nodes, getChildren, renderNodeComponent, expandedNodes, Immutable.Set(selected));
+      nodes, getChildren, renderNodeComponent, expandedNodes, Immutable.Set([selected]), handlers);
 
     // Now simply render the tree structure, wrapping the tree and each rendered
     // node using the tree renderer
-    return actualTreeRenderer.renderTree(
-      renderedNodes.map(r =>
-        actualTreeRenderer.renderNode(r.depth, r.nodeId === selected, r.component)),
-    );
+    return treeRenderer(renderedNodes.map(r => r.component));
   }
 
 }

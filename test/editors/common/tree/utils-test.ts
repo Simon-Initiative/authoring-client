@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { NodeId, NodeState, Nodes,
   ChildrenAccessor, ChildrenMutator,
-  InitialExpansionStrategy, TreeRenderer } from 'editors/common/tree/types';
+  TreeRenderer } from 'editors/common/tree/types';
 
 import { removeNode, updateNode, insertNode } from 'editors/common/tree/utils';
 
@@ -10,7 +10,7 @@ type TestNode = number;
 
 // Helper function to build a Nodes<TestNode> map, mapping
 // the string representation of a number to that number,
-// starting at 'start' for the number given in 'count'
+// starting at 'start' for the number given in 'count' times.
 const buildNodes = (start: number, count: number) => {
   const arr = [];
   let i = 0;

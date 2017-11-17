@@ -57,7 +57,6 @@ export interface QuestionEditor {
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
-  connectDragSource?: any;
 }
 
 export interface QuestionEditorState {
@@ -578,11 +577,7 @@ export abstract class QuestionEditor
 
           </Collapse>
 
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
 
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-
-          </div>
 
         </div>
 
