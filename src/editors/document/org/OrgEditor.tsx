@@ -274,7 +274,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     };
 
     return (
-      <div>
+      <div className="organization-content">
         {this.renderActionBar()}
 
         <table className="table table-sm table-striped">

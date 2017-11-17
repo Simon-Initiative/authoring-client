@@ -120,15 +120,6 @@ export class EditableCaption
   renderInsertExisting() {
 
     if (ADD_EXISTING_COMMANDS[this.props.model.contentType].length > 0) {
-
-      const label : any = {
-        fontFamily: 'sans-serif',
-        fontSize: '12pt',
-        position: 'relative',
-        marginLeft: '30px',
-        color: '#606060',
-      };
-
       const buttons = buildCommandButtons(
         'addexisting',
         ADD_EXISTING_COMMANDS,
@@ -136,7 +127,7 @@ export class EditableCaption
         this.props.processCommand, this.props.context, this.props.editMode);
 
       return [
-        <span key="add-existing" style={label}>Add existing:</span>,
+        <span key="add-existing" className="label">Add existing:</span>,
         ...buttons,
       ];
     } else {
@@ -148,16 +139,8 @@ export class EditableCaption
   renderInsertNew() {
 
     if (ADD_NEW_COMMANDS[this.props.model.contentType].length > 0) {
-
-      const label : any = {
-        fontFamily: 'sans-serif',
-        fontSize: '12pt',
-        position: 'relative',
-        color: '#606060',
-      };
-
       return [
-        <span key="add-new" style={label}>Add new:</span>,
+        <span key="add-new" className="label">Add new:</span>,
         ...buildCommandButtons(
           'addnew',
           ADD_NEW_COMMANDS,
@@ -176,24 +159,30 @@ export class EditableCaption
 
     if (this.state.isEditing) {
       return (
-        <div style={ { display: 'inline', marginLeft: '40px' } }>
-          <input ref={a => this.titleInput = a} type="text" onKeyUp={this.onKeyUp}
-            onChange={this.onTextChange}
-            value={this.state.title} style={ { width: '50%', paddingTop: '2px' } }/>
-          <button
-            key="save"
-            onClick={this.onTitleEdit}
-            type="button"
-            className="btn btn-link btn-sm">
-            Done
-          </button>
-          <button
-            key="cancel"
-            onClick={this.onCancel}
-            type="button"
-            className="btn btn-link btn-sm">
-            Cancel
-          </button>
+        <div className="form-inline" style={{ marginLeft: 30 }}>
+          <div className="form-group">
+            <input
+              type="text"
+              ref={a => this.titleInput = a}
+              onKeyUp={this.onKeyUp}
+              className="form-control input-sm"
+              onChange={this.onTextChange}
+              value={this.state.title} />
+            <button
+              key="save"
+              onClick={this.onTitleEdit}
+              type="button"
+              className="btn btn-link btn-sm">
+              Done
+            </button>
+            <button
+              key="cancel"
+              onClick={this.onCancel}
+              type="button"
+              className="btn btn-link btn-sm">
+              Cancel
+            </button>
+          </div>
         </div>
       );
     } else {
