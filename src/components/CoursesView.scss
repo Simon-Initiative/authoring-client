@@ -2,6 +2,10 @@
 @import 'oli/typography';
 
 .courses-view {
+  .my-course-packages {
+    margin: 2rem;
+  }
+
   .create-course {
     background-color: $blue;
     background-image: url(../../assets/book.svg);
@@ -12,6 +16,7 @@
     padding-top: 4rem;
     padding-bottom: 4rem;
     margin-bottom: 3rem;
+    padding-left: 4rem;
     text-align: left;
     color: $white;
 
@@ -70,64 +75,6 @@
 
       input:focus {
         outline: 2px solid #0055ab;
-      }
-    }
-  }
-
-.course-view {
-    &.editor {
-      margin-top:0px;
-    }
-
-    h2 {
-      margin: 1em auto;
-    }
-
-    .course {
-      background-color: $white;
-      min-height: 142px;
-        position: relative;
-        transition: box-shadow 0.3s ease-in-out;
-        margin-bottom: 20px;
-
-        &:hover {
-          box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.17);
-        }
-
-        .content {
-          background-color: $white;
-          position: absolute;
-          padding: 25px 28px;
-          width: 85%;
-          min-height: 40px;
-          bottom: 0px;
-          right: 0px;
-          font-size: 13px;
-
-          .information {
-            font-family: $serif-font;
-            color: $blue;
-            padding-top: 0.8em;
-
-            span {
-              display: block;
-              border-right: 2px solid #CCC;
-            }
-
-            .title {
-              text-transform: uppercase;
-            }
-          }
-
-          .btn {
-          margin-top: 2px;
-          border-radius: 0px;
-          font-size: 13px;
-          text-transform: uppercase;
-          font-weight:600;
-          cursor: pointer;
-          color: $white;
-        }
       }
     }
   }

@@ -1,0 +1,783 @@
+@import 'abstracts/variables';
+@import '../editors/content/common/draft/DraftWrapper';
+
+body { background: #f3f3f4; width: 100%; height: 100%; padding-top: 50px; -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale; font-family: $sans-font; outline: none;}
+#app { margin: 0px; padding: 0px; width: 100%; height: 100%;}
+.sidebar .nav-link { border-radius: 0px; }
+
+
+//Content Editable Focus
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
+.nav-link {
+	cursor: pointer;
+}
+
+.document {
+
+	h2 {
+		color: $color-black;
+
+		&.organize {
+			display:inline-block;
+		}
+	}
+}
+//Button Global
+.btn {
+	border-radius: 0px;
+	cursor: pointer;
+	background-color: transparent;
+	border: none;
+
+	&.btn-primary {
+		background-color: $color-blue;
+	}
+
+	&.btn-danger {
+		background-color: $color-blue;
+	}
+
+	&.outline {
+		background-color: transparent;
+		border: 2px solid $color-white;
+	}
+
+	&.serif {
+		font-family: $serif-font;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
+
+	&:active {
+		box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+		outline: none;
+	}
+}
+
+.btn-link.focus {
+	box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+	outline: none;
+}
+
+.btn-link.active {
+	box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+	outline: none;
+}
+
+
+// Header
+.navbar{
+	height: 50px;
+	background-color: $color-offwhite!important;
+	border-bottom: 2px solid $color-blue;
+	color: $color-black;
+	font-family: $serif-font;
+	.navbar-brand {
+		font-size: 16px;
+		font-weight: 500;
+	    font-style: normal;
+	    letter-spacing: 0.01rem;
+	    line-height: 30px;
+	    color: $color-black;
+	    cursor: pointer;
+	    img {
+	    	margin-right:10px;
+	    }
+	}
+	.navbar-nav {
+		margin-left:auto;
+		.nav-link {
+			color: $color-blue;
+			cursor: pointer;
+			&.active {
+				color: $color-blue;
+			}
+		}
+	}
+}
+
+// Sidebar
+.sidebar {
+	background-color: $color-blue;
+	color: $color-white;
+	font-size: 16px;
+	font-weight: 600;
+	min-height: 78vh;
+	h1 {
+		margin: 0px;
+	    font-size: 1.5em;
+	    padding: 30px 1.3em 0.4em 0.7em;
+	    font-family: $serif-font;
+	    color: $color-white;
+	}
+	h2 {
+		margin: 0px;
+	    font-size: 12px;
+	    text-transform: uppercase;
+	    padding: 30px 1.3em 0.4em 1.3em;
+	    font-weight: 600;
+	    color: $color-lblue;
+	}
+	a {
+		cursor: pointer;
+		padding: .1em 1em;
+
+		&:hover {
+    		text-decoration: underline !important;
+    	}
+	}
+	.feedback {
+		margin-top: 25px;
+		a {
+			display: block;
+		    text-align: center;
+		    background: #fff;
+		    width: 85%;
+		    margin: 0 auto;
+		    padding: 10px;
+		}
+	}
+}
+
+// Editor Global
+.editor {
+	margin: 3em auto;
+
+  blockquote {
+		background: #f9f9f9;
+		border-left: 10px solid #ccc;
+		margin: 1.5em 10px;
+		padding: 0.5em 10px;
+	}
+
+	.formulaDiv {
+		background: #f9f9f9;
+		border-left: 10px solid #7130c0;
+		margin: 1.5em 10px;
+		padding: 0.5em 10px;
+		font-family: monospace;
+		font-size: 13px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 400;
+		line-height: 18.5714px;
+	}
+
+	.codeDiv {
+		font-family: monospace;
+		font-size: 13px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 400;
+		line-height: 18.5714px;
+		background-color: #CCCCCC;
+		width: '100%';
+	}
+
+
+	h2 {
+		font-family: $serif-font;
+		margin: 0em 1em 0em auto;
+		display: inline-block;
+	}
+
+  .editor-link {
+		color: $color-blue !important;
+		cursor: pointer;
+		&.active {
+			color: $color-blue !important;
+		}
+	}
+
+	.docHead {
+		.btn {
+			padding: 5px 20px;
+			position: relative;
+			top: -6px;
+
+			&:hover {
+				border: 0px solid $color-blue;
+				color: $color-blue;
+				text-decoration: underline;
+			}
+		}
+	}
+
+	.btn {
+		cursor: pointer;
+		background-color: transparent;
+		transition: none;
+		// border-bottom: 1px dotted $color-blue;
+		font-weight: 600;
+		color: $color-blue;
+
+		&.btn-primary {
+			background-color: $color-blue;
+			color: #FFF !important;
+		}
+
+		&.btn-danger {
+			background-color: rgba(255, 0, 0, 0.723);
+			color: #FFF !important;
+		}
+
+		&.btn-remove {
+			background-color: $color-grey;
+			color: #FFF !important;
+			padding-left: 15px !important;
+		}
+
+		&.outline {
+			background-color: transparent;
+			border: 2px solid $color-white;
+		}
+
+		&.serif {
+			font-family: $serif-font;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
+
+		&:active {
+			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
+			outline: none;
+		}
+	}
+}
+
+// Create a Course
+.createCourse {
+	background-color: $color-blue;
+	background-image: url(../../assets/book.svg);
+	background-repeat: no-repeat;
+    background-size: 30%;
+    background-position-x: 25%;
+    background-position-y: 40%;
+	padding-top: 4rem;
+    padding-bottom: 4rem;
+		padding-left: 4rem;
+    text-align: left;
+    color: $color-white;
+
+
+
+    &.full {
+    	height: 100vh;
+    	padding: 10rem;
+
+    	h1 {
+    		font-family: $serif-font;
+    	}
+
+    	fieldset {
+    		width: 100%;
+    		position: relative;
+    	}
+
+    	input {
+    		//margin-top: 1rem;
+    		padding: 2rem;
+    		color: #000;
+    		//font-size: 1.5em;
+    		border: 1px solid #0055ab;
+    	}
+
+    	input::placeholder {
+		  color: #c3c6cb;
+		}
+
+		label {
+		  top: 37px;
+		  position: absolute;
+		  display: block;
+		  transition: 0.2s;
+		  margin-left: 2rem;
+		  margin-top: -25px;
+		}
+
+		input:focus + label{
+		  top: 12px;
+		  margin-top: 0px;
+		  margin-left: 2rem;
+		  color: #000;
+		}
+
+		input:focus {
+			outline: 2px solid #0055ab;
+			// border: solid 8px #0055ab;
+		}
+    }
+}
+
+// My Courses
+.courseView {
+
+	&.editor {
+		margin-top:0px;
+	}
+
+	h2 {
+		margin: 1em auto;
+	}
+
+	.course {
+		background-color: $color-white;
+		min-height: 142px;
+    	position: relative;
+    	transition: box-shadow 0.3s ease-in-out;
+    	margin-bottom: 20px;
+
+    	&:hover {
+    		box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.17);
+    	}
+
+    	.content {
+    		background-color: $color-white;
+		    position: absolute;
+		    padding: 25px 28px;
+		    width: 85%;
+		    min-height: 40px;
+		    bottom: 0px;
+		    right: 0px;
+		    font-size: 13px;
+
+		    .information {
+		    	font-family: $serif-font;
+		    	color: $color-blue;
+		    	padding-top: 0.8em;
+
+		    	span {
+		    		display: block;
+		    		border-right: 2px solid #CCC;
+		    	}
+
+		    	.title {
+		    		text-transform: uppercase;
+		    	}
+		    }
+
+		    .btn {
+          margin-top: 2px;
+          border-radius: 0px;
+          font-size: 13px;
+          text-transform: uppercase;
+          //padding: 1.4em 1em;
+          font-weight:600;
+          cursor: pointer;
+          color: $color-white;
+        }
+    	}
+	}
+
+}
+
+//footer
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    height: 124px;
+    background-color: #f2f2f2;
+    border-top: 1px solid #e8e8e8;
+    padding: 3rem;
+    color: #0067cb;
+    line-height: 1.2em;
+    font-family: $serif-font;
+		font-size: 14px;
+
+    .ccLicense {
+	    float: left;
+	    margin-right: 2.5rem;
+	}
+}
+
+// Organization
+.rst__node {
+
+	.rst__nodeContent {
+
+		h2 {
+			color: #000;
+			margin-bottom: 0px !important;
+			font-family: $sans-font;
+			font-size: 1em;
+			font-weight: 600;
+		}
+	}
+}
+
+// Tables Global
+.table {
+
+	background-color: $color-white;
+
+	thead {
+		background-color: rgba(190, 193, 197, 0.85);
+
+		th {
+			font-weight: 200;
+			font-size: 16px;
+			color: black;
+			min-height: 30px;
+		}
+	}
+
+	td {
+		vertical-align: middle;
+	}
+
+	th {
+		vertical-align: middle;
+	}
+}
+
+figure {
+	line-height: 1.5rem;
+    margin-top: 0px;
+    margin-bottom: 0;
+}
+
+.public-DraftStyleDefault-block {
+  &.public-DraftStyleDefault-ltr {
+    margin-top: 0rem;
+    margin-bottom: 0;
+  }
+}
+
+h1 {
+	.public-DraftStyleDefault-block {
+	  &.public-DraftStyleDefault-ltr {
+	    line-height: 4.5rem;
+    	// margin-top: 3rem;
+	  }
+	}
+}
+
+.mathPreview {
+	>span {
+		display: block;
+		text-align: center;
+		background-color: transparent;
+	}
+	.preview {
+		// margin-right: 1rem;
+		display: block;
+		color: $color-grey;
+		text-align: center;
+		font-family: $serif-font;
+	}
+}
+
+.public-DraftStyleDefault-ul, .public-DraftStyleDefault-ol {
+    margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+// Assessetment Toolbar
+.asxToolbar {
+	position: absolute;
+	right:0px;
+}
+
+//Skills Editor
+.skillEditor {
+
+	.form-inline {
+		display:inline-block;
+	}
+
+	.skillRows {
+
+		h2 {
+			margin:15px;
+			margin-bottom: 0px !important;
+			font-family: $sans-font !important;
+			font-size: 16px;
+			font-weight: 600;
+		}
+	}
+
+	.skillTitle {
+		h2 {
+			font-size: 1.3em;
+			font-family: $serif-font;
+			margin: 10px;
+		}
+	}
+}
+
+//Resources Applied to the table resources
+.resources {
+
+	a.source {
+		font-weight: 600;
+		color: $color-blue;
+		cursor: pointer;
+
+		&:hover {
+			color: $color-blue;
+			border-bottom: 1px dotted $color-blue;
+		}
+	}
+
+}
+
+//Learning Objectives
+.rst__nodeContent {
+
+}
+.rst__node .rst__nodeContent h2 {
+	color: $color-blue;
+	margin-top: 10px;
+}
+
+.componentWrapper {
+
+	&.content {
+		border-color: transparent;
+		background-color: $color-white;
+		border-radius: 4px;
+
+		.form-control {
+			border-color: transparent;
+
+			&:hover {
+				border-color: $color-grey;
+			}
+		}
+	}
+
+	&.question {
+		border-color: transparent;
+		background-color: $color-white;
+		border-radius: 4px;
+
+		.form-control {
+
+			&:first-child {
+				border-color: $color-grey;
+			}
+
+			&:hover {
+				border-color: $color-grey;
+			}
+		}
+		.ChoiceFeedback {
+
+			border: 2px solid $color-blue;
+
+			.input-group {
+
+				.input-group-addon {
+					border-radius: 0px;
+					background-color: $color-blue;
+					color: $color-white;
+					border: none;
+				}
+				.InputLabel-default {
+					font-size: 0.9rem;
+				}
+			}
+		}
+		.input-group-addon.InputLabel-default {
+			border-radius: 0px;
+			background-color: $color-blue;
+			color: $color-white;
+			border: none;
+			font-size: 0.9rem;
+		}
+		.closebtn.input-group-addon {
+			border-radius: 0px;
+			background-color: $color-blue;
+			color: $color-white;
+			border: none;
+		}
+		.itemWrapper {
+			border: 2px solid $color-blue;
+		}
+	}
+}
+
+.btn-secondary.dropdown-toggle, .btn-secondary.active, .btn-secondary:active, .show>.btn-secondary.dropdown-toggle {
+	color: $color-blue;
+	font-weight: 500;
+	font-size: 0.9rem;
+	background-color: transparent;
+	border: none;
+}
+.itemPart {
+	background-color: transparent;
+	margin: 8px;
+	border: 1px solid #CCCCCC;
+	padding: 12px;
+	border-radius: 4px;
+}
+// .ChoiceFeedback {
+// 	.input-group {
+// 		margin-bottom: 5px;
+// 	}
+// }
+.form-check-label.btn {
+	font-size: 0.9rem;
+	margin-left: 25px;
+
+	.form-check-input {
+		margin-right: 5px;
+	}
+}
+.itemType {
+	float:right;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	color: black;
+
+	span {
+		margin-right: 10px;
+	}
+}
+.form-inline.InputForm-right {
+	margin-bottom: 0px;
+}
+.chip {
+	background-color: $color-blue;
+	text-transform: uppercase;
+	margin-bottom: 15px;
+	color: $color-white;
+	padding: 10px;
+	height: 45px;
+	font-weight: 600;
+
+	.closebtn {
+		color: $color-white;
+	}
+}
+
+// Admin
+.admin {
+
+	.info {
+
+		.row {
+
+			[class*="col-"] {
+			    padding-top: 1rem;
+			    padding-bottom: 1rem;
+			    background-color: #fff;
+			    border-bottom: 1px solid rgba(86,61,124,.2);
+
+			    .btn-primary {
+			    	padding-left: 15px;
+			    	color: #fff;
+			    }
+			}
+		}
+	}
+}
+.users {
+
+	.user {
+		background-color: #fff;
+	    border-bottom: 1px solid rgba(86,61,124,.2);
+	    padding-top: 1rem;
+	    padding-bottom: 1rem;
+
+	    .profile {
+	    	display:inline-block;
+	    	height: 60px;
+	    	width: 60px;
+	    	float: left;
+	    	margin-right: 25px;
+	    	background-color: #eaeaea;
+	    	border-radius:45px;
+	    }
+	    .name {
+	    	font-weight: 700;
+	    	font-size: 1.1em;
+	    	display:block;
+	    }
+	    .inst {
+	    	font-size: 0.9em;
+	    	display:block;
+	    	line-height: 1.2em;
+	    }
+	    .email {
+	    	font-size: 0.9em;
+	    	display:block;
+	    	line-height: 1.2em;
+	    }
+	    .btn {
+    	    color: #fff;
+    		padding-left: 15px;
+    		margin-top: 10px;
+    		width: 100%;
+	    }
+	    .btn-success {
+	    	color: #fff;
+	    	float:right;
+		    background-color: #da3232;
+		    border-color: #da3232;
+	    }
+	    .btn-secondary {
+	    	color: #fff;
+	    	float:right;
+		    background-color: #0067cb;
+		    border: transparent;
+	    }
+
+	}
+}
+
+
+.three-bounce > div {
+	width: 18px;
+	height: 18px;
+	background-color: #333;
+
+	border-radius: 100%;
+	display: inline-block;
+	-webkit-animation: bouncedelay 1.4s infinite ease-in-out;
+	animation: bouncedelay 1.4s infinite ease-in-out;
+	/* Prevent first frame from flickering when animation starts */
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+}
+
+.three-bounce .bounce1 {
+	-webkit-animation-delay: -0.32s;
+	animation-delay: -0.32s;
+}
+
+.three-bounce .bounce2 {
+	-webkit-animation-delay: -0.16s;
+	animation-delay: -0.16s;
+}
+
+@-webkit-keyframes bouncedelay {
+	0%, 80%, 100% {
+		-webkit-transform: scale(0.0)
+	}
+	40% {
+		-webkit-transform: scale(1.0)
+	}
+}
+
+@keyframes bouncedelay {
+	0%, 80%, 100% {
+		transform: scale(0.0);
+		-webkit-transform: scale(0.0);
+	}
+	40% {
+		transform: scale(1.0);
+		-webkit-transform: scale(1.0);
+	}
+}

@@ -311,8 +311,6 @@ export class ImageEditor
     return (
       <div className="itemWrapper">
 
-        <br/>
-
         <TabContainer labels={['Source', 'Sizing', 'Other']}>
           {this.renderSource()}
           {this.renderSizing()}

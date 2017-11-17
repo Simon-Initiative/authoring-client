@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
+import { hasRole } from 'actions/utils/keycloak';
+import * as viewActions from 'actions/view';
 import {
   AbstractEditor,
   AbstractEditorProps,
@@ -30,7 +32,6 @@ class CourseEditor
       .then((result) => {
         let devs = this.props.model.developers;
         result.forEach((item) => {
-
           const userName = item.userName;
           devs = devs.set(userName, item);
         });
@@ -46,7 +47,7 @@ class CourseEditor
   }
 
   renderResources() {
-    const developers = this.props.model.developers.toArray().map(d => (
+    const developers = this.props.model.developers.toArray().map(d =>
       <div key={d.userName} className="row user">
         <div className="col-10">
           <span className="profile"></span>
@@ -55,16 +56,15 @@ class CourseEditor
           <span className="email">{d.email}</span>
         </div>
         <div className="col-2">
-          <button
-            type="button"
-            className={d.isDeveloper ? 'btn btn-remove' : 'btn btn-primary'}
-            onClick={e => this.registration(d.userName, d.isDeveloper ? 'remove' : 'add')}>
+          <button type="button" className={d.isDeveloper ? 'btn btn-success' : 'btn btn-primary'}
+                  onClick={e =>
+                  this.registration(
+                    d.userName, d.isDeveloper ? 'remove' : 'add')}>
             {d.isDeveloper ? 'Remove' : 'Add'}
           </button>
         </div>
-      </div>
-    ));
-
+      </div>,
+    );
     return (
       <div className="row users">
         <div className="col-md-9">
@@ -77,32 +77,31 @@ class CourseEditor
     );
   }
 
-  renderWebContent() {
-    const rows = this.props.model.webContents.map(r => (
-      <tr key={r.guid}>
-        <td>{JSON.stringify(r)}</td>
-      </tr>
-    ));
-
-    return (
-      <div className="row">
-        <h2>All WebContent</h2>
-        <table className="table table-striped table-hover">
-          <thead>
-          <tr>
-            <th>Files</th>
-          </tr>
-          </thead>
-          <tbody>
-          {rows}
-          </tbody>
-        </table>
-      </div>
-    );
+  removePackage() {
+    persistence.deleteCoursePackage(this.props.model.guid)
+    .then((document) => {
+      this.props.dispatch(viewActions.viewAllCourses());
+    })
+    .catch(err => console.log(err));
   }
 
   render() {
     const model = this.props.model;
+
+    const isAdmin = hasRole('admin');
+
+    const adminRow = isAdmin
+      ? <div className="row">
+          <div className="col-3">Administer</div>
+          <div className="col-9">
+          <button type="button"
+            className="btn btn-danger"
+            onClick={this.removePackage.bind(this)}>
+            Remove Package
+            </button>
+          </div>
+        </div>
+      : null;
 
     return (
       <div className="course-editor">
@@ -139,6 +138,7 @@ class CourseEditor
 
                 </div>
               </div>
+              {adminRow}
             </div>
           </div>
         </div>
