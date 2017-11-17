@@ -177,29 +177,21 @@ export class SelectionEditor
     }
 
     return (
-      <RemovableContent editMode={this.props.editMode}
+      <RemovableContent
+        editMode={this.props.editMode}
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
+        title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
         associatedClasses="selection">
+        <Collapse caption={caption}
+          details={details}>
 
-        <div style={ { position: 'relative' } }>
+          {controls}
 
-          <Collapse caption={caption}
-            details={details}>
+          {titleEditor}
 
-            {controls}
+          {this.renderSource()}
 
-            {titleEditor}
-
-            {this.renderSource()}
-
-          </Collapse>
-
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-          </div>
-
-        </div>
-
+        </Collapse>
       </RemovableContent>
     );
   }

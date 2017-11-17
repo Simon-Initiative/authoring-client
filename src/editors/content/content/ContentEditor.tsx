@@ -94,36 +94,23 @@ export class ContentEditor
       <RemovableContent
         editMode={this.props.editMode}
         onRemove={() => this.props.onRemove(this.props.model.guid)}
+        title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
         associatedClasses="content">
+        <Collapse
+          caption="Content"
+          details={getHtmlDetails(this.props.model.body)}
+          expanded={expanded}>
 
-        <div style={ { position: 'relative' } }>
-
-          <Collapse
-            caption="Content"
-            details={getHtmlDetails(this.props.model.body)}
-            expanded={expanded}>
-
-            <HtmlContentEditor
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  blockToolbar={blockToolbar}
-                  inlineInsertionToolbar={insertionToolbar}
-                  {...this.props}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit}
-                  />
-          </Collapse>
-
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
-
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-
-          </div>
-
-        </div>
-
+          <HtmlContentEditor
+            editorStyles={bodyStyle}
+            inlineToolbar={inlineToolbar}
+            blockToolbar={blockToolbar}
+            inlineInsertionToolbar={insertionToolbar}
+            {...this.props}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit} />
+        </Collapse>
       </RemovableContent>);
   }
-
 }
 

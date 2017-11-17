@@ -88,10 +88,14 @@ export class CriteriaEditor
           type="number"
           onEdit={this.onScore}
         />
-      </form>);
+      </form>
+    );
 
-    return <RemovableContent editMode={this.props.editMode}
-      onRemove={() => this.props.onRemove(this.props.model.guid)} associatedClasses="content">
+    return (
+      <RemovableContent
+        editMode={this.props.editMode}
+        onRemove={() => this.props.onRemove(this.props.model.guid)}
+        associatedClasses="content">
 
         {controls}
 
@@ -106,9 +110,8 @@ export class CriteriaEditor
           model={this.props.model.body}
           onEdit={this.onBodyEdit}/>
 
-      </RemovableContent>;
-
+      </RemovableContent>
+    );
   }
-
 }
 

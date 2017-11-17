@@ -1,0 +1,16 @@
+@import 'oli/colors';
+
+.removable-content {
+  .content-title {
+    display: flex;
+    flex-direction: row;
+
+    .remove-btn {
+      &:hover {
+        i {
+          color: $danger;
+        }
+      }
+    }
+  }
+}
