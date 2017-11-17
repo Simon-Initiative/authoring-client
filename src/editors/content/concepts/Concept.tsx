@@ -1,10 +1,8 @@
-'use strict';
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
 import * as contentTypes from 'data/contentTypes';
 import { Title } from 'types/course';
+
 import './Concept.scss';
 
 export interface ConceptProps {
@@ -18,8 +16,6 @@ export interface ConceptProps {
 }
 
 export interface ConceptState {}
-
-export default interface Concept {}
 
 /**
  * Concept React Component
@@ -49,7 +45,7 @@ export default class Concept extends React.PureComponent<ConceptProps, ConceptSt
     const { title } = this.props;
 
     return (
-    <div className="chip">
+    <div className="concept">
       {title || 'Waiting...'}
       <span className="closebtn" onClick={this.onClick}>&times;</span>
     </div>);

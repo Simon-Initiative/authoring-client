@@ -1,5 +1,3 @@
-'use strict';
-
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { AppServices } from '../../common/AppServices';
@@ -17,13 +15,6 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
-
-export interface Numeric {
-
-}
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 

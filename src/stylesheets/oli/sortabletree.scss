@@ -4,7 +4,7 @@
 * node renderer
 */
 
-@import 'abstracts/variables';
+@import './colors';
 @import '../editors/content/common/draft/DraftWrapper';
 
 /* ------------------------------------------------------------- */
@@ -25,7 +25,7 @@
 
 /**
  * Override to the default sortable tree class that adds a scrollbar
- * to the inner pane. 
+ * to the inner pane.
  */
 .rst__virtualScrollOverride {
     /*overflow: hidden !important;*/
@@ -39,7 +39,7 @@
 * down menu Nick designed. It should really go into its own file but
 * I'm keeping it here to have all node renderer settings together
 * for now.
-* 
+*
 * Per: http://koen.kivits.com/articles/pure-css-menu/
 */
 /* ------------------------------------------------------------- */
@@ -59,24 +59,24 @@
     z-index: 1;
     padding: 4px;
 
-    background: #ffffff; 
+    background: white;
     border-radius: 5px;
     border: 1px solid grey;
-    
+
     /* use opacity to fake immediate toggle */
     opacity: 1;
-    
+
     visibility: visible;
     display: block;
-    
+
     transition: display 0.6s;
     transition: visibility 0.5s;
-    
+
     /*
     -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    */    
-    
+    */
+
     outline: none;
 }

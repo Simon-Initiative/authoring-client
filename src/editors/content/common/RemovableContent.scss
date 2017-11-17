@@ -1,0 +1,19 @@
+@import 'oli/colors';
+
+.removable-content {
+  .content-title {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid $gray-lightest;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+
+    .remove-btn {
+      &:hover {
+        i {
+          color: $danger;
+        }
+      }
+    }
+  }
+}

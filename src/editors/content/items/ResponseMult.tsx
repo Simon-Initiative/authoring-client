@@ -11,32 +11,25 @@ import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { MatchEditor } from './MatchEditor';
 
-import '../common/editor.scss';
-
-
-export interface ResponseMultEditor {
-  
-}
-
-export interface ResponseMultEditorProps 
+export interface ResponseMultEditorProps
   extends AbstractContentEditorProps<contentTypes.ResponseMult> {
-  
+
 }
 
 export interface ResponseMultEditorState {
-  
+
 }
 
 /**
  * The content editor for Table.
  */
-export class ResponseMultEditor 
-  extends AbstractContentEditor<contentTypes.ResponseMult, 
+export class ResponseMultEditor
+  extends AbstractContentEditor<contentTypes.ResponseMult,
   ResponseMultEditorProps, ResponseMultEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onMatchStyleEdit = this.onMatchStyleEdit.bind(this);
     this.onMatchEdit = this.onMatchEdit.bind(this);
@@ -71,13 +64,13 @@ export class ResponseMultEditor
             model={m}
             onEdit={this.onMatchEdit.bind(this)}
             />);
-    
+
     return (
       <div className="itemWrapper">
         <form className="inline">
-      
-          <Select editMode={this.props.editMode} 
-            label="Match style" value={matchStyle} 
+
+          <Select editMode={this.props.editMode}
+            label="Match style" value={matchStyle}
             onChange={this.onMatchStyleEdit}>
             <option value="any">Any</option>
             <option value="all">All</option>
@@ -86,18 +79,18 @@ export class ResponseMultEditor
 
           Score:&nbsp;&nbsp;&nbsp;
           <TextInput
-            editMode={this.props.editMode} 
+            editMode={this.props.editMode}
             width="75px"
             label=""
             value={score}
             type="number"
             onEdit={this.onScoreEdit}
           />
-          
+
         </form>
 
         {matchEditors}
-        
+
       </div>);
   }
 

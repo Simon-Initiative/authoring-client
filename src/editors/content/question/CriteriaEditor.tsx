@@ -5,7 +5,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
 import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
@@ -17,17 +17,11 @@ import { Collapse } from '../common/Collapse';
 import { getHtmlDetails } from '../common/details';
 import { RemovableContent } from '../common/RemovableContent';
 
-import '../common/editor.scss';
-
 type IdTypes = {
   score: string,
 };
 
-export interface CriteriaEditor {
-  ids: IdTypes;
-}
-
-export interface CriteriaEditorProps 
+export interface CriteriaEditorProps
   extends AbstractContentEditorProps<contentTypes.GradingCriteria> {
   onRemove: (guid: string) => void;
 }
@@ -39,10 +33,11 @@ export interface CriteriaEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class CriteriaEditor 
-  extends AbstractContentEditor<contentTypes.GradingCriteria, 
+export class CriteriaEditor
+  extends AbstractContentEditor<contentTypes.GradingCriteria,
   CriteriaEditorProps, CriteriaEditorState> {
-    
+  ids: IdTypes;
+
   constructor(props) {
     super(props);
 
@@ -70,7 +65,7 @@ export class CriteriaEditor
   }
 
   render() : JSX.Element {
-    
+
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
@@ -86,21 +81,25 @@ export class CriteriaEditor
       <form className="form-inline">
         Score:&nbsp;&nbsp;&nbsp;
         <TextInput
-          editMode={this.props.editMode} 
+          editMode={this.props.editMode}
           width="75px"
           label=""
           value={this.props.model.score}
           type="number"
           onEdit={this.onScore}
         />
-      </form>);
+      </form>
+    );
 
-    return <RemovableContent editMode={this.props.editMode} 
-      onRemove={() => this.props.onRemove(this.props.model.guid)} associatedClasses="content">
-        
+    return (
+      <RemovableContent
+        editMode={this.props.editMode}
+        onRemove={() => this.props.onRemove(this.props.model.guid)}
+        associatedClasses="content">
+
         {controls}
-        
-        <HtmlContentEditor 
+
+        <HtmlContentEditor
           editorStyles={bodyStyle}
           inlineToolbar={inlineToolbar}
           inlineInsertionToolbar={insertionToolbar}
@@ -111,9 +110,8 @@ export class CriteriaEditor
           model={this.props.model.body}
           onEdit={this.onBodyEdit}/>
 
-      </RemovableContent>;
-  
+      </RemovableContent>
+    );
   }
-
 }
 

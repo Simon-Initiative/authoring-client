@@ -13,13 +13,6 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
-
-import '../common/editor.scss';
-
-export interface RichTextEditor {
-
-}
-
 export interface RichTextEditorProps extends AbstractContentEditorProps<ContentState> {
   label: string;
   showLabel?: boolean;
@@ -33,9 +26,9 @@ export interface RichTextEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class RichTextEditor 
+export class RichTextEditor
   extends AbstractContentEditor<ContentState, RichTextEditorProps, RichTextEditorState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -54,7 +47,7 @@ export class RichTextEditor
   }
 
   render() : JSX.Element {
-    
+
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;
     const insertionToolbar = <InlineInsertionToolbar/>;
@@ -70,7 +63,7 @@ export class RichTextEditor
       width: '80px',
     };
 
-    const editor = <HtmlContentEditor 
+    const editor = <HtmlContentEditor
             inline={this.props.inline}
             context={this.props.context}
             services={this.props.services}
@@ -80,7 +73,7 @@ export class RichTextEditor
             inlineInsertionToolbar={insertionToolbar}
             blockToolbar={blockToolbar}
             model={new contentTypes.Html({ contentState: this.props.model })}
-            onEdit={this.onEdit} 
+            onEdit={this.onEdit}
             />;
 
     const display = this.props.showLabel === undefined || this.props.showLabel

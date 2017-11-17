@@ -1,22 +1,40 @@
-.chip {
-    display: inline-block;
-    padding: 0 5px;
-    height: 25px;
-    font-size: 14px;
-    line-height: 25px;
-    border-radius: 9px;
-    background-color: #d0d0d0;
-}
+@import 'oli/colors';
 
-.closebtn {
+.concept {
+  display: inline-block;
+  padding: 0 5px;
+  height: 25px;
+  font-size: 14px;
+  line-height: 25px;
+  border-radius: 9px;
+  background-color: $blue;
+  color: $white;
+
+  .closebtn {
     padding-left: 10px;
-    color: #888;
+    color: $white;
     font-weight: bold;
     float: right;
     font-size: 20px;
     cursor: pointer;
+  }
+
+  .closebtn:hover {
+    color: darken($white, 10%);
+  }
 }
 
-.closebtn:hover {
-    color: #000;
-}
+
+// .chip {
+// 	background-color: $blue;
+// 	text-transform: uppercase;
+// 	margin-bottom: 15px;
+// 	color: $white;
+// 	padding: 10px;
+// 	height: 45px;
+// 	font-weight: 600;
+
+// 	.closebtn {
+// 		color: $white;
+// 	}
+// }

@@ -1,26 +1,21 @@
 import * as React from 'react';
 
 import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { removeHTML, getCaretPosition, 
+import { removeHTML, getCaretPosition,
   setCaretPosition, getSelectionRange } from '../../content/common/draft/utils';
 
-import '../common/editor.scss';
-
 const BACKSPACE = 8;
-
-export interface TitleContentEditor {
-  caretPosition: any;
-  direction: number;
-}
 
 export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
   styles?: Object;
 }
 
-export class TitleContentEditor 
+export class TitleContentEditor
   extends AbstractContentEditor<contentTypes.Title, TitleContentEditorProps, { text }> {
+  caretPosition: any;
+  direction: number;
 
   constructor(props) {
     super(props);
@@ -38,7 +33,7 @@ export class TitleContentEditor
     if (this.state.text !== nextState.text) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -48,13 +43,13 @@ export class TitleContentEditor
     const currentText = target.innerText;
 
     this.setState(
-      { text: currentText }, 
+      { text: currentText },
       () => setCaretPosition(target, this.caretPosition + this.direction));
-    
+
     // Persist this change
     const updatedContent = this.props.model.with({ text: currentText });
     this.props.onEdit(updatedContent);
-  
+
   }
 
   componentWillReceiveProps(nextProps: TitleContentEditorProps) {
@@ -68,18 +63,18 @@ export class TitleContentEditor
   renderView(): JSX.Element {
     if (this.props.styles) {
       return <div style={this.props.styles}>{this.props.model.text}</div>;
-    }    
-      
+    }
+
     return <div>{this.props.model.text}</div>;
   }
 
   onKeyPress(e) {
-    // Keep track of the position of caret 
+    // Keep track of the position of caret
 
     const range : any = getSelectionRange(e.target);
     if (range.endOffset - range.startOffset > 0) {
       this.caretPosition = range.startOffset;
-      
+
       if (e.keyCode === BACKSPACE) {
         this.direction = 0;
       } else {
@@ -93,7 +88,7 @@ export class TitleContentEditor
         this.direction = 1;
       }
     }
-    
+
   }
 
   onKeyUp(e) {
@@ -103,19 +98,19 @@ export class TitleContentEditor
   renderEdit(): JSX.Element {
 
     const html = { __html: this.state.text };
-    const style = this.props.styles ? this.props.styles : {};  
-    
+    const style = this.props.styles ? this.props.styles : {};
+
     return (
-      <h2 
-        style={this.props.styles} 
-        ref="text" 
-        onInput={this.onChange} 
+      <h2
+        style={this.props.styles}
+        ref="text"
+        onInput={this.onChange}
         onKeyDown={this.onKeyPress}
         onKeyUp={this.onKeyUp}
-        contentEditable 
+        contentEditable
         dangerouslySetInnerHTML={html}/>
     );
-    
+
   }
 
   render() : JSX.Element {

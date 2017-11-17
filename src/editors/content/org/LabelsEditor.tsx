@@ -7,20 +7,20 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 export interface LabelsEditor {
-  
+
 }
 
 export interface LabelsEditorProps extends AbstractContentEditorProps<contentTypes.Labels> {
-  
+
 }
 
 export interface LabelsEditorState {
 
 }
 
-export class LabelsEditor 
+export class LabelsEditor
   extends React.PureComponent<LabelsEditorProps, LabelsEditorState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -49,14 +49,14 @@ export class LabelsEditor
   render() {
 
     return (
-      <div>
+      <div className="labels-editor">
 
         <p>Enter custom labels to use in place of the following organization components:</p>
 
         <div className="form-group row">
           <label className="col-1 col-form-label">Sequence</label>
           <div className="col-2">
-            <TextInput editMode={this.props.editMode} 
+            <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.sequence}
               onEdit={this.onSequenceEdit} type="text"/>
           </div>
@@ -64,7 +64,7 @@ export class LabelsEditor
         <div className="form-group row">
           <label className="col-1 col-form-label">Unit</label>
           <div className="col-2">
-            <TextInput editMode={this.props.editMode} 
+            <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.unit}
               onEdit={this.onUnitEdit} type="text"/>
           </div>
@@ -72,7 +72,7 @@ export class LabelsEditor
         <div className="form-group row">
           <label className="col-1 col-form-label">Module</label>
           <div className="col-2">
-            <TextInput editMode={this.props.editMode} 
+            <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.module}
               onEdit={this.onModuleEdit} type="text"/>
           </div>
@@ -80,13 +80,13 @@ export class LabelsEditor
         <div className="form-group row">
           <label className="col-1 col-form-label">Section</label>
           <div className="col-2">
-            <TextInput editMode={this.props.editMode} 
+            <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.section}
               onEdit={this.onSectionEdit} type="text"/>
           </div>
         </div>
       </div>
-    ); 
+    );
   }
 
 }

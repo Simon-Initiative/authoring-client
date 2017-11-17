@@ -7,10 +7,10 @@ export type Position = Left | Right;
 
 export type InlineFormProps = {
   children?: any,
-  position: Position
-}
+  position: Position,
+};
 
-const Spacer = (props) => <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>; // There is probably a better way...
+const Spacer = props => <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 
 export const InlineForm = (props: InlineFormProps) => {
   const classes = 'form-inline InputForm-' + props.position;
@@ -24,5 +24,5 @@ export const InlineForm = (props: InlineFormProps) => {
     <form className={classes}>
       {interleaved}
     </form>
-  )
-}; 
+  );
+};

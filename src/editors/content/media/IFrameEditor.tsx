@@ -15,30 +15,23 @@ import { InputLabel } from '../common/InputLabel';
 
 import { TabContainer } from '../common/TabContainer';
 
-import '../common/editor.scss';
-
-
-export interface IFrameEditor {
-  
-}
-
 export interface IFrameEditorProps extends AbstractContentEditorProps<IFrame> {
-  
+
 }
 
 export interface IFrameEditorState {
-  
+
 }
 
 /**
  * The content editor for Table.
  */
-export class IFrameEditor 
+export class IFrameEditor
   extends AbstractContentEditor<IFrame, IFrameEditorProps, IFrameEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onWidthEdit = this.onWidthEdit.bind(this);
@@ -97,21 +90,21 @@ export class IFrameEditor
   }
 
   renderSource() {
-    
+
     const { titleContent, caption, cite, popout, alternate,
       width, height } = this.props.model;
-    
+
     const { src } = this.props.model;
-    
+
     const id : string = guid();
 
     return (
       <div style={ { marginTop: '70px' } }>
-        
+
         {this.row('URL', '6', <div className="input-group">
-          <TextInput width="100%" label="" 
+          <TextInput width="100%" label=""
             editMode={this.props.editMode}
-            value={src} 
+            value={src}
             type="text"
             onEdit={this.onSrcEdit}
           />
@@ -120,7 +113,7 @@ export class IFrameEditor
         {this.row('', '6', <span className="form-text text-muted">
           Enter a publicly resolvable URL (e.g. "https://www.google.com")
         </span>)}
-        
+
       </div>
     );
   }
@@ -136,25 +129,25 @@ export class IFrameEditor
   renderSizing() {
     const { titleContent, caption, cite, popout, alternate,
       width, height } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '70px', marginLeft: '75px' } }>
 
         {this.row('Height', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label="" 
+            <TextInput width="100px" label=""
             editMode={this.props.editMode}
-            value={height} 
+            value={height}
             type="number"
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
         {this.row('Width', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label="" 
+            <TextInput width="100px" label=""
             editMode={this.props.editMode}
-            value={width} 
+            value={width}
             type="number"
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
-        
+
       </div>
     );
   }
@@ -162,10 +155,10 @@ export class IFrameEditor
   renderOther() {
     const { titleContent, caption, cite, popout, alternate,
       width, height } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '30px' } }>
-        
+
           {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
           model={titleContent.content}
@@ -184,13 +177,13 @@ export class IFrameEditor
 
           <br/>
 
-          {this.row('Popout', '8', <TextInput width="100%" label="" 
+          {this.row('Popout', '8', <TextInput width="100%" label=""
               editMode={this.props.editMode}
-              value={popout.content} 
+              value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}
-        
+
       </div>
     );
   }
@@ -199,15 +192,15 @@ export class IFrameEditor
 
     return (
       <div className="itemWrapper">
-    
+
         <br/>
-    
+
         <TabContainer labels={['Source', 'Sizing', 'Other']}>
           {this.renderSource()}
           {this.renderSizing()}
-          {this.renderOther()}          
+          {this.renderOther()}
         </TabContainer>
-    
+
       </div>
     );
 

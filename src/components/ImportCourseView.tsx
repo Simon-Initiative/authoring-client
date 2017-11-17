@@ -5,6 +5,8 @@ import * as models from 'data/models';
 import * as courseActions from 'actions/course';
 import * as viewActions from 'actions/view';
 
+import './ImportCourseView.scss';
+
 export interface ImportCourseViewProps {
   dispatch: any;
 }
@@ -43,20 +45,19 @@ export class ImportCourseView
     const inputs = (
       <div className="col-md-4 offset-sm-4">
         <button onClick={this.onImport.bind(this)}
-                style={{ color: 'white ' }}
                 className="btn btn-secondary btn-lg btn-block outline serif">
           Import Course
         </button>
         <button onClick={this.onCancel}
                 style={{ color: 'white ' }}
-                className="btn btn-secondary btn-lg btn-block serif">
+                className="btn btn-cancel btn-lg btn-block serif">
           Cancel
         </button>
       </div>
     );
 
     return (
-      <div className="createCourse full container-fluid">
+      <div className="import-course-view full container-fluid">
         <div className="row">
           <div className="col-md-12">
             <h1>Import an existing course content package</h1>

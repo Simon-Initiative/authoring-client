@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import './ItemLabel.scss';
+
 export type ItemLabelProps = {
   editMode: boolean;
   label: string;
@@ -8,7 +10,7 @@ export type ItemLabelProps = {
 
 export const ItemLabel = (props: ItemLabelProps) => {
   return (
-    <div className="itemType">
+    <div className="item-label">
       <span>
         {props.label}
       </span>

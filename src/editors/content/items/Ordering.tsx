@@ -14,16 +14,9 @@ import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '.
 import { ItemLabel } from './ItemLabel';
 import guid from '../../../utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
 type IdTypes = {
   shuffle: string,
 };
-
-export interface Ordering {
-  ids: IdTypes;
-}
 
 export interface OrderingProps extends AbstractItemPartEditorProps<contentTypes.Ordering> {
 
@@ -38,6 +31,7 @@ export interface OrderingState {
  */
 export class Ordering
   extends AbstractItemPartEditor<contentTypes.Ordering, OrderingProps, OrderingState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);
