@@ -5,6 +5,17 @@
     color: #606060;
   }
 
+  .nodeContainer {
+    border-style: solid solid solid none;
+    border-radius: 3px;
+    border-width: 1;
+    border-color: #CCCCCC;
+
+  }
+
+  .outlineContainer {
+  }
+
   .label {
     font-family: $sans-font;
     // lineHeight: 1.25;

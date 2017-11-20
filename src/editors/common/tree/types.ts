@@ -1,9 +1,15 @@
 import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 
+export enum TreeType {
+  DIV,
+  TABLE,
+}
 
-export type RenderedNode = {
+export type RenderedNode<NodeType> = {
   nodeId: NodeId,
+  node: NodeType,
+  parent: Maybe<NodeType>,
   depth: number,
   indexWithinParent: number;
   component: JSX.Element,
@@ -15,11 +21,17 @@ export type Handlers = {
   onCollapse: (nodeId: NodeId) => void,
 };
 
+export type OnDropHandler =
+  (sourceModel: any, sourceParentGuid: string, targetGuid: string, index: number) => void;
+
+export type CanDropHandler = (
+  id: string, nodeBeingDropped, originalParent,
+  originalIndex: number, newParent, newIndex: number) => boolean;
+
 export type NodeRenderer<NodeType>
   = (node: NodeType,
      nodeState: NodeState<NodeType>,
-     handlers: Handlers,
-     connectDragSource: any) => JSX.Element;
+     handlers: Handlers) => JSX.Element;
 
 // What we use to uniquely identify a tree node.
 export type NodeId = string;
@@ -40,10 +52,20 @@ export type NodeState<NodeType> = {
   parentNode: Maybe<NodeType>,
 };
 
-// Renders the base components of the tree.  In a table-based
-// renderer, for instance, this would be something like:
-//
-// <table><tbody>{children}</tbody></table>
-//
-export type TreeRenderer = (children) => JSX.Element;
 
+
+export type TreeRenderer<NodeType> = {
+
+  renderTree: (children) => JSX.Element,
+
+  renderNode: (
+    nodeId: NodeId, node: NodeType, nodeState: NodeState<NodeType>,
+    renderedNode: any, indexWithinParent: number, editMode: boolean) => JSX.Element,
+
+  renderDropTarget: (
+    index: number,
+    onDrop: OnDropHandler,
+    canAcceptId: CanDropHandler,
+    parentModel: string,
+    ) => JSX.Element,
+};

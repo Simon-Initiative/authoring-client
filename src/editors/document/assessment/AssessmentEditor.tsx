@@ -473,18 +473,23 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           <div className="container-fluid">
             <div className="row no-gutters">
               <div className="col-3">
-                <Outline
-                  nodes={page.nodes}
-                  expandedNodes={expanded}
-                  selected={this.state.currentNode}
-                  onEdit={this.onEditNodes.bind(this)}
-                  onChangeExpansion={this.onChangeExpansion.bind(this)}
-                  onSelect={this.onSelect.bind(this)}
-                  />
+                <div className="outlineContainer">
+                  <Outline
+                    editMode={this.props.editMode}
+                    nodes={page.nodes}
+                    expandedNodes={expanded}
+                    selected={this.state.currentNode}
+                    onEdit={this.onEditNodes.bind(this)}
+                    onChangeExpansion={this.onChangeExpansion.bind(this)}
+                    onSelect={this.onSelect.bind(this)}
+                    />
+                </div>
               </div>
               <div className="col-9">
-                {this.renderNode(this.props.model.pages
-                  .get(this.state.currentPage).nodes.get(this.state.currentNode))}
+                <div className="nodeContainer">
+                  {this.renderNode(this.props.model.pages
+                    .get(this.state.currentPage).nodes.get(this.state.currentNode))}
+                </div>
               </div>
             </div>
           </div>

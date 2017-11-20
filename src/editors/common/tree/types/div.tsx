@@ -1,23 +1,17 @@
 import * as React from 'react';
-import guid from '../../../utils/guid';
+import { Maybe } from 'tsmonad';
+
+import * as Types from '../types';
+
 import { DragSource } from 'react-dnd';
-import { DragTypes } from '../../../utils/drag';
-import { SourceNodeType } from '../../content/org/drag/utils';
+import { DragTypes } from 'utils/drag';
 
-export interface DraggableNode {
-
-}
-
-export interface DraggableNodeProps {
+interface DraggableNodeProps {
   id: string;
   editMode: boolean;
   index: number;
-  source: SourceNodeType;
-  parentModel: any;
-}
-
-export interface DraggableNodeState {
-
+  sourceModel: any;
+  parentModel: Maybe<any>;
 }
 
 // tslint:disable-next-line
@@ -30,7 +24,7 @@ const NodeSource = {
     return {
       id: props.id,
       originalIndex: props.index,
-      sourceModel: props.source,
+      sourceModel: props.sourceModel,
       parentModel: props.parentModel,
     };
   },
@@ -44,8 +38,8 @@ const NodeSource = {
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging(),
 }))
-export class DraggableNode
-  extends React.PureComponent<DraggableNodeProps, DraggableNodeState> {
+export class DraggableNode<NodeType>
+  extends React.PureComponent<DraggableNodeProps, {}> {
 
   constructor(props) {
     super(props);
@@ -73,3 +67,27 @@ export class DraggableNode
 
 }
 
+export function buildRenderer<NodeType>() : TreeRenderer<NodeType> {
+
+  return {
+    renderTree: children => <div>{children}</div>,
+
+    renderNode: (nodeId, node, nodeState, renderedNode, indexWithinParent, editMode) => {
+      return (
+        <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
+          index={indexWithinParent} parentModel={nodeState.parentNode} >
+          {renderedNode}
+        </DraggableNode>
+      );
+    },
+
+    renderDropTarget: (
+      id: string, nodeBeingDropped, originalParent,
+      originalIndex: number, newParent, newIndex: number,
+      parentModel: string) => {
+
+
+
+    }
+  };
+}

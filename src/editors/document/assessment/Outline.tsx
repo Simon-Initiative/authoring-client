@@ -7,6 +7,7 @@ import { Node as AssessmentNode } from 'data/contentTypes';
 import { renderTab } from './tabs';
 
 export interface OutlineProps {
+  editMode: boolean;
   nodes: Immutable.OrderedMap<string, AssessmentNode>;
   expandedNodes: Immutable.Set<string>;
   selected: string;
@@ -71,11 +72,13 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
 
   render() {
 
-    const { nodes, expandedNodes, selected,
+    const { nodes, expandedNodes, selected, editMode,
       onEdit, onChangeExpansion, onSelect } = this.props;
 
     return (
       <Tree.Component
+        editMode={editMode}
+        treeType={Tree.TreeType.DIV}
         nodes={nodes}
         getChildren={getChildren}
         setChildren={setChildren}
@@ -86,7 +89,6 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
         onSelect={onSelect}
         renderNodeComponent={renderTab}
         canHandleDrop={canHandleDrop}
-        treeRenderer={treeRenderer}
         />
     );
   }

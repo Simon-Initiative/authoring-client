@@ -6,38 +6,39 @@ import { Node as AssessmentNode, Question, Content,
 import { getHtmlDetails } from '../../content/common/details';
 import { DragHandle } from './DragHandle';
 
+import './tabs.scss';
+
 export interface TabProps {
   node: AssessmentNode;
   nodeState: Tree.NodeState<AssessmentNode>;
   handlers: Tree.Handlers;
-  connectDragSoure: any;
+  connectDragSource?: any;
 }
 
 export function renderTab(
   node: AssessmentNode, nodeState: Tree.NodeState<AssessmentNode>,
-  handlers: Tree.Handlers,
-  connectDragSource: any) : JSX.Element {
+  handlers: Tree.Handlers) : JSX.Element {
 
   switch (node.contentType) {
     case 'Question':
-      return <QuestionTab connectDragSoure={connectDragSource}
+      return <QuestionTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Content':
-      return <ContentTab connectDragSoure={connectDragSource}
+      return <ContentTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Unsupported':
-      return <UnsupportedTab connectDragSoure={connectDragSource}
+      return <UnsupportedTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Selection':
       if (node.source.contentType === 'PoolRef') {
-        return <PoolRefTab connectDragSoure={connectDragSource}
+        return <PoolRefTab
           node={node} nodeState={nodeState} handlers={handlers}/>;
       } else {
-        return <PoolTab connectDragSoure={connectDragSource}
+        return <PoolTab
           node={node} nodeState={nodeState} handlers={handlers}/>;
       }
     default:
-      return <UnsupportedTab connectDragSoure={connectDragSource}
+      return <UnsupportedTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
   }
 }
@@ -109,17 +110,15 @@ const label = (question: Question) : string => {
 
 const Skills = (props) => {
   const skills = countSkills(props.question);
-  const style = { color: (props.nodeState.isSelected ? 'white' : 'black') };
   return (
-    <small style={style}>
+    <small>
       {skills + ' skill' + (skills === 1 ? '' : 's')}
     </small>
   );
 };
 
 const Label = (props) => {
-  const style = { color: (props.nodeState.isSelected ? 'white' : 'black') };
-  return <small className="mb-1" style={style}>{props.children}</small>;
+  return <small className="mb-1">{props.children}</small>;
 };
 
 const Pill = props => <span className="badge badge-default badge-pill">{props.children}</span>;
@@ -130,7 +129,8 @@ const QuestionTab = (props: TabProps) => {
     <Tab {...props} tooltip={preview(q.body)}>
       <div className="d-flex w-100 justify-content-between">
         <div>
-          <DragHandle connectDragSource={props.connectDragSoure}/>
+          <DragHandle connectDragSource={props.connectDragSource}/>
+          &nbsp;
           <Label {...props}>{label(q)}</Label>
         </div>
         <Skills {...props} question={props.node}/>
@@ -144,7 +144,11 @@ const ContentTab = (props: TabProps) => {
   return (
     <Tab {...props} tooltip={preview(c.body)}>
       <div className="d-flex w-100 justify-content-between">
-        <Label {...props}>Content</Label>
+        <div>
+          <DragHandle connectDragSource={props.connectDragSource}/>
+          &nbsp;
+          <Label {...props}>Content</Label>
+        </div>
       </div>
     </Tab>
   );
@@ -155,7 +159,11 @@ const UnsupportedTab = (props: TabProps) => {
   return (
     <Tab {...props} tooltip="This element is not yet supported">
       <div className="d-flex w-100 justify-content-between">
+        <div>
+        <DragHandle connectDragSource={props.connectDragSource}/>
+        &nbsp;
         <Label {...props}>Unsupported</Label>
+        </div>
       </div>
     </Tab>
   );
@@ -166,7 +174,11 @@ const PoolTab = (props: TabProps) => {
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">
+        <div>
+        <DragHandle connectDragSource={props.connectDragSource}/>
+        &nbsp;
         <Label {...props}>Embedded Pool</Label>
+        </div>
       </div>
     </Tab>
   );
@@ -177,7 +189,11 @@ const PoolRefTab = (props: TabProps) => {
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">
-        <Label {...props}>External Pool</Label>
+      <div>
+        <DragHandle connectDragSource={props.connectDragSource}/>
+        &nbsp;
+        <Label {...props}>Embedded Pool</Label>
+        </div>
       </div>
     </Tab>
   );
@@ -209,18 +225,15 @@ class Tab extends React.PureComponent<TabProperties, {}> {
   }
 
   render() : JSX.Element {
-    const style = { paddingLeft: '5px', paddingTop: '3px',
-      paddingBottom: '1px', paddingRight: '5px' };
-    const classes = 'list-group-item list-group-item-action flex-column align-items-start '
-      + (this.props.nodeState.isSelected ? 'active' : '');
+
+    const classes = 'tabItem '
+      + (this.props.nodeState.isSelected ? 'tabItemActive' : '');
 
     return (
-      <a onClick={() => this.props.handlers.onSelect(this.props.node.guid)} style={style}
-        ref={a => this.ref = a}
-        data-toggle="tooltip"
+      <div onClick={() => this.props.handlers.onSelect(this.props.node.guid)}
         className={classes}>
           {this.props.children}
-      </a>
+      </div>
     );
   }
 

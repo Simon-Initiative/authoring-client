@@ -12,9 +12,9 @@ export function renderVisibleNodes<NodeType>(
   renderer: NodeRenderer<NodeType>,
   expandedNodes: Immutable.Set<NodeId>,
   selectedNodes: Immutable.Set<NodeId>,
-  handlers: Handlers) : RenderedNode[] {
+  handlers: Handlers) : RenderedNode<NodeType>[] {
 
-  const rendered : RenderedNode[] = [];
+  const rendered : RenderedNode<NodeType>[] = [];
 
   renderVisibleNodesHelper(
     nodes, getChildren, renderer, expandedNodes,
@@ -33,7 +33,7 @@ export function renderVisibleNodesHelper<NodeType>(
   parentNode: Maybe<NodeType>,
   depth: number,
   handlers: Handlers,
-  rendered: RenderedNode[]) : void {
+  rendered: RenderedNode<NodeType>[]) : void {
 
   nodes
     .map((n, nodeId) => [nodeId, n])
@@ -49,7 +49,7 @@ export function renderVisibleNodesHelper<NodeType>(
         depth,
       };
       const component = renderer(n, nodeState, handlers);
-      rendered.push({ nodeId, depth, indexWithinParent, component });
+      rendered.push({ nodeId, node: n, parent: parentNode, depth, indexWithinParent, component });
 
       if (expandedNodes.has(nodeId)) {
         getChildren(n).lift(children =>

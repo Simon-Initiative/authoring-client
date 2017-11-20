@@ -4,13 +4,16 @@ import { DropTarget } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 
 export interface RepositionTarget {
-  
+
 }
 
 export interface RepositionTargetProps {
   index: number;
-  onDrop: (id: string, index: number) => void;
-  canAcceptId: (id: string) => boolean;
+  onDrop: (sourceModel: any, sourceParentGuid: string, targetGuid: string, index: number) => void;
+  canAcceptId: (
+    id: string, nodeBeingDropped, originalParent,
+    originalIndex: number, newParent, newIndex: number) => boolean;
+  parentModel: string;
 }
 
 export interface RepositionTargetState {
@@ -25,28 +28,35 @@ const boxTarget = {
       return;
     }
 
-    props.onDrop(component.props.draggedItem.id, props.index);
+    props.onDrop(
+      component.props.draggedItem.sourceModel, component.props.draggedItem.parentModel.guid,
+      props.parentModel, props.index);
   },
   canDrop(props, monitor) {
-    return props.canAcceptId(monitor.getItem().id);
+    return props.canAcceptId(
+      monitor.getItem().id,
+      monitor.getItem().sourceModel,
+      monitor.getItem().parentModel,
+      monitor.getItem().originalIndex,
+      props.index,
+      props.parentModel);
   },
 };
 
-
 /**
- * Isolate the drag and drop assessment node reordering. 
+ * Isolate the drag and drop assessment node reordering.
  */
 @DropTarget(DragTypes.AssessmentNode, boxTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop(),
   draggedItem: monitor.getItem(),
-}))export class RepositionTarget 
+}))export class RepositionTarget
   extends React.Component<RepositionTargetProps, RepositionTargetState> {
-    
+
   constructor(props) {
     super(props);
-    
+
 
   }
 
@@ -72,7 +82,7 @@ const boxTarget = {
 
     return (this.props as any).connectDropTarget(
       <div style={style}/>,
-    ); 
+    );
   }
 
 }

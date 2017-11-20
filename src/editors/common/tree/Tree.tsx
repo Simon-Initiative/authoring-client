@@ -5,7 +5,9 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { DraggableNode } from './DraggableNode';
 import { Maybe } from 'tsmonad';
 
-import { NodeId, Nodes, NodeState,
+import { buildRenderer as buildDivRenderer } from './types/div';
+
+import { NodeId, Nodes, NodeState, TreeType,
   RenderedNode, NodeRenderer, Handlers,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from './types';
@@ -14,6 +16,8 @@ import { renderVisibleNodes } from './render';
 
 
 export interface TreeProps<NodeType> {
+
+  editMode: boolean;
 
   // The current root nodes of the tree
   nodes: Nodes<NodeType>;
@@ -35,8 +39,8 @@ export interface TreeProps<NodeType> {
   // The identifier of the currently active, or selected node
   selected: NodeId;
 
-  // How the tree should render itself.
-  treeRenderer: TreeRenderer;
+  // The type of tree UI to render
+  treeType: TreeType;
 
   // Function to execute to report that the tree data has been edited.
   // This likely includes removals and reorders.
@@ -76,7 +80,7 @@ export class Tree<NodeType>
 
   render() {
 
-    const { selected, treeRenderer, nodes,
+    const { selected, treeType, nodes, editMode,
       expandedNodes, getChildren, renderNodeComponent } = this.props;
 
     const handlers : Handlers = {
@@ -90,17 +94,18 @@ export class Tree<NodeType>
     // Walk the nodes of the tree in-order, rendering each node, but being
     // careful to only render nodes that are visible (i.e. their parent is
     // is in an expanded state)
-    const renderedNodes : RenderedNode[] = renderVisibleNodes(
+    const renderedNodes : RenderedNode<NodeType>[] = renderVisibleNodes(
       nodes, getChildren, renderNodeComponent, expandedNodes, Immutable.Set([selected]), handlers);
+
+    const treeRenderer = buildDivRenderer();
 
     // Now simply render the tree structure, wrapping the tree and each rendered
     // node using the tree renderer
-    return treeRenderer(renderedNodes.map((r, i) =>
-      <DraggableNode
-        source={null}
-        parentModel={null}
-        index={r.indexWithinParent}
-        editMode={true} id={r.nodeId}>{r.component}</DraggableNode>));
+    return treeRenderer.renderTree(renderedNodes.map((r, i) =>
+      treeRenderer.renderNode(
+        r.nodeId, r.node,
+        { depth: r.depth, parentNode: r.parent, isSelected: selected === r.nodeId },
+        r.component, r.indexWithinParent, editMode)));
   }
 
 }
