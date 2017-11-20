@@ -18,7 +18,7 @@ import { Cite } from './cite';
 import guid from '../../../utils/guid';
 
 
-// Translation routines to convert from persistence model to draft model 
+// Translation routines to convert from persistence model to draft model
 
 const inlineTerminalTags = {};
 inlineTerminalTags['m:math'] = true;
@@ -31,7 +31,7 @@ inlineTagsDefaultContent['cite'] = ' ';
 
 
 type ParsingContext = {
-  draft : common.RawDraft, 
+  draft : common.RawDraft,
   depth: number,
 };
 
@@ -43,8 +43,8 @@ type WorkingBlock = {
 
 type BlockHandler = (item: Object, context: ParsingContext) => void;
 type InlineHandler = (
-  offset: number, length: number, item: Object, 
-  context: ParsingContext, 
+  offset: number, length: number, item: Object,
+  context: ParsingContext,
   workingBlock: WorkingBlock,
   blockBeforeChildren: WorkingBlock) => void;
 
@@ -88,16 +88,16 @@ const blockHandlers = {
 const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
   activity_link: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE', 
+    undefined, 'MUTABLE',
     common.EntityTypes.activity_link, 'activity_link', ActivityLink.fromPersistence),
   xref: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE', 
+    undefined, 'MUTABLE',
     common.EntityTypes.xref, 'xref', Xref.fromPersistence),
   link: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE', 
+    undefined, 'MUTABLE',
     common.EntityTypes.link, 'link', HyperLink.fromPersistence),
   cite: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE', 
+    undefined, 'MUTABLE',
     common.EntityTypes.cite, 'cite', Cite.fromPersistence),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -116,7 +116,7 @@ const inlineHandlers = {
 
 function activityLinkBlock(item: Object, context: ParsingContext) {
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: '',
     markups : [],
@@ -125,7 +125,7 @@ function activityLinkBlock(item: Object, context: ParsingContext) {
 
   processInline(item, context, blockContext);
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
@@ -134,13 +134,13 @@ function activityLinkBlock(item: Object, context: ParsingContext) {
 }
 
 function applyStyle(
-  style: string, offset: number, length: number, item: Object, 
+  style: string, offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
   workingBlock.markups.push({ offset, length, style });
 }
 
 function em(
-  offset: number, length: number, item: Object, 
+  offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   // Handle the case of no @style tag - treat it as italic
@@ -156,7 +156,7 @@ function em(
 }
 
 function image(
-  offset: number, length: number, item: Object, 
+  offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const style = common.styleMap[item[common.getKey(item)][common.STYLE]];
@@ -173,19 +173,19 @@ function extractAttrs(item: Object) : Object {
       (o, k) => {
         o[k] = item[key][k];
         return o;
-      }, 
+      },
       {});
 }
 
 function insertDataDrivenEntity(
-  mutability: string, type: string, label, 
-  fromPersistence, offset: number, length: number, item: Object, 
+  mutability: string, type: string, label,
+  fromPersistence, offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
 
   workingBlock.entities.push({ offset, length, key });
-  
+
   const data = {};
   data[label] = fromPersistence(item, '', toDraft);
 
@@ -198,17 +198,17 @@ function insertDataDrivenEntity(
 
 
 function insertEntity(
-  mutability: string, type: string, offset: number, length: number, item: Object, 
+  mutability: string, type: string, offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
 
   workingBlock.entities.push({ offset, length, key });
-  
+
   const data = extractAttrs(item);
   data[common.CDATA] = item[common.getKey(item)][common.CDATA];
   data[common.TEXT] = item[common.getKey(item)][common.TEXT];
-  
+
   context.draft.entityMap[key] = {
     type,
     mutability,
@@ -217,16 +217,16 @@ function insertEntity(
 }
 
 function hashMath(
-  offset: number, length: number, item: Object, 
+  offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
 
   workingBlock.entities.push({ offset, length, key });
-  
+
   const data = {};
   data['#math'] = item['#math'];
-  
+
   context.draft.entityMap[key] = {
     type: common.EntityTypes.math,
     mutability: 'IMMUTABLE',
@@ -235,7 +235,7 @@ function hashMath(
 }
 
 function imageInline(
-  offset: number, length: number, item: Object, 
+  offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {
 
   const key = common.generateRandomKey();
@@ -243,7 +243,7 @@ function imageInline(
   workingBlock.entities.push({ offset, length, key });
 
   const image = Image.fromPersistence(item, '', toDraft);
-  
+
   context.draft.entityMap[key] = {
     type: common.EntityTypes.image,
     mutability: 'IMMUTABLE',
@@ -252,19 +252,19 @@ function imageInline(
 }
 
 function formulaInline(
-  offset: number, length: number, item: Object, 
-  context: ParsingContext, workingBlock: WorkingBlock, 
+  offset: number, length: number, item: Object,
+  context: ParsingContext, workingBlock: WorkingBlock,
   blockBeforeChildren: WorkingBlock) {
 
   // Adjust the full text to account for our insertion of
   // the formula sentinels
-  workingBlock.fullText = workingBlock.fullText.substr(0, offset) 
+  workingBlock.fullText = workingBlock.fullText.substr(0, offset)
     + ' ' + workingBlock.fullText.substr(offset) + ' ';
-  
+
   // Adjust markup and entities that were added by children
-  const markupsStart = workingBlock.markups.length 
+  const markupsStart = workingBlock.markups.length
     - (workingBlock.markups.length - blockBeforeChildren.markups.length);
-  const entitiesStart = workingBlock.entities.length 
+  const entitiesStart = workingBlock.entities.length
     - (workingBlock.entities.length - blockBeforeChildren.entities.length);
 
   for (let i = markupsStart; i < workingBlock.markups.length; i += 1) {
@@ -276,11 +276,11 @@ function formulaInline(
 
   // Now add the sentinels
   insertEntity(
-    'IMMUTABLE', common.EntityTypes.formula_begin, 
+    'IMMUTABLE', common.EntityTypes.formula_begin,
     offset, 1, item, context, workingBlock);
 
   insertEntity(
-    'IMMUTABLE', common.EntityTypes.formula_end, 
+    'IMMUTABLE', common.EntityTypes.formula_end,
     offset + length + 1, 1, item, context, workingBlock);
 }
 
@@ -303,7 +303,7 @@ function codeblock(item: Object, context: ParsingContext) {
 function quoteBlock(item: Object, context: ParsingContext) {
 
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: '',
     markups : [],
@@ -324,7 +324,7 @@ function quoteBlock(item: Object, context: ParsingContext) {
 function formulaBlock(item: Object, context: ParsingContext) {
 
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: '',
     markups : [],
@@ -333,7 +333,7 @@ function formulaBlock(item: Object, context: ParsingContext) {
 
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
     data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
@@ -345,7 +345,7 @@ function formulaBlock(item: Object, context: ParsingContext) {
 function inputRefBlock(item: Object, context: ParsingContext) {
 
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: ' ',
     markups : [],
@@ -353,10 +353,10 @@ function inputRefBlock(item: Object, context: ParsingContext) {
   };
 
   insertEntity(
-    'IMMUTABLE', common.EntityTypes.input_ref, 
+    'IMMUTABLE', common.EntityTypes.input_ref,
     0, 1, item, context, blockContext);
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
     entityRanges: blockContext.entities,
@@ -366,7 +366,7 @@ function inputRefBlock(item: Object, context: ParsingContext) {
 function codeBlock(item: Object, context: ParsingContext) {
 
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: '',
     markups : [],
@@ -375,7 +375,7 @@ function codeBlock(item: Object, context: ParsingContext) {
 
   children.forEach(subItem => processInline(subItem, context, blockContext));
 
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
     data: extractIdTitle(item),
     text: blockContext.fullText,
     inlineStyleRanges: blockContext.markups,
@@ -430,21 +430,21 @@ function getInlineHandler(key: string) : InlineHandler {
 }
 
 function isVirtualParagraph(persistenceFormat: Object) {
-  
+
   let children = null;
   if (persistenceFormat['#array'] !== undefined) {
     children = persistenceFormat['#array'];
   } else {
     children = getChildren(persistenceFormat);
   }
-  
+
   if (children !== null && children.length > 0) {
     const firstKey = common.getKey(children[0]);
     return firstKey === '#cdata'
       || firstKey === '#text'
       || (inlineHandlers[firstKey] !== undefined && blockHandlers[firstKey] === undefined);
   }
-  
+
   return false;
 }
 
@@ -454,19 +454,19 @@ function isEmptyContent(obj) {
   } else {
     return Object.keys(obj).length === 0;
   }
-  
+
 }
 
 export function toDraft(persistenceFormat: Object) : ContentState {
-  
+
   const draft : common.RawDraft = {
     entityMap : {},
     blocks : [],
   };
 
-  // Sometimes serialization results in a top-level object 
+  // Sometimes serialization results in a top-level object
   // that has just #text or just an array of inline styles. We
-  // handle this simply by treating it as a paragraph. 
+  // handle this simply by treating it as a paragraph.
 
   if (isEmptyContent(persistenceFormat)) {
     addNewBlock(draft, {});
@@ -475,7 +475,7 @@ export function toDraft(persistenceFormat: Object) : ContentState {
 
     if (persistenceFormat['#array'] !== undefined) {
       paragraph(
-        { p: persistenceFormat }, 
+        { p: persistenceFormat },
         { draft, depth: 0 });
     } else {
       paragraph(persistenceFormat, { draft, depth: 0 });
@@ -483,20 +483,21 @@ export function toDraft(persistenceFormat: Object) : ContentState {
 
   } else {
     if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
-      parse(persistenceFormat[0], { draft, depth: 0 });
+      persistenceFormat.forEach(entry => parse(entry, { draft, depth: 0 }));
+
     } else {
       parse(persistenceFormat, { draft, depth: 0 });
     }
-    
+
   }
-  
-  if (draft.blocks.length === 0 || 
+
+  if (draft.blocks.length === 0 ||
     draft.blocks[draft.blocks.length - 1].type === 'atomic') {
     // Add a final empty block that will ensure that we have content past
     // any last positioned atomic blocks. This allows the user to click
     // past the last atomic block and begin inserting new text
     addNewBlock(draft, {});
-  }  
+  }
 
   return convertFromRaw(draft);
 }
@@ -539,7 +540,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
   children.forEach((listItem) => {
 
     const children = getChildren(listItem);
-  
+
     const blockContext = {
       fullText: '',
       markups : [],
@@ -548,7 +549,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
 
     children.forEach(subItem => processInline(subItem, context, blockContext));
 
-    addNewBlock(context.draft, { 
+    addNewBlock(context.draft, {
       data: extractIdTitle(item),
       text: blockContext.fullText,
       inlineStyleRanges: blockContext.markups,
@@ -559,7 +560,7 @@ function listHandler(listBlockType, item: Object, context: ParsingContext) {
 }
 
 function getChildren(item: Object, ignore = null) : Object[] {
-  
+
   const key = common.getKey(item);
 
   // Handle a case where there is no key
@@ -587,9 +588,9 @@ function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {
 }
 
 function processInline(
-  item: Object, 
+  item: Object,
   context: ParsingContext, blockContext: WorkingBlock) {
-  
+
   const key = common.getKey(item);
 
   if (key === common.CDATA || key === common.TEXT) {
@@ -597,7 +598,7 @@ function processInline(
     blockContext.fullText += item[key];
 
   } else {
-    
+
     const offset = blockContext.fullText.length;
 
     const blockBeforeChildren = cloneWorkingBlock(blockContext);
@@ -631,18 +632,18 @@ function processInline(
       }
 
     }
-    
+
     const text = blockContext.fullText.substring(offset);
     const handler = getInlineHandler(key);
     handler(offset, text.length, item, context, blockContext, blockBeforeChildren);
   }
-  
+
 }
 
 function paragraph(item: Object, context: ParsingContext) {
-  
+
   const children = getChildren(item);
-  
+
   const blockContext = {
     fullText: '',
     markups : [],
@@ -669,12 +670,12 @@ function extractIdTitle(item: Object) : Object {
   }
   if (item !== undefined && item !== null && item['@title'] !== undefined) {
     data.title = item['@title'];
-  } 
+  }
   return data;
 }
 
 function pureTextBlockHandler(key: string, item: Object, context: ParsingContext) {
-  addNewBlock(context.draft, { 
+  addNewBlock(context.draft, {
     text: item[key],
     inlineStyleRanges: [],
     entityRanges: [],
@@ -688,8 +689,8 @@ function arrayHandler(item: Object, context: ParsingContext) {
 function createSimpleTitle(
   title: string, context: ParsingContext, type: string, beginBlockKey: string) {
 
-  const values = { 
-    type, 
+  const values = {
+    type,
     text: title,
     data: { type: 'title', beginBlockKey },
   };
@@ -704,19 +705,19 @@ function section(item: Object, context: ParsingContext) {
     type: 'section_begin',
     purpose: extractAttrs(item)['@purpose'],
   };
-  
+
   const beginBlock = addAtomicBlock(common.EntityTypes.section_begin, beginData, context);
   beginBlock.data = extractIdTitle(item);
 
   // Create a content block displaying the title text
   processTitle(item, context);
 
-  // parse the body 
+  // parse the body
   context.depth += 1;
   parse(item[key][common.ARRAY][1], context);
-  context.depth -= 1; 
+  context.depth -= 1;
 
-  // Create then ending block 
+  // Create then ending block
   const endData : common.SectionEnd = {
     type: 'section_end',
     purpose: extractAttrs(item)['@purpose'],
@@ -738,12 +739,12 @@ function pullout(item: Object, context: ParsingContext) {
 
   // Process the title
   processTitle(item, context);
-  
+
   // Handle the children, excluding 'title'
   const children = getChildren(item, 'title');
   children.forEach(subItem => parse(subItem, context));
 
-  // Create then ending block 
+  // Create then ending block
   const endData : common.PulloutEnd = {
     type: 'pullout_end',
     subType: item[key]['@type'],
@@ -766,12 +767,12 @@ function definition(item: Object, context: ParsingContext) {
   };
   const beginBlock = addAtomicBlock(common.EntityTypes.definition_begin, beginData, context);
   beginBlock.data = extractIdTitle(item);
-  
+
   // Handle the children, excluding 'term'
   const children = getChildren(item, 'term');
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.DefinitionEnd = {
     type: 'definition_end',
   };
@@ -799,7 +800,7 @@ function pronunciation(item: Object, context: ParsingContext) {
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.PronunciationEnd = {
     type: 'pronunciation_end',
   };
@@ -822,7 +823,7 @@ function translation(item: Object, context: ParsingContext) {
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.TranslationEnd = {
     type: 'translation_end',
   };
@@ -845,7 +846,7 @@ function meaning(item: Object, context: ParsingContext) {
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.MeaningEnd = {
     type: 'meaning_end',
   };
@@ -868,7 +869,7 @@ function material(item: Object, context: ParsingContext) {
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.MaterialEnd = {
     type: 'material_end',
   };
@@ -890,7 +891,7 @@ function title(item: Object, context: ParsingContext) {
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.TitleEnd = {
     type: 'title_end',
   };
@@ -937,7 +938,7 @@ function example(item: Object, context: ParsingContext) {
   const children = getChildren(item, 'title');
   children.forEach(subItem => parse(subItem, context));
 
-  // Create the ending block 
+  // Create the ending block
   const endData : common.ExampleEnd = {
     type: 'example_end',
   };
@@ -962,8 +963,8 @@ function objref(item: Object, context: ParsingContext) {
 function addAtomicBlock(
   type: string, item: Object, context: ParsingContext) : common.RawContentBlock {
   const entityKey = common.generateRandomKey();
-  const values = { 
-    type: 'atomic', 
+  const values = {
+    type: 'atomic',
     text: ' ',
     entityRanges: [{ offset: 0, length: 1, key: entityKey }],
   };
@@ -980,7 +981,7 @@ function addAtomicBlock(
 function parse(item: Object, context: ParsingContext) {
 
   // item is an object with one key.  That key will be either 'section' or 'title'
-  // or 'body' or 'p' or ...  
+  // or 'body' or 'p' or ...
 
   // Get the key and then get the registered key handler
   const key = common.getKey(item);
@@ -995,7 +996,7 @@ function parse(item: Object, context: ParsingContext) {
 
   if (handler === undefined) {
     handleUnsupported(item, context);
-    
+
   } else {
     handler(item, context);
   }
