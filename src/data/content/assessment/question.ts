@@ -53,7 +53,7 @@ const defaultPart = new Part().toPersistence();
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
 function tagInputRefsWithType(model: Question) {
-  
+
   const byId = model.items.toArray().reduce(
     (p, c) => {
       if ((c as any).id !== undefined) {
@@ -62,7 +62,7 @@ function tagInputRefsWithType(model: Question) {
       } else {
         return p;
       }
-    }, 
+    },
     {});
 
   const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
@@ -74,7 +74,7 @@ function tagInputRefsWithType(model: Question) {
         } else {
           return contentState;
         }
-      }, 
+      },
       model.body.contentState);
 
   const body = model.body.with({ contentState });
@@ -92,7 +92,7 @@ function ensureResponsesExist(model: Question) {
 
     if (item.contentType === 'MultipleChoice') {
       if (item.select === 'single') {
-        
+
         // Make sure that there are n responses for n choices
         const choiceCount = item.choices.size;
         const responseCount = part.responses.size;
@@ -110,7 +110,7 @@ function ensureResponsesExist(model: Question) {
         if (choiceCount - responseCount > 0) {
           updated = updated.with({ parts: updated.parts.set(part.guid, part) });
         }
-      }      
+      }
     }
   }
   return updated;
@@ -134,7 +134,53 @@ function migrateSkillsToParts(model: Question) : Question {
       parts: model.parts.map(p => p.with({ concepts })).toOrderedMap(),
     });
   }
-  
+
+  return updated;
+
+}
+
+
+// If an explanation is found for a question that has just a short answer,
+// migrate that explanation content into a feedback
+function migrateExplanationToFeedback(model: Question) : Question {
+
+  const itemsArray = model.items.toArray();
+  const partsArray = model.parts.toArray();
+
+
+  let updated = model;
+
+  const justShortAnswer = itemsArray.length === 1 && itemsArray[0].contentType === 'ShortAnswer';
+  const hasPart = partsArray.length === 1;
+
+  if (justShortAnswer && hasPart) {
+    const so = itemsArray[0] as ShortAnswer;
+    const originalExplanation = partsArray[0].explanation;
+    const originalReponses = partsArray[0].responses;
+
+    const migratedAlready = originalExplanation.contentState.getBlocksAsArray().length === 1
+      && originalExplanation.contentState.getBlocksAsArray()[0].text === 'migrated';
+
+    if (!migratedAlready) {
+      const explanation
+        = new Html().with({ contentState: ContentState.createFromText('migrated') });
+
+      const f = new Feedback().with({ body: originalExplanation });
+      const feedback = Immutable.OrderedMap<string, Feedback>()
+        .set(f.guid, f);
+
+      const res = originalReponses.size === 0
+        ? new Response().with({ match: '*', feedback })
+        : originalReponses.first().with({ match: '*', feedback });
+
+      const responses = originalReponses.set(res.guid, res);
+
+      const part = partsArray[0].with({ responses, explanation });
+      const parts = updated.parts.set(part.guid, part);
+      updated = updated.with({ parts });
+    }
+  }
+
   return updated;
 
 }
@@ -150,7 +196,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   parts: Immutable.OrderedMap<string, Part>;
   explanation: Html;
   guid: string;
-  
+
   constructor(params?: QuestionParams) {
     super(augment(params));
   }
@@ -173,13 +219,13 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     }
 
     getChildren(question).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'responses':
-          // read weird legacy format where individual response elements are under a 
+          // read weird legacy format where individual response elements are under a
           // 'responses' element instead of a 'part'
           const copy = Object.assign({}, item);
           copy['part'] = copy['responses'];
@@ -194,7 +240,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with(
             { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
           break;
-        
+
         case 'body':
           model = model.with({ body: Html.fromPersistence(item, id) });
           break;
@@ -224,7 +270,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         case 'essay':
           model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
           break;
-        
+
         // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
@@ -233,11 +279,12 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         default:
-          
+
       }
     });
 
-    return ensureResponsesExist(tagInputRefsWithType(migrateSkillsToParts(model)));
+    return migrateExplanationToFeedback(
+        ensureResponsesExist(tagInputRefsWithType(migrateSkillsToParts(model))));
   }
 
   toPersistence() : Object {
@@ -253,13 +300,13 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           .map(part => part.toPersistence())];
 
     const children = [
-      
+
       { body: this.body.toPersistence() },
 
       ...this.concepts
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
- 
+
       ...itemsAndParts,
 
       { explanation: this.explanation.toPersistence() },
