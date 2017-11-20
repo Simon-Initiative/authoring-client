@@ -261,7 +261,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
         model={node}
-        org={this.props.model} context={this.props.context}
+        org={this.props.model}
+        context={this.props.context}
         parentModel={parent}
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}

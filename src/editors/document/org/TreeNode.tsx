@@ -123,24 +123,25 @@ export class TreeNode
 
       const resource = this.props.context.courseModel.resourcesById.get(
         this.props.model.resourceref.idref);
-      const titleString = resource === undefined
-        ? 'Unknown Resource'
-        : resource.title === null
-          ? 'Empty Title'
-          : resource.title;
 
-      title = <Caption
-        onViewEdit={() => this.props.onViewEdit(resource.id)}
-        labels={this.props.labels}
-        depth={0}
-        org={this.props.org} context={this.props.context}
-        isHoveredOver={this.state.mouseOver}
-        processCommand={this.props.processCommand}
-        editMode={this.props.editMode}
-        onEdit={this.props.onEdit}
-        model={this.props.model}
-        toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
-        {titleString}</Caption>;
+      const titleString = this.props.context.titles.get(this.props.model.resourceref.idref)
+        || 'Empty Title';
+
+      title = (
+        <Caption
+          onViewEdit={() => this.props.onViewEdit(resource.id)}
+          labels={this.props.labels}
+          depth={0}
+          org={this.props.org} context={this.props.context}
+          isHoveredOver={this.state.mouseOver}
+          processCommand={this.props.processCommand}
+          editMode={this.props.editMode}
+          onEdit={this.props.onEdit}
+          model={this.props.model}
+          toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
+          {titleString}
+        </Caption>
+      );
     } else if (this.props.model.contentType === contentTypes.OrganizationContentTypes.Include) {
       title = <Title toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
         Include</Title>;
