@@ -12,6 +12,12 @@ import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+
+import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import InlineToolbar from '../html/InlineToolbar';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import BlockToolbar from '../html/BlockToolbar';
+
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 
@@ -51,6 +57,7 @@ export class ShortAnswer
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
 
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onFeedbackEdit = this.onFeedbackEdit.bind(this);
   }
 
   onExplanation(explanation) {
@@ -114,7 +121,27 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
   }
 
+  onFeedbackEdit(body) {
+
+    const f = this.props.partModel.responses.first().feedback.first().with({ body });
+    const feedback = this.props.partModel.responses.first().feedback.set(f.guid, f);
+    const r = this.props.partModel.responses.first().with({ feedback });
+    const responses = this.props.partModel.responses.set(r.guid, r);
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ responses }));
+  }
+
   render() : JSX.Element {
+
+    const inlineToolbar = <InlineToolbar/>;
+    const blockToolbar = <BlockToolbar/>;
+    const insertionToolbar = <InlineInsertionToolbar/>;
+
+    const bodyStyle = {
+      minHeight: '20px',
+      borderStyle: 'none',
+      borderWith: 1,
+      borderColor: '#AAAAAA',
+    };
 
     const controls = (
       <div style={{ display: 'inline' }}>
@@ -155,15 +182,25 @@ export class ShortAnswer
 
         {this.renderCriteria()}
 
+        <Collapse caption="Feedback"
+        details="">
+
+          <HtmlContentEditor
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                blockToolbar={blockToolbar}
+                inlineInsertionToolbar={insertionToolbar}
+                {...this.props}
+                model={this.props.partModel.responses.first().feedback.first().body}
+                onEdit={this.onFeedbackEdit}
+                />
+
+        </Collapse>
+
         <Hints
             {...this.props}
             model={this.props.partModel}
             onEdit={this.onPartEdit}
-          />
-        <ExplanationEditor
-            {...this.props}
-            model={this.props.partModel.explanation}
-            onEdit={this.onExplanation}
           />
 
       </div>);
