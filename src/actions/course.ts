@@ -1,4 +1,3 @@
-import { differenceBy } from 'lodash';
 import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
@@ -145,7 +144,7 @@ export const getTitle = (courseId: string, id: string, type: string) => (
   (dispatch, getState): Promise<any> => {
     // if the title has already been loaded, just use the cached title
     const cachedTitle = getState().titles.get(id);
-    if (cachedTitle) return new Promise((resolve, reject) => resolve(cachedTitle));
+    if (cachedTitle) return Promise.resolve(cachedTitle);
 
     switch (type) {
       case 'skill':
@@ -173,7 +172,7 @@ export const getTitles = (courseId: string, ids: string[], type: string) => (
     // if all titles have already been loaded, just use the cached titles
     const cachedTitles = ids.map(id => getState().titles.get(id)).filter(title => title);
     if (cachedTitles.length === ids.length) {
-      return new Promise((resolve, reject) => resolve(cachedTitles));
+      return Promise.resolve(cachedTitles);
     }
 
     switch (type) {
@@ -185,7 +184,7 @@ export const getTitles = (courseId: string, ids: string[], type: string) => (
         return dispatch(fetchObjectiveTitles(courseId))
           .then(titles => titles.filter(t => ids.find(id => id === t.id)).map(t => t.title));
       default:
-        return new Promise((resolve, reject) => reject('must specify a valid title type'));
+        return Promise.reject('must specify a valid title type');
     }
   }
 );
