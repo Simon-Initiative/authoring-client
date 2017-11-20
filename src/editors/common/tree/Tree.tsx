@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import { DraggableNode } from './DraggableNode';
 import { Maybe } from 'tsmonad';
 
 import { NodeId, Nodes, NodeState,
@@ -73,8 +74,6 @@ export class Tree<NodeType>
     super(props);
   }
 
-
-
   render() {
 
     const { selected, treeRenderer, nodes,
@@ -96,7 +95,12 @@ export class Tree<NodeType>
 
     // Now simply render the tree structure, wrapping the tree and each rendered
     // node using the tree renderer
-    return treeRenderer(renderedNodes.map(r => r.component));
+    return treeRenderer(renderedNodes.map((r, i) =>
+      <DraggableNode
+        source={null}
+        parentModel={null}
+        index={r.indexWithinParent}
+        editMode={true} id={r.nodeId}>{r.component}</DraggableNode>));
   }
 
 }

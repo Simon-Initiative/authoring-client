@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 export type RenderedNode = {
   nodeId: NodeId,
   depth: number,
+  indexWithinParent: number;
   component: JSX.Element,
 };
 
@@ -15,7 +16,10 @@ export type Handlers = {
 };
 
 export type NodeRenderer<NodeType>
-  = (node: NodeType, nodeState: NodeState<NodeType>, handlers: Handlers) => JSX.Element;
+  = (node: NodeType,
+     nodeState: NodeState<NodeType>,
+     handlers: Handlers,
+     connectDragSource: any) => JSX.Element;
 
 // What we use to uniquely identify a tree node.
 export type NodeId = string;

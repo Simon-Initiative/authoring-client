@@ -257,7 +257,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
   renderWaiting() {
     return (
-      <div className="container">
+      <div className="container waiting-notification">
         <div className="row">
           <div className="col-2">
             &nbsp;

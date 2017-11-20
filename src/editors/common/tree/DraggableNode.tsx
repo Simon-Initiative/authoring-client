@@ -2,7 +2,9 @@ import * as React from 'react';
 import guid from '../../../utils/guid';
 import { DragSource } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
+import { SourceNodeType } from '../../content/org/drag/utils';
 
+import './DraggableNode.scss';
 
 export interface DraggableNode {
 
@@ -12,6 +14,8 @@ export interface DraggableNodeProps {
   id: string;
   editMode: boolean;
   index: number;
+  source: SourceNodeType;
+  parentModel: any;
 }
 
 export interface DraggableNodeState {
@@ -25,11 +29,14 @@ const NodeSource = {
   },
 
   beginDrag(props, monitor) {
-    return { id: props.id, index: props.index };
+    return {
+      id: props.id,
+      originalIndex: props.index,
+      sourceModel: props.source,
+      parentModel: props.parentModel,
+    };
   },
 };
-
-
 
 /**
  * Isolate the drag and drop assessment node reordering.
@@ -40,12 +47,10 @@ const NodeSource = {
   isDragging: monitor.isDragging(),
 }))
 export class DraggableNode
-  extends React.Component<DraggableNodeProps, DraggableNodeState> {
+  extends React.PureComponent<DraggableNodeProps, DraggableNodeState> {
 
   constructor(props) {
     super(props);
-
-
   }
 
   render() {
@@ -56,10 +61,14 @@ export class DraggableNode
     const opacity = isDragging ? 0.4 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div style={{ opacity }}>
+      <div className="draggable-node" style={{ opacity }}>
         {React.Children.map(
           this.props.children,
-          (child => React.cloneElement((child as any), { connectDragSource })))}
+          ((child) => {
+            const additionalProps = (child as any).type === 'span'
+              ? {} : { connectDragSource };
+            return React.cloneElement((child as any), additionalProps);
+          }))}
       </div>,
     );
   }

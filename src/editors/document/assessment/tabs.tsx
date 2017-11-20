@@ -4,32 +4,41 @@ import * as Tree from 'editors/common/tree';
 import { Node as AssessmentNode, Question, Content,
   Pool, PoolRef, Selection } from 'data/contentTypes';
 import { getHtmlDetails } from '../../content/common/details';
+import { DragHandle } from './DragHandle';
 
 export interface TabProps {
   node: AssessmentNode;
   nodeState: Tree.NodeState<AssessmentNode>;
   handlers: Tree.Handlers;
+  connectDragSoure: any;
 }
 
 export function renderTab(
   node: AssessmentNode, nodeState: Tree.NodeState<AssessmentNode>,
-  handlers: Tree.Handlers) : JSX.Element {
+  handlers: Tree.Handlers,
+  connectDragSource: any) : JSX.Element {
 
   switch (node.contentType) {
     case 'Question':
-      return <QuestionTab node={node} nodeState={nodeState} handlers={handlers}/>;
+      return <QuestionTab connectDragSoure={connectDragSource}
+        node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Content':
-      return <ContentTab node={node} nodeState={nodeState} handlers={handlers}/>;
+      return <ContentTab connectDragSoure={connectDragSource}
+        node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Unsupported':
-      return <UnsupportedTab node={node} nodeState={nodeState} handlers={handlers}/>;
+      return <UnsupportedTab connectDragSoure={connectDragSource}
+        node={node} nodeState={nodeState} handlers={handlers}/>;
     case 'Selection':
       if (node.source.contentType === 'PoolRef') {
-        return <PoolRefTab node={node} nodeState={nodeState} handlers={handlers}/>;
+        return <PoolRefTab connectDragSoure={connectDragSource}
+          node={node} nodeState={nodeState} handlers={handlers}/>;
       } else {
-        return <PoolTab node={node} nodeState={nodeState} handlers={handlers}/>;
+        return <PoolTab connectDragSoure={connectDragSource}
+          node={node} nodeState={nodeState} handlers={handlers}/>;
       }
     default:
-      return <UnsupportedTab node={node} nodeState={nodeState} handlers={handlers}/>;
+      return <UnsupportedTab connectDragSoure={connectDragSource}
+        node={node} nodeState={nodeState} handlers={handlers}/>;
   }
 }
 
@@ -120,7 +129,10 @@ const QuestionTab = (props: TabProps) => {
   return (
     <Tab {...props} tooltip={preview(q.body)}>
       <div className="d-flex w-100 justify-content-between">
-        <Label {...props}>{label(q)}</Label>
+        <div>
+          <DragHandle connectDragSource={props.connectDragSoure}/>
+          <Label {...props}>{label(q)}</Label>
+        </div>
         <Skills {...props} question={props.node}/>
       </div>
     </Tab>

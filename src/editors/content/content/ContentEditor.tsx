@@ -80,32 +80,27 @@ export class ContentEditor
       <RemovableContent
         editMode={this.props.editMode}
         onRemove={() => this.props.onRemove(this.props.model.guid)}
-        associatedClasses="content">
+        title="Content"
+        associatedClasses="">
 
-        <div style={ { position: 'relative' } }>
+        <Select onChange={this.onAvailability} label="Availability"
+          editMode={this.props.editMode}
+          value={this.props.model.availability}>
+          <option value="always">Always</option>
+          <option value="instructor_only">Instructor Only</option>
+          <option value="feedback_only">Feedback Only</option>
+          <option value="never">Never</option>
+        </Select>
 
-          <h4>Content</h4>
-
-          <Select onChange={this.onAvailability} label="Availability"
-            editMode={this.props.editMode}
-            value={this.props.model.availability}>
-            <option value="always">Always</option>
-            <option value="instructor_only">Instructor Only</option>
-            <option value="feedback_only">Feedback Only</option>
-            <option value="never">Never</option>
-          </Select>
-
-          <HtmlContentEditor
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            inlineInsertionToolbar={insertionToolbar}
-            {...this.props}
-            model={this.props.model.body}
-            onEdit={this.onBodyEdit}
-            />
-
-        </div>
+        <HtmlContentEditor
+          editorStyles={bodyStyle}
+          inlineToolbar={inlineToolbar}
+          blockToolbar={blockToolbar}
+          inlineInsertionToolbar={insertionToolbar}
+          {...this.props}
+          model={this.props.model.body}
+          onEdit={this.onBodyEdit}
+          />
 
       </RemovableContent>);
   }

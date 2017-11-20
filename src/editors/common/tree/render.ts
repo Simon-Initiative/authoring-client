@@ -35,21 +35,28 @@ export function renderVisibleNodesHelper<NodeType>(
   handlers: Handlers,
   rendered: RenderedNode[]) : void {
 
-  nodes.map((n, nodeId) => {
-    const nodeState = {
-      parentNode,
-      isSelected: selectedNodes.has(nodeId),
-      depth,
-    };
-    const component = renderer(n, nodeState, handlers);
-    rendered.push({ nodeId, depth, component });
+  nodes
+    .map((n, nodeId) => [nodeId, n])
+    .toArray()
+    .forEach((entry, indexWithinParent) => {
 
-    if (expandedNodes.has(nodeId)) {
-      getChildren(n).lift(children =>
-        renderVisibleNodesHelper(
-          children, getChildren, renderer, expandedNodes,
-          selectedNodes, Maybe.just(n), depth + 1, handlers, rendered));
-    }
+      const nodeId = (entry[0] as string);
+      const n = (entry[1] as NodeType);
 
-  });
+      const nodeState = {
+        parentNode,
+        isSelected: selectedNodes.has(nodeId),
+        depth,
+      };
+      const component = renderer(n, nodeState, handlers);
+      rendered.push({ nodeId, depth, indexWithinParent, component });
+
+      if (expandedNodes.has(nodeId)) {
+        getChildren(n).lift(children =>
+          renderVisibleNodesHelper(
+            children, getChildren, renderer, expandedNodes,
+            selectedNodes, Maybe.just(n), depth + 1, handlers, rendered));
+      }
+
+    });
 }

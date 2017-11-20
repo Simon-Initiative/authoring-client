@@ -110,10 +110,6 @@ export class SelectionEditor
       color: '#606060',
     };
 
-
-
-
-
     const controls = (
       <div>
         <span style={label}>Insert new: </span>
@@ -180,10 +176,8 @@ export class SelectionEditor
       <RemovableContent
         editMode={this.props.editMode}
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        associatedClasses="selection">
-        />
-
-        <h4>{caption}</h4>
+        title={caption}
+        associatedClasses="">
 
           {controls}
 

@@ -547,11 +547,10 @@ export abstract class QuestionEditor
 
       <RemovableContent editMode={this.props.editMode}
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
+        title={getLabelForQuestion(this.props.model)}
         associatedClasses="question">
 
         <div style={ { position: 'relative' } }>
-
-          <h4>{getLabelForQuestion(this.props.model)}</h4>
 
           {expanded}
 
