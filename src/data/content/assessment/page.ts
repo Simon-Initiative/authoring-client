@@ -74,6 +74,8 @@ export class Page extends Immutable.Record(defaultPageParams) {
         case 'selection':
           model = model.with({ nodes: model.nodes.set(id, Selection.fromPersistence(item, id)) });
           break;
+        default:
+          model = model.with({ nodes: model.nodes.set(id, Unsupported.fromPersistence(item, id)) });
       }
     });
 
