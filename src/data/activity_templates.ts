@@ -17,11 +17,6 @@ export function assessmentTemplate(title: string) {
           },
         },
         {
-          short_title: {
-            '#text': 'reveal',
-          },
-        },
-        {
           content: {
             p: {
               '#array': [
