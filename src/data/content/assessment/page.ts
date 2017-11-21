@@ -35,7 +35,7 @@ export class Page extends Immutable.Record(defaultPageParams) {
   title: Title;
   nodes: Immutable.OrderedMap<string, Node>;
   guid: string;
-  
+
   constructor(params?: PageParams) {
     super(augment(params));
   }
@@ -53,9 +53,9 @@ export class Page extends Immutable.Record(defaultPageParams) {
     if (s['@id'] !== undefined) {
       model = model.with({ id: s['@id'] });
     }
-    
+
     getChildren(s).forEach((item) => {
-    
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -74,8 +74,6 @@ export class Page extends Immutable.Record(defaultPageParams) {
         case 'selection':
           model = model.with({ nodes: model.nodes.set(id, Selection.fromPersistence(item, id)) });
           break;
-        default:
-          model = model.with({ nodes: model.nodes.set(id, Unsupported.fromPersistence(item, id)) });
       }
     });
 
