@@ -3,14 +3,17 @@ import {
   ReceiveTitlesAction,
   UpdateTitlesAction,
   RemoveTitlesAction,
+  ResetTitlesAction,
   RECEIVE_TITLES,
   UPDATE_TITLES,
   REMOVE_TITLES,
+  RESET_TITLES,
 } from 'actions/course';
 import * as models from 'data/models';
 import { OtherAction } from './utils';
 
-export type CourseActions = ReceiveTitlesAction | UpdateTitlesAction | OtherAction;
+export type CourseActions = ReceiveTitlesAction | UpdateTitlesAction
+  | ResetTitlesAction | OtherAction;
 export type TitlesState = Map<string, string>;
 
 const initialState: TitlesState = Map<string, string>();
@@ -30,6 +33,8 @@ export const titles = (
         },
         {});
       return state.merge(titlesMap);
+    case RESET_TITLES:
+      return initialState;
     default:
       return state;
   }

@@ -49,7 +49,7 @@ export type UpdateTitlesAction = {
 };
 
 /**
- * Receive titles action builder
+ * Update titles action builder
  * @param titles - titles received
  */
 export const updateTitles = (titles: Title[]): UpdateTitlesAction => ({
@@ -66,12 +66,27 @@ export type RemoveTitlesAction = {
 };
 
 /**
- * Receive titles action builder
+ * Remove titles action builder
  * @param titles - titles received
  */
 export const removeTitles = (titles: string[]): RemoveTitlesAction => ({
   type: REMOVE_TITLES,
   titles,
+});
+
+export type RESET_TITLES = 'course/RESET_TITLES';
+export const RESET_TITLES: RESET_TITLES = 'course/RESET_TITLES';
+
+export type ResetTitlesAction = {
+  type: RESET_TITLES,
+};
+
+/**
+ * Reset titles action builder - clears all titles from the state
+ * and resets to initial state.
+ */
+export const resetTitles = (): ResetTitlesAction => ({
+  type: RESET_TITLES,
 });
 
 /**
@@ -198,19 +213,23 @@ export const getTitles = (courseId: string, ids: string[], type: string) => (
  */
 export const getTitlesByModel = (model: CourseModel) => (
   (dispatch, getState): Promise<any> => {
-
     const courseId = model.get('guid');
     const resources = model.get('resourcesById').toJS();
-    const fetchTitlesPromises = Object.keys(resources).map((key) => {
-      switch (resources[key].type) {
-        case LegacyTypes.skills_model:
-          return dispatch(fetchSkillTitles(courseId));
-        case LegacyTypes.learning_objectives:
-          return dispatch(fetchObjectiveTitles(courseId));
-        default:
-          return dispatch(receiveTitles([{ id: key, title: resources[key].title }]));
-      }
-    });
+    const ids = Object.keys(resources);
+
+    const fetchTitlesPromises = ids
+      // if title with the same id has already been loaded, dont load it again
+      .filter(id => !getState().titles.get(id))
+      .map((key) => {
+        switch (resources[key].type) {
+          case LegacyTypes.skills_model:
+            return dispatch(fetchSkillTitles(courseId));
+          case LegacyTypes.learning_objectives:
+            return dispatch(fetchObjectiveTitles(courseId));
+          default:
+            return dispatch(receiveTitles([{ id: key, title: resources[key].title }]));
+        }
+      });
 
     return Promise.all(fetchTitlesPromises);
   }

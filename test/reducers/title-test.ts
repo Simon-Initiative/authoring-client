@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 import {
   ReceiveTitlesAction,
   RECEIVE_TITLES,
+  RESET_TITLES,
 } from 'actions/course';
 
 describe('title reducer', () => {
@@ -57,5 +58,15 @@ describe('title reducer', () => {
       'another-title-id': 'Title 2',
       'some-new-title-id': 'Title 3',
     });
+  });
+
+  it('should reset titles', () => {
+    const initialState: TitlesState = Map<string, string>({
+      'some-title-id': 'Title 1',
+      'another-title-id': 'Title 2',
+    });
+
+    const newState = titles(initialState, { type: RESET_TITLES });
+    expect(newState.toJS()).toEqual({});
   });
 });
