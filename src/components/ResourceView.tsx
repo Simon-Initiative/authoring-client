@@ -7,7 +7,7 @@ import * as models from 'data/models';
 import * as viewActions from 'actions/view';
 import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import { Resource } from 'data/content/resource';
-import { courseChanged, getTitlesByModel, updateTitles } from 'actions/course';
+import { courseChanged, getTitlesByModel, updateTitles, resetTitles } from 'actions/course';
 import * as contentTypes from 'data/contentTypes';
 import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
@@ -53,6 +53,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     this.fetchTitles(this.props.course.model, this.props.filterFn);
 
     // intiialize titles state for the course
+    dispatch(resetTitles());
     dispatch(getTitlesByModel(course.model));
   }
 
@@ -118,7 +119,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r => console.log('r', r.toJS()) || ({
+    const rows = this.state.resources.map(r => ({
       key: r.guid,
       data: r.set('title', titles.get(r.get('id'))),
     }));
