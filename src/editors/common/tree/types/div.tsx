@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Maybe } from 'tsmonad';
 
 import * as Types from '../types';
+import { RepositionTarget } from '../RepositionTarget';
 
 import { DragSource } from 'react-dnd';
 import { DragTypes } from 'utils/drag';
@@ -67,7 +68,7 @@ export class DraggableNode<NodeType>
 
 }
 
-export function buildRenderer<NodeType>() : TreeRenderer<NodeType> {
+export function buildRenderer<NodeType>() : Types.TreeRenderer<NodeType> {
 
   return {
     renderTree: children => <div>{children}</div>,
@@ -82,12 +83,22 @@ export function buildRenderer<NodeType>() : TreeRenderer<NodeType> {
     },
 
     renderDropTarget: (
-      id: string, nodeBeingDropped, originalParent,
-      originalIndex: number, newParent, newIndex: number,
-      parentModel: string) => {
+      index: number,
+      onDrop: Types.OnDropHandler,
+      canDrop: Types.CanDropHandler,
+      parentModel: NodeType) : JSX.Element => {
 
+      const props = {
+        index,
+        onDrop,
+        canDrop,
+        parentModel,
+      };
 
+      return (
+        <RepositionTarget {...props}/>
+      );
 
-    }
+    },
   };
 }

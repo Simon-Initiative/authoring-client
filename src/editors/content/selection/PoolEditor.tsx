@@ -55,11 +55,6 @@ export class PoolEditor
   }
 
 
-  renderDropTarget(index) {
-    return <RepositionTarget index={index} canAcceptId={this.canAcceptId}
-      onDrop={this.onReorderNode}/>;
-  }
-
   onReorderNode(id, index) {
 
     const oldQuestions = this.props.model.questions;
@@ -103,12 +98,9 @@ export class PoolEditor
     const elements = [];
     const arr = this.props.model.questions.toArray();
     arr.forEach((node, index) => {
-      elements.push(this.renderDropTarget(index));
       // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
       elements.push(this.renderQuestion(node));
     });
-
-    elements.push(this.renderDropTarget(arr.length));
 
     return elements;
   }

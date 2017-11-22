@@ -44,23 +44,12 @@ function setChildren(node: AssessmentNode, children) : AssessmentNode {
   }
 }
 
-const treeRenderer = (children) : JSX.Element => {
-  return (
-    <div className="list-group">
-      {children}
-    </div>
-  );
-};
+const canHandleDrop : Tree.CanDropHandler = (
+  id: string, nodeBeingDropped: any,
+  originalParent: any, originalIndex: number,
+  newParent: any, newIndex: number) : boolean => {
 
-const canHandleDrop = (
-  sourceNode: AssessmentNode,
-  sourceIndex: number,
-  sourceNodeState: Tree.NodeState<AssessmentNode>,
-  destNode: AssessmentNode,
-  destIndex: number,
-  destNodeState: Tree.NodeState<AssessmentNode>) : boolean => {
-
-  return false;
+  return true;
 };
 
 

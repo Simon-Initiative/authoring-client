@@ -66,6 +66,6 @@ export type TreeRenderer<NodeType> = {
     index: number,
     onDrop: OnDropHandler,
     canAcceptId: CanDropHandler,
-    parentModel: string,
+    parentModel: NodeType,
     ) => JSX.Element,
 };
