@@ -14,6 +14,7 @@ import { DuplicateListingInput } from './DuplicateListingInput';
 import guid from '../../utils/guid';
 import { RowType } from './types';
 import { ExistingSkillSelection } from './ExistingSkillSelection';
+import { CourseModel } from 'data/models';
 import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
@@ -26,6 +27,10 @@ export interface ObjectiveSkillViewProps {
   course: any;
   dispatch: any;
   expanded: any;
+  titles: any;
+  onLoadTitles: (courseId: CourseModel) => void;
+  onAddTitle: (id: string, title: string) => void;
+  onUpdateTitle: (id: string, title: string) => void;
 }
 
 interface ObjectiveSkillViewState {
@@ -74,7 +79,10 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
+    const { onLoadTitles, course } = this.props;
+
     this.buildModels();
+    onLoadTitles(course.model);
   }
 
   componentWillUnmount() {
@@ -123,6 +131,7 @@ export class ObjectiveSkillView
   }
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
+    const { onUpdateTitle } = this.props;
 
     const originalDocument = this.state.objectives.mapping.get(obj.id);
 
@@ -148,9 +157,12 @@ export class ObjectiveSkillView
     this.setState({ objectives: unified });
 
     persistence.persistDocument(updatedDocument);
+
+    onUpdateTitle(obj.get('id'), obj.get('title'));
   }
 
   onSkillEdit(model: contentTypes.Skill) {
+    const { onUpdateTitle } = this.props;
 
     const originalDocument = this.state.skills.mapping.get(model.id);
 
@@ -176,9 +188,12 @@ export class ObjectiveSkillView
     this.setState({ skills: unified });
 
     persistence.persistDocument(updatedDocument);
+
+    onUpdateTitle(model.id, model.title);
   }
 
   createNewSkill() : string {
+    const { onAddTitle } = this.props;
 
     // Create the new skill and persist it
     const id = guid();
@@ -204,6 +219,8 @@ export class ObjectiveSkillView
     this.setState({ skills: unified });
 
     persistence.persistDocument(updatedDocument);
+
+    onAddTitle(skill.get('id'), skill.get('title'));
 
     return skill.id;
   }
@@ -364,6 +381,8 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
+    const { titles } = this.props;
+
     const rows = [];
 
     const skillsById = this.state.skills.skills
@@ -395,6 +414,7 @@ export class ObjectiveSkillView
           onAddNewSkill={this.onAddNewSkill}
           highlighted={false}
           model={objective}
+          title={titles[objective.id]}
           isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
           editMode={this.state.aggregateModel.isLocked}
@@ -414,6 +434,7 @@ export class ObjectiveSkillView
                 onRemove={this.onRemove}
                 highlighted={false}
                 model={skill}
+                title={titles[skill.id]}
                 isExpanded={false}
                 toggleExpanded={this.onToggleExpanded}
                 editMode={this.state.aggregateModel.isLocked}

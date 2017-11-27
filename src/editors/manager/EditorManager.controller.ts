@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { Map } from 'immutable';
 import EditorManager from './EditorManager';
 import { courseChanged, fetchObjectiveTitles } from 'actions/course';
 import { CourseModel } from 'data/models';
@@ -6,12 +7,11 @@ import { UserProfile } from 'types/user';
 
 interface StateProps {
   expanded: any;
-  titles: any;
+  titles: Map<string, string>;
 }
 
 interface DispatchProps {
   onCourseChanged: (model: CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -36,9 +36,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onCourseChanged: (model: CourseModel) => {
       dispatch(courseChanged(model));
-    },
-    onLoadCourseTitles: (courseId) => {
-      dispatch(fetchObjectiveTitles(courseId));
     },
     onDispatch: dispatch,
   };

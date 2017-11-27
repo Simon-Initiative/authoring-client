@@ -1,4 +1,4 @@
-
+import { Map } from 'immutable';
 import * as models from 'data/models';
 
 export type AppContext = {
@@ -9,5 +9,5 @@ export type AppContext = {
   resourcePath: string;
   courseModel: models.CourseModel;
   undoRedoGuid: string;
-  titles: object;
+  titles: Map<string, string>;
 };

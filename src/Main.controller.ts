@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { TitlesState } from 'reducers//titles';
 import Main from './Main';
 
 interface StateProps {
@@ -7,6 +8,7 @@ interface StateProps {
   course: any;
   expanded: any;
   server: any;
+  titles: TitlesState;
 }
 
 interface DispatchProps {
@@ -24,6 +26,7 @@ const mapStateToProps = (state): StateProps => {
     course,
     expanded,
     server,
+    titles,
   } = state;
 
   return {
@@ -37,6 +40,7 @@ const mapStateToProps = (state): StateProps => {
     },
     expanded,
     server,
+    titles,
   };
 };
 
