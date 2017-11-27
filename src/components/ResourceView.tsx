@@ -53,7 +53,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     this.fetchTitles(this.props.course.model, this.props.filterFn);
 
     // intiialize titles state for the course
-    dispatch(resetTitles());
     dispatch(getTitlesByModel(course.model));
   }
 
