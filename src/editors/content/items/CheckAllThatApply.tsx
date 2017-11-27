@@ -23,12 +23,9 @@ type IdTypes = {
   shuffle: string,
 };
 
-export interface CheckAllThatApply {
-  ids: IdTypes;
-}
-
 export interface CheckAllThatApplyProps
   extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
+  hideGradingCriteria: boolean;
 }
 
 export interface CheckAllThatApplyState {}
@@ -39,6 +36,7 @@ export interface CheckAllThatApplyState {}
 export class CheckAllThatApply
   extends AbstractItemPartEditor<contentTypes.MultipleChoice,
     CheckAllThatApplyProps, CheckAllThatApplyState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);
@@ -231,7 +229,7 @@ export class CheckAllThatApply
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}

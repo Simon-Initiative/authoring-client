@@ -39,25 +39,15 @@ import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
 
-
 type Ids = {
   id: string,
 };
-
-export interface QuestionEditor {
-  ids: Ids;
-  lastBody: contentTypes.Html;
-  itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand;
-  numericCommand: InsertInputRefCommand;
-  textCommand: InsertInputRefCommand;
-  htmlEditor: CommandProcessor<EditorState>;
-}
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
   connectDragSource?: any;
+  isFormative?: boolean;
 }
 
 export interface QuestionEditorState {
@@ -104,6 +94,13 @@ function getLabelForQuestion(question: contentTypes.Question) : string {
  */
 export abstract class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
+  ids: Ids;
+  lastBody: contentTypes.Html;
+  itemToAdd: any;
+  fillInTheBlankCommand: InsertInputRefCommand;
+  numericCommand: InsertInputRefCommand;
+  textCommand: InsertInputRefCommand;
+  htmlEditor: CommandProcessor<EditorState>;
 
   constructor(props) {
     super(props);
@@ -360,6 +357,7 @@ export abstract class QuestionEditor
         key={item.guid}
         itemModel={item}
         partModel={part}
+        hideGradingCriteria={this.props.isFormative}
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
@@ -373,6 +371,7 @@ export abstract class QuestionEditor
         key={item.guid}
         itemModel={item}
         partModel={part}
+        hideGradingCriteria={this.props.isFormative}
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'FillInTheBlank') {
@@ -386,6 +385,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Numeric') {
@@ -399,6 +399,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
 
@@ -413,6 +414,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
 
@@ -427,6 +429,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Ordering') {
@@ -440,6 +443,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Essay') {
@@ -453,6 +457,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={this.props.isFormative}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     }

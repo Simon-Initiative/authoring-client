@@ -20,19 +20,13 @@ import { ResponseMultEditor } from './ResponseMult';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
-
-export interface Text {
-
-}
-
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface TextState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.
@@ -199,7 +193,7 @@ export class Text
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}

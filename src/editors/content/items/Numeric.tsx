@@ -20,13 +20,8 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
-
-export interface Numeric {
-
-}
-
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface NumericState {
@@ -188,8 +183,7 @@ export class Numeric
           conceptType="skill"
           />
 
-
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}

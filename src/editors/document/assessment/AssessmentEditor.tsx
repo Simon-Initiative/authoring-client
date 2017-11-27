@@ -28,11 +28,11 @@ import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 interface AssessmentEditor {
-  
+
 }
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
-  
+
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -41,7 +41,7 @@ interface AssessmentEditorState extends AbstractEditorState {
 
 @DragDropContext(HTML5Backend)
 class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
-  AssessmentEditorProps, 
+  AssessmentEditorProps,
   AssessmentEditorState>  {
 
   constructor(props) {
@@ -62,9 +62,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.canHandleDrop = this.canHandleDrop.bind(this);
   }
-        
+
   shouldComponentUpdate(
-    nextProps: AssessmentEditorProps, 
+    nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState) : boolean {
 
     if (this.props.model !== nextProps.model) {
@@ -85,7 +85,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     if (this.state.redoStackSize !== nextState.redoStackSize) {
       return true;
     }
-    
+
 
     return false;
   }
@@ -111,7 +111,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const supportedNodes = page.nodes.toArray().filter(n => n.contentType !== 'Unsupported');
 
     if (supportedNodes.length > 1) {
-      
+
       page = page.with({ nodes: page.nodes.delete(guid) });
 
       const pages = this.props.model.pages.set(page.guid, page);
@@ -126,14 +126,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return <QuestionEditor
               key={n.guid}
               isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
+              isFormative={this.props.model.resource.type === LegacyTypes.inline}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={c => this.onEdit(n.guid, c)} 
+              onEdit={c => this.onEdit(n.guid, c)}
               onRemove={this.onNodeRemove.bind(this)}
               />;
-              
+
     } else if (n.contentType === 'Content') {
       return <ContentEditor
               key={n.guid}
@@ -141,7 +142,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={c => this.onEdit(n.guid, c)} 
+              onEdit={c => this.onEdit(n.guid, c)}
               onRemove={this.onNodeRemove.bind(this)}
               />;
     } else if (n.contentType === 'Selection') {
@@ -152,7 +153,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={c => this.onEdit(n.guid, c)} 
+              onEdit={c => this.onEdit(n.guid, c)}
               onRemove={this.onNodeRemove.bind(this)}
               />;
     } else {
@@ -163,18 +164,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               services={this.props.services}
               context={this.props.context}
               model={n}
-              onEdit={c => this.onEdit(n.guid, c)} 
+              onEdit={c => this.onEdit(n.guid, c)}
               />; */
     }
   }
 
   renderTitle() {
-    return <TitleContentEditor 
+    return <TitleContentEditor
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
             model={this.props.model.title}
-            onEdit={this.onTitleEdit} 
+            onEdit={this.onTitleEdit}
             />;
   }
 
@@ -207,7 +208,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const text = 'Page ' + (this.props.model.pages.size + 1);
     const page = new contentTypes.Page()
       .with({ title: new contentTypes.Title().with({ text }) });
-    
+
     this.handleEdit(this.props.model.with(
       { pages: this.props.model.pages.set(page.guid, page) }));
   }
@@ -226,7 +227,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       } else {
         this.handleEdit(removed);
       }
-      
+
     }
   }
 
@@ -248,7 +249,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   renderDropTarget(index) {
-    return <RepositionTarget index={index} 
+    return <RepositionTarget index={index}
       canAcceptId={this.canHandleDrop}  onDrop={this.onReorderNode}/>;
   }
 
@@ -274,7 +275,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
         if (n.guid !== id) {
           nodes = nodes.set(n.guid, n);
-        } 
+        }
       });
 
       if (index === arr.length) {
@@ -310,7 +311,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       <Collapse caption="Settings">
         <div style={ { marginLeft: '25px' } }>
           <form>
-            
+
             <div className="form-group row">
               <label className="col-3 col-form-label">Recommended attempts:</label>
               <TextInput
@@ -346,34 +347,34 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   renderPagination() {
 
-    const addButton = <button disabled={!this.props.editMode} 
-      type="button" className="btn btn-secondary" 
+    const addButton = <button disabled={!this.props.editMode}
+      type="button" className="btn btn-secondary"
       onClick={this.onAddPage}>Add Page</button>;
 
 
     return (
-      
+
       <Collapse caption="Pagination" expanded={addButton}>
 
         <div style={ { marginLeft: '25px' } }>
-          
-          <PageSelection 
+
+          <PageSelection
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
-            pages={this.props.model.pages} 
+            pages={this.props.model.pages}
             current={this.props.model.pages.get(this.state.current)}
             onChangeCurrent={current => this.setState({ current })}
             onEdit={this.onPageEdit}/>
-          
+
         </div>
       </Collapse>
-    
+
     );
 
   }
 
   renderAdd() {
-    
+
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
     const slash : any = {
@@ -396,31 +397,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     return (
       <div>
 
-      <span style={label}>Insert new: </span> 
-      
-      <button disabled={!this.props.editMode} 
-        type="button" className="btn btn-secondary btn-sm" 
+      <span style={label}>Insert new: </span>
+
+      <button disabled={!this.props.editMode}
+        type="button" className="btn btn-secondary btn-sm"
         onClick={this.onAddContent}>Content</button>
 
       <span style={slash}>/</span>
 
-      <AddQuestion 
+      <AddQuestion
         editMode={this.props.editMode}
         onQuestionAdd={this.addQuestion.bind(this)}
         isSummative={this.props.model.type === LegacyTypes.assessment2}/>
 
       <span style={slash}>/</span>
-      
-      <button 
-        disabled={!this.props.editMode || isInline} 
-        type="button" className="btn btn-secondary btn-sm" 
+
+      <button
+        disabled={!this.props.editMode || isInline}
+        type="button" className="btn btn-secondary btn-sm"
         onClick={this.onAddPool}>Pool</button>
 
         <span style={slash}>/</span>
 
-      <button 
-        disabled={!this.props.editMode || isInline} 
-        type="button" className="btn btn-secondary btn-sm" 
+      <button
+        disabled={!this.props.editMode || isInline}
+        type="button" className="btn btn-secondary btn-sm"
         onClick={this.onAddPoolRef}>Pool Reference</button>
 
       </div>
@@ -437,11 +438,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       <div>
         <div className="docHead">
 
-          <UndoRedoToolbar 
+          <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}
             onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-          
+
           {titleEditor}
 
           <div style={ { marginTop: '20px' } }/>
@@ -449,18 +450,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           <div className="componentWrapper content">
             {this.props.model.type === LegacyTypes.assessment2
               ? this.renderSettings() : null}
-            {this.renderPagination()}         
+            {this.renderPagination()}
           </div>
 
           <div style={ { marginTop: '40px' } }/>
 
           {this.renderAdd()}
-          
+
           {nodeEditors}
 
         </div>
       </div>);
-    
+
   }
 
 }

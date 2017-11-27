@@ -22,12 +22,10 @@ type IdTypes = {
   shuffle: string,
 };
 
-export interface FillInTheBlank {
-  ids: IdTypes;
-}
-
 export interface FillInTheBlankProps
-  extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {}
+  extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
+  hideGradingCriteria: boolean;
+}
 
 export interface FillInTheBlankState {}
 
@@ -47,6 +45,7 @@ const ChoiceFeedback = (props) => {
 export class FillInTheBlank
   extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
     FillInTheBlankProps, FillInTheBlankState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);
@@ -295,7 +294,7 @@ export class FillInTheBlank
           onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill" />
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

@@ -18,19 +18,13 @@ import guid from '../../../utils/guid';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
-
-export interface ShortAnswer {
-
-}
-
 export interface ShortAnswerProps extends AbstractItemPartEditorProps<contentTypes.ShortAnswer> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface ShortAnswerState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.
@@ -95,7 +89,6 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel);
   }
 
-
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
     const criteria = this.props.partModel.criteria.set(c.guid, c);
@@ -153,7 +146,7 @@ export class ShortAnswer
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}

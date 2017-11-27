@@ -17,9 +17,9 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import '../common/editor.scss';
 import './MultipleChoice.scss';
 
-export interface Essay {}
-
-export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {}
+export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {
+  hideGradingCriteria: boolean;
+}
 
 export interface EssayState {}
 
@@ -96,7 +96,6 @@ export class Essay
     );
   }
 
-
   render() : JSX.Element {
     return (
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
@@ -115,7 +114,7 @@ export class Essay
             title="Skills"
             conceptType="skill" />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
           {...this.props}

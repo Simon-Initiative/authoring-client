@@ -23,12 +23,10 @@ type IdTypes = {
   shuffle: string,
 };
 
-export interface MultipleChoice {
-  ids: IdTypes;
-}
-
 export interface MultipleChoiceProps
-  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {}
+  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
+  hideGradingCriteria?: boolean;
+}
 
 export interface MultipleChoiceState {}
 
@@ -47,6 +45,7 @@ const ChoiceFeedback = (props) => {
 export class MultipleChoice
   extends AbstractItemPartEditor<contentTypes.MultipleChoice,
     MultipleChoiceProps, MultipleChoiceState> {
+  ids: IdTypes;
 
   constructor(props) {
     super(props);
@@ -280,7 +279,7 @@ export class MultipleChoice
           title="Skills"
           conceptType="skill" />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
