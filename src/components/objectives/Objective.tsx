@@ -22,6 +22,7 @@ export interface ObjectiveProps {
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: contentTypes.LearningObjective;
+  title: string;
   highlighted: boolean;
   mouseOver: boolean;
 }
@@ -46,30 +47,30 @@ export class Objective
 
   render() : JSX.Element {
 
-    const { model, editMode, mouseOver, isExpanded } = this.props;
+    const { model, title, editMode, mouseOver, isExpanded } = this.props;
 
-    let title = null;
+    let titleBlock = null;
 
     if (this.props.model.skills.size === 0) {
-      title = <div style={ { marginLeft: '10px' } }>
+      titleBlock = <div style={ { marginLeft: '10px' } }>
             <span>
               <i className="icon"></i>
             </span>&nbsp;
-          <b>Objective:</b> {this.props.model.title}
+          <b>Objective:</b> {title}
           </div>;
     } else if (isExpanded) {
-      title = <div>
+      titleBlock = <div>
                 <span >
                 <i className="icon icon-caret-down"></i>
                 </span>&nbsp;
-                <b>Objective:</b> {this.props.model.title}
+                <b>Objective:</b> {title}
               </div>;
     } else {
-      title = <div>
+      titleBlock = <div>
                 <span >
                 <i className="icon icon-caret-right"></i>
                 </span>&nbsp;
-                <b>Objective:</b> {this.props.model.title}
+                <b>Objective:</b> {title}
               </div>;
     }
 
@@ -111,7 +112,7 @@ export class Objective
           editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
           isHoveredOver={mouseOver}
-          onEdit={this.onTitleEdit}>{title}</Title>
+          onEdit={this.onTitleEdit}>{titleBlock}</Title>
         {skillButtons}
 
       </div>

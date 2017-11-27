@@ -23,6 +23,7 @@ export interface RowProps {
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: RowType;
+  title: string;
   highlighted: boolean;
 }
 
@@ -30,9 +31,9 @@ export interface RowState {
   mouseOver: boolean;
 }
 
-export class Row 
+export class Row
   extends React.PureComponent<RowProps, RowState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -42,7 +43,7 @@ export class Row
     this.onLeave = this.onLeave.bind(this);
     this.onObjectiveRemove = this.onObjectiveRemove.bind(this);
     this.onSkillRemove = this.onSkillRemove.bind(this);
-    
+
     this.state = { mouseOver: false };
   }
 
@@ -51,7 +52,7 @@ export class Row
       clearTimeout(this.timer);
     }
     this.timer = setTimeout(() => this.setState({ mouseOver: true }), 250);
-    
+
   }
 
   onLeave() {
@@ -72,27 +73,29 @@ export class Row
 
   render() : JSX.Element {
 
-    const { model, editMode, isExpanded } = this.props;
-    
+    const { model, editMode, isExpanded, title } = this.props;
+
     const item = this.props.model.contentType === 'LearningObjective'
-      ? <Objective {...this.props} mouseOver={this.state.mouseOver} 
+      ? <Objective {...this.props} mouseOver={this.state.mouseOver}
         onRemove={this.onObjectiveRemove}
         onAddExistingSkill={() => this.props.onAddExistingSkill(
           this.props.model as contentTypes.LearningObjective)}
         onAddNewSkill={() => this.props.onAddNewSkill(
           this.props.model as contentTypes.LearningObjective)}
-        model={this.props.model as contentTypes.LearningObjective}/>
-      : <Skill {...this.props} mouseOver={this.state.mouseOver} 
+        model={this.props.model as contentTypes.LearningObjective}
+        title={title}/>
+      : <Skill {...this.props} mouseOver={this.state.mouseOver}
         onRemove={this.onSkillRemove}
-        model={this.props.model as contentTypes.Skill}/>;
+        model={this.props.model as contentTypes.Skill}
+        title={title}/>;
 
     const highlighted = this.props.highlighted ? 'table-info' : '';
 
     return (
-      <tr key={model.guid} 
-        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave} 
+      <tr key={model.guid}
+        onMouseEnter={this.onEnter} onMouseLeave={this.onLeave}
         className={highlighted}>
-        
+
         <td key="content">
           {item}
         </td>

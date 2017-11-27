@@ -19,10 +19,10 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
+import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
-
-import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
+import { TitlesState } from 'reducers//titles';
 
 import './Main.scss';
 
@@ -117,6 +117,7 @@ interface MainProps {
   course: any;
   expanded: any;
   server: any;
+  titles: TitlesState;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -160,13 +161,14 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   renderResource(resource: ResourceList) {
-    const { onDispatch, server, course } = this.props;
+    const { onDispatch, server, course, titles } = this.props;
 
     return (
       <ResourceView
         serverTimeSkewInMs={server.timeSkewInMs}
         course={course}
         title={resource.title}
+        titles={titles}
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
