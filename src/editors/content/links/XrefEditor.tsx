@@ -11,15 +11,8 @@ import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 import { TextInput } from '../common/TextInput';
 
-import '../common/editor.scss';
-
-
-export interface XrefEditor {
-  
-}
-
 export interface XrefEditorProps extends AbstractContentEditorProps<Xref> {
-  
+
 }
 
 export interface XrefEditorState {
@@ -30,12 +23,12 @@ export interface XrefEditorState {
 /**
  * The content editor for Table.
  */
-export class XrefEditor 
+export class XrefEditor
   extends AbstractContentEditor<Xref, XrefEditorProps, XrefEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onTargetEdit = this.onTargetEdit.bind(this);
     this.onIdrefEdit = this.onIdrefEdit.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
@@ -77,13 +70,13 @@ export class XrefEditor
   }
 
   onIdrefEdit(idref) {
-    this.props.onEdit(this.props.model.with({ idref }));    
+    this.props.onEdit(this.props.model.with({ idref }));
   }
 
   render() : JSX.Element {
 
     const { idref, target } = this.props.model;
-    
+
     return (
       <div className="itemWrapper">
 

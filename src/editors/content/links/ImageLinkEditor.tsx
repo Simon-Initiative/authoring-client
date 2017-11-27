@@ -12,19 +12,12 @@ import { Button } from '../common/Button';
 import { LinkEditor } from './LinkEditor';
 import { ImageEditor } from '../media/ImageEditor';
 
-import '../common/editor.scss';
-
-
-export interface ImageLinkEditor {
-  
-}
-
 export interface ImageLinkEditorProps extends AbstractContentEditorProps<ImageLinkModel> {
-  
+
 }
 
 export interface ImageLinkEditorState {
-  
+
 }
 
 export interface ImageLinkModel {
@@ -35,12 +28,12 @@ export interface ImageLinkModel {
 /**
  * The content editor for Table.
  */
-export class ImageLinkEditor 
+export class ImageLinkEditor
   extends AbstractContentEditor<ImageLinkModel, ImageLinkEditorProps, ImageLinkEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onImageEdit = this.onImageEdit.bind(this);
     this.onLinkEdit = this.onLinkEdit.bind(this);
   }
@@ -48,7 +41,7 @@ export class ImageLinkEditor
   shouldComponentUpdate(nextProps, nextState: ImageLinkEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } 
+    }
     return false;
   }
 
@@ -63,14 +56,14 @@ export class ImageLinkEditor
   render() : JSX.Element {
 
     const { link, image } = this.props.model;
-    
+
     return (
       <div className="itemWrapper">
         <LinkEditor
           {...this.props}
           onEdit={this.onLinkEdit}
           model={link} />
-        <ImageEditor 
+        <ImageEditor
           {...this.props}
           onEdit={this.onImageEdit}
           model={image}

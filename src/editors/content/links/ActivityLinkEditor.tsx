@@ -11,15 +11,8 @@ import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 import { LegacyTypes } from '../../../data/types';
 
-import '../common/editor.scss';
-
-
-export interface ActivityLinkEditor {
-  
-}
-
 export interface ActivityLinkEditorProps extends AbstractContentEditorProps<ActivityLink> {
-  
+
 }
 
 export interface ActivityLinkEditorState {
@@ -30,12 +23,12 @@ export interface ActivityLinkEditorState {
 /**
  * The content editor for Table.
  */
-export class ActivityLinkEditor 
+export class ActivityLinkEditor
   extends AbstractContentEditor<ActivityLink, ActivityLinkEditorProps, ActivityLinkEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onTargetEdit = this.onTargetEdit.bind(this);
     this.onIdrefEdit = this.onIdrefEdit.bind(this);
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
@@ -88,7 +81,7 @@ export class ActivityLinkEditor
   render() : JSX.Element {
 
     const { idref, purpose, target } = this.props.model;
-    
+
     return (
       <div className="itemWrapper">
 
@@ -122,7 +115,7 @@ export class ActivityLinkEditor
             {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </Select>
         </InputLabel>
-        
+
       </div>);
   }
 

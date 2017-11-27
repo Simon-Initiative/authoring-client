@@ -12,12 +12,6 @@ import { Maybe } from 'tsmonad';
 
 import './CoursesView.scss';
 
-interface CoursesView {
-  onSelect: (id) => void;
-  _deleteCourse: (id) => void;
-  _createCourse: () => void;
-}
-
 type CourseDescription = {
   guid: string,
   id: string,
@@ -37,16 +31,16 @@ export interface CoursesViewState {
 }
 
 class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState> {
+  onSelect: (id: string) => void;
 
   constructor(props) {
     super(props);
 
     this.state = { courses: Maybe.nothing<CourseDescription[]>() };
-    this._createCourse = this.createCourse.bind(this);
+    this.createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
       this.fetchDocument(id);
     };
-
   }
 
   createCourse() {
@@ -118,9 +112,10 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
       .catch(err => console.log(err));
   }
 
+
   renderBanner() {
     return (
-      <div className="createCourse">
+      <div className="create-course">
 
         <p className="lead">
           Welcome to the OLI course authoring platform.
@@ -209,10 +204,10 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 
   render() {
     return (
-      <div>
+      <div className="courses-view">
         {this.renderBanner()}
 
-        <div className="myCoursePackages">
+        <div className="my-course-packages">
 
           <h2 style={ { display: 'inline' } }>My Course Packages</h2>
 
@@ -227,7 +222,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
           })}
 
           </div>
-
         </div>
       </div>
     );

@@ -22,6 +22,7 @@ module.exports = {
             data: path.resolve(__dirname, 'src/data'),
             editors: path.resolve(__dirname, 'src/editors'),
             reducers: path.resolve(__dirname, 'src/reducers'),
+            stylesheets: path.resolve(__dirname, 'src/stylesheets'),
             types: path.resolve(__dirname, 'src/types'),
             utils: path.resolve(__dirname, 'src/utils'),
         },
@@ -47,5 +48,10 @@ module.exports = {
             { test: /\.tsx$/, loaders: [ 'babel', 'ts-loader'], exclude: /node_modules/ }
         ],
 
-    }
+    },
+    sassLoader: {
+        includePaths: [
+            path.join(__dirname, 'src/stylesheets'),
+        ]
+    },
 };

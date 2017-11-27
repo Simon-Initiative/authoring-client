@@ -14,8 +14,6 @@ import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from 'utils/guid';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-import '../common/editor.scss';
-import './MultipleChoice.scss';
 
 export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {
   hideGradingCriteria: boolean;

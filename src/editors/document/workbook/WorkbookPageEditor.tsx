@@ -13,28 +13,16 @@ import { Resource } from 'data/content/resource';
 import { Collapse } from '../../content/common/Collapse';
 import { AuthoringActionsHandler, AuthoringActions } from 'actions/authoring';
 import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
-
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
 import { Title } from 'types/course';
 
-const styles = {
-  loContainer : {
-    border: '1px solid grey',
-    background: '#ffffff',
-    height: '125px',
-    overflowX: 'auto',
-    overflowY: 'scroll',
-    marginBottom : '10px',
-    padding : '4px',
-  },
-};
-
-interface WorkbookPageEditor {}
+import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
+  onUpdateTitle: (titles: Title[]) => void;
   objectiveTitles: any;
 }
 
@@ -68,8 +56,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onTitleEdit(title) {
+    const { onUpdateTitle } = this.props;
+
     const head = this.props.model.head.with({ title });
     this.handleEdit(this.props.model.with({ head }));
+
+    onUpdateTitle([{ id: this.props.model.getIn(['resource', 'id']), title: title.get('text') }]);
   }
 
   onBodyEdit(content : any) {
@@ -140,7 +132,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
-      <div>
+      <div className="workbookpage-editor">
           <UndoRedoToolbar
             undoEnabled={this.state.undoStackSize > 0}
             redoEnabled={this.state.redoStackSize > 0}

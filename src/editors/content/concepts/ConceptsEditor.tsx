@@ -12,6 +12,8 @@ import { SkillSelection } from 'utils/selection/SkillSelection';
 import { Collapse } from 'editors/content/common/Collapse';
 import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
+import './ConceptsEditor.scss';
+
 /* tslint:disable */
 const Spacer = props => <span>&nbsp;&nbsp;</span>; // There is probably a better way...
 /* tslint:enable */
@@ -24,8 +26,6 @@ export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutabl
 }
 
 export interface ConceptstEditorState {}
-
-export default interface ConceptsEditor {}
 
 /**
  * Concepts editor

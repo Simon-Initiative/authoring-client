@@ -15,8 +15,6 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/con
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-import '../common/editor.scss';
-import './MultipleChoice.scss';
 
 type IdTypes = {
   shuffle: string,
@@ -33,7 +31,7 @@ export interface FillInTheBlankState {}
 // tslint:disable-next-line
 const ChoiceFeedback = (props) => {
   return (
-    <div className="ChoiceFeedback clearfix">
+    <div className="choice-feedback clearfix">
       {props.children}
     </div>
   );

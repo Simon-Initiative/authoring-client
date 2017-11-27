@@ -1,7 +1,7 @@
 import 'babel-polyfill';
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Iterable } from 'immutable';
 import * as persistence from './data/persistence';
 import * as models from './data/models';
 import thunkMiddleware from 'redux-thunk';
@@ -11,16 +11,7 @@ import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
 import Perf from 'react-addons-perf';
-
-(window as any).React = React;
-(window as any).Perf = Perf;
-
 import { createLogger } from 'redux-logger';
-
-// tslint:disable-next-line
-var Provider = (require('react-redux') as RR).Provider;
-// tslint:disable-next-line
-//var createLogger = require('redux-logger');
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
@@ -30,28 +21,38 @@ import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';
 
-// Stylesheets
-import './stylesheets/main.scss';
-import './stylesheets/sortabletree.scss';
+// import redux provider
+const Provider = (require('react-redux') as RR).Provider;
+
+// attach global variables to window
+(window as any).React = React;
+(window as any).Perf = Perf;
+
+// import application styles
+import 'stylesheets/index.scss';
 
 interface RR {
   Provider: any;
 }
 
-function initStore() {
+const loggerMiddleware = (createLogger as any)({
+  stateTransformer: (state) => {
+    const newState = {};
 
-  const loggerMiddleware = (createLogger as any)();
+    // if state item is immutable, convert to JS for logging purposes
+    for (const i of Object.keys(state)) {
+      if (Iterable.isIterable(state[i])) {
+        newState[i] = state[i].toJS();
+      } else {
+        newState[i] = state[i];
+      }
+    }
 
-  const createStoreWithMiddleware = applyMiddleware(
-    thunkMiddleware, // lets us dispatch async actions
-    loggerMiddleware, // middleware that logs actions
-  )(createStore);
-
-  return createStoreWithMiddleware(rootReducer);
-}
+    return newState;
+  },
+});
 
 function initStoreWithState(state) {
-  const loggerMiddleware = (createLogger as any)();
   const store = createStore(
     rootReducer, state,
     applyMiddleware(thunkMiddleware, loggerMiddleware),
@@ -140,10 +141,8 @@ function main() {
       const store = initStoreWithState({ user: userInfo });
       render(store, current);
 
-      // initialize course and title data
+      // initialize course data
       store.dispatch(courseChanged(model));
-      store.dispatch(fetchSkillTitles(model.guid));
-      store.dispatch(fetchObjectiveTitles(model.guid));
     })
     .catch((err) => {
       render(initStoreWithState({ user: userInfo }), current);

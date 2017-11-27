@@ -19,10 +19,12 @@ import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
 import CreateCourseView from './components/CreateCourseView';
+import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
-
-import { ObjectiveSkillView } from './components/objectives/ObjectiveSkillView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
+import { TitlesState } from 'reducers//titles';
+
+import './Main.scss';
 
 type ResourceList = {
   title: string,
@@ -115,6 +117,7 @@ interface MainProps {
   course: any;
   expanded: any;
   server: any;
+  titles: TitlesState;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -122,16 +125,14 @@ interface MainState {
   current: any;
 }
 
-export default interface Main {
-  modalActions: Object;
-  viewActions: Object;
-  unlisten: any;
-}
-
 /**
  * Main React Component
  */
 export default class Main extends React.Component<MainProps, MainState> {
+  modalActions: Object;
+  viewActions: Object;
+  unlisten: any;
+
   constructor(props) {
     super(props);
     const { location, onDispatch } = this.props;
@@ -160,13 +161,14 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   renderResource(resource: ResourceList) {
-    const { onDispatch, server, course } = this.props;
+    const { onDispatch, server, course, titles } = this.props;
 
     return (
       <ResourceView
         serverTimeSkewInMs={server.timeSkewInMs}
         course={course}
         title={resource.title}
+        titles={titles}
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
@@ -232,7 +234,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     const logoutUrl = user !== null ? user.logoutUrl : '';
 
     return (
-        <div>
+        <div className="main">
           <Header dispatch={onDispatch} logoutUrl={logoutUrl}/>
 
           {currentView}

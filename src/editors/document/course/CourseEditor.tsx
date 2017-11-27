@@ -3,12 +3,13 @@ import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { hasRole } from 'actions/utils/keycloak';
 import * as viewActions from 'actions/view';
+import {
+  AbstractEditor,
+  AbstractEditorProps,
+  AbstractEditorState,
+} from '../common/AbstractEditor';
 
-import { AbstractEditor, AbstractEditorProps,
-  AbstractEditorState} from '../common/AbstractEditor';
-
-interface CourseEditor {
-}
+import './CourseEditor.scss';
 
 export interface CourseEditorProps extends AbstractEditorProps<models.CourseModel> {
 
@@ -21,7 +22,6 @@ interface CourseEditorState extends AbstractEditorState {
 
 class CourseEditor
   extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState> {
-
   constructor(props) {
     super(props, { failure: false });
   }
@@ -47,7 +47,6 @@ class CourseEditor
   }
 
   renderResources() {
-
     const developers = this.props.model.developers.toArray().map(d =>
       <div key={d.userName} className="row user">
         <div className="col-10">
@@ -57,7 +56,7 @@ class CourseEditor
           <span className="email">{d.email}</span>
         </div>
         <div className="col-2">
-          <button type="button" className={d.isDeveloper ? 'btn btn-success' : 'btn btn-primary'}
+          <button type="button" className={d.isDeveloper ? 'btn btn-remove' : 'btn btn-primary'}
                   onClick={e =>
                   this.registration(
                     d.userName, d.isDeveloper ? 'remove' : 'add')}>
@@ -74,7 +73,8 @@ class CourseEditor
             {developers}
           </div>
         </div>
-      </div>);
+      </div>
+    );
   }
 
   removePackage() {
@@ -104,7 +104,7 @@ class CourseEditor
       : null;
 
     return (
-      <div className="admin">
+      <div className="course-editor">
         <div className="row info">
           <div className="col-md-9">
             <h2>Content Package</h2>
@@ -141,9 +141,10 @@ class CourseEditor
               {adminRow}
             </div>
           </div>
-
         </div>
+
         <br/><br/>
+
         {this.renderResources()}
       </div>
     );

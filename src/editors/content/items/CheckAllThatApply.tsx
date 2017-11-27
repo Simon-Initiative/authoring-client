@@ -16,9 +16,6 @@ import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
 import guid from 'utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
 type IdTypes = {
   shuffle: string,
 };

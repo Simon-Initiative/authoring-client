@@ -20,13 +20,6 @@ import { Collapse } from '../common/Collapse';
 import { Checkbox } from '../common/Checkbox';
 import { TabContainer } from '../common/TabContainer';
 
-import '../common/editor.scss';
-
-
-export interface ImageEditor {
-
-}
-
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
 }

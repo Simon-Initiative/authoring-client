@@ -17,16 +17,8 @@ import { Collapse } from '../common/Collapse';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 
-
-import '../common/editor.scss';
-
-
-export interface YouTubeEditor {
-  
-}
-
 export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
-  
+
 }
 
 export interface YouTubeEditorState {
@@ -36,12 +28,12 @@ export interface YouTubeEditorState {
 /**
  * The content editor for Table.
  */
-export class YouTubeEditor 
+export class YouTubeEditor
   extends AbstractContentEditor<YouTube, YouTubeEditorProps, YouTubeEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onLabeledEdit = this.onLabeledEdit.bind(this);
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onHeightEdit = this.onHeightEdit.bind(this);
@@ -69,7 +61,7 @@ export class YouTubeEditor
 
     const { titleContent, cite, caption } = model;
     const updated = this.props.model.with({ titleContent, cite, caption });
-   
+
     this.props.onEdit(updated);
   }
 
@@ -132,31 +124,31 @@ export class YouTubeEditor
 
         {this.row('', '9', <div className="input-group">
             <span className="input-group-addon">https://youtube.com/watch?v=</span>
-            <input type="text" value={this.state.src} 
+            <input type="text" value={this.state.src}
               onChange={this.onSrcEdit.bind(this)} className="form-control"/>
             </div>)}
 
         <Collapse caption="Additional properties">
 
         {this.row('Height', '2', <div className="input-group input-group-sm">
-            <TextInput width="100%" label="" 
+            <TextInput width="100%" label=""
             editMode={this.props.editMode}
-            value={height} 
+            value={height}
             type="number"
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
-        
+
         {this.row('Width', '2', <div className="input-group input-group-sm">
-           <TextInput width="100%" label="" 
+           <TextInput width="100%" label=""
             editMode={this.props.editMode}
-            value={width} 
+            value={width}
             type="number"
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
-        
-          {this.row('Popout', '8', <TextInput width="100%" label="" 
+
+          {this.row('Popout', '8', <TextInput width="100%" label=""
               editMode={this.props.editMode}
-              value={popout.content} 
+              value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}

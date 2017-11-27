@@ -1,0 +1,114 @@
+@import 'oli/colors';
+
+.editor-manager {
+  .itemWrapper {
+    margin: 1;
+  }
+
+  .questionContentWrapper {
+
+    margin-left: 20px;
+    background-color: $blue-light;
+  }
+
+  .componentWrapper {
+    border-style: solid;
+    border-color: $blue;
+    border-width: 1px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .itemPart {
+    background-color: #dddddd;
+    padding: 9px;
+  }
+
+  .document {
+    padding-top: 20px;
+
+    h2 {
+      color: $black;
+
+      &.organize {
+        display:inline-block;
+      }
+    }
+  }
+
+  .componentWrapper {
+    &.content {
+      border-color: transparent;
+      background-color: $white;
+      border-radius: 4px;
+
+      .form-control {
+        border-color: transparent;
+
+        &:hover {
+          border-color: $gray-lighter;
+        }
+      }
+    }
+
+    &.question {
+      border-color: transparent;
+      background-color: $white;
+      border-radius: 4px;
+
+      .form-control {
+        &:first-child {
+          border-color: $gray-lighter;
+        }
+
+        &:hover {
+          border-color: $gray-lighter;
+        }
+      }
+
+      .ChoiceFeedback {
+        border: 2px solid $blue;
+
+        .input-group {
+          .input-group-addon {
+            border-radius: 0px;
+            background-color: $blue;
+            color: $white;
+            border: none;
+          }
+          .InputLabel-default {
+            font-size: 0.9rem;
+          }
+        }
+      }
+
+      .input-group-addon.InputLabel-default {
+        border-radius: 0px;
+        background-color: $blue;
+        color: $white;
+        border: none;
+        font-size: 0.9rem;
+      }
+
+      .closebtn.input-group-addon {
+        border-radius: 0px;
+        background-color: $blue;
+        color: $white;
+        border: none;
+      }
+
+      .itemWrapper {
+        border: 2px solid $blue;
+      }
+    }
+  }
+
+  .form-check-label.btn {
+    font-size: 0.9rem;
+    margin-left: 25px;
+
+    .form-check-input {
+      margin-right: 5px;
+    }
+  }
+}

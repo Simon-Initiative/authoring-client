@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import guid from '../../utils/guid';
 
-export interface DuplicateListingInput {  
+export interface DuplicateListingInput {
   id: string;
 }
 
@@ -21,7 +21,7 @@ export interface DuplicateListingInputState {
   duplicates: Immutable.List<string>;
 }
 
-export class DuplicateListingInput 
+export class DuplicateListingInput
   extends React.PureComponent<DuplicateListingInputProps, DuplicateListingInputState> {
 
   constructor(props) {
@@ -62,7 +62,7 @@ export class DuplicateListingInput
       border: '1px solid gray',
       zIndex: 9999,
     };
-    
+
     const duplicates = this.state.duplicates
       .map(d => <p>{d}</p>);
 
@@ -91,18 +91,18 @@ export class DuplicateListingInput
     return (
       <div style={outerDiv}>
         <form className="form-inline">
-          <input 
+          <input
             disabled={!this.props.editMode}
             style={ { width: this.props.width } }
             placeholder={this.props.placeholder}
             onChange={this.onChange}
-            className="form-control form-control-sm" 
-            type="string" 
-            value={this.state.value} 
+            className="form-control mb-2 mr-sm-2 mb-sm-0"
+            type="string"
+            value={this.state.value}
             id={this.id}/>
-          <button 
+          <button
             type="button"
-            className="btn btn-sm btn-primary"
+            className="btn btn-primary"
             disabled={!this.props.editMode}
             onClick={() => this.props.onClick(this.state.value)}>
             {this.props.buttonLabel}
@@ -112,6 +112,5 @@ export class DuplicateListingInput
       </div>
     );
   }
-  
-}
 
+}

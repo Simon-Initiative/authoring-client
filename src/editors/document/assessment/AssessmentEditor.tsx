@@ -27,9 +27,7 @@ import { AddQuestion } from '../../content/question/AddQuestion';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
-interface AssessmentEditor {
-
-}
+import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
 
@@ -348,7 +346,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderPagination() {
 
     const addButton = <button disabled={!this.props.editMode}
-      type="button" className="btn btn-secondary"
+      type="button" className="btn btn-link btn-sm"
       onClick={this.onAddPage}>Add Page</button>;
 
 
@@ -377,52 +375,35 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
-    const slash : any = {
-      fontFamily: 'sans-serif',
-      lineHeight: 1.25,
-      position: 'relative',
-      top: '-4',
-      color: '#606060',
-    };
-
-    const label : any = {
-      fontFamily: 'sans-serif',
-      lineHeight: 1.25,
-      fontSize: '13',
-      position: 'relative',
-      top: '-6',
-      color: '#606060',
-    };
-
     return (
-      <div>
+      <div className="add-menu">
 
-      <span style={label}>Insert new: </span>
+        <span className="label">Insert new: </span>
 
-      <button disabled={!this.props.editMode}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddContent}>Content</button>
+        <button disabled={!this.props.editMode}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddContent}>Content</button>
 
-      <span style={slash}>/</span>
+        <span className="slash">/</span>
 
-      <AddQuestion
-        editMode={this.props.editMode}
-        onQuestionAdd={this.addQuestion.bind(this)}
-        isSummative={this.props.model.type === LegacyTypes.assessment2}/>
+        <AddQuestion
+          editMode={this.props.editMode}
+          onQuestionAdd={this.addQuestion.bind(this)}
+          isSummative={this.props.model.type === LegacyTypes.assessment2}/>
 
-      <span style={slash}>/</span>
+        <span className="slash">/</span>
 
-      <button
-        disabled={!this.props.editMode || isInline}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddPool}>Pool</button>
+        <button
+          disabled={!this.props.editMode || isInline}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddPool}>Pool</button>
 
-        <span style={slash}>/</span>
+          <span className="slash">/</span>
 
-      <button
-        disabled={!this.props.editMode || isInline}
-        type="button" className="btn btn-secondary btn-sm"
-        onClick={this.onAddPoolRef}>Pool Reference</button>
+        <button
+          disabled={!this.props.editMode || isInline}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddPoolRef}>Pool Reference</button>
 
       </div>
     );
@@ -435,7 +416,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const nodeEditors = this.renderNodes(page);
 
     return (
-      <div>
+      <div className="assessment-editor">
         <div className="docHead">
 
           <UndoRedoToolbar
@@ -445,15 +426,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           {titleEditor}
 
-          <div style={ { marginTop: '20px' } }/>
-
           <div className="componentWrapper content">
             {this.props.model.type === LegacyTypes.assessment2
               ? this.renderSettings() : null}
             {this.renderPagination()}
           </div>
-
-          <div style={ { marginTop: '40px' } }/>
 
           {this.renderAdd()}
 

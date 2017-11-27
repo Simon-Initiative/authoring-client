@@ -22,6 +22,8 @@ import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 
+import './EditorManager.scss';
+
 export interface EditorManagerProps {
   documentId: string;
   userId: string;
@@ -29,9 +31,8 @@ export interface EditorManagerProps {
   profile: UserProfile;
   course: any;
   expanded: any;
-  titles: any;
+  titles: Immutable.Map<string, string>;
   onCourseChanged: (model: models.CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -44,16 +45,14 @@ export interface EditorManagerState {
   undoRedoGuid: string;
 }
 
-export default interface EditorManager {
+export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   componentDidUnmount: boolean;
   persistenceStrategy: PersistenceStrategy;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
   waitBufferTimer: any;
-}
 
-export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   constructor(props) {
     super(props);
 
@@ -114,7 +113,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
           listeningApproach === ListeningApproach.Always) {
 
           this.stopListening = false;
-          this.listenForChanges();
         }
       }
     });
@@ -193,7 +191,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   }
 
   componentDidMount() {
-    const { course, documentId, onLoadCourseTitles } = this.props;
+    const { course, documentId } = this.props;
 
     // Special handling for CourseModel  - don't call fetchDocument
     if (course && course.model.guid === documentId) {
@@ -215,7 +213,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       this.setState({ document });
     } else if (course) {
       this.fetchDocument(course.model.guid, documentId);
-      onLoadCourseTitles(course.model.guid);
     }
   }
 
@@ -235,24 +232,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       .substr(pathTo.indexOf('content\/') + 8);
     return stem
       .substr(0, stem.lastIndexOf('\/'));
-  }
-
-  listenForChanges() {
-    // persistence.listenToDocument(this.state.document)
-    //     .then(document => {
-    //         if (!this.stopListening) {
-    //
-    //             this.setState({document});
-    //
-    //             this.listenForChanges();
-    //         }
-    //
-    //     })
-    //     .catch(err => {
-    //         if (!this.stopListening) {
-    //             this.listenForChanges();
-    //         }
-    //     })
   }
 
   renderWaiting() {
@@ -368,7 +347,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       const editor = React.createElement((registeredEditor.component as any), childProps);
 
       return (
-        <div>
+        <div className="editor-manager">
           {editingAllowed ?
             null
             : renderLocked(this.persistenceStrategy.getLockDetails())

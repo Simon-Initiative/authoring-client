@@ -6,9 +6,7 @@ import * as courseActions from '../actions/course';
 import * as viewActions from '../actions/view';
 import { isNullOrUndefined } from 'util';
 
-interface CreateCourseView {
-  _onClickCancel: () => void;
-}
+import './CreateCourseView.scss';
 
 export interface CreateCourseViewProps {
   dispatch: any;
@@ -23,7 +21,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   constructor(props) {
     super(props);
-    this._onClickCancel = this.onClickCancel.bind(this);
+    this.onClickCancel = this.onClickCancel.bind(this);
 
     this.state = {
       waiting: false,
@@ -70,13 +68,11 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     const inputs = (
       <div className="col-md-4 offset-sm-4">
         <button onClick={this.createCourse.bind(this)}
-                style={{ color: 'white ' }}
                 className="btn btn-secondary btn-lg btn-block outline serif">
           Create Course
         </button>
-        <button onClick={this._onClickCancel}
-                style={{ color: 'white ' }}
-                className="btn btn-secondary btn-lg btn-block serif">
+        <button onClick={this.onClickCancel}
+                className="btn btn-cancel btn-lg btn-block serif">
           Cancel
         </button>
       </div>
@@ -107,7 +103,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     );
 
     return (
-      <div className="createCourse full container-fluid">
+      <div className="create-course-view full container-fluid">
         <div className="row">
           <div className="col-md-12">
             <h1>Create a new course content package</h1>

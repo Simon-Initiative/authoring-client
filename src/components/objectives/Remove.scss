@@ -1,0 +1,11 @@
+@import 'oli/colors';
+
+.remove-btn {
+  float: right;
+
+  .btn:hover {
+    .icon-remove {
+      color: $danger;
+    }
+  }
+}

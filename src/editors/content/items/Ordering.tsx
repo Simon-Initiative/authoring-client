@@ -14,9 +14,6 @@ import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '.
 import { ItemLabel } from './ItemLabel';
 import guid from '../../../utils/guid';
 
-import '../common/editor.scss';
-import './MultipleChoice.scss';
-
 type IdTypes = {
   shuffle: string,
 };

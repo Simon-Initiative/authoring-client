@@ -14,15 +14,8 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
-import '../common/editor.scss';
-
-
-export interface TableEditor {
-  
-}
-
 export interface TableEditorProps extends AbstractContentEditorProps<contentTypes.Table> {
-  
+
 }
 
 export interface TableEditorState {
@@ -32,9 +25,9 @@ export interface TableEditorState {
 /**
  * The content editor for Table.
  */
-export class TableEditor 
+export class TableEditor
   extends AbstractContentEditor<contentTypes.Table, TableEditorProps, TableEditorState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -70,7 +63,7 @@ export class TableEditor
       const cell = new CellData();
       cells = cells.set(cell.guid, cell);
     }
-    
+
     const newRow = new Row({ cells });
     const rows = this.props.model.rows.set(newRow.guid, newRow);
 
@@ -106,7 +99,7 @@ export class TableEditor
   onColRemove(index: number) {
 
     if (!this.props.editMode) return;
-    
+
     const model = this.props.model;
     let rows = model.rows;
 
@@ -124,7 +117,13 @@ export class TableEditor
   }
 
   renderCell(
-    rowGuid: string, cell: Cell, inlineToolbar: any, blockToolbar: any, insertionToolbar: any, totalCells: number) {
+    rowGuid: string,
+    cell: Cell,
+    inlineToolbar: any,
+    blockToolbar: any,
+    insertionToolbar: any,
+    totalCells: number,
+  ) {
 
     const width = ((1 / totalCells) * 100) + '%';
     const verticalAlign = 'top';
@@ -134,7 +133,7 @@ export class TableEditor
       borderWith: 1,
       borderColor: '#AAAAAA',
     };
-    const editor = <HtmlContentEditor 
+    const editor = <HtmlContentEditor
       showBorder={false}
       editorStyles={bodyStyle}
       inlineToolbar={inlineToolbar}
@@ -142,7 +141,7 @@ export class TableEditor
       inlineInsertionToolbar={insertionToolbar}
       {...this.props}
       model={new Html({ contentState: cell.content })}
-      onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)} 
+      onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)}
       />;
     if (cell.contentType === 'CellData') {
       return <td style={ { width, verticalAlign } } key={cell.guid}>{editor}</td>;
@@ -153,11 +152,11 @@ export class TableEditor
 
   renderDeleteColumn() {
     const rows = this.props.model.rows.toArray();
-    if (rows.length > 0) {  
+    if (rows.length > 0) {
       const tds = [];
       for (let i = 0; i < this.props.model.rows.first().cells.size; i += 1) {
         tds.push(<td key={i}>
-          <span className="closebtn input-group-addon" 
+          <span className="closebtn input-group-addon"
             onClick={this.onColRemove.bind(this, i)}>&times;</span>
           </td>);
       }
@@ -172,9 +171,9 @@ export class TableEditor
       <tr key={row.guid}>
         {row.cells.toArray().map(
           c => this.renderCell(
-            row.guid, c, inlineToolbar, 
+            row.guid, c, inlineToolbar,
             blockToolbar, insertionToolbar, row.cells.size))}
-        <td><span className="closebtn input-group-addon" 
+        <td><span className="closebtn input-group-addon"
           onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
       </tr>
     );
@@ -193,9 +192,9 @@ export class TableEditor
       <div className="itemWrapper">
         <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
           <div className="btn-group mr-2" role="group" aria-label="First group">
-            <button disabled={!this.props.editMode} onClick={this.onRowAdd} type="button" 
+            <button disabled={!this.props.editMode} onClick={this.onRowAdd} type="button"
               className="btn btn-secondary btn-sm">Add Row</button>
-            <button disabled={!this.props.editMode} onClick={this.onColAdd} type="button" 
+            <button disabled={!this.props.editMode} onClick={this.onColAdd} type="button"
               className="btn btn-secondary btn-sm">Add Column</button>
           </div>
         </div>

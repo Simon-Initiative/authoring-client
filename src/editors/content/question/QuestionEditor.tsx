@@ -8,7 +8,7 @@ import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import '../common/editor.scss';
+
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
@@ -38,6 +38,8 @@ import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
+
+import './QuestionEditor.scss';
 
 type Ids = {
   id: string,
@@ -551,20 +553,16 @@ export abstract class QuestionEditor
         </Select>
       </form>);
 
-
-
     return (
-
-      <RemovableContent editMode={this.props.editMode}
-        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        associatedClasses="question">
-
-        <div style={ { position: 'relative' } }>
-
+      <div className="question-editor">
+        <RemovableContent
+          editMode={this.props.editMode}
+          onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
+          title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
+          associatedClasses="question">
           <Collapse caption={getLabelForQuestion(this.props.model)}
             details={getHtmlDetails(this.props.model.body)}
             expanded={expanded}>
-
             <HtmlContentEditor
                   ref={c => this.htmlEditor = c}
                   editMode={this.props.editMode}
@@ -576,22 +574,14 @@ export abstract class QuestionEditor
                   inlineInsertionToolbar={insertionToolbar}
                   blockToolbar={blockToolbar}
                   model={this.props.model.body}
-                  onEdit={this.onBodyEdit}
-                  />
+                  onEdit={this.onBodyEdit} />
 
             {this.renderItemsAndParts()}
 
           </Collapse>
-
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
-
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-
-          </div>
-
-        </div>
-
-      </RemovableContent>);
+        </RemovableContent>
+      </div>
+    );
   }
 
 }

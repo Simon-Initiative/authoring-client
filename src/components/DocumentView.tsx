@@ -4,7 +4,10 @@ import NavigationBar from './navigation/NavigationBar.controller';
 import { UserProfile } from 'types/user';
 import EditorManager from 'editors/manager/EditorManager.controller';
 import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
+import { LegacyTypes } from 'data/types';
 import * as viewActions from 'actions/view';
+import { getTitlesByModel } from 'actions/course';
+import { Title } from 'types/course';
 
 export interface DocumentViewProps {
   dispatch: any;
@@ -17,12 +20,10 @@ export interface DocumentViewProps {
 
 export interface DocumentViewState {}
 
-export default interface DocumentView {
-  viewActions: Object;
-}
-
 export default class DocumentView
   extends React.PureComponent<DocumentViewProps, DocumentViewState> {
+  viewActions: Object;
+
   constructor(props) {
     super(props);
     const { dispatch } = this.props;
@@ -30,11 +31,17 @@ export default class DocumentView
     this.viewActions = bindActionCreators((viewActions as any), dispatch);
   }
 
+  componentDidMount() {
+    const { course, dispatch } = this.props;
+
+    dispatch(getTitlesByModel(course.model));
+  }
+
   render() {
     const { course, documentId, profile, userId, userName } = this.props;
 
     return (
-      <div className="container-fluid">
+      <div className="document-view container-fluid">
         <div className="row">
             <NavigationBar viewActions={this.viewActions} />
             <div className="col-sm-9 col-md-10 document">
