@@ -12,7 +12,7 @@ import guid from '../../utils/guid';
 
 
 export interface Skill {
-  
+
 }
 
 export interface SkillProps {
@@ -22,17 +22,18 @@ export interface SkillProps {
   editMode: boolean;
   toggleExpanded: (id) => void;
   model: contentTypes.Skill;
+  title: string;
   highlighted: boolean;
   mouseOver: boolean;
 }
 
 export interface SkillState {
- 
+
 }
 
-export class Skill 
+export class Skill
   extends React.PureComponent<SkillProps, SkillState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -46,22 +47,22 @@ export class Skill
 
   render() : JSX.Element {
 
-    const { model, editMode, mouseOver, isExpanded } = this.props;
+    const { model, title, editMode, mouseOver, isExpanded } = this.props;
 
     const remove = mouseOver && editMode
-      ? <Remove editMode={this.props.editMode} 
+      ? <Remove editMode={this.props.editMode}
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
       : null;
 
-    const title = <span><b>Skill: </b>{this.props.model.title}</span>;
+    const titleBlock = <span><b>Skill: </b>{title}</span>;
 
     return (
       <div style={ { marginLeft: '45px' } }>
-        <Title title={model.title} 
-          editMode={editMode} 
+        <Title title={model.title}
+          editMode={editMode}
           onToggleExpanded={() => this.props.toggleExpanded(model.id)}
-          isHoveredOver={mouseOver} 
-          onEdit={this.onTitleEdit}>{title}</Title>
+          isHoveredOver={mouseOver}
+          onEdit={this.onTitleEdit}>{titleBlock}</Title>
         {remove}
       </div>
     );

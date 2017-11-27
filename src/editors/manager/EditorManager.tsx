@@ -31,9 +31,8 @@ export interface EditorManagerProps {
   profile: UserProfile;
   course: any;
   expanded: any;
-  titles: any;
+  titles: Immutable.Map<string, string>;
   onCourseChanged: (model: models.CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -114,7 +113,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
           listeningApproach === ListeningApproach.Always) {
 
           this.stopListening = false;
-          this.listenForChanges();
         }
       }
     });
@@ -193,7 +191,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   }
 
   componentDidMount() {
-    const { course, documentId, onLoadCourseTitles } = this.props;
+    const { course, documentId } = this.props;
 
     // Special handling for CourseModel  - don't call fetchDocument
     if (course && course.model.guid === documentId) {
@@ -215,7 +213,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       this.setState({ document });
     } else if (course) {
       this.fetchDocument(course.model.guid, documentId);
-      onLoadCourseTitles(course.model.guid);
     }
   }
 
@@ -235,24 +232,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       .substr(pathTo.indexOf('content\/') + 8);
     return stem
       .substr(0, stem.lastIndexOf('\/'));
-  }
-
-  listenForChanges() {
-    // persistence.listenToDocument(this.state.document)
-    //     .then(document => {
-    //         if (!this.stopListening) {
-    //
-    //             this.setState({document});
-    //
-    //             this.listenForChanges();
-    //         }
-    //
-    //     })
-    //     .catch(err => {
-    //         if (!this.stopListening) {
-    //             this.listenForChanges();
-    //         }
-    //     })
   }
 
   renderWaiting() {

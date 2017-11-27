@@ -30,6 +30,7 @@ import { Row } from './Row';
 import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
+import { Title } from 'types/course';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import './OrgEditor.scss';
@@ -96,7 +97,7 @@ function identifyNewNodes(last: string[], current: string[]) : string[] {
 }
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
-
+  onUpdateTitle: (title: Title) => void;
 }
 
 const enum TABS {
@@ -261,7 +262,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         highlighted={this.state.highlightedNodes.has(node.guid)}
         labels={this.props.model.labels}
         model={node}
-        org={this.props.model} context={this.props.context}
+        org={this.props.model}
+        context={this.props.context}
         parentModel={parent}
         onEdit={this.onNodeEdit}
         editMode={this.props.editMode}
@@ -303,8 +305,17 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderDetails() {
-    return <Details editMode={this.props.editMode}
-      model={this.props.model} onEdit={model => this.handleEdit(model)}/>;
+    const { onUpdateTitle } = this.props;
+
+    return (
+      <Details
+        editMode={this.props.editMode}
+        model={this.props.model}
+        onEdit={(model) => {
+          onUpdateTitle({ id: model.get('id'), title: model.get('title') });
+          this.handleEdit(model);
+        }}/>
+    );
   }
 
   onLabelsEdit(labels) {

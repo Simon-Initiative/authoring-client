@@ -22,6 +22,7 @@ import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
+  onUpdateTitle: (titles: Title[]) => void;
   objectiveTitles: any;
 }
 
@@ -55,8 +56,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onTitleEdit(title) {
+    const { onUpdateTitle } = this.props;
+
     const head = this.props.model.head.with({ title });
     this.handleEdit(this.props.model.with({ head }));
+
+    onUpdateTitle([{ id: this.props.model.getIn(['resource', 'id']), title: title.get('text') }]);
   }
 
   onBodyEdit(content : any) {

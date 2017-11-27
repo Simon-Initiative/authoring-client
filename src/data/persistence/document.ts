@@ -11,9 +11,9 @@ import { Resource } from '../content/resource';
  */
 export function retrieveDocument(
   courseId: CourseId, documentId: DocumentId): Promise<Document> {
-  
+
   const url = `${configuration.baseUrl}/${courseId}/resources/${documentId}`;
-  
+
   return authenticatedFetch({ url })
     .then((json : any) => {
       json.courseId = courseId;
@@ -28,7 +28,7 @@ export function retrieveDocument(
 
 export function bulkFetchDocuments(
   courseId: string, filters: string[], action: string): Promise<Document[]> {
-  
+
   // Valid values for 'action' is limited to 'byIds' or 'byTypes'
   const url = `${configuration.baseUrl}/${courseId}/resources/bulk?action=${action}`;
   const body = JSON.stringify(filters);
@@ -74,7 +74,7 @@ export function listenToDocument(doc: Document): Promise<Document> {
           _rev: json.payload.rev,
           model: models.createModel(json.payload.doc),
         });
-      } 
+      }
       return null;
     });
 }
@@ -90,7 +90,7 @@ export function createDocument(courseId: CourseId,
   }
   const body = JSON.stringify(content.toPersistence());
   const method = 'POST';
-  
+
   return (authenticatedFetch({ url, body, method }) as any)
     .then((json) => {
       const packageGuid = (content as any).type === LegacyTypes.package ? json.guid : courseId;
