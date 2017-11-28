@@ -18,7 +18,7 @@ export interface OutlineProps {
   onSelect: (selectedNode: AssessmentNode) => void;
 }
 
-function getChildren(node: AssessmentNode)
+export function getChildren(node: AssessmentNode)
   : Maybe<Immutable.OrderedMap<string, AssessmentNode>> {
 
   switch (node.contentType) {
@@ -33,7 +33,7 @@ function getChildren(node: AssessmentNode)
   }
 }
 
-function setChildren(node: AssessmentNode, children) : AssessmentNode {
+export function setChildren(node: AssessmentNode, children) : AssessmentNode {
   switch (node.contentType) {
     case 'Selection':
       if (node.source.contentType === 'Pool') {

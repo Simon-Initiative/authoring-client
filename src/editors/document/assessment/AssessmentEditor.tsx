@@ -17,11 +17,12 @@ import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
-import { typeRestrictedByModel, findNodeByGuid } from './utils';
+import { typeRestrictedByModel, findNodeByGuid, locateNextOfKin } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
-import { Outline } from './Outline';
+import { Outline, getChildren, setChildren } from './Outline';
+import * as Tree from '../../common/tree';
 
 import './AssessmentEditor.scss';
 
@@ -138,14 +139,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     let page = this.props.model.pages.get(this.state.currentPage);
 
-    const supportedNodes = page.nodes.toArray().filter(n => n.contentType !== 'Unsupported');
+    const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
 
-    if (supportedNodes.length > 1) {
+    if (removed.size > 0) {
 
-      page = page.with({ nodes: page.nodes.delete(guid) });
+      this.pendingCurrentNode = locateNextOfKin(page.nodes, guid);
+
+      page = page.with({ nodes: removed });
 
       const pages = this.props.model.pages.set(page.guid, page);
-
       this.handleEdit(this.props.model.with({ pages }));
     }
 

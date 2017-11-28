@@ -42,6 +42,70 @@ export function findNodeByGuid(
   }
 }
 
+
+/**
+ *
+ * Find closest relative.  In an assessment tree, find either the given node's
+ * immediate next sibling - or, if the node has no siblings, return the node's parent.
+ */
+export function locateNextOfKin(
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>,
+  guid: string) : Maybe<contentTypes.Node> {
+
+  // Check top level nodes first
+  if (nodes.has(guid)) {
+    return chooseRelative(nodes, guid, Maybe.nothing<contentTypes.Node>());
+  } else {
+
+    // Check contents of all embedded pools next
+    return nodes
+      .toArray()
+      .reduce(
+        (node, p) => {
+          if (p.contentType === 'Selection') {
+            if (p.source.contentType === 'Pool') {
+              const pool : contentTypes.Pool = p.source;
+              return node.caseOf({
+                just: n => node,
+                nothing: () => {
+                  const n = pool.questions.get(guid);
+                  if (n !== undefined) {
+                    return chooseRelative(
+                      pool.questions, guid,
+                      Maybe.just(p));
+                  }
+                },
+              });
+            }
+          }
+          return node;
+        },
+        Maybe.nothing<contentTypes.Node>());
+
+  }
+}
+
+export function chooseRelative(
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>,
+  guid: string, parent: Maybe<contentTypes.Node>) : Maybe<contentTypes.Node> {
+
+  const arr = nodes
+    .toArray();
+
+  const index =
+    arr
+    .findIndex(q => q.guid === guid);
+
+  if (nodes.size === 1) {
+    return parent;
+  } else if (nodes.size === index + 1) {
+    return Maybe.just(arr[index - 1]);
+  } else {
+    return Maybe.just(arr[index + 1]);
+  }
+
+}
+
 /**
  * Determines if the type of the assessment is restricted by the contents of
  * of the assessment (aka the model)
