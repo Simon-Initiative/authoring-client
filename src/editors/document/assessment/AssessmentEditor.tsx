@@ -5,10 +5,7 @@ import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { QuestionEditor } from '../../content/question/QuestionEditor';
-import { ContentEditor } from '../../content/content/ContentEditor';
-import { SelectionEditor } from '../../content/selection/SelectionEditor';
-import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
+
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
 import { Select } from '../../content/common/Select';
@@ -23,6 +20,7 @@ import * as persistence from '../../../data/persistence';
 import { typeRestrictedByModel, findNodeByGuid } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
+import { renderAssessmentNode } from '../common/questions';
 import { Outline } from './Outline';
 
 import './AssessmentEditor.scss';
@@ -108,12 +106,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({ pages }));
   }
 
-  onEdit(guid : string, content : models.Node) {
-    this.addNode(content);
-  }
-
   onTitleEdit(content: contentTypes.Title) {
     this.handleEdit(this.props.model.with({ title: content }));
+  }
+
+  onEdit(guid : string, content : models.Node) {
+    this.addNode(content);
   }
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
@@ -151,51 +149,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
 
-  renderNode(n : models.Node) {
-    if (n.contentType === 'Question') {
-      return <QuestionEditor
-              key={n.guid}
-              isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={n}
-              onEdit={c => this.onEdit(n.guid, c)}
-              onRemove={this.onNodeRemove.bind(this)}
-              />;
 
-    } else if (n.contentType === 'Content') {
-      return <ContentEditor
-              key={n.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={n}
-              onEdit={c => this.onEdit(n.guid, c)}
-              onRemove={this.onNodeRemove.bind(this)}
-              />;
-    } else if (n.contentType === 'Selection') {
-      return <SelectionEditor
-              key={n.guid}
-              isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={n}
-              onEdit={c => this.onEdit(n.guid, c)}
-              onRemove={this.onNodeRemove.bind(this)}
-              />;
-    } else {
-      return <UnsupportedEditor
-              key={n.guid}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={n}
-              onEdit={c => this.onEdit(n.guid, c)}
-              />;
-    }
-  }
 
   renderTitle() {
     return <TitleContentEditor
@@ -445,7 +399,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               </div>
               <div className="col-9">
                 <div className="nodeContainer">
-                  {this.renderNode(this.state.currentNode)}
+                  {renderAssessmentNode(
+                    this.state.currentNode, this.props, this.onEdit, this.onNodeRemove)}
                 </div>
               </div>
             </div>

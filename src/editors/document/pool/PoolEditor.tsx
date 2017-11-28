@@ -6,43 +6,44 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { AddQuestion } from '../../content/question/AddQuestion';
-import { PoolEditor as PoolContentEditor } from '../../content/selection/PoolEditor';
+import { Outline } from '../assessment/Outline';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import guid from '../../../utils/guid';
 import { DragDropContext } from 'react-dnd';
+import { renderAssessmentNode } from '../common/questions';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 interface PoolEditor {
-  
+
 }
 
 export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
-  
+
 }
 
 interface PoolEditorState extends AbstractEditorState {
-  
+  currentNode: contentTypes.Node;
 }
 
 @DragDropContext(HTML5Backend)
 class PoolEditor extends AbstractEditor<models.PoolModel,
-  PoolEditorProps, 
+  PoolEditorProps,
   PoolEditorState>  {
 
   constructor(props) {
-    super(props, {});
+    super(props, { currentNode: props.model.pool.questions.first() });
 
     this.onEdit = this.onEdit.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+    this.onEditNodes = this.onEditNodes.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
-  }
-    
-  onEdit(pool: contentTypes.Pool) {
-    this.handleEdit(this.props.model.with({ pool }));
+    this.onSelect = this.onSelect.bind(this);
+    this.onChangeExpansion = this.onChangeExpansion.bind(this);
   }
 
   addQuestion(q) {
-    
-    const pool = this.props.model.pool.with( 
+
+    const pool = this.props.model.pool.with(
       { questions: this.props.model.pool.questions.set(q.guid, q) });
     const updated = this.props.model.with({ pool });
     this.handleEdit(updated);
@@ -54,35 +55,93 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.handleEdit(updated);
   }
 
+  onEdit(guid : string, question : contentTypes.Question) {
+
+    const questions = this.props.model.pool.questions.set(guid, question);
+    const pool = this.props.model.pool.with({ questions });
+    this.handleEdit(this.props.model.with({ pool }));
+  }
+
+  onEditNodes(questions: Immutable.OrderedMap<string, contentTypes.Question>) {
+
+    const pool = this.props.model.pool.with({ questions });
+    this.handleEdit(this.props.model.with({ pool }));
+  }
+
+  onChangeExpansion(nodes: Immutable.Set<string>) {
+    // Nothing to do here, as we are not allowing changing the
+    // expanded state of nodes in the outline
+  }
+
+  onSelect(currentNode: contentTypes.Node) {
+    this.setState({ currentNode });
+  }
+
+  onRemove(guid: string) {
+
+    const { model } = this.props;
+
+    if (model.pool.questions.size > 1) {
+      const pool = model.pool.with({ questions: model.pool.questions.delete(guid) });
+      this.handleEdit(this.props.model.with({ pool }));
+    }
+
+  }
+
   render() {
+
+    const { model } = this.props;
+
+    // We currently do not allow expanding / collapsing in the outline,
+    // so we simply tell the outline to expand every node.
+    const expanded = Immutable.Set<string>(model.pool.questions.toArray().map(n => n.guid));
+
     return (
-      <div>
+      <div className="pool-editor">
         <div className="docHead">
-          <UndoRedoToolbar 
+          <UndoRedoToolbar
               undoEnabled={this.state.undoStackSize > 0}
               redoEnabled={this.state.redoStackSize > 0}
               onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-          <TitleContentEditor 
+          <TitleContentEditor
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
               model={this.props.model.pool.title}
-              onEdit={this.onTitleEdit} 
+              onEdit={this.onTitleEdit}
               />
-          <AddQuestion 
+          <AddQuestion
             editMode={this.props.editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative={true}/>
-          <PoolContentEditor
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            onRemove={() => null}
-            model={this.props.model.pool}
-            onEdit={this.onEdit}/>
+
+          <div className="container-fluid">
+            <div className="row no-gutters">
+              <div className="col-3">
+                <div className="outlineContainer">
+                  <Outline
+                    editMode={this.props.editMode}
+                    nodes={model.pool.questions}
+                    expandedNodes={expanded}
+                    selected={this.state.currentNode.guid}
+                    onEdit={this.onEditNodes.bind(this)}
+                    onChangeExpansion={this.onChangeExpansion.bind(this)}
+                    onSelect={this.onSelect.bind(this)}
+                    />
+                </div>
+              </div>
+              <div className="col-9">
+                <div className="nodeContainer">
+                  {renderAssessmentNode(
+                    this.state.currentNode, this.props, this.onEdit, this.onRemove)}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-    );    
+    );
   }
 
 }
