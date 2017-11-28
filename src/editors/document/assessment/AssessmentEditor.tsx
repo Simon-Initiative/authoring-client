@@ -56,6 +56,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
+    this.onNodeRemove = this.onNodeRemove.bind(this);
+    this.onEdit = this.onEdit.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
   }

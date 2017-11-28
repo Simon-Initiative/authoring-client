@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import * as models from '../../../data/models';
@@ -30,6 +31,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorProps,
   PoolEditorState>  {
 
+  pendingCurrentNode: Maybe<contentTypes.Question>;
+
   constructor(props) {
     super(props, { currentNode: props.model.pool.questions.first() });
 
@@ -41,11 +44,22 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
   }
 
+
+  componentWillReceiveProps(nextProps: PoolEditorProps) {
+    this.pendingCurrentNode
+      .lift((currentNode) => {
+        this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
+        this.setState({ currentNode });
+      });
+  }
+
   addQuestion(q) {
 
     const pool = this.props.model.pool.with(
       { questions: this.props.model.pool.questions.set(q.guid, q) });
     const updated = this.props.model.with({ pool });
+
+    this.pendingCurrentNode = Maybe.just(q);
     this.handleEdit(updated);
   }
 
@@ -82,7 +96,26 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     const { model } = this.props;
 
     if (model.pool.questions.size > 1) {
+
       const pool = model.pool.with({ questions: model.pool.questions.delete(guid) });
+
+      // Pick a new node to be the current node
+
+      // Find the index where the question to remove is located
+      const index = this.props.model.pool.questions
+        .toArray()
+        .findIndex(q => q.guid === guid);
+
+      // Account for the case that the question removed was last
+      const adjustedIndex = pool.questions.size === index ? index - 1 : index;
+
+      // Get the node at the adjusted index
+      const newCurrent = pool.questions
+        .toArray()[adjustedIndex];
+
+      // Set it to be the new current (pending)
+      this.pendingCurrentNode = Maybe.just(newCurrent);
+
       this.handleEdit(this.props.model.with({ pool }));
     }
 
