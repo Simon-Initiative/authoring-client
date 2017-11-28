@@ -386,27 +386,21 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           {this.renderAdd()}
 
-          <div className="container-fluid">
-            <div className="row no-gutters">
-              <div className="col-3">
-                <div className="outlineContainer">
-                  <Outline
-                    editMode={this.props.editMode}
-                    nodes={page.nodes}
-                    expandedNodes={expanded}
-                    selected={this.state.currentNode.guid}
-                    onEdit={this.onEditNodes.bind(this)}
-                    onChangeExpansion={this.onChangeExpansion.bind(this)}
-                    onSelect={this.onSelect.bind(this)}
-                    />
-                </div>
-              </div>
-              <div className="col-9">
-                <div className="nodeContainer">
-                  {renderAssessmentNode(
-                    this.state.currentNode, this.props, this.onEdit, this.onNodeRemove)}
-                </div>
-              </div>
+          <div className="outline">
+            <div className="outlineContainer">
+              <Outline
+                editMode={this.props.editMode}
+                nodes={page.nodes}
+                expandedNodes={expanded}
+                selected={this.state.currentNode.guid}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect.bind(this)}
+                />
+            </div>
+            <div className="nodeContainer">
+              {renderAssessmentNode(
+                this.state.currentNode, this.props, this.onEdit, this.onNodeRemove)}
             </div>
           </div>
         </div>

@@ -56,7 +56,7 @@ export class DraggableNode<NodeType>
     const opacity = isDragging ? 0.4 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div className="draggable-node" style={{ opacity }}>
+      <div className="draggable-tree-node" style={{ opacity }}>
         {React.Children.map(
           this.props.children,
           ((child) => {

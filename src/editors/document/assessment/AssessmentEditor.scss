@@ -5,15 +5,26 @@
     color: #606060;
   }
 
+  .outline {
+    position: relative;
+  }
+
   .nodeContainer {
     border-style: solid solid solid none;
     border-radius: 3px;
     border-width: 1;
     border-color: #CCCCCC;
-
+    left: 225;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
   }
 
   .outlineContainer {
+    position: absolute;
+    width: 225;
+    height: 100%;
   }
 
   .label {

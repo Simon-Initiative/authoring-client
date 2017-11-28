@@ -4,6 +4,8 @@ import { DragSource } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 import { SourceNodeType } from '../../content/org/drag/utils';
 
+import 'DraggableNode.scss';
+
 export interface DraggableNode {
 
 }
@@ -56,10 +58,10 @@ export class DraggableNode
     const isDragging = (this.props as any).isDragging;
     const connectDragSource = (this.props as any).connectDragSource;
 
-    const opacity = isDragging ? 0.4 : 1;
+    const opacity = isDragging ? 0.0 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div className="draggable-node" style={{ opacity }}>
+      <div className="draggable-tree-node" style={{ opacity }}>
         {React.Children.map(
           this.props.children,
           ((child) => {
