@@ -124,7 +124,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return <QuestionEditor
               key={n.guid}
               isParentAssessmentGraded={this.props.model.resource.type === LegacyTypes.assessment2}
-              isFormative={this.props.model.resource.type === LegacyTypes.inline}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
