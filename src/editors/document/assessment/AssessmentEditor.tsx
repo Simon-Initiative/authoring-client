@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
@@ -19,7 +20,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import * as persistence from '../../../data/persistence';
-import { typeRestrictedByModel } from './utils';
+import { typeRestrictedByModel, findNodeByGuid } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from './Outline';
@@ -40,6 +41,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState>  {
 
+  pendingCurrentNode: Maybe<contentTypes.Node>;
+
   constructor(props) {
     super(props, ({
       currentPage: props.model.pages.first().guid,
@@ -55,9 +58,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
-    this.onReorderNode = this.onReorderNode.bind(this);
 
-    this.canHandleDrop = this.canHandleDrop.bind(this);
+    this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
   }
 
   shouldComponentUpdate(
@@ -86,10 +88,20 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return true;
     }
 
-
     return false;
   }
 
+  componentWillReceiveProps(nextProps: AssessmentEditorProps) {
+
+    const currentPage = nextProps.model.pages.get(this.state.currentPage);
+
+    this.pendingCurrentNode
+      .bind(node => findNodeByGuid(currentPage.nodes, node.guid))
+      .map((currentNode) => {
+        this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
+        this.setState({ currentNode });
+      });
+  }
 
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
@@ -114,7 +126,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
-
+    // Nothing to do here, as we are not allowing changing the
+    // expanded state of nodes in the outline
   }
 
   onSelect(currentNode: contentTypes.Node) {
@@ -173,7 +186,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               onRemove={this.onNodeRemove.bind(this)}
               />;
     } else {
-      /*
       return <UnsupportedEditor
               key={n.guid}
               editMode={this.props.editMode}
@@ -181,7 +193,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               context={this.props.context}
               model={n}
               onEdit={c => this.onEdit(n.guid, c)}
-              />; */
+              />;
     }
   }
 
@@ -198,16 +210,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddContent() {
     let content = new contentTypes.Content();
     content = content.with({ guid: guid() });
+    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   addQuestion(question: contentTypes.Question) {
     const content = question.with({ guid: guid() });
+    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
+    this.pendingCurrentNode = Maybe.just(pool);
     this.addNode(pool);
   }
 
@@ -258,70 +273,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
     this.addNode(pool);
   }
-
-  canHandleDrop(id) {
-    const page = this.props.model.pages.get(this.state.currentPage);
-    return page.nodes.get(id) !== undefined;
-  }
-
-  renderDropTarget(index) {
-    return null;
-    // <RepositionTarget index={index}
-    //  canAcceptId={this.canHandleDrop}  onDrop={this.onReorderNode}/>;
-  }
-
-  onReorderNode(id, index) {
-
-    let page = this.props.model.pages.get(this.state.currentPage);
-    const arr = page.nodes.toArray();
-
-    // find the index of the source node
-    const sourceIndex = arr.findIndex(n => n.guid === id);
-
-    if (sourceIndex !== -1) {
-
-      let nodes = Immutable.OrderedMap<string, contentTypes.Node>();
-      const moved = page.nodes.get(id);
-      const indexToInsert = (sourceIndex < index) ? index - 1 : index;
-
-      arr.forEach((n, i) => {
-
-        if (i === index) {
-          nodes = nodes.set(moved.guid, moved);
-        }
-
-        if (n.guid !== id) {
-          nodes = nodes.set(n.guid, n);
-        }
-      });
-
-      if (index === arr.length) {
-        nodes = nodes.set(moved.guid, moved);
-      }
-
-      page = page.with({ nodes });
-      const pages = this.props.model.pages.set(page.guid, page);
-      const model = this.props.model.with({ pages });
-
-      this.handleEdit(model);
-    }
-
-  }
-
-  renderNodes(page: contentTypes.Page) {
-    const elements = [];
-    const arr = page.nodes.toArray();
-    arr.forEach((node, index) => {
-      elements.push(this.renderDropTarget(index));
-      // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
-      //  {}</DraggableNode>);
-    });
-
-    elements.push(this.renderDropTarget(arr.length));
-
-    return elements;
-  }
-
 
   renderSettings() {
     return (
@@ -449,7 +400,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const titleEditor = this.renderTitle();
     const page = this.props.model.pages.get(this.state.currentPage);
-    const nodeEditors = this.renderNodes(page);
+
+    // We currently do not allow expanding / collapsing in the outline,
+    // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
     return (

@@ -6,6 +6,7 @@ import { Maybe } from 'tsmonad';
 import * as Tree from 'editors/common/tree';
 import { Node as AssessmentNode } from 'data/contentTypes';
 import { renderTab } from './tabs';
+import { findNodeByGuid } from './utils';
 
 export interface OutlineProps {
   editMode: boolean;
@@ -111,32 +112,8 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
   }
 
   onSelect(selected: string) {
-
-    // Find the node
-    if (this.props.nodes.has(selected)) {
-      this.props.onSelect(this.props.nodes.get(selected));
-    } else {
-
-      // Find the node in the embedded pools
-      const found = this.props.nodes
-        .toArray()
-        .reduce(
-          (node, p) => {
-            if (p.contentType === 'Selection') {
-              if (p.source.contentType === 'Pool') {
-                return node !== undefined
-                  ? node
-                  : p.source.questions.get(selected);
-              }
-            }
-            return node;
-          },
-          undefined);
-
-      this.props.onSelect(found);
-    }
-
-
+    findNodeByGuid(this.props.nodes, selected)
+      .lift(n => this.props.onSelect(n));
   }
 
   render() {

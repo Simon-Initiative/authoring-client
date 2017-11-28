@@ -1,7 +1,46 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
+
+
+/**
+ * Finds a node based on guid in an assessment.
+ */
+export function findNodeByGuid(
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>, guid: string) : Maybe<contentTypes.Node> {
+
+  // Check top level nodes first
+  if (nodes.has(guid)) {
+    return Maybe.just(nodes.get(guid));
+  } else {
+
+    // Check contents of all embedded pools next
+    return nodes
+      .toArray()
+      .reduce(
+        (node, p) => {
+          if (p.contentType === 'Selection') {
+            if (p.source.contentType === 'Pool') {
+              const pool : contentTypes.Pool = p.source;
+              return node.caseOf({
+                just: n => node,
+                nothing: () => {
+                  const n = pool.questions.get(guid);
+                  return n === undefined
+                    ? Maybe.nothing<contentTypes.Node>()
+                    : Maybe.just(n);
+                },
+              });
+            }
+          }
+          return node;
+        },
+        Maybe.nothing<contentTypes.Node>());
+
+  }
+}
 
 /**
  * Determines if the type of the assessment is restricted by the contents of
@@ -21,7 +60,7 @@ export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
     pages.reduce(
       (prev, page) => {
         return prev || page.nodes.toArray().find(n => n.contentType === 'Selection') !== undefined;
-      }, 
+      },
       false)
 
         ||
@@ -32,11 +71,11 @@ export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
         const questions = [];
         extractFromNodes(page.nodes, questions);
         return questions.find(q => isMultipart(q)) !== undefined;
-      }, 
+      },
       false)
   );
-      
-  
+
+
 }
 
 function isMultipart(q: contentTypes.Question) {
@@ -44,7 +83,7 @@ function isMultipart(q: contentTypes.Question) {
 }
 
 function extractFromNodes(
-  nodes: Immutable.OrderedMap<string, contentTypes.Node>, 
+  nodes: Immutable.OrderedMap<string, contentTypes.Node>,
   questions: contentTypes.Question[]) {
 
   nodes.toArray()
@@ -61,6 +100,6 @@ function extractFromNodes(
         }
       }
     });
-  
-} 
+
+}
 
