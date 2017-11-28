@@ -14,6 +14,8 @@ import { DragDropContext } from 'react-dnd';
 import { renderAssessmentNode } from '../common/questions';
 import HTML5Backend from 'react-dnd-html5-backend';
 
+import './PoolEditor.scss';
+
 interface PoolEditor {
 
 }
@@ -148,30 +150,23 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative={true}/>
 
-          <div className="container-fluid">
-            <div className="row no-gutters">
-              <div className="col-3">
-                <div className="outlineContainer">
-                  <Outline
-                    editMode={this.props.editMode}
-                    nodes={model.pool.questions}
-                    expandedNodes={expanded}
-                    selected={this.state.currentNode.guid}
-                    onEdit={this.onEditNodes.bind(this)}
-                    onChangeExpansion={this.onChangeExpansion.bind(this)}
-                    onSelect={this.onSelect.bind(this)}
-                    />
-                </div>
-              </div>
-              <div className="col-9">
-                <div className="nodeContainer">
-                  {renderAssessmentNode(
-                    this.state.currentNode, this.props, this.onEdit, this.onRemove)}
-                </div>
-              </div>
+          <div className="outline">
+            <div className="outlineContainer">
+              <Outline
+                editMode={this.props.editMode}
+                nodes={model.pool.questions}
+                expandedNodes={expanded}
+                selected={this.state.currentNode.guid}
+                onEdit={this.onEditNodes.bind(this)}
+                onChangeExpansion={this.onChangeExpansion.bind(this)}
+                onSelect={this.onSelect.bind(this)}
+                />
+            </div>
+            <div className="nodeContainer">
+              {renderAssessmentNode(
+                this.state.currentNode, this.props, this.onEdit, this.onRemove)}
             </div>
           </div>
-
         </div>
       </div>
     );
