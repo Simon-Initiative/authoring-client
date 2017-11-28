@@ -17,7 +17,7 @@ import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface NumericState {
@@ -179,8 +179,7 @@ export class Numeric
           conceptType="skill"
           />
 
-
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}
