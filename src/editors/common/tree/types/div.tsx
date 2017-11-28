@@ -7,6 +7,8 @@ import { RepositionTarget } from '../RepositionTarget';
 import { DragSource } from 'react-dnd';
 import { DragTypes } from 'utils/drag';
 
+import './div.scss';
+
 interface DraggableNodeProps {
   id: string;
   editMode: boolean;
@@ -68,35 +70,50 @@ export class DraggableNode<NodeType>
 
 }
 
-export function buildRenderer<NodeType>() : Types.TreeRenderer<NodeType> {
+export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRenderer<NodeType> {
 
   return {
     renderTree: children => <div>{children}</div>,
 
-    renderNode: (nodeId, node, nodeState, renderedNode, indexWithinParent, editMode) => {
+    renderNode: (
+      nodeId, node, nodeState, renderedNode, dropTarget, indexWithinParent, editMode) => {
+
       return (
-        <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
-          index={indexWithinParent} parentModel={nodeState.parentNode} >
-          {renderedNode}
-        </DraggableNode>
+        <div className="div-node">
+          <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
+            index={indexWithinParent} parentModel={nodeState.parentNode} >
+            {renderedNode}
+          </DraggableNode>
+          {dropTarget}
+        </div>
       );
+
+
     },
 
     renderDropTarget: (
       index: number,
-      onDrop: Types.OnDropHandler,
-      canDrop: Types.CanDropHandler,
-      parentModel: NodeType) : JSX.Element => {
+      onDrop: Types.OnDropHandler<NodeType>,
+      canDrop: Types.CanDropHandler<NodeType>,
+      parentModel: Maybe<NodeType>,
+      parentModelId: Maybe<string>,
+      isBottom: boolean) : JSX.Element => {
 
       const props = {
         index,
         onDrop,
         canDrop,
         parentModel,
+        parentModelId,
       };
 
+      const dropClass = isBottom ? 'bottom-drop' : 'top-drop';
+
+
       return (
-        <RepositionTarget {...props}/>
+        <div className={dropClass}>
+          <RepositionTarget {...props}/>
+        </div>
       );
 
     },

@@ -229,10 +229,16 @@ class Tab extends React.PureComponent<TabProperties, {}> {
     const classes = 'tabItem '
       + (this.props.nodeState.isSelected ? 'tabItemActive' : '');
 
+    const indentation = {
+      marginLeft: this.props.nodeState.depth * 15,
+    };
+
     return (
       <div onClick={() => this.props.handlers.onSelect(this.props.node.guid)}
         className={classes}>
+        <div style={indentation}>
           {this.props.children}
+        </div>
       </div>
     );
   }

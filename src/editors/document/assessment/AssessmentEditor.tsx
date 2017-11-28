@@ -32,7 +32,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 
 interface AssessmentEditorState extends AbstractEditorState {
   currentPage: string;
-  currentNode: string;
+  currentNode: contentTypes.Node;
 }
 
 
@@ -43,7 +43,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   constructor(props) {
     super(props, ({
       currentPage: props.model.pages.first().guid,
-      currentNode: props.model.pages.first().nodes.first().guid,
+      currentNode: props.model.pages.first().nodes.first(),
     } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
@@ -106,14 +106,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
 
+    let page = this.props.model.pages.get(this.state.currentPage);
+    page = page.with({ nodes });
+
+    const pages = this.props.model.pages.set(page.guid, page);
+    this.handleEdit(this.props.model.with({ pages }));
   }
 
   onChangeExpansion(nodes: Immutable.Set<string>) {
 
   }
 
-  onSelect(nodeId: string) {
-    this.setState({ currentNode: nodeId });
+  onSelect(currentNode: contentTypes.Node) {
+    this.setState({ currentNode });
   }
 
   onNodeRemove(guid: string) {
@@ -478,7 +483,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                     editMode={this.props.editMode}
                     nodes={page.nodes}
                     expandedNodes={expanded}
-                    selected={this.state.currentNode}
+                    selected={this.state.currentNode.guid}
                     onEdit={this.onEditNodes.bind(this)}
                     onChangeExpansion={this.onChangeExpansion.bind(this)}
                     onSelect={this.onSelect.bind(this)}
@@ -487,8 +492,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               </div>
               <div className="col-9">
                 <div className="nodeContainer">
-                  {this.renderNode(this.props.model.pages
-                    .get(this.state.currentPage).nodes.get(this.state.currentNode))}
+                  {this.renderNode(this.state.currentNode)}
                 </div>
               </div>
             </div>

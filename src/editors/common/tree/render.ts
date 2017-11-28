@@ -2,11 +2,11 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
 import { NodeId, NodeState, Nodes,
-  RenderedNode, NodeRenderer, Handlers,
+  RenderedNode, NodeRenderer, Handlers, HasGuid,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from './types';
 
-export function renderVisibleNodes<NodeType>(
+export function renderVisibleNodes<NodeType extends HasGuid>(
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
   renderer: NodeRenderer<NodeType>,
@@ -24,7 +24,7 @@ export function renderVisibleNodes<NodeType>(
 }
 
 
-export function renderVisibleNodesHelper<NodeType>(
+export function renderVisibleNodesHelper<NodeType extends HasGuid>(
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
   renderer: NodeRenderer<NodeType>,

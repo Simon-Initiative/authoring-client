@@ -1,12 +1,39 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
-import { NodeId, NodeState, Nodes,
+import { NodeId, NodeState, Nodes, HasGuid,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from './types';
 
-// Recursive manipulation routines for our
-// immutable tree representation
+// Determines whether two things that might be nodes
+// are the same node.  In the context of our tree
+// representation, Nothing as a parent is used to represent
+// the fact that a node is a root node.
+export function isSameNode<NodeType extends HasGuid>(
+    a: Maybe<NodeType>,
+    b: Maybe<NodeType>) {
+
+  return a.caseOf({
+    just: (aP) => {
+      return b.caseOf({
+        just: (bP) => {
+          return aP.guid === bP.guid;
+        },
+        nothing: () => false,
+      });
+    },
+    nothing: () => {
+      return b.caseOf({
+        just: (bP) => {
+          return false;
+        },
+        nothing: () => true,
+      });
+    },
+  });
+}
+
+// Routines for manipulating immutable trees
 
 /**
  * Remove a node from the tree.
@@ -15,7 +42,7 @@ import { NodeId, NodeState, Nodes,
  * @param getChildren the accessor to get node children
  * @param setChildren the mutator to use to set node children
  */
-export function removeNode<NodeType>(
+export function removeNode<NodeType extends HasGuid>(
   idToRemove: NodeId,
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
@@ -41,11 +68,11 @@ export function removeNode<NodeType>(
 }
 
 // Helper insertion function.
-function insert<NodeType>(
+function insert<NodeType extends HasGuid>(
   nodes: Nodes<NodeType>, childId: NodeId, childToAdd: NodeType, index: number) : Nodes<NodeType> {
 
   const arr = nodes
-    .map((k, v) => [k, v])
+    .map((v, k) => [k, v])
     .toArray();
 
   arr.splice(index, 0, [childId, childToAdd]);
@@ -63,7 +90,7 @@ function insert<NodeType>(
  * @param getChildren the get accessor for node children
  * @param setChildren the mutator to set node children
  */
-export function insertNode<NodeType>(
+export function insertNode<NodeType extends HasGuid>(
   targetParentId: Maybe<NodeId>,
   childId: NodeId,
   childToAdd: NodeType,
@@ -110,7 +137,7 @@ export function insertNode<NodeType>(
  * @param getChildren the get accessor to access node children
  * @param setChildren the mutator used to set node children
  */
-export function updateNode<NodeType>(
+export function updateNode<NodeType extends HasGuid>(
   idToUpdate: NodeId,
   newNode: NodeType,
   currentNodes: Nodes<NodeType>,

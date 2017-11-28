@@ -1,18 +1,16 @@
 import * as React from 'react';
+import { Maybe } from 'tsmonad';
 import * as Types from './types';
 import guid from '../../../utils/guid';
 import { DropTarget } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 
-export interface RepositionTarget {
-
-}
-
-export interface RepositionTargetProps {
+export interface RepositionTargetProps<NodeType extends Types.HasGuid> {
   index: number;
-  onDrop: Types.OnDropHandler;
-  canDrop: Types.CanDropHandler;
-  parentModel: any;
+  onDrop: Types.OnDropHandler<NodeType>;
+  canDrop: Types.CanDropHandler<NodeType>;
+  parentModelId: Maybe<string>;
+  parentModel: Maybe<any>;
 }
 
 export interface RepositionTargetState {
@@ -21,19 +19,24 @@ export interface RepositionTargetState {
 
 // tslint:disable-next-line
 const boxTarget = {
-  drop(props: RepositionTargetProps, monitor, component) {
+  drop(props: RepositionTargetProps<any>, monitor, component) {
     const hasDroppedOnChild = monitor.didDrop();
     if (hasDroppedOnChild && !(props as any).greedy) {
       return;
     }
 
+    const parent = component.props.draggedItem.parentModel;
+
     props.onDrop(
-      component.props.draggedItem.sourceModel, component.props.draggedItem.parentModel.guid,
-      props.parentModel, props.index);
+      component.props.draggedItem.sourceModel,
+      parent,
+      props.parentModel,
+      component.props.draggedItem.originalIndex,
+      props.index,
+    );
   },
-  canDrop(props: RepositionTargetProps, monitor) {
+  canDrop(props: RepositionTargetProps<any>, monitor) {
     return props.canDrop(
-      monitor.getItem().id,
       monitor.getItem().sourceModel,
       monitor.getItem().parentModel,
       monitor.getItem().originalIndex,
@@ -50,8 +53,8 @@ const boxTarget = {
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop(),
   draggedItem: monitor.getItem(),
-}))export class RepositionTarget
-  extends React.Component<RepositionTargetProps, RepositionTargetState> {
+}))export class RepositionTarget<NodeType extends Types.HasGuid>
+  extends React.Component<RepositionTargetProps<NodeType>, RepositionTargetState> {
 
   constructor(props) {
     super(props);
@@ -63,11 +66,9 @@ const boxTarget = {
     const canDrop = (this.props as any).canDrop;
     const draggedItem = (this.props as any).draggedItem;
 
-    const delta =  draggedItem === null ? 0 : draggedItem.index - this.props.index;
+    const delta =  draggedItem === null ? 0 : draggedItem.originalIndex - this.props.index;
 
-    const directlyAboveOrBelow = delta === 0 || delta === -1;
-
-    const opacity = (isOver && canDrop && !directlyAboveOrBelow) ? 1.0 : 0.5;
+    const opacity = (isOver && canDrop) ? 1.0 : 0.0;
 
     const style = {
       backgroundColor: '#f4bf42',
@@ -75,7 +76,7 @@ const boxTarget = {
       height: '10px',
       width: '100%',
       marginBottom: '8px',
-
+      zIndex: 9999,
     };
 
     return (this.props as any).connectDropTarget(
