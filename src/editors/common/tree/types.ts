@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 export enum TreeType {
   DIV,
-  TABLE,
+  TABLE, // Not supported yet
 }
 
 export interface HasGuid {
@@ -25,6 +25,7 @@ export type Handlers = {
   onCollapse: (nodeId: NodeId) => void,
 };
 
+// Callback to handle drops
 export type OnDropHandler<NodeType extends HasGuid> = (
   nodeDropped: NodeType,
   nodeParent: Maybe<NodeType>,
@@ -32,6 +33,7 @@ export type OnDropHandler<NodeType extends HasGuid> = (
   originalIndex: number,
   newIndex: number) => void;
 
+// Callback to test drops
 export type CanDropHandler<NodeType extends HasGuid> = (
   nodeBeingDropped: NodeType,
   originalParent: Maybe<NodeType>,
@@ -39,6 +41,7 @@ export type CanDropHandler<NodeType extends HasGuid> = (
   newParent: Maybe<NodeType>,
   newIndex: number) => boolean;
 
+// A client supplied node renderer
 export type NodeRenderer<NodeType extends HasGuid>
   = (node: NodeType,
      nodeState: NodeState<NodeType>,
@@ -50,9 +53,13 @@ export type NodeId = string;
 // The data for a tree.
 export type Nodes<NodeType extends HasGuid> = Immutable.OrderedMap<NodeId, NodeType>;
 
+// We abstract away navigating the tree and allow the client
+// to implement this to control navigation
 export type ChildrenAccessor<NodeType extends HasGuid>
   = (node: NodeType) => Maybe<Nodes<NodeType>>;
 
+// Similar to accessor, we give control to the client as to
+// how to mutate children in a tree.
 export type ChildrenMutator<NodeType extends HasGuid>
   = (node: NodeType, children: Nodes<NodeType>) => NodeType;
 
@@ -81,5 +88,6 @@ export type TreeRenderer<NodeType extends HasGuid> = {
     parentModel: Maybe<NodeType>,
     parentModelId: Maybe<string>,
     isBottom: boolean,
+    editMode: boolean,
     ) => JSX.Element,
 };

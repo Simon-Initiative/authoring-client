@@ -11,6 +11,7 @@ export interface RepositionTargetProps<NodeType extends Types.HasGuid> {
   canDrop: Types.CanDropHandler<NodeType>;
   parentModelId: Maybe<string>;
   parentModel: Maybe<any>;
+  editMode: boolean;
 }
 
 export interface RepositionTargetState {
@@ -36,7 +37,7 @@ const boxTarget = {
     );
   },
   canDrop(props: RepositionTargetProps<any>, monitor) {
-    return props.canDrop(
+    return props.editMode && props.canDrop(
       monitor.getItem().sourceModel,
       monitor.getItem().parentModel,
       monitor.getItem().originalIndex,

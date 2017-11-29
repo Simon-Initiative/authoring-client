@@ -7,7 +7,7 @@ import { NodeId, NodeState, Nodes, HasGuid,
 
 // Determines whether two things that might be nodes
 // are the same node.  In the context of our tree
-// representation, Nothing as a parent is used to represent
+// representation, Nothing - as a parent - is used to represent
 // the fact that a node is a root node.
 export function isSameNode<NodeType extends HasGuid>(
     a: Maybe<NodeType>,
@@ -147,7 +147,6 @@ export function updateNode<NodeType extends HasGuid>(
   // If the node to update is in this set of children,
   // just simply update it and we are done.
   if (currentNodes.has(idToUpdate)) {
-    console.log(idToUpdate + ' ' + newNode);
     return currentNodes.set(idToUpdate, newNode);
   } else {
 

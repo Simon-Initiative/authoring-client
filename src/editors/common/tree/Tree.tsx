@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { DraggableNode } from './DraggableNode';
 import { Maybe } from 'tsmonad';
 import { removeNode, insertNode, isSameNode } from './utils';
 
@@ -135,8 +134,10 @@ export class Tree<NodeType extends Types.HasGuid>
           just: m => Maybe.just(m.guid),
           nothing: () => Maybe.nothing<string>(),
         });
+
         const target = treeRenderer.renderDropTarget(
-          r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false);
+          r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false, editMode);
+
         return treeRenderer.renderNode(
             r.nodeId, r.node,
             { depth: r.depth, parentNode: r.parent, isSelected: selected === r.nodeId },

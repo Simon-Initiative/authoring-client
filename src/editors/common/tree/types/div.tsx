@@ -9,6 +9,9 @@ import { DragTypes } from 'utils/drag';
 
 import './div.scss';
 
+// A simple div based tree renderer.
+
+
 interface DraggableNodeProps {
   id: string;
   editMode: boolean;
@@ -97,7 +100,8 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
       canDrop: Types.CanDropHandler<NodeType>,
       parentModel: Maybe<NodeType>,
       parentModelId: Maybe<string>,
-      isBottom: boolean) : JSX.Element => {
+      isBottom: boolean,
+      editMode: boolean) : JSX.Element => {
 
       const props = {
         index,
@@ -105,6 +109,7 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
         canDrop,
         parentModel,
         parentModelId,
+        editMode,
       };
 
       const dropClass = isBottom ? 'bottom-drop' : 'top-drop';

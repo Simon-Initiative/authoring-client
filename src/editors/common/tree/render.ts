@@ -6,6 +6,9 @@ import { NodeId, NodeState, Nodes,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from './types';
 
+// Given a collection of root nodes (nodes) and a way to navigate
+// through their tree structure (getChildren) render only
+// the visible nodes using a suppled renderer.
 export function renderVisibleNodes<NodeType extends HasGuid>(
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
@@ -23,8 +26,8 @@ export function renderVisibleNodes<NodeType extends HasGuid>(
   return rendered;
 }
 
-
-export function renderVisibleNodesHelper<NodeType extends HasGuid>(
+// Exists to facilitate the recursion.
+function renderVisibleNodesHelper<NodeType extends HasGuid>(
   nodes: Nodes<NodeType>,
   getChildren: ChildrenAccessor<NodeType>,
   renderer: NodeRenderer<NodeType>,
@@ -43,14 +46,18 @@ export function renderVisibleNodesHelper<NodeType extends HasGuid>(
       const nodeId = (entry[0] as string);
       const n = (entry[1] as NodeType);
 
+      // Record metadata about this node
       const nodeState = {
         parentNode,
         isSelected: selectedNodes.has(nodeId),
         depth,
       };
+
+      // Now render it
       const component = renderer(n, nodeState, handlers);
       rendered.push({ nodeId, node: n, parent: parentNode, depth, indexWithinParent, component });
 
+      // If this node is expanded, recursively render it's children
       if (expandedNodes.has(nodeId)) {
         getChildren(n).lift(children =>
           renderVisibleNodesHelper(

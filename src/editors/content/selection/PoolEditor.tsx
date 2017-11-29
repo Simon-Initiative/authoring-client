@@ -11,7 +11,6 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
-import { DraggableNode } from 'editors/common/tree/DraggableNode';
 import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
