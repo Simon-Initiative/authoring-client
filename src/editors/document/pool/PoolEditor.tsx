@@ -44,6 +44,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
+
+    this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
   }
 
 
