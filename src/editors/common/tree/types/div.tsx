@@ -82,7 +82,7 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
       nodeId, node, nodeState, renderedNode, dropTarget, indexWithinParent, editMode) => {
 
       return (
-        <div className="div-node">
+        <div className="div-node" key={nodeId}>
           <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
             index={indexWithinParent} parentModel={nodeState.parentNode} >
             {renderedNode}
