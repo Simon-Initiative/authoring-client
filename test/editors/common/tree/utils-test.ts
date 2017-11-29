@@ -87,17 +87,17 @@ it('top level insert', () => {
 
   expect(added.has('7')).toBe(true);
   expect(added.size).toBe(5);
-  expect(added.first()).toBe(7);
+  expect(added.first().value).toBe(7);
   expect(nodes.has('7')).toBe(false);
   expect(nodes.size).toBe(4);
 
   added = insertNode<TestNode>(
     Maybe.nothing<NodeId>(), '7', child, 1, nodes, get, set);
-  expect(added.toArray()[1]).toBe(7);
+  expect(added.toArray()[1].value).toBe(7);
 
   added = insertNode<TestNode>(
     Maybe.nothing<NodeId>(), '7', child, 4, nodes, get, set);
-  expect(added.toArray()[4]).toBe(7);
+  expect(added.toArray()[4].value).toBe(7);
 
 });
 
@@ -146,7 +146,7 @@ it('top level update', () => {
   expect(updated.has('2')).toBe(true);
   expect(updated.get('2').value).toBe(10);
   expect(nodes.has('2')).toBe(true);
-  expect(nodes.get('2')).toBe(2);
+  expect(nodes.get('2').value).toBe(2);
 
 });
 
