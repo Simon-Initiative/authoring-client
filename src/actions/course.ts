@@ -217,17 +217,33 @@ export const getTitlesByModel = (model: CourseModel) => (
     const resources = model.get('resourcesById').toJS();
     const ids = Object.keys(resources);
 
-    const fetchTitlesPromises = ids
+    const missingByType = ids
       // if title with the same id has already been loaded, dont load it again
       .filter(id => !getState().titles.get(id))
-      .map((key) => {
-        switch (resources[key].type) {
+
+      // Bucket the missing titles by resource type
+      .reduce(
+        (byType, id) => {
+          const type = resources[id].type;
+          if (byType[type] === undefined) {
+            byType[type] = [];
+          }
+          byType[type].push(id);
+          return byType;
+        },
+        {});
+
+    // Now dispatch one request per type
+    const fetchTitlesPromises = Object.keys(missingByType)
+      .map((type) => {
+        switch (type) {
           case LegacyTypes.skills_model:
             return dispatch(fetchSkillTitles(courseId));
           case LegacyTypes.learning_objectives:
             return dispatch(fetchObjectiveTitles(courseId));
           default:
-            return dispatch(receiveTitles([{ id: key, title: resources[key].title }]));
+            const titles = missingByType[type].map(id => ({ id, title: resources[id].title }));
+            return dispatch(receiveTitles(titles));
         }
       });
 
