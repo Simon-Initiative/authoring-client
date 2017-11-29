@@ -16,13 +16,12 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import guid from '../../../utils/guid';
 
 export interface ShortAnswerProps extends AbstractItemPartEditorProps<contentTypes.ShortAnswer> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface ShortAnswerState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.
@@ -87,7 +86,6 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel);
   }
 
-
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
     const criteria = this.props.partModel.criteria.set(c.guid, c);
@@ -145,7 +143,7 @@ export class ShortAnswer
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}
