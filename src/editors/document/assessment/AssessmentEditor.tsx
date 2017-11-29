@@ -113,8 +113,34 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({ title: content }));
   }
 
-  onEdit(guid : string, content : models.Node) {
-    this.addNode(content);
+  detectPoolAdditions(
+    node: models.Node,
+    nodes: Immutable.OrderedMap<string, contentTypes.Node>) {
+
+    if (node.contentType === 'Selection') {
+      if (node.source.contentType === 'Pool') {
+        if (nodes.has(node.guid)) {
+          const previous = nodes.get(node.guid) as contentTypes.Selection;
+          const prevQuestions = (previous.source as contentTypes.Pool).questions;
+          const questions = node.source.questions;
+
+          // We detected an addition of a question to an embedded pool
+          if (questions.size > prevQuestions.size) {
+            this.pendingCurrentNode = Maybe.just(questions.last());
+          }
+
+        }
+      }
+    }
+  }
+
+  onEdit(guid : string, node : models.Node) {
+
+    const nodes = this.props.model.pages.get(this.state.currentPage).nodes;
+
+    this.detectPoolAdditions(node, nodes);
+
+    this.onEditNodes(Tree.updateNode(guid, node, nodes, getChildren, setChildren));
   }
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {

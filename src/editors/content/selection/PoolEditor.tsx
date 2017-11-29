@@ -97,7 +97,6 @@ export class PoolEditor
     const elements = [];
     const arr = this.props.model.questions.toArray();
     arr.forEach((node, index) => {
-      // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
       elements.push(this.renderQuestion(node));
     });
 

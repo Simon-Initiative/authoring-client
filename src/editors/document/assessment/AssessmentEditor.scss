@@ -12,7 +12,7 @@
   }
 
   .nodeContainer {
-    border-style: solid solid solid none;
+    border-style: solid;
     border-radius: 3px;
     border-width: 1;
     border-color: #CCCCCC;
@@ -22,6 +22,7 @@
   .outlineContainer {
     flex-basis: 300px;
     height: 100%;
+    margin-right: 2px;
   }
 
   .label {

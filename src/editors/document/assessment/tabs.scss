@@ -1,16 +1,23 @@
-.tabItem {
+@import 'oli/colors';
+
+$active-tab: $gray-dark;
+
+.tab-item {
   cursor: pointer;
   padding: 5px;
-  background-color: rgba(255, 255, 255, 0.71);
   border-style: solid;
-  border-radius: 1px;
+  border-radius: 3px;
   border-width: 1;
   border-color: #CCCCCC;
   color: black;
+  background-color: transparent;
+
+  &:hover {
+    border-bottom: 2px solid $active-tab;
+  }
 }
 
-.tabItemActive {
-  background-color: transparent;
-  border-style: solid none solid solid;
-  font-weight: 900;
+.tab-item-active {
+  background-color: $active-tab;
+  color: white;
 }

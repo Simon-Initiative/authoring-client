@@ -5,6 +5,8 @@ import guid from '../../../utils/guid';
 import { DropTarget } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 
+import './RepositionTarget.scss';
+
 export interface RepositionTargetProps<NodeType extends Types.HasGuid> {
   index: number;
   onDrop: Types.OnDropHandler<NodeType>;
@@ -18,7 +20,6 @@ export interface RepositionTargetState {
 
 }
 
-// tslint:disable-next-line
 const boxTarget = {
   drop(props: RepositionTargetProps<any>, monitor, component) {
     const hasDroppedOnChild = monitor.didDrop();
@@ -69,19 +70,10 @@ const boxTarget = {
 
     const delta =  draggedItem === null ? 0 : draggedItem.originalIndex - this.props.index;
 
-    const opacity = (isOver && canDrop) ? 1.0 : 0.0;
-
-    const style = {
-      backgroundColor: '#f4bf42',
-      opacity,
-      height: '10px',
-      width: '100%',
-      marginBottom: '8px',
-      zIndex: 9999,
-    };
+    const classes = 'reposition-target ' + ((isOver && canDrop) ? 'reposition-target-active' : '');
 
     return (this.props as any).connectDropTarget(
-      <div style={style}/>,
+      <div className={classes}/>,
     );
   }
 

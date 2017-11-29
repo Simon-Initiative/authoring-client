@@ -43,14 +43,6 @@ export function renderTab(
   }
 }
 
-// content = label + leading text
-
-// question = question type as label, leading text, # skills
-
-// pool = label + count# out of #questions
-
-// pool ref = label + count#
-
 const countSkills = (q: Question) : number =>
   q.concepts.size + q.parts.toArray().reduce((total, p) => total + p.concepts.size, 0);
 
@@ -214,20 +206,10 @@ class Tab extends React.PureComponent<TabProperties, {}> {
     super(props);
   }
 
-  componentDidMount() {
-    // (window as any).$(this.ref).tooltip(
-    //  { delay: { show: 1000, hide: 100 } },
-    // );
-  }
-
-  componentWillUnmount() {
-    // (window as any).$(this.ref).tooltip('hide');
-  }
-
   render() : JSX.Element {
 
-    const classes = 'tabItem '
-      + (this.props.nodeState.isSelected ? 'tabItemActive' : '');
+    const classes = 'tab-item '
+      + (this.props.nodeState.isSelected ? 'tab-item-active' : '');
 
     const indentation = {
       marginLeft: this.props.nodeState.depth * 15,
