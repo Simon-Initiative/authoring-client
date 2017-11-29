@@ -19,7 +19,7 @@ type IdTypes = {
 };
 
 export interface OrderingProps extends AbstractItemPartEditorProps<contentTypes.Ordering> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface OrderingState {
@@ -226,7 +226,7 @@ export class Ordering
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}

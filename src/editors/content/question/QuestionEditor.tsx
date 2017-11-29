@@ -358,6 +358,7 @@ export abstract class QuestionEditor
         key={item.guid}
         itemModel={item}
         partModel={part}
+        hideGradingCriteria={!this.props.isParentAssessmentGraded}
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
@@ -371,6 +372,7 @@ export abstract class QuestionEditor
         key={item.guid}
         itemModel={item}
         partModel={part}
+        hideGradingCriteria={!this.props.isParentAssessmentGraded}
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'FillInTheBlank') {
@@ -384,6 +386,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Numeric') {
@@ -397,6 +400,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
 
@@ -411,6 +415,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
 
@@ -425,6 +430,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Ordering') {
@@ -438,6 +444,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Essay') {
@@ -451,6 +458,7 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     }

@@ -21,7 +21,9 @@ type IdTypes = {
 };
 
 export interface MultipleChoiceProps
-  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {}
+  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
+  hideGradingCriteria?: boolean;
+}
 
 export interface MultipleChoiceState {}
 
@@ -274,7 +276,7 @@ export class MultipleChoice
           title="Skills"
           conceptType="skill" />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}

@@ -15,7 +15,9 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import guid from 'utils/guid';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 
-export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {}
+export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {
+  hideGradingCriteria: boolean;
+}
 
 export interface EssayState {}
 
@@ -92,7 +94,6 @@ export class Essay
     );
   }
 
-
   render() : JSX.Element {
     return (
       <div onFocus={() => this.props.onFocus(this.props.itemModel.id)}
@@ -111,7 +112,7 @@ export class Essay
             title="Skills"
             conceptType="skill" />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
           {...this.props}
