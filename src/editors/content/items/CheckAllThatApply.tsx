@@ -21,6 +21,8 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import { CommandProcessor } from '../common/command';
+import { EditorState } from 'draft-js';
 
 import './QuestionBody.scss';
 
@@ -36,7 +38,7 @@ export interface CheckAllThatApplyProps
   hideGradingCriteria: boolean;
 }
 
-let htmlEditor;
+let htmlEditor: CommandProcessor<EditorState>;
 
 /**
  * The content editor for HtmlContent.

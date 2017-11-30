@@ -15,20 +15,19 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/con
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import {
+  MultipartInput, MultipartInputProps, Section,
+  SectionHeader, SectionContent,
+} from './MultipartInput';
 
-type IdTypes = {
-  shuffle: string,
-};
+export interface FillInTheBlankProps extends MultipartInputProps {
 
-export interface FillInTheBlankProps
-  extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
-  hideGradingCriteria: boolean;
 }
 
-export interface FillInTheBlankState {}
+export interface FillInTheBlankState {
 
+}
 
-// tslint:disable-next-line
 const ChoiceFeedback = (props) => {
   return (
     <div className="choice-feedback clearfix">
@@ -38,69 +37,36 @@ const ChoiceFeedback = (props) => {
 };
 
 /**
- * The content editor for HtmlContent.
+ * FillInTheBlank Question Editor
  */
 export class FillInTheBlank
-  extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
-    FillInTheBlankProps, FillInTheBlankState> {
-  ids: IdTypes;
+  extends MultipartInput {
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      editHistory: [],
-    };
-    this.ids = {
-      shuffle: guid(),
-    };
-
-    this.onAddChoice = this.onAddChoice.bind(this);
-    this.onShuffleChange = this.onShuffleChange.bind(this);
-    this.onChoiceEdit = this.onChoiceEdit.bind(this);
-    this.onHintsEdit = this.onHintsEdit.bind(this);
-    this.onExplanation = this.onExplanation.bind(this);
-
-    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
-    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
-    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
-
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
   }
 
-  onExplanation(explanation) {
-    const part = this.props.partModel.with({ explanation });
+  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
+    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
+    const part = this.props.partModel.with(
+      { responses: this.props.partModel.responses.set(updated.guid, updated) },
+    );
     this.props.onEdit(this.props.itemModel, part);
   }
 
-  onShuffleChange(e) {
-    this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
-  }
-
-  renderCriteria() {
-    const expandedCriteria = (
-      <form className="form-inline">
-        <Button editMode={this.props.editMode}
-          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
-      </form>
-    );
-
+  renderFeedback(
+    choice: contentTypes.Choice,
+    response : contentTypes.Response, feedback: contentTypes.Feedback) {
     return (
-      <Collapse caption="Grading Criteria"
-        details=""
-        expanded={expandedCriteria}>
-        {this.props.partModel.criteria.toArray()
-          .map(c => <CriteriaEditor
-            onRemove={this.onCriteriaRemove}
-            model={c}
-            onEdit={this.onCriteriaEdit}
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode} />,
-          )
-        }
-
-      </Collapse>
+      <FeedbackEditor
+        key={feedback.guid}
+        context={this.props.context}
+        services={this.props.services}
+        editMode={this.props.editMode}
+        model={feedback}
+        showLabel={true}
+        onRemove={this.onRemoveChoice.bind(this, choice, response)}
+        onEdit={this.onFeedbackEdit.bind(this, response)} />
     );
   }
 
@@ -120,6 +86,15 @@ export class FillInTheBlank
     this.props.onEdit(itemModel, partModel);
   }
 
+  onRemoveChoice(choice, response) {
+    const itemModel = this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.delete(choice.guid) });
+    const partModel = this.props.partModel.with(
+      { responses: this.props.partModel.responses.delete(response.guid) });
+
+    this.props.onEdit(itemModel, partModel);
+  }
+
   onChoiceEdit(c) {
     this.props.onEdit(
       this.props.itemModel.with(
@@ -127,26 +102,16 @@ export class FillInTheBlank
       this.props.partModel);
   }
 
-  onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaRemove(guid) {
-    const criteria = this.props.partModel.criteria.delete(guid);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaEdit(c) {
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+
+  onShuffleEdit(shuffle: boolean) {
+    const itemModel = this.props.itemModel.with({ shuffle });
+    this.props.onEdit(itemModel, this.props.partModel);
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
-    const part = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(updated.guid, updated) },
-    );
-    this.props.onEdit(this.props.itemModel, part);
+  onEditMult(mult) {
+    const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
+    const partModel = this.props.partModel.with({ responseMult });
+    this.props.onEdit(this.props.itemModel, partModel);
   }
 
   renderChoice(choice: contentTypes.Choice, response : contentTypes.Response) {
@@ -162,50 +127,10 @@ export class FillInTheBlank
     );
   }
 
-  onHintsEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
-  }
-
   onScoreEdit(response: contentTypes.Response, score: string) {
     const updated = response.with({ score });
     const partModel = this.props.partModel.with(
       { responses: this.props.partModel.responses.set(updated.guid, updated) });
-    this.props.onEdit(this.props.itemModel, partModel);
-  }
-
-  renderFeedback(
-    choice: contentTypes.Choice,
-    response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    return (
-      <FeedbackEditor
-        key={feedback.guid}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        model={feedback}
-        showLabel={true}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)}
-        onEdit={this.onFeedbackEdit.bind(this, response)} />
-    );
-  }
-
-  onRemoveChoice(choice, response) {
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.delete(choice.guid) });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.delete(response.guid) });
-
-    this.props.onEdit(itemModel, partModel);
-  }
-
-  onShuffleEdit(shuffle: boolean) {
-    const itemModel = this.props.itemModel.with({ shuffle });
-    this.props.onEdit(itemModel, this.props.partModel);
-  }
-
-  onEditMult(mult) {
-    const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
-    const partModel = this.props.partModel.with({ responseMult });
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
@@ -254,61 +179,20 @@ export class FillInTheBlank
     return rendered;
   }
 
-  onConceptsEdit(concepts) {
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
-  }
-
-  render() : JSX.Element {
-    const bodyStyle = {
-      minHeight: '75px',
-      borderStyle: 'solid',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
-    const expanded = (
-      <div style={ { display: 'inline' } }>
-        <Button editMode={this.props.editMode}
-          type="link" onClick={this.onAddChoice}>Add Choice</Button>
-        <Checkbox editMode={this.props.editMode}
-          label="Shuffle" value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
-      </div>
-    );
-
-    return (
-      <div className="itemPart"
-        onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
-
-        <ItemLabel label="Dropdown"
-          editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)} />
-        <ConceptsEditor
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          courseId={this.props.context.courseId}
-          model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit}
-          title="Skills"
-          conceptType="skill" />
-        {!this.props.hideGradingCriteria && this.renderCriteria()}
-        <Collapse caption="Choices" expanded={expanded}>
+  renderAdditionalSections() {
+    return ([
+      <Section name="choices">
+        <SectionHeader name="Choices"/>
+        <SectionContent>
+          <div style={ { display: 'inline' } }>
+            <Button editMode={this.props.editMode}
+              type="link" onClick={this.onAddChoice}>Add Choice</Button>
+            <Checkbox editMode={this.props.editMode}
+              label="Shuffle" value={this.props.itemModel.shuffle} onEdit={this.onShuffleEdit}/>
+          </div>
           {this.renderChoices()}
-        </Collapse>
-        <Hints
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          model={this.props.partModel}
-          onEdit={this.onHintsEdit} />
-        <ExplanationEditor
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          model={this.props.partModel.explanation}
-          onEdit={this.onExplanation} />
-      </div>
-    );
+        </SectionContent>
+      </Section>,
+    ]);
   }
 }

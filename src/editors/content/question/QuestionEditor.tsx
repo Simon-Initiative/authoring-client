@@ -18,6 +18,7 @@ import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
 
+import { MultipartInput } from '../items/MultipartInput';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { CommandProcessor, Command } from '../common/command';
@@ -103,7 +104,6 @@ export abstract class QuestionEditor
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
-  htmlEditor: CommandProcessor<EditorState>;
 
   constructor(props) {
     super(props);
@@ -138,9 +138,6 @@ export abstract class QuestionEditor
     this.textCommand = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
     this.onRemove = this.onRemove.bind(this);
-    this.onInsertFillInTheBlank = this.onInsertFillInTheBlank.bind(this);
-    this.onInsertNumeric = this.onInsertNumeric.bind(this);
-    this.onInsertText = this.onInsertText.bind(this);
 
     this.onFocusChange = this.onFocusChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -162,27 +159,6 @@ export abstract class QuestionEditor
 
     return !restricted || this.props.model.items.size === 0;
   }
-
-  onInsertNumeric(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.numericCommand);
-    }
-
-  }
-  onInsertText(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.textCommand);
-    }
-  }
-  onInsertFillInTheBlank(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.fillInTheBlankCommand);
-    }
-  }
-
 
   onFocusChange(activeItemId: string) {
     this.setState({ activeItemId });
@@ -360,25 +336,50 @@ export abstract class QuestionEditor
     this.onItemPartEdit(item, part.with({ explanation }));
   }
 
+  // renderQuestionBody(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
   renderQuestionBody(): JSX.Element {
     const item = this.props.model.items.toArray()[0];
     const part = this.props.model.parts.toArray()[0];
 
     let questionBodyEditor;
-    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
-      questionBodyEditor = <MultipleChoice
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        onRemove={this.onRemove}
-        onFocus={this.onFocusChange}
-        onBlur={this.onBlur}
-        key={item.guid}
-        itemModel={item}
-        partModel={part}
-        hideGradingCriteria={!this.props.isParentAssessmentGraded}
-        onEdit={(c, p) => this.onItemPartEdit(c, p)}
-        />;
+    const isEmptyMultipart = (this.props.model.items.size === 0);
+    if (isEmptyMultipart) {
+      questionBodyEditor = (
+        <MultipartInput
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          itemModel={item}
+          partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          fillInTheBlankCommand={this.fillInTheBlankCommand}
+          numericCommand={this.numericCommand}
+          textCommand={this.textCommand}
+          canInsertAnotherPart={() => this.canInsertAnotherPart()}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+        );
+    } else if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+      questionBodyEditor = (
+        <MultipleChoice
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+        );
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       questionBodyEditor = <CheckAllThatApply
         context={this.props.context}
@@ -408,7 +409,15 @@ export abstract class QuestionEditor
           key={item.guid}
           itemModel={item}
           partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          fillInTheBlankCommand={this.fillInTheBlankCommand}
+          numericCommand={this.numericCommand}
+          textCommand={this.textCommand}
+          canInsertAnotherPart={() => this.canInsertAnotherPart()}
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Numeric') {
