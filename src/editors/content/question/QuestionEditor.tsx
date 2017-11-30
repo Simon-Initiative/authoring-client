@@ -48,7 +48,6 @@ type Ids = {
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
-  connectDragSource?: any;
 }
 
 export interface QuestionEditorState {
@@ -553,34 +552,35 @@ export abstract class QuestionEditor
       </form>);
 
     return (
-      <div className="question-editor">
-        <RemovableContent
-          editMode={this.props.editMode}
-          onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-          title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
-          associatedClasses="question">
-          <Collapse caption={getLabelForQuestion(this.props.model)}
-            details={getHtmlDetails(this.props.model.body)}
-            expanded={expanded}>
-            <HtmlContentEditor
-                  ref={c => this.htmlEditor = c}
-                  editMode={this.props.editMode}
-                  services={this.props.services}
-                  context={this.props.context}
-                  activeItemId={this.state.activeItemId}
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  inlineInsertionToolbar={insertionToolbar}
-                  blockToolbar={blockToolbar}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit} />
 
-            {this.renderItemsAndParts()}
+      <RemovableContent editMode={this.props.editMode}
+        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
+        title={getLabelForQuestion(this.props.model)}
+        associatedClasses="question">
 
-          </Collapse>
-        </RemovableContent>
-      </div>
-    );
+        <div style={ { position: 'relative' } }>
+
+          {expanded}
+
+          <HtmlContentEditor
+                ref={c => this.htmlEditor = c}
+                editMode={this.props.editMode}
+                services={this.props.services}
+                context={this.props.context}
+                activeItemId={this.state.activeItemId}
+                editorStyles={bodyStyle}
+                inlineToolbar={inlineToolbar}
+                inlineInsertionToolbar={insertionToolbar}
+                blockToolbar={blockToolbar}
+                model={this.props.model.body}
+                onEdit={this.onBodyEdit}
+                />
+
+          {this.renderItemsAndParts()}
+
+        </div>
+
+      </RemovableContent>);
   }
 
 }

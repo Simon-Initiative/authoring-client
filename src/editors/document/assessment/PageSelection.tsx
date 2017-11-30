@@ -5,7 +5,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { TextInput } from '../../content/common/TextInput';
 import { RemovableContent } from '../../content/common/RemovableContent';
 
-export interface PageSelectionProps {  
+export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;
   onEdit: (page: contentTypes.Page) => void;
   onRemove: (page: contentTypes.Page) => void;
@@ -15,7 +15,7 @@ export interface PageSelectionProps {
 }
 
 export interface PageSelection {
-  
+
 }
 
 export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
@@ -46,16 +46,16 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
     };
 
     return (
-      <tr>  
+      <tr key={page.guid}>
 
-        <td style={ { minWidth: '75px' } }>
+        <td style={ { minWidth: '75px' } } key="label">
           <a style={linkStyle} onClick={this.onChange.bind(this, page)}>
             {pageLabel}
           </a>
         </td>
 
-        <td style={ { width: '100%' } }>
-          
+        <td style={ { width: '100%' } } key="title">
+
           <TextInput
             editMode={this.props.editMode}
             value={page.title.text}
@@ -64,15 +64,15 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
             width="100%"
             label=""
             />
-          
+
         </td>
 
-        <td>
+        <td key="remove">
           <span>
-            <button 
-              disabled={!this.props.editMode} 
-              onClick={this.props.onRemove.bind(this, page)} 
-              type="button" 
+            <button
+              disabled={!this.props.editMode}
+              onClick={this.props.onRemove.bind(this, page)}
+              type="button"
               className="btn btn-sm btn-outline-secondary">
               <i className="icon icon-remove"></i>
             </button>
@@ -80,13 +80,13 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
         </td>
       </tr>
     );
-    
+
   }
 
   renderRows() {
     return this.props.pages.toArray().map((page, index) => this.renderPage(page, index + 1));
   }
-  
+
   render() {
 
     const headStyle = {
@@ -97,11 +97,11 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
       <table className="table table-sm">
         <thead style={headStyle}>
           <tr>
-            <th></th>
-            <th>Title</th>
-            <th></th>
+            <th key="placeholder"></th>
+            <th key="title">Title</th>
+            <th key="placeholder2"></th>
           </tr>
-          
+
         </thead>
         <tbody>
           {this.renderRows()}

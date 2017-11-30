@@ -15,7 +15,6 @@ import { DragHandle } from '../../document/assessment/DragHandle';
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
-  connectDragSource?: any;
 }
 
 export interface SelectionState {
@@ -111,10 +110,6 @@ export class SelectionEditor
       color: '#606060',
     };
 
-
-
-
-
     const controls = (
       <div>
         <span style={label}>Insert new: </span>
@@ -156,7 +151,8 @@ export class SelectionEditor
         </form>
       </div>);
 
-    const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
+    const caption = this.props.model.source.contentType === 'Pool'
+      ? 'Embedded Pool' : 'External Pool';
 
     let details = '';
     let titleEditor = null;
@@ -180,10 +176,8 @@ export class SelectionEditor
       <RemovableContent
         editMode={this.props.editMode}
         onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
-        associatedClasses="selection">
-        <Collapse caption={caption}
-          details={details}>
+        title={caption}
+        associatedClasses="">
 
           {controls}
 
@@ -191,7 +185,6 @@ export class SelectionEditor
 
           {this.renderSource()}
 
-        </Collapse>
       </RemovableContent>
     );
   }

@@ -1,6 +1,11 @@
 @import 'oli/colors';
 
+.waiting-notification {
+  margin-top: 200px;
+}
+
 .editor-manager {
+
   .itemWrapper {
     margin: 1;
   }
@@ -12,8 +17,6 @@
   }
 
   .componentWrapper {
-    border-style: solid;
-    border-color: $blue;
     border-width: 1px;
     padding: 12px;
     margin-bottom: 8px;
@@ -25,7 +28,7 @@
   }
 
   .document {
-    padding-top: 20px;
+    padding-top: 0px;
 
     h2 {
       color: $black;
@@ -53,8 +56,6 @@
 
     &.question {
       border-color: transparent;
-      background-color: $white;
-      border-radius: 4px;
 
       .form-control {
         &:first-child {

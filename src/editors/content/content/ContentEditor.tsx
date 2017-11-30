@@ -24,7 +24,6 @@ type IdTypes = {
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
   onRemove: (guid: string) => void;
-  connectDragSource?: any;
 }
 
 export interface ContentEditorState {
@@ -77,8 +76,13 @@ export class ContentEditor
       borderColor: '#AAAAAA',
     };
 
-    const expanded = (
-      <InlineForm position="right">
+    return (
+      <RemovableContent
+        editMode={this.props.editMode}
+        onRemove={() => this.props.onRemove(this.props.model.guid)}
+        title="Content"
+        associatedClasses="">
+
         <Select onChange={this.onAvailability} label="Availability"
           editMode={this.props.editMode}
           value={this.props.model.availability}>
@@ -87,29 +91,17 @@ export class ContentEditor
           <option value="feedback_only">Feedback Only</option>
           <option value="never">Never</option>
         </Select>
-      </InlineForm>
-    );
 
-    return (
-      <RemovableContent
-        editMode={this.props.editMode}
-        onRemove={() => this.props.onRemove(this.props.model.guid)}
-        title={<DragHandle connectDragSource={this.props.connectDragSource}/>}
-        associatedClasses="content">
-        <Collapse
-          caption="Content"
-          details={getHtmlDetails(this.props.model.body)}
-          expanded={expanded}>
+        <HtmlContentEditor
+          editorStyles={bodyStyle}
+          inlineToolbar={inlineToolbar}
+          blockToolbar={blockToolbar}
+          inlineInsertionToolbar={insertionToolbar}
+          {...this.props}
+          model={this.props.model.body}
+          onEdit={this.onBodyEdit}
+          />
 
-          <HtmlContentEditor
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            inlineInsertionToolbar={insertionToolbar}
-            {...this.props}
-            model={this.props.model.body}
-            onEdit={this.onBodyEdit} />
-        </Collapse>
       </RemovableContent>);
   }
 }

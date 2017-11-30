@@ -11,8 +11,7 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
-import { DraggableNode } from '../../document/assessment/DraggableNode';
-import { RepositionTarget } from '../../document/assessment/RepositionTarget';
+import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
@@ -54,11 +53,6 @@ export class PoolEditor
 
   }
 
-
-  renderDropTarget(index) {
-    return <RepositionTarget index={index} canAcceptId={this.canAcceptId}
-      onDrop={this.onReorderNode}/>;
-  }
 
   onReorderNode(id, index) {
 
@@ -103,12 +97,8 @@ export class PoolEditor
     const elements = [];
     const arr = this.props.model.questions.toArray();
     arr.forEach((node, index) => {
-      elements.push(this.renderDropTarget(index));
-      elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
-        {this.renderQuestion(node)}</DraggableNode>);
+      elements.push(this.renderQuestion(node));
     });
-
-    elements.push(this.renderDropTarget(arr.length));
 
     return elements;
   }
