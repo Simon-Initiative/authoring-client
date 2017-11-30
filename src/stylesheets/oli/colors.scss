@@ -29,4 +29,7 @@ $danger:          #da3232;
 // Action Colors
 $remove: $danger;
 $add: darken($primary, 10%);
+
 $selection: $peter-river;
+$hover: darken($peter-river, 10%);
+$active: darken($peter-river, 15%);

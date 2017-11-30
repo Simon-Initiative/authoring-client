@@ -9,7 +9,6 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import Concept from './Concept.controller';
 import { SkillSelection } from 'utils/selection/SkillSelection';
-import { Collapse } from 'editors/content/common/Collapse';
 import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
 import './ConceptsEditor.scss';
@@ -66,17 +65,17 @@ export default class ConceptsEditor
   }
 
   render() : JSX.Element {
-
-    const expanded =
-        <Button editMode={this.props.editMode}
-          type="link" onClick={this.onAddConcept}>Add Skill</Button>;
-
     return (
-      <Collapse caption="Skills" expanded={expanded}>
-        <div className="ConceptWell">
-          {this.renderConcepts()}
-        </div>
-      </Collapse>);
+      <div className="concept-well">
+        <Button
+          editMode={this.props.editMode}
+          type="link"
+          onClick={this.onAddConcept}>
+          Add Skill
+        </Button>
+        {this.renderConcepts()}
+      </div>
+    );
 
   }
 

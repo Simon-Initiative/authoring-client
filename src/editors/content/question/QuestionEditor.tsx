@@ -13,7 +13,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { Essay } from '../items/Essay';
-import { CheckAllThatApply } from '../items/CheckAllThatApply';
+import { CheckAllThatApply } from '../items/CheckAllThatApply.controller';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
@@ -32,12 +32,15 @@ import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
-import ConceptsEditor from '../concepts/ConceptsEditor';
+import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
+import { TabContainer } from 'editors/content/common/TabContainer';
+import { Hints } from '../part/Hints';
+import { ExplanationEditor } from '../part/ExplanationEditor';
 
 import './QuestionEditor.scss';
 
@@ -55,7 +58,7 @@ export interface QuestionEditorState {
   activeItemId: string;
 }
 
-function getLabelForQuestion(question: contentTypes.Question) : string {
+const getLabelForQuestion = (question: contentTypes.Question): string => {
 
   if (question.items.size === 0) {
     return 'Input Question';
@@ -87,7 +90,7 @@ function getLabelForQuestion(question: contentTypes.Question) : string {
     }
   }
 
-}
+};
 
 /**
  * The content editor for HtmlContent.
@@ -153,7 +156,7 @@ export abstract class QuestionEditor
     }
   }
 
-  canInsertAnotherPart() : boolean {
+  canInsertAnotherPart(): boolean {
     const restricted = this.props.isParentAssessmentGraded
       === undefined || this.props.isParentAssessmentGraded;
 
@@ -345,9 +348,25 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  renderItemPartEditor(item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onConceptsEdit(concepts, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    this.onItemPartEdit(item, part.with({ concepts }));
+  }
+
+  onHintsEdit(item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    this.onItemPartEdit(item, part);
+  }
+
+  onExplanation(explanation, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    this.onItemPartEdit(item, part.with({ explanation }));
+  }
+
+  renderQuestionBody(): JSX.Element {
+    const item = this.props.model.items.toArray()[0];
+    const part = this.props.model.parts.toArray()[0];
+
+    let questionBodyEditor;
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
-      return <MultipleChoice
+      questionBodyEditor = <MultipleChoice
         context={this.props.context}
         services={this.props.services}
         editMode={this.props.editMode}
@@ -360,7 +379,7 @@ export abstract class QuestionEditor
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
-      return <CheckAllThatApply
+      questionBodyEditor = <CheckAllThatApply
         context={this.props.context}
         services={this.props.services}
         editMode={this.props.editMode}
@@ -370,10 +389,14 @@ export abstract class QuestionEditor
         key={item.guid}
         itemModel={item}
         partModel={part}
+        body={this.props.model.body}
+        grading={this.props.model.grading}
+        onGradingChange={this.onGradingChange}
+        onBodyEdit={this.onBodyEdit}
         onEdit={(c, p) => this.onItemPartEdit(c, p)}
         />;
     } else if (item.contentType === 'FillInTheBlank') {
-      return <FillInTheBlank
+      questionBodyEditor = <FillInTheBlank
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -386,7 +409,7 @@ export abstract class QuestionEditor
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Numeric') {
-      return <Numeric
+      questionBodyEditor = <Numeric
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -400,7 +423,7 @@ export abstract class QuestionEditor
           />;
 
     } else if (item.contentType === 'Text') {
-      return <Text
+      questionBodyEditor = <Text
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -414,7 +437,7 @@ export abstract class QuestionEditor
           />;
 
     } else if (item.contentType === 'ShortAnswer') {
-      return <ShortAnswer
+      questionBodyEditor = <ShortAnswer
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -427,7 +450,7 @@ export abstract class QuestionEditor
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Ordering') {
-      return <Ordering
+      questionBodyEditor = <Ordering
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -440,7 +463,7 @@ export abstract class QuestionEditor
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     } else if (item.contentType === 'Essay') {
-      return <Essay
+      questionBodyEditor = <Essay
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -453,127 +476,155 @@ export abstract class QuestionEditor
           onEdit={(c, p) => this.onItemPartEdit(c, p)}
           />;
     }
-  }
-
-
-  renderItemsAndParts() {
-
-    const items = this.props.model.items.toArray();
-    const parts = this.props.model.parts.toArray();
-    const toRender = [];
-    for (let i = 0; i < items.length; i += 1) {
-      toRender.push(<div key={items[i].guid}>
-        {this.renderItemPartEditor(items[i], parts[i])}</div>);
-    }
-
-    return toRender;
-  }
-
-
-
-  render() : JSX.Element {
-
-    const isMultipart = this.props.model.items.size === 0
-      || this.props.model.items.first().contentType === 'Text'
-      || this.props.model.items.first().contentType === 'Numeric'
-      || this.props.model.items.first().contentType === 'FillInTheBlank';
-
-    const inlineToolbar
-      = <InlineToolbar>
-
-        </InlineToolbar>;
-
-    const multipartButtons = isMultipart
-      ? [<HtmlToolbarButton
-        tooltip="Insert Dropdown" key="server"
-        icon="server" command={this.fillInTheBlankCommand}/>,
-        <HtmlToolbarButton
-          tooltip="Insert Numeric Input" key="info"
-          icon="info" command={this.numericCommand}/>,
-        <HtmlToolbarButton
-          tooltip="Insert Text Input" key="i-cursor"
-          icon="i-cursor" command={this.textCommand}/>]
-        : [];
-
-    const insertionToolbar =
-        <InlineInsertionToolbar>
-          {multipartButtons}
-        </InlineInsertionToolbar>;
-
-    const blockToolbar = <BlockToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '30px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
-    const addPart =
-      this.props.model.items.size === 0
-       || this.props.model.items.first().contentType === 'Text'
-       || this.props.model.items.first().contentType === 'Numeric'
-       || this.props.model.items.first().contentType === 'FillInTheBlank'
-
-       ? <div className="dropdown" style={ { display: 'inline' } }>
-          <button disabled={!this.props.editMode}
-            className="btn btn-secondary btn-link dropdown-toggle"
-            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Add Item
-          </button>
-          <div className="dropdown-menu">
-            <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
-            <a onClick={this.onInsertText} className="dropdown-item">Text</a>
-            <a onClick={this.onInsertFillInTheBlank}
-              className="dropdown-item">Dropdown</a>
-          </div>
-        </div>
-      : null;
-
-
-    const expanded = (
-      <form className="inline">
-        {addPart}
-        <Select editMode={this.props.editMode}
-          label="Grading" value={this.props.model.grading}
-          onChange={this.onGradingChange}>
-          <option value="automatic">Automatic</option>
-          <option value="instructor">Instructor</option>
-          <option value="hybrid">Hybrid</option>
-        </Select>
-      </form>);
 
     return (
-
-      <RemovableContent editMode={this.props.editMode}
-        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        title={getLabelForQuestion(this.props.model)}
-        associatedClasses="question">
-
-        <div style={ { position: 'relative' } }>
-
-          {expanded}
-
-          <HtmlContentEditor
-                ref={c => this.htmlEditor = c}
-                editMode={this.props.editMode}
-                services={this.props.services}
-                context={this.props.context}
-                activeItemId={this.state.activeItemId}
-                editorStyles={bodyStyle}
-                inlineToolbar={inlineToolbar}
-                inlineInsertionToolbar={insertionToolbar}
-                blockToolbar={blockToolbar}
-                model={this.props.model.body}
-                onEdit={this.onBodyEdit}
-                />
-
-          {this.renderItemsAndParts()}
-
-        </div>
-
-      </RemovableContent>);
+      <div className="question-body">
+        {questionBodyEditor}
+      </div>
+    );
   }
 
+  renderSkillsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
+    return (
+      <div className="skills-tab tab-content">
+        <div className="section">
+          <ConceptsEditor
+            editMode={this.props.editMode}
+            services={this.props.services}
+            context={this.props.context}
+            courseId={this.props.context.courseId}
+            model={part.concepts}
+            onEdit={concepts => this.onConceptsEdit(concepts, item, part)}
+            title="Skills"
+            conceptType="skill" />
+        </div>
+      </div>
+    );
+  }
+
+  renderGradingTab(): JSX.Element {
+    return (
+      <div className="grading-tab tab-content">
+        <div className="section">
+          <form className="inline">
+            <Select editMode={this.props.editMode}
+              label="Grading" value={this.props.model.grading}
+              onChange={this.onGradingChange}>
+              <option value="automatic">Automatic</option>
+              <option value="instructor">Instructor</option>
+              <option value="hybrid">Hybrid</option>
+            </Select>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  renderHintsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
+    return (
+      <div className="hints-tab tab-content">
+        <div className="section">
+          <Hints
+            context={this.props.context}
+            services={this.props.services}
+            editMode={this.props.editMode}
+            model={part}
+            onEdit={() => this.onHintsEdit(item, part)} />
+        </div>
+      </div>
+    );
+  }
+
+  renderOtherTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
+    return (
+      <div className="other-tab tab-content">
+        <div className="section">
+          <div className="section-header">
+            <h3>Explanation</h3>
+          </div>
+          <div className="section-content">
+            <ExplanationEditor
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              model={part.explanation}
+              onEdit={explanation => this.onExplanation(explanation, item, part)} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderItemsParts(): JSX.Element[] {
+    const items = this.props.model.items.toArray();
+    const parts = this.props.model.parts.toArray();
+
+    return items.map((item, index) => (
+      <div key={item.guid} className="item-part-editor">
+        <TabContainer
+          labels={[
+            'Skills',
+            'Hints',
+            'Other',
+          ]}>
+
+          {this.renderSkillsTab(item, parts[index])}
+          {this.renderHintsTab(item, parts[index])}
+          {this.renderOtherTab(item, parts[index])}
+
+        </TabContainer>
+      </div>
+    ));
+  }
+
+  renderQuestionTitle(): JSX.Element {
+    return (
+      <div className="question-title">
+        <div className="title">{getLabelForQuestion(this.props.model)}</div>
+        <div className="flex-spacer"/>
+        <div
+          className="action-btn action-btn-duplicate"
+          onClick={() => { console.log(`onClick: duplicate - NOT IMPLEMENTED`); }}>
+          <i className="fa fa-copy" />
+        </div>
+        <div
+          className="action-btn action-btn-remove"
+          onClick={() => { console.log(`onClick: remove - NOT IMPLEMENTED`); }}>
+          <i className="fa fa-trash-o" />
+        </div>
+      </div>
+    );
+  }
+
+  render(): JSX.Element {
+
+    // const addPart = this.props.model.items.size === 0
+    // || this.props.model.items.first().contentType === 'Text'
+    // || this.props.model.items.first().contentType === 'Numeric'
+    // || this.props.model.items.first().contentType === 'FillInTheBlank'
+
+    // ? <div className="dropdown" style={ { display: 'inline' } }>
+    //     <button disabled={!this.props.editMode}
+    //       className="btn btn-secondary btn-link dropdown-toggle"
+    //       type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    //       Add Item
+    //     </button>
+    //     <div className="dropdown-menu">
+    //       <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
+    //       <a onClick={this.onInsertText} className="dropdown-item">Text</a>
+    //       <a onClick={this.onInsertFillInTheBlank}
+    //         className="dropdown-item">Dropdown</a>
+    //     </div>
+    //   </div>
+    // : null;
+
+    return (
+      <div className="question-editor">
+        {this.renderQuestionTitle()}
+        {this.renderQuestionBody()}
+        {this.renderItemsParts()}
+      </div>
+    );
+  }
 }
 

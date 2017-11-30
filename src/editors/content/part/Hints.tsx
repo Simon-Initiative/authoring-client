@@ -5,15 +5,10 @@ import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import guid from '../../../utils/guid';
 import { HintEditor } from './HintEditor';
-
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 
-export interface Hints {
-  
-}
-
 export interface HintsProps {
-  model: contentTypes.Part
+  model: contentTypes.Part;
   onEdit: (model: contentTypes.Part) => void;
   context: AppContext;
   editMode: boolean;
@@ -21,15 +16,15 @@ export interface HintsProps {
 }
 
 export interface HintsState {
-  
+
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export abstract class Hints 
+export abstract class Hints
   extends React.PureComponent<HintsProps, HintsState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -37,46 +32,51 @@ export abstract class Hints
     this.onHintEdit = this.onHintEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
   }
-  
+
   onAddHint() {
-    let content = new contentTypes.Hint();
-    this.props.onEdit(this.props.model.with({hints: this.props.model.hints.set(content.guid, content) }));
+    const content = new contentTypes.Hint();
+    this.props.onEdit(this.props.model.with({
+      hints: this.props.model.hints.set(content.guid, content),
+    }));
   }
 
   onHintEdit(hint: contentTypes.Hint) {
-    this.props.onEdit(this.props.model.with({hints: this.props.model.hints.set(hint.guid, hint) }));
+    this.props.onEdit(this.props.model.with({
+      hints: this.props.model.hints.set(hint.guid, hint),
+    }));
   }
 
   onRemove(hint: contentTypes.Hint) {
-    this.props.onEdit(this.props.model.with({hints: this.props.model.hints.delete(hint.guid) }));
+    this.props.onEdit(this.props.model.with({
+      hints: this.props.model.hints.delete(hint.guid),
+    }));
   }
 
   renderHints() {
-    return this.props.model.hints.toArray().map(i => {
-      return <HintEditor
-              key={i.guid}
-              {...this.props}
-              model={i}
-              onEdit={this.onHintEdit} 
-              onRemove={this.onRemove}
-              />;
+    return this.props.model.hints.toArray().map((i) => {
+      return (
+        <HintEditor
+          key={i.guid}
+          {...this.props}
+          model={i}
+          onEdit={this.onHintEdit}
+          onRemove={this.onRemove} />
+      );
     });
   }
 
   render() : JSX.Element {
-
-    const expanded = 
-        <Button editMode={this.props.editMode} 
-          type='link' onClick={this.onAddHint}>Add Hint</Button>;
-      
     return (
-      <Collapse 
-        caption='Hints' 
-        expanded={expanded}>
+      <div className="hints">
+        <Button
+          editMode={this.props.editMode}
+          type="link"
+          onClick={this.onAddHint}>
+          Add Hint
+        </Button>
 
         {this.renderHints()}
-
-      </Collapse>
+      </div>
     );
   }
 
