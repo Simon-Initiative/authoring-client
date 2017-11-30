@@ -1,9 +1,12 @@
 import * as persistence from 'data/persistence';
-import { CourseModel } from 'data/models';
+import { CourseModel, ModelTypes, WorkbookPageModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { Skill, Title } from 'types/course';
 import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
+import { viewDocument } from './view';
+import { fetchSkills } from './skills';
+import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { configuration } from './utils/config';
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -30,6 +33,60 @@ export type ReceiveTitlesAction = {
   type: RECEIVE_TITLES,
   titles: Title[],
 };
+
+
+
+function createPlaceholderPage(courseId: string) {
+
+  const resource = WorkbookPageModel.createNew(
+        PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty content');
+
+  persistence.createDocument(courseId, resource);
+
+  return resource;
+}
+
+export function loadCourse(courseId: string) {
+  return function (dispatch: any) {
+
+    return persistence.retrieveCoursePackage(courseId)
+    .then((document) => {
+
+      // Notify that the course has changed when a user views a course
+      if (document.model.modelType === ModelTypes.CourseModel) {
+
+        const courseModel : CourseModel = document.model;
+
+        if (!document.model.resources.toArray().some(
+          resource => resource.id === PLACEHOLDER_ITEM_ID)) {
+
+          const placeholder = createPlaceholderPage(courseId);
+          const updatedModel = courseModel.with(
+            { resources: courseModel.resources.set(PLACEHOLDER_ITEM_ID, placeholder.resource) });
+
+          dispatch(courseChanged(updatedModel));
+          dispatch(fetchSkills(courseId));
+          return updatedModel;
+
+        } else {
+          dispatch(courseChanged(document.model));
+          dispatch(fetchSkills(courseId));
+          return document.model;
+        }
+      }
+
+    })
+    .catch(err => console.log(err));
+  };
+}
+
+export function viewCourse(courseId: string) {
+  return function (dispatch) {
+    dispatch(loadCourse(courseId)).then(c => viewDocument(courseId, courseId));
+  };
+}
+
+
 
 /**
  * Receive titles action builder
@@ -108,25 +165,6 @@ export const fetchTitle = (courseId: string, id: string) => (
   }
 );
 
-/**
- * Returns a Promise to fetch skill titles of the course with the given id.
- * Dispatches ReceiveTitlesAction on success.
- * @param courseId - id of the course
- */
-export const fetchSkillTitles = (courseId: string) => (
-  (dispatch, getState): Promise<Skill[]> => {
-    return persistence.bulkFetchDocuments(courseId, [LegacyTypes.skills_model], 'byTypes')
-      .then ((skills) => {
-        const titles: Title[] = skills
-          .map(doc => (doc.model as any).skills.toArray())
-          .reduce((p, c) => [...p, ...c], [])
-          .map(s => s.toJS());
-
-        dispatch(receiveTitles(titles));
-        return titles as Skill[];
-      });
-  }
-);
 
 /**
  * Returns a Promise to fetch objective titles of the course with the given id.
@@ -162,9 +200,6 @@ export const getTitle = (courseId: string, id: string, type: string) => (
     if (cachedTitle) return Promise.resolve(cachedTitle);
 
     switch (type) {
-      case 'skill':
-        return dispatch(fetchSkillTitles(courseId))
-          .then(titles => titles.find(t => t.id === id));
       case 'objective':
       case LegacyTypes.learning_objectives:
         return dispatch(fetchObjectiveTitles(courseId))
@@ -191,9 +226,6 @@ export const getTitles = (courseId: string, ids: string[], type: string) => (
     }
 
     switch (type) {
-      case 'skill':
-        return dispatch(fetchSkillTitles(courseId))
-          .then(titles => titles.filter(t => ids.find(id => id === t.id)).map(t => t.title));
       case 'objective':
       case LegacyTypes.learning_objectives:
         return dispatch(fetchObjectiveTitles(courseId))
@@ -237,8 +269,6 @@ export const getTitlesByModel = (model: CourseModel) => (
     const fetchTitlesPromises = Object.keys(missingByType)
       .map((type) => {
         switch (type) {
-          case LegacyTypes.skills_model:
-            return dispatch(fetchSkillTitles(courseId));
           case LegacyTypes.learning_objectives:
             return dispatch(fetchObjectiveTitles(courseId));
           default:
