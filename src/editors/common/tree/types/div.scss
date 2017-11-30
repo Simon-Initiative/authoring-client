@@ -1,0 +1,25 @@
+.div-node {
+
+  position: relative;
+  height: 40px;
+  display: block;
+  padding: 0px;
+
+  .top-drop {
+    position: absolute;
+    top: -5;
+    height: 10px;
+    width: 100%;
+  }
+
+  .botton-drop {
+    position: absolute;
+    top: 35;
+    height: 10px;
+    width: 100%;
+  }
+}
+
+.draggable-tree-node {
+
+}

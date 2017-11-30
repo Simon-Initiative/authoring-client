@@ -21,7 +21,9 @@ type IdTypes = {
 };
 
 export interface FillInTheBlankProps
-  extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {}
+  extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
+  hideGradingCriteria: boolean;
+}
 
 export interface FillInTheBlankState {}
 
@@ -290,7 +292,7 @@ export class FillInTheBlank
           onEdit={this.onConceptsEdit}
           title="Skills"
           conceptType="skill" />
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}
         </Collapse>

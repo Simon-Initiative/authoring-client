@@ -17,13 +17,12 @@ import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
-
+  hideGradingCriteria: boolean;
 }
 
 export interface TextState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.
@@ -190,7 +189,7 @@ export class Text
           conceptType="skill"
           />
 
-        {this.renderCriteria()}
+        {!this.props.hideGradingCriteria && this.renderCriteria()}
 
         <Hints
             {...this.props}

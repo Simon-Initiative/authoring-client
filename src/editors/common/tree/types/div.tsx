@@ -7,6 +7,11 @@ import { RepositionTarget } from '../RepositionTarget';
 import { DragSource } from 'react-dnd';
 import { DragTypes } from 'utils/drag';
 
+import './div.scss';
+
+// A simple div based tree renderer.
+
+
 interface DraggableNodeProps {
   id: string;
   editMode: boolean;
@@ -54,7 +59,7 @@ export class DraggableNode<NodeType>
     const opacity = isDragging ? 0.4 : 1;
 
     return (this.props as any).connectDragPreview(
-      <div className="draggable-node" style={{ opacity }}>
+      <div className="draggable-tree-node" style={{ opacity }}>
         {React.Children.map(
           this.props.children,
           ((child) => {
@@ -68,35 +73,52 @@ export class DraggableNode<NodeType>
 
 }
 
-export function buildRenderer<NodeType>() : Types.TreeRenderer<NodeType> {
+export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRenderer<NodeType> {
 
   return {
     renderTree: children => <div>{children}</div>,
 
-    renderNode: (nodeId, node, nodeState, renderedNode, indexWithinParent, editMode) => {
+    renderNode: (
+      nodeId, node, nodeState, renderedNode, dropTarget, indexWithinParent, editMode) => {
+
       return (
-        <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
-          index={indexWithinParent} parentModel={nodeState.parentNode} >
-          {renderedNode}
-        </DraggableNode>
+        <div className="div-node" key={nodeId}>
+          <DraggableNode editMode={editMode} id={nodeId} sourceModel={node}
+            index={indexWithinParent} parentModel={nodeState.parentNode} >
+            {renderedNode}
+          </DraggableNode>
+          {dropTarget}
+        </div>
       );
+
+
     },
 
     renderDropTarget: (
       index: number,
-      onDrop: Types.OnDropHandler,
-      canDrop: Types.CanDropHandler,
-      parentModel: NodeType) : JSX.Element => {
+      onDrop: Types.OnDropHandler<NodeType>,
+      canDrop: Types.CanDropHandler<NodeType>,
+      parentModel: Maybe<NodeType>,
+      parentModelId: Maybe<string>,
+      isBottom: boolean,
+      editMode: boolean) : JSX.Element => {
 
       const props = {
         index,
         onDrop,
         canDrop,
         parentModel,
+        parentModelId,
+        editMode,
       };
 
+      const dropClass = isBottom ? 'bottom-drop' : 'top-drop';
+
+
       return (
-        <RepositionTarget {...props}/>
+        <div className={dropClass}>
+          <RepositionTarget {...props}/>
+        </div>
       );
 
     },

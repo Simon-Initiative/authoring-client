@@ -3,10 +3,14 @@ import * as Immutable from 'immutable';
 
 export enum TreeType {
   DIV,
-  TABLE,
+  TABLE, // Not supported yet
 }
 
-export type RenderedNode<NodeType> = {
+export interface HasGuid {
+  guid: string;
+}
+
+export type RenderedNode<NodeType extends HasGuid> = {
   nodeId: NodeId,
   node: NodeType,
   parent: Maybe<NodeType>,
@@ -21,14 +25,24 @@ export type Handlers = {
   onCollapse: (nodeId: NodeId) => void,
 };
 
-export type OnDropHandler =
-  (sourceModel: any, sourceParentGuid: string, targetGuid: string, index: number) => void;
+// Callback to handle drops
+export type OnDropHandler<NodeType extends HasGuid> = (
+  nodeDropped: NodeType,
+  nodeParent: Maybe<NodeType>,
+  newParent: Maybe<NodeType>,
+  originalIndex: number,
+  newIndex: number) => void;
 
-export type CanDropHandler = (
-  id: string, nodeBeingDropped, originalParent,
-  originalIndex: number, newParent, newIndex: number) => boolean;
+// Callback to test drops
+export type CanDropHandler<NodeType extends HasGuid> = (
+  nodeBeingDropped: NodeType,
+  originalParent: Maybe<NodeType>,
+  originalIndex: number,
+  newParent: Maybe<NodeType>,
+  newIndex: number) => boolean;
 
-export type NodeRenderer<NodeType>
+// A client supplied node renderer
+export type NodeRenderer<NodeType extends HasGuid>
   = (node: NodeType,
      nodeState: NodeState<NodeType>,
      handlers: Handlers) => JSX.Element;
@@ -37,16 +51,20 @@ export type NodeRenderer<NodeType>
 export type NodeId = string;
 
 // The data for a tree.
-export type Nodes<NodeType> = Immutable.OrderedMap<NodeId, NodeType>;
+export type Nodes<NodeType extends HasGuid> = Immutable.OrderedMap<NodeId, NodeType>;
 
-export type ChildrenAccessor<NodeType>
+// We abstract away navigating the tree and allow the client
+// to implement this to control navigation
+export type ChildrenAccessor<NodeType extends HasGuid>
   = (node: NodeType) => Maybe<Nodes<NodeType>>;
 
-export type ChildrenMutator<NodeType>
+// Similar to accessor, we give control to the client as to
+// how to mutate children in a tree.
+export type ChildrenMutator<NodeType extends HasGuid>
   = (node: NodeType, children: Nodes<NodeType>) => NodeType;
 
 // Metadata regarding a node
-export type NodeState<NodeType> = {
+export type NodeState<NodeType extends HasGuid> = {
   depth: number,
   isSelected: boolean,
   parentNode: Maybe<NodeType>,
@@ -54,18 +72,22 @@ export type NodeState<NodeType> = {
 
 
 
-export type TreeRenderer<NodeType> = {
+export type TreeRenderer<NodeType extends HasGuid> = {
 
   renderTree: (children) => JSX.Element,
 
   renderNode: (
     nodeId: NodeId, node: NodeType, nodeState: NodeState<NodeType>,
-    renderedNode: any, indexWithinParent: number, editMode: boolean) => JSX.Element,
+    renderedNode: any, dropTarget: any,
+    indexWithinParent: number, editMode: boolean) => JSX.Element,
 
   renderDropTarget: (
     index: number,
-    onDrop: OnDropHandler,
-    canAcceptId: CanDropHandler,
-    parentModel: NodeType,
+    onDrop: OnDropHandler<NodeType>,
+    canAcceptId: CanDropHandler<NodeType>,
+    parentModel: Maybe<NodeType>,
+    parentModelId: Maybe<string>,
+    isBottom: boolean,
+    editMode: boolean,
     ) => JSX.Element,
 };

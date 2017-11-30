@@ -1,12 +1,15 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { NodeId, NodeState, Nodes,
+import { NodeId, NodeState, Nodes, HasGuid,
   ChildrenAccessor, ChildrenMutator,
   TreeRenderer } from 'editors/common/tree/types';
 
 import { removeNode, updateNode, insertNode } from 'editors/common/tree/utils';
 
-type TestNode = number;
+type TestNode = {
+  value: number,
+  guid: string,
+};
 
 // Helper function to build a Nodes<TestNode> map, mapping
 // the string representation of a number to that number,
@@ -16,7 +19,7 @@ const buildNodes = (start: number, count: number) => {
   let i = 0;
   while (i < count) {
     const value = start + i;
-    arr.push([value + '', value]);
+    arr.push([value + '', { value, guid: value + '' }]);
     i += 1;
   }
   return Immutable.OrderedMap<NodeId, TestNode>(arr);
@@ -49,12 +52,12 @@ it('second-level remove', () => {
 
   const get : ChildrenAccessor<TestNode> = (n) => {
 
-    const c = children[n];
-    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
+    const c = children[n.value];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n.value]);
   };
 
   const set : ChildrenMutator<TestNode> = (n, nodes) => {
-    children[n] = nodes;
+    children[n.value] = nodes;
     return n;
   };
 
@@ -77,24 +80,24 @@ it('top level insert', () => {
 
   const nodes : Nodes<TestNode> = buildNodes(1, 4);
 
-  const child = 7;
+  const child = { value: 7, guid: '7' };
 
   let added = insertNode<TestNode>(
     Maybe.nothing<NodeId>(), '7', child, 0, nodes, get, set);
 
   expect(added.has('7')).toBe(true);
   expect(added.size).toBe(5);
-  expect(added.first()).toBe(7);
+  expect(added.first().value).toBe(7);
   expect(nodes.has('7')).toBe(false);
   expect(nodes.size).toBe(4);
 
   added = insertNode<TestNode>(
     Maybe.nothing<NodeId>(), '7', child, 1, nodes, get, set);
-  expect(added.toArray()[1]).toBe(7);
+  expect(added.toArray()[1].value).toBe(7);
 
   added = insertNode<TestNode>(
     Maybe.nothing<NodeId>(), '7', child, 4, nodes, get, set);
-  expect(added.toArray()[4]).toBe(7);
+  expect(added.toArray()[4].value).toBe(7);
 
 });
 
@@ -109,19 +112,19 @@ it('recursive insert', () => {
 
   const get : ChildrenAccessor<TestNode> = (n) => {
 
-    const c = children[n];
-    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
+    const c = children[n.value];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n.value]);
   };
 
   const set : ChildrenMutator<TestNode> = (n, nodes) => {
-    children[n] = nodes;
+    children[n.value] = nodes;
     return n;
   };
 
   const nodes : Nodes<TestNode> = buildNodes(1, 4);
 
   const inserted = insertNode<TestNode>(
-    Maybe.just('20'), '50', 50, 0, nodes, get, set);
+    Maybe.just('20'), '50', { value: 50, guid: '50' }, 0, nodes, get, set);
 
   expect(inserted.size).toBe(4);
   expect(nodes.size).toBe(4);
@@ -138,12 +141,12 @@ it('top level update', () => {
 
   const nodes : Nodes<TestNode> = buildNodes(1, 4);
 
-  const updated = updateNode<TestNode>('2', 10, nodes, get, set);
+  const updated = updateNode<TestNode>('2', { value: 10, guid: '10' }, nodes, get, set);
 
   expect(updated.has('2')).toBe(true);
-  expect(updated.get('2')).toBe(10);
+  expect(updated.get('2').value).toBe(10);
   expect(nodes.has('2')).toBe(true);
-  expect(nodes.get('2')).toBe(2);
+  expect(nodes.get('2').value).toBe(2);
 
 });
 
@@ -159,22 +162,22 @@ it('recursive update', () => {
 
   const get : ChildrenAccessor<TestNode> = (n) => {
 
-    const c = children[n];
-    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n]);
+    const c = children[n.value];
+    return c === undefined ? Maybe.nothing<TestNode>() : Maybe.just(children[n.value]);
   };
 
   const set : ChildrenMutator<TestNode> = (n, nodes) => {
-    children[n] = nodes;
+    children[n.value] = nodes;
     return n;
   };
 
   const nodes : Nodes<TestNode> = buildNodes(1, 4);
 
   const inserted = updateNode<TestNode>(
-    '31', 50, nodes, get, set);
+    '31', { value: 50, guid: '50' }, nodes, get, set);
 
   expect(inserted.size).toBe(4);
   expect(nodes.size).toBe(4);
-  expect(children[20].get('31')).toBe(50);
+  expect(children[20].get('31').value).toBe(50);
 
 });

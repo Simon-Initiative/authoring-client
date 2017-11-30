@@ -33,6 +33,7 @@ export interface CheckAllThatApplyProps
   onGradingChange: (value) => void;
   onToggleAdvancedMode: () => void;
   onToggleShuffleChoices: () => void;
+  hideGradingCriteria: boolean;
 }
 
 let htmlEditor;

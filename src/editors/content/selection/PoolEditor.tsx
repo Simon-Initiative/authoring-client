@@ -11,7 +11,6 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../co
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
 
-import { DraggableNode } from 'editors/common/tree/DraggableNode';
 import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
@@ -98,7 +97,6 @@ export class PoolEditor
     const elements = [];
     const arr = this.props.model.questions.toArray();
     arr.forEach((node, index) => {
-      // elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
       elements.push(this.renderQuestion(node));
     });
 

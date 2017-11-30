@@ -45,17 +45,13 @@ export default class DocumentView
         <div className="row">
             <NavigationBar viewActions={this.viewActions} />
             <div className="col-sm-9 col-md-10 document">
-              <div className="container-fluid editor">
-                <div className="row">
-                  <div className="col-12">
-                    <EditorManager
-                      course={course}
-                      profile={profile}
-                      userId={userId}
-                      userName={userName}
-                      documentId={documentId} />
-                  </div>
-                </div>
+              <div className="editor">
+                <EditorManager
+                  course={course}
+                  profile={profile}
+                  userId={userId}
+                  userName={userName}
+                  documentId={documentId} />
               </div>
             </div>
         </div>

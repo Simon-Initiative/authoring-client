@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { DraggableNode } from './DraggableNode';
 import { Maybe } from 'tsmonad';
+import { removeNode, insertNode, isSameNode } from './utils';
 
 import { buildRenderer as buildDivRenderer } from './types/div';
 
@@ -12,7 +12,7 @@ import * as Types from './types';
 import { renderVisibleNodes } from './render';
 
 
-export interface TreeProps<NodeType> {
+export interface TreeProps<NodeType extends Types.HasGuid> {
 
   editMode: boolean;
 
@@ -55,14 +55,14 @@ export interface TreeProps<NodeType> {
   renderNodeComponent: Types.NodeRenderer<NodeType>;
 
   // Called by the tree when a potential drop is initiated.
-  canHandleDrop: Types.CanDropHandler;
+  canHandleDrop: Types.CanDropHandler<NodeType>;
 }
 
 /**
  * Reusable tree component.
  */
 @DragDropContext(HTML5Backend)
-export class Tree<NodeType>
+export class Tree<NodeType extends Types.HasGuid>
   extends React.PureComponent<TreeProps<NodeType>, {}> {
 
   constructor(props) {
@@ -71,7 +71,35 @@ export class Tree<NodeType>
     this.onDrop = this.onDrop.bind(this);
   }
 
-  onDrop() {
+  onDrop(
+    sourceModel: NodeType,
+    sourceParent: Maybe<NodeType>,
+    targetParent: Maybe<NodeType>,
+    originalIndex: number,
+    newIndex: number) {
+
+    const { nodes, getChildren, setChildren, onEdit } = this.props;
+    const id = sourceModel.guid;
+
+    // removeNode |> insertNode |> onEdit
+
+    const removedNodes = removeNode(id, nodes, getChildren, setChildren);
+
+    // Handle the case where the drag is from and to the same parent
+    // and the drag is a lowering of the source further down the parent -
+    // We have to adjust the index otherwise we will place it at the wrong
+    // spot after we remove it
+    const adjustedIndex = isSameNode<NodeType>(sourceParent, targetParent)
+      ? originalIndex < newIndex
+        ? newIndex - 1
+        : newIndex
+      : newIndex;
+
+    const insertedNodes = insertNode(
+      targetParent.map(p => p.guid),
+      id, sourceModel, adjustedIndex, removedNodes, getChildren, setChildren);
+
+    onEdit(insertedNodes);
 
   }
 
@@ -101,14 +129,21 @@ export class Tree<NodeType>
     // node using the tree renderer.  We interleave the drop targets between
     // the rendered nodes, as well.
     const treeNodes = renderedNodes
-      .map((r, i) =>
-        [treeRenderer.renderNode(
+      .map((r) => {
+        const parentId = r.parent.caseOf({
+          just: m => Maybe.just(m.guid),
+          nothing: () => Maybe.nothing<string>(),
+        });
+
+        const target = treeRenderer.renderDropTarget(
+          r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false, editMode);
+
+        return treeRenderer.renderNode(
             r.nodeId, r.node,
             { depth: r.depth, parentNode: r.parent, isSelected: selected === r.nodeId },
-            r.component, r.indexWithinParent, editMode),
-          treeRenderer.renderDropTarget(i, this.onDrop, canHandleDrop, r.node),
-        ])
-      .reduce((all, pair) =>  [...all, ...pair], []);
+            r.component, target, r.indexWithinParent, editMode);
+
+      });
 
     return treeRenderer.renderTree(treeNodes);
   }

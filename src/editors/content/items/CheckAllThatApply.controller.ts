@@ -19,6 +19,7 @@ interface OwnProps extends AbstractItemPartEditorProps<contentTypes.MultipleChoi
   onGradingChange: (...args: any[]) => any;
   body: any;
   grading: any;
+  hideGradingCriteria: boolean;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
