@@ -220,8 +220,6 @@ export class ObjectiveSkillView
 
     persistence.persistDocument(updatedDocument);
 
-    onAddTitle(skill.get('id'), skill.get('title'));
-
     return skill.id;
   }
 
@@ -289,54 +287,18 @@ export class ObjectiveSkillView
   onRemove(model: RowType) {
     if (model.contentType === 'LearningObjective') {
       this.removeObjective(model);
-    } else {
-      this.removeSkill(model);
     }
   }
 
-  removeSkill(model: contentTypes.Skill) {
+  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
 
-    // Update the parent objectives
-    const parentObjectives = [];
-    this.state.objectives.objectives.toArray().forEach((obj) => {
-      if (obj.skills.contains(model.id)) {
+    // Update the parent objective
+    const index = objective.skills.indexOf(model.id);
+    const skills = objective.skills.remove(index);
+    const updated = objective.with({ skills });
 
-        const index = obj.skills.indexOf(model.id);
-        const skills = obj.skills.remove(index);
-        const updated = obj.with({ skills });
-        parentObjectives.push(updated);
-      }
-    });
+    this.onObjectiveEdit(updated);
 
-    if (parentObjectives.length > 0) {
-      parentObjectives.forEach(o => this.onObjectiveEdit(o));
-    }
-
-    // Update the skills
-    const originalDocument = this.state.skills.mapping.get(model.id);
-
-    const skills = (originalDocument.model as models.SkillsModel)
-      .skills.delete(model.guid);
-    const updatedModel =
-      (originalDocument.model as models.SkillsModel)
-      .with({ skills });
-
-    const updatedDocument = originalDocument.with({ model: updatedModel });
-
-    const unified = Object.assign({}, this.state.skills);
-
-    const index = unified.documents.indexOf(originalDocument);
-
-    unified.documents[index] = updatedDocument;
-    unified.skills = unified.skills.delete(model.id);
-
-    if (originalDocument === unified.newBucket) {
-      unified.newBucket = updatedDocument;
-    }
-
-    this.setState({ skills: unified });
-
-    persistence.persistDocument(updatedDocument);
   }
 
   removeObjective(obj: contentTypes.LearningObjective) {
@@ -431,7 +393,7 @@ export class ObjectiveSkillView
                 key={objective.id + '-' + skill.id}
                 onAddExistingSkill={this.onAddExistingSkill}
                 onAddNewSkill={this.onAddNewSkill}
-                onRemove={this.onRemove}
+                onRemove={this.removeSkill.bind(this, objective)}
                 highlighted={false}
                 model={skill}
                 title={titles[skill.id]}
@@ -477,6 +439,9 @@ export class ObjectiveSkillView
     unified.newBucket = document;
 
     this.setState({ objectives: unified });
+
+
+    this.props.onAddTitle(id, title);
 
     persistence.persistDocument(document);
   }
