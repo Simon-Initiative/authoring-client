@@ -5,7 +5,7 @@ import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-
+import { Skill } from 'types/course';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
 import { Select } from '../../content/common/Select';
@@ -23,11 +23,13 @@ import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { Outline, getChildren, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
+import { hasUnknownSkill } from 'utils/skills';
 
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
-
+  onFetchSkills: (courseId: string) => void;
+  skills: Immutable.OrderedMap<string, Skill>;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -42,7 +44,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   pendingCurrentNode: Maybe<contentTypes.Node>;
 
-  constructor(props) {
+  constructor(props : AssessmentEditorProps) {
     super(props, ({
       currentPage: props.model.pages.first().guid,
       currentNode: props.model.pages.first().nodes.first(),
@@ -61,40 +63,35 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEdit = this.onEdit.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
+
+    if (hasUnknownSkill(props.model, props.skills)) {
+      props.onFetchSkills(props.context.courseId);
+    }
   }
 
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState) : boolean {
 
-    if (this.props.model !== nextProps.model) {
-      return true;
-    }
-    if (this.props.expanded !== nextProps.expanded) {
-      return true;
-    }
-    if (this.props.editMode !== nextProps.editMode) {
-      return true;
-    }
-    if (this.state.currentPage !== nextState.currentPage) {
-      return true;
-    }
-    if (this.state.currentNode !== nextState.currentNode) {
-      return true;
-    }
-    if (this.state.undoStackSize !== nextState.undoStackSize) {
-      return true;
-    }
-    if (this.state.redoStackSize !== nextState.redoStackSize) {
-      return true;
-    }
+    const shouldUpdate = this.props.model !== nextProps.model
+        || this.props.expanded !== nextProps.expanded
+        || this.props.editMode !== nextProps.editMode
+        || this.state.currentPage !== nextState.currentPage
+        || this.state.currentNode !== nextState.currentNode
+        || this.state.undoStackSize !== nextState.undoStackSize
+        || this.state.redoStackSize !== nextState.redoStackSize;
 
-    return false;
+    return shouldUpdate;
   }
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
     const currentPage = nextProps.model.pages.get(this.state.currentPage);
+
+    // Handle the case that the current node has changed externally,
+    // for instance, from an undo/redo
+    findNodeByGuid(currentPage.nodes, this.state.currentNode.guid)
+      .lift(currentNode => this.setState({ currentNode }));
 
     this.pendingCurrentNode
       .bind(node => findNodeByGuid(currentPage.nodes, node.guid))

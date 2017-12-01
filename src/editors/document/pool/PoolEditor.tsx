@@ -12,6 +12,9 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import guid from '../../../utils/guid';
 import { DragDropContext } from 'react-dnd';
 import { renderAssessmentNode } from '../common/questions';
+import { hasUnknownSkill } from 'utils/skills';
+import { Skill } from 'types/course';
+
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import './PoolEditor.scss';
@@ -21,7 +24,8 @@ interface PoolEditor {
 }
 
 export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
-
+  onFetchSkills: (courseId: string) => void;
+  skills: Immutable.OrderedMap<string, Skill>;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -46,6 +50,10 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
+
+    if (hasUnknownSkill(props.model, props.skills)) {
+      props.onFetchSkills(props.context.courseId);
+    }
   }
 
 

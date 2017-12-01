@@ -1,11 +1,14 @@
 import * as React from 'react';
-
+import * as Immutable from 'immutable';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
+import { Skill } from 'types/course';
 
 export interface AbstractItemPartEditorProps<ItemType> {
+
+  allSkills: Immutable.OrderedMap<string, Skill>;
 
   itemModel: ItemType;
 

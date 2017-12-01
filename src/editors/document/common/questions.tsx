@@ -1,7 +1,9 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
+
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-
+import { Skill } from 'types/course';
 import { AppContext } from '../../common/AppContext';
 import { AppServices } from '../../common/AppServices';
 import { QuestionEditor } from '../../content/question/QuestionEditor';
@@ -15,6 +17,7 @@ export type Props = {
   editMode: boolean,
   context: AppContext,
   services: AppServices,
+  skills: Immutable.OrderedMap<string, Skill>,
 };
 
 export type EditHandler = (guid: string, node: contentTypes.Node) => void;
@@ -32,6 +35,7 @@ export function renderAssessmentNode(
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}
+            allSkills={props.skills}
             context={props.context}
             model={n}
             onEdit={c => onEdit(n.guid, c)}
@@ -55,6 +59,7 @@ export function renderAssessmentNode(
             editMode={props.editMode}
             services={props.services}
             context={props.context}
+            allSkills={props.skills}
             model={n}
             onEdit={c => onEdit(n.guid, c)}
             onRemove={() => onRemove(n.guid)}

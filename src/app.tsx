@@ -5,7 +5,7 @@ import { Iterable } from 'immutable';
 import * as persistence from './data/persistence';
 import * as models from './data/models';
 import thunkMiddleware from 'redux-thunk';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
@@ -16,10 +16,11 @@ import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
+import { loadCourse } from 'actions/course';
 import Main from './Main.controller';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';
+import { courseChanged, fetchObjectiveTitles } from './actions/course';
 
 // import redux provider
 const Provider = (require('react-redux') as RR).Provider;
@@ -74,22 +75,6 @@ function historyRequiresCourseLoad() {
     && window.location.hash.indexOf('-') !== -1;
 }
 
-function loadCourse() : Promise<models.CourseModel> {
-  const hash = window.location.hash;
-  const courseId = hash.substr(hash.indexOf('-') + 1);
-
-  return new Promise((resolve, reject) => {
-    persistence.retrieveCoursePackage(courseId)
-    .then((document) => {
-      if (document.model.modelType === 'CourseModel') {
-        resolve(document.model);
-      }
-    })
-    .catch(err => reject(err));
-  });
-
-}
-
 function tryLogin() : Promise<UserInfo> {
   return new Promise<UserInfo>((resolve, reject) => {
     initialize(
@@ -126,23 +111,28 @@ function main() {
     search: '',
   };
 
+  let store : Store<any> = null;
+
   tryLogin()
     .then((user) => {
+
+      store = initStoreWithState({ user });
+
       // initialize user data
       if (historyRequiresCourseLoad()) {
+
+        const hash = window.location.hash;
+        const courseId = hash.substr(hash.indexOf('-') + 1);
+
         userInfo = user;
-        return loadCourse();
+        return store.dispatch(loadCourse(courseId));
       } else {
-        render(initStoreWithState({ user }), current);
+        render(store, current);
         return;
       }
     })
     .then((model) => {
-      const store = initStoreWithState({ user: userInfo });
       render(store, current);
-
-      // initialize course data
-      store.dispatch(courseChanged(model));
     })
     .catch((err) => {
       render(initStoreWithState({ user: userInfo }), current);

@@ -14,7 +14,7 @@ import { CriteriaEditor } from '../question/CriteriaEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 
 type IdTypes = {
   shuffle: string,
@@ -287,11 +287,10 @@ export class FillInTheBlank
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
-          courseId={this.props.context.courseId}
+          allSkills={this.props.allSkills}
           model={this.props.partModel.concepts}
           onEdit={this.onConceptsEdit}
-          title="Skills"
-          conceptType="skill" />
+           />
         {!this.props.hideGradingCriteria && this.renderCriteria()}
         <Collapse caption="Choices" expanded={expanded}>
           {this.renderChoices()}

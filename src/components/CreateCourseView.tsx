@@ -38,9 +38,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       .then((document) => {
         // Get an updated course content package payload
         if (document.model.modelType === models.ModelTypes.CourseModel) {
-
-          this.props.dispatch(courseActions.courseChanged((document.model as any)));
-          viewActions.viewDocument(document._courseId, document._courseId);
+          this.props.dispatch(courseActions.viewCourse(document._courseId));
         }
       })
       .catch((err) => {
