@@ -34,6 +34,8 @@ export class ShortAnswer
   constructor(props) {
     super(props);
 
+    this.setClassname('short-answer');
+
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
   }

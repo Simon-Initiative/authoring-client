@@ -25,8 +25,6 @@ import { EditorState } from 'draft-js';
 import { Question, QuestionProps, QuestionState,
 Section, SectionContent, SectionHeader, OptionControl, SectionControl } from './Question';
 
-import './QuestionBody.scss';
-
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
 
 }
@@ -64,6 +62,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   }
 
   onToggleAdvanced(e) {
+    // TODO
     console.log('onToggleAdvancedMode NOT IMPLEMENTED');
   }
 

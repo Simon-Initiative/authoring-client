@@ -44,17 +44,12 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 
 import './QuestionEditor.scss';
 
-type Ids = {
-  id: string,
-};
-
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
 }
 
 export interface QuestionEditorState {
-
   activeItemId: string;
 }
 
@@ -63,7 +58,6 @@ export interface QuestionEditorState {
  */
 export abstract class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
-  ids: Ids;
   lastBody: contentTypes.Html;
   itemToAdd: any;
   fillInTheBlankCommand: InsertInputRefCommand;
@@ -77,10 +71,6 @@ export abstract class QuestionEditor
       activeItemId: null,
     };
 
-    this.ids = {
-      id: guid(),
-    };
-
     const createFillInTheBlank = () => {
       const value = guid().replace('-', '');
       const choice = new contentTypes.Choice({ value, guid: guid() });
@@ -90,25 +80,27 @@ export abstract class QuestionEditor
       return new contentTypes.FillInTheBlank().with({ choices });
     };
 
+    this.onBlur = this.onBlur.bind(this);
+    this.onFocusChange = this.onFocusChange.bind(this);
+    this.canInsertAnotherPart = this.canInsertAnotherPart.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
-    this.onAddOrdering = this.onAddOrdering.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+    this.onGradingChange = this.onGradingChange.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
+    this.onAddOrdering = this.onAddOrdering.bind(this);
+    this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onExplanation = this.onExplanation.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
     this.numericCommand
       = new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
-    this.textCommand = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
+    this.textCommand
+      = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
-    this.onRemove = this.onRemove.bind(this);
-
-    this.onFocusChange = this.onFocusChange.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-
-
-    this.onGradingChange = this.onGradingChange.bind(this);
     this.lastBody = this.props.model.body;
   }
 
@@ -118,17 +110,16 @@ export abstract class QuestionEditor
     }
   }
 
+  onFocusChange(activeItemId: string) {
+    this.setState({ activeItemId });
+  }
+
   canInsertAnotherPart(): boolean {
     const restricted = this.props.isParentAssessmentGraded
       === undefined || this.props.isParentAssessmentGraded;
 
     return !restricted || this.props.model.items.size === 0;
   }
-
-  onFocusChange(activeItemId: string) {
-    this.setState({ activeItemId });
-  }
-
 
   onBodyEdit(body) {
 
@@ -347,10 +338,18 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          key={item.guid}
           itemModel={item}
           partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onConceptsEdit={this.onConceptsEdit}
+          onHintsEdit={this.onHintsEdit}
+          onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
@@ -408,10 +407,18 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          key={item.guid}
           itemModel={item}
           partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onConceptsEdit={this.onConceptsEdit}
+          onHintsEdit={this.onHintsEdit}
+          onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     } else if (item.contentType === 'Essay') {
@@ -423,10 +430,18 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          key={item.guid}
           itemModel={item}
           partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onConceptsEdit={this.onConceptsEdit}
+          onHintsEdit={this.onHintsEdit}
+          onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     }

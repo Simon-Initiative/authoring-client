@@ -5,6 +5,7 @@ import { AppContext } from '../../common/AppContext';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
@@ -25,7 +26,7 @@ export interface FillInTheBlankProps
 
 }
 
-export interface FillInTheBlankState {
+export interface FillInTheBlankState extends AbstractItemPartEditorState {
 
 }
 
@@ -41,7 +42,8 @@ const ChoiceFeedback = (props) => {
  * FillInTheBlank Question Editor
  */
 export class FillInTheBlank
-  extends React.PureComponent<FillInTheBlankProps, FillInTheBlankState> {
+  extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
+    FillInTheBlankProps, FillInTheBlankState> {
 
   constructor(props) {
     super(props);

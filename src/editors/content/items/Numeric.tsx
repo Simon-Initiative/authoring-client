@@ -4,6 +4,7 @@ import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { CriteriaEditor } from '../question/CriteriaEditor';
@@ -20,10 +21,9 @@ export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.N
 
 }
 
-export interface NumericState {
+export interface NumericState extends AbstractItemPartEditorState {
 
 }
-
 
 /**
  * The content editor for HtmlContent.

@@ -134,6 +134,10 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
   constructor(props) {
     super(props);
+
+    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
+    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
+    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
   }
 
   setClassname(className) {
@@ -187,7 +191,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     // add grading criteria option if not disabled
     if (!hideGradingCriteria) {
       options = options.concat(
-        <OptionControl key="grading" name="grading">
+        <OptionControl key="grading" name="Grading">
           <Select
             editMode={editMode}
             label=""

@@ -4,6 +4,7 @@ import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
 import { ExplanationEditor } from '../part/ExplanationEditor';
@@ -20,7 +21,7 @@ export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text
 
 }
 
-export interface TextState {
+export interface TextState extends AbstractItemPartEditorState {
 
 }
 
