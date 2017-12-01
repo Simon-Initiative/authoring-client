@@ -7,6 +7,7 @@ import { requests } from './reducers/requests';
 import { titles } from './reducers/titles';
 import { expanded } from './reducers/expanded';
 import { server } from './reducers/server';
+import { skills } from './reducers/skills';
 
 const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
@@ -16,6 +17,7 @@ const reducers = combineReducers({
   requests,       // the current pending async requests
   expanded,       // preserves expaned state of tree UIs
   server,         // server specific info (time skew, etc)
+  skills,         // all known skills for the current course
 });
 
 export default reducers;

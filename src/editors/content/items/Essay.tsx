@@ -13,7 +13,7 @@ import { CriteriaEditor } from '../question/CriteriaEditor';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from 'utils/guid';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 
 export interface EssayProps extends AbstractItemPartEditorProps<contentTypes.Essay> {
   hideGradingCriteria: boolean;
@@ -106,11 +106,10 @@ export class Essay
             editMode={this.props.editMode}
             services={this.props.services}
             context={this.props.context}
-            courseId={this.props.context.courseId}
+            allSkills={this.props.allSkills}
             model={this.props.partModel.concepts}
             onEdit={this.onConceptsEdit}
-            title="Skills"
-            conceptType="skill" />
+            />
 
         {!this.props.hideGradingCriteria && this.renderCriteria()}
 

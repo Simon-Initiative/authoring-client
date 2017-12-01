@@ -10,12 +10,13 @@ import { ContentEditor } from '../content/ContentEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
-
+import { Skill } from 'types/course';
 import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface PoolState {

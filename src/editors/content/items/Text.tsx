@@ -11,7 +11,7 @@ import { TabularFeedback } from '../part/TabularFeedback';
 import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
@@ -182,11 +182,9 @@ export class Text
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
-          courseId={this.props.context.courseId}
           model={this.props.partModel.concepts}
+          allSkills={this.props.allSkills}
           onEdit={this.onConceptsEdit}
-          title="Skills"
-          conceptType="skill"
           />
 
         {!this.props.hideGradingCriteria && this.renderCriteria()}

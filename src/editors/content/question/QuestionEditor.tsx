@@ -27,7 +27,7 @@ import { EntityTypes } from '../../../data/content/html/common';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-
+import { Skill } from 'types/course';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
@@ -48,6 +48,7 @@ type Ids = {
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface QuestionEditorState {
@@ -92,7 +93,7 @@ function getLabelForQuestion(question: contentTypes.Question) : string {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class QuestionEditor
+export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
   ids: Ids;
   lastBody: contentTypes.Html;
@@ -145,6 +146,15 @@ export abstract class QuestionEditor
 
     this.onGradingChange = this.onGradingChange.bind(this);
     this.lastBody = this.props.model.body;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+
+    const should = this.props.model !== nextProps.model
+      || this.props.allSkills !== nextProps.allSkills
+      || this.state.activeItemId !== nextState.activeItemId;
+
+    return should;
   }
 
   onBlur(activeItemId: string) {
@@ -354,6 +364,7 @@ export abstract class QuestionEditor
         onRemove={this.onRemove}
         onFocus={this.onFocusChange}
         onBlur={this.onBlur}
+        allSkills={this.props.allSkills}
         key={item.guid}
         itemModel={item}
         partModel={part}
@@ -368,6 +379,7 @@ export abstract class QuestionEditor
         onRemove={this.onRemove}
         onFocus={this.onFocusChange}
         onBlur={this.onBlur}
+        allSkills={this.props.allSkills}
         key={item.guid}
         itemModel={item}
         partModel={part}
@@ -382,6 +394,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
@@ -396,6 +409,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
@@ -411,6 +425,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
@@ -426,6 +441,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
@@ -440,6 +456,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
@@ -454,6 +471,7 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
