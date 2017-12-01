@@ -2,6 +2,12 @@
 @import 'oli/typography';
 
 .org-editor {
+
+  .org-tab {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+
 	.doc-head {
     .action-bar {
       .btn {

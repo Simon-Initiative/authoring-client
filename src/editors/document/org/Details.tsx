@@ -58,7 +58,7 @@ export class Details
     return (
       <div className="details">
         <div className="form-group row">
-          <label className="col-1 col-form-label">Title</label>
+          <label className="col-2 col-form-label">Title</label>
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.title}
@@ -66,7 +66,7 @@ export class Details
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Description</label>
+          <label className="col-2 col-form-label">Description</label>
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.description}
@@ -74,7 +74,7 @@ export class Details
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Audience</label>
+          <label className="col-2 col-form-label">Audience</label>
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.audience}
@@ -82,7 +82,7 @@ export class Details
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Version</label>
+          <label className="col-2 col-form-label">Version</label>
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.version}
@@ -90,7 +90,7 @@ export class Details
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Product</label>
+          <label className="col-2 col-form-label">Product</label>
           <div className="col-10">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={product}

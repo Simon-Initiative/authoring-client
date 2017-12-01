@@ -16,6 +16,7 @@ interface OwnProps extends AbstractContentEditorProps<List<string>> {
   conceptType: string;
   courseId: string;
   title: string;
+  
 }
 
 const mapStateToProps = (state): StateProps => {
