@@ -1,22 +1,4 @@
 import * as React from 'react';
-import * as contentTypes from 'data/contentTypes';
-// import * as Immutable from 'immutable';
-// import { AppServices } from '../../common/AppServices';
-import {
-//   AbstractItemPartEditor,
-  AbstractItemPartEditorProps,
-} from '../common/AbstractItemPartEditor';
-// import { Choice } from './Choice';
-// import { ExplanationEditor } from '../part/ExplanationEditor';
-// import { TabularFeedback } from '../part/TabularFeedback';
-// import { Hints } from '../part/Hints';
-// import { ItemLabel } from './ItemLabel';
-// import { CriteriaEditor } from '../question/CriteriaEditor';
-// import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-// import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse }
-// from '../common/controls';
-import { Select } from '../common/controls';
-// import guid from 'utils/guid';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
@@ -24,108 +6,61 @@ import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { InsertInputRefCommand } from '../question/commands';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown.tsx';
-import { CommandProcessor } from '../common/command';
-import { EditorState } from 'draft-js';
+import { TabContainer } from 'editors/content/common/TabContainer';
+import { Question, QuestionProps, QuestionState,
+  Section, SectionHeader, SectionContent, Tab } from './Question';
+
+import { FillInTheBlank } from '../items/FillInTheBlank';
+import { Text } from '../items/Text';
+import { Numeric } from '../items/Numeric';
 
 import './MultipartInput.scss';
-import './QuestionBody.scss';
 
 export interface MultipartInputProps
-  extends AbstractItemPartEditorProps<any> {
-  onBodyEdit: (...args: any[]) => any;
-  body: any;
-
-  grading: any;
-  onGradingChange: (value) => void;
-  hideGradingCriteria: boolean;
-
+  extends QuestionProps {
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
   canInsertAnotherPart: (e: any) => void;
 }
 
-export interface MultipartInputState {
+export interface MultipartInputState extends QuestionState {
 
 }
 
-let htmlEditor: CommandProcessor<EditorState>;
-
-const onInsertNumeric = (e, numericCommand, canInsertAnotherPart) => {
-  e.preventDefault();
-  if (canInsertAnotherPart()) {
-    htmlEditor.process(numericCommand);
-  }
-};
-
-const onInsertText = (e, textCommand, canInsertAnotherPart) => {
-  e.preventDefault();
-  if (canInsertAnotherPart()) {
-    htmlEditor.process(textCommand);
-  }
-};
-
-const onInsertFillInTheBlank = (e, fillInTheBlankCommand, canInsertAnotherPart) => {
-  e.preventDefault();
-  if (canInsertAnotherPart()) {
-    htmlEditor.process(fillInTheBlankCommand);
-  }
-};
-
-// type SectionHeaderProps = {
-//   name: string;
-//   children: React.Component[];
-// };
-
-export const SectionHeader = props => (
-  <div className={`section-header ${props.name}`}>
-    <h3>{props.name}</h3>
-    <div className="flex-spacer" />
-    {props.children}
-  </div>
-);
-
-// type SectionContentProps = {
-//   children: React.Component[];
-// };
-// export type SectionContent = React.SFC<SectionContentProps>;
-export const SectionContent = ({ children }) => (
-  <div className={`section-content ${name}`}>{children}</div>
-);
-
-export const Section = ({ name, children }) => (
-  <div key={name} className={`section ${name}`}>{children}</div>
-);
-
 /**
- * The content editor for HtmlContent.
+ * Multipart Question Editor
  */
-export class MultipartInput extends React.PureComponent<MultipartInputProps, MultipartInputState> {
+export class MultipartInput extends Question<MultipartInputProps, MultipartInputState> {
   constructor(props) {
     super(props);
+    this.setClassname('multipart-input');
   }
 
-  renderOptions() {
-    const { editMode, grading, onGradingChange } = this.props;
-
-    return (
-      <div className="options">
-        <div className="control grading">
-          <div className="control-label">Grading</div>
-          <Select
-            editMode={editMode}
-            label=""
-            value={grading}
-            onChange={onGradingChange}>
-            <option value="automatic">Automatic</option>
-            <option value="instructor">Instructor</option>
-            <option value="hybrid">Hybrid</option>
-          </Select>
-        </div>
-      </div>
-    );
+  onInsertNumeric(e, numericCommand, canInsertAnotherPart) {
+    e.preventDefault();
+    if (canInsertAnotherPart()) {
+      this.htmlEditor.process(numericCommand);
+    }
   }
 
+  onInsertText(e, textCommand, canInsertAnotherPart) {
+    e.preventDefault();
+    if (canInsertAnotherPart()) {
+      this.htmlEditor.process(textCommand);
+    }
+  }
+
+  onInsertFillInTheBlank(e, fillInTheBlankCommand, canInsertAnotherPart) {
+    e.preventDefault();
+    if (canInsertAnotherPart()) {
+      this.htmlEditor.process(fillInTheBlankCommand);
+    }
+  }
+
+  /**
+   * Override parent renderQuestionSection function
+   */
   renderQuestionSection() {
     const {
       editMode,
@@ -171,30 +106,30 @@ export class MultipartInput extends React.PureComponent<MultipartInputProps, Mul
 
     return (
       <Section name="question">
-        <SectionHeader name="Question">
+        <SectionHeader title="Question">
           <div className="control insert-item">
             <Dropdown label="Insert Item">
               <DropdownItem
                 label="Numeric"
                 onClick={e =>
-                  onInsertNumeric(e, numericCommand, canInsertAnotherPart)
+                  this.onInsertNumeric(e, fillInTheBlankCommand, canInsertAnotherPart)
                 }/>
               <DropdownItem
                 label="Text"
                 onClick={e =>
-                  onInsertText(e, textCommand, canInsertAnotherPart)
+                  this.onInsertText(e, fillInTheBlankCommand, canInsertAnotherPart)
                 }/>
               <DropdownItem
                 label="Dropdown"
                 onClick={e =>
-                  onInsertFillInTheBlank(e, fillInTheBlankCommand, canInsertAnotherPart)
+                  this.onInsertFillInTheBlank(e, fillInTheBlankCommand, canInsertAnotherPart)
                 }/>
             </Dropdown>
           </div>
         </SectionHeader>
         <SectionContent>
           <HtmlContentEditor
-            ref={c => htmlEditor = c}
+            ref={c => this.htmlEditor = c}
             editMode={editMode}
             services={services}
             context={context}
@@ -209,33 +144,88 @@ export class MultipartInput extends React.PureComponent<MultipartInputProps, Mul
     );
   }
 
-  renderAdditionalSections() {
-    return [];
-  }
+  renderItemParts(): JSX.Element[] {
+    const { model } = this.props;
+    const items = model.items.toArray();
+    const parts = model.parts.toArray();
 
-  renderSections() {
-    return [
-      this.renderQuestionSection(),
-      ...this.renderAdditionalSections(),
-    ];
-  }
+    const getTabNameFromContentType = (contentType, index) => {
+      switch (contentType) {
+        case 'FillInTheBlank':
+          return `Fill in the Blank Item ${index}`;
+        case 'Number':
+          return `Number Item ${index}`;
+        case 'Text':
+        default:
+          return `Text Item ${index}`;
+      }
+    };
 
-  render() {
-    const {
-      itemModel,
-      onFocus,
-      onBlur,
-    } = this.props;
+    const getTabFromContentType = (contentType, props) => {
+      switch (contentType) {
+        case 'FillInTheBlank':
+          return (
+            <FillInTheBlank
+              context={props.context}
+              services={props.services}
+              editMode={props.editMode}
+              onRemove={props.onRemove}
+              onFocus={props.onFocusChange}
+              onBlur={props.onBlur}
+              itemModel={props.itemModel}
+              partModel={props.partModel}
+              onEdit={props.onEdit} />
+          );
+        case 'Number':
+          return (
+            <Numeric
+              context={props.context}
+              services={props.services}
+              editMode={props.editMode}
+              onRemove={props.onRemove}
+              onFocus={props.onFocusChange}
+              onBlur={props.onBlur}
+              itemModel={props.itemModel}
+              partModel={props.partModel}
+              onEdit={props.onEdit} />
+          );
+        case 'Text':
+        default:
+          return (
+            <Text
+              context={props.context}
+              services={props.services}
+              editMode={props.editMode}
+              onRemove={props.onRemove}
+              onFocus={props.onFocusChange}
+              onBlur={props.onBlur}
+              itemModel={props.itemModel}
+              partModel={props.partModel}
+              onEdit={props.onEdit} />
+          );
+      }
+    };
 
-    return (
-      <div
-        className="multipart-input item-content-tab"
-        onFocus={() => onFocus(itemModel.id)}
-        onBlur={() => onBlur(itemModel.id)}>
+    return items.map((item, index) => (
+      <div key={item.guid} className="item-part-editor">
+        <TabContainer
+          labels={[
+            getTabNameFromContentType(item.contentType, index + 1),
+            'Skills',
+            'Hints',
+            'Grading Criteria',
+            'Other',
+          ]}>
 
-        {this.renderOptions()}
-        {this.renderSections()}
+          {getTabFromContentType(item.contentType, this.props)}
+          {this.renderSkillsTab(item, parts[index])}
+          {this.renderHintsTab(item, parts[index])}
+          {this.renderGradingCriteriaTab(item, parts[index])}
+          {this.renderOtherTab(item, parts[index])}
+          {}
+        </TabContainer>
       </div>
-    );
+    ));
   }
+
 }

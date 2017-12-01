@@ -4,6 +4,11 @@
       button {
         padding: 0;
       }
+
+      .dropdown-menu {
+        cursor: pointer;
+        left: -75;
+      }
     }
   }
 }
