@@ -37,6 +37,7 @@ export class Numeric
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
     this.onNotationChange = this.onNotationChange.bind(this);
+    this.onEditMult = this.onEditMult.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part) {

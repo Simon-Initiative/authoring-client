@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as contentTypes from 'data/contentTypes';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
@@ -17,7 +18,7 @@ import { Numeric } from '../items/Numeric';
 import './MultipartInput.scss';
 
 export interface MultipartInputProps
-  extends QuestionProps {
+  extends QuestionProps<contentTypes.QuestionItem> {
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
@@ -105,7 +106,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <Section name="question">
+      <Section name="question" key="question">
         <SectionHeader title="Question">
           <div className="control insert-item">
             <Dropdown label="Insert Item">
@@ -170,7 +171,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               services={props.services}
               editMode={props.editMode}
               onRemove={props.onRemove}
-              onFocus={props.onFocusChange}
+              onFocus={props.onFocus}
               onBlur={props.onBlur}
               itemModel={props.itemModel}
               partModel={props.partModel}
@@ -183,7 +184,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               services={props.services}
               editMode={props.editMode}
               onRemove={props.onRemove}
-              onFocus={props.onFocusChange}
+              onFocus={props.onFocus}
               onBlur={props.onBlur}
               itemModel={props.itemModel}
               partModel={props.partModel}
@@ -197,7 +198,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               services={props.services}
               editMode={props.editMode}
               onRemove={props.onRemove}
-              onFocus={props.onFocusChange}
+              onFocus={props.onFocus}
               onBlur={props.onBlur}
               itemModel={props.itemModel}
               partModel={props.partModel}
@@ -222,7 +223,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
           {this.renderHintsTab(item, parts[index])}
           {this.renderGradingCriteriaTab(item, parts[index])}
           {this.renderOtherTab(item, parts[index])}
-          {}
         </TabContainer>
       </div>
     ));

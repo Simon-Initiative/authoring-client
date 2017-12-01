@@ -18,11 +18,12 @@ import { Hints } from '../part/Hints';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { CriteriaEditor } from '../question/CriteriaEditor';
+import { convertStringToCSS } from 'utils//style';
 
 import './Question.scss';
 
-export interface QuestionProps
-  extends AbstractItemPartEditorProps<any> {
+export interface QuestionProps<ModelType>
+  extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
   body: any;
 
@@ -34,6 +35,7 @@ export interface QuestionProps
   onConceptsEdit: (concepts, item, part) => void;
   onHintsEdit: (item, part) => void;
   onExplanation: (explanation, item, part) => void;
+  onRemoveQuestion: () => void;
 }
 
 export interface QuestionState {
@@ -87,7 +89,9 @@ export const SectionHeader: React.StatelessComponent<SectionHeaderProps> = ({
   <div className={`section-header`}>
     <h3>{title}</h3>
     <div className="flex-spacer" />
-    {children}
+    <div className="controls">
+      {children}
+    </div>
   </div>
 );
 
@@ -102,13 +106,28 @@ type SectionProps = {
 };
 
 export const Section: React.StatelessComponent<SectionProps> = ({ name, children }) => (
-  <div key={name} className={`section ${name}`}>{children}</div>
+  <div key={name} className={`section ${convertStringToCSS(name)}`}>{children}</div>
 );
+
+type OptionControlProps = {
+  name: string,
+  onClick?: (name: string, e) => void;
+};
+
+export const OptionControl: React.StatelessComponent<OptionControlProps>
+  = ({ name, onClick, children }) => (
+  <div className={`control ${convertStringToCSS(name)}`} onClick={e => onClick && onClick(name, e)}>
+    <div className="control-label">{name}</div>
+    {children}
+  </div>
+);
+
+export const SectionControl = OptionControl;
 
 /**
  * The content editor for HtmlContent.
  */
-export class Question<P extends QuestionProps, S extends QuestionState>
+export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S extends QuestionState>
   extends React.PureComponent<P, S> {
   htmlEditor: CommandProcessor<EditorState>;
   className: string;
@@ -136,6 +155,8 @@ export class Question<P extends QuestionProps, S extends QuestionState>
   }
 
   renderQuestionTitle(): JSX.Element {
+    const { onRemoveQuestion } = this.props;
+
     return (
       <div className="question-title">
         <div className="title">{getLabelForQuestion(this.props.model)}</div>
@@ -147,14 +168,14 @@ export class Question<P extends QuestionProps, S extends QuestionState>
         </div>
         <div
           className="action-btn action-btn-remove"
-          onClick={() => { console.log(`onClick: remove - NOT IMPLEMENTED`); }}>
+          onClick={onRemoveQuestion}>
           <i className="fa fa-trash-o" />
         </div>
       </div>
     );
   }
 
-  renderCustomOptions() {
+  renderAdditionalOptions() {
     return [];
   }
 
@@ -166,8 +187,7 @@ export class Question<P extends QuestionProps, S extends QuestionState>
     // add grading criteria option if not disabled
     if (!hideGradingCriteria) {
       options = options.concat(
-        <div className="control grading">
-          <div className="control-label">Grading</div>
+        <OptionControl key="grading" name="grading">
           <Select
             editMode={editMode}
             label=""
@@ -177,12 +197,18 @@ export class Question<P extends QuestionProps, S extends QuestionState>
             <option value="instructor">Instructor</option>
             <option value="hybrid">Hybrid</option>
           </Select>
-        </div>,
+        </OptionControl>,
       );
     }
 
     // add custom defined options
-    options = options.concat(this.renderCustomOptions());
+    const additionalOptions = this.renderAdditionalOptions();
+    if (additionalOptions.length > 0) {
+      options = options.concat(
+        <div className="flex-spacer"/>,
+        ...additionalOptions,
+      );
+    }
 
     return options.length > 0
       ? (
@@ -210,7 +236,7 @@ export class Question<P extends QuestionProps, S extends QuestionState>
     };
 
     return (
-      <Section name="question">
+      <Section name="question" key="question">
         <SectionHeader title="Question"/>
         <SectionContent>
           <HtmlContentEditor
@@ -355,7 +381,6 @@ export class Question<P extends QuestionProps, S extends QuestionState>
           {this.renderHintsTab(item, parts[index])}
           {this.renderGradingCriteriaTab(item, parts[index])}
           {this.renderOtherTab(item, parts[index])}
-          {}
         </TabContainer>
       </div>
     ));

@@ -17,7 +17,7 @@ import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { MultipartInput, MultipartInputProps, MultipartInputState } from './MultipartInput';
-import { Section, SectionHeader, SectionContent } from './Question';
+import { Section, SectionHeader, SectionContent, SectionControl } from './Question';
 import * as models from '../../../data/models';
 
 export interface FillInTheBlankProps
@@ -45,6 +45,13 @@ export class FillInTheBlank
 
   constructor(props) {
     super(props);
+
+    this.onFeedbackEdit = this.onFeedbackEdit.bind(this);
+    this.onAddChoice = this.onAddChoice.bind(this);
+    this.onRemoveChoice = this.onRemoveChoice.bind(this);
+    this.onToggleShuffle = this.onToggleShuffle.bind(this);
+    this.onEditMult = this.onEditMult.bind(this);
+    this.onScoreEdit = this.onScoreEdit.bind(this);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
@@ -133,16 +140,14 @@ export class FillInTheBlank
       partModel);
   }
 
-
-  onShuffleEdit(shuffle: boolean) {
+  onToggleShuffle(e) {
     const {
       itemModel,
       partModel,
       onEdit,
     } = this.props;
 
-    const newItemModel = itemModel.with({ shuffle });
-    onEdit(newItemModel, partModel);
+    onEdit(itemModel.with({ shuffle: e.target.value }), partModel);
   }
 
   onEditMult(mult) {
@@ -172,7 +177,7 @@ export class FillInTheBlank
         editMode={editMode}
         model={choice}
         onEdit={this.onChoiceEdit}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)} />
+        onRemove={() => this.onRemoveChoice(choice, response)} />
     );
   }
 
@@ -221,7 +226,7 @@ export class FillInTheBlank
             services={services}
             context={context}
             model={m}
-            onEdit={this.onEditMult.bind(this)}
+            onEdit={this.onEditMult}
           />);
       }
 
@@ -251,13 +256,19 @@ export class FillInTheBlank
 
     return (
       <Section name="choices">
-        <SectionHeader title="Choices"/>
+        <SectionHeader title="Choices">
+          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+            <input
+              className="toggle toggle-light"
+              type="checkbox"
+              checked={itemModel.shuffle} />
+            <label className="toggle-btn"></label>
+          </SectionControl>
+        </SectionHeader>
         <SectionContent>
           <div style={ { display: 'inline' } }>
             <Button editMode={editMode}
               type="link" onClick={this.onAddChoice}>Add Choice</Button>
-            <Checkbox editMode={editMode}
-              label="Shuffle" value={itemModel.shuffle} onEdit={this.onShuffleEdit}/>
           </div>
           {this.renderChoices()}
         </SectionContent>

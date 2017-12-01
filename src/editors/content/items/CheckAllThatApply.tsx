@@ -1,21 +1,19 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-// import * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 // import { AppServices } from '../../common/AppServices';
 import {
 //   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
 } from '../common/AbstractItemPartEditor';
-// import { Choice } from './Choice';
+import { Choice } from './Choice';
 // import { ExplanationEditor } from '../part/ExplanationEditor';
-// import { TabularFeedback } from '../part/TabularFeedback';
+import { TabularFeedback } from '../part/TabularFeedback';
 // import { Hints } from '../part/Hints';
 // import { ItemLabel } from './ItemLabel';
-// import { CriteriaEditor } from '../question/CriteriaEditor';
+import { CriteriaEditor } from '../question/CriteriaEditor';
 // import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-// import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse }
-// from '../common/controls';
-import { Select } from '../common/controls';
+import { Button, Checkbox } from '../common/controls';
 // import guid from 'utils/guid';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
@@ -24,132 +22,175 @@ import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
 
+import { Question, QuestionProps, QuestionState,
+Section, SectionContent, SectionHeader, OptionControl, SectionControl } from './Question';
+
 import './QuestionBody.scss';
 
-export interface CheckAllThatApplyProps
-  extends AbstractItemPartEditorProps<contentTypes.MultipleChoice> {
-  onBodyEdit: (...args: any[]) => any;
-  body: any;
+export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
 
-  grading: any;
-  onGradingChange: (value) => void;
-  onToggleAdvancedMode: () => void;
-  onToggleShuffleChoices: () => void;
-  hideGradingCriteria: boolean;
 }
 
-let htmlEditor: CommandProcessor<EditorState>;
+export interface CheckAllThatApplyState extends QuestionState {
+
+}
 
 /**
  * The content editor for HtmlContent.
  */
-export const CheckAllThatApply: React.SFC<CheckAllThatApplyProps> = ({
-  itemModel,
-  onFocus,
-  onBlur,
+export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAllThatApplyState> {
 
-  partModel,
+  constructor(props) {
+    super(props);
 
-  onEdit,
+    this.setClassname('check-all-that-apply');
 
-  context,
+    this.onToggleShuffle = this.onToggleShuffle.bind(this);
+    this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
+    this.onAddChoice = this.onAddChoice.bind(this);
+    this.onChoiceEdit = this.onChoiceEdit.bind(this);
+    this.onPartEdit = this.onPartEdit.bind(this);
+    this.onRemoveChoice = this.onRemoveChoice.bind(this);
+  }
 
-  services,
+  onToggleShuffle(e) {
+    const {
+      itemModel,
+      partModel,
+      onEdit,
+    } = this.props;
 
-  editMode,
+    onEdit(itemModel.with({ shuffle: e.target.value }), partModel);
+  }
 
-  onRemove,
+  onToggleAdvanced(e) {
+    console.log('onToggleAdvancedMode NOT IMPLEMENTED');
+  }
 
-  onBodyEdit,
-  body,
+  onAddChoice() {
+    const count = this.props.itemModel.choices.size;
+    const value = String.fromCharCode(65 + count);
 
-  // --------
+    const choice = new contentTypes.Choice().with({ value });
 
-  grading,
-  onGradingChange,
-  onToggleAdvancedMode,
-  onToggleShuffleChoices,
-}) => {
-  const bodyStyle = {
-    minHeight: '30px',
-    borderStyle: 'none',
-    borderWith: '1px',
-    borderColor: '#AAAAAA',
-  };
+    const itemModel = this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
 
-  return (
-    <div
-      className="check-all-that-apply item-content-tab"
-      onFocus={() => onFocus(itemModel.id)}
-      onBlur={() => onBlur(itemModel.id)}>
-      <div className="options">
-        <div className="control grading">
-          <div className="control-label">Grading</div>
-          <select
-            disabled={!editMode}
-            value={grading}
-            onChange={e => onGradingChange(e.target.value)}
-            className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0">
-            <option value="automatic">Automatic</option>
-            <option value="instructor">Instructor</option>
-            <option value="hybrid">Hybrid</option>
-          </select>
+    this.props.onEdit(itemModel, this.props.partModel);
+  }
+
+  onChoiceEdit(c) {
+    this.props.onEdit(
+      this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.set(c.guid, c) }),
+      this.props.partModel);
+  }
+
+  toLetter(index) {
+    return String.fromCharCode(65 + index);
+  }
+
+  renderChoice(choice: contentTypes.Choice, index: number) {
+    return (
+      <Choice
+        key={choice.guid}
+        label={'Choice ' + this.toLetter(index)}
+        {...this.props}
+        model={choice}
+        onEdit={this.onChoiceEdit}
+        onRemove={this.onRemoveChoice.bind(this, choice)}
+        />
+    );
+  }
+
+  onPartEdit(partModel: contentTypes.Part) {
+    this.props.onEdit(this.props.itemModel, partModel);
+  }
+
+  updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
+    // For each response, adjust matches that may have
+    // utilized the removedValue...
+    return partModel;
+  }
+
+  updateChoiceValues(itemModel: contentTypes.MultipleChoice) : contentTypes.MultipleChoice {
+
+    const choices = itemModel.choices.toArray();
+    let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
+
+    choices.forEach((choice, index) => {
+      const value = this.toLetter(index);
+      const updated = choice.with({ value });
+      newChoices = newChoices.set(updated.guid, updated);
+    });
+
+    return itemModel.with({ choices: newChoices });
+  }
+
+  onRemoveChoice(choice: contentTypes.Choice) {
+    let itemModel = this.props.itemModel.with(
+      { choices: this.props.itemModel.choices.delete(choice.guid) });
+
+    itemModel = this.updateChoiceValues(itemModel);
+
+    const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
+
+    this.props.onEdit(itemModel, partModel);
+  }
+
+  renderChoices() {
+    const { itemModel } = this.props;
+
+    return itemModel.choices
+      .toArray()
+      .map((c, i) => this.renderChoice(c, i));
+  }
+
+  renderAdditionalOptions() {
+    return [
+      <OptionControl key="advanced" name="Advanced" onClick={this.onToggleAdvanced}>
+        <div className="control">
+          <input className="toggle toggle-light" type="checkbox" checked={false} />
+          <label className="toggle-btn"></label>
         </div>
-        <div className="flex-spacer"/>
-        <div className="control advanced-mode clickable" onClick={() => onToggleAdvancedMode()}>
-          <div className="control-label">Advanced</div>
-          <div className="control">
-            <input className="toggle toggle-light" type="checkbox" checked={false} />
+      </OptionControl>,
+    ];
+  }
+
+  renderAdditionalSections() {
+    const { editMode, itemModel, partModel } = this.props;
+
+    return ([
+      <Section key="choices" name="choices">
+        <SectionHeader title="Choices">
+          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+            <input
+              className="toggle toggle-light"
+              type="checkbox"
+              checked={itemModel.shuffle} />
             <label className="toggle-btn"></label>
-          </div>
-        </div>
-      </div>
-
-      <div className="section question">
-        <div className="section-header">
-          <h3>Question</h3>
-        </div>
-        <div className="section-content">
-          <HtmlContentEditor
-            ref={c => htmlEditor = c}
+          </SectionControl>
+        </SectionHeader>
+        <SectionContent>
+          <Button
             editMode={editMode}
-            services={services}
-            context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={<InlineInsertionToolbar/>}
-            blockToolbar={<BlockToolbar/>}
-            model={body}
-            onEdit={onBodyEdit} />
-          </div>
-      </div>
+            type="link"
+            onClick={this.onAddChoice}>
+            Add Choice
+          </Button>
+          {this.renderChoices()}
+        </SectionContent>
+      </Section>,
+      <Section key="feedback" name="feedback">
+        <SectionHeader title="Feedback"/>
+        <SectionContent>
+          <TabularFeedback
+            {...this.props}
+            model={partModel}
+            onEdit={this.onPartEdit} />
+        </SectionContent>
+      </Section>,
+    ]);
+  }
 
-      <div className="section choices">
-        <div className="section-header">
-          <h3>Choices</h3>
-          <div className="flex-spacer"/>
-          <div className="controls">
-            <div className="control shuffle-choices" onClick={() => onToggleShuffleChoices()}>
-              <div className="control-label">Shuffle</div>
-              <div className="control">
-                <input className="toggle toggle-light" type="checkbox" checked={true} />
-                <label className="toggle-btn"></label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="section-content">
-        </div>
-      </div>
-
-      <div className="section feedback">
-        <div className="section-header">
-          <h3>Feedback</h3>
-        </div>
-        <div className="section-content">
-        </div>
-      </div>
-    </div>
-  );
-
-};
+}

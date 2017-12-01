@@ -28,7 +28,7 @@ export interface TextState {
  * The content editor for HtmlContent.
  */
 export class Text
-  extends React.PureComponent<TextProps, TextState> {
+  extends AbstractItemPartEditor<contentTypes.Text, TextProps, TextState> {
 
   constructor(props) {
     super(props);
@@ -36,6 +36,8 @@ export class Text
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
+    this.onSizeChange = this.onSizeChange.bind(this);
+    this.onEditMult = this.onEditMult.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part) {
@@ -112,7 +114,7 @@ export class Text
           services={services}
           context={context}
           model={m}
-          onEdit={this.onEditMult.bind(this)}
+          onEdit={this.onEditMult}
         />);
     } else {
 

@@ -13,7 +13,7 @@ import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { Essay } from '../items/Essay';
-import { CheckAllThatApply } from '../items/CheckAllThatApply.controller';
+import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
@@ -335,6 +335,7 @@ export abstract class QuestionEditor
           onConceptsEdit={this.onConceptsEdit}
           onHintsEdit={this.onHintsEdit}
           onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     } else if (item.contentType === 'MultipleChoice' && item.select === 'single') {
@@ -361,7 +362,6 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -369,6 +369,11 @@ export abstract class QuestionEditor
           onGradingChange={this.onGradingChange}
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onConceptsEdit={this.onConceptsEdit}
+          onHintsEdit={this.onHintsEdit}
+          onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     } else if (item.contentType === 'ShortAnswer') {
@@ -380,10 +385,18 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
-          key={item.guid}
           itemModel={item}
           partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onConceptsEdit={this.onConceptsEdit}
+          onHintsEdit={this.onHintsEdit}
+          onExplanation={this.onExplanation}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
     } else if (item.contentType === 'Ordering') {
