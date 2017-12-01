@@ -2,16 +2,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractItemPartEditor,
-  AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
-import { Hints } from '../part/Hints';
-import { CriteriaEditor } from '../question/CriteriaEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor';
-import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
-import { ItemLabel } from './ItemLabel';
+import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import { Question, QuestionProps, QuestionState,
 Section, SectionContent, SectionControl, SectionHeader } from './Question';

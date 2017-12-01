@@ -1,19 +1,13 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
   AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Choice } from './Choice';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
-import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
-import { CriteriaEditor } from '../question/CriteriaEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
+import { Checkbox, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 

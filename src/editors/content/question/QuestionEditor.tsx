@@ -1,45 +1,24 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
+import { ContentState, EditorState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions,
-  insertInlineEntity } from '../../../actions/authoring';
-import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
 import { MultipleChoice } from '../items/MultipleChoice';
 import { Essay } from '../items/Essay';
 import { CheckAllThatApply } from '../items/CheckAllThatApply';
 import { ShortAnswer } from '../items/ShortAnswer';
 import { Numeric } from '../items/Numeric';
 import { Ordering } from '../items/Ordering';
-
 import { MultipartInput } from '../items/MultipartInput';
 import { Text } from '../items/Text';
 import { FillInTheBlank } from '../items/FillInTheBlank';
-import { CommandProcessor, Command } from '../common/command';
-import { Collapse } from '../common/Collapse';
-import { getHtmlDetails } from '../common/details';
+import { Command } from '../common/command';
 import { EntityTypes } from '../../../data/content/html/common';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { Skill } from 'types/course';
-import { HtmlToolbarButton } from '../html/TypedToolbar';
-import { Toolbar } from '../common/toolbar/Toolbar';
-import { ToolbarButton } from '../common/toolbar/ToolbarButton';
-import * as toolbarConfigs from '../common/toolbar/Configs';
-import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
-import { RemovableContent } from '../common/RemovableContent';
-import { DragHandle } from '../../document/assessment/DragHandle';
 import { Hints } from '../part/Hints';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 
 import './QuestionEditor.scss';
 
@@ -105,7 +84,6 @@ export class QuestionEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-
     const should = this.props.model !== nextProps.model
       || this.props.allSkills !== nextProps.allSkills
       || this.state.activeItemId !== nextState.activeItemId;
@@ -302,14 +280,13 @@ export class QuestionEditor
   }
 
   renderQuestionBody(): JSX.Element {
-    // TODO: CHANGE THIS
-    const item = this.props.model.items.toArray()[0];
-    const part = this.props.model.parts.toArray()[0];
+    const item = this.props.model.items.first();
+    const part = this.props.model.parts.first();
 
     const isMultipart = (this.props.model.items.size === 0)
-      || this.props.model.items.first().contentType === 'Text'
-      || this.props.model.items.first().contentType === 'Numeric'
-      || this.props.model.items.first().contentType === 'FillInTheBlank';
+      || item.contentType === 'Text'
+      || item.contentType === 'Numeric'
+      || item.contentType === 'FillInTheBlank';
 
     if (isMultipart) {
       return (

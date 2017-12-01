@@ -1,25 +1,17 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
   AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Choice } from './Choice';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import { FeedbackEditor } from '../part/FeedbackEditor';
-import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
-import { CriteriaEditor } from '../question/CriteriaEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
+import { TextInput, InlineForm, Button } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import ConceptsEditor from '../concepts/ConceptsEditor';
-import { MultipartInput, MultipartInputProps, MultipartInputState } from './MultipartInput';
 import { Section, SectionHeader, SectionContent, SectionControl } from './Question';
-import * as models from '../../../data/models';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
