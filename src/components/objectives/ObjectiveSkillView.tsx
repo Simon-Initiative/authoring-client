@@ -234,7 +234,7 @@ export class ObjectiveSkillView
     persistence.persistDocument(updatedDocument);
 
     onUpdateSkills(Immutable.OrderedMap(
-      [skill.get('id'), { id: skill.get('id'), title: skill.get('title') }]));
+      [[skill.get('id'), { id: skill.get('id'), title: skill.get('title') }]]));
 
     return skill.id;
   }
