@@ -27,12 +27,16 @@ export class Actions
 
       <dl className="row">
 
-        <dd className="col-sm-10">Create a <strong>duplicate</strong> of this organization.
+        <dd className="col-sm-10">Create a <strong>copy</strong> of this organization.
         Changes you make to the structure
-          of the duplicate (e.g. adding units, removing modules,
-          renaming sections) will not appear in this original organization.</dd>
+          of the copy (e.g. adding units, removing modules,
+          renaming sections) will not be reflected in this original organization.</dd>
           <dt className="col-sm-2 justify-content-right">
-        <button className="btn btn-block btn-primary">Duplicate</button></dt>
+        <button
+          onClick={this.props.onDuplicate}
+          className="btn btn-block btn-primary">
+          Copy
+        </button></dt>
 
         <dd className="col-sm-10">
           <p>Permanently <strong>delete</strong> this organization from the course package. This

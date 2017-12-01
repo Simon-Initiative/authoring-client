@@ -32,6 +32,7 @@ import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
 import { Title } from 'types/course';
+import { duplicateOrganization } from 'actions/models';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import './OrgEditor.scss';
@@ -399,7 +400,12 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderActions() {
-    return <Actions onDuplicate={() => console.log('test')}/>;
+    const dupe = () => this.props.dispatch(
+      duplicateOrganization(
+        this.props.context.courseId,
+        this.props.model, this.props.context.courseModel));
+
+    return <Actions onDuplicate={dupe}/>;
   }
 
   renderActiveTabContent() {
