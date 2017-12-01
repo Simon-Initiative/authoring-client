@@ -28,12 +28,11 @@ import { EntityTypes } from '../../../data/content/html/common';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-
+import { Skill } from 'types/course';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { Toolbar } from '../common/toolbar/Toolbar';
 import { ToolbarButton } from '../common/toolbar/ToolbarButton';
 import * as toolbarConfigs from '../common/toolbar/Configs';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/controls';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
@@ -47,6 +46,7 @@ import './QuestionEditor.scss';
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface QuestionEditorState {
@@ -56,7 +56,7 @@ export interface QuestionEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class QuestionEditor
+export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
   lastBody: contentTypes.Html;
   itemToAdd: any;
@@ -102,6 +102,15 @@ export abstract class QuestionEditor
       = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
     this.lastBody = this.props.model.body;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+
+    const should = this.props.model !== nextProps.model
+      || this.props.allSkills !== nextProps.allSkills
+      || this.state.activeItemId !== nextState.activeItemId;
+
+    return should;
   }
 
   onBlur(activeItemId: string) {
@@ -311,6 +320,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -338,6 +349,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -361,6 +374,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -384,6 +399,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -407,6 +424,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}
@@ -430,6 +449,8 @@ export abstract class QuestionEditor
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}

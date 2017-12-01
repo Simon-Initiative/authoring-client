@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   AbstractItemPartEditorProps,
@@ -16,8 +17,9 @@ import { EditorState } from 'draft-js';
 import { TabContainer } from 'editors/content/common/TabContainer';
 import { Hints } from '../part/Hints';
 import { ExplanationEditor } from '../part/ExplanationEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
+import { Skill } from 'types/course';
 import { convertStringToCSS } from 'utils//style';
 
 import './Question.scss';
@@ -30,6 +32,9 @@ export interface QuestionProps<ModelType>
   grading: any;
   onGradingChange: (value) => void;
   hideGradingCriteria: boolean;
+
+  allSkills: Immutable.OrderedMap<string, Skill>;
+
 
   model: contentTypes.Question;
   onConceptsEdit: (concepts, item, part) => void;
@@ -279,17 +284,18 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div className="skills-tab tab-content">
-        <div className="section">
-          <ConceptsEditor
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
-            courseId={this.props.context.courseId}
-            model={part.concepts}
-            onEdit={concepts => onConceptsEdit(concepts, item, part)}
-            title="Skills"
-            conceptType="skill" />
-        </div>
+        <Section name="skills">
+          <SectionHeader title="Attached Skills"/>
+          <SectionContent>
+            <ConceptsEditor
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={part.concepts}
+              allSkills={this.props.allSkills}
+              onEdit={concepts => onConceptsEdit(concepts, item, part)} />
+          </SectionContent>
+        </Section>
       </div>
     );
   }
@@ -304,7 +310,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div className="grading-tab tab-content">
-        <div className="section">
+        <Section name="grading">
           <Button
             editMode={editMode}
             onClick={this.onCriteriaAdd}>
@@ -322,7 +328,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
                 editMode={editMode} />
             ))
           }
-        </div>
+        </Section>
       </div>
     );
   }
@@ -332,14 +338,14 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div className="hints-tab tab-content">
-        <div className="section">
+        <Section name="hints">
           <Hints
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
             model={part}
             onEdit={() => onHintsEdit(item, part)} />
-        </div>
+        </Section>
       </div>
     );
   }
@@ -349,7 +355,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div className="other-tab tab-content">
-        <div className="section">
+        <Section name="other">
           <div className="section-header">
             <h3>Explanation</h3>
           </div>
@@ -361,7 +367,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
               model={part.explanation}
               onEdit={explanation => onExplanation(explanation, item, part)} />
           </div>
-        </div>
+        </Section>
       </div>
     );
   }

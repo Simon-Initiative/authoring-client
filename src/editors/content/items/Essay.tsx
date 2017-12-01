@@ -13,14 +13,16 @@ import { CriteriaEditor } from '../question/CriteriaEditor';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from 'utils/guid';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { Question, QuestionProps, QuestionState } from './Question';
 
 export interface EssayProps extends QuestionProps<contentTypes.Essay> {
 
 }
 
-export interface EssayState extends QuestionState {}
+export interface EssayState extends QuestionState {
+
+}
 
 /**
  * The content editor for HtmlContent.
@@ -34,4 +36,3 @@ export class Essay
     this.setClassname('essay');
   }
 }
-

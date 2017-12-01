@@ -12,15 +12,9 @@ import { TabularFeedback } from '../part/TabularFeedback';
 // import { Hints } from '../part/Hints';
 // import { ItemLabel } from './ItemLabel';
 import { CriteriaEditor } from '../question/CriteriaEditor';
-// import ConceptsEditor from '../concepts/ConceptsEditor.controller';
-import { Button, Checkbox } from '../common/controls';
-// import guid from 'utils/guid';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { CommandProcessor } from '../common/command';
-import { EditorState } from 'draft-js';
+import ConceptsEditor from '../concepts/ConceptsEditor';
+import { TextInput, InlineForm, InputLabel, Button, Checkbox, Collapse } from '../common/controls';
+import guid from 'utils/guid';
 
 import { Question, QuestionProps, QuestionState,
 Section, SectionContent, SectionHeader, OptionControl, SectionControl } from './Question';

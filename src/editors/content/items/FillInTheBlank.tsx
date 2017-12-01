@@ -16,7 +16,7 @@ import { CriteriaEditor } from '../question/CriteriaEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 import { MultipartInput, MultipartInputProps, MultipartInputState } from './MultipartInput';
 import { Section, SectionHeader, SectionContent, SectionControl } from './Question';
 import * as models from '../../../data/models';

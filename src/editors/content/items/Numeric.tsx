@@ -15,7 +15,7 @@ import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
+import ConceptsEditor from '../concepts/ConceptsEditor';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 

@@ -24,6 +24,7 @@ import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 import { TitlesState } from 'reducers//titles';
 
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
 
 type ResourceList = {
