@@ -7,7 +7,7 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { AssessmentModel } from 'data/models';
 
 interface StateProps {
-  skills: OrderedMap<string, Skill>;
+
 }
 
 interface DispatchProps {
@@ -17,11 +17,7 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<AssessmentModel> {}
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { skills } = state;
-
-  return {
-    skills,
-  };
+  return {};
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {

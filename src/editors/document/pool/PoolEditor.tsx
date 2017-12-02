@@ -76,8 +76,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onTitleEdit(title) {
+    const resource = this.props.model.resource.with({ title: title.text });
     const pool = this.props.model.pool.with({ title });
-    const updated = this.props.model.with({ pool });
+    const updated = this.props.model.with({ pool, resource });
     this.handleEdit(updated);
   }
 

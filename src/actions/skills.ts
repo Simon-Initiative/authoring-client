@@ -1,4 +1,4 @@
-import { Skill } from 'types/course';
+import { Skill } from 'data/contentTypes';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 
@@ -45,7 +45,7 @@ export const fetchSkills = (courseId: string) =>
       const skillArray = skills
         .map(doc => (doc.model as any).skills.toArray())
         .reduce((p, c) => [...p, ...c], [])
-        .map(s => [s.id, { title: s.title, id: s.id }]);
+        .map(s => [s.id, s]);
 
       const map = Immutable.OrderedMap<string, Skill>(skillArray);
       dispatch(setSkills(map));

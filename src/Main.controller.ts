@@ -1,14 +1,14 @@
 import { connect } from 'react-redux';
-import { TitlesState } from 'reducers//titles';
+import { CourseModel } from 'data/models';
+import { Maybe } from 'tsmonad';
 import Main from './Main';
 
 interface StateProps {
   user: any;
   modal: any;
-  course: any;
+  course: CourseModel;
   expanded: any;
   server: any;
-  titles: TitlesState;
 }
 
 interface DispatchProps {
@@ -32,15 +32,12 @@ const mapStateToProps = (state): StateProps => {
   return {
     user,
     modal,
-    course: {
-      model: course.get('model').caseOf({
-        just: c => c,
-        nothing: c => undefined,
-      }),
-    },
+    course: course.caseOf({
+      just: c => c,
+      nothing: c => undefined,
+    }),
     expanded,
     server,
-    titles,
   };
 };
 

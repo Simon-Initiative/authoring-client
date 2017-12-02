@@ -22,7 +22,6 @@ import CreateCourseView from './components/CreateCourseView';
 import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
-import { TitlesState } from 'reducers//titles';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -115,10 +114,9 @@ interface MainProps {
   location: any;
   user: any;
   modal: any;
-  course: any;
+  course: models.CourseModel;
   expanded: any;
   server: any;
-  titles: TitlesState;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -162,14 +160,13 @@ export default class Main extends React.Component<MainProps, MainState> {
   }
 
   renderResource(resource: ResourceList) {
-    const { onDispatch, server, course, titles } = this.props;
+    const { onDispatch, server, course } = this.props;
 
     return (
       <ResourceView
         serverTimeSkewInMs={server.timeSkewInMs}
         course={course}
         title={resource.title}
-        titles={titles}
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
@@ -187,13 +184,13 @@ export default class Main extends React.Component<MainProps, MainState> {
     } else if (url === '/import') {
       return <ImportCourseView dispatch={onDispatch}/>;
 
-    } else if (url.startsWith('/objectives-') && course.model) {
+    } else if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView
           course={course}
           dispatch={onDispatch}
           expanded={expanded}
           userName={user.user}/>;
-    } else if (course.model) {
+    } else if (course) {
       const documentId = url.substr(1, url.indexOf('-') - 1);
 
       if (resources[documentId] !== undefined) {

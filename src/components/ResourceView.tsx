@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import NavigationBar from './navigation/NavigationBar.controller';
@@ -7,21 +8,19 @@ import * as models from 'data/models';
 import * as viewActions from 'actions/view';
 import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import { Resource } from 'data/content/resource';
-import { courseChanged, getTitlesByModel, updateTitles, resetTitles } from 'actions/course';
+import { courseChanged, updateCourseResources } from 'actions/course';
 import * as contentTypes from 'data/contentTypes';
 import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
-import { TitlesState } from 'reducers/titles';
 import guid from 'utils/guid';
 
 import './ResourceView.scss';
 
 export interface ResourceViewProps {
-  course: any;
+  course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
-  titles: TitlesState;
   resourceType: string;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
@@ -39,42 +38,11 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   constructor(props) {
     super(props);
 
-    this.state = {
-      resources: [],
-    };
-
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
-  componentDidMount() {
-    const { course, dispatch } = this.props;
-
-    // Fetch all current course resources
-    this.fetchTitles(this.props.course.model, this.props.filterFn);
-
-    // intiialize titles state for the course
-    dispatch(getTitlesByModel(course.model));
-  }
-
-
-  fetchTitles(model: models.CourseModel, filterFn: any) {
-    const resources = model.resources.toArray()
-      .filter(filterFn)
-      .map((res) => {
-        if (res.title === null) {
-          return res.with({ title: 'Empty title' });
-        }
-        return res;
-      });
-    this.setState({ resources });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.fetchTitles(nextProps.course.model, nextProps.filterFn);
-  }
-
   clickResource(id) {
-    viewActions.viewDocument(id, this.props.course.model.guid);
+    viewActions.viewDocument(id, this.props.course.guid);
   }
 
   createResource(e) {
@@ -87,30 +55,20 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     }
     const type = this.props.resourceType;
     const resource = this.props.createResourceFn(
-      this.props.course.model.guid, title, type);
+      this.props.course.guid, title, type);
 
     (this.refs['title'] as any).value = '';
 
-    persistence.createDocument(this.props.course.model.guid, resource)
+    persistence.createDocument(this.props.course.guid, resource)
       .then((result) => {
-        dispatch(updateTitles([{ id: result.getIn(['model', 'id']), title }]));
-        this.refreshCoursePackage(this.props.course.model.guid);
+        const r = (resource as any).resource;
+        const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+        dispatch(updateCourseResources(updated));
       });
   }
 
-  refreshCoursePackage(courseId: string) {
-    persistence.retrieveCoursePackage(courseId)
-      .then((document) => {
-        // Get an updated course content package payload
-        if (document.model.modelType === models.ModelTypes.CourseModel) {
-          this.props.dispatch(courseChanged(document.model));
-        }
-      })
-      .catch(err => console.log(err));
-  }
-
   renderResources() {
-    const { titles } = this.props;
+    const { course } = this.props;
 
     const creationTitle = <h2>{this.props.title}</h2>;
 
@@ -118,10 +76,13 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r => ({
-      key: r.guid,
-      data: r.set('title', titles.get(r.get('id'))),
-    }));
+    const rows = course.resources
+      .toArray()
+      .filter(this.props.filterFn)
+      .map(r => ({
+        key: r.guid,
+        data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
+      }));
 
     const labels = [
       'Title',

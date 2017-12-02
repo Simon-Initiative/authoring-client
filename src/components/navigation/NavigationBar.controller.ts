@@ -22,7 +22,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
   return {
     course: {
-      model: course.get('model').caseOf({
+      model: course.caseOf({
         just: m => m,
         nothing: m => undefined,
       }),

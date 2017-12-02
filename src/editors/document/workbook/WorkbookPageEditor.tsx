@@ -16,27 +16,27 @@ import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
-import { Title } from 'types/course';
 
 import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
-  onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
-  onUpdateTitle: (titles: Title[]) => void;
-  objectiveTitles: any;
+  fetchObjectives: (courseId: string) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
-  constructor(props) {
+  constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
-    this.fetchObjectiveTitles(this.props.model.head.objrefs);
+    if (this.hasMissingObjective(
+      props.model.head.objrefs, props.context.objectives)) {
+      props.services.refreshObjectives(props.context.courseId);
+    }
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
@@ -50,18 +50,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return false;
   }
 
-  fetchObjectiveTitles(objrefs: Immutable.List<string>) {
-    const { context, onGetTitles } = this.props;
-    onGetTitles(context.courseId, objrefs.toArray(), LegacyTypes.learning_objectives);
-  }
-
   onTitleEdit(title) {
-    const { onUpdateTitle } = this.props;
-
+    const resource = this.props.model.resource.with({ title: title.text });
     const head = this.props.model.head.with({ title });
-    this.handleEdit(this.props.model.with({ head }));
-
-    onUpdateTitle([{ id: this.props.model.getIn(['resource', 'id']), title: title.get('text') }]);
+    this.handleEdit(this.props.model.with({ head, resource }));
   }
 
   onBodyEdit(content : any) {
@@ -77,10 +69,22 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(this.props.model.with({ head }));
   }
 
+  hasMissingObjective(
+    objrefs: Immutable.List<string>,
+    objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>) {
+
+    return objrefs
+      .toArray()
+      .some(id => !objectives.has(id));
+  }
+
   renderObjectives() {
-    const objectives = this.props.objectiveTitles
-      .map((title) => {
-        return <li key={title}>{title}</li>;
+    const objectives = this.props.model.head.objrefs.toArray()
+      .map((id) => {
+        const title = this.props.context.objectives.has(id)
+          ? this.props.context.objectives.get(id).title
+          : 'Loading...';
+        return <li key={id}>{title}</li>;
       });
     return (
       <ol>
@@ -90,26 +94,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-    const updateObjectiveTitles = () => {
-      if (nextProps.model.head.objrefs.size > 0) {
-        this.fetchObjectiveTitles(nextProps.model.head.objrefs);
-      }
-    };
-
 
     if (nextProps.model !== this.props.model) {
+      if (this.hasMissingObjective(
+        nextProps.model.head.objrefs, nextProps.context.objectives)) {
 
-      if (nextProps.model.head.objrefs.size !== this.props.model.head.objrefs.size) {
-        updateObjectiveTitles();
-      } else {
-        for (let i = 0; i < nextProps.model.head.objrefs.size; i += 1) {
-          if (nextProps.model.head.objrefs.get(i) !== this.props.model.head.objrefs.get(i)) {
-            updateObjectiveTitles();
-            break;
-          }
-        }
+        nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
-
     }
   }
 

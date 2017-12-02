@@ -29,7 +29,6 @@ import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
-  skills: Immutable.OrderedMap<string, Skill>;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -64,7 +63,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
 
-    if (hasUnknownSkill(props.model, props.skills)) {
+    if (hasUnknownSkill(props.model, props.context.skills)) {
       props.onFetchSkills(props.context.courseId);
     }
   }
@@ -107,7 +106,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    this.handleEdit(this.props.model.with({ title: content }));
+    const resource = this.props.model.resource.with({ title: content.text });
+    this.handleEdit(this.props.model.with({ title: content, resource }));
   }
 
   detectPoolAdditions(
@@ -386,6 +386,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
+    const rendererProps = {
+      model: this.props.model,
+      skills: this.props.context.skills,
+      editMode: this.props.editMode,
+      context: this.props.context,
+      services: this.props.services,
+    };
+
     return (
       <div className="assessment-editor">
         <div className="docHead">
@@ -423,7 +431,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit, this.onNodeRemove)}
+                this.state.currentNode, rendererProps, this.onEdit, this.onNodeRemove)}
             </div>
           </div>
         </div>

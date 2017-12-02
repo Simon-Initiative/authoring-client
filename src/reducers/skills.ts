@@ -8,7 +8,7 @@ import {
 } from 'actions/skills';
 
 import * as models from 'data/models';
-import { Skill } from 'types/course';
+import { Skill } from 'data//contentTypes';
 import { OtherAction } from './utils';
 
 export type SkillAction = SetSkillsAction | UpdateSkillsAction | OtherAction;
