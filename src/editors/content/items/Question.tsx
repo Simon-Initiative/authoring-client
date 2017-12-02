@@ -28,18 +28,11 @@ export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
   body: any;
-
   grading: any;
   onGradingChange: (value) => void;
   hideGradingCriteria: boolean;
-
   allSkills: Immutable.OrderedMap<string, Skill>;
-
-
   model: contentTypes.Question;
-  onConceptsEdit: (concepts, item, part) => void;
-  onHintsEdit: (item, part) => void;
-  onExplanation: (explanation, item, part) => void;
   onRemoveQuestion: () => void;
 }
 
@@ -107,11 +100,11 @@ export const SectionContent: React.StatelessComponent<SectionContentProps> = ({ 
 );
 
 type SectionProps = {
-  name: string,
+  className?: string,
 };
 
-export const Section: React.StatelessComponent<SectionProps> = ({ name, children }) => (
-  <div key={name} className={`section ${convertStringToCSS(name)}`}>{children}</div>
+export const Section: React.StatelessComponent<SectionProps> = ({ className, children }) => (
+  <div className={`section ${className}`}>{children}</div>
 );
 
 type OptionControlProps = {
@@ -143,6 +136,9 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
+    this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onHintsEdit = this.onHintsEdit.bind(this);
+    this.onExplanationEdit = this.onExplanationEdit.bind(this);
   }
 
   setClassname(className) {
@@ -161,6 +157,24 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
   onCriteriaEdit(c) {
     const criteria = this.props.partModel.criteria.set(c.guid, c);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+  }
+
+  onConceptsEdit(concepts, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    const { onEdit } = this.props;
+
+    onEdit(item, part.with({ concepts }));
+  }
+
+  onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    const { onEdit } = this.props;
+
+    onEdit(item, part.with({ hints }));
+  }
+
+  onExplanationEdit(explanation, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    const { onEdit } = this.props;
+
+    onEdit(item, part.with({ explanation }));
   }
 
   renderQuestionTitle(): JSX.Element {
@@ -245,7 +259,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     };
 
     return (
-      <Section name="question" key="question">
+      <Section className="question" key="question">
         <SectionHeader title="Question"/>
         <SectionContent>
           <HtmlContentEditor
@@ -280,11 +294,9 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
   }
 
   renderSkillsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
-    const { onConceptsEdit } = this.props;
-
     return (
       <div className="skills-tab tab-content">
-        <Section name="skills">
+        <Section className="skills">
           <SectionHeader title="Attached Skills"/>
           <SectionContent>
             <ConceptsEditor
@@ -293,7 +305,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
               context={this.props.context}
               model={part.concepts}
               allSkills={this.props.allSkills}
-              onEdit={concepts => onConceptsEdit(concepts, item, part)} />
+              onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
           </SectionContent>
         </Section>
       </div>
@@ -310,9 +322,10 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div className="grading-tab tab-content">
-        <Section name="grading">
+        <Section className="grading">
           <Button
             editMode={editMode}
+            type="link"
             onClick={this.onCriteriaAdd}>
             Add Grading Criteria
           </Button>
@@ -334,28 +347,26 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
   }
 
   renderHintsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
-    const { onHintsEdit } = this.props;
-
     return (
       <div className="hints-tab tab-content">
-        <Section name="hints">
+        <Section className="hints">
           <Hints
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
             model={part}
-            onEdit={() => onHintsEdit(item, part)} />
+            onEdit={hints => this.onHintsEdit(hints, item, part)} />
         </Section>
       </div>
     );
   }
 
   renderOtherTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
-    const { context, services, editMode, onExplanation } = this.props;
+    const { context, services, editMode } = this.props;
 
     return (
       <div className="other-tab tab-content">
-        <Section name="other">
+        <Section className="other">
           <div className="section-header">
             <h3>Explanation</h3>
           </div>
@@ -365,7 +376,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
               services={services}
               editMode={editMode}
               model={part.explanation}
-              onEdit={explanation => onExplanation(explanation, item, part)} />
+              onEdit={explanation => this.onExplanationEdit(explanation, item, part)} />
           </div>
         </Section>
       </div>
@@ -373,7 +384,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model } = this.props;
+    const { model, hideGradingCriteria } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
@@ -383,13 +394,13 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
           labels={[
             'Skills',
             'Hints',
-            'Grading Criteria',
+            ...(!hideGradingCriteria ? ['Criteria'] : []),
             'Other',
           ]}>
 
           {this.renderSkillsTab(item, parts[index])}
           {this.renderHintsTab(item, parts[index])}
-          {this.renderGradingCriteriaTab(item, parts[index])}
+          {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
           {this.renderOtherTab(item, parts[index])}
         </TabContainer>
       </div>

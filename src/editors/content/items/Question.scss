@@ -58,6 +58,8 @@
 
       .controls {
         font-size: 0.8rem;
+        @include disable-select;
+
         & > * {
           display: flex;
           flex-direction: row;

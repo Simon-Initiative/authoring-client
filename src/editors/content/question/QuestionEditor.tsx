@@ -18,7 +18,6 @@ import { EntityTypes } from '../../../data/content/html/common';
 import { Skill } from 'types/course';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
-import { Hints } from '../part/Hints';
 
 import './QuestionEditor.scss';
 
@@ -69,9 +68,6 @@ export class QuestionEditor
     this.onGradingChange = this.onGradingChange.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
     this.onAddOrdering = this.onAddOrdering.bind(this);
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
-    this.onHintsEdit = this.onHintsEdit.bind(this);
-    this.onExplanation = this.onExplanation.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
@@ -267,18 +263,6 @@ export class QuestionEditor
     this.props.onEdit(model);
   }
 
-  onConceptsEdit(concepts, item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    this.onItemPartEdit(item, part.with({ concepts }));
-  }
-
-  onHintsEdit(item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    this.onItemPartEdit(item, part);
-  }
-
-  onExplanation(explanation, item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    this.onItemPartEdit(item, part.with({ explanation }));
-  }
-
   renderQuestionBody(): JSX.Element {
     const item = this.props.model.items.first();
     const part = this.props.model.parts.first();
@@ -311,9 +295,6 @@ export class QuestionEditor
           textCommand={this.textCommand}
           canInsertAnotherPart={() => this.canInsertAnotherPart()}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -336,9 +317,6 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -361,9 +339,6 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -386,9 +361,6 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -411,9 +383,6 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -436,9 +405,6 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
-          onConceptsEdit={this.onConceptsEdit}
-          onHintsEdit={this.onHintsEdit}
-          onExplanation={this.onExplanation}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );

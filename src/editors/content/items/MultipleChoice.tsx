@@ -42,8 +42,14 @@ export class MultipleChoice
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
   }
 
-  onToggleShuffle(e) {
-    this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
+  onToggleShuffle() {
+    const {
+      itemModel,
+      partModel,
+      onEdit,
+    } = this.props;
+
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
   onAddChoice() {
@@ -164,7 +170,7 @@ export class MultipleChoice
     const { editMode, itemModel, partModel } = this.props;
 
     return ([
-      <Section key="choices" name="choices">
+      <Section key="choices" className="choices">
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input

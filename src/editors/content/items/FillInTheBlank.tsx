@@ -134,14 +134,14 @@ export class FillInTheBlank
       partModel);
   }
 
-  onToggleShuffle(e) {
+  onToggleShuffle() {
     const {
       itemModel,
       partModel,
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ shuffle: e.target.value }), partModel);
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
   onEditMult(mult) {
@@ -249,7 +249,7 @@ export class FillInTheBlank
     } = this.props;
 
     return (
-      <Section name="choices">
+      <Section className="choices">
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input

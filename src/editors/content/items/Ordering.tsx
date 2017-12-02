@@ -27,13 +27,21 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
     this.setClassname('ordering');
 
+    this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
+    this.onRemoveChoice = this.onRemoveChoice.bind(this);
   }
 
-  onToggleShuffle(e) {
-    this.props.onEdit(this.props.itemModel.with({ shuffle: e.target.value }), this.props.partModel);
+  onToggleShuffle() {
+    const {
+      itemModel,
+      partModel,
+      onEdit,
+    } = this.props;
+
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
   onAddChoice() {
@@ -117,7 +125,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     const { context, services, editMode, itemModel, partModel } = this.props;
 
     return ([
-      <Section key="choices" name="choices">
+      <Section key="choices" className="choices">
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input
@@ -137,7 +145,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
           {this.renderChoices()}
         </SectionContent>
       </Section>,
-      <Section key="feedback" name="feedback">
+      <Section key="feedback" className="feedback">
         <SectionHeader title="Feedback"/>
         <SectionContent>
           <TabularFeedback

@@ -34,14 +34,14 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
   }
 
-  onToggleShuffle(e) {
+  onToggleShuffle() {
     const {
       itemModel,
       partModel,
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ shuffle: e.target.value }), partModel);
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
   onToggleAdvanced(e) {
@@ -143,7 +143,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     const { editMode, itemModel, partModel } = this.props;
 
     return ([
-      <Section key="choices" name="choices">
+      <Section key="choices" className="choices">
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input
@@ -163,7 +163,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
           {this.renderChoices()}
         </SectionContent>
       </Section>,
-      <Section key="feedback" name="feedback">
+      <Section key="feedback" className="feedback">
         <SectionHeader title="Feedback"/>
         <SectionContent>
           <TabularFeedback

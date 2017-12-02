@@ -39,7 +39,7 @@ export class ShortAnswer
     const { editMode, itemModel, partModel } = this.props;
 
     return ([
-      <Section key="choices" name="choices">
+      <Section key="choices" className="choices">
         <SectionHeader title="Options"/>
         <SectionContent>
           <div style={{ display: 'inline' }}>

@@ -105,7 +105,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <Section name="question" key="question">
+      <Section className="question" key="question">
         <SectionHeader title="Question">
           <div className="control insert-item">
             <Dropdown label="Insert Item">

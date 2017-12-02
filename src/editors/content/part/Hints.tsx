@@ -9,7 +9,7 @@ import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/con
 
 export interface HintsProps {
   model: contentTypes.Part;
-  onEdit: (model: contentTypes.Part) => void;
+  onEdit: (hints: Immutable.Map<string, contentTypes.Hint>) => void;
   context: AppContext;
   editMode: boolean;
   services: AppServices;
@@ -34,22 +34,22 @@ export abstract class Hints
   }
 
   onAddHint() {
-    const content = new contentTypes.Hint();
-    this.props.onEdit(this.props.model.with({
-      hints: this.props.model.hints.set(content.guid, content),
-    }));
+    const { onEdit } = this.props;
+
+    const hint = new contentTypes.Hint();
+    onEdit(this.props.model.hints.set(hint.guid, hint));
   }
 
   onHintEdit(hint: contentTypes.Hint) {
-    this.props.onEdit(this.props.model.with({
-      hints: this.props.model.hints.set(hint.guid, hint),
-    }));
+    const { onEdit } = this.props;
+
+    onEdit(this.props.model.hints.set(hint.guid, hint));
   }
 
   onRemove(hint: contentTypes.Hint) {
-    this.props.onEdit(this.props.model.with({
-      hints: this.props.model.hints.delete(hint.guid),
-    }));
+    const { onEdit } = this.props;
+
+    onEdit(this.props.model.hints.delete(hint.guid));
   }
 
   renderHints() {
