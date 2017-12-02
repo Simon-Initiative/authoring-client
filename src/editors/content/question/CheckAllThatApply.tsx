@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import * as Immutable from 'immutable';
-import { Choice } from './Choice';
+import { Choice } from '../common/Choice';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Button } from '../common/controls';
 import guid from 'utils/guid';

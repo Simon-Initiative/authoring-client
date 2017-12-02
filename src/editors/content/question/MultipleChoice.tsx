@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { Choice } from './Choice';
+import { Choice } from '../common/Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { TextInput, InlineForm, Button } from '../common/controls';
 import guid from 'utils/guid';

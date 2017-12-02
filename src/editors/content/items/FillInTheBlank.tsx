@@ -5,13 +5,13 @@ import {
   AbstractItemPartEditorProps,
   AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Choice } from './Choice';
+import { Choice } from '../common/Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { ItemLabel } from './ItemLabel';
 import { TextInput, InlineForm, Button } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import { Section, SectionHeader, SectionContent, SectionControl } from './Question';
+import { Section, SectionHeader, SectionContent, SectionControl } from '../question/Question';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
