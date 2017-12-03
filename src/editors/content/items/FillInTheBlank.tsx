@@ -251,6 +251,12 @@ export class FillInTheBlank
 
     return (
       <Section className="choices">
+
+        <ItemLabel label="Dropdown" editMode={this.props.editMode}
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+
+        <br/>
+
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input

@@ -146,20 +146,23 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
-    const getTabNameFromContentType = (contentType, index) => {
-      switch (contentType) {
+    const getTabNameFromContentType = (item: contentTypes.QuestionItem, index) => {
+      switch (item.contentType) {
         case 'FillInTheBlank':
           return `Dropdown Item ${index}`;
-        case 'Number':
-          return `Number Item ${index}`;
+        case 'Numeric':
+          return `Numeric Item ${index}`;
         case 'Text':
         default:
           return `Text Item ${index}`;
       }
     };
 
-    const getTabFromContentType = (contentType, props) => {
-      switch (contentType) {
+    const getTabFromContentType = (
+      item: contentTypes.QuestionItem,
+      part: contentTypes.Part,
+      props) => {
+      switch (item.contentType) {
         case 'FillInTheBlank':
           return (
             <FillInTheBlank
@@ -169,11 +172,11 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onRemove={props.onRemove}
               onFocus={props.onFocus}
               onBlur={props.onBlur}
-              itemModel={props.itemModel}
-              partModel={props.partModel}
+              itemModel={item}
+              partModel={part}
               onEdit={props.onEdit} />
           );
-        case 'Number':
+        case 'Numeric':
           return (
             <Numeric
               context={props.context}
@@ -182,12 +185,11 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onRemove={props.onRemove}
               onFocus={props.onFocus}
               onBlur={props.onBlur}
-              itemModel={props.itemModel}
-              partModel={props.partModel}
+              itemModel={item}
+              partModel={part}
               onEdit={props.onEdit} />
           );
         case 'Text':
-        default:
           return (
             <Text
               context={props.context}
@@ -196,8 +198,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               onRemove={props.onRemove}
               onFocus={props.onFocus}
               onBlur={props.onBlur}
-              itemModel={props.itemModel}
-              partModel={props.partModel}
+              itemModel={item}
+              partModel={part}
               onEdit={props.onEdit} />
           );
       }
@@ -207,14 +209,14 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
-            getTabNameFromContentType(item.contentType, index + 1),
+            getTabNameFromContentType(item, index + 1),
             'Skills',
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             'Other',
           ]}>
 
-          {getTabFromContentType(item.contentType, this.props)}
+          {getTabFromContentType(item, parts[index], this.props)}
           {this.renderSkillsTab(item, parts[index])}
           {this.renderHintsTab(item, parts[index])}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}

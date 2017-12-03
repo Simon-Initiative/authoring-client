@@ -48,7 +48,7 @@ export class QuestionEditor
 
     const createFillInTheBlank = () => {
       const value = guid().replace('-', '');
-      const choice = new contentTypes.Choice({ value, guid: guid() });
+      const choice = new contentTypes.Choice().with({ value, guid: guid() });
 
       const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
 
@@ -102,8 +102,6 @@ export class QuestionEditor
   }
 
   onBodyEdit(body) {
-
-    console.log('onBodyEdit');
 
     let question = this.props.model.with({ body });
 
