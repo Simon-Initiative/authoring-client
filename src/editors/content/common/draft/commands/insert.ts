@@ -16,17 +16,17 @@ export class InsertBlockEntityCommand
   }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
-    
+
     const contentState = editorState.getCurrentContent();
     const contentStateWithEntity = contentState.createEntity(
       this.type,
       'IMMUTABLE',
-      this.data
-    );
+      this.data);
+
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const newEditorState = EditorState.set(
       editorState,
-      {currentContent: contentStateWithEntity}
+      { currentContent: contentStateWithEntity },
     );
 
     return Promise.resolve(AtomicBlockUtils.insertAtomicBlock(
@@ -55,15 +55,33 @@ export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
     let selectionState = editorState.getSelection();
 
     // We cannot insert an entity at the beginning of a content block,
-    // to handle that case we adjust and add 1 to the focus offset 
-    if (selectionState.focusOffset === selectionState.anchorOffset) {
-      
-      selectionState = new SelectionState({ 
-        anchorKey: selectionState.anchorKey,
-        focusKey: selectionState.focusKey,
-        anchorOffset: selectionState.anchorOffset,
-        focusOffset: selectionState.anchorOffset + 1,
-      });
+    // to handle that case we adjust and add 1 to the focus offset
+    if (selectionState.focusOffset === selectionState.anchorOffset
+      && selectionState.focusKey === selectionState.anchorKey) {
+
+      if (selectionState.focusOffset === 0) {
+
+        const block = contentState.getBlockForKey(selectionState.anchorKey);
+        contentState = appendText(block, contentState, '  ');
+        const text = block.getText();
+
+        selectionState = new SelectionState({
+          anchorKey: selectionState.anchorKey,
+          focusKey: selectionState.focusKey,
+          anchorOffset: text.length + 1,
+          focusOffset: text.length + 2,
+        });
+      } else {
+
+        selectionState = new SelectionState({
+          anchorKey: selectionState.anchorKey,
+          focusKey: selectionState.focusKey,
+          anchorOffset: selectionState.anchorOffset,
+          focusOffset: selectionState.anchorOffset + 1,
+        });
+      }
+
+
     }
 
     const block = contentState.getBlockForKey(selectionState.anchorKey);
@@ -78,7 +96,7 @@ export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
     const contentStateWithLink = Modifier.applyEntity(
       contentState,
       selectionState,
-      entityKey
+      entityKey,
     );
 
     return Promise.resolve(EditorState.set(editorState, { currentContent: contentStateWithLink }));

@@ -32,7 +32,7 @@ export interface MultipartInputState extends QuestionState {
  * Multipart Question Editor
  */
 export class MultipartInput extends Question<MultipartInputProps, MultipartInputState> {
-  constructor(props) {
+  constructor(props: MultipartInputProps) {
     super(props);
     this.setClassname('multipart-input');
   }
