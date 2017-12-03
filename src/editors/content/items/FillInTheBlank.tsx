@@ -46,6 +46,7 @@ export class FillInTheBlank
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onEditMult = this.onEditMult.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
+    this.onChoiceEdit = this.onChoiceEdit.bind(this);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {

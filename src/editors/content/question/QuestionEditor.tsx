@@ -103,6 +103,8 @@ export class QuestionEditor
 
   onBodyEdit(body) {
 
+    console.log('onBodyEdit');
+
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
@@ -162,6 +164,8 @@ export class QuestionEditor
     }
 
     this.lastBody = body;
+
+
 
     this.props.onEdit(question);
   }
@@ -270,6 +274,7 @@ export class QuestionEditor
       || item.contentType === 'FillInTheBlank';
 
     if (isMultipart) {
+      const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
           context={this.props.context}
@@ -279,7 +284,7 @@ export class QuestionEditor
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
-          key={item.guid}
+          key={key}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}

@@ -37,22 +37,19 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     this.setClassname('multipart-input');
   }
 
-  onInsertNumeric(e, numericCommand, canInsertAnotherPart) {
-    e.preventDefault();
+  onInsertNumeric(numericCommand, canInsertAnotherPart) {
     if (canInsertAnotherPart()) {
       this.htmlEditor.process(numericCommand);
     }
   }
 
-  onInsertText(e, textCommand, canInsertAnotherPart) {
-    e.preventDefault();
+  onInsertText(textCommand, canInsertAnotherPart) {
     if (canInsertAnotherPart()) {
       this.htmlEditor.process(textCommand);
     }
   }
 
-  onInsertFillInTheBlank(e, fillInTheBlankCommand, canInsertAnotherPart) {
-    e.preventDefault();
+  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart) {
     if (canInsertAnotherPart()) {
       this.htmlEditor.process(fillInTheBlankCommand);
     }
@@ -108,23 +105,23 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       <Section className="question" key="question">
         <SectionHeader title="Question">
           <div className="control insert-item">
-            <Dropdown label="Insert Item">
-              <DropdownItem
-                label="Numeric"
-                onClick={e =>
-                  this.onInsertNumeric(e, fillInTheBlankCommand, canInsertAnotherPart)
-                }/>
-              <DropdownItem
-                label="Text"
-                onClick={e =>
-                  this.onInsertText(e, fillInTheBlankCommand, canInsertAnotherPart)
-                }/>
-              <DropdownItem
-                label="Dropdown"
-                onClick={e =>
-                  this.onInsertFillInTheBlank(e, fillInTheBlankCommand, canInsertAnotherPart)
-                }/>
-            </Dropdown>
+              Insert:&nbsp;&nbsp;
+              <button className="btn btn-sm btn-link" type="button"
+                onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
+                Numeric
+              </button>
+              &nbsp;&nbsp;
+              <button className="btn btn-sm btn-link" type="button"
+                onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
+                Text
+              </button>
+              &nbsp;&nbsp;
+              <button className="btn btn-sm btn-link" type="button"
+                onClick={() => this.onInsertFillInTheBlank(
+                  fillInTheBlankCommand, canInsertAnotherPart)}>
+                Dropdown
+              </button>
+
           </div>
         </SectionHeader>
         <SectionContent>
@@ -145,14 +142,14 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model } = this.props;
+    const { model, hideGradingCriteria } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
     const getTabNameFromContentType = (contentType, index) => {
       switch (contentType) {
         case 'FillInTheBlank':
-          return `Fill in the Blank Item ${index}`;
+          return `Dropdown Item ${index}`;
         case 'Number':
           return `Number Item ${index}`;
         case 'Text':
@@ -213,14 +210,14 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             getTabNameFromContentType(item.contentType, index + 1),
             'Skills',
             'Hints',
-            'Grading Criteria',
+            ...(!hideGradingCriteria ? ['Criteria'] : []),
             'Other',
           ]}>
 
           {getTabFromContentType(item.contentType, this.props)}
           {this.renderSkillsTab(item, parts[index])}
           {this.renderHintsTab(item, parts[index])}
-          {this.renderGradingCriteriaTab(item, parts[index])}
+          {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
           {this.renderOtherTab(item, parts[index])}
         </TabContainer>
       </div>
