@@ -183,7 +183,6 @@ export class Text
           services={this.props.services}
           context={this.props.context}
           model={this.props.partModel.concepts}
-          allSkills={this.props.allSkills}
           onEdit={this.onConceptsEdit}
           />
 

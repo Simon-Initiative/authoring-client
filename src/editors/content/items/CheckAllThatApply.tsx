@@ -219,7 +219,6 @@ export class CheckAllThatApply
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
-          allSkills={this.props.allSkills}
           model={this.props.partModel.concepts}
           onEdit={this.onConceptsEdit}
           />
