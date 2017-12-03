@@ -1,19 +1,19 @@
 @import 'oli/colors';
 
-$active-tab: $gray-dark;
+$active-tab: $blue;
 
 .tab-item {
   cursor: pointer;
   padding: 5px;
-  border-style: solid;
-  border-radius: 3px;
+  border-style: none;
+  border-radius: 0px;
   border-width: 1;
   border-color: #CCCCCC;
   color: black;
   background-color: transparent;
 
   &:hover {
-    border-bottom: 2px solid $active-tab;
+    border-bottom: 1px solid $active-tab;
   }
 }
 
@@ -22,6 +22,6 @@ $active-tab: $gray-dark;
   color: white;
 
   &:hover {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 2px solid $active-tab;
   }
 }
