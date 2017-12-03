@@ -17,10 +17,7 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { objrefs } = ownProps.model.head;
-  return {
-    objectiveTitles: objrefs.map(id => state.titles.get(id)),
-  };
+  return {};
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {

@@ -7,6 +7,7 @@ import { requestActions } from './requests';
 import { credentials, getHeaders } from './utils/credentials';
 import { viewDocument } from './view';
 import { fetchSkills } from './skills';
+import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { configuration } from './utils/config';
 
@@ -73,11 +74,13 @@ export function loadCourse(courseId: string) {
 
           dispatch(courseChanged(updatedModel));
           dispatch(fetchSkills(courseId));
+          dispatch(fetchObjectives(courseId));
           return updatedModel;
 
         } else {
           dispatch(courseChanged(document.model));
           dispatch(fetchSkills(courseId));
+          dispatch(fetchObjectives(courseId));
           return document.model;
         }
       }

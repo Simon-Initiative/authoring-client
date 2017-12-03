@@ -15,7 +15,11 @@ import { AuthoringActionsHandler, AuthoringActions } from 'actions/authoring';
 import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
+import { ContentState, ContentBlock } from 'draft-js';
 import { LegacyTypes } from 'data/types';
+import { getEntities } from 'data/content/html/changes';
+import { EntityTypes } from 'data/content/html/common';
+import { Objectives } from './Objectives';
 
 import './WorkbookPageEditor.scss';
 
@@ -24,6 +28,18 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
+
+function hasMissingResource(
+  contentState: ContentState, course: models.CourseModel) : boolean {
+
+  const missingActivity = getEntities(EntityTypes.activity, contentState)
+    .some(e => !course.resourcesById.has(e.entity.data.activity.idref));
+
+  return missingActivity ||
+    getEntities(EntityTypes.wb_inline, contentState)
+      .some(e => !course.resourcesById.has(e.entity.data.wb_inline.idref));
+}
+
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
@@ -36,6 +52,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
       props.services.refreshObjectives(props.context.courseId);
+    }
+    if (hasMissingResource(
+      props.model.body.contentState, props.context.courseModel)) {
+      props.services.refreshCourse(props.context.courseId);
     }
   }
 
@@ -61,11 +81,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onObjectivesEdit(objectives: Immutable.Set<contentTypes.LearningObjective>) {
-    this.props.services.dismissModal();
+  onObjectivesEdit(objrefs: Immutable.List<string>) {
 
-    const head = this.props.model.head.with(
-      { objrefs: objectives.map(o => o.id).toList() });
+    const head = this.props.model.head.with({ objrefs });
     this.handleEdit(this.props.model.with({ head }));
   }
 
@@ -79,18 +97,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   renderObjectives() {
-    const objectives = this.props.model.head.objrefs.toArray()
-      .map((id) => {
-        const title = this.props.context.objectives.has(id)
-          ? this.props.context.objectives.get(id).title
-          : 'Loading...';
-        return <li key={id}>{title}</li>;
-      });
-    return (
-      <ol>
-        {objectives}
-      </ol>
-    );
+    return <Objectives
+      {...this.props}
+      model={this.props.model.head.objrefs}
+      onEdit={this.onObjectivesEdit}
+      />;
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
@@ -104,23 +115,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
-  selectObjectives() {
-    const component = <ObjectiveSelection
-      onInsert={this.onObjectivesEdit}
-      onCancel={() => this.props.services.dismissModal()}
-      courseId={this.props.context.courseId} />;
-
-    this.props.services.displayModal(component);
-  }
 
   render() {
     const inlineToolbar = <InlineToolbar />;
     const blockToolbar = <BlockToolbar />;
     const insertionToolbar = <InlineInsertionToolbar />;
-
-    const addLearningObj = <button
-      className="btn btn-link"
-      onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
       <div className="workbookpage-editor">
@@ -135,13 +134,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             model={this.props.model.head.title}
             onEdit={this.onTitleEdit} />
 
-          <Collapse
-            caption="Learning Objectives"
-            expanded={addLearningObj}>
-
-            {this.renderObjectives()}
-
-          </Collapse>
+          {this.renderObjectives()}
 
           <HtmlContentEditor
               inlineToolbar={inlineToolbar}
