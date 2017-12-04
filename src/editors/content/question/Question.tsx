@@ -126,7 +126,7 @@ export const SectionControl = OptionControl;
  * The content editor for HtmlContent.
  */
 export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S extends QuestionState>
-  extends React.PureComponent<P, S> {
+  extends React.Component<P, S> {
   htmlEditor: CommandProcessor<EditorState>;
   className: string;
 

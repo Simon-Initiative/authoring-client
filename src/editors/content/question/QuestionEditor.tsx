@@ -48,7 +48,7 @@ export class QuestionEditor
 
     const createFillInTheBlank = () => {
       const value = guid().replace('-', '');
-      const choice = new contentTypes.Choice({ value, guid: guid() });
+      const choice = new contentTypes.Choice().with({ value, guid: guid() });
 
       const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
 
@@ -163,6 +163,8 @@ export class QuestionEditor
 
     this.lastBody = body;
 
+
+
     this.props.onEdit(question);
   }
 
@@ -270,6 +272,7 @@ export class QuestionEditor
       || item.contentType === 'FillInTheBlank';
 
     if (isMultipart) {
+      const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
           context={this.props.context}
@@ -279,7 +282,7 @@ export class QuestionEditor
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
-          key={item.guid}
+          key={key}
           itemModel={item}
           partModel={part}
           body={this.props.model.body}

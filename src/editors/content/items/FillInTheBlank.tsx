@@ -46,6 +46,7 @@ export class FillInTheBlank
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onEditMult = this.onEditMult.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
+    this.onChoiceEdit = this.onChoiceEdit.bind(this);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
@@ -250,6 +251,12 @@ export class FillInTheBlank
 
     return (
       <Section className="choices">
+
+        <ItemLabel label="Dropdown" editMode={this.props.editMode}
+          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
+
+        <br/>
+
         <SectionHeader title="Choices">
           <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input
