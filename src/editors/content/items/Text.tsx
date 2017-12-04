@@ -1,26 +1,21 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Choice } from './Choice';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
-import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
-import { CriteriaEditor } from '../question/CriteriaEditor';
-import ConceptsEditor from '../concepts/ConceptsEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
+import { Checkbox, Select } from '../common/controls';
 import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
-  hideGradingCriteria: boolean;
+
 }
 
-export interface TextState {
+export interface TextState extends AbstractItemPartEditorState {
 
 }
 
@@ -36,171 +31,137 @@ export class Text
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
-    this.onExplanation = this.onExplanation.bind(this);
-
-    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
-    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
-    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
-
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
-  }
-
-  onExplanation(explanation) {
-    const part = this.props.partModel.with({ explanation });
-    this.props.onEdit(this.props.itemModel, part);
+    this.onSizeChange = this.onSizeChange.bind(this);
+    this.onEditMult = this.onEditMult.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+    const {
+      itemModel,
+      onEdit,
+    } = this.props;
+
+    onEdit(itemModel, partModel);
   }
 
   onWhitespaceChange(whitespace) {
-    this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel);
+    const {
+      partModel,
+      itemModel,
+      onEdit,
+    } = this.props;
+
+    onEdit(itemModel.with({ whitespace }), partModel);
   }
 
   onCaseSensitive(caseSensitive) {
-    this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel);
-  }
+    const {
+      partModel,
+      itemModel,
+      onEdit,
+    } = this.props;
 
-  renderCriteria() {
-    const expandedCriteria =
-      <form className="form-inline">
-        <Button editMode={this.props.editMode}
-          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
-      </form>;
-
-    return <Collapse caption="Grading Criteria"
-        details=""
-        expanded={expandedCriteria}>
-
-          {this.props.partModel.criteria.toArray()
-            .map(c => <CriteriaEditor
-              onRemove={this.onCriteriaRemove}
-              model={c}
-              onEdit={this.onCriteriaEdit}
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
-              />)}
-
-      </Collapse>;
-
+    onEdit(itemModel.with({ caseSensitive }), partModel);
   }
 
   onSizeChange(inputSize) {
-    this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
+    const {
+      partModel,
+      itemModel,
+      onEdit,
+    } = this.props;
+
+    onEdit(itemModel.with({ inputSize }), partModel);
   }
 
   onEditMult(mult) {
-    const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
-    const partModel = this.props.partModel.with({ responseMult });
-    this.props.onEdit(this.props.itemModel, partModel);
-  }
+    const {
+      partModel,
+      itemModel,
+      onEdit,
+    } = this.props;
 
-
-  onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaRemove(guid) {
-    const criteria = this.props.partModel.criteria.delete(guid);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaEdit(c) {
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-
-  onConceptsEdit(concepts) {
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
+    const responseMult = partModel.responseMult.set(mult.guid, mult);
+    const newPartModel = partModel.with({ responseMult });
+    onEdit(itemModel, newPartModel);
   }
 
   render() : JSX.Element {
+    const {
+      context,
+      services,
+      partModel,
+      itemModel,
+      editMode,
+      onEdit,
+      onFocus,
+      onBlur,
+      onRemove,
+    } = this.props;
 
     let feedback;
 
-    if (this.props.partModel.responseMult.size > 0) {
+    if (partModel.responseMult.size > 0) {
 
-      feedback = this.props.partModel.responseMult
+      feedback = partModel.responseMult
         .toArray().map(m => <ResponseMultEditor
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
+          editMode={editMode}
+          services={services}
+          context={context}
           model={m}
-          onEdit={this.onEditMult.bind(this)}
+          onEdit={this.onEditMult}
         />);
     } else {
 
       feedback = <TabularFeedback
-            input={this.props.itemModel.id}
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
-            model={this.props.partModel}
+            input={itemModel.id}
+            editMode={editMode}
+            services={services}
+            context={context}
+            model={partModel}
             onEdit={this.onPartEdit}
           />;
     }
 
-
     const controls = (
       <div style={{ display: 'inline' }}>
         <Select
-          editMode={this.props.editMode}
+          editMode={editMode}
           label="Whitespace"
-          value={this.props.itemModel.whitespace}
+          value={itemModel.whitespace}
           onChange={this.onWhitespaceChange}>
           <option value="preserve">Preserve</option>
           <option value="trim">Trim</option>
           <option value="normalize">Normalize</option>
         </Select>
-        <Select editMode={this.props.editMode}
-          label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+        <Select editMode={editMode}
+          label="Size" value={itemModel.inputSize} onChange={this.onSizeChange}>
           <option value="small">small</option>
           <option value="medium">medium</option>
           <option value="large">large</option>
         </Select>
 
-        <Checkbox editMode={this.props.editMode}
+        <Checkbox editMode={editMode}
           label="Case Sensitive"
-          value={this.props.itemModel.caseSensitive}
+          value={itemModel.caseSensitive}
           onEdit={this.onCaseSensitive} />
       </div>);
 
     return (
       <div className="itemPart"
-        onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
-          <ItemLabel
+        onFocus={() => onFocus(itemModel.id)}
+        onBlur={() => onBlur(itemModel.id)}>
+        <ItemLabel
           label="Text"
-          editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)} />
+          editMode={editMode}
+          onClick={() => onRemove(itemModel, partModel)} />
 
         {controls}
 
-        <ConceptsEditor
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit}
-          />
-
-        {!this.props.hideGradingCriteria && this.renderCriteria()}
-
-        <Hints
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit} />
-
         {feedback}
 
-        <ExplanationEditor
-            {...this.props}
-            model={this.props.partModel.explanation}
-            onEdit={this.onExplanation} />
-      </div>);
+      </div>
+    );
   }
 
 }
-

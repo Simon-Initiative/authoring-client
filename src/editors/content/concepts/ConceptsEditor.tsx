@@ -7,7 +7,6 @@ import {
   AbstractContentEditor,
   AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-
 import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
 import './ConceptsEditor.scss';
@@ -74,9 +73,6 @@ export default class ConceptsEditor
 
     return (
       <div className="concepts-editor">
-
-        <p>Currently attached skills:</p>
-
         <Typeahead
           multiple
           onChange={(selected: Skill[]) => {

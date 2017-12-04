@@ -1,0 +1,36 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+.tab-container {
+  .tab-header {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #ddd;
+    @include disable-select;
+
+    .nav-tabs {
+      border-bottom: none;
+
+      .nav-link {
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+
+        &:hover {
+          border-bottom: 2px solid $selection;
+          margin-bottom: -2px;
+        }
+      }
+
+      .nav-item.show .nav-link, .nav-link.active {
+        background-color: transparent;
+        border-color: #ddd #ddd transparent;
+        border-bottom: 2px solid $white;
+        margin-bottom: -2px;
+      }
+    }
+  }
+
+  .nav-link {
+    cursor: pointer;
+  }
+}
