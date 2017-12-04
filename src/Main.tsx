@@ -214,7 +214,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   render(): JSX.Element {
     const { modal, user, onDispatch } = this.props;
-
+    console.log('render');
     if (user === null) {
       return null;
     }

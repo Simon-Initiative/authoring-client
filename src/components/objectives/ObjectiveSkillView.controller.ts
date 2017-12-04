@@ -1,9 +1,10 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
-import { Skill } from 'data/contentTypes';
+import { Skill, LearningObjective } from 'data/contentTypes';
 import ObjectiveSkillView from './ObjectiveSkillView';
 import { CourseModel } from 'data/models';
 import { setSkills, updateSkills } from 'actions/skills';
+import { setObjectives, updateObjectives } from 'actions/objectives';
 
 interface StateProps {
   skills: any;
@@ -12,6 +13,8 @@ interface StateProps {
 interface DispatchProps {
   onSetSkills: (skills: OrderedMap<string, Skill>) => void;
   onUpdateSkills: (skills: OrderedMap<string, Skill>) => void;
+  onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
+  onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
 }
 
 interface OwnProps {
@@ -36,6 +39,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onUpdateSkills: (skills: OrderedMap<string, Skill>) => {
       dispatch(updateSkills(skills));
+    },
+    onSetObjectives: (objs: OrderedMap<string, LearningObjective>) => {
+      dispatch(setObjectives(objs));
+    },
+    onUpdateObjectives: (objs: OrderedMap<string, LearningObjective>) => {
+      dispatch(updateObjectives(objs));
     },
   };
 };

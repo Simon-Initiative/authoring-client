@@ -1,5 +1,4 @@
 import { Map } from 'immutable';
-import { Maybe } from 'tsmonad';
 import {
   CourseModel,
 } from 'data/models';
@@ -12,9 +11,9 @@ import {
 import { OtherAction } from './utils';
 
 type ActionTypes = CourseChangedAction | UpdateCourseResourcesAction | OtherAction;
-type CourseState = Maybe<CourseModel>;
+type CourseState = CourseModel;
 
-const initialState = Maybe.nothing<CourseModel>();
+const initialState = null;
 
 export const course = (
   state: CourseState = initialState,
@@ -22,12 +21,9 @@ export const course = (
 ): CourseState => {
   switch (action.type) {
     case COURSE_CHANGED:
-      return Maybe.just(action.model);
+      return action.model;
     case UPDATE_COURSE_RESOURCES:
-      return state.caseOf({
-        just: m => Maybe.just(m.with({ resources: m.resources.merge(action.resources) })),
-        nothing: () => Maybe.nothing<CourseModel>(),
-      });
+      return state.with({ resources: state.resources.merge(action.resources) });
     default:
       return state;
   }

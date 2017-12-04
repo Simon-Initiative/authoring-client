@@ -19,22 +19,22 @@ import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
 import { Row } from './Row';
-import { Skill } from 'types/course';
 
 import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
-  course: any;
+  course: models.CourseModel;
   dispatch: any;
   expanded: any;
-  titles: any;
-  skills: Immutable.OrderedMap<string, Skill>;
-  onLoadTitles: (courseId: CourseModel) => void;
-  onAddTitle: (id: string, title: string) => void;
-  onUpdateTitle: (id: string, title: string) => void;
-  onSetSkills: (skills: Immutable.OrderedMap<string, Skill>) => void;
-  onUpdateSkills: (skills: Immutable.OrderedMap<string, Skill>) => void;
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>;
+  onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
+  onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
+  onSetObjectives: (objectives: Immutable.OrderedMap<string,
+    contentTypes.LearningObjective>) => void;
+  onUpdateObjectives: (objectives: Immutable.OrderedMap<string,
+    contentTypes.LearningObjective>) => void;
+
 }
 
 interface ObjectiveSkillViewState {
@@ -78,15 +78,14 @@ export class ObjectiveSkillView
 
     this.services = new DispatchBasedServices(
       this.props.dispatch,
-      this.props.course.model,
+      this.props.course,
     );
   }
 
   componentDidMount() {
-    const { onLoadTitles, course } = this.props;
+    const { course } = this.props;
 
     this.buildModels();
-    onLoadTitles(course.model);
   }
 
   componentWillUnmount() {
@@ -104,12 +103,12 @@ export class ObjectiveSkillView
 
   releaseAllLocks(documents) {
     documents.forEach(
-      d => persistence.releaseLock(this.props.course.model.guid, d._id));
+      d => persistence.releaseLock(this.props.course.guid, d._id));
   }
 
   buildModels() {
 
-    const courseId = this.props.course.model.guid;
+    const courseId = this.props.course.guid;
     const userName = this.props.userName;
 
     buildAggregateModel(courseId, userName)
@@ -126,15 +125,16 @@ export class ObjectiveSkillView
         } else {
 
           const skills = unifySkills(aggregateModel);
+          const objectives = unifyObjectives(aggregateModel);
 
-          // We got a fresh look at the skills, let the application know
+          // We got a fresh look at the skills and objectives, let the application know
           // about it so that others can take advantage
-          this.props.onSetSkills(skills.skills
-            .map(s => ({ id: s.id, title: s.title })).toOrderedMap());
+          this.props.onSetSkills(skills.skills);
+          this.props.onSetObjectives(objectives.objectives);
 
           this.setState({
             aggregateModel,
-            objectives: unifyObjectives(aggregateModel),
+            objectives,
             skills,
           });
         }
@@ -143,7 +143,6 @@ export class ObjectiveSkillView
   }
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
-    const { onUpdateTitle } = this.props;
 
     const originalDocument = this.state.objectives.mapping.get(obj.id);
 
@@ -170,7 +169,8 @@ export class ObjectiveSkillView
 
     persistence.persistDocument(updatedDocument);
 
-    onUpdateTitle(obj.get('id'), obj.get('title'));
+    this.props.onUpdateObjectives(Immutable.OrderedMap(
+      [[obj.get('id'), obj]]));
   }
 
   onSkillEdit(model: contentTypes.Skill) {
@@ -360,7 +360,6 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
-    const { titles } = this.props;
 
     const rows = [];
 
@@ -393,7 +392,7 @@ export class ObjectiveSkillView
           onAddNewSkill={this.onAddNewSkill}
           highlighted={false}
           model={objective}
-          title={titles[objective.id]}
+          title={objective.title}
           isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
           editMode={this.state.aggregateModel.isLocked}
@@ -461,8 +460,8 @@ export class ObjectiveSkillView
 
     this.setState({ objectives: unified });
 
-
-    this.props.onAddTitle(id, title);
+    this.props.onUpdateObjectives(Immutable.OrderedMap(
+      [[obj.get('id'), obj]]));
 
     persistence.persistDocument(document);
   }

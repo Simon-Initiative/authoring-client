@@ -17,7 +17,7 @@ const Section = (props) => {
 };
 
 export interface NavigationBarProps {
-  course: any;
+  course: models.CourseModel;
   user: any;
   viewActions: any;
   onDispatch: (...args: any[]) => any;
@@ -48,14 +48,14 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
   render() {
     const { course, user } = this.props;
 
-    const courseId = course.model && course.model.guid;
+    const courseId = course && course.guid;
 
     const formUrl = buildFeedbackFromCurrent(
       user.profile.firstName + ' ' + user.profile.lastName,
       user.profile.email,
     );
 
-    const title = course.model && course.model.title || '';
+    const title = course && course.title || '';
 
     return (
       <nav className="navigation-bar col-sm-3 col-md-2 hidden-xs-down sidebar">

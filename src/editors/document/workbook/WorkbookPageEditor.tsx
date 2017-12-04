@@ -33,11 +33,14 @@ function hasMissingResource(
   contentState: ContentState, course: models.CourseModel) : boolean {
 
   const missingActivity = getEntities(EntityTypes.activity, contentState)
-    .some(e => !course.resourcesById.has(e.entity.data.activity.idref));
+    .some(e => !course.resourcesById.has(e.entity.data.activity.idRef));
+
+  getEntities(EntityTypes.wb_inline, contentState)
+    .forEach(e => console.log(e));
 
   return missingActivity ||
     getEntities(EntityTypes.wb_inline, contentState)
-      .some(e => !course.resourcesById.has(e.entity.data.wb_inline.idref));
+      .some(e => !course.resourcesById.has(e.entity.data.wbinline.idRef));
 }
 
 

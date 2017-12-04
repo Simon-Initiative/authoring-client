@@ -61,7 +61,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     persistence.createDocument(this.props.course.guid, resource)
       .then((result) => {
-        const r = (resource as any).resource;
+        const r = (result as any).model.resource;
+
         const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
         dispatch(updateCourseResources(updated));
       });
@@ -140,7 +141,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   render() {
-
+    console.log('render resourceview');
     return (
       <div className="resource-view container-fluid new">
         <div className="row">

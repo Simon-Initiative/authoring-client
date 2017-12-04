@@ -32,10 +32,7 @@ const mapStateToProps = (state): StateProps => {
   return {
     user,
     modal,
-    course: course.caseOf({
-      just: c => c,
-      nothing: c => undefined,
-    }),
+    course,
     expanded,
     server,
   };
