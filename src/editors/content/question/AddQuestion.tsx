@@ -93,7 +93,14 @@ export class AddQuestion
 
     const item = new contentTypes.ShortAnswer();
 
-    const response = new contentTypes.Response({ match: '*', score: '1' });
+    const body = new contentTypes.Html()
+      .with({ contentState: ContentState.createFromText('Enter feedback here') });
+    const feedback = new contentTypes.Feedback().with({ body });
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
+      .set(feedback.guid, feedback);
+
+    const response = new contentTypes.Response()
+      .with({ match: '*', score: '1', feedback: feedbacks });
 
     const part = new contentTypes.Part()
       .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()

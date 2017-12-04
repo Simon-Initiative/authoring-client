@@ -39,12 +39,23 @@ function migrateNodesToPage(model: AssessmentModel) {
     updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
   }
 
-  // Now move any root nodes to the first page
+  // Now move all supported nodes into the first page
   if (updated.nodes.size > 0) {
-    let page = updated.pages.first();
-    updated.nodes.toArray().forEach(
-      node => page = page.with({ nodes: page.nodes.set(node.guid, node) }));
-    updated = updated.with({ pages: updated.pages.set(page.guid, page) });
+
+    const page = updated.pages.first();
+    const migratedPage = updated.nodes
+      .toArray()
+      .reduce(
+        (page, node) => {
+          if (node.contentType !== 'Unsupported') {
+            return page.with({ nodes: page.nodes.set(node.guid, node) });
+          } else {
+            return page;
+          }
+        },
+        page);
+
+    updated = updated.with({ pages: updated.pages.set(migratedPage.guid, migratedPage) });
     updated = updated.with({ nodes: Immutable.OrderedMap<string, contentTypes.Node>() });
   }
 
@@ -138,6 +149,7 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   toPersistence(): Object {
     const children = [
       this.title.toPersistence(),
+      { short_title: { '#text': this.title.text } },
       ...this.pages.toArray().map(page => page.toPersistence()),
     ];
     let resource = this.resource.toPersistence();
