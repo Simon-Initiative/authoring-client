@@ -141,7 +141,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   render() {
-    console.log('render resourceview');
     return (
       <div className="resource-view container-fluid new">
         <div className="row">

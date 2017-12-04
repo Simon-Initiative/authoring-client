@@ -26,11 +26,13 @@ import { renderDraggableTreeNode,
 import { insertNode, removeNode, updateNode } from './utils';
 import { TreeNode } from './TreeNode';
 import { ActionDropdown } from './ActionDropdown';
+import { Actions } from './Actions';
 import { Row } from './Row';
 import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
 import { Title } from 'types/course';
+import { duplicateOrganization } from 'actions/models';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import './OrgEditor.scss';
@@ -129,6 +131,7 @@ const enum TABS {
   Content = 0,
   Details = 1,
   Labels = 2,
+  Actions = 3,
 }
 
 interface OrgEditorState extends AbstractEditorState {
@@ -334,13 +337,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     const { onUpdateTitle } = this.props;
 
     return (
-      <Details
-        editMode={this.props.editMode}
-        model={this.props.model}
-        onEdit={(model) => {
-          onUpdateTitle({ id: model.get('id'), title: model.get('title') });
-          this.handleEdit(model);
-        }}/>
+      <div className="org-tab">
+        <Details
+          editMode={this.props.editMode}
+          model={this.props.model}
+          onEdit={(model) => {
+            onUpdateTitle({ id: model.get('id'), title: model.get('title') });
+            this.handleEdit(model);
+          }}/>
+      </div>
     );
   }
 
@@ -349,8 +354,12 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderLabels() {
-    return <LabelsEditor {...this.props}
-      onEdit={this.onLabelsEdit} model={this.props.model.labels} />;
+    return (
+      <div className="org-tab">
+        <LabelsEditor {...this.props}
+        onEdit={this.onLabelsEdit} model={this.props.model.labels} />
+      </div>
+    );
   }
 
   renderConstraints() {
@@ -395,7 +404,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   renderTabs() {
 
-    const tabs = ['Content', 'Details', 'Labels']
+    const tabs = ['Content', 'Details', 'Labels', 'Actions']
       .map((title, index) => {
         const active = index === this.state.currentTab ? 'active' : '';
         const classes = 'nav-link ' + active;
@@ -416,6 +425,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     );
   }
 
+  renderActions() {
+    const dupe = () => this.props.dispatch(
+      duplicateOrganization(
+        this.props.context.courseId,
+        this.props.model, this.props.context.courseModel));
+
+    return <Actions onDuplicate={dupe}/>;
+  }
+
   renderActiveTabContent() {
     switch (this.state.currentTab) {
       case TABS.Content:
@@ -424,6 +442,8 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         return this.renderDetails();
       case TABS.Labels:
         return this.renderLabels();
+      case TABS.Actions:
+        return this.renderActions();
     }
   }
 

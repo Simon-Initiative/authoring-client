@@ -54,7 +54,7 @@ export class LabelsEditor
         <p>Enter custom labels to use in place of the following organization components:</p>
 
         <div className="form-group row">
-          <label className="col-1 col-form-label">Sequence</label>
+          <label className="col-2 col-form-label">Sequence</label>
           <div className="col-2">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.sequence}
@@ -62,7 +62,7 @@ export class LabelsEditor
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Unit</label>
+          <label className="col-2 col-form-label">Unit</label>
           <div className="col-2">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.unit}
@@ -70,7 +70,7 @@ export class LabelsEditor
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Module</label>
+          <label className="col-2 col-form-label">Module</label>
           <div className="col-2">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.module}
@@ -78,7 +78,7 @@ export class LabelsEditor
           </div>
         </div>
         <div className="form-group row">
-          <label className="col-1 col-form-label">Section</label>
+          <label className="col-2 col-form-label">Section</label>
           <div className="col-2">
             <TextInput editMode={this.props.editMode}
               width="100%" label="" value={this.props.model.section}
