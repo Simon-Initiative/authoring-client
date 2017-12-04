@@ -69,6 +69,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (this.props.editMode !== nextProps.editMode) {
       return true;
     }
+    if (this.props.context !== nextProps.context) {
+      return true;
+    }
 
     return false;
   }

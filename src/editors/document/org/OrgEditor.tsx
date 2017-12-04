@@ -63,7 +63,7 @@ function calculatePositionsAtLevel(
 function hasMissingResource(
   model: models.OrganizationModel, course: models.CourseModel) : boolean {
 
-  return model.sequences
+  return model.sequences.children
     .toArray()
     .map(c => hasMissingResourceHelper(model, course, c))
     .reduce((all, result) => all || result, false);
@@ -74,12 +74,14 @@ function hasMissingResourceHelper(
   node: any) : boolean {
 
   if (node.contentType === 'Item') {
-    return !course.resourcesById.has(node.id);
+    return !course.resourcesById.has(node.resourceref.idref);
   } else if (node.children !== undefined) {
     return node.children
       .toArray()
       .map(c => hasMissingResourceHelper(model, course, c))
       .reduce((all, result) => all || result, false);
+  } else {
+    return false;
   }
 }
 

@@ -1,11 +1,15 @@
 import * as React from 'react';
 import * as viewActions from '../actions/view';
 
+import { buildFeedbackFromCurrent } from '../utils/feedback';
+
 import './Header.scss';
 
 export interface HeaderProps {
   dispatch: any;
   logoutUrl: string;
+  name: string;
+  email: string;
 }
 
 class Header extends React.PureComponent<HeaderProps, {}> {
@@ -26,15 +30,27 @@ class Header extends React.PureComponent<HeaderProps, {}> {
   }
 
   render() {
+
+    const { name, email } = this.props;
+
+    const formUrl = buildFeedbackFromCurrent(
+      name,
+      email,
+    );
+
     return (
       <div className="header">
-        <nav className="navbar navbar-light bg-light justify-content-between">
+        <nav className="navbar navbar-light bg-light justify-content-start">
+
           <a className="navbar-brand" onClick={this.onClickHome}>
           <img src="assets/oli-icon.png" width="30" height="30"
               className="d-inline-block align-top" alt=""/>
             Open Learning Initiative
           </a>
-          <a className="nav-link active" href={this.props.logoutUrl}>Logout</a>
+
+          <a className="nav-link" href={formUrl}>Provide Feedback</a>
+          <a className="nav-link" href={this.props.logoutUrl}>Logout</a>
+
         </nav>
       </div>
     );

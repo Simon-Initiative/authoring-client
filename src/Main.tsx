@@ -233,12 +233,11 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     return (
         <div className="main">
-          <Header dispatch={onDispatch} logoutUrl={logoutUrl}/>
-
+          <Header dispatch={onDispatch}
+            name={user.profile.firstName + ' ' + user.profile.lastName}
+            email={user.profile.email}
+            logoutUrl={logoutUrl}/>
           {currentView}
-
-          <Footer dispatch={onDispatch}/>
-
           {modalDisplay}
         </div>
     );

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { WbInline as WbInlineType } from '../../../../../data/content/html/wbinline';
 import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps, 
+import { InteractiveRenderer, InteractiveRendererProps,
   InteractiveRendererState} from './InteractiveRenderer';
 import * as persistence from '../../../../../data/persistence';
 
@@ -25,11 +25,11 @@ export interface WbInlineProps extends InteractiveRendererProps {
 }
 
 export interface WbInlineState extends InteractiveRendererState {
-  
+
 }
 
 export interface WbInlineProps {
-  
+
 }
 
 
@@ -47,11 +47,6 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     this.onInsert = this.onInsert.bind(this);
     this.onCancel = this.onCancel.bind(this);
 
-    this.findTitleId(this.props.data.wbinline.idRef);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.findTitleId(nextProps.data.wbinline.idRef);
   }
 
   onClick() {
@@ -59,7 +54,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
       this.props.blockProps.services.viewDocument(
         this.guid,
         this.props.blockProps.context.courseId);
-    } 
+    }
   }
 
   onPurposeEdit(purpose) {
@@ -79,7 +74,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     const found = resources.find(r => r.guid === resource.id);
 
     if (found !== undefined) {
-      
+
       this.props.blockProps.onEdit(
         { wbinline: this.props.data.wbinline.with({ idRef: found.id }) });
     }
@@ -97,34 +92,26 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
         <ResourceSelection
           filterPredicate={predicate}
           courseId={this.props.blockProps.context.courseId}
-          onInsert={this.onInsert} 
+          onInsert={this.onInsert}
           onCancel={this.onCancel}/>);
   }
 
-  findTitleId(idref) {
-    const resources = this.props.blockProps
-      .context.courseModel.resources.toArray();
-
-    const resource = resources.find(resource => resource.id === idref);
-
-    if (resource === undefined) {
-      this.title = 'Not set';
-      this.guid = null;
-    } else {
-      this.title = resource.title;
-      this.guid = resource.guid;
-    }
-  }
-
   render() : JSX.Element {
+
+    const title = this.props.blockProps.context.courseModel
+      .resourcesById.has(this.props.data.wbinline.idRef)
+      ? this.props.blockProps.context.courseModel
+      .resourcesById.get(this.props.data.wbinline.idRef).title
+      : 'Loading...';
+
     return (
-      <div className="wbinline" 
-        ref={c => this.focusComponent = c} onFocus={this.onFocus} 
+      <div className="wbinline"
+        ref={c => this.focusComponent = c} onFocus={this.onFocus}
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
         <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
-        <button onClick={this.onClick} type="button" 
-          className="btn btn-link">{this.title}</button>
-        <Button editMode={this.props.blockProps.editMode} 
+        <button onClick={this.onClick} type="button"
+          className="btn btn-link">{title}</button>
+        <Button editMode={this.props.blockProps.editMode}
           onClick={this.onSelectActivity}>Edit</Button>
         <div style={ { float: 'right' } }>
           <Select editMode={this.props.blockProps.editMode}

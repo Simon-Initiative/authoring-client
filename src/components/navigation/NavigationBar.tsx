@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import { Resource } from '../../data/content/resource';
-import { buildFeedbackFromCurrent } from '../../utils/feedback';
 import guid from '../../utils/guid';
 import * as view from '../../actions/view';
 import { Content } from './Content';
@@ -50,10 +49,6 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
 
     const courseId = course && course.guid;
 
-    const formUrl = buildFeedbackFromCurrent(
-      user.profile.firstName + ' ' + user.profile.lastName,
-      user.profile.email,
-    );
 
     const title = course && course.title || '';
 
@@ -95,12 +90,31 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
 
         <br/>
 
-        <ul className="nav nav-pills flex-column feedback">
-          <li><a target="_blank"
-            ref={a => this.feedback = a}
-            data-toggle="tooltip" title="Report a problem or suggest improvements"
-            href={formUrl}>Feedback</a></li>
+
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+        <ul className="nav nav-pills flex-column copyright">
+          <li><img
+          className="ccLicense"
+          src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></li>
+
+          <li>
+          <small>
+          Unless otherwise noted this work is licensed under a <a className="ccLink"
+          href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">Creative
+          Commons Attribution-NonCommercial-ShareAlike 4.0 Unported License
+        </a></small>
+          </li>
         </ul>
+
+
+
+
+
       </nav>
     );
   }
