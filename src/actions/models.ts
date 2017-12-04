@@ -4,7 +4,7 @@ import { Sequence, Sequences, Unit, Module, Resource,
   Section, Include, Item } from 'data/contentTypes';
 import * as persistence from 'data//persistence';
 import { viewOrganizations } from 'actions/view';
-import { courseChanged, updateTitles } from 'actions/course';
+import { courseChanged, updateCourseResources } from 'actions/course';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
 
@@ -85,12 +85,9 @@ export function duplicateOrganization(
 
         if (doc.model.modelType === 'OrganizationModel') {
 
-          const updatedModel = courseModel.with({
-            resources: courseModel.resources.set(doc.model.resource.id, doc.model.resource),
-          });
-
-          dispatch(courseChanged(updatedModel));
-          dispatch(updateTitles([{ id: doc._id, title: doc.model.resource.title }]));
+          const resources = Immutable.OrderedMap<string, Resource>(
+            [[doc.model.resource.guid, doc.model.resource]]);
+          dispatch(updateCourseResources(resources));
 
           viewOrganizations(courseId);
         }
