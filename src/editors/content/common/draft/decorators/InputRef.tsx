@@ -7,33 +7,33 @@ import './InputRef.scss';
 
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
-  
+
   let selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
-  
+
   if (data.$type === 'FillInTheBlank') {
     let classes = 'form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0 ' + selected;
     return (
-        <select data-offset-key={props.offsetKey} disabled 
+        <select data-offset-key={props.offsetKey} disabled
           value='sample1' className={classes}>
-          <option value="sample1">Fill in the blank</option>
+          <option value="sample1">Dropdown</option>
         </select>
       );
   } else if (data.$type === 'Numeric') {
     let classes = 'form-control form-control-sm ' + selected;
     return (
-        <input 
-          data-offset-key={props.offsetKey} 
-          style={{width:'65px', marginRight: '2px', display: 'inline'}}
+        <input
+          data-offset-key={props.offsetKey}
+          style={{width:'75px', marginRight: '2px', display: 'inline'}}
           disabled
           className={classes}
-          value='Number'/>
+          value='Numeric'/>
       );
 
   } else if (data.$type === 'Text') {
     let classes = 'form-control form-control-sm ' + selected;
     return (
-        <input 
-          data-offset-key={props.offsetKey} 
+        <input
+          data-offset-key={props.offsetKey}
           style={{width:'65px', marginRight: '2px', display: 'inline'}}
           disabled
           className={classes}
@@ -43,8 +43,8 @@ const InputRef = (props) => {
   } else {
     let classes = 'form-control form-control-sm ' + selected;
     return (
-        <input 
-          data-offset-key={props.offsetKey} 
+        <input
+          data-offset-key={props.offsetKey}
           style={{width:'65px', marginRight: '2px', display: 'inline'}}
           disabled
           className={classes}

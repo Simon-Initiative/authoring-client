@@ -36,11 +36,6 @@ export class ExplanationEditor
   }
 
   render() : JSX.Element {
-
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
     const bodyStyle = {
       minHeight: '20px',
       borderStyle: 'none',
@@ -49,16 +44,16 @@ export class ExplanationEditor
     };
 
     return (
-      <Collapse caption="Explanation">
+      <div className="explanation-editor">
         <HtmlContentEditor
           editorStyles={bodyStyle}
-          inlineToolbar={inlineToolbar}
-          blockToolbar={blockToolbar}
-          inlineInsertionToolbar={insertionToolbar}
+          inlineToolbar={<InlineToolbar/>}
+          blockToolbar={<BlockToolbar/>}
+          inlineInsertionToolbar={<InlineInsertionToolbar/>}
           {...this.props}
           model={this.props.model}
-          onEdit={this.props.onEdit}
-          />
-      </Collapse>);
+          onEdit={this.props.onEdit} />
+      </div>
+    );
   }
 }
