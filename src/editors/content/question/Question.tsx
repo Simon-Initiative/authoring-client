@@ -150,10 +150,12 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     const criteria = this.props.partModel.criteria.set(c.guid, c);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
   }
+
   onCriteriaRemove(guid) {
     const criteria = this.props.partModel.criteria.delete(guid);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
   }
+
   onCriteriaEdit(c) {
     const criteria = this.props.partModel.criteria.set(c.guid, c);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
@@ -228,7 +230,7 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     const additionalOptions = this.renderAdditionalOptions();
     if (additionalOptions.length > 0) {
       options = options.concat(
-        <div className="flex-spacer"/>,
+        <div key="flex-spacer" className="flex-spacer"/>,
         ...additionalOptions,
       );
     }
