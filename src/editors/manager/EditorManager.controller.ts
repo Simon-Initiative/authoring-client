@@ -1,13 +1,15 @@
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import EditorManager from './EditorManager';
-import { courseChanged, fetchObjectiveTitles } from 'actions/course';
+import { courseChanged } from 'actions/course';
 import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
+import { Skill, LearningObjective } from 'data/contentTypes';
 
 interface StateProps {
   expanded: any;
-  titles: Map<string, string>;
+  skills: Map<string, Skill>;
+  objectives: Map<string, LearningObjective>;
 }
 
 interface DispatchProps {
@@ -24,11 +26,12 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { expanded, titles } = state;
+  const { expanded, skills, objectives } = state;
 
   return {
     expanded,
-    titles,
+    skills,
+    objectives,
   };
 };
 

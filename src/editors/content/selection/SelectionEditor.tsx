@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor,
@@ -11,10 +12,12 @@ import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
+import { Skill } from 'types/course';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface SelectionState {
@@ -65,14 +68,7 @@ export class SelectionEditor
   }
 
   renderSource() {
-    if (this.props.model.source.contentType === 'Pool') {
-      return <PoolEditor
-               {...this.props}
-               model={this.props.model.source}
-               onEdit={this.onSourceEdit}
-               onRemove={() => this.props.onRemove(this.props.model.guid)}
-             />;
-    } else {
+    if (this.props.model.source.contentType === 'PoolRef') {
       return <PoolRefEditor
                {...this.props}
                model={this.props.model.source}
@@ -113,10 +109,13 @@ export class SelectionEditor
     const controls = (
       <div>
         <span style={label}>Insert new: </span>
-        <AddQuestion
-          editMode={this.props.editMode}
-          onQuestionAdd={this.onAddQuestion.bind(this)}
-          isSummative={true}/>
+        {
+          this.props.model.source.contentType === 'Pool' &&
+          <AddQuestion
+            editMode={this.props.editMode}
+            onQuestionAdd={this.onAddQuestion.bind(this)}
+            isSummative={true}/>
+        }
         <form className="form-inline">
           <Select editMode={this.props.editMode}
             label="Strategy" value={this.props.model.strategy}
@@ -152,7 +151,7 @@ export class SelectionEditor
       </div>);
 
     const caption = this.props.model.source.contentType === 'Pool'
-      ? 'Embedded Pool' : 'External Pool';
+      ? 'Pool' : 'Shared Pool';
 
     let details = '';
     let titleEditor = null;

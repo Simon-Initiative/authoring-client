@@ -5,7 +5,7 @@ import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-
+import { Skill } from 'types/course';
 import { PageSelection } from './PageSelection';
 import { Toolbar } from './Toolbar';
 import { Select } from '../../content/common/Select';
@@ -23,11 +23,12 @@ import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { Outline, getChildren, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
+import { hasUnknownSkill } from 'utils/skills';
 
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
-
+  onFetchSkills: (courseId: string) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -42,7 +43,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   pendingCurrentNode: Maybe<contentTypes.Node>;
 
-  constructor(props) {
+  constructor(props : AssessmentEditorProps) {
     super(props, ({
       currentPage: props.model.pages.first().guid,
       currentNode: props.model.pages.first().nodes.first(),
@@ -61,40 +62,35 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEdit = this.onEdit.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
+
+    if (hasUnknownSkill(props.model, props.context.skills)) {
+      props.onFetchSkills(props.context.courseId);
+    }
   }
 
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState) : boolean {
 
-    if (this.props.model !== nextProps.model) {
-      return true;
-    }
-    if (this.props.expanded !== nextProps.expanded) {
-      return true;
-    }
-    if (this.props.editMode !== nextProps.editMode) {
-      return true;
-    }
-    if (this.state.currentPage !== nextState.currentPage) {
-      return true;
-    }
-    if (this.state.currentNode !== nextState.currentNode) {
-      return true;
-    }
-    if (this.state.undoStackSize !== nextState.undoStackSize) {
-      return true;
-    }
-    if (this.state.redoStackSize !== nextState.redoStackSize) {
-      return true;
-    }
+    const shouldUpdate = this.props.model !== nextProps.model
+        || this.props.expanded !== nextProps.expanded
+        || this.props.editMode !== nextProps.editMode
+        || this.state.currentPage !== nextState.currentPage
+        || this.state.currentNode !== nextState.currentNode
+        || this.state.undoStackSize !== nextState.undoStackSize
+        || this.state.redoStackSize !== nextState.redoStackSize;
 
-    return false;
+    return shouldUpdate;
   }
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
     const currentPage = nextProps.model.pages.get(this.state.currentPage);
+
+    // Handle the case that the current node has changed externally,
+    // for instance, from an undo/redo
+    findNodeByGuid(currentPage.nodes, this.state.currentNode.guid)
+      .lift(currentNode => this.setState({ currentNode }));
 
     this.pendingCurrentNode
       .bind(node => findNodeByGuid(currentPage.nodes, node.guid))
@@ -110,7 +106,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    this.handleEdit(this.props.model.with({ title: content }));
+    const resource = this.props.model.resource.with({ title: content.text });
+    this.handleEdit(this.props.model.with({ title: content, resource }));
   }
 
   detectPoolAdditions(
@@ -389,6 +386,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
+    const rendererProps = {
+      model: this.props.model,
+      skills: this.props.context.skills,
+      editMode: this.props.editMode,
+      context: this.props.context,
+      services: this.props.services,
+    };
+
     return (
       <div className="assessment-editor">
         <div className="docHead">
@@ -426,7 +431,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit, this.onNodeRemove)}
+                this.state.currentNode, rendererProps, this.onEdit, this.onNodeRemove)}
             </div>
           </div>
         </div>

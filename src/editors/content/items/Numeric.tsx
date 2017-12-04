@@ -1,29 +1,23 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { AppServices } from '../../common/AppServices';
 import {
   AbstractItemPartEditor,
   AbstractItemPartEditorProps,
+  AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Choice } from './Choice';
-import { CriteriaEditor } from '../question/CriteriaEditor';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
-import { Hints } from '../part/Hints';
 import { ItemLabel } from './ItemLabel';
-import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
+import { Select } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import ConceptsEditor from '../concepts/ConceptsEditor.controller';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
-  hideGradingCriteria: boolean;
-}
-
-export interface NumericState {
 
 }
 
+export interface NumericState extends AbstractItemPartEditorState {
+
+}
 
 /**
  * The content editor for HtmlContent.
@@ -37,64 +31,12 @@ export class Numeric
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
     this.onNotationChange = this.onNotationChange.bind(this);
-    this.onExplanation = this.onExplanation.bind(this);
-
-    this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
-    this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
-    this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
-
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
-  }
-
-  onExplanation(explanation) {
-    const part = this.props.partModel.with({ explanation });
-    this.props.onEdit(this.props.itemModel, part);
+    this.onEditMult = this.onEditMult.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
   }
-
-  renderCriteria() {
-    const expandedCriteria =
-      <form className="form-inline">
-        <Button editMode={this.props.editMode}
-          onClick={this.onCriteriaAdd}>Add Grading Criteria</Button>
-      </form>;
-
-    return <Collapse caption="Grading Criteria"
-        details=""
-        expanded={expandedCriteria}>
-
-          {this.props.partModel.criteria.toArray()
-            .map(c => <CriteriaEditor
-              onRemove={this.onCriteriaRemove}
-              model={c}
-              onEdit={this.onCriteriaEdit}
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
-              />)}
-
-      </Collapse>;
-
-  }
-
-
-  onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaRemove(guid) {
-    const criteria = this.props.partModel.criteria.delete(guid);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-  onCriteriaEdit(c) {
-    const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
-  }
-
 
   onSizeChange(inputSize) {
     this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
@@ -108,10 +50,6 @@ export class Numeric
     const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
     const partModel = this.props.partModel.with({ responseMult });
     this.props.onEdit(this.props.itemModel, partModel);
-  }
-
-  onConceptsEdit(concepts) {
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ concepts }));
   }
 
   render() : JSX.Element {
@@ -160,42 +98,17 @@ export class Numeric
       <div
         className="itemPart"
         onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}
-        >
+        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
 
         <ItemLabel label="Numeric" editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
 
         {controls}
 
-        <ConceptsEditor
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          courseId={this.props.context.courseId}
-          model={this.props.partModel.concepts}
-          onEdit={this.onConceptsEdit}
-          title="Skills"
-          conceptType="skill"
-          />
-
-        {!this.props.hideGradingCriteria && this.renderCriteria()}
-
-        <Hints
-            {...this.props}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />
-
         {feedback}
 
-        <ExplanationEditor
-            {...this.props}
-            model={this.props.partModel.explanation}
-            onEdit={this.onExplanation}
-          />
-
-      </div>);
+      </div>
+    );
   }
 
 }

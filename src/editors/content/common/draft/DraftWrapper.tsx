@@ -703,6 +703,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           onEdit: (data) => {
             this.processBlockEdit(block, data);
+
+            setTimeout(
+              () => {
+                this.setState(
+                  { lockedByBlockRenderer: true },
+                  () => this.setState({ lockedByBlockRenderer: false }));
+              },
+              100);
           },
           onInsertBlock: (key) => {
             this.insertEmptyBlockAfter(key);

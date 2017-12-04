@@ -1,5 +1,5 @@
 import * as types from 'data/types';
-
+import * as Immutable from 'immutable';
 import { modalActions } from 'actions/modal';
 import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
@@ -7,6 +7,9 @@ import * as view from 'actions/view';
 import * as courseActions from 'actions/course';
 import * as models from 'data/models';
 import guid from 'utils/guid';
+
+import { fetchSkills } from 'actions/skills';
+import { fetchObjectives } from 'actions//objectives';
 
 /**
  * An interface that defines the  'services' that are available to
@@ -44,6 +47,14 @@ export interface AppServices {
   // returns an object whose keys are the attributes requested
   fetchAttributesBy(
     attributesToFetch: string[], attributeToFindBy: string, findByValue: any) : Promise<any>;
+
+  updateCourseResource: (resource: contentTypes.Resource) => void;
+
+  refreshSkills: (courseId: string) => void;
+
+  refreshObjectives: (courseId: string) => void;
+
+  refreshCourse: (courseId: string) => void;
 }
 
 export interface DispatchBasedServices {
@@ -80,6 +91,23 @@ export class DispatchBasedServices implements AppServices {
 
   dismissModal() {
     this.dispatch(modalActions.dismiss());
+  }
+
+  updateCourseResource(resource: contentTypes.Resource) {
+    this.dispatch(courseActions.updateCourseResources(
+      Immutable.OrderedMap<string, contentTypes.Resource>([[resource.guid, resource]])));
+  }
+
+  refreshSkills(courseId: string) {
+    this.dispatch(fetchSkills(courseId));
+  }
+
+  refreshObjectives(courseId: string) {
+    this.dispatch(fetchObjectives(courseId));
+  }
+
+  refreshCourse(courseId: string) {
+    this.dispatch(courseActions.loadCourse(courseId));
   }
 
   fetchIdByGuid(guid: string) : Promise<string> {

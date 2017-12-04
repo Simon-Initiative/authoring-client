@@ -15,28 +15,51 @@ import { AuthoringActionsHandler, AuthoringActions } from 'actions/authoring';
 import { ObjectiveSelection } from 'utils/selection/ObjectiveSelection';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
+import { ContentState, ContentBlock } from 'draft-js';
 import { LegacyTypes } from 'data/types';
-import { Title } from 'types/course';
+import { getEntities } from 'data/content/html/changes';
+import { EntityTypes } from 'data/content/html/common';
+import { Objectives } from './Objectives';
 
 import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
-  onGetTitles: (courseId: string, ids: string[], type: string) => Promise<Title[]>;
-  onUpdateTitle: (titles: Title[]) => void;
-  objectiveTitles: any;
+  fetchObjectives: (courseId: string) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
 
+function hasMissingResource(
+  contentState: ContentState, course: models.CourseModel) : boolean {
+
+  const missingActivity = getEntities(EntityTypes.activity, contentState)
+    .some(e => !course.resourcesById.has(e.entity.data.activity.idRef));
+
+  getEntities(EntityTypes.wb_inline, contentState)
+    .forEach(e => console.log(e));
+
+  return missingActivity ||
+    getEntities(EntityTypes.wb_inline, contentState)
+      .some(e => !course.resourcesById.has(e.entity.data.wbinline.idRef));
+}
+
+
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
-  constructor(props) {
+  constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
-    this.fetchObjectiveTitles(this.props.model.head.objrefs);
+    if (this.hasMissingObjective(
+      props.model.head.objrefs, props.context.objectives)) {
+      props.services.refreshObjectives(props.context.courseId);
+    }
+    if (hasMissingResource(
+      props.model.body.contentState, props.context.courseModel)) {
+      props.services.refreshCourse(props.context.courseId);
+    }
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
@@ -46,22 +69,17 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     if (this.props.editMode !== nextProps.editMode) {
       return true;
     }
+    if (this.props.context !== nextProps.context) {
+      return true;
+    }
 
     return false;
   }
 
-  fetchObjectiveTitles(objrefs: Immutable.List<string>) {
-    const { context, onGetTitles } = this.props;
-    onGetTitles(context.courseId, objrefs.toArray(), LegacyTypes.learning_objectives);
-  }
-
   onTitleEdit(title) {
-    const { onUpdateTitle } = this.props;
-
+    const resource = this.props.model.resource.with({ title: title.text });
     const head = this.props.model.head.with({ title });
-    this.handleEdit(this.props.model.with({ head }));
-
-    onUpdateTitle([{ id: this.props.model.getIn(['resource', 'id']), title: title.get('text') }]);
+    this.handleEdit(this.props.model.with({ head, resource }));
   }
 
   onBodyEdit(content : any) {
@@ -69,67 +87,45 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onObjectivesEdit(objectives: Immutable.Set<contentTypes.LearningObjective>) {
-    this.props.services.dismissModal();
+  onObjectivesEdit(objrefs: Immutable.List<string>) {
 
-    const head = this.props.model.head.with(
-      { objrefs: objectives.map(o => o.id).toList() });
+    const head = this.props.model.head.with({ objrefs });
     this.handleEdit(this.props.model.with({ head }));
   }
 
+  hasMissingObjective(
+    objrefs: Immutable.List<string>,
+    objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>) {
+
+    return objrefs
+      .toArray()
+      .some(id => !objectives.has(id));
+  }
+
   renderObjectives() {
-    const objectives = this.props.objectiveTitles
-      .map((title) => {
-        return <li key={title}>{title}</li>;
-      });
-    return (
-      <ol>
-        {objectives}
-      </ol>
-    );
+    return <Objectives
+      {...this.props}
+      model={this.props.model.head.objrefs}
+      onEdit={this.onObjectivesEdit}
+      />;
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-    const updateObjectiveTitles = () => {
-      if (nextProps.model.head.objrefs.size > 0) {
-        this.fetchObjectiveTitles(nextProps.model.head.objrefs);
-      }
-    };
-
 
     if (nextProps.model !== this.props.model) {
+      if (this.hasMissingObjective(
+        nextProps.model.head.objrefs, nextProps.context.objectives)) {
 
-      if (nextProps.model.head.objrefs.size !== this.props.model.head.objrefs.size) {
-        updateObjectiveTitles();
-      } else {
-        for (let i = 0; i < nextProps.model.head.objrefs.size; i += 1) {
-          if (nextProps.model.head.objrefs.get(i) !== this.props.model.head.objrefs.get(i)) {
-            updateObjectiveTitles();
-            break;
-          }
-        }
+        nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
-
     }
   }
 
-  selectObjectives() {
-    const component = <ObjectiveSelection
-      onInsert={this.onObjectivesEdit}
-      onCancel={() => this.props.services.dismissModal()}
-      courseId={this.props.context.courseId} />;
-
-    this.props.services.displayModal(component);
-  }
 
   render() {
     const inlineToolbar = <InlineToolbar />;
     const blockToolbar = <BlockToolbar />;
     const insertionToolbar = <InlineInsertionToolbar />;
-
-    const addLearningObj = <button
-      className="btn btn-link"
-      onClick={() => this.selectObjectives()}>Edit Learning Objectives</button>;
 
     return (
       <div className="workbookpage-editor">
@@ -144,13 +140,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
             model={this.props.model.head.title}
             onEdit={this.onTitleEdit} />
 
-          <Collapse
-            caption="Learning Objectives"
-            expanded={addLearningObj}>
-
-            {this.renderObjectives()}
-
-          </Collapse>
+          {this.renderObjectives()}
 
           <HtmlContentEditor
               inlineToolbar={inlineToolbar}

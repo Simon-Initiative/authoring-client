@@ -1,5 +1,6 @@
 import { Map } from 'immutable';
 import * as models from 'data/models';
+import { LearningObjective, Skill } from 'data/contentTypes';
 
 export type AppContext = {
   userId: string;
@@ -9,5 +10,6 @@ export type AppContext = {
   resourcePath: string;
   courseModel: models.CourseModel;
   undoRedoGuid: string;
-  titles: Map<string, string>;
+  skills: Map<string, Skill>;
+  objectives: Map<string, LearningObjective>;
 };

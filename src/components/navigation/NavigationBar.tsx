@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import { Resource } from '../../data/content/resource';
-import { buildFeedbackFromCurrent } from '../../utils/feedback';
 import guid from '../../utils/guid';
 import * as view from '../../actions/view';
 import { Content } from './Content';
@@ -17,7 +16,7 @@ const Section = (props) => {
 };
 
 export interface NavigationBarProps {
-  course: any;
+  course: models.CourseModel;
   user: any;
   viewActions: any;
   onDispatch: (...args: any[]) => any;
@@ -48,14 +47,10 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
   render() {
     const { course, user } = this.props;
 
-    const courseId = course.model && course.model.guid;
+    const courseId = course && course.guid;
 
-    const formUrl = buildFeedbackFromCurrent(
-      user.profile.firstName + ' ' + user.profile.lastName,
-      user.profile.email,
-    );
 
-    const title = course.model && course.model.title || '';
+    const title = course && course.title || '';
 
     return (
       <nav className="navigation-bar col-sm-3 col-md-2 hidden-xs-down sidebar">
@@ -93,14 +88,6 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
             onClick={view.viewObjectives.bind(undefined, courseId)}/>
         </ul>
 
-        <br/>
-
-        <ul className="nav nav-pills flex-column feedback">
-          <li><a target="_blank"
-            ref={a => this.feedback = a}
-            data-toggle="tooltip" title="Report a problem or suggest improvements"
-            href={formUrl}>Feedback</a></li>
-        </ul>
       </nav>
     );
   }

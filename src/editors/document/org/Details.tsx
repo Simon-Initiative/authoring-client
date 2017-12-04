@@ -30,7 +30,8 @@ export class Details
   }
 
   onTitleEdit(title) {
-    this.props.onEdit(this.props.model.with({ title }));
+    const resource = this.props.model.resource.with({ title });
+    this.props.onEdit(this.props.model.with({ title, resource }));
   }
 
   onAudienceEdit(audience) {
