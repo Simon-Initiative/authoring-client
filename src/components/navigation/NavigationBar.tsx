@@ -88,33 +88,6 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
             onClick={view.viewObjectives.bind(undefined, courseId)}/>
         </ul>
 
-        <br/>
-
-
-
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-
-        <ul className="nav nav-pills flex-column copyright">
-          <li><img
-          className="ccLicense"
-          src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></li>
-
-          <li>
-          <small>
-          Unless otherwise noted this work is licensed under a <a className="ccLink"
-          href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">Creative
-          Commons Attribution-NonCommercial-ShareAlike 4.0 Unported License
-        </a></small>
-          </li>
-        </ul>
-
-
-
-
-
       </nav>
     );
   }

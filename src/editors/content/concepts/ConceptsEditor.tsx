@@ -66,10 +66,9 @@ export default class ConceptsEditor
 
     const skills = this.props.model.toArray();
 
-
-
     const options = this.props.context.skills
-      .toArray();
+      .toArray()
+      .map(s => ({ id: s.id, title: s.title }));
 
     return (
       <div className="concepts-editor">
