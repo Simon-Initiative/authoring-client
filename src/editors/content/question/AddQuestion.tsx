@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
-
 import { ContentState } from 'draft-js';
+const defaultInputBody = ContentState.createFromText('Add numeric, text, or dropdown components');
 
 export interface AddQuestion {
 
@@ -141,7 +141,11 @@ export class AddQuestion
   }
 
   onAddMultipart() {
-    this.props.onQuestionAdd(new contentTypes.Question());
+    const q = new contentTypes.Question()
+      .with({
+        body: new contentTypes.Html().with({ contentState:  defaultInputBody }),
+      });
+    this.props.onQuestionAdd(q);
   }
 
   render() {
@@ -153,7 +157,7 @@ export class AddQuestion
     return (
       <div className="dropdown" style={ { display: 'inline' } }>
         <button disabled={!this.props.editMode}
-          className="btn btn-secondary btn-link dropdown-toggle"
+          className="btn btn-link dropdown-toggle"
           type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <b>Question</b>
         </button>

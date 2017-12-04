@@ -1,0 +1,13 @@
+.undo-redo-toolbar {
+  display: flex;
+  flex-direction: row;
+
+  button {
+    background-color: black;
+    width: 50px;
+
+    i {
+      color: white;
+    }
+  }
+}

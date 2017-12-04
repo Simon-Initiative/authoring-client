@@ -6,7 +6,6 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
-
 import { LockDetails, renderLocked } from '../../utils/lock';
 import NavigationBar from '../navigation/NavigationBar.controller';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
@@ -15,24 +14,27 @@ import { DuplicateListingInput } from './DuplicateListingInput';
 import guid from '../../utils/guid';
 import { RowType } from './types';
 import { ExistingSkillSelection } from './ExistingSkillSelection';
-
+import { CourseModel } from 'data/models';
 import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
-
 import { Row } from './Row';
 
-export interface ObjectiveSkillView {
-  viewActions: Object;
-  services: AppServices;
-  unmounted: boolean;
-}
+import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
-  course: any;
+  course: models.CourseModel;
   dispatch: any;
   expanded: any;
+  skills: Immutable.OrderedMap<string, contentTypes.Skill>;
+  onSetSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
+  onUpdateSkills: (skills: Immutable.OrderedMap<string, contentTypes.Skill>) => void;
+  onSetObjectives: (objectives: Immutable.OrderedMap<string,
+    contentTypes.LearningObjective>) => void;
+  onUpdateObjectives: (objectives: Immutable.OrderedMap<string,
+    contentTypes.LearningObjective>) => void;
+
 }
 
 interface ObjectiveSkillViewState {
@@ -52,6 +54,9 @@ interface ObjectiveSkillViewState {
 
 export class ObjectiveSkillView
   extends React.Component<ObjectiveSkillViewProps, ObjectiveSkillViewState> {
+  viewActions: Object;
+  services: AppServices;
+  unmounted: boolean;
 
   constructor(props) {
     super(props);
@@ -73,11 +78,13 @@ export class ObjectiveSkillView
 
     this.services = new DispatchBasedServices(
       this.props.dispatch,
-      this.props.course.model,
+      this.props.course,
     );
   }
 
   componentDidMount() {
+    const { course } = this.props;
+
     this.buildModels();
   }
 
@@ -96,12 +103,12 @@ export class ObjectiveSkillView
 
   releaseAllLocks(documents) {
     documents.forEach(
-      d => persistence.releaseLock(this.props.course.model.guid, d._id));
+      d => persistence.releaseLock(this.props.course.guid, d._id));
   }
 
   buildModels() {
 
-    const courseId = this.props.course.model.guid;
+    const courseId = this.props.course.guid;
     const userName = this.props.userName;
 
     buildAggregateModel(courseId, userName)
@@ -116,10 +123,19 @@ export class ObjectiveSkillView
           this.releaseAllLocks([...aggregateModel.objectives, ...aggregateModel.skills]);
 
         } else {
+
+          const skills = unifySkills(aggregateModel);
+          const objectives = unifyObjectives(aggregateModel);
+
+          // We got a fresh look at the skills and objectives, let the application know
+          // about it so that others can take advantage
+          this.props.onSetSkills(skills.skills);
+          this.props.onSetObjectives(objectives.objectives);
+
           this.setState({
             aggregateModel,
-            objectives: unifyObjectives(aggregateModel),
-            skills: unifySkills(aggregateModel),
+            objectives,
+            skills,
           });
         }
 
@@ -152,9 +168,13 @@ export class ObjectiveSkillView
     this.setState({ objectives: unified });
 
     persistence.persistDocument(updatedDocument);
+
+    this.props.onUpdateObjectives(Immutable.OrderedMap(
+      [[obj.get('id'), obj]]));
   }
 
   onSkillEdit(model: contentTypes.Skill) {
+    const { onUpdateSkills } = this.props;
 
     const originalDocument = this.state.skills.mapping.get(model.id);
 
@@ -180,9 +200,13 @@ export class ObjectiveSkillView
     this.setState({ skills: unified });
 
     persistence.persistDocument(updatedDocument);
+
+    onUpdateSkills(Immutable.OrderedMap(
+      [[model.id, { id: model.id, title: model.title }]]));
   }
 
   createNewSkill() : string {
+    const { onUpdateSkills } = this.props;
 
     // Create the new skill and persist it
     const id = guid();
@@ -209,6 +233,9 @@ export class ObjectiveSkillView
 
     persistence.persistDocument(updatedDocument);
 
+    onUpdateSkills(Immutable.OrderedMap(
+      [[skill.get('id'), { id: skill.get('id'), title: skill.get('title') }]]));
+
     return skill.id;
   }
 
@@ -221,6 +248,7 @@ export class ObjectiveSkillView
   onAddNewSkill(model: contentTypes.LearningObjective) {
 
     const id = this.createNewSkill();
+
 
 
     // Attach the skill id to the objective and then persist that
@@ -276,54 +304,18 @@ export class ObjectiveSkillView
   onRemove(model: RowType) {
     if (model.contentType === 'LearningObjective') {
       this.removeObjective(model);
-    } else {
-      this.removeSkill(model);
     }
   }
 
-  removeSkill(model: contentTypes.Skill) {
+  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
 
-    // Update the parent objectives
-    const parentObjectives = [];
-    this.state.objectives.objectives.toArray().forEach((obj) => {
-      if (obj.skills.contains(model.id)) {
+    // Update the parent objective
+    const index = objective.skills.indexOf(model.id);
+    const skills = objective.skills.remove(index);
+    const updated = objective.with({ skills });
 
-        const index = obj.skills.indexOf(model.id);
-        const skills = obj.skills.remove(index);
-        const updated = obj.with({ skills });
-        parentObjectives.push(updated);
-      }
-    });
+    this.onObjectiveEdit(updated);
 
-    if (parentObjectives.length > 0) {
-      parentObjectives.forEach(o => this.onObjectiveEdit(o));
-    }
-
-    // Update the skills
-    const originalDocument = this.state.skills.mapping.get(model.id);
-
-    const skills = (originalDocument.model as models.SkillsModel)
-      .skills.delete(model.guid);
-    const updatedModel =
-      (originalDocument.model as models.SkillsModel)
-      .with({ skills });
-
-    const updatedDocument = originalDocument.with({ model: updatedModel });
-
-    const unified = Object.assign({}, this.state.skills);
-
-    const index = unified.documents.indexOf(originalDocument);
-
-    unified.documents[index] = updatedDocument;
-    unified.skills = unified.skills.delete(model.id);
-
-    if (originalDocument === unified.newBucket) {
-      unified.newBucket = updatedDocument;
-    }
-
-    this.setState({ skills: unified });
-
-    persistence.persistDocument(updatedDocument);
   }
 
   removeObjective(obj: contentTypes.LearningObjective) {
@@ -368,6 +360,7 @@ export class ObjectiveSkillView
   }
 
   renderObjectives() {
+
     const rows = [];
 
     const skillsById = this.state.skills.skills
@@ -399,6 +392,7 @@ export class ObjectiveSkillView
           onAddNewSkill={this.onAddNewSkill}
           highlighted={false}
           model={objective}
+          title={objective.title}
           isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
           editMode={this.state.aggregateModel.isLocked}
@@ -411,13 +405,18 @@ export class ObjectiveSkillView
             const skill = skillsById[skillId];
             if (skill !== undefined) {
 
+              const title = this.props.skills.has(skill.id)
+                ? this.props.skills.get(skill.id).title
+                : 'Loading...';
+
               rows.push(<Row
                 key={objective.id + '-' + skill.id}
                 onAddExistingSkill={this.onAddExistingSkill}
                 onAddNewSkill={this.onAddNewSkill}
-                onRemove={this.onRemove}
+                onRemove={this.removeSkill.bind(this, objective)}
                 highlighted={false}
                 model={skill}
+                title={title}
                 isExpanded={false}
                 toggleExpanded={this.onToggleExpanded}
                 editMode={this.state.aggregateModel.isLocked}
@@ -461,6 +460,9 @@ export class ObjectiveSkillView
 
     this.setState({ objectives: unified });
 
+    this.props.onUpdateObjectives(Immutable.OrderedMap(
+      [[obj.get('id'), obj]]));
+
     persistence.persistDocument(document);
   }
 
@@ -479,16 +481,18 @@ export class ObjectiveSkillView
 
   renderCreation() {
     return (
-      <DuplicateListingInput
-        editMode={this.state.aggregateModel === null ? false : this.state.aggregateModel.isLocked}
-        buttonLabel="Create new"
-        width={600}
-        value=""
-        placeholder="Enter title for new objective"
-        existing={this.state.objectives === null ? Immutable.List<string>()
-          : this.state.objectives.objectives.toList().map(o => o.title).toList()}
-        onClick={this.createNew}
-      />
+      <div className="table-toolbar input-group">
+        <div className="flex-spacer"/>
+        <DuplicateListingInput
+          editMode={this.state.aggregateModel === null ? false : this.state.aggregateModel.isLocked}
+          buttonLabel="Create"
+          width={600}
+          value=""
+          placeholder="New Objective Title"
+          existing={this.state.objectives === null ? Immutable.List<string>()
+            : this.state.objectives.objectives.toList().map(o => o.title).toList()}
+          onClick={this.createNew} />
+      </div>
     );
   }
 
@@ -515,7 +519,7 @@ export class ObjectiveSkillView
     const lockDisplay = this.renderLockDisplay();
 
     return (
-      <div className="container-fluid new">
+      <div className="objective-skill-view container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 col-md-10 document">

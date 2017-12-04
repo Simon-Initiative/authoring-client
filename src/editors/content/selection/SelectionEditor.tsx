@@ -1,7 +1,8 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { PoolTitleEditor } from './PoolTitleEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
@@ -11,18 +12,12 @@ import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
 import { DragHandle } from '../../document/assessment/DragHandle';
-
-import '../common/editor.scss';
-
-
-export interface SelectionEditor {
-  
-}
+import { Skill } from 'types/course';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
-  connectDragSource?: any;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface SelectionState {
@@ -33,12 +28,12 @@ export interface SelectionState {
 /**
  * The content editor for HtmlContent.
  */
-export class SelectionEditor 
+export class SelectionEditor
   extends AbstractContentEditor<contentTypes.Selection, SelectionProps, SelectionState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onStrategyChange = this.onStrategyChange.bind(this);
     this.onExhaustionChange = this.onExhaustionChange.bind(this);
     this.onScopeChange = this.onScopeChange.bind(this);
@@ -73,14 +68,7 @@ export class SelectionEditor
   }
 
   renderSource() {
-    if (this.props.model.source.contentType === 'Pool') {
-      return <PoolEditor
-               {...this.props}
-               model={this.props.model.source}
-               onEdit={this.onSourceEdit}
-               onRemove={() => this.props.onRemove(this.props.model.guid)}
-             />;
-    } else {
+    if (this.props.model.source.contentType === 'PoolRef') {
       return <PoolRefEditor
                {...this.props}
                model={this.props.model.source}
@@ -92,7 +80,7 @@ export class SelectionEditor
 
   onAddQuestion(question: contentTypes.Question) {
     if (this.props.model.source.contentType === 'Pool') {
-      const source = this.props.model.source.with( 
+      const source = this.props.model.source.with(
         { questions: this.props.model.source.questions
           .set(question.guid, question) });
       const updated = this.props.model.with({ source });
@@ -118,34 +106,33 @@ export class SelectionEditor
       color: '#606060',
     };
 
-   
-
-      
-    
     const controls = (
       <div>
-        <span style={label}>Insert new: </span> 
-        <AddQuestion 
-          editMode={this.props.editMode}
-          onQuestionAdd={this.onAddQuestion.bind(this)}
-          isSummative={true}/>
-        <form className="form-inline">  
-          <Select editMode={this.props.editMode} 
-            label="Strategy" value={this.props.model.strategy} 
+        <span style={label}>Insert new: </span>
+        {
+          this.props.model.source.contentType === 'Pool' &&
+          <AddQuestion
+            editMode={this.props.editMode}
+            onQuestionAdd={this.onAddQuestion.bind(this)}
+            isSummative={true}/>
+        }
+        <form className="form-inline">
+          <Select editMode={this.props.editMode}
+            label="Strategy" value={this.props.model.strategy}
             onChange={this.onStrategyChange}>
             <option value="random">Random</option>
             <option value="random_with_replace">Random with replace</option>
             <option value="ordered">Ordered</option>
           </Select>
-          <Select editMode={this.props.editMode} 
-            label="Exhaustion" value={this.props.model.exhaustion} 
+          <Select editMode={this.props.editMode}
+            label="Exhaustion" value={this.props.model.exhaustion}
             onChange={this.onExhaustionChange}>
             <option value="reuse">Reuse</option>
             <option value="skip">Skip</option>
             <option value="fail">Fail</option>
           </Select>
-          <Select editMode={this.props.editMode} 
-            label="Scope" value={this.props.model.scope} 
+          <Select editMode={this.props.editMode}
+            label="Scope" value={this.props.model.scope}
             onChange={this.onScopeChange}>
             <option value="section">Section</option>
             <option value="resource">Resource</option>
@@ -153,7 +140,7 @@ export class SelectionEditor
 
           Count:&nbsp;&nbsp;&nbsp;
           <TextInput
-            editMode={this.props.editMode} 
+            editMode={this.props.editMode}
             width="75px"
             label="Count"
             value={this.props.model.selectionCount}
@@ -163,7 +150,8 @@ export class SelectionEditor
         </form>
       </div>);
 
-    const caption = this.props.model.source.contentType === 'Pool' ? 'Pool' : 'Pool Reference';
+    const caption = this.props.model.source.contentType === 'Pool'
+      ? 'Pool' : 'Shared Pool';
 
     let details = '';
     let titleEditor = null;
@@ -171,41 +159,30 @@ export class SelectionEditor
       const count = this.props.model.source.questions.size;
       details = count + ' question' + (count !== 1 ? 's' : '');
 
-      titleEditor = 
+      titleEditor =
         <Collapse caption="Title" details={this.props.model.source.title.text}>
-            <PoolTitleEditor 
+            <PoolTitleEditor
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
               model={this.props.model.source.title}
-              onEdit={this.onTitleEdit} 
+              onEdit={this.onTitleEdit}
             />
         </Collapse>;
-    } 
+    }
 
     return (
-      <RemovableContent editMode={this.props.editMode} 
-        onRemove={this.props.onRemove.bind(this, this.props.model.guid)} 
-        associatedClasses="selection">
+      <RemovableContent
+        editMode={this.props.editMode}
+        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
+        title={caption}
+        associatedClasses="">
 
-        <div style={ { position: 'relative' } }>
+          {controls}
 
-          <Collapse caption={caption}
-            details={details}>
+          {titleEditor}
 
-            {controls}
-
-            {titleEditor}
-
-            {this.renderSource()}
-
-          </Collapse>
-
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-          </div>
-
-        </div>
+          {this.renderSource()}
 
       </RemovableContent>
     );

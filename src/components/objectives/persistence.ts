@@ -29,7 +29,7 @@ function createObjectivesModel() : models.LearningObjectivesModel {
     id,
     guid: id,
     title: NEW_BUCKET_TITLE,
-    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }), 
+    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }),
   });
 }
 
@@ -39,7 +39,7 @@ function createSkillsModel() : models.SkillsModel {
     id,
     guid: id,
     title: NEW_BUCKET_TITLE,
-    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }), 
+    resource: new Resource().with({ title: NEW_BUCKET_TITLE, id }),
   });
 }
 
@@ -49,7 +49,7 @@ type BucketCreationResult = {
 };
 
 function createNewBucket(
-  courseId: string, docs: persistence.Document[], createFn, userName: string) 
+  courseId: string, docs: persistence.Document[], createFn, userName: string)
   : Promise<BucketCreationResult> {
 
   return new Promise((resolve, reject) => {
@@ -68,10 +68,10 @@ function createNewBucket(
     } else {
       resolve({ doc, wasCreated: false });
     }
-  });  
+  });
 }
 
-export function retrieveAllObjectives(courseId: string) 
+export function retrieveAllObjectives(courseId: string)
   : Promise<Immutable.List<contentTypes.LearningObjective>> {
 
   return retrieveObjectives(courseId)
@@ -93,7 +93,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
     let skills : persistence.Document[] = null;
     let skillBucket : persistence.Document = null;
     let objectiveBucket : persistence.Document = null;
-    
+
 
     // First fetch all the learning objectives and skills documents
 
@@ -111,7 +111,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
         Promise.all([
           createNewBucket(courseId, objectives, createObjectivesModel, userName),
           createNewBucket(courseId, skills, createSkillsModel, userName)])
-          
+
           .then((results: BucketCreationResult[]) => {
 
             // See if we had to create the bucket documents, if we did, then push those
@@ -126,7 +126,7 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
             objectiveBucket = results[0].doc;
             skillBucket = results[1].doc;
 
-            // Lock just the new bucket objective document first.  If that succeeds, we 
+            // Lock just the new bucket objective document first.  If that succeeds, we
             // can assume that we can safely lock all others.
             return persistence.acquireLock(courseId, results[0].doc._id);
           })
@@ -136,31 +136,31 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
               return Promise.all([...objectives, ...skills]
                 .map(d => persistence.acquireLock(courseId, d._id)));
             } else {
-              resolve({ 
-                objectives, 
-                skills, 
+              resolve({
+                objectives,
+                skills,
                 lockDetails: lockResult,
-                isLocked: false, 
-                objectiveBucket, 
+                isLocked: false,
+                objectiveBucket,
                 skillBucket,
               });
             }
-            
+
           })
           .then((lockResults: LockDetails[]) => {
-            resolve({ 
-              objectives, 
+            resolve({
+              objectives,
               skills,
               lockDetails: lockResults[0],
-              isLocked: true, 
-              objectiveBucket, 
+              isLocked: true,
+              objectiveBucket,
               skillBucket,
             });
           })
           .catch(err => reject(err));
       })
       .catch(err => reject(err));
-        
+
   });
 }
 
@@ -171,8 +171,8 @@ function objectivesToKV(doc: persistence.Document, itemFn) : any {
       (o, obj) => {
         o[obj.id] = itemFn(doc, obj);
         return o;
-      }, 
-      {}); 
+      },
+      {});
 }
 
 
@@ -183,21 +183,21 @@ function skillsToKV(doc: persistence.Document, itemFn) : any {
       (o, obj) => {
         o[obj.id] = itemFn(doc, obj);
         return o;
-      }, 
-      {}); 
+      },
+      {});
 }
 
 export function unifyObjectives(aggregate: AggregateModel) : UnifiedObjectivesModel {
 
   const mapping = aggregate.objectives
     .reduce(
-      (map, doc) => map.merge(objectivesToKV(doc, (doc, obj) => doc)), 
+      (map, doc) => map.merge(objectivesToKV(doc, (doc, obj) => doc)),
       Immutable.Map<string, persistence.Document>());
 
-  
+
   const objectives = aggregate.objectives
     .reduce(
-      (map, doc) => map.merge(objectivesToKV(doc, (doc, obj) => obj)), 
+      (map, doc) => map.merge(objectivesToKV(doc, (doc, obj) => obj)),
       Immutable.Map<string, contentTypes.LearningObjective>());
 
   return {
@@ -212,13 +212,13 @@ export function unifySkills(aggregate: AggregateModel) : UnifiedSkillsModel {
 
   const mapping = aggregate.skills
     .reduce(
-      (map, doc) => map.merge(skillsToKV(doc, (doc, obj) => doc)), 
+      (map, doc) => map.merge(skillsToKV(doc, (doc, obj) => doc)),
       Immutable.Map<string, persistence.Document>());
 
-  
+
   const skills = aggregate.skills
     .reduce(
-      (map, doc) => map.merge(skillsToKV(doc, (doc, obj) => obj)), 
+      (map, doc) => map.merge(skillsToKV(doc, (doc, obj) => obj)),
       Immutable.Map<string, contentTypes.Skill>());
 
   return {
@@ -242,12 +242,12 @@ export type AggregateModel = {
 export type UnifiedObjectivesModel = {
 
   // All the docs that contain the objective models
-  documents: persistence.Document[];  
+  documents: persistence.Document[];
 
   newBucket: persistence.Document;
 
   // Mapping from LearningObjective id to the source document that contains it
-  mapping: Immutable.Map<string, persistence.Document>;           
+  mapping: Immutable.Map<string, persistence.Document>;
 
   // Unified view of all learning objectives
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>;
@@ -257,12 +257,12 @@ export type UnifiedObjectivesModel = {
 export type UnifiedSkillsModel = {
 
   // All the docs that contain the objective models
-  documents: persistence.Document[];  
+  documents: persistence.Document[];
 
   newBucket: persistence.Document;
 
   // Mapping from LearningObjective id to the source document that contains it
-  mapping: Immutable.Map<string, persistence.Document>;           
+  mapping: Immutable.Map<string, persistence.Document>;
 
   // Unified view of all learning objectives
   skills: Immutable.OrderedMap<string, contentTypes.Skill>;

@@ -72,8 +72,6 @@ export function createModel(object: any): ContentModel {
       return MediaModel.fromPersistence(object);
     case types.LegacyTypes.assessment2_pool:
       return PoolModel.fromPersistence(object);
-    default:
-      return DefaultModel.fromPersistence(object);
   }
 }
 
@@ -93,8 +91,7 @@ export type ContentModel =
   OrganizationModel |
   LearningObjectivesModel |
   SkillsModel |
-  PoolModel |
-  DefaultModel;
+  PoolModel;
 
 // A pure function that takes a content model as
 // input and returns a changed content model

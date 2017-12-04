@@ -18,30 +18,23 @@ import { Button } from '../common/Button';
 
 import { TabContainer } from '../common/TabContainer';
 
-import '../common/editor.scss';
-
-
-export interface AudioEditor {
-  
-}
-
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
-  
+
 }
 
 export interface AudioEditorState {
-  
+
 }
 
 /**
  * The content editor for Table.
  */
-export class AudioEditor 
+export class AudioEditor
   extends AbstractContentEditor<Audio, AudioEditorProps, AudioEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
@@ -93,17 +86,17 @@ export class AudioEditor
   }
 
   onSetClick() {
-    // TODO 
+    // TODO
   }
 
 
   renderTracks() {
 
     const { tracks } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '5px' } }>
-        
+
         <Tracks
           {...this.props}
           mediaType="audio"
@@ -111,20 +104,20 @@ export class AudioEditor
           model={tracks}
           onEdit={this.onTracksEdit}
         />
-        
+
       </div>
     );
   }
 
   renderOther() {
     const { titleContent, caption, cite, popout, alternate } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '30px' } }>
 
           {this.row('', '8', <label className="form-check-label">
             &nbsp;&nbsp;&nbsp;
-            <input type="checkbox" 
+            <input type="checkbox"
               onClick={this.onControlEdit}
               className="form-check-input"
               checked={this.props.model.controls}
@@ -134,7 +127,7 @@ export class AudioEditor
 
           <br/>
 
-        
+
           {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
           model={titleContent.content}
@@ -153,13 +146,13 @@ export class AudioEditor
 
           <br/>
 
-          {this.row('Popout', '8', <TextInput width="100%" label="" 
+          {this.row('Popout', '8', <TextInput width="100%" label=""
               editMode={this.props.editMode}
-              value={popout.content} 
+              value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}
-        
+
       </div>
     );
   }
@@ -178,12 +171,12 @@ export class AudioEditor
   }
 
   renderSources() {
-    
+
     const { sources } = this.props.model;
-    
+
     return (
       <div style={ { marginTop: '5px' } }>
-        
+
         <Sources
           {...this.props}
           mediaType="audio"
@@ -191,7 +184,7 @@ export class AudioEditor
           model={sources}
           onEdit={this.onSourcesEdit}
         />
-        
+
       </div>
     );
   }
@@ -201,15 +194,15 @@ export class AudioEditor
 
     return (
       <div className="itemWrapper">
-    
+
         <br/>
-    
+
         <TabContainer labels={['Sources', 'Tracks', 'Other']}>
           {this.renderSources()}
           {this.renderTracks()}
-          {this.renderOther()}          
+          {this.renderOther()}
         </TabContainer>
-    
+
       </div>
     );
 

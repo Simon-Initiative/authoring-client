@@ -1,0 +1,11 @@
+@import 'oli/typography';
+
+.main {
+  .editor {
+
+    h2 {
+      font-family: $serif-font;
+      display: inline-block;
+    }
+  }
+}

@@ -1,9 +1,9 @@
 
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor.controller';
-import AssessmentEditor from '../document/assessment/AssessmentEditor';
+import AssessmentEditor from '../document/assessment/AssessmentEditor.controller';
 import CourseEditor from '../document/course/CourseEditor';
-import OrgEditor from '../document/org/OrgEditor';
-import PoolEditor from '../document/pool/PoolEditor';
+import OrgEditor from '../document/org/OrgEditor.controller';
+import PoolEditor from '../document/pool/PoolEditor.controller';
 
 import { DeferredPersistenceStrategy } from './persistence/DeferredPersistenceStrategy';
 import { ImmediatePersistenceStrategy } from './persistence/ImmediatePersistenceStrategy';

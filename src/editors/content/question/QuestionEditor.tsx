@@ -1,109 +1,43 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
+import { ContentState, EditorState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions,
-  insertInlineEntity } from '../../../actions/authoring';
-import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import '../common/editor.scss';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import { UnsupportedEditor } from '../unsupported/UnsupportedEditor';
-import { MultipleChoice } from '../items/MultipleChoice';
-import { Essay } from '../items/Essay';
-import { CheckAllThatApply } from '../items/CheckAllThatApply';
-import { ShortAnswer } from '../items/ShortAnswer';
-import { Numeric } from '../items/Numeric';
-import { Ordering } from '../items/Ordering';
-
-import { Text } from '../items/Text';
-import { FillInTheBlank } from '../items/FillInTheBlank';
-import { CommandProcessor, Command } from '../common/command';
-import { Collapse } from '../common/Collapse';
-import { getHtmlDetails } from '../common/details';
+import { MultipleChoice } from './MultipleChoice';
+import { Essay } from './Essay';
+import { CheckAllThatApply } from './CheckAllThatApply';
+import { ShortAnswer } from './ShortAnswer';
+import { Ordering } from './Ordering';
+import { MultipartInput } from './MultipartInput';
+import { Command } from '../common/command';
 import { EntityTypes } from '../../../data/content/html/common';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-
-import { HtmlToolbarButton } from '../html/TypedToolbar';
-import { Toolbar } from '../common/toolbar/Toolbar';
-import { ToolbarButton } from '../common/toolbar/ToolbarButton';
-import * as toolbarConfigs from '../common/toolbar/Configs';
-import ConceptsEditor from '../concepts/ConceptsEditor';
-import { TextInput, InlineForm, Select, Button, Checkbox } from '../common/controls';
+import { Skill } from 'types/course';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
-import { RemovableContent } from '../common/RemovableContent';
-import { DragHandle } from '../../document/assessment/DragHandle';
 
-
-type Ids = {
-  id: string,
-};
-
-export interface QuestionEditor {
-  ids: Ids;
-  lastBody: contentTypes.Html;
-  itemToAdd: any;
-  fillInTheBlankCommand: InsertInputRefCommand;
-  numericCommand: InsertInputRefCommand;
-  textCommand: InsertInputRefCommand;
-  htmlEditor: CommandProcessor<EditorState>;
-}
+import './QuestionEditor.scss';
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
-  connectDragSource?: any;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface QuestionEditorState {
-
   activeItemId: string;
-}
-
-function getLabelForQuestion(question: contentTypes.Question) : string {
-
-  if (question.items.size === 0) {
-    return 'Input Question';
-  } else {
-
-    // Look at first item and base label off of that
-    const item = question.items.first();
-
-    switch (item.contentType) {
-
-      case 'MultipleChoice':
-        if (item.select === 'single') {
-          return 'Multiple Choice Question';
-        } else {
-          return 'Check All That Apply Question';
-        }
-      case 'Ordering':
-        return 'Ordering Question';
-      case 'Essay':
-        return 'Essay Question';
-      case 'ShortAnswer':
-        return 'Short Answer Question';
-      case 'Text':
-      case 'Numeric':
-      case 'FillInTheBlank':
-        return 'Input Question';
-      default:
-        return 'Question';
-    }
-  }
-
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export abstract class QuestionEditor
+export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
+  lastBody: contentTypes.Html;
+  itemToAdd: any;
+  fillInTheBlankCommand: InsertInputRefCommand;
+  numericCommand: InsertInputRefCommand;
+  textCommand: InsertInputRefCommand;
 
   constructor(props) {
     super(props);
@@ -112,42 +46,42 @@ export abstract class QuestionEditor
       activeItemId: null,
     };
 
-    this.ids = {
-      id: guid(),
-    };
-
     const createFillInTheBlank = () => {
       const value = guid().replace('-', '');
-      const choice = new contentTypes.Choice({ value, guid: guid() });
+      const choice = new contentTypes.Choice().with({ value, guid: guid() });
 
       const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
 
       return new contentTypes.FillInTheBlank().with({ choices });
     };
 
+    this.onBlur = this.onBlur.bind(this);
+    this.onFocusChange = this.onFocusChange.bind(this);
+    this.canInsertAnotherPart = this.canInsertAnotherPart.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
-    this.onAddOrdering = this.onAddOrdering.bind(this);
+    this.onRemove = this.onRemove.bind(this);
+    this.onGradingChange = this.onGradingChange.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
+    this.onAddOrdering = this.onAddOrdering.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
     this.numericCommand
       = new InsertInputRefCommand(this, () => new contentTypes.Numeric(), 'Numeric');
-    this.textCommand = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
+    this.textCommand
+      = new InsertInputRefCommand(this, () => new contentTypes.Text(), 'Text');
 
-    this.onRemove = this.onRemove.bind(this);
-    this.onInsertFillInTheBlank = this.onInsertFillInTheBlank.bind(this);
-    this.onInsertNumeric = this.onInsertNumeric.bind(this);
-    this.onInsertText = this.onInsertText.bind(this);
-
-    this.onFocusChange = this.onFocusChange.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-
-
-    this.onGradingChange = this.onGradingChange.bind(this);
     this.lastBody = this.props.model.body;
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const should = this.props.model !== nextProps.model
+      || this.props.allSkills !== nextProps.allSkills
+      || this.state.activeItemId !== nextState.activeItemId;
+
+    return should;
   }
 
   onBlur(activeItemId: string) {
@@ -156,38 +90,16 @@ export abstract class QuestionEditor
     }
   }
 
-  canInsertAnotherPart() : boolean {
+  onFocusChange(activeItemId: string) {
+    this.setState({ activeItemId });
+  }
+
+  canInsertAnotherPart(): boolean {
     const restricted = this.props.isParentAssessmentGraded
       === undefined || this.props.isParentAssessmentGraded;
 
     return !restricted || this.props.model.items.size === 0;
   }
-
-  onInsertNumeric(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.numericCommand);
-    }
-
-  }
-  onInsertText(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.textCommand);
-    }
-  }
-  onInsertFillInTheBlank(e) {
-    e.preventDefault();
-    if (this.canInsertAnotherPart()) {
-      this.htmlEditor.process(this.fillInTheBlankCommand);
-    }
-  }
-
-
-  onFocusChange(activeItemId: string) {
-    this.setState({ activeItemId });
-  }
-
 
   onBodyEdit(body) {
 
@@ -250,6 +162,8 @@ export abstract class QuestionEditor
     }
 
     this.lastBody = body;
+
+
 
     this.props.onEdit(question);
   }
@@ -348,246 +262,161 @@ export abstract class QuestionEditor
     this.props.onEdit(model);
   }
 
-  renderItemPartEditor(item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
-      return <MultipleChoice
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        onRemove={this.onRemove}
-        onFocus={this.onFocusChange}
-        onBlur={this.onBlur}
-        key={item.guid}
-        itemModel={item}
-        partModel={part}
-        onEdit={(c, p) => this.onItemPartEdit(c, p)}
-        />;
+  renderQuestionBody(): JSX.Element {
+    const item = this.props.model.items.first();
+    const part = this.props.model.parts.first();
+
+    const isMultipart = (this.props.model.items.size === 0)
+      || item.contentType === 'Text'
+      || item.contentType === 'Numeric'
+      || item.contentType === 'FillInTheBlank';
+
+    if (isMultipart) {
+      const key = item ? item.guid : Math.random() + '';
+      return (
+        <MultipartInput
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={key}
+          itemModel={item}
+          partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          fillInTheBlankCommand={this.fillInTheBlankCommand}
+          numericCommand={this.numericCommand}
+          textCommand={this.textCommand}
+          canInsertAnotherPart={() => this.canInsertAnotherPart()}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
+    } else if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+      return (
+        <MultipleChoice
+          context={this.props.context}
+          services={this.props.services}
+          editMode={this.props.editMode}
+          onRemove={this.onRemove}
+          onFocus={this.onFocusChange}
+          onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
+          key={item.guid}
+          itemModel={item}
+          partModel={part}
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
     } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
-      return <CheckAllThatApply
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        onRemove={this.onRemove}
-        onFocus={this.onFocusChange}
-        onBlur={this.onBlur}
-        key={item.guid}
-        itemModel={item}
-        partModel={part}
-        onEdit={(c, p) => this.onItemPartEdit(c, p)}
-        />;
-    } else if (item.contentType === 'FillInTheBlank') {
-      return <FillInTheBlank
+      return (
+        <CheckAllThatApply
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
-    } else if (item.contentType === 'Numeric') {
-      return <Numeric
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
-          onBlur={this.onBlur}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
-
-    } else if (item.contentType === 'Text') {
-      return <Text
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
-          onBlur={this.onBlur}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
-
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
     } else if (item.contentType === 'ShortAnswer') {
-      return <ShortAnswer
+      return (
+        <ShortAnswer
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
     } else if (item.contentType === 'Ordering') {
-      return <Ordering
+      return (
+        <Ordering
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
     } else if (item.contentType === 'Essay') {
-      return <Essay
+      return (
+        <Essay
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
           onFocus={this.onFocusChange}
           onBlur={this.onBlur}
+          allSkills={this.props.allSkills}
           key={item.guid}
           itemModel={item}
           partModel={part}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)}
-          />;
+          body={this.props.model.body}
+          grading={this.props.model.grading}
+          onGradingChange={this.onGradingChange}
+          onBodyEdit={this.onBodyEdit}
+          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          model={this.props.model}
+          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
+          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+      );
     }
   }
 
-
-  renderItemsAndParts() {
-
-    const items = this.props.model.items.toArray();
-    const parts = this.props.model.parts.toArray();
-    const toRender = [];
-    for (let i = 0; i < items.length; i += 1) {
-      toRender.push(<div key={items[i].guid}>
-        {this.renderItemPartEditor(items[i], parts[i])}</div>);
-    }
-
-    return toRender;
-  }
-
-
-
-  render() : JSX.Element {
-
-    const isMultipart = this.props.model.items.size === 0
-      || this.props.model.items.first().contentType === 'Text'
-      || this.props.model.items.first().contentType === 'Numeric'
-      || this.props.model.items.first().contentType === 'FillInTheBlank';
-
-    const inlineToolbar
-      = <InlineToolbar>
-
-        </InlineToolbar>;
-
-    const multipartButtons = isMultipart
-      ? [<HtmlToolbarButton
-        tooltip="Insert Dropdown" key="server"
-        icon="server" command={this.fillInTheBlankCommand}/>,
-        <HtmlToolbarButton
-          tooltip="Insert Numeric Input" key="info"
-          icon="info" command={this.numericCommand}/>,
-        <HtmlToolbarButton
-          tooltip="Insert Text Input" key="i-cursor"
-          icon="i-cursor" command={this.textCommand}/>]
-        : [];
-
-    const insertionToolbar =
-        <InlineInsertionToolbar>
-          {multipartButtons}
-        </InlineInsertionToolbar>;
-
-    const blockToolbar = <BlockToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '30px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
-    const addPart =
-      this.props.model.items.size === 0
-       || this.props.model.items.first().contentType === 'Text'
-       || this.props.model.items.first().contentType === 'Numeric'
-       || this.props.model.items.first().contentType === 'FillInTheBlank'
-
-       ? <div className="dropdown" style={ { display: 'inline' } }>
-          <button disabled={!this.props.editMode}
-            className="btn btn-secondary btn-link dropdown-toggle"
-            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Add Item
-          </button>
-          <div className="dropdown-menu">
-            <a onClick={this.onInsertNumeric} className="dropdown-item">Numeric</a>
-            <a onClick={this.onInsertText} className="dropdown-item">Text</a>
-            <a onClick={this.onInsertFillInTheBlank}
-              className="dropdown-item">Dropdown</a>
-          </div>
-        </div>
-      : null;
-
-
-    const expanded = (
-      <form className="inline">
-        {addPart}
-        <Select editMode={this.props.editMode}
-          label="Grading" value={this.props.model.grading}
-          onChange={this.onGradingChange}>
-          <option value="automatic">Automatic</option>
-          <option value="instructor">Instructor</option>
-          <option value="hybrid">Hybrid</option>
-        </Select>
-      </form>);
-
-
-
+  render() {
     return (
-
-      <RemovableContent editMode={this.props.editMode}
-        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        associatedClasses="question">
-
-        <div style={ { position: 'relative' } }>
-
-          <Collapse caption={getLabelForQuestion(this.props.model)}
-            details={getHtmlDetails(this.props.model.body)}
-            expanded={expanded}>
-
-            <HtmlContentEditor
-                  ref={c => this.htmlEditor = c}
-                  editMode={this.props.editMode}
-                  services={this.props.services}
-                  context={this.props.context}
-                  activeItemId={this.state.activeItemId}
-                  editorStyles={bodyStyle}
-                  inlineToolbar={inlineToolbar}
-                  inlineInsertionToolbar={insertionToolbar}
-                  blockToolbar={blockToolbar}
-                  model={this.props.model.body}
-                  onEdit={this.onBodyEdit}
-                  />
-
-            {this.renderItemsAndParts()}
-
-          </Collapse>
-
-          <div style={ { position: 'absolute', left: '0px', top: '0px' } }>
-
-            <DragHandle connectDragSource={this.props.connectDragSource}/>
-
-          </div>
-
-        </div>
-
-      </RemovableContent>);
+      <div className="question-editor">
+        {this.renderQuestionBody()}
+      </div>
+    );
   }
-
 }
 

@@ -21,17 +21,19 @@ import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
+import { Skill, LearningObjective } from 'data//contentTypes';
+import './EditorManager.scss';
 
 export interface EditorManagerProps {
   documentId: string;
   userId: string;
   userName: string;
   profile: UserProfile;
-  course: any;
+  course: models.CourseModel;
   expanded: any;
-  titles: any;
+  skills: Immutable.Map<string, Skill>;
+  objectives: Immutable.Map<string, LearningObjective>;
   onCourseChanged: (model: models.CourseModel) => any;
-  onLoadCourseTitles: (courseId: string) => any;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -44,16 +46,14 @@ export interface EditorManagerState {
   undoRedoGuid: string;
 }
 
-export default interface EditorManager {
+export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   componentDidUnmount: boolean;
   persistenceStrategy: PersistenceStrategy;
   onSaveCompleted: onSaveCompletedCallback;
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
   waitBufferTimer: any;
-}
 
-export default class EditorManager extends React.Component<EditorManagerProps, EditorManagerState> {
   constructor(props) {
     super(props);
 
@@ -81,12 +81,24 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   onEdit(model: models.ContentModel) {
     const { document } = this.state;
 
+    if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
+      const resource = model.resource.with({ dateUpdated: new Date() });
+      const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
+      this.props.onDispatch(courseActions.updateCourseResources(resources));
+    }
+
     const doc = document.with({ model });
     this.setState({ document: doc }, () => this.persistenceStrategy.save(doc));
   }
 
   onUndoRedoEdit(model: models.ContentModel) {
     const { document } = this.state;
+
+    if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
+      const resource = model.resource.with({ dateUpdated: new Date() });
+      const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
+      this.props.onDispatch(courseActions.updateCourseResources(resources));
+    }
 
     const doc = document.with({ model });
     const undoRedoGuid = guid();
@@ -114,7 +126,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
           listeningApproach === ListeningApproach.Always) {
 
           this.stopListening = false;
-          this.listenForChanges();
         }
       }
     });
@@ -165,12 +176,12 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
       this.stopListening = true;
       // Special processing if next document is a CourseModel - don't call fetchDocument
-      if (nextProps.course && nextProps.course.model.guid === nextProps.documentId) {
+      if (nextProps.course && nextProps.course.guid === nextProps.documentId) {
         const document = new persistence.Document({
-          _courseId: nextProps.course.model.guid,
-          _id: nextProps.course.model.guid,
-          _rev: nextProps.course.model.rev,
-          model: nextProps.course.model,
+          _courseId: nextProps.course.guid,
+          _id: nextProps.course.guid,
+          _rev: nextProps.course.rev,
+          model: nextProps.course,
         });
         // Tear down previous persistence strategy
         if (this.persistenceStrategy !== null) {
@@ -186,22 +197,22 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         this.setState({ document: null, editingAllowed: null,
           failure: null, waitBufferElapsed: false });
         if (nextProps.course) {
-          this.fetchDocument(nextProps.course.model.guid, nextProps.documentId);
+          this.fetchDocument(nextProps.course.guid, nextProps.documentId);
         }
       }
     }
   }
 
   componentDidMount() {
-    const { course, documentId, onLoadCourseTitles } = this.props;
+    const { course, documentId } = this.props;
 
     // Special handling for CourseModel  - don't call fetchDocument
-    if (course && course.model.guid === documentId) {
+    if (course && course.guid === documentId) {
       const document = new persistence.Document({
-        _courseId: course.model.guid,
-        _id: course.model.guid,
-        _rev: course.model.rev,
-        model: course.model,
+        _courseId: course.guid,
+        _id: course.guid,
+        _rev: course.rev + '',
+        model: course,
       });
       // Tear down previous persistence strategy
       if (this.persistenceStrategy !== null) {
@@ -214,8 +225,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       }
       this.setState({ document });
     } else if (course) {
-      this.fetchDocument(course.model.guid, documentId);
-      onLoadCourseTitles(course.model.guid);
+      this.fetchDocument(course.guid, documentId);
     }
   }
 
@@ -237,27 +247,9 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       .substr(0, stem.lastIndexOf('\/'));
   }
 
-  listenForChanges() {
-    // persistence.listenToDocument(this.state.document)
-    //     .then(document => {
-    //         if (!this.stopListening) {
-    //
-    //             this.setState({document});
-    //
-    //             this.listenForChanges();
-    //         }
-    //
-    //     })
-    //     .catch(err => {
-    //         if (!this.stopListening) {
-    //             this.listenForChanges();
-    //         }
-    //     })
-  }
-
   renderWaiting() {
     return (
-      <div className="container">
+      <div className="container waiting-notification">
         <div className="row">
           <div className="col-2">
             &nbsp;
@@ -317,7 +309,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   }
 
   render(): JSX.Element {
-    const { course, documentId, expanded, userId, titles, onDispatch } = this.props;
+    const { course, documentId, expanded, userId, onDispatch } = this.props;
     const {
       document,
       editingAllowed,
@@ -335,9 +327,9 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         return null;
       }
     } else {
-      const courseId = (course.model as models.CourseModel).guid;
-      const courseLabel = (course.model as models.CourseModel).id;
-      const version = (course.model as models.CourseModel).version;
+      const courseId = (course as models.CourseModel).guid;
+      const courseLabel = (course as models.CourseModel).id;
+      const version = (course as models.CourseModel).version;
 
       const childProps: AbstractEditorProps<any> = {
         model: document.model,
@@ -350,16 +342,17 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
           courseId,
           resourcePath: this.determineBaseUrl((document.model as any).resource),
           baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-          courseModel: course.model,
+          courseModel: course,
           undoRedoGuid,
-          titles,
+          skills: this.props.skills,
+          objectives: this.props.objectives,
         },
         dispatch: onDispatch,
         onEdit: this.onEdit,
         onUndoRedoEdit: this.onUndoRedoEdit,
         services: new DispatchBasedServices(
           onDispatch,
-          course.model,
+          course,
         ),
         editMode: editingAllowed,
       };
@@ -368,7 +361,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       const editor = React.createElement((registeredEditor.component as any), childProps);
 
       return (
-        <div>
+        <div className="editor-manager">
           {editingAllowed ?
             null
             : renderLocked(this.persistenceStrategy.getLockDetails())

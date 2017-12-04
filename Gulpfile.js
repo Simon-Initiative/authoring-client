@@ -17,7 +17,7 @@ var fs = require('fs');
 //var runDataInit = require('./src/data/couch.js');
 
 var exec = require('child_process').exec;
- 
+
 
 var runSequence = require('run-sequence');
 
@@ -42,7 +42,7 @@ var etcLog = function(str) {
   $.util.log($.util.colors.bgCyan(str));
 };
 
-var port = 9000;
+var port = process.env.WEBPACK_DEV_PORT || 9000;
 
 gulp.task('setupDist', function() {
   setupLog("Setup for dist: Copying files to " + config.distDir);
@@ -57,7 +57,7 @@ gulp.task('setupDist', function() {
         .pipe(gulp.dest(config.distDir + '/assets'));
 
   var patterns = ["./index.html",
-                  "/../assets/*",                   
+                  "/../assets/*",
                   config.srcDir + '/vendor/**/*.*'];
 
   setupLog("Patterns: " + patterns);
@@ -175,7 +175,7 @@ gulp.task('clean:test', function(cb) {
   fs.unlink('test-out/results.txt', () => {
     return fs.rmdir('test-out', () => cb());
   });
-  
+
 });
 
 gulp.task('setup:test', function(cb) {
@@ -185,7 +185,7 @@ gulp.task('setup:test', function(cb) {
 
 gulp.task('exec:test', function(cb) {
   return exec('jest',(error, stdout, stderr) => {
-    
+
     fs.writeFile('test-out/results.txt', stderr, (err) => {
       if (err) {
         cb(err);
@@ -193,7 +193,7 @@ gulp.task('exec:test', function(cb) {
       }
       cb(error);
     });
-    
+
     console.log(stderr);
   });
 
@@ -209,7 +209,7 @@ gulp.task('postdist', function() {
 
 gulp.task('open', function(){
   var options = {
-    uri: 'http://128.237.220.60:' + port + '/webpack-dev-server/index.html'
+    uri: 'http://dev.local:' + port + '/webpack-dev-server/index.html'
   };
   gulp.src('').pipe(open(options));
 });
@@ -263,11 +263,14 @@ gulp.task('serve', function(callback) {
       //proxy: {
       //  "*": "http://128.237.220.60:9090"
       //}
+
+      proxy: process.env.WEBPACK_DEV_PORT ? {'**': 'http://dev.local'} : undefined,
+
   }).listen(port, "0.0.0.0", function(err) {
 
       if(err) throw new gutil.PluginError("serve", err);
       // Server listening
-      gutil.log("[serve]", "http://128.237.220.60:" + port + "/webpack-dev-server/index.html");
+      gutil.log("[serve]", "http://dev.local:" + port + "/webpack-dev-server/index.html");
 
 
       // keep the server alive or continue?

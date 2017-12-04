@@ -1,0 +1,37 @@
+@import 'oli/typography';
+
+.pool-editor {
+
+
+  .outline {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .nodeContainer {
+    border-style: solid solid solid none;
+    border-radius: 3px;
+    border-width: 1;
+    border-color: #CCCCCC;
+    width: 100%;
+  }
+
+  .outlineContainer {
+    flex-basis: 300px;
+    height: 100%;
+  }
+
+  .label {
+    font-family: $sans-font;
+    font-size: 13px;
+    color: #606060;
+  }
+
+  .add-menu {
+    button.btn.btn-sm {
+      font-size: 1rem;
+    }
+  }
+}

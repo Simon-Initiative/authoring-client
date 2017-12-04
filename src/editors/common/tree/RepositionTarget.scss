@@ -1,0 +1,14 @@
+@import 'oli/zindex';
+
+.reposition-target {
+  background-color: #f4bf42;
+  height: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+  z-index: $reposition-target;
+  opacity: 0;
+}
+
+.reposition-target-active {
+  opacity: 1;
+}

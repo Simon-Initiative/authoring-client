@@ -1,0 +1,27 @@
+@import 'oli/colors';
+
+$active-tab: $blue;
+
+.tab-item {
+  cursor: pointer;
+  padding: 5px;
+  border-style: none;
+  border-radius: 0px;
+  border-width: 1;
+  border-color: #CCCCCC;
+  color: black;
+  background-color: transparent;
+
+  &:hover {
+    border-bottom: 1px solid $active-tab;
+  }
+}
+
+.tab-item-active {
+  background-color: $active-tab;
+  color: white;
+
+  &:hover {
+    border-bottom: 2px solid $active-tab;
+  }
+}

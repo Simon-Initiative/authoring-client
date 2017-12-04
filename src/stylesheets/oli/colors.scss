@@ -1,0 +1,35 @@
+/** Colors */
+@import 'palettes/flatui';
+@import 'palettes/acrylic';
+
+// Base Colors
+$black: black;
+$white: white;
+$offwhite: #f0f4fa;
+$blue: #0067cb;
+$blue-light: #a3b8cc;
+
+$gray-base:              #000;
+$gray-darkest:           lighten($gray-base, 13.3%);
+$gray-darker:            lighten($gray-base, 26.6%);
+$gray-dark:              lighten($gray-base, 39.9%);
+$gray:                   lighten($gray-base, 53.3%);
+$gray-light:             lighten($gray-base, 66.6%);
+$gray-lighter:           lighten($gray-base, 79.9%);
+$gray-lightest:          lighten($gray-base, 93.3%);
+
+// Indication Colors
+$primary:         #2780E3;
+$secondary:       #a3b8cc;
+$success:         #3FB618;
+$info:            #9954BB;
+$warning:         #FF7518;
+$danger:          #da3232;
+
+// Action Colors
+$remove: $danger;
+$add: darken($primary, 10%);
+
+$selection: $peter-river;
+$hover: darken($peter-river, 10%);
+$active: darken($peter-river, 15%);

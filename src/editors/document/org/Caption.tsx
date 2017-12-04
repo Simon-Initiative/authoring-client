@@ -15,6 +15,8 @@ import { ActionDropdown } from './ActionDropdown';
 import { TextInput } from '../../content/common/TextInput';
 import { Remove } from './Remove';
 
+import './Caption.scss';
+
 export interface Caption {
   titleInput: any;
   timer: any;
@@ -36,18 +38,18 @@ export interface CaptionProps {
 
 export interface CaptionState {
   mouseOver: boolean;
-  
+
 }
- 
 
 
-export class Caption 
+
+export class Caption
   extends React.PureComponent<CaptionProps, CaptionState> {
-    
+
   constructor(props) {
     super(props);
 
-    this.state = { mouseOver: false };    
+    this.state = { mouseOver: false };
 
     this.onViewEdit = this.onViewEdit.bind(this);
   }
@@ -68,30 +70,33 @@ export class Caption
   render() : JSX.Element {
 
     const { model, depth, editMode } = this.props;
-    
-    const linkStyle : any = {
-      color: 'black',
-      fontWeight: 'normal',
-    };
-    
+
     const buttons = this.props.isHoveredOver
-        ? [<button 
-          onClick={this.onViewEdit}
-          type="button" 
-          className="btn btn-sm">
-          Edit
-        </button>,
-          <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>]
+        ? [(
+          <button
+            onClick={this.onViewEdit}
+            type="button"
+            className="btn btn-link btn-sm">
+            Edit
+          </button>
+        ), (
+          <span className="flex-spacer"/>
+        ), (
+          <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>
+        )]
         : null;
     return (
-      <div style={ { display: 'inline' } }>
-        <button style={linkStyle} onClick={() => this.props.toggleExpanded(getExpandId(model))} 
-        type="button" className="btn btn-link">{this.props.children}</button>
+      <div className="caption">
+        <button
+          className="caption-btn btn btn-link"
+          onClick={() => this.props.toggleExpanded(getExpandId(model))}
+          type="button">{this.props.children}
+        </button>
+
         {buttons}
-        
       </div>
     );
-    
+
   }
 
 }

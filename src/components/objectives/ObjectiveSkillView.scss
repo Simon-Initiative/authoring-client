@@ -1,0 +1,18 @@
+@import 'oli/colors';
+@import 'oli/layout';
+
+.objective-skill-view {
+  .document {
+    padding-top: 30px;
+  }
+
+  .table-toolbar {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .rst__node .rst__nodeContent h2 {
+    color: $blue;
+    margin-top: 10px;
+  }
+}

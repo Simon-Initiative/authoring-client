@@ -1,9 +1,7 @@
 import * as React from 'react';
 import guid from '../../../utils/guid';
 
-export interface TabContainer {  
-  
-}
+import './TabContainer.scss';
 
 export interface TabContainerProps {
   labels: string[];
@@ -13,7 +11,8 @@ export interface TabContainerState {
   currentTabIndex: number;
 }
 
-export class TabContainer extends React.PureComponent<TabContainerProps, TabContainerState> {
+export class TabContainer
+  extends React.PureComponent<TabContainerProps, TabContainerState> {
 
   constructor(props) {
     super(props);
@@ -35,7 +34,7 @@ export class TabContainer extends React.PureComponent<TabContainerProps, TabCont
       .map((title, index) => {
         const active = index === this.state.currentTabIndex ? 'active' : '';
         const classes = 'nav-link ' + active;
-        return <a key={title} className={classes} 
+        return <a key={title} className={classes}
           onClick={this.onTabClick.bind(this, index)}>{title}</a>;
       });
 
@@ -52,14 +51,16 @@ export class TabContainer extends React.PureComponent<TabContainerProps, TabCont
 
   render() {
     return (
-      <div>
-        <ul className="nav nav-tabs">
+      <div className="tab-container">
+        <div className="tab-header">
           {this.renderTabs()}
-        </ul>
-        {this.renderCurrentTab()}
+        </div>
+        <div className="tab-content">
+          {this.renderCurrentTab()}
+        </div>
       </div>
     );
   }
-  
+
 }
 

@@ -8,20 +8,14 @@ import { AppServices } from '../../common/AppServices';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
-import '../common/editor.scss';
+
 
 export type ChangePreviewer = (
-  current: contentTypes.Html, 
+  current: contentTypes.Html,
   next: contentTypes.Html) => contentTypes.Html;
 
-export interface HtmlContentEditor {
-  _onChange: (e: any) => void;
-  container: any;
-  draft: any;
-}
-
 export interface HtmlContentEditorProps extends AbstractContentEditorProps<contentTypes.Html> {
-  
+
   inlineToolbar: any;
 
   inlineInsertionToolbar: any;
@@ -41,28 +35,30 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
 
 export interface HtmlContentEditorState {
 
-  
+
 }
 
 /**
  * The content editor for HtmlContent.
  */
-export class HtmlContentEditor 
+export class HtmlContentEditor
   extends AbstractContentEditor<contentTypes.Html, HtmlContentEditorProps, HtmlContentEditorState>
   implements CommandProcessor<EditorState> {
-    
+  container: any;
+  draft: any;
+
   constructor(props) {
     super(props);
 
-    this._onChange = this.onChange.bind(this);
-    this.container = null; 
+    this.onChange = this.onChange.bind(this);
+    this.container = null;
     this.draft = null;
   }
 
 
   onChange(content: contentTypes.Html) {
     this.props.onEdit(content);
-  } 
+  }
 
   onSelectionChange(selectionState) {
     this.setState({ selectionState });
@@ -73,6 +69,9 @@ export class HtmlContentEditor
       return true;
     }
     if (nextProps.activeItemId !== this.props.activeItemId) {
+      return true;
+    }
+    if (nextProps.context !== this.props.context) {
       return true;
     }
     return false;
@@ -88,12 +87,12 @@ export class HtmlContentEditor
 
   render() : JSX.Element {
 
-    const classes = this.props.showBorder === undefined 
+    const classes = this.props.showBorder === undefined
       || !this.props.showBorder ? 'form-control' : '';
 
     return (
       <div className={classes}>
-        
+
           <DraftWrapper
             ref={draft => this.draft = draft}
             inlineOnlyMode={this.props.inline}
@@ -106,11 +105,11 @@ export class HtmlContentEditor
             onSelectionChange={this.onSelectionChange.bind(this)}
             services={this.props.services}
             context={this.props.context}
-            content={this.props.model} 
+            content={this.props.model}
             undoRedoGuid={this.props.context.undoRedoGuid}
             locked={!this.props.editMode}
-            onEdit={this._onChange} />
-        
+            onEdit={this.onChange} />
+
       </div>);
   }
 

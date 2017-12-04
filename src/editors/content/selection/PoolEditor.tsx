@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor, 
+import { AbstractContentEditor,
   AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { QuestionEditor } from '../question/QuestionEditor';
 import { ContentEditor } from '../content/ContentEditor';
@@ -10,20 +10,13 @@ import { ContentEditor } from '../content/ContentEditor';
 import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
 import { RemovableContent } from '../common/RemovableContent';
 import guid from '../../../utils/guid';
-
-import { DraggableNode } from '../../document/assessment/DraggableNode';
-import { RepositionTarget } from '../../document/assessment/RepositionTarget';
-
-import '../common/editor.scss';
-
-
-export interface PoolEditor {
-  
-}
+import { Skill } from 'types/course';
+import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
+  allSkills: Immutable.OrderedMap<string, Skill>;
 }
 
 export interface PoolState {
@@ -34,12 +27,12 @@ export interface PoolState {
 /**
  * The content editor for HtmlContent.
  */
-export class PoolEditor 
+export class PoolEditor
   extends AbstractContentEditor<contentTypes.Pool, PoolProps, PoolState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onRemoveQuestion = this.onRemoveQuestion.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
@@ -55,17 +48,12 @@ export class PoolEditor
   onRemoveQuestion(guid) {
 
     if (this.props.model.questions.size > 1) {
-      this.props.onEdit(this.props.model.with( 
+      this.props.onEdit(this.props.model.with(
         { questions: this.props.model.questions.delete(guid) }));
     }
-    
+
   }
 
-
-  renderDropTarget(index) {
-    return <RepositionTarget index={index} canAcceptId={this.canAcceptId} 
-      onDrop={this.onReorderNode}/>;
-  }
 
   onReorderNode(id, index) {
 
@@ -89,7 +77,7 @@ export class PoolEditor
 
         if (n.guid !== id) {
           questions = questions.set(n.guid, n);
-        } 
+        }
       });
 
       if (index === arr.length) {
@@ -110,12 +98,8 @@ export class PoolEditor
     const elements = [];
     const arr = this.props.model.questions.toArray();
     arr.forEach((node, index) => {
-      elements.push(this.renderDropTarget(index));
-      elements.push(<DraggableNode id={node.guid} editMode={this.props.editMode} index={index}>
-        {this.renderQuestion(node)}</DraggableNode>);
+      elements.push(this.renderQuestion(node));
     });
-
-    elements.push(this.renderDropTarget(arr.length));
 
     return elements;
   }
@@ -140,7 +124,7 @@ export class PoolEditor
   }
 
   render() : JSX.Element {
-    
+
     return (
       <div>
         {this.renderQuestions()}

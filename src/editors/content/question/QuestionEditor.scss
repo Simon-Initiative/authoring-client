@@ -1,0 +1,84 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+.question-editor {
+  padding: 0 20px;
+
+  .question-title {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    @include disable-select;
+
+    .title {
+      font-size: 1.3em;
+    }
+
+    .action-btn {
+      cursor: pointer;
+
+      i {
+        padding: 6px;
+      }
+
+      &.action-btn-duplicate {
+        &:hover {
+          i {
+            color: darken($selection, 10%);
+          }
+        }
+
+        &:active {
+          i {
+            color: darken($selection, 15%);
+          }
+        }
+      }
+
+      &.action-btn-remove {
+        &:hover {
+          i {
+            color: darken($remove, 10%);
+          }
+        }
+
+        &:active {
+          i {
+            color: darken($remove, 15%);
+          }
+        }
+      }
+    }
+  }
+
+  .question-content {
+    padding: 0 10px;
+    @include disable-select;
+  }
+
+  .item-part-editor {
+    min-height: 200px;
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+  }
+
+  .tab-container {
+    .tab-header {
+      .nav-tabs {
+        .nav-link {
+          font-size: 0.8em;
+          font-weight: 600;
+        }
+
+        .nav-item.show .nav-link, .nav-link.active {
+          border-bottom-color: #F1F1F2;
+        }
+      }
+    }
+  }
+}

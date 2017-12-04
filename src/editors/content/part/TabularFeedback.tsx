@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Collapse, Button } from '../common/controls';
+import { Button } from '../common/controls';
 import { FeedbackEditor } from './FeedbackEditor';
 import { FeedbackRow } from './FeedbackRow';
 
@@ -20,9 +20,9 @@ export interface TabularFeedbackState {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class TabularFeedback 
+export abstract class TabularFeedback
   extends AbstractContentEditor<contentTypes.Part, TabularFeedbackProps, TabularFeedbackState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -32,53 +32,64 @@ export abstract class TabularFeedback
   }
 
   onResponseEdit(response) {
-    const model = this.props.model.with({ responses: this.props.model.responses.set(response.guid, response)});
+    const model = this.props.model.with({
+      responses: this.props.model.responses.set(response.guid, response),
+    });
     this.props.onEdit(model);
   }
 
   onAdd() {
     const feedback = new contentTypes.Feedback();
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-  
+
     let response = new contentTypes.Response({
       score: '0',
       match: '*',
-      feedback: feedbacks.set(feedback.guid, feedback)
+      feedback: feedbacks.set(feedback.guid, feedback),
     });
 
     if (this.props.input !== undefined) {
       response = response.with({ input: this.props.input });
     }
-    const model = this.props.model.with({ responses: this.props.model.responses.set(response.guid, response)});
+    const model = this.props.model.with({
+      responses: this.props.model.responses.set(response.guid, response),
+    });
     this.props.onEdit(model);
   }
 
   onResponseRemove(response) {
-    const model = this.props.model.with({ responses: this.props.model.responses.delete(response.guid)});
+    const model = this.props.model.with({
+      responses: this.props.model.responses.delete(response.guid),
+    });
     this.props.onEdit(model);
   }
 
   renderRows() {
     return this.props.model.responses.toArray()
-      .map(r => <FeedbackRow
-                  {...this.props}
-                  key={r.guid}
-                  onEdit={this.onResponseEdit}
-                  model={r}
-                  onRemove={this.onResponseRemove}
-                />);
+      .map(r => (
+        <FeedbackRow
+          {...this.props}
+          key={r.guid}
+          onEdit={this.onResponseEdit}
+          model={r}
+          onRemove={this.onResponseRemove} />
+        ));
   }
-  
+
   render() : JSX.Element {
-    
-    const expanded = 
-        <Button editMode={this.props.editMode} 
-          type='link' onClick={this.onAdd}>Add Feedback</Button>;
-    
+
+    const expanded =
+        <Button editMode={this.props.editMode}
+          type="link" onClick={this.onAdd}>Add Feedback</Button>;
+
     const rows = this.renderRows();
 
     return (
-      <Collapse caption='Feedback' expanded={expanded}>
+      <div className="tabular-feedback">
+        <Button editMode={this.props.editMode}
+          type="link" onClick={this.onAdd}>
+          Add Feedback
+        </Button>
         <table className="table table-bordered">
           <thead>
             <tr>
@@ -91,7 +102,8 @@ export abstract class TabularFeedback
             {rows}
           </tbody>
         </table>
-      </Collapse>);
+      </div>
+    );
   }
 
 }

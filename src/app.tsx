@@ -1,57 +1,59 @@
 import 'babel-polyfill';
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Iterable } from 'immutable';
 import * as persistence from './data/persistence';
 import * as models from './data/models';
 import thunkMiddleware from 'redux-thunk';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
 import Perf from 'react-addons-perf';
-
-(window as any).React = React;
-(window as any).Perf = Perf;
-
 import { createLogger } from 'redux-logger';
-
-// tslint:disable-next-line
-var Provider = (require('react-redux') as RR).Provider;
-// tslint:disable-next-line
-//var createLogger = require('redux-logger');
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
+import { loadCourse } from 'actions/course';
 import Main from './Main.controller';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { courseChanged, fetchSkillTitles, fetchObjectiveTitles } from './actions/course';
+import { courseChanged } from './actions/course';
 
-// Stylesheets
-import './stylesheets/main.scss';
-import './stylesheets/sortabletree.scss';
+// import redux provider
+const Provider = (require('react-redux') as RR).Provider;
+
+// attach global variables to window
+(window as any).React = React;
+(window as any).Perf = Perf;
+
+// import application styles
+import 'stylesheets/index.scss';
 
 interface RR {
   Provider: any;
 }
 
-function initStore() {
+const loggerMiddleware = (createLogger as any)({
+  stateTransformer: (state) => {
+    const newState = {};
 
-  const loggerMiddleware = (createLogger as any)();
+    // if state item is immutable, convert to JS for logging purposes
+    for (const i of Object.keys(state)) {
+      if (Iterable.isIterable(state[i])) {
+        newState[i] = state[i].toJS();
+      } else {
+        newState[i] = state[i];
+      }
+    }
 
-  const createStoreWithMiddleware = applyMiddleware(
-    thunkMiddleware, // lets us dispatch async actions
-    loggerMiddleware, // middleware that logs actions
-  )(createStore);
-
-  return createStoreWithMiddleware(rootReducer);
-}
+    return newState;
+  },
+});
 
 function initStoreWithState(state) {
-  const loggerMiddleware = (createLogger as any)();
   const store = createStore(
     rootReducer, state,
     applyMiddleware(thunkMiddleware, loggerMiddleware),
@@ -71,22 +73,6 @@ function initStoreWithState(state) {
 function historyRequiresCourseLoad() {
   return window.location.hash !== ''
     && window.location.hash.indexOf('-') !== -1;
-}
-
-function loadCourse() : Promise<models.CourseModel> {
-  const hash = window.location.hash;
-  const courseId = hash.substr(hash.indexOf('-') + 1);
-
-  return new Promise((resolve, reject) => {
-    persistence.retrieveCoursePackage(courseId)
-    .then((document) => {
-      if (document.model.modelType === 'CourseModel') {
-        resolve(document.model);
-      }
-    })
-    .catch(err => reject(err));
-  });
-
 }
 
 function tryLogin() : Promise<UserInfo> {
@@ -125,25 +111,28 @@ function main() {
     search: '',
   };
 
+  let store : Store<any> = null;
+
   tryLogin()
     .then((user) => {
+
+      store = initStoreWithState({ user });
+
       // initialize user data
       if (historyRequiresCourseLoad()) {
+
+        const hash = window.location.hash;
+        const courseId = hash.substr(hash.indexOf('-') + 1);
+
         userInfo = user;
-        return loadCourse();
+        return store.dispatch(loadCourse(courseId));
       } else {
-        render(initStoreWithState({ user }), current);
+        render(store, current);
         return;
       }
     })
     .then((model) => {
-      const store = initStoreWithState({ user: userInfo });
       render(store, current);
-
-      // initialize course and title data
-      store.dispatch(courseChanged(model));
-      store.dispatch(fetchSkillTitles(model.guid));
-      store.dispatch(fetchObjectiveTitles(model.guid));
     })
     .catch((err) => {
       render(initStoreWithState({ user: userInfo }), current);

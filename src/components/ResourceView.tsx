@@ -1,20 +1,23 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import NavigationBar from './navigation/NavigationBar.controller';
-import * as persistence from '../data/persistence';
-import * as models from '../data/models';
-import * as viewActions from '../actions/view';
-import { compareDates, relativeToNow, adjustForSkew } from '../utils/date';
-import { Resource } from '../data/content/resource';
-import * as courseActions from '../actions/course';
-import * as contentTypes from '../data/contentTypes';
+import * as persistence from 'data/persistence';
+import * as models from 'data/models';
+import * as viewActions from 'actions/view';
+import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
+import { Resource } from 'data/content/resource';
+import { courseChanged, updateCourseResources } from 'actions/course';
+import * as contentTypes from 'data/contentTypes';
 import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
-import guid from '../utils/guid';
+import guid from 'utils/guid';
+
+import './ResourceView.scss';
 
 export interface ResourceViewProps {
-  course: any;
+  course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
@@ -29,48 +32,22 @@ interface ResourceViewState {
   resources: Resource[];
 }
 
-export default interface ResourceView {
-  viewActions: any;
-}
-
 export default class ResourceView extends React.Component<ResourceViewProps, ResourceViewState> {
+  viewActions: any;
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      resources: [],
-    };
-
     this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
-  componentDidMount() {
-    // Fetch the titles of all current course resources
-    this.fetchTitles(this.props.course.model, this.props.filterFn);
-  }
-
-  fetchTitles(model: models.CourseModel, filterFn: any) {
-    const resources = model.resources.toArray()
-      .filter(filterFn)
-      .map((res) => {
-        if (res.title === null) {
-          return res.with({ title: 'Empty title' });
-        }
-        return res;
-      });
-    this.setState({ resources });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.fetchTitles(nextProps.course.model, nextProps.filterFn);
-  }
-
   clickResource(id) {
-    viewActions.viewDocument(id, this.props.course.model.guid);
+    viewActions.viewDocument(id, this.props.course.guid);
   }
 
   createResource(e) {
+    const { dispatch } = this.props;
+
     e.preventDefault();
     const title = (this.refs['title'] as any).value;
     if (isNullOrUndefined(title) || title === '') {
@@ -78,26 +55,21 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     }
     const type = this.props.resourceType;
     const resource = this.props.createResourceFn(
-      this.props.course.model.guid, title, type);
+      this.props.course.guid, title, type);
 
     (this.refs['title'] as any).value = '';
 
-    persistence.createDocument(this.props.course.model.guid, resource)
-      .then(result => this.refreshCoursePackage(this.props.course.model.guid));
-  }
+    persistence.createDocument(this.props.course.guid, resource)
+      .then((result) => {
+        const r = (result as any).model.resource;
 
-  refreshCoursePackage(courseId: string) {
-    persistence.retrieveCoursePackage(courseId)
-      .then((document) => {
-        // Get an updated course content package payload
-        if (document.model.modelType === models.ModelTypes.CourseModel) {
-          this.props.dispatch(courseActions.courseChanged(document.model));
-        }
-      })
-      .catch(err => console.log(err));
+        const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+        dispatch(updateCourseResources(updated));
+      });
   }
 
   renderResources() {
+    const { course } = this.props;
 
     const creationTitle = <h2>{this.props.title}</h2>;
 
@@ -105,10 +77,13 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = this.state.resources.map(r => ({
-      key: r.guid,
-      data: r,
-    }));
+    const rows = course.resources
+      .toArray()
+      .filter(this.props.filterFn)
+      .map(r => ({
+        key: r.guid,
+        data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
+      }));
 
     const labels = [
       'Title',
@@ -151,22 +126,23 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   renderCreation() {
     return (
-      <div className="input-group col-4 float-right">
+      <div className="table-toolbar input-group">
+        <div className="flex-spacer"/>
         <form className="form-inline">
           <input type="text" ref="title"
                  className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-                 placeholder="Title"></input>
+                 placeholder="New Title"></input>
           <button onClick={this.createResource.bind(this)}
                   className="btn btn-primary">Create
           </button>
         </form>
-      </div>);
+      </div>
+    );
   }
 
   render() {
-
     return (
-      <div className="container-fluid new">
+      <div className="resource-view container-fluid new">
         <div className="row">
           <NavigationBar viewActions={this.viewActions}/>
           <div className="col-sm-9 col-md-10 document">

@@ -29,25 +29,12 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
+import './DraftWrapper.scss';
 
 const SHIFT_KEY = 16;
 const ENTER_KEY = 13;
 const ALT_KEY = 18;
 const PADDING = 0;
-
-interface DraftWrapper {
-  lastBlockY: number;
-  onChange: any;
-  focus: () => any;
-  lastSelectionState: SelectionState;
-  lastContent: ContentState;
-  container: any;
-  _onKeyDown: () => void;
-  _onKeyUp: () => void;
-  mouseDown: boolean;
-  shiftPressed: boolean;
-  _dismissToolbar: () => void;
-}
 
 export interface DraftWrapperProps {
   onEdit: (html : Html) => void;
@@ -317,6 +304,14 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   implements CommandProcessor<EditorState> {
+  lastBlockY: number;
+  onChange: any;
+  focus: () => any;
+  lastSelectionState: SelectionState;
+  lastContent: ContentState;
+  container: any;
+  mouseDown: boolean;
+  shiftPressed: boolean;
 
   constructor(props) {
     super(props);
@@ -326,12 +321,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
     this.lastSelectionState = null;
 
-    this._dismissToolbar = this.dismissToolbar.bind(this);
+    this.dismissToolbar = this.dismissToolbar.bind(this);
     this.mouseDown = false;
     this.shiftPressed = false;
 
-    this._onKeyDown = this.onKeyDown.bind(this);
-    this._onKeyUp = this.onKeyUp.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onClickExpand = this.onClickExpand.bind(this);
@@ -708,6 +703,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           },
           onEdit: (data) => {
             this.processBlockEdit(block, data);
+
+            setTimeout(
+              () => {
+                this.setState(
+                  { lockedByBlockRenderer: true },
+                  () => this.setState({ lockedByBlockRenderer: false }));
+              },
+              100);
           },
           onInsertBlock: (key) => {
             this.insertEmptyBlockAfter(key);
@@ -892,7 +895,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const additionalProps = {
         editorState: this.state.editorState,
         commandProcessor: this,
-        dismissToolbar: this._dismissToolbar,
+        dismissToolbar: this.dismissToolbar,
       };
       const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
 
@@ -941,7 +944,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const additionalProps = {
         editorState: this.state.editorState,
         commandProcessor: this,
-        dismissToolbar: this._dismissToolbar,
+        dismissToolbar: this.dismissToolbar,
       };
 
 
@@ -1085,11 +1088,13 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     (editorStyle as any).left = '0px';
 
     return (
-        <div ref={(container => this.container = container)}
+        <div
+          className="draft-wrapper"
+          ref={(container => this.container = container)}
           onBlur={this.onBlur}
           onFocus={this.onFocus}
-          onKeyUp={this._onKeyUp}
-          onKeyDown={this._onKeyDown}
+          onKeyUp={this.onKeyUp}
+          onKeyDown={this.onKeyDown}
           style={editorStyle}
           onClick={this.focus}>
 

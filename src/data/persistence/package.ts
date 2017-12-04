@@ -4,10 +4,19 @@ import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 
+export function importPackage(repositoryUrl: string) : void {
+
+  const url = `${configuration.baseUrl}/packages/import`;
+  const body = JSON.stringify({ repositoryUrl });
+  const method = 'POST';
+
+  authenticatedFetch({ url, body, method });
+}
+
 export function getEditablePackages(): Promise<models.CourseModel[]> {
-  
+
   const url = `${configuration.baseUrl}/packages/editable`;
-  
+
   return authenticatedFetch({ url })
     .then((json : any) => json.map(m => models.createModel(m)));
 }

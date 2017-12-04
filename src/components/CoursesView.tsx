@@ -1,19 +1,16 @@
 import * as React from 'react';
 
-import * as persistence from '../data/persistence';
-import * as viewActions from '../actions/view';
-import { LegacyTypes } from '../data/types';
-import * as models from '../data/models';
-import * as contentTypes from '../data/contentTypes';
-import * as courseActions from '../actions/course';
-import { hasRole } from '../actions/utils/keycloak';
-import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
+import * as persistence from 'data/persistence';
+import * as viewActions from 'actions/view';
 
-interface CoursesView {
-  onSelect: (id) => void;
-  _deleteCourse: (id) => void;
-  _createCourse: () => void;
-}
+import { LegacyTypes } from 'data/types';
+import * as models from 'data/models';
+import * as contentTypes from 'data/contentTypes';
+import * as courseActions from 'actions/course';
+import { hasRole } from 'actions/utils/keycloak';
+import { Maybe } from 'tsmonad';
+
+import './CoursesView.scss';
 
 type CourseDescription = {
   guid: string,
@@ -29,18 +26,20 @@ export interface CoursesViewProps {
   dispatch: any;
 }
 
-class CoursesView extends React.PureComponent<CoursesViewProps, { courses: CourseDescription[] }> {
+export interface CoursesViewState {
+  courses: Maybe<CourseDescription[]>;
+}
+
+class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState> {
+  onSelect: (id: string) => void;
 
   constructor(props) {
     super(props);
 
-    this.state = { courses: [] };
-    this._createCourse = this.createCourse.bind(this);
+    this.state = { courses: Maybe.nothing<CourseDescription[]>() };
+    this.createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
-      this.fetchDocument(id);
-    };
-    this._deleteCourse = (id) => {
-      this.removeCourse(id);
+      this.props.dispatch(courseActions.viewCourse(id));
     };
   }
 
@@ -48,15 +47,10 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
     viewActions.viewCreateCourse();
   }
 
-  createPlaceholderPage(courseId: string) {
-
-    const resource = models.WorkbookPageModel.createNew(
-          PLACEHOLDER_ITEM_ID, 'Placeholder', 'This is a new page with empty content');
-
-    persistence.createDocument(courseId, resource);
-
-    return resource;
+  importExisting() {
+    viewActions.viewImportCourse();
   }
+
 
   componentDidMount() {
     persistence.getEditablePackages()
@@ -69,7 +63,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
           description: d.description,
           buildStatus: d.buildStatus,
         }));
-        this.setState({ courses });
+        this.setState({ courses: Maybe.just(courses) });
       })
       .catch((err) => {
         console.log(err);
@@ -77,138 +71,115 @@ class CoursesView extends React.PureComponent<CoursesViewProps, { courses: Cours
 
   }
 
-  removeCourse(courseId: string) {
-    persistence.deleteCoursePackage(courseId)
-      .then((document) => {
-        this.props.dispatch(viewActions.viewAllCourses());
-      })
-      .catch(err => console.log(err));
+  renderBanner() {
+    return (
+      <div className="create-course">
+
+        <p className="lead">
+          Welcome to the OLI course authoring platform.
+        </p>
+      </div>
+    );
   }
 
+  renderActionBar() {
+    return (
+      <div style={ { display: 'inline', float: 'right' } }>
+        <button
+          type="button" className="btn btn-primary" key="createNew"
+          onClick={this.createCourse.bind(this)}>
+          <b>Create new</b>
+        </button>
+        &nbsp;&nbsp;
+        <button
+          type="button" className="btn btn-primary" key="import"
+          onClick={this.importExisting.bind(this)}>
+          <b>Import existing</b>
+        </button>
+      </div>
+    );
+  }
 
+  renderCourses(courses: CourseDescription[]) {
+    return courses
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((c, i) => {
 
-  fetchDocument(courseId: string) {
+        const { guid, id, version, title, description, buildStatus } = c;
 
-    persistence.retrieveCoursePackage(courseId)
-      .then((document) => {
-        // Notify that the course has changed when a user views a course
-        if (document.model.modelType === models.ModelTypes.CourseModel) {
+        const isReady = buildStatus === 'READY';
 
-          const courseModel : models.CourseModel = document.model;
+        const button =
+          <button
+            disabled={!isReady}
+            type="button" className="btn btn-link" key={guid}
+            onClick={this.onSelect.bind(this, guid)}>
+            <b>
+              {title +  ' - v' + version + (isReady ? '' : ' (Import in process)')}
+            </b>
+          </button>;
 
-          if (!document.model.resources.toArray().some(
-            resource => resource.id === PLACEHOLDER_ITEM_ID)) {
+        return (
+          <div key={guid}>
+            <div className="content ">
+              <div className="row">
+                <div className="col-5">
+                  {button}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      });
+  }
 
-            const placeholder = this.createPlaceholderPage(courseId);
-            const updatedModel = courseModel.with(
-              { resources: courseModel.resources.set(PLACEHOLDER_ITEM_ID, placeholder.resource) });
+  renderNoCourses() {
+    return (
+      <div>
+      <p className="lead">
+        <b>You have no course packages available.</b>
+      </p>
 
-            this.props.dispatch(courseActions.courseChanged(updatedModel));
-            viewActions.viewDocument(courseId, courseId);
+      Try:
 
-          } else {
-            this.props.dispatch(courseActions.courseChanged(document.model));
-            viewActions.viewDocument(courseId, courseId);
-          }
+      <ul>
+        <li>Creating a new course package</li>
+        <li>Importing an existing OLI course package directly from a Subversion repository</li>
+        <li>Contacting another user to have them grant you access to their course package</li>
+      </ul>
 
+      </div>
+    );
+  }
 
-
-        }
-
-      })
-      .catch(err => console.log(err));
+  renderWaiting() {
+    return (
+      <p className="lead">
+        Loading...
+      </p>
+    );
   }
 
   render() {
-    const rows = this.state.courses.map((c, i) => {
-      const { guid, id, version, title, description, buildStatus } = c;
-      return <div className="course" key={guid}>
-        <img src="assets/ph-courseView.png" className="img-fluid" alt=""/>
-        <div className="content container">
-          <div className="row">
-
-            {/*
-             <div className="information col-3">
-             <span className="title">{id + '_' + version}</span>
-             </div>
-             */}
-            <div className="information col-3">
-
-                <div className="row">
-                  {title}
-                  {/*<span className="title">{title}</span>*/}
-                </div>
-                <div className="row">
-                  Id: {id}
-                  {/*<span className="name">Id: {id}</span>*/}
-                </div>
-                <div className="row">
-                  Version: {version}
-                  {/*<span className="name">Version: {version}</span>*/}
-                </div>
-            </div>
-            <div className="description col-7">
-              {description}
-            </div>
-            <div className="enter col-2">
-              { buildStatus === 'READY' ?
-                <div>
-                  <div className="row">
-
-                    <button type="button" className="btn btn-primary" key={guid}
-                            onClick={this.onSelect.bind(this, guid)}>
-                      Enter Course
-                    </button>
-                  </div>
-                  {hasRole('admin') &&
-                  <div className="row">
-                    <button type="button" className="btn btn-remove" key={guid}
-                            onClick={this._deleteCourse.bind(this, guid)}>
-                      Remove
-                    </button>
-                  </div>}
-                </div>
-                : <div>
-                  <div>Package Importing...</div>
-                  <div style={{ margin: 'auto' }} className="three-bounce">
-                    <div className="bounce1"/>
-                    <div className="bounce2"/>
-                    <div className="bounce3"/>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>;
-    });
-
     return (
-      <div>
-        <div className="createCourse">
-          <div className="container">
-            <div className="row">
-              <div className="col-6 offset-1">
-                <p className="lead">
-                  OLI’s aim is to combine free, high-quality courses, continuous feedback, and
-                  research to improve learning and transform higher education. If you’re
-                  ready to check out OLI for yourself, let’s get started.
-                </p>
-              </div>
-              <div className="col-4">
-                <button onClick={this._createCourse}
-                        className="btn btn-secondary btn-lg btn-block outline serif">
-                  <img src="assets/icon-book.png" width="42" height="42"
-                       className="d-inline-block align-middle" alt=""/>
-                  Create Course Package
-                </button>
-              </div>
-            </div>
+      <div className="courses-view">
+        {this.renderBanner()}
+
+        <div className="my-course-packages">
+
+          <h2 style={ { display: 'inline' } }>My Course Packages</h2>
+
+          {this.renderActionBar()}
+
+          <div style={ { marginTop: '30px' }}>
+
+          {this.state.courses.caseOf({
+            just: courses => courses.length === 0
+              ? this.renderNoCourses() : this.renderCourses(courses),
+            nothing: () => this.renderWaiting(),
+          })}
+
           </div>
-        </div>
-        <div className="container courseView editor">
-          <h2>Course Packages</h2>
-          {rows}
         </div>
       </div>
     );

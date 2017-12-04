@@ -2,11 +2,11 @@ import * as contentTypes from '../../../data/contentTypes';
 
 const MAX_LENGTH = 50;
 
-export function getHtmlDetails(html : contentTypes.Html) : string {
+export function getHtmlDetails(html : contentTypes.Html, length = MAX_LENGTH) : string {
 
-  let block = html.contentState.getBlocksAsArray()
-    .find(b => b.getType !== 'atomic' && b.getText() !== ' ')
-    
+  const block = html.contentState.getBlocksAsArray()
+    .find(b => b.getType !== 'atomic' && b.getText() !== ' ');
+
   if (block === undefined) {
     return '';
   } else {
@@ -21,5 +21,4 @@ function maxLength(text: string, length: number) : string {
   } else {
     return text.substr(0, length - 3) + '...';
   }
-  
 }

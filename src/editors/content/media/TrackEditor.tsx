@@ -14,13 +14,6 @@ import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 
-import '../common/editor.scss';
-
-
-export interface TrackEditor {
-  
-}
-
 export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
   onRemove: (guid: string) => void;
   mediaType: string;
@@ -34,16 +27,16 @@ export interface TrackEditorState {
 /**
  * The content editor for Table.
  */
-export class TrackEditor 
+export class TrackEditor
   extends AbstractContentEditor<Track, TrackEditorProps, TrackEditorState> {
-    
+
   constructor(props) {
     super(props);
-    
+
     this.onKindEdit = this.onKindEdit.bind(this);
     this.onDefaultEdit = this.onDefaultEdit.bind(this);
     this.onLabelEdit = this.onLabelEdit.bind(this);
-    this.onLangEdit = this.onLangEdit.bind(this); 
+    this.onLangEdit = this.onLangEdit.bind(this);
     this.onFileChange = this.onFileChange.bind(this);
 
     this.state = {
@@ -89,11 +82,11 @@ export class TrackEditor
   onFileChange(e) {
     const file = e.target.files[0];
     const src = file.name;
-    
+
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {
       this.setState(
-        { failure: false }, 
+        { failure: false },
         () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
     })
     .catch((err) => {
@@ -112,7 +105,7 @@ export class TrackEditor
     if (!this.state.failure) {
       srcDisplay = src === '' ? '<not set>' : extractFileName(src);
     } else {
-      srcDisplay = 
+      srcDisplay =
         <div className="alert alert-danger" role="alert">
           <strong>Failed</strong> Rename the file and try again
         </div>;
@@ -121,13 +114,13 @@ export class TrackEditor
 
     return (
       <tr>
-        <td>    
-          <input 
+        <td>
+          <input
             id={id}
             style={ { display: 'none' } }
             accept={this.props.accept}
-            onChange={this.onFileChange} 
-            type="file" 
+            onChange={this.onFileChange}
+            type="file"
           />
           <Button editMode={this.props.editMode}
             onClick={this.openFileDialog.bind(this, id)}>Set</Button>
@@ -136,32 +129,32 @@ export class TrackEditor
           <b>{srcDisplay}</b>
         </td>
         <td>
-          <TextInput width="75px" label="" 
+          <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onKindEdit}
             value={kind} type="text"/>
         </td>
         <td>
-          <TextInput width="75px" label="" 
+          <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onLabelEdit}
             value={label} type="text"/>
         </td>
         <td>
-          <TextInput width="75px" label="" 
+          <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onLangEdit}
             value={srclang} type="text"/>
         </td>
         <td>
-          <TextInput width="75px" label="" 
+          <TextInput width="75px" label=""
             editMode={this.props.editMode}
             onEdit={this.onDefaultEdit}
             value={this.props.model.default} type="text"/>
         </td>
         <td>
-          <span 
-            className="closebtn input-group-addon" 
+          <span
+            className="closebtn input-group-addon"
             onClick={() => this.props.onRemove(this.props.model.guid)}>
             &times;
           </span>
