@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
-
-import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
+import * as contentTypes from 'data/contentTypes';
 import {
   AbstractContentEditor,
   AbstractContentEditorProps,
@@ -13,7 +12,7 @@ import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/
 import './ConceptsEditor.scss';
 
 export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
-  allSkills: Immutable.OrderedMap<string, Skill>;
+
 }
 
 export interface ConceptstEditorState {
@@ -21,7 +20,8 @@ export interface ConceptstEditorState {
 }
 
 function toSkillArray(
-  ids: Immutable.List<string>, allSkills: Immutable.OrderedMap<string, Skill>) : Skill[] {
+  ids: Immutable.List<string>,
+  allSkills: Immutable.OrderedMap<string, contentTypes.Skill>) : Skill[] {
 
   return ids
     .toArray()
@@ -38,21 +38,22 @@ export default class ConceptsEditor
     super(props);
 
     this.state = {
-      selected: toSkillArray(props.model, props.allSkills),
+      selected: toSkillArray(props.model, props.context.skills),
     };
   }
 
   componentWillReceiveProps(nextProps: ConceptsEditorProps) {
     if (nextProps.model !== this.props.model) {
-      this.setState({ selected: toSkillArray(nextProps.model, nextProps.allSkills) });
+      this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
+
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (nextProps.model !== this.props.model) {
       return true;
     }
-    if (nextProps.allSkills !== this.props.allSkills) {
+    if (nextProps.context.skills !== this.props.context.skills) {
       return true;
     }
     if (nextState.selected !== this.state.selected) {
@@ -65,10 +66,9 @@ export default class ConceptsEditor
 
     const skills = this.props.model.toArray();
 
-
-
-    const options = this.props.allSkills
-      .toArray();
+    const options = this.props.context.skills
+      .toArray()
+      .map(s => ({ id: s.id, title: s.title }));
 
     return (
       <div className="concepts-editor">

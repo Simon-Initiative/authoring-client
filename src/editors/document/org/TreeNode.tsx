@@ -124,8 +124,9 @@ export class TreeNode
       const resource = this.props.context.courseModel.resourcesById.get(
         this.props.model.resourceref.idref);
 
-      const titleString = this.props.context.titles.get(this.props.model.resourceref.idref)
-        || 'Empty Title';
+      const titleString = resource !== undefined
+        ? resource.title
+        : 'Loading...';
 
       title = (
         <Caption

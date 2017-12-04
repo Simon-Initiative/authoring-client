@@ -20,7 +20,7 @@ import { loadCourse } from 'actions/course';
 import Main from './Main.controller';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { courseChanged, fetchObjectiveTitles } from './actions/course';
+import { courseChanged } from './actions/course';
 
 // import redux provider
 const Provider = (require('react-redux') as RR).Provider;

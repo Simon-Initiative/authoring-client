@@ -6,7 +6,6 @@ import EditorManager from 'editors/manager/EditorManager.controller';
 import { AppServices, DispatchBasedServices } from 'editors/common/AppServices';
 import { LegacyTypes } from 'data/types';
 import * as viewActions from 'actions/view';
-import { getTitlesByModel } from 'actions/course';
 import { Title } from 'types/course';
 
 export interface DocumentViewProps {
@@ -29,12 +28,6 @@ export default class DocumentView
     const { dispatch } = this.props;
 
     this.viewActions = bindActionCreators((viewActions as any), dispatch);
-  }
-
-  componentDidMount() {
-    const { course, dispatch } = this.props;
-
-    dispatch(getTitlesByModel(course.model));
   }
 
   render() {

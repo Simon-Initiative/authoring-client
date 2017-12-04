@@ -71,6 +71,9 @@ export class HtmlContentEditor
     if (nextProps.activeItemId !== this.props.activeItemId) {
       return true;
     }
+    if (nextProps.context !== this.props.context) {
+      return true;
+    }
     return false;
   }
 

@@ -60,6 +60,31 @@ function calculatePositionsAtLevel(
   return positions;
 }
 
+function hasMissingResource(
+  model: models.OrganizationModel, course: models.CourseModel) : boolean {
+
+  return model.sequences.children
+    .toArray()
+    .map(c => hasMissingResourceHelper(model, course, c))
+    .reduce((all, result) => all || result, false);
+}
+
+function hasMissingResourceHelper(
+  model: models.OrganizationModel, course: models.CourseModel,
+  node: any) : boolean {
+
+  if (node.contentType === 'Item') {
+    return !course.resourcesById.has(node.resourceref.idref);
+  } else if (node.children !== undefined) {
+    return node.children
+      .toArray()
+      .map(c => hasMissingResourceHelper(model, course, c))
+      .reduce((all, result) => all || result, false);
+  } else {
+    return false;
+  }
+}
+
 function calculatePositionsAtLevelHelper(
   node: any, index: number, level: number,
   positions: Object, positionAtLevels: Object, allNodeIds: string[],
@@ -121,7 +146,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   idMap: Object;
   parentMap: Object;
 
-  constructor(props) {
+  constructor(props: OrgEditorProps) {
     super(props, ({ currentTab: TABS.Content,
       highlightedNodes: Immutable.Set<string>() } as OrgEditorState));
 
@@ -139,10 +164,11 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     this.parentMap = {};
     this.positionsAtLevel = calculatePositionsAtLevel(
       this.props.model, this.allNodeIds, this.idMap, this.parentMap);
+
+    if (hasMissingResource(props.model, props.context.courseModel)) {
+      props.services.refreshCourse(props.context.courseId);
+    }
   }
-
-
-
 
   onReposition(sourceNode: Object, sourceParentGuid: string, targetModel: any, index: number) {
 

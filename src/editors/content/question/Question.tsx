@@ -306,7 +306,6 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
               services={this.props.services}
               context={this.props.context}
               model={part.concepts}
-              allSkills={this.props.allSkills}
               onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
           </SectionContent>
         </Section>

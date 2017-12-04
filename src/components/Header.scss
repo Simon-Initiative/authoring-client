@@ -1,7 +1,14 @@
 @import 'oli/colors';
 @import 'oli/typography';
 
+
+
+
 .header {
+
+  .logo {
+    float: left;
+  }
   .navbar {
     height: 50px;
     background-color: $offwhite!important;
