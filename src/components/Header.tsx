@@ -22,11 +22,11 @@ class Header extends React.PureComponent<HeaderProps, {}> {
   }
 
   onClickHome() {
-    viewActions.viewAllCourses();
+    this.props.dispatch(viewActions.viewAllCourses());
   }
 
   onClickCreate() {
-    viewActions.viewCreateCourse();
+    this.props.dispatch(viewActions.viewCreateCourse());
   }
 
   render() {

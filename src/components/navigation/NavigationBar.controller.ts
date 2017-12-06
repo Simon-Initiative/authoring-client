@@ -11,7 +11,6 @@ interface DispatchProps {
 }
 
 interface OwnProps {
-  viewActions: any;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

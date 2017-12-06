@@ -521,7 +521,7 @@ export class ObjectiveSkillView
     return (
       <div className="objective-skill-view container-fluid new">
         <div className="row">
-          <NavigationBar viewActions={this.viewActions}/>
+          <NavigationBar />
           <div className="col-sm-9 col-md-10 document">
             <div className="container-fluid editor">
               <div className="row">

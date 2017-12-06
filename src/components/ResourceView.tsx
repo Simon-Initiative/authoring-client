@@ -37,12 +37,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   constructor(props) {
     super(props);
-
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
   clickResource(id) {
-    viewActions.viewDocument(id, this.props.course.guid);
+    this.props.dispatch(viewActions.viewDocument(id, this.props.course.guid));
   }
 
   createResource(e) {
@@ -144,7 +142,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     return (
       <div className="resource-view container-fluid new">
         <div className="row">
-          <NavigationBar viewActions={this.viewActions}/>
+          <NavigationBar/>
           <div className="col-sm-9 col-md-10 document">
             <div className="container-fluid editor">
               <div className="row">

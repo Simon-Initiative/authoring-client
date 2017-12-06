@@ -36,7 +36,7 @@ export default class DocumentView
     return (
       <div className="document-view container-fluid">
         <div className="row">
-            <NavigationBar viewActions={this.viewActions} />
+            <NavigationBar />
             <div className="col-sm-9 col-md-10 document">
               <div className="editor">
                 <EditorManager
