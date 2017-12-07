@@ -1,28 +1,96 @@
 import * as React from 'react';
 import * as Messages from 'types/messages';
+import { Maybe } from 'tsmonad';
 
+import { ModalMessage } from 'utils/ModalMessage';
+
+import './Message.scss';
 
 export interface MessageProps {
   message: Messages.Message;
+  dismissMessage: (message: Messages.Message) => void;
+  executeAction: (message: Messages.Message, action: Messages.MessageAction) => void;
 }
 
 export interface MessageState {
 
 }
 
-
+const classesForSeverity = {
+  [Messages.Severity.Error]: 'navbar-dark bg-danger error-message',
+  [Messages.Severity.Warning]: 'navbar-light bg-warning warning-message',
+  [Messages.Severity.Information]: 'navbar-light bg-info info-message',
+};
 
 export class Message
   extends React.PureComponent<MessageProps, MessageState> {
+
+  nav: any;
 
   constructor(props) {
     super(props);
   }
 
-  render() : JSX.Element {
-    return (
-      <nav className="navbar navbar-inverse bg-primary">
+  onDismiss(e) {
+    e.preventDefault();
 
+    this.props.dismissMessage(this.props.message);
+  }
+
+  componentDidMount() {
+    this.nav.scrollIntoView(true);
+  }
+
+  renderMessageAction(message: Messages.Message, action: Messages.MessageAction) {
+    return (
+      <button
+        className="btn btn-action"
+        onClick={() => this.props.executeAction(message, action)}
+        type="button">{action.label}
+      </button>
+    );
+  }
+
+  renderActions(message: Messages.Message) {
+
+    if (message.canUserDismiss || message.payload.actions.size > 0) {
+      return (
+        <form className="form-inline my-2 my-lg-0">
+          {message.payload.actions.toArray().map(a => this.renderMessageAction(message, a))}
+          {message.canUserDismiss && this.renderCloseButton()}
+        </form>
+      );
+    }
+  }
+
+  renderCloseButton() {
+    return (
+      <button
+        onClick={this.onDismiss.bind(this)}
+        className="btn btn-sm">
+        <i className="icon icon-remove"></i>
+      </button>
+    );
+  }
+
+  renderMessage(payload: Messages.DetailedMessagePayload) {
+    return (
+      <span className="navbar-text message-text">
+        <b>{payload.title}</b> {payload.message}
+      </span>
+    );
+  }
+
+  render() : JSX.Element {
+
+    const { message } = this.props;
+    const classes = 'navbar justify-content-between '
+      + classesForSeverity[message.severity];
+
+    return (
+      <nav className={classes} ref={nav => this.nav = nav}>
+        {this.renderMessage(message.payload)}
+        {this.renderActions(message)}
       </nav>
     );
 

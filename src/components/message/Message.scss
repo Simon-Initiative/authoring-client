@@ -1,0 +1,33 @@
+@import 'oli/colors';
+
+.btn-action {
+  background-color: $gray-lightest !important;
+  border: 1px solid $gray-light;
+  color: $black;
+
+  &:hover {
+    background-color: $gray-lighter !important;
+  }
+  margin-right: 8px;
+
+}
+
+.error-message {
+  background-color: #AA0000;
+  .message-text {
+    color: #FFFFFF;
+  }
+}
+
+.warning-message {
+  .message-text {
+    color: #000000;
+  }
+}
+
+.info-message {
+  background-color: rgb(103, 198, 227);
+  .message-text {
+    color: #FFFFFF;
+  }
+}

@@ -4,9 +4,15 @@ import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { augment } from 'data/content/common';
 
+
+export type MessageAction = {
+  label: string,
+  execute: (message, dispatch) => void;
+};
+
 export type DetailedMessagePayloadParams = {
   guid? : string,
-  additionalInformation?: Maybe<string>;
+  actions?: Immutable.List<MessageAction>;
   data?: Maybe<Object>;
   title?: string;
   message?: string;
@@ -14,7 +20,7 @@ export type DetailedMessagePayloadParams = {
 
 const defaultContent = {
   guid: '',
-  additionalInformation: Maybe.nothing<string>(),
+  actions: Immutable.List<MessageAction>(),
   data: Maybe.nothing<Object>(),
   title: 'An error has occurred.',
   message: '',
@@ -23,7 +29,7 @@ const defaultContent = {
 export class DetailedMessagePayload extends Immutable.Record(defaultContent) {
 
   guid: string;
-  additionalInformation: Maybe<string>;
+  actions: Immutable.List<MessageAction>;
   data: Maybe<Object>;
   title: string;
   message: string;

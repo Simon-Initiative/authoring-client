@@ -1,50 +1,60 @@
 import * as React from 'react';
-import * as Messages from 'types/messages';
+import * as Immutable from 'immutable';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
+import { Message as Msg, Severity, MessageAction } from 'types/messages';
+import { Message } from './message';
 
-export interface Content {
-  ref;
+import './Messages.scss';
+
+export interface MessagesProps {
+  dismissMessage: (message: Msg) => void;
+  executeAction: (message: Msg, action: MessageAction) => void;
+  messages: Immutable.OrderedMap<string, Msg>;
 }
 
-export interface ContentProps {
-  label: string;
-  onClick: () => void;
-  tooltip: string;
-}
-
-export interface ContentState {
+export interface MessagesState {
 
 }
 
-export class Content
-  extends React.PureComponent<ContentProps, ContentState> {
+function mostRecent(
+  messages: Immutable.OrderedMap<string, Msg>, severity: Severity)
+  : Msg[] {
+
+  const last = messages
+    .filter(m => m.severity === severity)
+    .toOrderedMap()
+    .last();
+
+  return last ? [last] : [];
+}
+
+
+export class Messages
+  extends React.PureComponent<MessagesProps, MessagesState> {
 
   constructor(props) {
     super(props);
   }
 
-  componentDidMount() {
-    (window as any).$(this.ref).tooltip(
-      { delay: { show: 1000, hide: 100 } },
-    );
-  }
-
-  componentWillUnmount() {
-    (window as any).$(this.ref).tooltip('hide');
-  }
 
   render() : JSX.Element {
+
+    // Only display one instance of each message severity at a time
+
+    const errors = mostRecent(this.props.messages, Severity.Error);
+    const warnings = mostRecent(this.props.messages, Severity.Warning);
+    const infos = mostRecent(this.props.messages, Severity.Information);
+
+    const messages = [...errors, ...warnings, ...infos];
+
     return (
-      <li key={this.props.label} className="nav-item">
-        <a
-          className="nav-link"
-          ref={a => this.ref = a}
-          data-toggle="tooltip"
-          title={this.props.tooltip}
-          onClick={this.props.onClick}>
-          {this.props.label}
-        </a>
-      </li>
+      <div>
+        <ReactCSSTransitionGroup transitionName="message"
+        transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+          {messages.map(m => <Message key={m.guid} {...this.props} message={m}/>)}
+        </ReactCSSTransitionGroup>
+      </div>
     );
 
   }
