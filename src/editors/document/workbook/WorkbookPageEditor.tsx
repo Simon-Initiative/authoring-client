@@ -28,6 +28,7 @@ import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
+  preview: (courseId: string, resource: Resource) => Promise<any>;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -154,9 +155,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   renderActionsTab() {
-    return <Actions onPreview={() => console.log('d')}/>;
+    return <Actions onPreview={() =>
+      this.props.preview(this.props.context.courseId, this.props.model.resource)}/>;
   }
-
 
   render() {
 

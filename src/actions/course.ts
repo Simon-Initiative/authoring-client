@@ -57,6 +57,10 @@ function createPlaceholderPage(courseId: string) {
   return resource;
 }
 
+
+
+
+
 export function loadCourse(courseId: string) {
   return function (dispatch: any) {
 

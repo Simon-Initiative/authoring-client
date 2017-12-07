@@ -26,6 +26,38 @@ export function retrieveDocument(
     });
 }
 
+
+
+export interface PreviewNotSetUp {
+  type: 'PreviewNotSetUp';
+  message: string[];
+}
+
+export interface PreviewSuccess {
+  type: 'PreviewSuccess';
+  admitCode: string;
+  sectionUrl: string;
+  activityUrl: string;
+}
+
+export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
+
+/**
+ * Initiates a resource preview.
+ * @param courseId the course guid
+ * @param documentId the document guid
+ */
+export function initiatePreview(
+  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+
+  return authenticatedFetch({ url })
+    .then((json : any) => {
+      return json as PreviewResult;
+    });
+}
+
 export function bulkFetchDocuments(
   courseId: string, filters: string[], action: string): Promise<Document[]> {
 
