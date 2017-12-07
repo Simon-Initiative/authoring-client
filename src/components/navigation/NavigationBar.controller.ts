@@ -29,15 +29,12 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
 
-
-
   const actions = Object.keys(viewActions).reduce(
     (p, c) => {
       p[c] = viewActions[c];
       return p;
     },
     {});
-
 
   return {
     viewActions: bindActionCreators(actions, dispatch),
