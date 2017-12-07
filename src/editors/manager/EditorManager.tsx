@@ -92,32 +92,34 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
       } else if (reason === 'Bad Request') {
 
-        const payload = new Messages.DetailedMessagePayload().with({
+        const content = new Messages.TitledContent().with({
           title: 'Cannot save.',
           message: 'There was a problem saving your changes. Try undoing recent changes.',
-          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+
         });
         this.failedMessage = new Messages.Message().with({
           guid: 'PersistenceProblem',
           scope: Messages.Scope.Resource,
           severity: Messages.Severity.Error,
           canUserDismiss: false,
-          payload,
+          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+          content,
         });
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       } else {
 
-        const payload = new Messages.DetailedMessagePayload().with({
+        const content = new Messages.TitledContent().with({
           title: 'Cannot save.',
           message: 'An error \'' + reason + '\'was encountered trying to save your changes.',
-          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+
         });
         this.failedMessage = new Messages.Message().with({
           guid: 'UnknownError',
           scope: Messages.Scope.Resource,
           severity: Messages.Severity.Error,
           canUserDismiss: true,
-          payload,
+          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+          content,
         });
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       }
@@ -222,16 +224,16 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       })
       .catch((failure) => {
 
-        const payload = new Messages.DetailedMessagePayload().with({
+        const content = new Messages.TitledContent().with({
           title: 'Cannot load resource.',
           message: 'There was a problem loading this course resource.',
-          actions: Immutable.List([this.buildReportProblemAction(failure)]),
         });
         this.failedMessage = new Messages.Message().with({
           scope: Messages.Scope.Resource,
           severity: Messages.Severity.Error,
           canUserDismiss: false,
-          payload,
+          actions: Immutable.List([this.buildReportProblemAction(failure)]),
+          content,
         });
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
 

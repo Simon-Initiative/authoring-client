@@ -1,9 +1,12 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import guid from 'utils/guid';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as courseActions from 'actions/course';
 import * as viewActions from 'actions/view';
+import { showMessage } from 'actions/messages';
+import * as Messages from 'types/messages';
 
 import './ImportCourseView.scss';
 
@@ -13,6 +16,24 @@ export interface ImportCourseViewProps {
 
 export interface ImportCourseViewState {
 
+}
+
+function buildImportMessage() : Messages.Message {
+
+  const content = new Messages.TitledContent().with({
+    title: 'Importing course.',
+    message: 'Your course is importing. To check progress,'
+      + ' click \'Refresh\' to reload the page.',
+
+  });
+
+  return new Messages.Message().with({
+    actions: Immutable.List([Messages.RELOAD_ACTION]),
+    canUserDismiss: true,
+    content,
+    severity: Messages.Severity.Information,
+    scope: Messages.Scope.Resource,
+  });
 }
 
 export class ImportCourseView
@@ -31,9 +52,11 @@ export class ImportCourseView
       return;
     }
 
-    persistence.importPackage(url);
+    // persistence.importPackage(url);
 
     viewActions.viewAllCourses();
+
+    this.props.dispatch(showMessage(buildImportMessage()));
   }
 
   onCancel() {

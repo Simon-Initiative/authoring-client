@@ -53,10 +53,10 @@ export class Message
 
   renderActions(message: Messages.Message) {
 
-    if (message.canUserDismiss || message.payload.actions.size > 0) {
+    if (message.canUserDismiss || message.actions.size > 0) {
       return (
         <form className="form-inline my-2 my-lg-0">
-          {message.payload.actions.toArray().map(a => this.renderMessageAction(message, a))}
+          {message.actions.toArray().map(a => this.renderMessageAction(message, a))}
           {message.canUserDismiss && this.renderCloseButton()}
         </form>
       );
@@ -73,10 +73,10 @@ export class Message
     );
   }
 
-  renderMessage(payload: Messages.DetailedMessagePayload) {
+  renderMessage(content: Messages.TitledContent) {
     return (
       <span className="navbar-text message-text">
-        <b>{payload.title}</b> {payload.message}
+        <b>{content.title}</b> {content.message}
       </span>
     );
   }
@@ -89,7 +89,7 @@ export class Message
 
     return (
       <nav className={classes} ref={nav => this.nav = nav}>
-        {this.renderMessage(message.payload)}
+        {this.renderMessage(message.content)}
         {this.renderActions(message)}
       </nav>
     );

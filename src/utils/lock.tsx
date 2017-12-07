@@ -27,16 +27,17 @@ export function buildReadOnlyMessage(lockDetails: LockDetails, retryAction) {
     actions.push(retryAction);
   }
 
-  const payload = new Messages.DetailedMessagePayload().with({
+  const content = new Messages.TitledContent().with({
     title: 'Read only',
     message: 'User ' + lockDetails.lockedBy + ' is currently editing.',
-    actions: Immutable.List(actions),
+
   });
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Warning,
     canUserDismiss: false,
-    payload,
+    actions: Immutable.List(actions),
+    content,
   });
 
 }
@@ -69,16 +70,17 @@ export function buildLockExpiredMessage(retryAction) {
     actions.push(retryAction);
   }
 
-  const payload = new Messages.DetailedMessagePayload().with({
+  const content = new Messages.TitledContent().with({
     title: 'Write lock expired',
     message: 'The time limit of your exclusive editing has expired.',
-    actions: Immutable.List(actions),
+
   });
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Warning,
     canUserDismiss: false,
-    payload,
+    content,
+    actions: Immutable.List(actions),
   });
 
 }

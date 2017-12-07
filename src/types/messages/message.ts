@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import createGuid from 'utils/guid';
 import { augment } from 'data/content/common';
 
-import { DetailedMessagePayload } from './detailed';
+import { TitledContent } from './titled';
 
 export enum Severity {
   Error = 'Error',
@@ -18,20 +18,28 @@ export enum Scope {
   Resource,
 }
 
-export enum PayloadType {
-  DetailedMessage = 'DetailedMessage',
+export enum ContentType {
+  TitledContent = 'TitledContent',
 }
+
+
+
+export type MessageAction = {
+  label: string,
+  execute: (message: Message, dispatch) => void;
+};
 
 // As the application evolves, we can extend the messaging by
 // defining additional payload types, but for now, there is just
 // one payload type.
-export type Payload = DetailedMessagePayload;
+export type MessageContents = TitledContent;
 
 export type MessageParams = {
   guid? : string,
   severity?: Severity;
   scope?: Scope;
-  payload: Payload;
+  content?: MessageContents;
+  actions?: Immutable.List<MessageAction>;
   canUserDismiss?: boolean;
 };
 
@@ -39,7 +47,8 @@ const defaultContent = {
   guid: '',
   severity: Severity.Error,
   scope: Scope.Resource,
-  payload: new DetailedMessagePayload(),
+  content: new TitledContent(),
+  actions: Immutable.List<MessageAction>(),
   canUserDismiss: false,
 };
 
@@ -48,7 +57,8 @@ export class Message extends Immutable.Record(defaultContent) {
   guid: string;
   severity: Severity;
   scope: Scope;
-  payload: Payload;
+  content: MessageContents;
+  actions: Immutable.List<MessageAction>;
   canUserDismiss: boolean;
 
   constructor(params?: MessageParams) {
