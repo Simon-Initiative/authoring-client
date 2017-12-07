@@ -99,7 +99,7 @@ export function viewCourse(courseId: string) {
 
       // This ensures that we wipe any messages displayed from
       // another course
-      dispatch(dismissScopedMessages(Scope.Application));
+      dispatch(dismissScopedMessages(Scope.Package));
       dispatch(viewDocument(courseId, courseId));
     });
   };
