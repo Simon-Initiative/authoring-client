@@ -40,12 +40,13 @@ export interface PreviewSuccess {
   activityUrl: string;
 }
 
+// Previewing can result in one of two responses from the server
 export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
 
 /**
  * Initiates a resource preview.
  * @param courseId the course guid
- * @param documentId the document guid
+ * @param documentId the document guid to preview
  */
 export function initiatePreview(
   courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {

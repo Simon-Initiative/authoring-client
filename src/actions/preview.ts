@@ -2,17 +2,6 @@ import * as persistence from 'data/persistence';
 import { CourseModel, ModelTypes, OrganizationModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { Resource } from 'data/contentTypes';
-import * as Immutable from 'immutable';
-import { requestActions } from './requests';
-import { credentials, getHeaders } from './utils/credentials';
-import { viewDocument } from './view';
-import { fetchSkills } from './skills';
-import { fetchObjectives } from './objectives';
-import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
-import { configuration } from './utils/config';
-import { dismissScopedMessages } from './messages';
-import { Scope } from 'types/messages';
-
 
 interface MissingFromOrganization {
   type: 'MissingFromOrganization';
@@ -33,13 +22,15 @@ interface PreviewNotSetUp {
   type: 'PreviewNotSetUp';
 }
 
+// The four different results that we can get from attempting to
+// preview a resource
 export type PreviewResult =
-  PreviewNotSetUp |
-  MissingFromOrganization |
-  PreviewSuccess |
-  UnknownPreviewError;
+  PreviewNotSetUp |            // Preview may not be set up for this course
+  MissingFromOrganization |    // The resource might not be included in the default org
+  PreviewSuccess |             // We successfully previewed the resource
+  UnknownPreviewError;         // We encountered some unknown problem
 
-
+// Determine which org is the 'default' org in use by preview
 function determineDefaultOrg(model: CourseModel) : Resource {
 
   // Take the first org that contains "Default" in the title
@@ -58,18 +49,20 @@ function determineDefaultOrg(model: CourseModel) : Resource {
   }
 }
 
+// Retrieve the org model from server
 function fetchOrg(courseId: string, resource: Resource) : Promise<OrganizationModel> {
   return persistence.retrieveDocument(courseId, resource.guid)
     .then(doc => doc.model as OrganizationModel);
 }
 
+// Determine if a resource is present as an Item in this org
 function isResourceInOrg(org: OrganizationModel, resource: Resource) : boolean {
   return org.sequences.children
     .toArray()
     .some(n => isResourceInOrgHelper(org, resource, n));
 }
 
-
+// Recursive helper
 function isResourceInOrgHelper(org: OrganizationModel, resource: Resource, node) : boolean {
   if (node.contentType === 'Item') {
     return node.resourceref.idref === resource.id;
@@ -80,6 +73,7 @@ function isResourceInOrgHelper(org: OrganizationModel, resource: Resource, node)
   }
 }
 
+// The action to invoke preview.
 export function preview(resource: Resource) {
   return function (dispatch, getState) : Promise<PreviewResult> {
 
