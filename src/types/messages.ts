@@ -1,3 +1,4 @@
-export { Message, Scope, Severity, Payload, PayloadType } from './messages/message';
-export { DetailedMessagePayload, MessageAction } from './messages/detailed';
+export { Message, Scope, Severity,
+  MessageContents, MessageAction, ContentType } from './messages/message';
+export { TitledContent } from './messages/titled';
 export { RELOAD_ACTION } from './messages/actions';

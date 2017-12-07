@@ -22,8 +22,8 @@ function buildImportMessage() : Messages.Message {
 
   const content = new Messages.TitledContent().with({
     title: 'Importing course.',
-    message: 'Your course is importing. To check progress,'
-      + ' click \'Refresh\' to reload the page.',
+    message: 'Your course is importing. To check on the progress,'
+      + ' reload the page.',
 
   });
 
@@ -52,9 +52,9 @@ export class ImportCourseView
       return;
     }
 
-    // persistence.importPackage(url);
+    persistence.importPackage(url);
 
-    viewActions.viewAllCourses();
+    this.props.dispatch(viewActions.viewAllCourses());
 
     this.props.dispatch(showMessage(buildImportMessage()));
   }

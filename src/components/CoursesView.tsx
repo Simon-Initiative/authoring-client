@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as viewActions from 'actions/view';
 
@@ -7,8 +7,11 @@ import { LegacyTypes } from 'data/types';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import * as courseActions from 'actions/course';
+import * as messageActions from 'actions/messages';
+import * as Messages from 'types/messages';
 import { hasRole } from 'actions/utils/keycloak';
 import { Maybe } from 'tsmonad';
+import { buildFeedbackFromCurrent } from 'utils/feedback';
 
 import './CoursesView.scss';
 
@@ -28,6 +31,37 @@ export interface CoursesViewProps {
 
 export interface CoursesViewState {
   courses: Maybe<CourseDescription[]>;
+}
+
+
+function buildReportProblemAction() : Messages.MessageAction {
+
+  const url = buildFeedbackFromCurrent(
+    '',
+    '',
+  );
+
+  return {
+    label: 'Report Problem',
+    execute: (message, dispatch) => {
+      window.open(url, 'ReportProblemTab');
+    },
+  };
+}
+
+function buildErrorMessage() : Messages.Message {
+
+  const content = new Messages.TitledContent().with({
+    title: 'Error contacting server.',
+    message: 'Try reloading the page. If the problem persists, please contact support.',
+  });
+
+  return new Messages.Message().with({
+    actions: Immutable.List([buildReportProblemAction(), Messages.RELOAD_ACTION]),
+    content,
+    severity: Messages.Severity.Error,
+    scope: Messages.Scope.Application,
+  });
 }
 
 class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState> {
@@ -67,6 +101,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
       })
       .catch((err) => {
         console.log(err);
+        this.props.dispatch(messageActions.showMessage(buildErrorMessage()));
       });
 
   }
