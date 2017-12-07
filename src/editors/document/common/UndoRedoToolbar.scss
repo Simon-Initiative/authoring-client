@@ -1,13 +1,30 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+
 .undo-redo-toolbar {
   display: flex;
   flex-direction: row;
 
-  button {
-    background-color: black;
-    width: 50px;
+  .toolbar-btn {
+    cursor: pointer;
+    background: transparent;
+    border: none;
 
     i {
-      color: white;
+      padding: 6px;
+    }
+
+    &:hover {
+      i {
+        color: darken($selection, 10%);
+      }
+    }
+
+    &:active {
+      i {
+        color: darken($selection, 15%);
+      }
     }
   }
 }
