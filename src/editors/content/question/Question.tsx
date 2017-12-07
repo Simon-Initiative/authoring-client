@@ -114,7 +114,9 @@ type OptionControlProps = {
 
 export const OptionControl: React.StatelessComponent<OptionControlProps>
   = ({ name, onClick, children }) => (
-  <div className={`control ${convertStringToCSS(name)}`} onClick={e => onClick && onClick(e, name)}>
+  <div
+    className={`control clickable ${convertStringToCSS(name)}`}
+    onClick={e => onClick && onClick(e, name)}>
     <div className="control-label">{name}</div>
     {children}
   </div>

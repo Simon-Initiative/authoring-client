@@ -82,10 +82,11 @@ export class MultipleChoice
     this.props.onEdit(this.props.itemModel, part);
   }
 
-  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response) {
+  renderChoice(choice: contentTypes.Choice, index: number, response : contentTypes.Response) {
     return (
       <Choice
         key={choice.guid}
+        index={index}
         context={this.props.context}
         services={this.props.services}
         editMode={this.props.editMode}
@@ -157,7 +158,7 @@ export class MultipleChoice
 
       rendered.push(
         <ChoiceFeedback key={c.guid}>
-          {this.renderChoice(c, responses[i])}
+          {this.renderChoice(c, i, responses[i])}
           {renderedFeedback}
           {renderedScore}
         </ChoiceFeedback>);

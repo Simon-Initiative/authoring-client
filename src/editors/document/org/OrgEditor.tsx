@@ -33,7 +33,6 @@ import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { DragDropContext } from 'react-dnd';
 import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
-import HTML5Backend from 'react-dnd-html5-backend';
 
 import './OrgEditor.scss';
 
@@ -139,7 +138,6 @@ interface OrgEditorState extends AbstractEditorState {
   highlightedNodes: Immutable.Set<string>;
 }
 
-@DragDropContext(HTML5Backend)
 class OrgEditor extends AbstractEditor<models.OrganizationModel,
   OrgEditorProps,
   OrgEditorState>  {

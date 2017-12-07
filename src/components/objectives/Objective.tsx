@@ -7,7 +7,7 @@ import { Maybe } from 'tsmonad';
 import { Title } from './Title';
 import { AppServices } from '../../editors/common/AppServices';
 import guid from '../../utils/guid';
-import { Remove } from './Remove';
+import { Remove } from 'components/common/Remove';
 
 export interface Objective {
 
