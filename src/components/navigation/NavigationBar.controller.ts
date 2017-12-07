@@ -1,5 +1,7 @@
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import NavigationBar from './NavigationBar';
+import * as viewActions from 'actions/view';
 
 interface StateProps {
   course: any;
@@ -7,11 +9,10 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onDispatch: (...args: any[]) => any;
+  viewActions: any;
 }
 
 interface OwnProps {
-  viewActions: any;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
@@ -27,8 +28,16 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
+
+  const actions = Object.keys(viewActions).reduce(
+    (p, c) => {
+      p[c] = viewActions[c];
+      return p;
+    },
+    {});
+
   return {
-    onDispatch: dispatch,
+    viewActions: bindActionCreators(actions, dispatch),
   };
 };
 

@@ -6,6 +6,8 @@ import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as courseActions from 'actions/course';
+import * as messageActions from 'actions/messages';
+import * as Messages from 'types/messages';
 import guid from 'utils/guid';
 import { configuration } from 'actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
@@ -16,7 +18,7 @@ import {
   onSaveCompletedCallback,
   PersistenceStrategy,
 } from './persistence/PersistenceStrategy';
-import { LockDetails, renderLocked } from 'utils/lock';
+import { LockDetails, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
@@ -53,6 +55,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
   waitBufferTimer: any;
+  failedMessage: Messages.Message;
 
   constructor(props) {
     super(props);
@@ -66,14 +69,59 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       undoRedoGuid: guid(),
     };
 
+    this.failedMessage = null;
     this.componentDidUnmount = false;
     this.persistenceStrategy = null;
     this.onEdit = this.onEdit.bind(this);
     this.onUndoRedoEdit = this.onUndoRedoEdit.bind(this);
-    this.onSaveCompleted = (doc: persistence.Document) => {};
+    this.onSaveCompleted = (doc: persistence.Document) => {
+      if (this.failedMessage !== null) {
+        this.props.onDispatch(messageActions.dismissSpecificMessage(this.failedMessage));
+        this.failedMessage = null;
+      }
+    };
     this.onSaveFailure = (reason: any) => {
+
       if (reason === 'Forbidden') {
+
+        const message = buildLockExpiredMessage({ label: 'Reload',
+          execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
+
+        this.props.onDispatch(messageActions.showMessage(message));
         this.setState({ editingAllowed: false });
+
+      } else if (reason === 'Bad Request') {
+
+        const content = new Messages.TitledContent().with({
+          title: 'Cannot save.',
+          message: 'There was a problem saving your changes. Try undoing recent changes.',
+
+        });
+        this.failedMessage = new Messages.Message().with({
+          guid: 'PersistenceProblem',
+          scope: Messages.Scope.Resource,
+          severity: Messages.Severity.Error,
+          canUserDismiss: false,
+          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+          content,
+        });
+        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
+      } else {
+
+        const content = new Messages.TitledContent().with({
+          title: 'Cannot save.',
+          message: 'An error \'' + reason + '\'was encountered trying to save your changes.',
+
+        });
+        this.failedMessage = new Messages.Message().with({
+          guid: 'UnknownError',
+          scope: Messages.Scope.Resource,
+          severity: Messages.Severity.Error,
+          canUserDismiss: true,
+          actions: Immutable.List([this.buildReportProblemAction(reason)]),
+          content,
+        });
+        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       }
     };
   }
@@ -118,6 +166,16 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     ).then((editingAllowed) => {
       if (!this.componentDidUnmount) {
         this.setState({ editingAllowed });
+
+        if (!editingAllowed) {
+
+          const lockDetails = this.persistenceStrategy.getLockDetails();
+          const message = buildReadOnlyMessage(lockDetails, { label: 'Reload',
+            execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
+          this.props.onDispatch(messageActions.showMessage(message));
+        } else {
+          this.props.onDispatch(messageActions.dismissScopedMessages(Messages.Scope.Resource));
+        }
 
         const listeningApproach: ListeningApproach
           = lookUpByName(document.model.modelType).listeningApproach;
@@ -165,6 +223,20 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         this.setState({ document });
       })
       .catch((failure) => {
+
+        const content = new Messages.TitledContent().with({
+          title: 'Cannot load resource.',
+          message: 'There was a problem loading this course resource.',
+        });
+        this.failedMessage = new Messages.Message().with({
+          scope: Messages.Scope.Resource,
+          severity: Messages.Severity.Error,
+          canUserDismiss: false,
+          actions: Immutable.List([this.buildReportProblemAction(failure)]),
+          content,
+        });
+        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
+
         this.setState({ failure });
       });
   }
@@ -268,44 +340,20 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     );
   }
 
-  renderError() {
+  buildReportProblemAction(failure) : Messages.MessageAction {
     const { documentId, profile } = this.props;
-    const { failure } = this.state;
 
     const url = buildFeedbackFromCurrent(
       profile.firstName + ' ' + profile.lastName,
       profile.email,
     );
 
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-2">
-            &nbsp;
-          </div>
-          <div className="col-8">
-            <div className="alert alert-danger" role="alert">
-              <h4 className="alert-heading">Problem encountered!</h4>
-              <p>
-                A problem was encountered while trying to render the
-                course material.
-              </p>
-              <p className="mb-0">Resource id:</p>
-              <pre>{documentId}</pre>
-
-              <p className="mb-0">Error:</p>
-              <pre className="mb-0">{failure}</pre>
-              <br/>
-              <br/>
-              <a target="_blank" href={url}>Report this Error</a>
-            </div>
-          </div>
-          <div className="col-2">
-            &nbsp;
-          </div>
-        </div>
-      </div>
-    );
+    return {
+      label: 'Report Problem',
+      execute: (message, dispatch) => {
+        window.open(url, 'ReportProblemTab');
+      },
+    };
   }
 
   render(): JSX.Element {
@@ -319,7 +367,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     } = this.state;
 
     if (failure !== null) {
-      return this.renderError();
+      return null;
     } else if (document === null || editingAllowed === null) {
       if (waitBufferElapsed) {
         return this.renderWaiting();
@@ -362,10 +410,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
       return (
         <div className="editor-manager">
-          {editingAllowed ?
-            null
-            : renderLocked(this.persistenceStrategy.getLockDetails())
-          }
           {editor}
         </div>
       );

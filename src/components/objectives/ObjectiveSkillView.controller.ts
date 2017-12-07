@@ -5,6 +5,8 @@ import ObjectiveSkillView from './ObjectiveSkillView';
 import { CourseModel } from 'data/models';
 import { setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
+import * as Messages from 'types/messages';
+import { showMessage } from 'actions/messages';
 
 interface StateProps {
   skills: any;
@@ -15,6 +17,7 @@ interface DispatchProps {
   onUpdateSkills: (skills: OrderedMap<string, Skill>) => void;
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
+  showMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps {
@@ -45,6 +48,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onUpdateObjectives: (objs: OrderedMap<string, LearningObjective>) => {
       dispatch(updateObjectives(objs));
+    },
+    showMessage: (message: Messages.Message) => {
+      dispatch(showMessage(message));
     },
   };
 };

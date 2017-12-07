@@ -10,6 +10,9 @@ import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
 import { configuration } from './utils/config';
+import { dismissScopedMessages } from './messages';
+import { Scope } from 'types/messages';
+
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -92,7 +95,13 @@ export function loadCourse(courseId: string) {
 
 export function viewCourse(courseId: string) {
   return function (dispatch) {
-    dispatch(loadCourse(courseId)).then(c => viewDocument(courseId, courseId));
+    dispatch(loadCourse(courseId)).then((c) => {
+
+      // This ensures that we wipe any messages displayed from
+      // another course
+      dispatch(dismissScopedMessages(Scope.Package));
+      dispatch(viewDocument(courseId, courseId));
+    });
   };
 }
 

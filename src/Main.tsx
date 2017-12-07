@@ -22,6 +22,7 @@ import CreateCourseView from './components/CreateCourseView';
 import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
+import Messages from './components/message/Messages.controller';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -233,6 +234,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     return (
         <div className="main">
+          <Messages/>
           <Header dispatch={onDispatch}
             name={user.profile.firstName + ' ' + user.profile.lastName}
             email={user.profile.email}
