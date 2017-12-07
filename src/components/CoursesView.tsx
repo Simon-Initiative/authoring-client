@@ -44,11 +44,11 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   }
 
   createCourse() {
-    viewActions.viewCreateCourse();
+    this.props.dispatch(viewActions.viewCreateCourse());
   }
 
   importExisting() {
-    viewActions.viewImportCourse();
+    this.props.dispatch(viewActions.viewImportCourse());
   }
 
 

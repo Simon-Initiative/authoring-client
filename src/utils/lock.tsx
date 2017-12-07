@@ -22,10 +22,15 @@ function buildModalMessageAction(label, text) : Messages.MessageAction {
 
 export function buildReadOnlyMessage(lockDetails: LockDetails, retryAction) {
 
+  const actions = [buildModalMessageAction('Learn more', readOnlyDetails)];
+  if (retryAction) {
+    actions.push(retryAction);
+  }
+
   const payload = new Messages.DetailedMessagePayload().with({
     title: 'Read only',
     message: 'User ' + lockDetails.lockedBy + ' is currently editing.',
-    actions: Immutable.List([buildModalMessageAction('Learn more', readOnlyDetails), retryAction]),
+    actions: Immutable.List(actions),
   });
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
@@ -59,10 +64,15 @@ const readOnlyDetails =
 
 export function buildLockExpiredMessage(retryAction) {
 
+  const actions = [buildModalMessageAction('Learn more', readOnlyDetails)];
+  if (retryAction) {
+    actions.push(retryAction);
+  }
+
   const payload = new Messages.DetailedMessagePayload().with({
     title: 'Write lock expired',
     message: 'The time limit of your exclusive editing has expired.',
-    actions: Immutable.List([buildModalMessageAction('Learn more', readOnlyDetails), retryAction]),
+    actions: Immutable.List(actions),
   });
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,

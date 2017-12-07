@@ -18,6 +18,8 @@ import { CourseModel } from 'data/models';
 import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
+import * as Messages from 'types/messages';
+import { buildReadOnlyMessage } from 'utils/lock';
 import { Row } from './Row';
 
 import './ObjectiveSkillView.scss';
@@ -34,7 +36,7 @@ export interface ObjectiveSkillViewProps {
     contentTypes.LearningObjective>) => void;
   onUpdateObjectives: (objectives: Immutable.OrderedMap<string,
     contentTypes.LearningObjective>) => void;
-
+  showMessage: (message: Messages.Message) => void;
 }
 
 interface ObjectiveSkillViewState {
@@ -137,6 +139,10 @@ export class ObjectiveSkillView
             objectives,
             skills,
           });
+
+          if (!aggregateModel.isLocked) {
+            this.props.showMessage(buildReadOnlyMessage(aggregateModel.lockDetails, undefined));
+          }
         }
 
       });
@@ -500,23 +506,11 @@ export class ObjectiveSkillView
     return <h2>Learning Objectives and Skills</h2>;
   }
 
-  renderLockDisplay() {
-
-    if (this.state.aggregateModel !== null) {
-      return this.state.aggregateModel.isLocked ? null :
-        renderLocked(this.state.aggregateModel.lockDetails);
-    } else {
-      return null;
-    }
-  }
-
   render() {
 
     const content = this.state.aggregateModel === null
       ? <p>Loading...</p>
       : this.renderContent();
-
-    const lockDisplay = this.renderLockDisplay();
 
     return (
       <div className="objective-skill-view container-fluid new">
@@ -526,7 +520,6 @@ export class ObjectiveSkillView
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
-                  {lockDisplay}
                   {this.renderTitle()}
                   {this.renderCreation()}
                   {content}
