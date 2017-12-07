@@ -43,7 +43,7 @@ export default class NavigationBar extends React.Component<NavigationBarProps, N
   }
 
   render() {
-    const { course, user, onDispatch } = this.props;
+    const { course, user } = this.props;
 
     const courseId = course && course.guid;
 
