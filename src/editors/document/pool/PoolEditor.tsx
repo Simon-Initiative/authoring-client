@@ -12,6 +12,7 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import guid from '../../../utils/guid';
 import { DragDropContext } from 'react-dnd';
 import { renderAssessmentNode } from '../common/questions';
+import { findNodeByGuid } from '../assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 
@@ -58,6 +59,10 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
 
   componentWillReceiveProps(nextProps: PoolEditorProps) {
+
+    findNodeByGuid(nextProps.model.pool.questions, this.state.currentNode.guid)
+      .lift(currentNode => this.setState({ currentNode }));
+
     this.pendingCurrentNode
       .lift((currentNode) => {
         this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
