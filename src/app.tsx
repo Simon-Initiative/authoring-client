@@ -22,18 +22,13 @@ import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { courseChanged } from './actions/course';
 
-// import redux provider
-const Provider = (require('react-redux') as RR).Provider;
+import { ApplicationRoot } from './ApplicationRoot';
 
 // attach global variables to window
 (window as any).React = React;
 
 // import application styles
 import 'stylesheets/index.scss';
-
-interface RR {
-  Provider: any;
-}
 
 const loggerMiddleware = (createLogger as any)({
   stateTransformer: (state) => {
@@ -84,19 +79,22 @@ function tryLogin() : Promise<UserInfo> {
   });
 }
 
-function render(store, current) {
+function render(store, current) : Promise<boolean> {
 
   // Now do the initial rendering
-  ReactDOM.render(
-      <Provider store={store}>
-        <AppContainer>
-          <Main location={current}/>
-        </AppContainer>
-      </Provider>,
-      document.getElementById('app'));
+  return new Promise((resolve, reject) => {
+    ReactDOM.render(
+      <AppContainer>
+        <CurrentApplicationRoot store={store} location={current}/>
+      </AppContainer>,
+      document.getElementById('app'), () => resolve(true));
+  });
 
 }
 
+
+let store : Store<any> = null;
+let CurrentApplicationRoot = ApplicationRoot;
 
 function main() {
   // Application specific initialization
@@ -111,8 +109,6 @@ function main() {
     pathname: '/' + (redirectFragment === null ? '' : redirectFragment),
     search: '',
   };
-
-  let store : Store<any> = null;
 
   tryLogin()
     .then((user) => {
@@ -142,3 +138,16 @@ function main() {
 
 main();
 
+history.listen((current) => {
+
+  render(store, current)
+    .then(result => window.scrollTo(0, 0));
+});
+
+if ((module as any).hot) {
+  (module as any).hot.accept('./ApplicationRoot', () => {
+    CurrentApplicationRoot = require('./ApplicationRoot').ApplicationRoot;
+
+    render(store, window.location);
+  });
+}

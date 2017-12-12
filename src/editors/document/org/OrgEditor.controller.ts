@@ -24,5 +24,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {};
 };
 
-export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(OrgEditor);
+const connected = connect<StateProps, DispatchProps, OwnProps>
+(mapStateToProps, mapDispatchToProps)(OrgEditor);
+
+export default connected ;

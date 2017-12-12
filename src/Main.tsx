@@ -12,7 +12,7 @@ import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
 import { LegacyTypes } from './data/types';
-import history from './utils/history';
+
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
@@ -121,7 +121,7 @@ interface MainProps {
 }
 
 interface MainState {
-  current: any;
+
 }
 
 /**
@@ -130,7 +130,6 @@ interface MainState {
 export default class Main extends React.Component<MainProps, MainState> {
   modalActions: Object;
   viewActions: Object;
-  unlisten: any;
 
   constructor(props) {
     super(props);
@@ -147,16 +146,8 @@ export default class Main extends React.Component<MainProps, MainState> {
   componentDidMount() {
     const { onDispatch } = this.props;
 
-    this.unlisten = history.listen((current) => {
-      this.setState({ current }, () => window.scrollTo(0, 0));
-    });
-
     // Fire off the async request to determine server time skew
     onDispatch(setServerTimeSkew());
-  }
-
-  componentWillUnmount() {
-    this.unlisten();
   }
 
   renderResource(resource: ResourceList) {
@@ -230,7 +221,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         .map((component, i) => <div key={i}>{component}</div>);
     }
 
-    const currentView = this.getView(getPathName(this.state.current.pathname));
+    const currentView = this.getView(getPathName(this.props.location.pathname));
 
     const logoutUrl = user !== null ? user.logoutUrl : '';
 
