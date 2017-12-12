@@ -26,6 +26,52 @@ export function retrieveDocument(
     });
 }
 
+
+
+export interface PreviewNotSetUp {
+  type: 'PreviewNotSetUp';
+  message: string[];
+}
+
+export interface PreviewSuccess {
+  type: 'PreviewSuccess';
+  admitCode: string;
+  sectionUrl: string;
+  activityUrl: string;
+}
+
+// Previewing can result in one of two responses from the server
+export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
+
+/**
+ * Initiates a resource preview.
+ * @param courseId the course guid
+ * @param documentId the document guid to preview
+ */
+export function initiatePreview(
+  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+
+  return authenticatedFetch({ url })
+    .then((json : any) => {
+
+      if (json.message !== undefined) {
+        return {
+          type: 'PreviewNotSetUp',
+          message: json.message as string[],
+        } as PreviewNotSetUp;
+      }
+      const { admitCode, sectionUrl, activityUrl } = json;
+      return {
+        admitCode,
+        sectionUrl,
+        activityUrl,
+        type: 'PreviewSuccess',
+      } as PreviewSuccess;
+    });
+}
+
 export function bulkFetchDocuments(
   courseId: string, filters: string[], action: string): Promise<Document[]> {
 

@@ -20,11 +20,15 @@ import { LegacyTypes } from 'data/types';
 import { getEntities } from 'data/content/html/changes';
 import { EntityTypes } from 'data/content/html/common';
 import { Objectives } from './Objectives';
+import { TabContainer } from '../../content/common/TabContainer';
+import { Details } from './Details';
+import { Actions } from './Actions';
 
 import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
+  preview: (courseId: string, resource: Resource) => Promise<any>;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -49,7 +53,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
-    this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onModelEdit = this.onModelEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
     if (this.hasMissingObjective(
@@ -76,10 +80,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return false;
   }
 
-  onTitleEdit(title) {
-    const resource = this.props.model.resource.with({ title: title.text });
-    const head = this.props.model.head.with({ title });
-    this.handleEdit(this.props.model.with({ head, resource }));
+  onModelEdit(model) {
+    this.handleEdit(model);
   }
 
   onBodyEdit(content : any) {
@@ -121,36 +123,66 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
-
-  render() {
+  renderContentTab() {
     const inlineToolbar = <InlineToolbar />;
     const blockToolbar = <BlockToolbar />;
     const insertionToolbar = <InlineInsertionToolbar />;
 
     return (
+      <div className="html-editor-well">
+        <HtmlContentEditor
+          inlineToolbar={inlineToolbar}
+          inlineInsertionToolbar={insertionToolbar}
+          blockToolbar={blockToolbar}
+          editMode={this.props.editMode}
+          services={this.props.services}
+          context={this.props.context}
+          model={this.props.model.body}
+          onEdit={c => this.onBodyEdit(c)} />
+      </div>
+    );
+  }
+
+  renderDetailsTab() {
+    return <Details
+      model={this.props.model}
+      editMode={this.props.editMode}
+      onEdit={this.onModelEdit}/>;
+  }
+
+  renderObjectivesTab() {
+    return this.renderObjectives();
+  }
+
+  renderActionsTab() {
+    return <Actions onPreview={() =>
+      this.props.preview(this.props.context.courseId, this.props.model.resource)}/>;
+  }
+
+  render() {
+
+    const labels = ['Content', 'Details', 'Objectives', 'Actions'];
+    const tabs = [
+      this.renderContentTab(),
+      this.renderDetailsTab(),
+      this.renderObjectivesTab(),
+      this.renderActionsTab(),
+    ];
+
+    return (
       <div className="workbookpage-editor">
-          <UndoRedoToolbar
-            undoEnabled={this.state.undoStackSize > 0}
-            redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)} />
-          <TitleContentEditor
-            services={this.props.services}
-            context={this.props.context}
-            editMode={this.props.editMode}
-            model={this.props.model.head.title}
-            onEdit={this.onTitleEdit} />
+          <div className="title-row">
+            <h3>Page: {this.props.model.head.title.text}</h3>
+            <div className="flex-spacer"/>
+            <UndoRedoToolbar
+              undoEnabled={this.state.undoStackSize > 0}
+              redoEnabled={this.state.redoStackSize > 0}
+              onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)} />
+          </div>
 
-          {this.renderObjectives()}
-
-          <HtmlContentEditor
-              inlineToolbar={inlineToolbar}
-              inlineInsertionToolbar={insertionToolbar}
-              blockToolbar={blockToolbar}
-              editMode={this.props.editMode}
-              services={this.props.services}
-              context={this.props.context}
-              model={this.props.model.body}
-              onEdit={c => this.onBodyEdit(c)} />
+          <TabContainer labels={labels}>
+            {tabs}
+          </TabContainer>
       </div>
     );
   }
