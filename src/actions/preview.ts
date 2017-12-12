@@ -123,23 +123,23 @@ function invokePreview(resource: Resource) {
 
 export function preview(courseId: string, resource: Resource) {
 
-  return function (dispatch) {
-    dispatch(invokePreview(resource))
-    .then((result: PreviewResult) => {
-      if (result.type === 'MissingFromOrganization') {
-        const message = buildMissingFromOrgMessage(courseId, result.model);
-        dispatch(showMessage(message));
-      } else if (result.type === 'PreviewNotSetUp') {
-        const message = buildNotSetUpMessage();
-        dispatch(showMessage(message));
-      } else if (result.type === 'UnknownPreviewError') {
-        const message = buildUnknownErrorMessage(result.error);
-        dispatch(showMessage(message));
-      } else if (result.type === 'PreviewSuccess') {
-        window.open(result.url, 'PreviewTab');
-      }
+  return function (dispatch) : Promise<any> {
 
-    });
+    return dispatch(invokePreview(resource))
+      .then((result: PreviewResult) => {
+        if (result.type === 'MissingFromOrganization') {
+          const message = buildMissingFromOrgMessage(courseId, result.model);
+          dispatch(showMessage(message));
+        } else if (result.type === 'PreviewNotSetUp') {
+          const message = buildNotSetUpMessage();
+          dispatch(showMessage(message));
+        } else if (result.type === 'UnknownPreviewError') {
+          const message = buildUnknownErrorMessage(result.error);
+          dispatch(showMessage(message));
+        } else if (result.type === 'PreviewSuccess') {
+          window.open(result.url, 'PreviewTab');
+        }
+      });
   };
 
 }
