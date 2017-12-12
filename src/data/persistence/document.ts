@@ -55,7 +55,20 @@ export function initiatePreview(
 
   return authenticatedFetch({ url })
     .then((json : any) => {
-      return json as PreviewResult;
+
+      if (json.message !== undefined) {
+        return {
+          type: 'PreviewNotSetUp',
+          message: json.message as string[],
+        } as PreviewNotSetUp;
+      }
+      const { admitCode, sectionUrl, activityUrl } = json;
+      return {
+        admitCode,
+        sectionUrl,
+        activityUrl,
+        type: 'PreviewSuccess',
+      } as PreviewSuccess;
     });
 }
 
