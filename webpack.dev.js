@@ -3,28 +3,27 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: [
-        'webpack-dev-server/client?http://0.0.0.0:3000',
+        'webpack-dev-server/client?http://dev.local:3000',
         'webpack/hot/only-dev-server',
+        'react-hot-loader/patch',
         './src/app.tsx'
     ],
     output: {
         path: __dirname + '/dev',
         filename: "bundle.js",
+        publicPath: '/',
         sourcePrefix: ''
     },
     externals: {
     },
-    debug: true,
     devtool: 'source-map',
     devServer: {
-        contentBase: './dev',
-        historyApiFallback: {
-          index: 'index.html'
-        }
+        contentBase: path.join(__dirname, "dev"),
+        historyApiFallback: true
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ["", ".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js"],
         // Add webpack aliases for top level imports
         alias: {
             actions: path.resolve(__dirname, 'src/actions'),
@@ -39,24 +38,41 @@ module.exports = {
     },
     module: {
         unknownContextCritical: false,
-        loaders: [
-            { test: /\.css$/, loader: "style-loader!css-loader?sourceMap=true" },
+        rules: [
+            { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
-              loaders: ["style-loader", "css-loader?sourceMap=true", "sass-loader"]
+              use: [
+                  { loader: "style-loader"},
+                  { loader: "css-loader"},
+                  { loader: "sass-loader",
+                    options: {
+                        includePaths: [
+                            path.join(__dirname, 'src/stylesheets'),
+                        ],
+                        sourceMap: true
+                    }
+                }]
             },
-            { test: /\.json$/, loader: 'json-loader' },
-            { test: /\.(png|gif|jpg|jpeg|svg)$/, loader: 'file-loader' },
-            { test: /\.ts$/, loaders: [ 'babel', 'ts-loader'], exclude: /node_modules/ },
-            { test: /\.tsx$/, loaders: [ 'react-hot', 'babel', 'ts-loader'], exclude: /node_modules/ }
+            { test: /\.json$/, use: 'json-loader' },
+            { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
+            { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
+            { test: /\.tsx$/, use: [
+                { loader: 'babel-loader',
+                    options: {
+                        // This is a feature of `babel-loader` for webpack (not Babel itself).
+                        // It enables caching results in ./node_modules/.cache/babel-loader/
+                        // directory for faster rebuilds.
+                        cacheDirectory: true,
+                        plugins: [
+                        'react-hot-loader/babel'
+                        ]
+                    },
+                },
+                { loader: 'ts-loader'}
+            ], exclude: /node_modules/ }
         ]
 
-    },
-    sassLoader: {
-        includePaths: [
-            path.join(__dirname, 'src/stylesheets'),
-        ],
-        sourceMap: true
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin()

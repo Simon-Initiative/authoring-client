@@ -1078,14 +1078,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   render() {
 
-    const editorStyle = this.props.editorStyles !== undefined
-      ? this.props.editorStyles
-      : styles.editor;
+    let editorStyle : any = this.props.editorStyles !== undefined
+      ? Object.assign({}, this.props.editorStyles)
+      : Object.assign({}, styles.editor);
 
-    (editorStyle as any).paddingLeft = '50px';
-    (editorStyle as any).position = 'relative';
-    (editorStyle as any).top = '0px';
-    (editorStyle as any).left = '0px';
+    editorStyle.paddingLeft = '50px';
+    editorStyle.position = 'relative';
+    editorStyle.top = '0px';
+    editorStyle.left = '0px';
 
     return (
         <div

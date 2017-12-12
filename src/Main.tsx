@@ -46,9 +46,8 @@ function res(title, resourceType, filterFn, createResourceFn) : ResourceList {
 function getPathName(pathname: string): string {
   if (pathname.startsWith('/state')) {
     return '/';
-  } else {
-    return pathname;
   }
+  return pathname;
 }
 
 const createOrg = (courseId, title, type) => {
@@ -58,11 +57,11 @@ const createOrg = (courseId, title, type) => {
     + g.substring(g.lastIndexOf('-') + 1);
 
   return new models.OrganizationModel().with({
-    resource: new contentTypes.Resource().with({ id, guid: id, title }),
     type,
     id,
-    version: '1.0',
     title,
+    resource: new contentTypes.Resource().with({ title, id, guid: id }),
+    version: '1.0',
   });
 };
 
@@ -105,7 +104,7 @@ const resources = {
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
           return new models.PoolModel({
             type,
-            pool: new contentTypes.Pool({ id: guid(), questions,
+            pool: new contentTypes.Pool({ questions, id: guid(),
               title: new contentTypes.Title({ text: title }) }),
           });
         }),
@@ -180,24 +179,27 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     if (url === '/') {
       return <CoursesView dispatch={onDispatch} userId={user.userId}/>;
-    } else if (url === '/create') {
+    }
+    if (url === '/create') {
       return <CreateCourseView dispatch={onDispatch}/>;
-    } else if (url === '/import') {
+    }
+    if (url === '/import') {
       return <ImportCourseView dispatch={onDispatch}/>;
-
-    } else if (url.startsWith('/objectives-') && course) {
+    }
+    if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView
           course={course}
           dispatch={onDispatch}
           expanded={expanded}
           userName={user.user}/>;
-    } else if (course) {
+    }
+    if (course) {
       const documentId = url.substr(1, url.indexOf('-') - 1);
 
       if (resources[documentId] !== undefined) {
         return this.renderResource(resources[documentId]);
-      } else {
-        return (
+      }
+      return (
           <DocumentView
             profile={user.profile}
             dispatch={onDispatch}
@@ -205,11 +207,11 @@ export default class Main extends React.Component<MainProps, MainState> {
             userId={user.userId}
             userName={user.user}
             documentId={documentId} />
-        );
-      }
-    } else {
-      return undefined;
+      );
+
     }
+    return undefined;
+
   }
 
 

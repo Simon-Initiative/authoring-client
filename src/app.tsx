@@ -10,7 +10,6 @@ import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import {} from 'node';
-import Perf from 'react-addons-perf';
 import { createLogger } from 'redux-logger';
 import { UserInfo } from './reducers/user';
 import { getUserName, getQueryVariable } from './utils/params';
@@ -18,6 +17,7 @@ import history from './utils/history';
 import rootReducer from './reducers';
 import { loadCourse } from 'actions/course';
 import Main from './Main.controller';
+import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
 import { courseChanged } from './actions/course';
@@ -27,7 +27,6 @@ const Provider = (require('react-redux') as RR).Provider;
 
 // attach global variables to window
 (window as any).React = React;
-(window as any).Perf = Perf;
 
 // import application styles
 import 'stylesheets/index.scss';
@@ -79,7 +78,7 @@ function tryLogin() : Promise<UserInfo> {
   return new Promise<UserInfo>((resolve, reject) => {
     initialize(
       (profile, logoutUrl, accountManagementUrl) =>
-        resolve({ user: profile.username, profile, userId: profile.id, logoutUrl }),
+        resolve({ profile, logoutUrl, user: profile.username, userId: profile.id }),
       err => reject(err),
       configuration.protocol + configuration.hostname);
   });
@@ -90,7 +89,9 @@ function render(store, current) {
   // Now do the initial rendering
   ReactDOM.render(
       <Provider store={store}>
-        <Main location={current}/>
+        <AppContainer>
+          <Main location={current}/>
+        </AppContainer>
       </Provider>,
       document.getElementById('app'));
 
@@ -126,10 +127,9 @@ function main() {
 
         userInfo = user;
         return store.dispatch(loadCourse(courseId));
-      } else {
-        render(store, current);
-        return;
       }
+      render(store, current);
+
     })
     .then((model) => {
       render(store, current);
