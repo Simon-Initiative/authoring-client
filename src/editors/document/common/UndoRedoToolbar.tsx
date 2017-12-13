@@ -30,8 +30,8 @@ export class UndoRedoToolbar extends React.Component<UndoRedoToolbarProps, {}> {
         disabled={!enabled}
         onClick={handler}
         type="button"
-        className="btn">
-        <i className={`icon icon-${icon}`}></i>
+        className="toolbar-btn">
+        <i className={`fa fa-${icon}`}></i>
       </button>
     );
   }
