@@ -16,7 +16,7 @@ export type HtmlParams = {
 const defaultHtmlParams = {
   contentType: 'Html',
   contentState: emptyContent,
-  guid: '',
+  guid: undefined,
 };
 
 export class Html extends Immutable.Record(defaultHtmlParams) {
@@ -25,7 +25,7 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
 
   contentState: ContentState;
   guid: string;
-  
+
   constructor(params?: HtmlParams) {
     super(augment(params));
   }

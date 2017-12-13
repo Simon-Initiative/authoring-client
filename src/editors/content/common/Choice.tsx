@@ -13,9 +13,8 @@ import { DragSource, DropTarget } from 'react-dnd';
 import { RepositionTarget } from 'editors/common/tree/RepositionTarget.tsx';
 import { Maybe } from 'tsmonad';
 import { Remove } from 'components/common/Remove';
-
-// TODO: move to a common location
 import { DragHandle } from 'components/common/DragHandle.tsx';
+import { convert } from 'utils/format';
 
 import './Choice.scss';
 
@@ -129,10 +128,6 @@ export class Choice
     return false;
   }
 
-  toLetter(index) {
-    return String.fromCharCode(65 + index);
-  }
-
   render() : JSX.Element {
     const { isDraggable, index, connectDragSource, connectDragPreview, onDragDrop } = this.props;
 
@@ -148,7 +143,7 @@ export class Choice
     };
 
     const label = this.props.label === undefined
-      ? this.props.index === undefined ? 'Choice' : this.toLetter(this.props.index)
+      ? this.props.index === undefined ? 'Choice' : convert.toAlphaNotation(this.props.index)
       : this.props.label;
 
     const draggableComponent = (

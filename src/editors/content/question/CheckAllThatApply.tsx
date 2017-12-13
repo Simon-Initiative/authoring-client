@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import * as Immutable from 'immutable';
-import { TabularFeedback } from '../part/TabularFeedback';
+import { ChoiceFeedback } from '../part/ChoiceFeedback';
 import { Button } from '../common/controls';
 import guid from 'utils/guid';
 import { Question, QuestionProps, QuestionState,
@@ -88,9 +88,10 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       <Section key="feedback" className="feedback">
         <SectionHeader title="Feedback"/>
         <SectionContent>
-          <TabularFeedback
+          <ChoiceFeedback
             {...this.props}
             model={partModel}
+            choices={itemModel.choices.toArray()}
             onEdit={this.onPartEdit} />
         </SectionContent>
       </Section>,
