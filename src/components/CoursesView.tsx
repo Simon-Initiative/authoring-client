@@ -57,8 +57,8 @@ function buildErrorMessage() : Messages.Message {
   });
 
   return new Messages.Message().with({
-    actions: Immutable.List([buildReportProblemAction(), Messages.RELOAD_ACTION]),
     content,
+    actions: Immutable.List([buildReportProblemAction(), Messages.RELOAD_ACTION]),
     severity: Messages.Severity.Error,
     scope: Messages.Scope.Application,
   });
@@ -73,7 +73,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
     this.state = { courses: Maybe.nothing<CourseDescription[]>() };
     this.createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
-      this.props.dispatch(courseActions.viewCourse(id));
+      this.props.dispatch(viewActions.viewCourse(id));
     };
   }
 
@@ -104,17 +104,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
         this.props.dispatch(messageActions.showMessage(buildErrorMessage()));
       });
 
-  }
-
-  renderBanner() {
-    return (
-      <div className="create-course">
-
-        <p className="lead">
-          Welcome to the OLI course authoring platform.
-        </p>
-      </div>
-    );
   }
 
   renderActionBar() {
@@ -198,7 +187,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   render() {
     return (
       <div className="courses-view">
-        {this.renderBanner()}
 
         <div className="my-course-packages">
 

@@ -8,9 +8,20 @@ import {
   UpdateCourseResourcesAction,
   UPDATE_COURSE_RESOURCES,
 } from 'actions/course';
+
+import {
+  ENTER_APPLICATION_VIEW,
+  EnterApplicationViewAction,
+} from 'actions/view';
+
 import { OtherAction } from './utils';
 
-type ActionTypes = CourseChangedAction | UpdateCourseResourcesAction | OtherAction;
+type ActionTypes =
+  EnterApplicationViewAction
+  | CourseChangedAction
+  | UpdateCourseResourcesAction
+  | OtherAction;
+
 type CourseState = CourseModel;
 
 const initialState = null;
@@ -24,6 +35,8 @@ export const course = (
       return action.model;
     case UPDATE_COURSE_RESOURCES:
       return state.with({ resources: state.resources.merge(action.resources) });
+    case ENTER_APPLICATION_VIEW:
+      return initialState;
     default:
       return state;
   }
