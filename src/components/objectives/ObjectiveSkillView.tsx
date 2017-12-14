@@ -158,16 +158,16 @@ export class ObjectiveSkillView
 
   saveCompleted() {
     this.setState({ isSavePending: false });
+
     this.failureMessage.lift(m => this.props.dismissMessage(m));
+    this.failureMessage = Maybe.nothing<Messages.Message>();
   }
 
   failureEncountered(error: string) {
     this.setState({ isSavePending: false });
 
-    const message = buildPersistenceFailureMessage(error);
-    this.failureMessage = Maybe.just(message);
-
-    this.props.showMessage(message);
+    this.failureMessage = Maybe.just(buildPersistenceFailureMessage(error));
+    this.failureMessage.lift(m => this.props.showMessage(m));
   }
 
   onObjectiveEdit(obj: contentTypes.LearningObjective) {
