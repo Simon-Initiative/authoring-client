@@ -249,13 +249,12 @@ export abstract class ChoiceFeedback
 
   renderMaxChoicesMessage() {
     return (
-      <div className="message">
-        <div className="alert alert-warning flex-spacer">
-          <strong>NOTE</strong>&nbsp;&nbsp;When the number of choices is greater
-          than {AUTOGEN_MAX_CHOICES} (Choice {convert.toAlphaNotation(AUTOGEN_MAX_CHOICES)}),
-          you will not be able to determine exact selections for all other choices.
+      <div className="message flex-spacer">
+        <div className="alert alert-warning">
+          <strong>NOTE</strong>&nbsp;&nbsp;Providing more than {AUTOGEN_MAX_CHOICES} choices
+          (Choice {convert.toAlphaNotation(AUTOGEN_MAX_CHOICES)}) for this question will prevent
+          you from determining exact selections for All Other Choices.
         </div>
-        <div className="flex-spacer"/>
       </div>
     );
   }
