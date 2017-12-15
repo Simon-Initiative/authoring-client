@@ -3,9 +3,18 @@ import * as contentTypes from 'data/contentTypes';
 import { Choice } from '../common/Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { TextInput, InlineForm, Button } from '../common/controls';
+import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import InlineToolbar from '../html/InlineToolbar';
+import BlockToolbar from '../html/BlockToolbar';
 import guid from 'utils/guid';
 import { Question, QuestionProps, QuestionState,
  Section, SectionContent, SectionControl, SectionHeader } from './Question';
+import {
+  InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
+} from 'editors/content/common/InputList.tsx';
+
+import './MultipleChoice.scss';
 
 export interface MultipleChoiceProps
   extends QuestionProps<contentTypes.MultipleChoice> {
@@ -15,7 +24,14 @@ export interface MultipleChoiceProps
 export interface MultipleChoiceState
   extends QuestionState {
 
-  }
+}
+
+const HTML_CONTENT_EDITOR_STYLE = {
+  minHeight: '20px',
+  borderStyle: 'none',
+  borderWith: 1,
+  borderColor: '#AAAAAA',
+};
 
 // tslint:disable-next-line
 const ChoiceFeedback = (props) => {
@@ -53,6 +69,8 @@ export class MultipleChoice
   }
 
   onAddChoice() {
+    const { partModel, itemModel, onEdit } = this.props;
+
     const value = guid().replace('-', '');
     const match = value;
     const choice = new contentTypes.Choice({ value });
@@ -60,111 +78,127 @@ export class MultipleChoice
     let response = new contentTypes.Response({ match });
     response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(response.guid, response) });
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.set(choice.guid, choice) });
+    const updatedPartModel = partModel.with(
+      { responses: partModel.responses.set(response.guid, response) });
 
-    this.props.onEdit(itemModel, partModel);
+    onEdit(updatedItemModel, updatedPartModel);
   }
 
   onChoiceEdit(c) {
-    this.props.onEdit(
-      this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
-      this.props.partModel);
+    const { partModel, itemModel, onEdit } = this.props;
+
+    onEdit(
+      itemModel.with({
+        choices: itemModel.choices.set(c.guid, c),
+      }),
+      partModel);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
-    const part = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(updated.guid, updated) });
-    this.props.onEdit(this.props.itemModel, part);
-  }
+    const { partModel, itemModel, onEdit } = this.props;
 
-  renderChoice(choice: contentTypes.Choice, index: number, response : contentTypes.Response) {
-    return (
-      <Choice
-        key={choice.guid}
-        index={index}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        model={choice}
-        onEdit={this.onChoiceEdit}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)} />
-    );
+    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
+    const part = partModel.with(
+      { responses: partModel.responses.set(updated.guid, updated) });
+    onEdit(itemModel, part);
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
-    const updated = response.with({ score });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(updated.guid, updated) },
-    );
-    this.props.onEdit(this.props.itemModel, partModel);
-  }
+    const { partModel, itemModel, onEdit } = this.props;
 
-  renderFeedback(
-    choice: contentTypes.Choice,
-    response : contentTypes.Response,
-    feedback: contentTypes.Feedback,
-  ) {
-    return (
-      <FeedbackEditor
-        key={feedback.guid}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        showLabel={true}
-        model={feedback}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)}
-        onEdit={this.onFeedbackEdit.bind(this, response)} />
+    const updatedScore = response.with({ score });
+    const updatedPartModel = partModel.with(
+      { responses: partModel.responses.set(updatedScore.guid, updatedScore) },
     );
+
+    onEdit(itemModel, updatedPartModel);
   }
 
   onRemoveChoice(choice, response) {
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.delete(choice.guid) });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.delete(response.guid) });
+    const { partModel, itemModel, onEdit } = this.props;
 
-    this.props.onEdit(itemModel, partModel);
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.delete(choice.guid) });
+
+    let updatePartModel = partModel;
+    if (response) {
+      updatePartModel = partModel.with(
+        { responses: partModel.responses.delete(response.guid) });
+    }
+
+    onEdit(updatedItemModel, updatePartModel);
   }
 
   renderChoices() {
-    const responses = this.props.partModel.responses.toArray();
-    const choices = this.props.itemModel.choices.toArray();
+    const { context, services, editMode, partModel, itemModel } = this.props;
 
-    const rendered = [];
+    const responses = partModel.responses.toArray();
+    const choices = itemModel.choices.toArray();
 
-    for (let i = 0; i < choices.length; i += 1) {
-      const c = choices[i];
+    const renderedChoices = choices.map((choice, i) => {
+      const response = responses[i];
 
-      let renderedFeedback = null;
-      let renderedScore = null;
+      let feedbackEditor;
+      let scoreEditor;
+      if (response && response.feedback.size > 0) {
+        const feedback = response.feedback.first();
 
-      if (responses.length > i) {
-        if (responses[i].feedback.size > 0) {
-          const f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(c, responses[i], f);
+        feedbackEditor = (
+          <HtmlContentEditor
+            editorStyles={HTML_CONTENT_EDITOR_STYLE}
+            inlineToolbar={<InlineToolbar/>}
+            blockToolbar={<BlockToolbar/>}
+            inlineInsertionToolbar={<InlineInsertionToolbar/>}
+            {...this.props}
+            model={feedback.body}
+            onEdit={body => this.onFeedbackEdit(response, feedback.with({ body }))} />
+        );
 
-          renderedScore = <InlineForm position="right">
-              <TextInput editMode={this.props.editMode}
-                label="Score" value={responses[i].score} type="number" width="75px"
-                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-            </InlineForm>;
-        }
+        scoreEditor = (
+          <div className="input-group">
+            <input
+              type="number"
+              className="form-control input-sm form-control-sm"
+              disabled={!editMode}
+              value={response.score}
+              onChange={({ target: { value } }) =>
+                this.onScoreEdit(response, value)
+              } />
+          </div>
+        );
       }
 
-      rendered.push(
-        <ChoiceFeedback key={c.guid}>
-          {this.renderChoice(c, i, responses[i])}
-          {renderedFeedback}
-          {renderedScore}
-        </ChoiceFeedback>);
-    }
+      return (
+        <InputListItem
+          key={choice.guid}
+          className="choice"
+          id={choice.guid}
+          label={`${i + 1}`}
+          context={context}
+          services={services}
+          editMode={editMode}
+          body={choice.body}
+          onEdit={body => this.onChoiceEdit(choice.with({ body }))}
+          onRemove={() => this.onRemoveChoice.bind(this, choice, response)}>
+          <ItemOptions>
+            <ItemOption className="feedback" label="Feedback" flex={true}>
+              {feedbackEditor}
+            </ItemOption>
+            <ItemOption className="score" label="Score">
+              {scoreEditor}
+            </ItemOption>
+          </ItemOptions>
+        </InputListItem>
+      );
+    });
 
-    return rendered;
+    return (
+      <InputList className="multiple-choice-choices">
+        {renderedChoices}
+      </InputList>
+    );
   }
 
   renderAdditionalSections() {

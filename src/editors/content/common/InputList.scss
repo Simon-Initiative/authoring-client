@@ -1,0 +1,60 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+.input-list {
+  @include disable-select;
+
+  .input-list-item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 25px;
+
+    .input-list-item-label {
+      margin-right: 10px;
+      padding-top: 6px;
+      min-width: 16px;
+
+      .input-list-item-controls {
+
+      }
+    }
+
+    .input-list-item-content {
+      flex: 1;
+      display: block;
+
+      .input-list-item-content-title {
+        font-size: 1em;
+
+      }
+
+      .input-list-item-options {
+        display: flex;
+        flex-direction: row;
+
+        & > * {
+          margin-right: 10px;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        .option-label {
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          color: $gray-dark;
+        }
+      }
+    }
+
+    .remove-btn {
+      padding-top: 8px;
+      width: 26px;
+    }
+
+    .content-title-btn-offset {
+      margin-top: 1.5em;
+    }
+  }
+}
