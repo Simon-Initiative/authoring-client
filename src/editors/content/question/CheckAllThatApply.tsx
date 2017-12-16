@@ -71,7 +71,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             <input
               className="toggle toggle-light"
               type="checkbox"
-              readOnly={true}
+              readOnly
               checked={itemModel.shuffle} />
             <label className="toggle-btn"></label>
           </SectionControl>

@@ -77,15 +77,11 @@ const source = {
     return props.editMode;
   },
   beginDrag(props) {
-  /* code here */
-    console.log('begin drag', props);
     return {
       index: props.index,
     };
   },
   endDrag(props) {
-  /* code here */
-    console.log('end drag', props);
     return {
       index: props.index,
     };

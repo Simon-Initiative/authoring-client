@@ -222,7 +222,7 @@ export abstract class ChoiceFeedback
           <ItemOptions>
             {!response.isDefault
               ? (
-                <ItemOption className="matches" label="Matching Choices" flex={true}>
+                <ItemOption className="matches" label="Matching Choices" flex>
                   <Typeahead
                     multiple
                     bsSize="small"
