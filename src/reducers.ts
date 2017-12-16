@@ -8,6 +8,7 @@ import { expanded } from './reducers/expanded';
 import { server } from './reducers/server';
 import { skills } from './reducers/skills';
 import { objectives } from './reducers/objectives';
+import { messages } from './reducers/messages';
 
 const reducers = combineReducers({
   user,           // Information about current user, null if not logged in
@@ -18,6 +19,7 @@ const reducers = combineReducers({
   server,         // server specific info (time skew, etc)
   skills,         // all known skills for the current course
   objectives,     // The current learning objectives
+  messages,       // Active application messages
 });
 
 export default reducers;

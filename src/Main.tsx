@@ -12,7 +12,7 @@ import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
 import { LegacyTypes } from './data/types';
-import history from './utils/history';
+
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
@@ -24,6 +24,7 @@ import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
+import Messages from './components/message/Messages.controller';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -47,9 +48,8 @@ function res(title, resourceType, filterFn, createResourceFn) : ResourceList {
 function getPathName(pathname: string): string {
   if (pathname.startsWith('/state')) {
     return '/';
-  } else {
-    return pathname;
   }
+  return pathname;
 }
 
 const createOrg = (courseId, title, type) => {
@@ -59,11 +59,11 @@ const createOrg = (courseId, title, type) => {
     + g.substring(g.lastIndexOf('-') + 1);
 
   return new models.OrganizationModel().with({
-    resource: new contentTypes.Resource().with({ id, guid: id, title }),
     type,
     id,
-    version: '1.0',
     title,
+    resource: new contentTypes.Resource().with({ title, id, guid: id }),
+    version: '1.0',
   });
 };
 
@@ -106,7 +106,7 @@ const resources = {
           const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
           return new models.PoolModel({
             type,
-            pool: new contentTypes.Pool({ id: guid(), questions,
+            pool: new contentTypes.Pool({ questions, id: guid(),
               title: new contentTypes.Title({ text: title }) }),
           });
         }),
@@ -123,7 +123,7 @@ interface MainProps {
 }
 
 interface MainState {
-  current: any;
+
 }
 
 /**
@@ -133,7 +133,6 @@ interface MainState {
 export default class Main extends React.Component<MainProps, MainState> {
   modalActions: Object;
   viewActions: Object;
-  unlisten: any;
 
   constructor(props) {
     super(props);
@@ -150,16 +149,8 @@ export default class Main extends React.Component<MainProps, MainState> {
   componentDidMount() {
     const { onDispatch } = this.props;
 
-    this.unlisten = history.listen((current) => {
-      this.setState({ current }, () => window.scrollTo(0, 0));
-    });
-
     // Fire off the async request to determine server time skew
     onDispatch(setServerTimeSkew());
-  }
-
-  componentWillUnmount() {
-    this.unlisten();
   }
 
   renderResource(resource: ResourceList) {
@@ -182,24 +173,27 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     if (url === '/') {
       return <CoursesView dispatch={onDispatch} userId={user.userId}/>;
-    } else if (url === '/create') {
+    }
+    if (url === '/create') {
       return <CreateCourseView dispatch={onDispatch}/>;
-    } else if (url === '/import') {
+    }
+    if (url === '/import') {
       return <ImportCourseView dispatch={onDispatch}/>;
-
-    } else if (url.startsWith('/objectives-') && course) {
+    }
+    if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView
           course={course}
           dispatch={onDispatch}
           expanded={expanded}
           userName={user.user}/>;
-    } else if (course) {
+    }
+    if (course) {
       const documentId = url.substr(1, url.indexOf('-') - 1);
 
       if (resources[documentId] !== undefined) {
         return this.renderResource(resources[documentId]);
-      } else {
-        return (
+      }
+      return (
           <DocumentView
             profile={user.profile}
             dispatch={onDispatch}
@@ -207,11 +201,11 @@ export default class Main extends React.Component<MainProps, MainState> {
             userId={user.userId}
             userName={user.user}
             documentId={documentId} />
-        );
-      }
-    } else {
-      return undefined;
+      );
+
     }
+    return undefined;
+
   }
 
 
@@ -230,12 +224,13 @@ export default class Main extends React.Component<MainProps, MainState> {
         .map((component, i) => <div key={i}>{component}</div>);
     }
 
-    const currentView = this.getView(getPathName(this.state.current.pathname));
+    const currentView = this.getView(getPathName(this.props.location.pathname));
 
     const logoutUrl = user !== null ? user.logoutUrl : '';
 
     return (
         <div className="main">
+          <Messages/>
           <Header dispatch={onDispatch}
             name={user.profile.firstName + ' ' + user.profile.lastName}
             email={user.profile.email}

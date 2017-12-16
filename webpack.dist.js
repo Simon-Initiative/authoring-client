@@ -13,8 +13,8 @@ module.exports = {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ["", ".ts", ".tsx", ".js"],
-        extensions: ["", ".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js"],
+
         // Add webpack aliases for top level imports
         alias: {
             actions: path.resolve(__dirname, 'src/actions'),
@@ -35,23 +35,27 @@ module.exports = {
       })
     ],
     module: {
-        unknownContextCritical: false,
-        loaders: [
-            { test: /\.css$/, loader: "style-loader!css-loader" },
+        rules: [
+            { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
-              loaders: ["style-loader", "css-loader", "sass-loader"]
+              use: [
+                  { loader: "style-loader"},
+                  { loader: "css-loader"},
+                  { loader: "sass-loader",
+                    options: {
+                        includePaths: [
+                            path.join(__dirname, 'src/stylesheets'),
+                        ],
+                        sourceMap: true
+                    }
+                }]
             },
-            { test: /\.json$/, loader: 'json-loader' },
-            { test: /\.(png|gif|jpg|jpeg|svg)$/, loader: 'file-loader' },
-            { test: /\.ts$/, loaders: [ 'babel', 'ts-loader'], exclude: /node_modules/ },
-            { test: /\.tsx$/, loaders: [ 'babel', 'ts-loader'], exclude: /node_modules/ }
-        ],
-
-    },
-    sassLoader: {
-        includePaths: [
-            path.join(__dirname, 'src/stylesheets'),
+            { test: /\.json$/, use: 'json-loader' },
+            { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
+            { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
+            { test: /\.tsx$/, use: ['babel-loader','ts-loader'], exclude: /node_modules/ }
         ]
-    },
+
+    }
 };

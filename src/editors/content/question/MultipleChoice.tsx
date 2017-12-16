@@ -14,8 +14,6 @@ import {
   InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
 
-import './MultipleChoice.scss';
-
 export interface MultipleChoiceProps
   extends QuestionProps<contentTypes.MultipleChoice> {
 
@@ -181,16 +179,17 @@ export class MultipleChoice
           editMode={editMode}
           body={choice.body}
           onEdit={body => this.onChoiceEdit(choice.with({ body }))}
-          onRemove={() => this.onRemoveChoice.bind(this, choice, response)}>
-          <ItemOptions>
-            <ItemOption className="feedback" label="Feedback" flex={true}>
-              {feedbackEditor}
-            </ItemOption>
-            <ItemOption className="score" label="Score">
-              {scoreEditor}
-            </ItemOption>
-          </ItemOptions>
-        </InputListItem>
+          onRemove={() => this.onRemoveChoice.bind(this, choice, response)}
+          options={
+            <ItemOptions>
+              <ItemOption className="feedback" label="Feedback" flex={true}>
+                {feedbackEditor}
+              </ItemOption>
+              <ItemOption className="score" label="Score">
+                {scoreEditor}
+              </ItemOption>
+            </ItemOptions>
+          } />
       );
     });
 
@@ -211,6 +210,7 @@ export class MultipleChoice
             <input
               className="toggle toggle-light"
               type="checkbox"
+              readOnly={true}
               checked={itemModel.shuffle} />
             <label className="toggle-btn"></label>
           </SectionControl>

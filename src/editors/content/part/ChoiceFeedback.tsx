@@ -217,7 +217,8 @@ export abstract class ChoiceFeedback
           editMode={editMode}
           body={response.feedbackBody}
           onEdit={body => response.onEdit(body, response.item)}
-          onRemove={() => this.onResponseRemove(response.item)}>
+          onRemove={() => this.onResponseRemove(response.item)}
+          options={
           <ItemOptions>
             {!response.isDefault
               ? (
@@ -252,7 +253,7 @@ export abstract class ChoiceFeedback
               </div>
             </ItemOption>
           </ItemOptions>
-        </InputListItem>
+          } />
       ));
   }
 

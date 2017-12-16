@@ -26,13 +26,6 @@ export const InputList: React.StatelessComponent<InputListProps> = ({
   className,
   children,
 }) => {
-  // verify children are valid
-  React.Children.forEach(children, (child: React.ReactElement<any>) => {
-    if (child.type !== InputListItem) {
-      throw new Error('InputList children must consist of elements only of type InputListItem');
-    }
-  });
-
   return (
     <div className={`input-list ${className || ''}`}>
       {children}
@@ -48,6 +41,8 @@ export interface InputListItemProps {
   context: AppContext;
   services: AppServices;
   body: Html;
+  options?: any;
+  controls?: any;
   editMode: boolean;
   onEdit: (body: Html) => void;
   onRemove?: (id: string) => void;
@@ -62,6 +57,8 @@ export const InputListItem: React.StatelessComponent<InputListItemProps> = ({
   context,
   services,
   body,
+  options,
+  controls,
   editMode,
   onEdit,
   onRemove,
@@ -83,7 +80,7 @@ export const InputListItem: React.StatelessComponent<InputListItemProps> = ({
     <div className={`input-list-item ${className || ''}`}>
       <div className="input-list-item-label">
         {label}
-        {itemControls}
+        {controls}
       </div>
       <div className="input-list-item-content">
         {contentTitle
@@ -100,7 +97,7 @@ export const InputListItem: React.StatelessComponent<InputListItemProps> = ({
           editMode={editMode}
           model={body}
           onEdit={onEdit} />
-        {itemOptionRows}
+        {options}
       </div>
       {onRemove
         ? (

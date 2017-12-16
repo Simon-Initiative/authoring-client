@@ -38,10 +38,6 @@ export class Choices
     this.onReorderChoices = this.onReorderChoices.bind(this);
   }
 
-  shouldComponentUpdate() {
-    return true;
-  }
-
   updateChoiceValuesAndRefs(itemModel: contentTypes.MultipleChoice, partModel: contentTypes.Part) {
     const { onEdit } = this.props;
 

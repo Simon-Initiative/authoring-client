@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { get } from 'lodash';
 import PreformattedText from './PreformattedText';
 import { InteractiveRenderer, InteractiveRendererProps,
   InteractiveRendererState} from './InteractiveRenderer';
