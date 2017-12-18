@@ -11,7 +11,7 @@ import { CommandProcessor, Command } from '../command';
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType,
-  getCursorPosition, hasSelection, getPosition } from './utils';
+  getCursorPosition, hasSelection, getPosition, cloneDuplicatedEntities } from './utils';
 import { BlockProps } from './renderers/properties';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
@@ -24,7 +24,6 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { insertBlocksAfter, containerPrecondition } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
-
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
@@ -307,49 +306,6 @@ function getSingularKey(o) {
     return null;
   }
 }
-
-export function cloneDuplicatedEntities(current: ContentState) : ContentState {
-
-  let contentState = current;
-  const entities = getAllEntities(contentState);
-
-  // Find any duplicated entities and clone them
-  const seenKeys = {};
-  entities.forEach((e) => {
-    if (seenKeys[e.entityKey] === undefined) {
-      seenKeys[e.entityKey] = e;
-    } else {
-      // This is a duplicate, clone it
-
-      const copy = Object.assign({}, e.entity.data);
-
-      // If the data has an id, generate a new one to
-      // avoid duplication
-      if (copy.id !== undefined) {
-        copy.id = guid();
-      } else {
-        const key = this.getSingularKey(copy);
-        if (key !== null && copy[key].id !== undefined) {
-          copy[key] = copy[key].with({ id: guid() });
-        }
-      }
-
-      contentState = contentState.createEntity(
-        e.entity.type, e.entity.mutability, copy);
-      const createdKey = contentState.getLastCreatedEntityKey();
-      const range = new SelectionState({
-        anchorKey: e.range.contentBlock.key,
-        focusKey: e.range.contentBlock.key,
-        anchorOffset: e.range.start,
-        focusOffset: e.range.end,
-      });
-      contentState = Modifier.applyEntity(contentState, range, createdKey);
-    }
-  });
-
-  return contentState;
-}
-
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   implements CommandProcessor<EditorState> {
