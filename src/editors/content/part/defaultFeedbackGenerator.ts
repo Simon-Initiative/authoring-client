@@ -56,8 +56,6 @@ const generateFeedbackCombinations = (userResponses, choices) => {
 export const modelWithDefaultFeedback =
   (model, choices, body: Html, score: string, maxGenChoices: number) => {
 
-    console.log('body.clone()', body.clone());
-
     // remove all existing default responses
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
@@ -79,9 +77,9 @@ export const modelWithDefaultFeedback =
     } else {
       // generate new default responses
       generatedResponses = generateFeedbackCombinations(userResponses, choices).map((combo) => {
+
         const feedback = new contentTypes.Feedback({
-          // body: body.with({ guid: newGuid }),
-          body: body.clone(),  // || body,
+          body: body.clone(),
         });
         const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
         const match = combo.map(id => choices.find(c => c.guid === id).value).join(',');
@@ -102,8 +100,6 @@ export const modelWithDefaultFeedback =
         ),
       ),
     });
-
-    console.log('body', body);
 
     return updatedModel;
   };

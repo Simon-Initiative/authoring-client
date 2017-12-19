@@ -6,7 +6,7 @@ import { Row } from './row';
 import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
-
+import { cloneContent } from '../common/clone';
 const emptyContent = ContentState.createFromText('');
 
 import { toPersistence } from './topersistence';
@@ -30,14 +30,14 @@ const defaultContent = {
 };
 
 export class CellHeader extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'CellHeader';
   align: string;
   colspan: string;
   rowspan: string;
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: CellHeaderParams) {
     super(augment(params));
   }
@@ -46,12 +46,19 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : CellHeader {
+    return this.with({
+      content: cloneContent(this.content),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : CellHeader {
 
     const t = (root as any).th;
 
     let model = new CellHeader({ guid });
-    
+
     if (t['@colspan'] !== undefined) {
       model = model.with({ colspan: t['@colspan'] });
     }
@@ -61,13 +68,13 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     if (t['@align'] !== undefined) {
       model = model.with({ align: t['@align'] });
     }
-    
+
     if (t['#text'] !== undefined) {
       model = model.with({ content: toDraft(t) });
     } else {
       model = model.with({ content: toDraft(getChildren(t)) });
     }
-    
+
     return model;
   }
 
@@ -78,7 +85,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
         '@rowspan': this.rowspan,
         '@align': this.align,
         '#array': toPersistence(this.content, true),
-      }, 
+      },
     };
   }
 }

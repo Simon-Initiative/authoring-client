@@ -28,7 +28,7 @@ const defaultContent = {
 };
 
 export class CodeBlock extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'CodeBlock';
   id: string;
   title: string;
@@ -38,7 +38,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
   start: string;
   highlight: string;
   guid: string;
-  
+
   constructor(params?: CodeBlockParams) {
     super(augment(params));
   }
@@ -47,12 +47,18 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : CodeBlock {
+    return this.with({
+      id: createGuid(),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : CodeBlock {
 
     const cb = (root as any).codeblock;
 
     let model = new CodeBlock({ guid });
-    
+
     if (cb['@id'] !== undefined) {
       model = model.with({ id: cb['@id'] });
     } else {
@@ -76,7 +82,7 @@ export class CodeBlock extends Immutable.Record(defaultContent) {
     if (cb['#text'] !== undefined) {
       model = model.with({ source: cb['#text'] });
     }
-    
+
     return model;
   }
 

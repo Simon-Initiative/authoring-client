@@ -1,4 +1,4 @@
-
+import * as Immutable from 'immutable';
 import { ContentState, Modifier, SelectionState } from 'draft-js';
 import guid from 'utils/guid';
 import { getAllEntities } from 'data/content/html/changes';
@@ -49,11 +49,10 @@ export function getPosition() {
 export function hasSelection(ss: SelectionState) {
   if (ss.getAnchorKey() !== ss.getFocusKey()) {
     return true;
-  } else if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
+  } if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 export function removeHTML(text : string) : string {
@@ -135,10 +134,16 @@ export function determineChangeType(
 
   if (!currentHasSelection && !previousHasSelection) {
     return SelectionChangeType.CursorPosition;
-  } else {
-    return SelectionChangeType.Selection;
   }
+  return SelectionChangeType.Selection;
 
+}
+
+function getSingularKey(o) {
+  if (Object.keys(o).length === 1) {
+    return Object.keys(o)[0];
+  }
+  return null;
 }
 
 export function cloneDuplicatedEntities(current: ContentState) : ContentState {
@@ -160,7 +165,7 @@ export function cloneDuplicatedEntities(current: ContentState) : ContentState {
       if (copy.id !== undefined) {
         copy.id = guid();
       } else {
-        const key = this.getSingularKey(copy);
+        const key = getSingularKey(copy);
         if (key !== null && copy[key].id !== undefined) {
           copy[key] = copy[key].with({ id: guid() });
         }
