@@ -4,7 +4,7 @@ import { toPersistence } from './html/topersistence';
 import { toDraft } from './html/todraft';
 import createGuid from 'utils/guid';
 import { augment } from './common';
-import { cloneDuplicatedEntities } from 'editors/content/common/draft/utils';
+import { cloneContent } from './common/clone';
 
 const emptyContent = ContentState.createFromText('');
 
@@ -40,8 +40,8 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
   }
 
   clone() {
-    return this.with({
-      contentState: cloneDuplicatedEntities(this.contentState),
+    return new Html().with({
+      contentState: cloneContent(this.contentState),
     });
   }
 

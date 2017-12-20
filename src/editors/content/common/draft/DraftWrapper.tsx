@@ -26,6 +26,7 @@ import { insertBlocksAfter, containerPrecondition } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
+import { updateData } from 'data/content/common/clone';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 import './DraftWrapper.scss';
@@ -235,22 +236,6 @@ function appendText(contentBlock, contentState, text) {
 
 }
 
-function updateData(contentBlock, contentState, blockData) {
-
-  const targetRange = new SelectionState({
-    anchorKey: contentBlock.key,
-    focusKey: contentBlock.key,
-    anchorOffset: 0,
-    focusOffset: contentBlock.text.length,
-  });
-
-  return Modifier.setBlockData(
-    contentState,
-    targetRange,
-    blockData);
-
-}
-
 function addSpaceAfterEntity(editorState, block) {
 
   const blockKey = block.key;
@@ -299,13 +284,6 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
   }
 }
 
-function getSingularKey(o) {
-  if (Object.keys(o).length === 1) {
-    return Object.keys(o)[0];
-  } else {
-    return null;
-  }
-}
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   implements CommandProcessor<EditorState> {

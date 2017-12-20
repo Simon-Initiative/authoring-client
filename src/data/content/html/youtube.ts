@@ -42,7 +42,7 @@ const defaultContent = {
 };
 
 export class YouTube extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'YouTube';
   id: string;
   title: string;
@@ -55,7 +55,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
   caption: Caption;
   cite: Cite;
   guid: string;
-  
+
   constructor(params?: YouTubeParams) {
     super(augment(params));
   }
@@ -64,12 +64,23 @@ export class YouTube extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : YouTube {
+    return this.with({
+      id: createGuid(),
+      alternate: this.alternate.clone(),
+      titleContent: this.titleContent.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string, toDraft) : YouTube {
 
     const t = (root as any).youtube;
 
     let model = new YouTube({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -87,9 +98,9 @@ export class YouTube extends Immutable.Record(defaultContent) {
     if (t['@width'] !== undefined) {
       model = model.with({ width: t['@width'] });
     }
-    
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -112,10 +123,10 @@ export class YouTube extends Immutable.Record(defaultContent) {
           model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -137,7 +148,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
         '@height': this.height,
         '@width': this.width,
         '#array': children,
-      }, 
+      },
     };
   }
 }

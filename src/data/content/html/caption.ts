@@ -5,7 +5,7 @@ import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
-
+import { cloneContent } from '../common/clone';
 const emptyContent = ContentState.createFromText('');
 
 import { toPersistence } from './topersistence';
@@ -23,11 +23,11 @@ const defaultContent = {
 };
 
 export class Caption extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Caption';
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: CaptionParams) {
     super(augment(params));
   }
@@ -36,13 +36,19 @@ export class Caption extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Caption {
+    return this.with({
+      content: cloneContent(this.content),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Caption {
 
     const t = (root as any).caption;
 
     let model = new Caption({ guid });
     model = model.with({ content: toDraft(getChildren(t)) });
-    
+
     return model;
   }
 
