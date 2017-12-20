@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './NavigationBar';
+import Header from './Header';
 import * as viewActions from 'actions/view';
 
 interface StateProps {
@@ -9,7 +9,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  viewActions: any;
+  viewActions: viewActions.ViewActions;
 }
 
 interface OwnProps {
@@ -37,9 +37,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     {});
 
   return {
-    viewActions: bindActionCreators(actions, dispatch),
+    viewActions: (bindActionCreators(actions, dispatch) as viewActions.ViewActions),
   };
 };
 
 export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(NavigationBar);
+  (mapStateToProps, mapDispatchToProps)(Header);

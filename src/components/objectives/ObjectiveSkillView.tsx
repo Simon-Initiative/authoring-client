@@ -7,7 +7,6 @@ import * as contentTypes from '../../data/contentTypes';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
 import { LockDetails, renderLocked } from '../../utils/lock';
-import NavigationBar from '../navigation/NavigationBar.controller';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
 import * as viewActions from '../../actions/view';
 import { DuplicateListingInput } from './DuplicateListingInput';
@@ -515,8 +514,7 @@ export class ObjectiveSkillView
     return (
       <div className="objective-skill-view container-fluid new">
         <div className="row">
-          <NavigationBar />
-          <div className="col-sm-9 col-md-10 document">
+          <div className="col-sm-12 col-md-12 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">

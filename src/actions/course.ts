@@ -32,8 +32,8 @@ export type UpdateCourseResourcesAction = {
 
 export const updateCourseResources = (resources: Immutable.OrderedMap<string, Resource>)
   : UpdateCourseResourcesAction => ({
-    type: UPDATE_COURSE_RESOURCES,
     resources,
+    type: UPDATE_COURSE_RESOURCES,
   });
 
 
@@ -42,9 +42,10 @@ export const updateCourseResources = (resources: Immutable.OrderedMap<string, Re
  * @param model - course model
  */
 export const courseChanged = (model: CourseModel): CourseChangedAction => ({
-  type: COURSE_CHANGED,
   model,
+  type: COURSE_CHANGED,
 });
+
 
 
 function createPlaceholderPage(courseId: string) {
@@ -80,12 +81,12 @@ export function loadCourse(courseId: string) {
           dispatch(fetchObjectives(courseId));
           return updatedModel;
 
-        } else {
-          dispatch(courseChanged(document.model));
-          dispatch(fetchSkills(courseId));
-          dispatch(fetchObjectives(courseId));
-          return document.model;
         }
+        dispatch(courseChanged(document.model));
+        dispatch(fetchSkills(courseId));
+        dispatch(fetchObjectives(courseId));
+        return document.model;
+
       }
 
     })
@@ -93,16 +94,5 @@ export function loadCourse(courseId: string) {
   };
 }
 
-export function viewCourse(courseId: string) {
-  return function (dispatch) {
-    dispatch(loadCourse(courseId)).then((c) => {
-
-      // This ensures that we wipe any messages displayed from
-      // another course
-      dispatch(dismissScopedMessages(Scope.Package));
-      dispatch(viewDocument(courseId, courseId));
-    });
-  };
-}
 
 

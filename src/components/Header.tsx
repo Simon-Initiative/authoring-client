@@ -1,57 +1,121 @@
 import * as React from 'react';
-import * as viewActions from '../actions/view';
-
+import { ViewActions } from '../actions/view';
+import { CourseModel } from 'data/models';
 import { buildFeedbackFromCurrent } from '../utils/feedback';
+import { UserInfo } from 'reducers/user';
 
 import './Header.scss';
 
 export interface HeaderProps {
-  dispatch: any;
-  logoutUrl: string;
-  name: string;
-  email: string;
+  course: CourseModel;
+  user: UserInfo;
+  viewActions: ViewActions;
 }
+
+type LinkProps = {
+  action: any,
+  children: any,
+};
+
+const Link: React.StatelessComponent<LinkProps> = ({
+  action,
+  children,
+}) => (
+  <a className="header-link" href="#"
+    onClick={(e) => { e.preventDefault(); action();}}>{children}</a>
+);
+
+type MenuProps = {
+  label: string,
+  children: any,
+};
+
+const Menu: React.StatelessComponent<MenuProps> = ({
+  label,
+  children,
+}) => (
+  <div className="dropdown show header-dropdown">
+    <a className="header-link dropdown-toggle" href="#"
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {label}
+    </a>
+    <div className="dropdown-menu">
+      {children}
+    </div>
+  </div>
+);
+
+
+type MenuItemProps = {
+  action: any,
+  children: any,
+};
+
+const MenuItem: React.StatelessComponent<MenuItemProps> = ({
+  action,
+  children,
+}) => (
+  <a className="dropdown-item" href="#"
+    onClick={(e) => { e.preventDefault(); action();}}>{children}</a>
+);
+
 
 class Header extends React.PureComponent<HeaderProps, {}> {
 
-  constructor(props) {
-    super(props);
+  renderPackageActions() {
 
-    this.onClickCreate = this.onClickCreate.bind(this);
-    this.onClickHome = this.onClickHome.bind(this);
+    const v = this.props.viewActions;
+    const id = this.props.course.guid;
+
+    return (
+      <React.Fragment>
+        <a className="header-link course-link" href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            v.viewDocument(id, id);
+          }}>{this.props.course.title}:</a>
+
+        <Link action={v.viewObjectives.bind(undefined, id)}>Objectives</Link>
+        <Link action={v.viewOrganizations.bind(undefined, id)}>Organizations</Link>
+        <Link action={v.viewPages.bind(undefined, id)}>Pages</Link>
+        <Menu label="Assessments">
+          <MenuItem action={v.viewFormativeAssessments.bind(undefined, id)}>
+            Formative
+          </MenuItem>
+          <MenuItem action={v.viewSummativeAssessments.bind(undefined, id)}>
+            Summative
+          </MenuItem>
+          <MenuItem action={v.viewPools.bind(undefined, id)}>
+            Question Pools
+          </MenuItem>
+        </Menu>
+
+      </React.Fragment>
+    );
   }
 
-  onClickHome() {
-    this.props.dispatch(viewActions.viewAllCourses());
-  }
-
-  onClickCreate() {
-    this.props.dispatch(viewActions.viewCreateCourse());
+  renderApplicationLabel() {
+    return <span>OLI Course Authoring</span>;
   }
 
   render() {
 
-    const { name, email } = this.props;
-
-    const formUrl = buildFeedbackFromCurrent(
-      name,
-      email,
-    );
-
     return (
       <div className="header">
-        <nav className="navbar navbar-light bg-light justify-content-start">
-
-          <a className="navbar-brand" onClick={this.onClickHome}>
-          <img src="assets/oli-icon.png" width="30" height="30"
-              className="d-inline-block align-top" alt=""/>
-            Open Learning Initiative
-          </a>
-
-          <a className="nav-link" href={formUrl}>Provide Feedback</a>
-          <a className="nav-link" href={this.props.logoutUrl}>Logout</a>
-
-        </nav>
+        <div className="header-logo">
+          <Link action={this.props.viewActions.viewAllCourses}>
+            <img src="assets/oli-icon.png" width="30" height="30"
+                className="d-inline-block align-top" alt=""/>
+          </Link>
+        </div>
+        <div className="header-content">
+          {this.props.course ? this.renderPackageActions() : this.renderApplicationLabel()}
+        </div>
+        <div className="header-logout">
+          <Link action={() => window.open(this.props.user.logoutUrl)}>
+            Logout
+          </Link>
+        </div>
       </div>
     );
   }
