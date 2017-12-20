@@ -2,7 +2,9 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import {onFailureCallback, onSaveCompletedCallback, 
+import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
+
+import {onFailureCallback, onSaveCompletedCallback,
   PersistenceStrategy } from './PersistenceStrategy';
 
 export interface AbstractPersistenceStrategy {
@@ -12,6 +14,8 @@ export interface AbstractPersistenceStrategy {
   courseId: string;
   destroyed: boolean;
   lockDetails: LockDetails;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 export abstract class AbstractPersistenceStrategy implements PersistenceStrategy {
@@ -23,6 +27,8 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
     this.courseId = null;
     this.destroyed = false;
     this.lockDetails = null;
+    this.registerLocks = null;
+    this.unregisterLocks = null;
   }
 
   getLockDetails() : LockDetails {
@@ -30,15 +36,15 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
   }
 
   releaseLock(when: number) {
-    
+
     // Release the write lock if it was acquired, but fetch
     // the document first to get the most up to date version
 
     if (this.writeLockedDocumentId !== null) {
+      this.unregisterLocks([{ courseId: this.courseId, documentId: this.writeLockedDocumentId }]);
       return persistence.releaseLock(this.courseId, this.writeLockedDocumentId);
-    } else {
-      return Promise.resolve({});
     }
+    return Promise.resolve({});
   }
 
 
@@ -48,11 +54,16 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
    */
   initialize(doc: persistence.Document, userName: string,
              onSuccess: onSaveCompletedCallback,
-             onFailure: onFailureCallback): Promise<boolean> {
+             onFailure: onFailureCallback,
+             registerLocks: RegisterLocks,
+             unregisterLocks: UnregisterLocks,
+            ): Promise<boolean> {
 
     this.successCallback = onSuccess;
     this.failureCallback = onFailure;
-    
+    this.registerLocks = registerLocks;
+    this.unregisterLocks = unregisterLocks;
+
     return new Promise((resolve, reject) => {
 
       persistence.acquireLock(doc._courseId, doc._id)
@@ -61,16 +72,18 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
           this.lockDetails = (result as any);
           this.writeLockedDocumentId = doc._id;
           this.courseId = doc._courseId;
+
+          this.registerLocks([{ courseId: doc._courseId, documentId: doc._id }]);
           onSuccess(doc);
           resolve(true);
-          
+
         } else {
           this.lockDetails = (result as any);
           resolve(false);
         }
-      });      
+      });
     });
-     
+
   }
 
   abstract save(doc: persistence.Document): void;

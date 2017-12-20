@@ -144,6 +144,22 @@ history.listen((current) => {
     .then(result => window.scrollTo(0, 0));
 });
 
+function clearHeldLocks() {
+  return function (dispatch, getState) {
+    if (getState().locks.size > 0) {
+      getState().locks
+        .toArray()
+        .forEach(locks => persistence.releaseLock(locks.courseId, locks.documentId));
+    }
+  };
+}
+
+window.addEventListener('beforeunload', (event) => {
+  if (store !== null) {
+    store.dispatch(clearHeldLocks());
+  }
+});
+
 if ((module as any).hot) {
   (module as any).hot.accept('./ApplicationRoot', () => {
     CurrentApplicationRoot = require('./ApplicationRoot').ApplicationRoot;

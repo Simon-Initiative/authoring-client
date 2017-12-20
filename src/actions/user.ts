@@ -56,4 +56,5 @@ export module user {
         configuration.protocol + configuration.hostname);
     };
   }
+
 }

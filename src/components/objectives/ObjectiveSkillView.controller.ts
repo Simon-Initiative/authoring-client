@@ -7,6 +7,8 @@ import { setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
 import * as Messages from 'types/messages';
 import { showMessage } from 'actions/messages';
+import * as lockActions from 'actions/locks';
+import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
 
 interface StateProps {
   skills: any;
@@ -18,6 +20,8 @@ interface DispatchProps {
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   showMessage: (message: Messages.Message) => void;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 interface OwnProps {
@@ -51,6 +55,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     showMessage: (message: Messages.Message) => {
       dispatch(showMessage(message));
+    },
+    registerLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.registerLocks(locks));
+    },
+    unregisterLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.unregisterLocks(locks));
     },
   };
 };
