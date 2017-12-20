@@ -368,51 +368,52 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
     if (failure !== null) {
       return null;
-    } else if (document === null || editingAllowed === null) {
+    }
+    if (document === null || editingAllowed === null) {
       if (waitBufferElapsed) {
         return this.renderWaiting();
-      } else {
-        return null;
       }
-    } else {
-      const courseId = (course as models.CourseModel).guid;
-      const courseLabel = (course as models.CourseModel).id;
-      const version = (course as models.CourseModel).version;
 
-      const childProps: AbstractEditorProps<any> = {
-        model: document.model,
-        expanded: expanded.has(documentId)
-          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
-          : Maybe.nothing<Immutable.Set<string>>(),
-        context: {
-          documentId,
-          userId,
-          courseId,
-          resourcePath: this.determineBaseUrl((document.model as any).resource),
-          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-          courseModel: course,
-          undoRedoGuid,
-          skills: this.props.skills,
-          objectives: this.props.objectives,
-        },
-        dispatch: onDispatch,
-        onEdit: this.onEdit,
-        onUndoRedoEdit: this.onUndoRedoEdit,
-        services: new DispatchBasedServices(
-          onDispatch,
-          course,
-        ),
-        editMode: editingAllowed,
-      };
-
-      const registeredEditor = lookUpByName(document.model.modelType);
-      const editor = React.createElement((registeredEditor.component as any), childProps);
-
-      return (
-        <div className="editor-manager">
-          {editor}
-        </div>
-      );
+      return null;
     }
+
+    const courseId = (course as models.CourseModel).guid;
+    const courseLabel = (course as models.CourseModel).id;
+    const version = (course as models.CourseModel).version;
+
+    const childProps: AbstractEditorProps<any> = {
+      model: document.model,
+      expanded: expanded.has(documentId)
+        ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+        : Maybe.nothing<Immutable.Set<string>>(),
+      context: {
+        documentId,
+        userId,
+        courseId,
+        resourcePath: this.determineBaseUrl((document.model as any).resource),
+        baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
+        courseModel: course,
+        undoRedoGuid,
+        skills: this.props.skills,
+        objectives: this.props.objectives,
+      },
+      dispatch: onDispatch,
+      onEdit: this.onEdit,
+      onUndoRedoEdit: this.onUndoRedoEdit,
+      services: new DispatchBasedServices(
+        onDispatch,
+        course,
+      ),
+      editMode: editingAllowed,
+    };
+
+    const registeredEditor = lookUpByName(document.model.modelType);
+    const editor = React.createElement((registeredEditor.component as any), childProps);
+
+    return (
+      <div className="editor-manager">
+        {editor}
+      </div>
+    );
   }
 }

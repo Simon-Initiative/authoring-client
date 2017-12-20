@@ -83,10 +83,10 @@ export const updateChoiceValuesAndRefs =
       );
     });
 
-    onEdit(
-      itemModel.with({ choices: newChoices }),
-      partModel.with({ responses: newResponses }),
-    );
+    return {
+      itemModel: itemModel.with({ choices: newChoices }),
+      partModel: partModel.with({ responses: newResponses }),
+    };
   };
 
 /**
@@ -208,7 +208,12 @@ export class MultipleChoice
     });
 
     // update models with new choices and references
-    updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+
+    onEdit(
+      newModels.itemModel,
+      newModels.partModel,
+    );
   }
 
   renderChoices() {

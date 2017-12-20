@@ -12,6 +12,11 @@ import {
   InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
 import { updateChoiceValuesAndRefs } from './MultipleChoice';
+import {
+  modelWithDefaultFeedback, getGeneratedResponseBody, getGeneratedResponseScore,
+} from 'editors/content/part/defaultFeedbackGenerator.ts';
+import { AUTOGEN_MAX_CHOICES } from '../part/ChoiceFeedback';
+import { CombinationsMap } from 'types/combinations';
 
 export interface ChoicesProps {
   itemModel: any;
@@ -20,6 +25,7 @@ export interface ChoicesProps {
   context: AppContext;
   services: AppServices;
   editMode: boolean;
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 export interface ChoicesState {
@@ -42,27 +48,66 @@ export class Choices
   }
 
   onAddChoice() {
-    const count = this.props.itemModel.choices.size;
+    const {
+      itemModel, partModel, onGetChoiceCombinations, onEdit,
+    } = this.props;
+
+    const count = itemModel.choices.size;
     const value = String.fromCharCode(65 + count);
 
     const choice = new contentTypes.Choice().with({ value });
 
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.set(choice.guid, choice) });
 
-    this.props.onEdit(itemModel, this.props.partModel);
+    // update part model with default feedback
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+    );
   }
 
   onRemoveChoice(choice: contentTypes.Choice) {
-    let { itemModel } = this.props;
-    const { partModel, onEdit } = this.props;
+    const {
+      itemModel, partModel, onGetChoiceCombinations, onEdit,
+    } = this.props;
 
-    itemModel = itemModel.with({
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = itemModel.with({
       choices: itemModel.choices.delete(choice.guid),
     });
 
     // update models with new choices and references
-    updateChoiceValuesAndRefs(itemModel, partModel, onEdit);
+    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    updatedItemModel = updatedModels.itemModel;
+    updatedPartModel = updatedModels.partModel;
+
+    // update part model with default feedback
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+    );
   }
 
   onReorderChoices(originalIndex, newIndex) {
@@ -80,7 +125,9 @@ export class Choices
     choices.splice((newIndex - 1) + indexOffset, 0, choice);
 
     // update item model
-    const updatedItemModel = itemModel.with({
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = itemModel.with({
       // set choices to a new OrderedMap with updated choice ordering
       choices: choices.reduce(
         (acc, c) => {
@@ -91,7 +138,14 @@ export class Choices
     });
 
     // update models with new choices and references
-    updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    updatedItemModel = updatedModels.itemModel;
+    updatedPartModel = updatedModels.partModel;
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+    );
   }
 
   onChoiceEdit(c) {

@@ -1,44 +1,24 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { Html } from 'data/content/html.ts';
+import { CombinationsMap } from 'types/combinations';
 
 /**
  * Generates the remaining feedback match combinations of choices not specified by the user
  */
-const generateFeedbackCombinations = (userResponses, choices) => {
-  // function that recursively generates all combinations of the specified ids
-  const recursiveCombination = (ids, prefix = []) => (
-    // combine nested arrays into a single result array
-    ids.reduce(
-      (acc, id, i) => (
-        // return an array containing the current new combination
-        // and recursively add remaining combinations
-        acc.concat([
-          [...prefix, id],
-          ...recursiveCombination(ids.slice(i + 1), [...prefix, id]),
-        ])
-      ),
-      [],
-    )
-  );
+const getFeedbackCombinations = (userResponses, choices, allCombinations: CombinationsMap) => {
+  // get all user specified combinations
+  const existingCombinations = userResponses.map(response => response.match.split(',')
+    .filter(s => s));
 
-  const allCombinations = recursiveCombination(choices.map(c => c.guid));
-  const existingCombinations = userResponses.map(response => (
-      response.match.split(',').map(m =>
-          choices.find(c => c.value === m) && choices.find(c => c.value === m).guid,
-      ).filter(s => s)
-    ),
-  );
-
-  const setsEqual = (set1: string[], set2: string[]): boolean => {
-    return set1.length === set2.length
-      && set1.reduce((acc, i) => acc && !!set2.find(j => j === i), true)
-      && set2.reduce((acc, i) => acc && !!set1.find(j => j === i), true);
+  // function that calculates the key of a given combination
+  const getComboKey = (combination: string[]): string => {
+    return combination.sort().join(',');
   };
 
-  /// return the difference of all combinations and existing combinations
-  return allCombinations.filter(combination =>
-    !existingCombinations.reduce((acc, e) => acc || setsEqual(e, combination), false),
+  // return the difference of all combinations and existing combinations
+  return allCombinations.keySeq().filter(combinationKey =>
+    !existingCombinations.reduce((acc, e) => acc || combinationKey === getComboKey(e), false),
   );
 };
 
@@ -54,10 +34,8 @@ const generateFeedbackCombinations = (userResponses, choices) => {
  *                      be a single feedback item with match set to the match-all 'glob'
  */
 export const modelWithDefaultFeedback =
-  (model, choices, body: Html, score: string, maxGenChoices: number) => {
-
-    console.log('body.clone()', body.clone());
-
+  (model, choices, body: Html, score: string, maxGenChoices: number,
+   onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap) => {
     // remove all existing default responses
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
@@ -77,22 +55,25 @@ export const modelWithDefaultFeedback =
         }),
       ];
     } else {
-      // generate new default responses
-      generatedResponses = generateFeedbackCombinations(userResponses, choices).map((combo) => {
-        const feedback = new contentTypes.Feedback({
-          // body: body.with({ guid: newGuid }),
-          body: body.clone(),  // || body,
-        });
-        const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-        const match = combo.map(id => choices.find(c => c.guid === id).value).join(',');
+      // // update available choice combinations before proceeding
+      const allCombinations = onUpdateChoiceCombinations(choices.length);
 
-        return new contentTypes.Response({
-          name: 'AUTOGEN',
-          score,
-          match,
-          feedback: feedbacks.set(feedback.guid, feedback),
+      // generate new default responses
+      generatedResponses = getFeedbackCombinations(userResponses, choices, allCombinations)
+        .map((combo) => {
+          const feedback = new contentTypes.Feedback({
+            body: body.clone(),
+          });
+          const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
+          const match = combo;
+
+          return new contentTypes.Response({
+            name: 'AUTOGEN',
+            score,
+            match,
+            feedback: feedbacks.set(feedback.guid, feedback),
+          });
         });
-      });
     }
 
     const updatedModel = model.with({
@@ -103,7 +84,22 @@ export const modelWithDefaultFeedback =
       ),
     });
 
-    console.log('body', body);
-
     return updatedModel;
   };
+
+export const getGeneratedResponseItem = (partModel) => {
+  return partModel &&
+    partModel.responses.toArray().find(r => r.name && !!r.name.match(/^AUTOGEN.*/));
+};
+
+export const getGeneratedResponseBody = (partModel) => {
+  const defaultResponseItem = getGeneratedResponseItem(partModel);
+
+  return defaultResponseItem ? defaultResponseItem.feedback.first().body : new Html();
+};
+
+export const getGeneratedResponseScore = (partModel) => {
+  const defaultResponseItem = getGeneratedResponseItem(partModel);
+
+  return defaultResponseItem ? defaultResponseItem.score : '0';
+};

@@ -84,7 +84,6 @@ export class Objectives
           onChange={(selected: ObjTitle[]) => {
 
             const model = Immutable.List(selected.map(s => s.id));
-            console.log(selected);
             this.setState({ selected }, () => this.props.onEdit(model));
           }}
           options={options}

@@ -15,7 +15,10 @@ import createGuid from 'utils/guid';
 import {
   InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
-import { modelWithDefaultFeedback } from 'editors/content/part/defaultFeedbackGenerator.ts';
+import {
+  modelWithDefaultFeedback, getGeneratedResponseBody, getGeneratedResponseScore,
+} from 'editors/content/part/defaultFeedbackGenerator.ts';
+import { CombinationsMap } from 'types/combinations';
 
 import './ChoiceFeedback.scss';
 
@@ -23,7 +26,7 @@ import './ChoiceFeedback.scss';
 // feedback combinations feature. When exceeded, the editor will switch to
 // the glob notation, but as a side effect, analyzing which choices were made
 // will no longer be possible
-const AUTOGEN_MAX_CHOICES = 10;
+export const AUTOGEN_MAX_CHOICES = 12;
 
 const HTML_CONTENT_EDITOR_STYLE = {
   minHeight: '20px',
@@ -35,6 +38,7 @@ const HTML_CONTENT_EDITOR_STYLE = {
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   input?: string;
   choices: contentTypes.Choice[];
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 export interface ChoiceFeedbackState {
@@ -51,7 +55,7 @@ export abstract class ChoiceFeedback
     super(props);
 
     this.onResponseEdit = this.onResponseEdit.bind(this);
-    this.onAddFeedback = this.onAddFeedback.bind(this);
+    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onResponseRemove = this.onResponseRemove.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
@@ -61,13 +65,25 @@ export abstract class ChoiceFeedback
   }
 
   onResponseEdit(response) {
-    const model = this.props.model.with({
-      responses: this.props.model.responses.set(response.guid, response),
+    const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
+
+    let updatedModel = model.with({
+      responses: model.responses.set(response.guid, response),
     });
-    this.props.onEdit(model);
+
+    updatedModel = modelWithDefaultFeedback(
+      updatedModel,
+      choices,
+      getGeneratedResponseBody(updatedModel),
+      getGeneratedResponseScore(updatedModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(updatedModel);
   }
 
-  onAddFeedback() {
+  onResponseAdd() {
     const feedback = new contentTypes.Feedback();
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
@@ -87,13 +103,22 @@ export abstract class ChoiceFeedback
   }
 
   onResponseRemove(response) {
-    let { model } = this.props;
+    const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
-    model = model.with({
+    let updatedModel = model.with({
       responses: model.responses.delete(response.guid),
     });
 
-    this.props.onEdit(model);
+    updatedModel = modelWithDefaultFeedback(
+      updatedModel,
+      choices,
+      getGeneratedResponseBody(updatedModel),
+      getGeneratedResponseScore(updatedModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(updatedModel);
   }
 
   onScoreEdit(response, score) {
@@ -119,9 +144,16 @@ export abstract class ChoiceFeedback
   }
 
   onDefaultFeedbackEdit(body: Html, score: string) {
-    const { model, choices, onEdit } = this.props;
+    const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
-    const updatedModel = modelWithDefaultFeedback(model, choices, body, score, AUTOGEN_MAX_CHOICES);
+    const updatedModel = modelWithDefaultFeedback(
+      model,
+      choices,
+      body,
+      score,
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
     onEdit(updatedModel);
   }
 
@@ -153,7 +185,7 @@ export abstract class ChoiceFeedback
       <div className="message flex-spacer">
         <div className="alert alert-warning">
           <strong>NOTE</strong>&nbsp;&nbsp;Providing more than {AUTOGEN_MAX_CHOICES} choices
-          (Choice {convert.toAlphaNotation(AUTOGEN_MAX_CHOICES)}) for this question will prevent
+          (Choice {convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will prevent
           you from determining exact selections for All Other Choices.
         </div>
       </div>
@@ -164,17 +196,8 @@ export abstract class ChoiceFeedback
     const { choices, model, context, services, editMode, onEdit } = this.props;
 
     // get default feedback details
-    let defaultFeedbackBody;
-    let defaultFeedbackScore;
-    const defaultResponseItem =
-      this.props.model.responses.toArray().find(r => r.name && !!r.name.match(/^AUTOGEN.*/));
-    if (defaultResponseItem) {
-      defaultFeedbackBody = defaultResponseItem.feedback.first().body;
-      defaultFeedbackScore = defaultResponseItem.score;
-    } else {
-      defaultFeedbackBody = new Html();
-      defaultFeedbackScore = '0';
-    }
+    const defaultFeedbackBody = getGeneratedResponseBody(model);
+    const defaultFeedbackScore = getGeneratedResponseScore(model);
 
     // this methods takes the list of responses, filters out the auto-generated feedback
     // elements and replaces them with a single psudo-feedback element which covers all
@@ -261,7 +284,7 @@ export abstract class ChoiceFeedback
     return (
       <div className="choice-feedback">
         <Button editMode={this.props.editMode}
-          type="link" onClick={this.onAddFeedback}>
+          type="link" onClick={this.onResponseAdd}>
           Add Feedback
         </Button>
         <InputList className="feedback-items">

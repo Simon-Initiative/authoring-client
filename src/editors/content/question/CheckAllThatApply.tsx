@@ -1,15 +1,16 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import * as Immutable from 'immutable';
-import { ChoiceFeedback } from '../part/ChoiceFeedback';
+import { ChoiceFeedback, AUTOGEN_MAX_CHOICES } from '../part/ChoiceFeedback';
 import { Button } from '../common/controls';
 import guid from 'utils/guid';
 import { Question, QuestionProps, QuestionState,
 Section, SectionContent, SectionHeader, OptionControl, SectionControl } from './Question';
 import { Choices } from './Choices';
+import { CombinationsMap } from 'types/combinations';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
-
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 export interface CheckAllThatApplyState extends QuestionState {
@@ -29,6 +30,22 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
+  }
+
+  componentDidMount() {
+    this.updateChoiceCombinations();
+  }
+
+  componentDidUpdate() {
+    this.updateChoiceCombinations();
+  }
+
+  updateChoiceCombinations() {
+    const { itemModel, onGetChoiceCombinations } = this.props;
+
+    if (itemModel.choices.size <= AUTOGEN_MAX_CHOICES) {
+      onGetChoiceCombinations(itemModel.choices.size);
+    }
   }
 
   onToggleShuffle() {
@@ -62,7 +79,10 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   }
 
   renderAdditionalSections() {
-    const { context, services, editMode, itemModel, partModel, onEdit } = this.props;
+    const {
+      context, services, editMode, itemModel,
+      partModel, onGetChoiceCombinations, onEdit,
+    } = this.props;
 
     return ([
       <Section key="choices" className="choices">
@@ -83,7 +103,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             services={services}
             editMode={editMode}
             partModel={partModel}
-            itemModel={itemModel} />
+            itemModel={itemModel}
+            onGetChoiceCombinations={onGetChoiceCombinations} />
         </SectionContent>
       </Section>,
       <Section key="feedback" className="feedback">
@@ -93,6 +114,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             {...this.props}
             model={partModel}
             choices={itemModel.choices.toArray()}
+            onGetChoiceCombinations={onGetChoiceCombinations}
             onEdit={this.onPartEdit} />
         </SectionContent>
       </Section>,
