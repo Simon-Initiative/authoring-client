@@ -13,7 +13,7 @@ export type RegisterLocksAction = {
 
 export function registerLocks(locks: AcquiredLock[]) : RegisterLocksAction {
   return {
-	  type: REGISTER_LOCKS,
+    type: REGISTER_LOCKS,
     locks,
   };
 }
@@ -25,7 +25,7 @@ export type UnregisterLocksAction = {
 
 export function unregisterLocks(locks: AcquiredLock[]) : UnregisterLocksAction {
   return {
-	  type: UNREGISTER_LOCKS,
+    type: UNREGISTER_LOCKS,
     locks,
   };
 }

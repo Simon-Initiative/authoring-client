@@ -149,7 +149,7 @@ function clearHeldLocks() {
     if (getState().locks.size > 0) {
       getState().locks
         .toArray()
-        .forEach(locks => persistence.releaseLock(locks.courseId, locks.documentId));
+        .forEach(lock => persistence.releaseLock(lock.courseId, lock.documentId));
     }
   };
 }
