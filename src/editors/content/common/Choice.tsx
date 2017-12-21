@@ -1,17 +1,12 @@
-
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { InputLabel } from '../common/InputLabel';
 import { DragTypes } from 'utils/drag';
 import { DragSource, DropTarget } from 'react-dnd';
-import { RepositionTarget } from 'editors/common/tree/RepositionTarget.tsx';
-import { Maybe } from 'tsmonad';
 import { Remove } from 'components/common/Remove';
 import { DragHandle } from 'components/common/DragHandle.tsx';
 import { convert } from 'utils/format';

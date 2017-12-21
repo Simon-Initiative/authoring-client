@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 
 import { TextInput } from '../../content/common/TextInput';
-import { RemovableContent } from '../../content/common/RemovableContent';
 
 export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;

@@ -1,6 +1,6 @@
 import * as persistence from 'data/persistence';
 import * as Immutable from 'immutable';
-import { CourseModel, ModelTypes, OrganizationModel } from 'data/models';
+import { CourseModel, OrganizationModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { Resource } from 'data/contentTypes';
 import * as Messages from 'types/messages';

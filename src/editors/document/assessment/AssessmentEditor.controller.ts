@@ -1,8 +1,6 @@
 import { connect } from 'react-redux';
-import { OrderedMap } from 'immutable';
 import AssessmentEditor from './AssessmentEditor';
 import { fetchSkills } from 'actions/skills';
-import { Title, Skill } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
 import { AssessmentModel } from 'data/models';
 

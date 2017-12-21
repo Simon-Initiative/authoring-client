@@ -1,8 +1,7 @@
 import { user as userActions } from '../actions/user';
 import { OtherAction } from './utils';
-
 // tslint:disable-next-line
-import { UserProfile } from 'types/user';
+import {UserProfile} from 'types/user';
 
 type UserAction =
   userActions.loginSuccessAction |

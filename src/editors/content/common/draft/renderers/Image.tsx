@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Image as ImageType } from '../../../../../data/content/html/image';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState} from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
@@ -20,11 +19,11 @@ export interface ImageProps extends InteractiveRendererProps {
 }
 
 export interface ImageState extends InteractiveRendererState {
-  
+
 }
 
 export interface ImageProps {
-  
+
 }
 
 
@@ -50,13 +49,13 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
         services={b.services}
 
         model={this.props.data.image}
-        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onCancel={() => this.props.blockProps.services.dismissModal()}
         onInsert={(image) => {
           this.props.blockProps.services.dismissModal();
           this.props.blockProps.onEdit({ image });
         }
       }>
-        <ImageEditor 
+        <ImageEditor
           model={this.props.data.image}
           context={b.context}
           services={b.services}
@@ -73,15 +72,15 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     let imageComponent = null;
 
     if (src === '') {
-      imageComponent = <img onClick={this.onClick} 
+      imageComponent = <img onClick={this.onClick}
         src="assets/400x300.png" width="400" height="300"/>;
-           
+
     } else {
 
       const fullSrc = buildUrl(
-        this.props.blockProps.context.baseUrl, 
-        this.props.blockProps.context.courseId, 
-        this.props.blockProps.context.resourcePath, 
+        this.props.blockProps.context.baseUrl,
+        this.props.blockProps.context.courseId,
+        this.props.blockProps.context.resourcePath,
         src);
 
       imageComponent =
@@ -89,10 +88,10 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
     }
 
     return (
-      <div ref={c => this.focusComponent = c} 
+      <div ref={c => this.focusComponent = c}
         onFocus={this.onFocus} onBlur={this.onBlur}>
-        <AutoHideEditRemove 
-          editMode={this.props.blockProps.editMode} 
+        <AutoHideEditRemove
+          editMode={this.props.blockProps.editMode}
           onEdit={this.onClick}
           onRemove={this.onRemove}
           >
@@ -100,7 +99,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
         </AutoHideEditRemove>
       </div>
     );
-    
+
   }
 }
 

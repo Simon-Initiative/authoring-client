@@ -1,13 +1,6 @@
 import { Map } from 'immutable';
 
-import {
-  SetSkillsAction,
-  UpdateSkillsAction,
-  SET_SKILLS,
-  UPDATE_SKILLS,
-} from 'actions/skills';
-
-import * as models from 'data/models';
+import { SET_SKILLS, SetSkillsAction, UPDATE_SKILLS, UpdateSkillsAction } from 'actions/skills';
 import { Skill } from 'data//contentTypes';
 import { OtherAction } from './utils';
 

@@ -107,7 +107,6 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
   render() {
     const {
       className,
-      children,
       id,
       label,
       contentTitle,
@@ -120,28 +119,12 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
       onEdit,
       onRemove,
       isDraggable,
-      index,
       connectDragSource,
       connectDragPreview,
-      onDragDrop,
-      isDragging,
       connectDropTarget,
       isHovered,
       canDrop,
     } = this.props;
-
-    const elementChildren = React.Children.toArray(children)
-      .map((element: React.ReactElement<any>): React.ReactElement<any> =>
-        React.cloneElement(element, { editMode }),
-      );
-
-    const itemOptionRows = elementChildren.filter(
-      (child: React.ReactElement<any>): boolean => child.type === ItemOptions,
-    );
-
-    const itemControls = elementChildren.filter(
-      (child: React.ReactElement<any>): boolean => child.type === ItemControl,
-    );
 
     return connectDropTarget(
       <div className={`input-list-item ${className || ''}`}>

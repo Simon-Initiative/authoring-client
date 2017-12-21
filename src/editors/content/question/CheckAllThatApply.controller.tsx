@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { Skill } from 'types/course';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
-import { CheckAllThatApply, CheckAllThatApplyProps } from './CheckAllThatApply';
+import { CheckAllThatApply } from './CheckAllThatApply';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
 

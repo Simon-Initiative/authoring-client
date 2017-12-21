@@ -12,40 +12,6 @@ export interface ModalSelectionProps {
   onCancel: () => void;
 }
 
-const tempnavstyle : any = {
-  objectContainer: {
-    marginTop: '10px',
-    overflow: 'auto',
-  },
-};
-
-const customStyles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(70, 70, 70, 0.75)',
-    zIndex: 10001, // otherwise we're behind the left most nav bar
-  },
-  content: {
-    position: 'absolute',
-    top: '140px',
-    left: '140px',
-    right: '140px',
-    bottom: '140px',
-    border: '0px solid #444444',
-    background: '#fff',
-    overflow: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    borderRadius: '4px',
-    outline: 'none',
-    padding: '20px',
-    zIndex: 10000,
-  },
-};
-
 class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
 
   componentDidMount() {

@@ -1,11 +1,9 @@
 import { connect } from 'react-redux';
-import * as Immutable from 'immutable';
 
 import WorkbookPageEditor from './WorkbookPageEditor';
 import { fetchObjectives } from 'actions/objectives';
-import { Title } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
-import { WorkbookPageModel, OrganizationModel } from 'data/models';
+import { WorkbookPageModel } from 'data/models';
 import { Resource } from 'data/contentTypes';
 import { preview } from 'actions/preview';
 

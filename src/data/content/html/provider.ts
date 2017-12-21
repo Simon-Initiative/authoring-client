@@ -1,5 +1,3 @@
-import * as Immutable from 'immutable';
-
 import { ContentBlock, ContentState } from 'draft-js';
 import * as common from './common';
 

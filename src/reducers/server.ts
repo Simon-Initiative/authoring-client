@@ -1,5 +1,4 @@
 import * as serverActions from '../actions/server';
-import * as models from '../data/models';
 import { OtherAction } from './utils';
 
 type ServerActions =

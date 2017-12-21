@@ -1,10 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as t from '../../data/contentTypes';
-import * as models from '../../data/models';
-import { Maybe } from 'tsmonad';
-import guid from '../../utils/guid';
-import { TextInput } from '../../editors/content/common/TextInput';
 
 export interface TitleProps {
   title: string;
@@ -67,9 +61,6 @@ export class Title
 
 
   render() : JSX.Element {
-
-    const { title, editMode } = this.props;
-
     if (this.state.isEditing) {
       return (
         <div style={ { display: 'inline', marginLeft: '40px' } }>
@@ -92,41 +83,31 @@ export class Title
           </button>
         </div>
       );
-    } else {
-      const linkStyle : any = {
-        color: 'black',
-        fontWeight: 'normal',
-      };
-      const label : any = {
-        fontFamily: 'sans-serif',
-        lineHeight: 1.25,
-        fontSize: '12',
-        position: 'relative',
-        top: '-6',
-        color: '#606060',
-      };
-      const renameButton = this.props.isHoveredOver && this.props.editMode
-          ? <button
-              key="rename"
-              onClick={this.onBeginEdit}
-              type="button"
-              className="btn btn-link btn-sm">
-              Rename
-            </button>
-          : null;
-
-      return (
-        <div style={ { display: 'inline' } }
-          >
-          <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
-          type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
-          {renameButton}
-        </div>
-      );
     }
 
+    const linkStyle : any = {
+      color: 'black',
+      fontWeight: 'normal',
+    };
 
+    const renameButton = this.props.isHoveredOver && this.props.editMode
+        ? <button
+            key="rename"
+            onClick={this.onBeginEdit}
+            type="button"
+            className="btn btn-link btn-sm">
+            Rename
+          </button>
+        : null;
+
+    return (
+      <div style={ { display: 'inline' } }
+        >
+        <button key="itemClick" onClick={() => this.props.onToggleExpanded()}
+        type="button" style={linkStyle} className="btn btn-link">{this.props.children}</button>
+        {renameButton}
+      </div>
+    );
   }
-
 }
 

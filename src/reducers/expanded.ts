@@ -1,7 +1,7 @@
-
 import * as Immutable from 'immutable';
-import { expandNodesAction, collapseNodesAction,
-  COLLAPSE_NODES, EXPAND_NODES } from '../actions/expand';
+import {
+  COLLAPSE_NODES, collapseNodesAction, EXPAND_NODES, expandNodesAction,
+} from '../actions/expand';
 import { OtherAction } from './utils';
 
 type ExpandCollapseAction =

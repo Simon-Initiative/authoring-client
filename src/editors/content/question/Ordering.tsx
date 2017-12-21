@@ -1,13 +1,14 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
 import { Choice } from '../common/Choice';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
-import { Question, QuestionProps, QuestionState,
-Section, SectionContent, SectionControl, SectionHeader } from './Question';
+import {
+    Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
+    SectionHeader,
+} from './Question';
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
 

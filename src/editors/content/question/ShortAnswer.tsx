@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { Checkbox, Select } from '../common/controls';
-import { Question, QuestionProps, QuestionState,
-Section, SectionContent, SectionHeader } from './Question';
+import {
+  Question, QuestionProps, QuestionState, Section, SectionContent, SectionHeader,
+} from './Question';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -36,8 +37,6 @@ export class ShortAnswer
   }
 
   renderAdditionalSections() {
-    const { editMode, itemModel, partModel } = this.props;
-
     return ([
       <Section key="choices" className="choices">
         <SectionHeader title="Options"/>

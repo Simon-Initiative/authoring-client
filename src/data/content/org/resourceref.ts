@@ -1,8 +1,5 @@
 import * as Immutable from 'immutable';
-
-import { Html } from '../html';
 import { augment } from '../common';
-import { getKey } from '../../common';
 import { Maybe } from 'tsmonad';
 
 import * as types from './types';

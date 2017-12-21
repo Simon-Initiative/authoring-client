@@ -6,11 +6,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import * as viewActions from 'actions/view';
-import {
-  AbstractEditor,
-  AbstractEditorProps,
-  AbstractEditorState,
-} from '../common/AbstractEditor';
+import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 
 import './CourseEditor.scss';
 
@@ -72,18 +68,10 @@ class CourseEditor
       { selectedDevelopers: developers },
       () => {
         persistence.developerRegistration(courseId, changes, action)
-          .then((result) => {
-
-            const model = this.props.context.courseModel.with({
-              developers: Immutable.OrderedMap<string, UserInfo>(
-                [developers.map(d => [d.userName, d])]),
-            });
-          })
           .catch((err) => {
             // We need to handle this better.  This editor should be managed
             // by the EditorManager
             console.log(err);
-
           });
       });
 

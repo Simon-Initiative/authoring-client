@@ -9,7 +9,6 @@ import { AppServices } from '../../common/AppServices';
 import { QuestionEditor } from '../../content/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
-import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { LegacyTypes } from '../../../data/types';
 
 export type Props = {
@@ -42,7 +41,8 @@ export function renderAssessmentNode(
             onRemove={() => onRemove(n.guid)}
             />;
 
-  } else if (n.contentType === 'Content') {
+  }
+  if (n.contentType === 'Content') {
     return <ContentEditor
             key={n.guid}
             editMode={props.editMode}
@@ -52,7 +52,8 @@ export function renderAssessmentNode(
             onEdit={c => onEdit(n.guid, c)}
             onRemove={() => onRemove(n.guid)}
             />;
-  } else if (n.contentType === 'Selection') {
+  }
+  if (n.contentType === 'Selection') {
     return <SelectionEditor
             key={n.guid}
             isParentAssessmentGraded={isParentAssessmentGraded}

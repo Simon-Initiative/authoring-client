@@ -1,22 +1,20 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../../../data/content/html/common';
-import { WbInline } from '../../../../../data/content/html/wbinline';
-import { AppServices } from '../../../../common/AppServices';
-import { AppContext } from '../../../../common/AppContext';
-import { AssessmentsToDisplay, AssessmentSelection } 
-  from '../../../../../utils/selection/AssessmentSelection';
+import { EntityTypes } from 'data/content/html/common';
+import { WbInline } from 'data/content/html/wbinline';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
 import { InsertBlockEntityCommand } from '../../draft/commands/insert';
 import { AbstractCommand } from '../../command';
-import { LegacyTypes } from '../../../../../data/types';
 import { EditorState } from 'draft-js';
 
 export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
 
   onInsert(editorState: EditorState, context, services, resolve, reject, assessment) {
-   
+
     services.dismissModal();
-    
+
     const data = { wbinline: new WbInline({ idRef: assessment.resource.id }) };
 
     const delegate = new InsertBlockEntityCommand(EntityTypes.wb_inline, 'IMMUTABLE', data);
@@ -30,15 +28,15 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
   }
 
   execute(
-    editorState: EditorState, context: AppContext, 
+    editorState: EditorState, context: AppContext,
     services: AppServices) : Promise<EditorState> {
-    
+
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
           courseId={context.courseId}
           toDisplay={AssessmentsToDisplay.Formative}
-          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)} 
+          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
     });
   }

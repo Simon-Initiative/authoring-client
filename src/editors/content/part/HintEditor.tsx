@@ -1,10 +1,5 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
@@ -12,7 +7,6 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
-
 
 
 type IdTypes = {
@@ -77,10 +71,6 @@ export class HintEditor
       borderStyle: 'none',
       borderWith: 1,
       borderColor: '#AAAAAA',
-    };
-
-    const style = {
-      width: '80px',
     };
 
     return (

@@ -1,14 +1,7 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { Link }  from '../../../data/content/html/link';
-import { Image }  from '../../../data/content/html/image';
-
-import { AppServices } from '../../common/AppServices';
+import { Link } from '../../../data/content/html/link';
+import { Image } from '../../../data/content/html/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 import { LinkEditor } from './LinkEditor';
 import { ImageEditor } from '../media/ImageEditor';
 

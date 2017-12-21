@@ -1,17 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor,
-  AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { QuestionEditor } from '../question/QuestionEditor';
-import { ContentEditor } from '../content/ContentEditor';
-
-import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
-import { RemovableContent } from '../common/RemovableContent';
-import guid from '../../../utils/guid';
 import { Skill } from 'types/course';
-import { RepositionTarget } from 'editors/common/tree/RepositionTarget';
 
 export interface PoolProps extends AbstractContentEditorProps<contentTypes.Pool> {
   onRemove: (guid: string) => void;
@@ -67,7 +59,6 @@ export class PoolEditor
 
       let questions = Immutable.OrderedMap<string, contentTypes.Question>();
       const moved = oldQuestions.get(id);
-      const indexToInsert = (sourceIndex < index) ? index - 1 : index;
 
       arr.forEach((n, i) => {
 

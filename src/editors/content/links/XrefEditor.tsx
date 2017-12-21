@@ -1,14 +1,9 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
-import { Xref }  from '../../../data/content/html/xref';
-import { AppServices } from '../../common/AppServices';
-import { PurposeTypes } from '../../../data/content/html/common';
+import { Xref } from '../../../data/content/html/xref';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 import { TextInput } from '../common/TextInput';
 
 export interface XrefEditorProps extends AbstractContentEditorProps<Xref> {
@@ -50,7 +45,8 @@ export class XrefEditor
   shouldComponentUpdate(nextProps, nextState: XrefEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.resources !== this.state.resources) {
+    }
+    if (nextState.resources !== this.state.resources) {
       return true;
     }
     return false;
@@ -61,10 +57,6 @@ export class XrefEditor
   }
 
   onPageEdit(guid) {
-
-    const resources = this.props.context.courseModel.resources.toArray();
-    const found = resources.find(r => r.guid === guid);
-
     this.props.services.fetchIdByGuid(guid)
       .then(idref => this.props.onEdit(this.props.model.with({ idref })));
   }
@@ -75,7 +67,7 @@ export class XrefEditor
 
   render() : JSX.Element {
 
-    const { idref, target } = this.props.model;
+    const { target } = this.props.model;
 
     return (
       <div className="itemWrapper">

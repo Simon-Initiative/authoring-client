@@ -1,10 +1,8 @@
 import * as React from 'react';
-import guid from '../../../utils/guid';
-import * as models from '../../../data/models';
 import { TextInput } from '../../content/common/TextInput';
 import * as contentTypes from '../../../data/contentTypes';
 
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 export interface LabelsEditor {
 

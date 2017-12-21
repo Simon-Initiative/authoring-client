@@ -1,17 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import {
-  AbstractItemPartEditorProps,
-} from '../common/AbstractItemPartEditor';
-import { Select, Button } from '../common/controls';
+import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
+import { Button, Select } from '../common/controls';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { HtmlToolbarButton } from '../html/TypedToolbar';
-import { InsertInputRefCommand } from '../question/commands';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown.tsx';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
 import { TabContainer } from 'editors/content/common/TabContainer';

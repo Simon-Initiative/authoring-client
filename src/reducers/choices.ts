@@ -1,9 +1,6 @@
-import { OrderedMap, List } from 'immutable';
+import { OrderedMap } from 'immutable';
 import { CombinationsMap } from 'types/combinations';
-import {
-  ReceiveCombinations,
-  RECEIVE_COMBINATIONS,
-} from 'actions/choices';
+import { RECEIVE_COMBINATIONS, ReceiveCombinations } from 'actions/choices';
 import { OtherAction } from './utils';
 
 type ActionTypes = ReceiveCombinations | OtherAction;

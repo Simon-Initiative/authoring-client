@@ -1,4 +1,3 @@
-
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor.controller';
 import AssessmentEditor from '../document/assessment/AssessmentEditor.controller';
 import CourseEditor from '../document/course/CourseEditor.controller';

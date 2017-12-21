@@ -1,17 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 
-import { IFrame }  from '../../../data/content/html/iframe';
-import { AppServices } from '../../common/AppServices';
+import { IFrame } from '../../../data/content/html/iframe';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-
-import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
 
 import { TabContainer } from '../common/TabContainer';
 
@@ -90,13 +83,7 @@ export class IFrameEditor
   }
 
   renderSource() {
-
-    const { titleContent, caption, cite, popout, alternate,
-      width, height } = this.props.model;
-
     const { src } = this.props.model;
-
-    const id : string = guid();
 
     return (
       <div style={ { marginTop: '70px' } }>
@@ -127,8 +114,7 @@ export class IFrameEditor
   }
 
   renderSizing() {
-    const { titleContent, caption, cite, popout, alternate,
-      width, height } = this.props.model;
+    const { width, height } = this.props.model;
 
     return (
       <div style={ { marginTop: '70px', marginLeft: '75px' } }>
@@ -153,8 +139,7 @@ export class IFrameEditor
   }
 
   renderOther() {
-    const { titleContent, caption, cite, popout, alternate,
-      width, height } = this.props.model;
+    const { titleContent, caption, popout } = this.props.model;
 
     return (
       <div style={ { marginTop: '30px' } }>

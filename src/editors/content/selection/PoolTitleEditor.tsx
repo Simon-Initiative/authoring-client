@@ -59,10 +59,9 @@ export class PoolTitleEditor
   render() : JSX.Element {
     if (this.props.editMode) {
       return this.renderEdit();
-    } else {
-      return this.renderView();
     }
+
+    return this.renderView();
   }
 
 }
-

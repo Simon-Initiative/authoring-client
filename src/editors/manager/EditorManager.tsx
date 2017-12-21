@@ -1,7 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
@@ -11,20 +9,18 @@ import * as Messages from 'types/messages';
 import guid from 'utils/guid';
 import { configuration } from 'actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
-import { AppServices, DispatchBasedServices } from '../common/AppServices';
+import { DispatchBasedServices } from '../common/AppServices';
 import {
-  onFailureCallback,
-  onSaveCompletedCallback,
-  PersistenceStrategy,
+  onFailureCallback, onSaveCompletedCallback, PersistenceStrategy,
 } from './persistence/PersistenceStrategy';
-import { LockDetails, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
-import { buildReportProblemAction, buildPersistenceFailureMessage } from 'utils/error';
+import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import { buildPersistenceFailureMessage, buildReportProblemAction } from 'utils/error';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
-import { Skill, LearningObjective } from 'data//contentTypes';
+import { LearningObjective, Skill } from 'data//contentTypes';
 import './EditorManager.scss';
 
 export interface EditorManagerProps {
@@ -340,8 +336,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     }
 
     const courseId = (course as models.CourseModel).guid;
-    const courseLabel = (course as models.CourseModel).id;
-    const version = (course as models.CourseModel).version;
 
     const childProps: AbstractEditorProps<any> = {
       model: document.model,

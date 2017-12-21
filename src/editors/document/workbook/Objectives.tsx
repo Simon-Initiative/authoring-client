@@ -3,8 +3,7 @@ import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from 'data/contentTypes';
 import {
-  AbstractContentEditor,
-  AbstractContentEditorProps,
+  AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 
 import './Objectives.scss';
@@ -64,8 +63,6 @@ export class Objectives
   }
 
   render() : JSX.Element {
-
-    const skills = this.props.model.toArray();
 
     const options = this.props.context.objectives
       .toArray()

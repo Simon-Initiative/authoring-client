@@ -1,14 +1,8 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import * as persistence from '../../../data/persistence';
-import { Cite }  from '../../../data/content/html/cite';
-import { AppServices } from '../../common/AppServices';
-import { PurposeTypes } from '../../../data/content/html/common';
+import { Cite } from '../../../data/content/html/cite';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { InputLabel } from '../common/InputLabel';
 import { TextInput } from '../common/TextInput';
-import { Button } from '../common/Button';
 
 export interface CiteEditorProps extends AbstractContentEditorProps<Cite> {
 

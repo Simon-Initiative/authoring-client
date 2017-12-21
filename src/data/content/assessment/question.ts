@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { ContentState, ContentBlock, convertToRaw } from 'draft-js';
+import { ContentState } from 'draft-js';
 
 import { Html } from '../html';
 import { Part } from './part';
@@ -9,7 +9,6 @@ import { FillInTheBlank } from './fill_in_the_blank';
 import { Ordering } from './ordering';
 import { Text } from './text';
 import { ShortAnswer } from './short_answer';
-import { GradingCriteria } from './criteria';
 import { Essay } from './essay';
 import { Numeric } from './numeric';
 import { Feedback } from './feedback';
@@ -17,7 +16,7 @@ import { Response } from './response';
 import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { getChildren, augment } from '../common';
+import { augment, getChildren } from '../common';
 import { getEntities } from '../html/changes';
 import { EntityTypes } from '../html/common';
 
@@ -59,9 +58,9 @@ function tagInputRefsWithType(model: Question) {
       if ((c as any).id !== undefined) {
         p[(c as any).id] = c;
         return p;
-      } else {
-        return p;
       }
+
+      return p;
     },
     {});
 
@@ -71,9 +70,9 @@ function tagInputRefsWithType(model: Question) {
         if (byId[info.entity.data['@input']] !== undefined) {
           const type = byId[info.entity.data['@input']].contentType;
           return contentState.mergeEntityData(info.entityKey, { $type: type });
-        } else {
-          return contentState;
         }
+
+        return contentState;
       },
       model.body.contentState);
 
@@ -154,7 +153,6 @@ function migrateExplanationToFeedback(model: Question) : Question {
   const hasPart = partsArray.length === 1;
 
   if (justShortAnswer && hasPart) {
-    const so = itemsArray[0] as ShortAnswer;
     const originalExplanation = partsArray[0].explanation;
     const originalReponses = partsArray[0].responses;
 

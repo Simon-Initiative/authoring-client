@@ -1,10 +1,7 @@
 import { Map, Set } from 'immutable';
 
 import {
-  RegisterLocksAction,
-  UnregisterLocksAction,
-  REGISTER_LOCKS,
-  UNREGISTER_LOCKS,
+  REGISTER_LOCKS, RegisterLocksAction, UNREGISTER_LOCKS, UnregisterLocksAction,
 } from 'actions/locks';
 
 import { AcquiredLock } from 'types/locks';

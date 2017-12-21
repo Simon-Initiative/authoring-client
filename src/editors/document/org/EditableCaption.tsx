@@ -1,20 +1,11 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as t from '../../../data/contentTypes';
 import * as models from '../../../data/models';
 import { AppContext } from '../../common/AppContext';
-import { Maybe } from 'tsmonad';
-import { AppServices } from '../../common/AppServices';
-import guid from '../../../utils/guid';
-import { DraggableNode } from './DraggableNode';
-import { NodeTypes, getExpandId } from './traversal';
-import { canHandleDrop } from './utils';
+import { getExpandId } from './traversal';
 import { Command } from './commands/command';
-import { ActionDropdown } from './ActionDropdown';
-import { TextInput } from '../../content/common/TextInput';
 import { Remove } from './Remove';
-import { ADD_NEW_COMMANDS, ADD_EXISTING_COMMANDS } from './commands/map';
-import { RemoveCommand } from './commands/remove';
+import { ADD_EXISTING_COMMANDS, ADD_NEW_COMMANDS } from './commands/map';
 
 import './EditableCaption.scss';
 
@@ -129,10 +120,9 @@ export class EditableCaption
         <span key="add-existing" className="label">Add existing:</span>,
         ...buttons,
       ];
-    } else {
-      return [];
     }
 
+    return [];
   }
 
   renderInsertNew() {
@@ -146,15 +136,15 @@ export class EditableCaption
           this.props.org, this.props.model, this.props.labels,
           this.props.processCommand, this.props.context, this.props.editMode)];
 
-    } else {
-      return [];
     }
+
+    return [];
   }
 
 
   render() : JSX.Element {
 
-    const { model, depth, editMode } = this.props;
+    const { model } = this.props;
 
     if (this.state.isEditing) {
       return (
@@ -184,47 +174,45 @@ export class EditableCaption
           </div>
         </div>
       );
-    } else {
-      let buttons = null;
-
-      if (this.props.isHoveredOver) {
-
-        buttons = [];
-
-        buttons.push(
-          <button
-            key="rename"
-            onClick={this.onBeginEdit}
-            disabled={!this.props.editMode}
-            type="button"
-            className="btn btn-link btn-sm">
-            Rename
-          </button>,
-        );
-
-        this.renderInsertNew().forEach(e => buttons.push(e));
-        this.renderInsertExisting().forEach(e => buttons.push(e));
-
-        buttons.push(<span className="flex-spacer"/>);
-
-        buttons.push(<Remove key="remove" editMode={this.props.editMode}
-          processCommand={this.props.processCommand}/>);
-      }
-
-      return (
-        <div className="editable-caption">
-          <button
-            className="caption-btn btn btn-link"
-            onClick={() => this.props.toggleExpanded(getExpandId(model))}>
-            {this.props.children}
-          </button>
-
-          {buttons}
-        </div>
-      );
     }
 
+    let buttons = null;
 
+    if (this.props.isHoveredOver) {
+
+      buttons = [];
+
+      buttons.push(
+        <button
+          key="rename"
+          onClick={this.onBeginEdit}
+          disabled={!this.props.editMode}
+          type="button"
+          className="btn btn-link btn-sm">
+          Rename
+        </button>,
+      );
+
+      this.renderInsertNew().forEach(e => buttons.push(e));
+      this.renderInsertExisting().forEach(e => buttons.push(e));
+
+      buttons.push(<span className="flex-spacer"/>);
+
+      buttons.push(<Remove key="remove" editMode={this.props.editMode}
+        processCommand={this.props.processCommand}/>);
+    }
+
+    return (
+      <div className="editable-caption">
+        <button
+          className="caption-btn btn btn-link"
+          onClick={() => this.props.toggleExpanded(getExpandId(model))}>
+          {this.props.children}
+        </button>
+
+        {buttons}
+      </div>
+    );
   }
 
 }

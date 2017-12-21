@@ -1,16 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 
-import { Source }  from '../../../data/content/html/source';
-import { AppServices } from '../../common/AppServices';
+import { Source } from '../../../data/content/html/source';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { SourceEditor } from './SourceEditor';
-import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 
 export interface SourcesProps
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Source>> {

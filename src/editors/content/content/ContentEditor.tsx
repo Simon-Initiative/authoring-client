@@ -1,22 +1,13 @@
-
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { TextInput, InlineForm, Button, Checkbox, Select } from '../common/controls';
-import { Collapse } from '../common/Collapse';
-import { getHtmlDetails } from '../common/details';
+import { Select } from '../common/controls';
 import { RemovableContent } from '../common/RemovableContent';
-import { DragHandle } from '../../document/assessment/DragHandle';
 
 type IdTypes = {
   availability: string,

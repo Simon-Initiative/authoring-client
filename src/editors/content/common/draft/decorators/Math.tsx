@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { Math as MathRenderer } from '../../../../../utils/math/Math';
-import { ContentState, Entity } from 'draft-js';
+import { ContentState } from 'draft-js';
 
 import { AppServices } from '../../../../common/AppServices';
 
@@ -13,7 +13,7 @@ interface Math {
 }
 
 interface MathProps {
-  
+
   services: AppServices;
   offsetKey: string;
   contentState: ContentState;
@@ -37,7 +37,7 @@ class Math extends React.PureComponent<MathProps, any> {
     const { data } = entity;
     const math = data[this.attribute];
 
-    const editor = <ModalMathEditor content={math} 
+    const editor = <ModalMathEditor content={math}
       onCancel={() => this.props.services.dismissModal()}
       onInsert={(content) => {
 
@@ -45,11 +45,11 @@ class Math extends React.PureComponent<MathProps, any> {
 
         const toMerge = {};
         toMerge[this.attribute] = content;
-        
+
         const contentState = this.props.contentState
           .replaceEntityData(this.props.entityKey, toMerge);
 
-        this.props.onEdit(contentState); 
+        this.props.onEdit(contentState);
       }}/>;
 
     this.props.services.displayModal(editor);
@@ -57,7 +57,7 @@ class Math extends React.PureComponent<MathProps, any> {
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    
+
     let math;
     if (data['#cdata'] !== undefined) {
       math = data['#cdata'];
@@ -76,10 +76,10 @@ class Math extends React.PureComponent<MathProps, any> {
 }
 
 
-export default function(props: Object) : Decorator {
+export default function (props: Object) : Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.math),
     component: Math,
     props,
   };
-};
+}

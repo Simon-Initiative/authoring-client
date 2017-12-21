@@ -1,17 +1,9 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as t from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
-import { Maybe } from 'tsmonad';
-import { AppServices } from '../../common/AppServices';
 import * as models from '../../../data/models';
-import guid from '../../../utils/guid';
-import { DraggableNode } from './DraggableNode';
-import { NodeTypes, getExpandId } from './traversal';
-import { canHandleDrop } from './utils';
+import { getExpandId } from './traversal';
 import { Command } from './commands/command';
-import { ActionDropdown } from './ActionDropdown';
-import { TextInput } from '../../content/common/TextInput';
 import { Remove } from './Remove';
 
 import './Caption.scss';
@@ -68,7 +60,7 @@ export class Caption
 
   render() : JSX.Element {
 
-    const { model, depth, editMode } = this.props;
+    const { model } = this.props;
 
     const buttons = this.props.isHoveredOver
         ? [(

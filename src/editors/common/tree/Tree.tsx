@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { DragDropContext } from 'react-dnd';
 import { Maybe } from 'tsmonad';
-import { removeNode, insertNode, isSameNode } from './utils';
+import { insertNode, isSameNode, removeNode } from './utils';
 
 import { buildRenderer as buildDivRenderer } from './types/div';
 
@@ -103,7 +102,7 @@ export class Tree<NodeType extends Types.HasGuid>
 
   render() {
 
-    const { selected, treeType, nodes, editMode, canHandleDrop,
+    const { selected, nodes, editMode, canHandleDrop,
       expandedNodes, getChildren, renderNodeComponent } = this.props;
 
     const handlers : Types.Handlers = {

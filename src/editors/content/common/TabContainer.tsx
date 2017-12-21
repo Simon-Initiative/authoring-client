@@ -1,5 +1,4 @@
 import * as React from 'react';
-import guid from '../../../utils/guid';
 
 import './TabContainer.scss';
 

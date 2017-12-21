@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
-import { ContentBlock, ContentState, 
-  EditorState, Modifier } from 'draft-js';
+import { ContentBlock, ContentState, EditorState, Modifier } from 'draft-js';
 
 
 // Routines for validating paste operations

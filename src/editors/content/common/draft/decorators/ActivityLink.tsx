@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { ActivityLinkEditor } from '../../../links/ActivityLinkEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
@@ -24,7 +24,7 @@ class ActivityLink extends React.PureComponent<any, any> {
   onClick() {
     const key = this.props.entityKey;
     const data = this.props.contentState.getEntity(key).getData();
-    
+
     this.props.services.displayModal(
       <ModalMediaEditor
         editMode={true}
@@ -32,18 +32,18 @@ class ActivityLink extends React.PureComponent<any, any> {
         services={this.props.services}
 
         model={data.activity_link}
-        onCancel={() => this.props.services.dismissModal()} 
-        onInsert={(activity_link) => {
+        onCancel={() => this.props.services.dismissModal()}
+        onInsert={(activityLink) => {
           this.props.services.dismissModal();
           const data = {
-            activity_link,
+            activityLink,
           };
           const contentState = this.props.contentState.replaceEntityData(key, data);
 
           this.props.onEdit(contentState);
         }
       }>
-        <ActivityLinkEditor 
+        <ActivityLinkEditor
           model={data.activity_link}
           context={this.props.context}
           services={this.props.services}
@@ -58,9 +58,9 @@ class ActivityLink extends React.PureComponent<any, any> {
     const purpose = data['@purpose'];
     return (
       <a
-        className="editor-link" 
-        data-offset-key={this.props.offsetKey} 
-        ref={a => this.a = a} data-toggle="tooltip" 
+        className="editor-link"
+        data-offset-key={this.props.offsetKey}
+        ref={a => this.a = a} data-toggle="tooltip"
         data-placement="top" title={purpose} onClick={this.onClick}>
         {this.props.children}
       </a>

@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
 import { cloneContent } from '../common/clone';
 import { ContentState } from 'draft-js';
 

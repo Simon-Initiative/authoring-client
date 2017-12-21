@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
-import { Message as Msg, Severity, MessageAction } from 'types/messages';
+import { Message as Msg, MessageAction, Severity } from 'types/messages';
 import { Message } from './Message';
 
 import './Messages.scss';

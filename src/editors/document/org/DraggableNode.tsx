@@ -1,5 +1,4 @@
 import * as React from 'react';
-import guid from '../../../utils/guid';
 import { DragSource } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 import { SourceNodeType } from '../../content/org/drag/utils';

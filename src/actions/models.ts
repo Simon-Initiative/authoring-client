@@ -1,10 +1,11 @@
 import * as models from 'data/models';
 import * as Immutable from 'immutable';
-import { Sequence, Sequences, Unit, Module, Resource,
-  Section, Include, Item } from 'data/contentTypes';
+import {
+  Include, Item, Module, Resource, Section, Sequence, Sequences, Unit,
+} from 'data/contentTypes';
 import * as persistence from 'data//persistence';
 import { viewOrganizations } from 'actions/view';
-import { courseChanged, updateCourseResources } from 'actions/course';
+import { updateCourseResources } from 'actions/course';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
 
@@ -45,17 +46,23 @@ function dupe(v: OrgNode) : OrgNode {
 
   if (v.contentType === 'Item') {
     return v.with({ guid: id, id });
-  } else if (v.contentType === 'Sequences') {
+  }
+  if (v.contentType === 'Sequences') {
     return v.with({ guid: id, children: dupeChildren(v.children) });
-  } else if (v.contentType === 'Sequence') {
+  }
+  if (v.contentType === 'Sequence') {
     return v.with({ guid: id, id, children: dupeChildren(v.children) });
-  } else if (v.contentType === 'Unit') {
+  }
+  if (v.contentType === 'Unit') {
     return v.with({ guid: id, id, children: dupeChildren(v.children) });
-  } else if (v.contentType === 'Module') {
+  }
+  if (v.contentType === 'Module') {
     return v.with({ guid: id, id, children: dupeChildren(v.children) });
-  } else if (v.contentType === 'Section') {
+  }
+  if (v.contentType === 'Section') {
     return v.with({ guid: id, id, children: dupeChildren(v.children) });
-  } else if (v.contentType === 'Include') {
+  }
+  if (v.contentType === 'Include') {
     return v.with({ guid: id });
   }
 

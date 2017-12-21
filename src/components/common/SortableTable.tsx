@@ -1,6 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import guid from '../../utils/guid';
 
 // A reusable, sortable table component
 

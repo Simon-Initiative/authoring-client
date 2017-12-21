@@ -2,14 +2,10 @@ import * as React from 'react';
 
 import * as contentTypes from '../../../../../data/contentTypes';
 import { Table as TableType } from '../../../../../data/content/html/table';
-import { CellData } from '../../../../../data/content/html/celldata';
 import { CellHeader } from '../../../../../data/content/html/cellheader';
-
-import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState } from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalTableEditor from '../../../table/ModalTableEditor';
 import { Html } from '../../../../../data/content/html';
 import AutoHideEditRemove from './AutoHideEditRemove';
@@ -23,11 +19,11 @@ export interface TableProps extends InteractiveRendererProps {
 }
 
 export interface TableState extends InteractiveRendererState {
-  
+
 }
 
 export interface TableProps {
-  
+
 }
 
 export function getHtmlDetails(html : contentTypes.Html) : JSX.Element {
@@ -35,15 +31,14 @@ export function getHtmlDetails(html : contentTypes.Html) : JSX.Element {
   const blocks = html.contentState.getBlocksAsArray();
 
   const filtered = html.contentState.getBlocksAsArray()
-    .filter(b => b.getType !== 'atomic' 
+    .filter(b => b.getType !== 'atomic'
       && b.getCharacterList().toArray().every(e => e.getEntity() === null));
-    
+
   if (filtered.length !== blocks.length) {
     return <i>Click &apos;Edit&apos; to see cell content</i>;
-  } else {
-    return blocks.map(b => <p key={b.getKey()}>{b.getText()}</p>);
   }
 
+  return blocks.map(b => <p key={b.getKey()}>{b.getText()}</p>);
 }
 
 
@@ -57,7 +52,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
   }
 
   onEdit(model) {
-    
+
   }
 
   onClick() {
@@ -69,7 +64,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
         services={b.services}
 
         model={this.props.data.table}
-        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onCancel={() => this.props.blockProps.services.dismissModal()}
         onInsert={(model) => {
           this.props.blockProps.services.dismissModal();
           this.props.blockProps.onEdit({ table: model });
@@ -93,15 +88,15 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
         colspan = parseInt(cell.colspan, 10);
       }
       if (cell instanceof CellHeader) {
-        
+
         return <th colSpan={colspan} key={cell.guid}>
           {getHtmlDetails(new Html({ contentState: cell.content }))}</th>;
-      } else {
-        return <td colSpan={colspan} key={cell.guid}>
-          {getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
       }
+
+      return <td colSpan={colspan} key={cell.guid}>
+        {getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
     };
-    
+
     if (rows.length > 0) {
       renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.map(renderCell)}</tr>);
     } else {

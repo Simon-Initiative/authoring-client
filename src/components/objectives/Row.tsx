@@ -1,12 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../data/contentTypes';
-import { AppContext } from '../../editors/common/AppContext';
-import * as models from '../../data/models';
-import { Maybe } from 'tsmonad';
 import { RowType } from './types';
-import { AppServices } from '../../editors/common/AppServices';
-import guid from '../../utils/guid';
 import { Objective } from './Objective';
 import { Skill } from './Skill';
 
@@ -73,7 +67,7 @@ export class Row
 
   render() : JSX.Element {
 
-    const { model, editMode, isExpanded, title } = this.props;
+    const { model, title } = this.props;
 
     const item = this.props.model.contentType === 'LearningObjective'
       ? <Objective {...this.props} mouseOver={this.state.mouseOver}

@@ -1,4 +1,3 @@
-
 import { PersistenceStrategy } from './persistence/PersistenceStrategy';
 import { ListeningApproach } from './ListeningApproach';
 

@@ -57,11 +57,9 @@ function createNewBucket(
     .find(d => (d.model as any).title === NEW_BUCKET_TITLE);
 
     if (doc === undefined) {
-      let createdDoc = null;
       // Create and then lock it
       persistence.createDocument(courseId, createFn())
         .then((doc) => {
-          createdDoc = doc;
           resolve({ doc, wasCreated: true });
         })
         .catch(err => reject(err));
@@ -135,17 +133,16 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
             if ((lockResult as any).lockedBy === userName) {
               return Promise.all([...objectives, ...skills]
                 .map(d => persistence.acquireLock(courseId, d._id)));
-            } else {
-              resolve({
-                objectives,
-                skills,
-                lockDetails: lockResult,
-                isLocked: false,
-                objectiveBucket,
-                skillBucket,
-              });
             }
 
+            resolve({
+              objectives,
+              skills,
+              lockDetails: lockResult,
+              isLocked: false,
+              objectiveBucket,
+              skillBucket,
+            });
           })
           .then((lockResults: LockDetails[]) => {
             resolve({

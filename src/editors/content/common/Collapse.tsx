@@ -1,7 +1,7 @@
 import * as React from 'react';
 import guid from '../../../utils/guid';
 
-export interface Collapse {  
+export interface Collapse {
   id: string;
 }
 
@@ -23,14 +23,14 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
     this.id = guid();
 
     this.state = {
-      collapsed: true
-    }
+      collapsed: true,
+    };
 
     this.onClick = this.onClick.bind(this);
   }
 
   onClick() {
-    this.setState({ collapsed: !this.state.collapsed});
+    this.setState({ collapsed: !this.state.collapsed });
   }
 
   render() {
@@ -47,8 +47,13 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
 
     return (
       <div>
-        
-        <button onClick={this.onClick} type="button" className="btn btn-link">{this.props.caption} {indicator}</button>
+
+        <button
+          onClick={this.onClick}
+          type="button"
+          className="btn btn-link">
+          {this.props.caption} {indicator}
+        </button>
         {detailsOrExpanded}
         <div className={collapsedOrNot} id={this.id}>
           {this.props.children}
@@ -56,6 +61,6 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
       </div>
     );
   }
-  
+
 }
 

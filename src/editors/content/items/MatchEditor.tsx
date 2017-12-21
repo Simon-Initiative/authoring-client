@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';

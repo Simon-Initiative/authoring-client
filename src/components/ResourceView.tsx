@@ -1,17 +1,13 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as viewActions from 'actions/view';
-import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
+import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { Resource } from 'data/content/resource';
-import { courseChanged, updateCourseResources } from 'actions/course';
-import * as contentTypes from 'data/contentTypes';
-import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
+import { updateCourseResources } from 'actions/course';
+import { SortableTable, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
-import guid from 'utils/guid';
 
 import './ResourceView.scss';
 

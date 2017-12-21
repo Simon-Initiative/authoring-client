@@ -1,8 +1,5 @@
 import * as React from 'react';
 import * as Messages from 'types/messages';
-import { Maybe } from 'tsmonad';
-
-import { ModalMessage } from 'utils/ModalMessage';
 
 import './Message.scss';
 

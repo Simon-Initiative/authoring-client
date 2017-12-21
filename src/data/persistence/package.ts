@@ -1,6 +1,6 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId } from '../types';
+import { CourseId } from '../types';
 import * as models from '../models';
 import { Resource } from '../content/resource';
 

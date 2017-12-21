@@ -1,11 +1,10 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import * as Immutable from 'immutable';
-import { ChoiceFeedback, AUTOGEN_MAX_CHOICES } from '../part/ChoiceFeedback';
-import { Button } from '../common/controls';
-import guid from 'utils/guid';
-import { Question, QuestionProps, QuestionState,
-Section, SectionContent, SectionHeader, OptionControl, SectionControl } from './Question';
+import { AUTOGEN_MAX_CHOICES, ChoiceFeedback } from '../part/ChoiceFeedback';
+import {
+    OptionControl, Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
+    SectionHeader,
+} from './Question';
 import { Choices } from './Choices';
 import { CombinationsMap } from 'types/combinations';
 

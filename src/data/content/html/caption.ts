@@ -1,15 +1,12 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
 import { cloneContent } from '../common/clone';
-const emptyContent = ContentState.createFromText('');
-
 import { toPersistence } from './topersistence';
 import { toDraft } from './todraft';
+
+const emptyContent = ContentState.createFromText('');
 
 export type CaptionParams = {
   content?: ContentState,

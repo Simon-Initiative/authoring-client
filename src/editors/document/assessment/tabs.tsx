@@ -1,8 +1,9 @@
 import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
-import { Node as AssessmentNode, Question, Content,
-  Pool, PoolRef, Selection } from 'data/contentTypes';
+import {
+  Content, Node as AssessmentNode, Question, Selection,
+} from 'data/contentTypes';
 import { getHtmlDetails } from '../../content/common/details';
 import { DragHandle } from './DragHandle';
 
@@ -33,10 +34,9 @@ export function renderTab(
       if (node.source.contentType === 'PoolRef') {
         return <PoolRefTab
           node={node} nodeState={nodeState} handlers={handlers}/>;
-      } else {
-        return <PoolTab
-          node={node} nodeState={nodeState} handlers={handlers}/>;
       }
+      return <PoolTab
+        node={node} nodeState={nodeState} handlers={handlers}/>;
     default:
       return <UnsupportedTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
@@ -70,32 +70,30 @@ const label = (question: Question) : string => {
 
   if (question.items.size === 0) {
     return 'Input';
-  } else {
+  }
 
-    // Look at first item and base label off of that
-    const item = question.items.first();
+  // Look at first item and base label off of that
+  const item = question.items.first();
 
-    switch (item.contentType) {
+  switch (item.contentType) {
 
-      case 'MultipleChoice':
-        if (item.select === 'single') {
-          return 'Multiple Choice';
-        } else {
-          return 'Check All That Apply';
-        }
-      case 'Ordering':
-        return 'Ordering';
-      case 'Essay':
-        return 'Essay';
-      case 'ShortAnswer':
-        return 'Short Answer';
-      case 'Text':
-      case 'Numeric':
-      case 'FillInTheBlank':
-        return 'Input';
-      default:
-        return 'Question';
-    }
+    case 'MultipleChoice':
+      if (item.select === 'single') {
+        return 'Multiple Choice';
+      }
+      return 'Check All That Apply';
+    case 'Ordering':
+      return 'Ordering';
+    case 'Essay':
+      return 'Essay';
+    case 'ShortAnswer':
+      return 'Short Answer';
+    case 'Text':
+    case 'Numeric':
+    case 'FillInTheBlank':
+      return 'Input';
+    default:
+      return 'Question';
   }
 
 };
@@ -112,8 +110,6 @@ const Skills = (props) => {
 const Label = (props) => {
   return <small className="mb-1">{props.children}</small>;
 };
-
-const Pill = props => <span className="badge badge-default badge-pill">{props.children}</span>;
 
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
@@ -162,7 +158,6 @@ const UnsupportedTab = (props: TabProps) => {
 };
 
 const PoolTab = (props: TabProps) => {
-  const p = ((props.node as Selection).source as Pool);
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">
@@ -177,7 +172,6 @@ const PoolTab = (props: TabProps) => {
 };
 
 const PoolRefTab = (props: TabProps) => {
-  const p = ((props.node as Selection).source as Pool);
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">

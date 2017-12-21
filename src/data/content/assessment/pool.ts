@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { getChildren, augment } from '../common';
+import { augment, getChildren } from '../common';
 
 import { ObjRef } from '../objref';
 import { Title } from '../title';

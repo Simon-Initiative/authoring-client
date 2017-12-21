@@ -1,4 +1,3 @@
-import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 import * as Messages from 'types/messages';
 import { ModalMessage } from 'utils//ModalMessage';
@@ -41,16 +40,6 @@ export function buildReadOnlyMessage(lockDetails: LockDetails, retryAction) {
   });
 
 }
-
-const expiredDetails =
-  'The OLI authoring platform allows multiple users to author and edit course '
-  + 'materials.  To prevent loss of data, the system eliminates the possibility '
-  + 'that two users can concurrently edit the same course resource (e.g. page, assessment) '
-  + 'by requiring a user to first \'lock\' a resource before editing it. '
-  + '\n\nThis lock, however, will expire after ten minutes of inactivity by the user.'
-  + '\n\nThis appears to have happened to you.  To continue editing, please refresh '
-  + 'your browser page and load the course resource again.';
-
 
 const readOnlyDetails =
   'The OLI authoring platform allows multiple users to author and edit course '

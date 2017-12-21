@@ -1,15 +1,15 @@
 import * as Immutable from 'immutable';
 
-import { ContentState, CharacterMetadata, ContentBlock,
-  EntityMap, convertToRaw, convertFromRaw } from 'draft-js';
+import {
+  CharacterMetadata, ContentBlock, ContentState, convertToRaw,
+} from 'draft-js';
 
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
-import { Link } from './link';
 import { Table } from './table';
 import guid from '../../../utils/guid';
 import * as common from './common';
-import { Block, BlockIterator, BlockProvider } from './provider';
+import { BlockIterator, BlockProvider } from './provider';
 
 // Translation routine from draft model to persistence model
 
@@ -49,9 +49,6 @@ type OverlappingRanges = {
   length: number,
   ranges: InlineOrEntity[],
 };
-
-type EntityHandler = (
-  s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) => Object;
 
 const entityHandlers = {
   activity_link,
@@ -244,27 +241,27 @@ function getSentinelType(
 }
 
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block;
+  const { type } = block;
   return (type === 'unstyled');
 }
 
 function isHeaderBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block;
+  const { type } = block;
   return (type.startsWith('header'));
 }
 
 function isQuoteBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block;
+  const { type } = block;
   return (type === 'blockquote');
 }
 
 function isFormulaBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block;
+  const { type } = block;
   return (type === 'formula');
 }
 
 function isBasicCodeBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block;
+  const { type } = block;
   return (type === 'code');
 }
 
@@ -279,7 +276,6 @@ function isOrderedListBlock(block : common.RawContentBlock) : boolean {
 }
 
 function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'codeblock';
@@ -288,7 +284,6 @@ function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntity
 }
 
 function isTable(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'table';
@@ -300,7 +295,6 @@ function isCustom(
   customType: string,
   block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
 
-  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === customType;
@@ -309,7 +303,6 @@ function isCustom(
 }
 
 function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'wb_inline';
@@ -318,7 +311,6 @@ function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityM
 }
 
 function isObjRef(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'objref';
@@ -579,7 +571,6 @@ function translatePronunciation(
   iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
-  const src = entityMap[rawBlock.entityRanges[0].key].data.type;
   const type = entityMap[rawBlock.entityRanges[0].key].data.srcType;
 
   const arr = [];
@@ -693,9 +684,6 @@ function translateMaterial(
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
 
   const p = {
     material: {
@@ -1179,7 +1167,6 @@ function translateInline(
     return translateInlineStyle(s, text, entityMap);
   }
 
-  const { offset, length } = s;
   const obj = translateInlineEntity(s, text, entityMap);
 
   const sub = text.substr(s.offset, s.length);

@@ -1,6 +1,5 @@
 import { List, OrderedMap } from 'immutable';
 import { CombinationsMap } from 'types/combinations';
-import { ChoicesState } from 'reducers/choices';
 import { generateCombinations } from 'utils/combinations';
 
 export const RECEIVE_COMBINATIONS = 'choices/RECEIVE_COMBINATIONS';

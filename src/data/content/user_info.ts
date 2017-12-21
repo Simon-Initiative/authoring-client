@@ -5,18 +5,20 @@ export type UserInfoParams = {
   firstName?: string,
   lastName?: string,
   email?: string,
-  isDeveloper?: boolean
+  isDeveloper?: boolean,
 };
 
-export class UserInfo extends Immutable.Record({contentType: 'UserInfo',userName:'', firstName: '', lastName: '', email: '', isDeveloper: false}) {
-  
+export class UserInfo extends Immutable.Record({
+  contentType: 'UserInfo',userName:'', firstName: '', lastName: '', email: '', isDeveloper: false,
+}) {
+
   contentType: 'UserInfo';
   userName: string;
   firstName: string;
   lastName: string;
   email: string;
   isDeveloper: boolean;
-  
+
   constructor(params?: UserInfoParams) {
     params ? super(params) : super();
   }
@@ -26,17 +28,20 @@ export class UserInfo extends Immutable.Record({contentType: 'UserInfo',userName
   }
 
   static fromPersistence(root: Object) : UserInfo {
-    let a = (root as any);
-    return new UserInfo({userName: a.userName, firstName: a.firstName, lastName: a.lastName, email: a.email, isDeveloper: a.isDeveloper});
+    const a = (root as any);
+    return new UserInfo({
+      userName: a.userName, firstName: a.firstName, lastName: a.lastName,
+      email: a.email, isDeveloper: a.isDeveloper,
+    });
   }
 
   toPersistence() : Object {
     return {
-      "userName": this.userName,
-      "firstName": this.firstName,
-      "lastName": this.lastName,
-      "email": this.email,
-      "isDeveloper": this.isDeveloper
-    }
+      userName: this.userName,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      email: this.email,
+      isDeveloper: this.isDeveloper,
+    };
   }
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BlockProps } from './properties';
-import { ContentState, ContentBlock } from 'draft-js';
+import { ContentBlock, ContentState } from 'draft-js';
 
 export interface InteractiveRendererProps {
   blockProps: BlockProps;
@@ -12,18 +12,20 @@ export interface InteractiveRendererState {
   editMode: boolean;
 }
 
-export interface InteractiveRenderer<P extends InteractiveRendererProps, S extends InteractiveRendererState> {
+export interface InteractiveRenderer<P extends InteractiveRendererProps,
+  S extends InteractiveRendererState> {
   focusComponent: any;
 }
 
-export abstract class InteractiveRenderer<P extends InteractiveRendererProps, S extends InteractiveRendererState> extends React.Component<P, S> {
+export abstract class InteractiveRenderer<P extends InteractiveRendererProps,
+  S extends InteractiveRendererState> extends React.Component<P, S> {
 
   constructor(props, childState) {
     super(props);
 
-    this.state = (Object.assign({}, { 
-        editMode: false   
-    }, childState) as S);
+    this.state = (Object.assign({}, {
+      editMode: false,
+    },                          childState) as S);
 
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
@@ -39,17 +41,17 @@ export abstract class InteractiveRenderer<P extends InteractiveRendererProps, S 
 
       setTimeout(() => {
         if (!currentTarget.contains(document.activeElement)) {
-          this.setState({editMode: false});
+          this.setState({ editMode: false });
           this.props.blockProps.onLockChange(false);
         }
-      }, 0);
-    
+      },         0);
+
     }
   }
 
   onFocus() {
     if (!this.state.editMode) {
-      this.setState({editMode: true}, () => this.focusComponent.focus());
+      this.setState({ editMode: true }, () => this.focusComponent.focus());
       this.props.blockProps.onLockChange(true);
     }
   }

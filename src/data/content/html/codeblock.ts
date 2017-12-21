@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment } from '../common';
-import { getKey } from '../../common';
 
 export type CodeBlockParams = {
   id?: string,

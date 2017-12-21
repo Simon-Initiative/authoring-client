@@ -5,8 +5,8 @@ import { courseChanged } from 'actions/course';
 import * as lockActions from 'actions/locks';
 import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
-import { Skill, LearningObjective } from 'data/contentTypes';
-import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
+import { LearningObjective, Skill } from 'data/contentTypes';
+import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
 
 interface StateProps {
   expanded: any;

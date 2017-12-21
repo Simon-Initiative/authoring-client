@@ -1,17 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 
-import { Source }  from '../../../data/content/html/source';
-import { uploadFile } from '../common/UploadFile';
-import { AppServices } from '../../common/AppServices';
+import { Source } from '../../../data/content/html/source';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
-
-import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 
 export interface SourceEditorProps extends AbstractContentEditorProps<Source> {
@@ -43,7 +36,8 @@ export class SourceEditor
   shouldComponentUpdate(nextProps, nextState: SourceEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.failure !== this.state.failure) {
+    }
+    if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;
@@ -61,7 +55,6 @@ export class SourceEditor
 
   onFileChange(e) {
     const file = e.target.files[0];
-    const src = file.name;
 
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {
@@ -80,7 +73,7 @@ export class SourceEditor
 
   render() : JSX.Element {
 
-    const { src, type } = this.props.model;
+    const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
       srcDisplay = src === '' ? '<not set>' : extractFileName(src);

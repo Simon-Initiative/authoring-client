@@ -1,10 +1,5 @@
 import * as React from 'react';
 
-import { AppServices } from '../../common/AppServices';
-import { toggleInlineStyle, toggleBlockType,
-  insertInlineEntity, AuthoringActionsHandler } from '../../../actions/authoring';
-import { EntityTypes } from '../../../data/content/html/common';
-
 export interface ToolbarProps {
   onAddQuestion: () => void;
   onAddContent: () => void;
@@ -22,7 +17,6 @@ export class Toolbar extends React.Component<ToolbarProps, {}> {
   }
 
   button(icon, handler, enabled) {
-    const iconClasses = 'icon icon-' + icon;
     return (
       <button
         disabled={!enabled}

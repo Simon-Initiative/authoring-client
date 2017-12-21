@@ -1,4 +1,3 @@
-import { appendText } from './common';
 import { AbstractCommand } from '../../command';
 import { EditorState, RichUtils, SelectionState } from 'draft-js';
 
@@ -7,7 +6,7 @@ export class ToggleStyleCommand extends AbstractCommand<EditorState> {
   style: string;
 
   constructor(style: string) {
-    super()
+    super();
     this.style = style;
   }
 
@@ -16,7 +15,9 @@ export class ToggleStyleCommand extends AbstractCommand<EditorState> {
     const updateStyle = RichUtils.toggleInlineStyle(editorState, this.style);
 
     const key : string = editorState.getSelection().getAnchorKey();
-    return Promise.resolve(EditorState.acceptSelection(updateStyle, SelectionState.createEmpty(key)))
+    return Promise.resolve(EditorState.acceptSelection(
+      updateStyle, SelectionState.createEmpty(key)),
+    );
   }
 }
 
@@ -25,7 +26,7 @@ export class ToggleBlockTypeCommand extends AbstractCommand<EditorState> {
   type: string;
 
   constructor(type: string) {
-    super()
+    super();
     this.type = type;
   }
 

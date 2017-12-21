@@ -1,21 +1,14 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 
-import { YouTube }  from '../../../data/content/html/youtube';
-import { AppServices } from '../../common/AppServices';
+import { YouTube } from '../../../data/content/html/youtube';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
 
-import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
+import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
 
 import { Collapse } from '../common/Collapse';
-import { Button } from '../common/Button';
-import { Select } from '../common/Select';
 
 export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
 
@@ -114,7 +107,7 @@ export class YouTubeEditor
 
   render() : JSX.Element {
 
-    const { titleContent, src, caption, cite, popout, alternate, height, width } = this.props.model;
+    const { titleContent, caption, popout, height, width } = this.props.model;
 
     return (
       <div className="itemWrapper container">

@@ -1,14 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
-import * as models from '../../../data/models';
-import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor,
-  AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Button, Well, Checkbox, Collapse, Select } from '../common/controls';
-import guid from '../../../utils/guid';
-import { describePool } from './details';
-import { RemovableContent } from '../common/RemovableContent';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ResourceSelection from '../../../utils/selection/ResourceSelection';
 import { LegacyTypes } from '../../../data/types';
 

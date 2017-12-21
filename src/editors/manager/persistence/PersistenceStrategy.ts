@@ -1,9 +1,6 @@
-
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
-import { ChangeRequest } from '../../../data/models';
-import { RegisteredEditor } from 'editors/manager/registry';
 
 export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 

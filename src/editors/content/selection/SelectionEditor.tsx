@@ -1,17 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
-import { AbstractContentEditor,
-  AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { PoolTitleEditor } from './PoolTitleEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse, Select } from '../common/controls';
-import guid from '../../../utils/guid';
-import { PoolEditor } from './PoolEditor';
+import { Collapse, Select, TextInput } from '../common/controls';
 import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { RemovableContent } from '../common/RemovableContent';
-import { DragHandle } from '../../document/assessment/DragHandle';
 import { Skill } from 'types/course';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
@@ -153,12 +148,8 @@ export class SelectionEditor
     const caption = this.props.model.source.contentType === 'Pool'
       ? 'Pool' : 'Shared Pool';
 
-    let details = '';
     let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
-      const count = this.props.model.source.questions.size;
-      details = count + ' question' + (count !== 1 ? 's' : '');
-
       titleEditor =
         <Collapse caption="Title" details={this.props.model.source.title.text}>
             <PoolTitleEditor

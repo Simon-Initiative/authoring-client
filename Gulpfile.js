@@ -25,7 +25,7 @@ var config = {
   srcDir: "./src",
   devDir: "./dev",
   distDir: "./dist"
-}
+};
 
 var setupChalk = $.util.colors.bgYellow;
 var setupLog = function(str) {

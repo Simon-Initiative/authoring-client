@@ -5,23 +5,20 @@ import { bindActionCreators } from 'redux';
 import * as persistence from '../../data/persistence';
 import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
-import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
 import * as viewActions from '../../actions/view';
 import { DuplicateListingInput } from './DuplicateListingInput';
 import guid from '../../utils/guid';
 import { RowType } from './types';
-import {
-  LockDetails, renderLocked, buildLockExpiredMessage, buildReadOnlyMessage,
-} from 'utils/lock';
-import { buildReportProblemAction, buildPersistenceFailureMessage } from 'utils/error';
+import { buildReadOnlyMessage } from 'utils/lock';
+import { buildPersistenceFailureMessage } from 'utils/error';
 
 import { ExistingSkillSelection } from './ExistingSkillSelection';
-import { CourseModel } from 'data/models';
-import { AggregateModel,
-  UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
-  unifySkills, unifyObjectives } from './persistence';
+import {
+  AggregateModel, buildAggregateModel, UnifiedObjectivesModel,
+  UnifiedSkillsModel, unifyObjectives, unifySkills,
+} from './persistence';
 import * as Messages from 'types/messages';
 import { UserInfo } from 'reducers/user';
 import { Row } from './Row';
@@ -100,8 +97,6 @@ export class ObjectiveSkillView
   }
 
   componentDidMount() {
-    const { course } = this.props;
-
     this.buildModels();
   }
 
@@ -472,6 +467,7 @@ export class ObjectiveSkillView
         const set = this.props.expanded.get('objectives');
         return set.includes(guid);
       }
+
       return true;
     };
 

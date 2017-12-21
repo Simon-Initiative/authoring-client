@@ -1,8 +1,5 @@
 import * as Immutable from 'immutable';
-
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
-import { Maybe } from 'tsmonad';
+import { augment } from '../common';
 import * as types from './types';
 
 export type LabelsParams = {
@@ -23,14 +20,14 @@ const defaultContent = {
 };
 
 export class Labels extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Labels;
   sequence: string;
   unit: string;
   module: string;
   section: string;
   guid: string;
-  
+
   constructor(params?: LabelsParams) {
     super(augment(params));
   }
@@ -56,19 +53,19 @@ export class Labels extends Immutable.Record(defaultContent) {
     if (s['@section'] !== undefined) {
       model = model.with({ section: s['@section'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    return { 
+
+    return {
       labels: {
         '@sequence': this.sequence,
         '@unit': this.unit,
         '@module': this.module,
         '@section': this.section,
-      }, 
+      },
     };
 
   }

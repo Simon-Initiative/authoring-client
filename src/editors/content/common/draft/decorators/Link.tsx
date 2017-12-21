@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { LinkEditor } from '../../../links/LinkEditor';
 import { ImageLinkEditor } from '../../../links/ImageLinkEditor';

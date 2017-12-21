@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 import { ContentState } from 'draft-js';
 import { toPersistence } from './html/topersistence';
 import { toDraft } from './html/todraft';
-import createGuid from 'utils/guid';
 import { augment } from './common';
 import { cloneContent } from './common/clone';
 

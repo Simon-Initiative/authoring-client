@@ -1,8 +1,5 @@
-import { authenticatedFetch, Document } from './common';
+import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId } from '../types';
-import * as models from '../models';
-import { Resource } from '../content/resource';
 import { UserInfo } from '../content/user_info';
 
 export function developerRegistration(courseId: string,

@@ -1,23 +1,20 @@
 import * as React from 'react';
-import { Dropdown, DropdownItem } from '../../Dropdown';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState } from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Select } from '../../Select';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 
 import './markers.scss';
 
 export interface MaterialBeginProps extends InteractiveRendererProps {
-  
+
 }
 
 export interface MaterialBeginState extends InteractiveRendererState {
-  
+
 }
 
 export interface MaterialBegin {
-  
+
 }
 
 export class MaterialBegin extends InteractiveRenderer<MaterialBeginProps, MaterialBeginState> {
@@ -28,7 +25,7 @@ export class MaterialBegin extends InteractiveRenderer<MaterialBeginProps, Mater
   }
 
   render() {
-    
+
     return (
       <span ref={c => this.focusComponent = c} className="MaterialSentinel">
         Material&nbsp;

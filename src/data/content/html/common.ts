@@ -1,5 +1,3 @@
-import * as types from '../../types';
-
 export type PurposeType = {
   value: string,
   label: string,

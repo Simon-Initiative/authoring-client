@@ -34,7 +34,7 @@ export interface AssessmentSelectionState {
   selected: SelectableAssessment;
 }
 
-export class AssessmentSelection 
+export class AssessmentSelection
   extends React.PureComponent<AssessmentSelectionProps, AssessmentSelectionState> {
 
   constructor(props) {
@@ -61,9 +61,11 @@ export class AssessmentSelection
             if (this.props.toDisplay === AssessmentsToDisplay.Both) {
               return d.type === types.LegacyTypes.assessment2
                 || d.type === types.LegacyTypes.inline;
-            } else if (this.props.toDisplay === AssessmentsToDisplay.Formative) {
+            }
+            if (this.props.toDisplay === AssessmentsToDisplay.Formative) {
               return d.type === types.LegacyTypes.inline;
-            } else if (this.props.toDisplay === AssessmentsToDisplay.Summative) {
+            }
+            if (this.props.toDisplay === AssessmentsToDisplay.Summative) {
               return d.type === types.LegacyTypes.assessment2;
             }
           })
@@ -83,8 +85,8 @@ export class AssessmentSelection
     ? types.LegacyTypes.inline
     : types.LegacyTypes.assessment2;
 
-    const resource = { 
-      id, 
+    const resource = {
+      id,
       type,
       title,
     };
@@ -137,10 +139,10 @@ export class AssessmentSelection
           </table>
 
           <form className="form-inline">
-            <input type="text" ref="title" 
+            <input type="text" ref="title"
                 className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
                     placeholder="Title"></input>
-            <button onClick={this.createAssessment.bind(this)} 
+            <button onClick={this.createAssessment.bind(this)}
                 className="btn btn-primary">Create New</button>
           </form>
 

@@ -3,9 +3,8 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
-import guid from '../../../utils/guid';
 import { HintEditor } from './HintEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
+import { Button } from '../common/controls';
 
 export interface HintsProps {
   model: contentTypes.Part;

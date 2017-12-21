@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import * as contentTypes from '../../../data/contentTypes';
-import { AbstractContentEditor,
-  AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { removeHTML, getCaretPosition,
-  setCaretPosition, getSelectionRange } from '../../content/common/draft/utils';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import {
+  getCaretPosition, getSelectionRange, setCaretPosition,
+} from '../../content/common/draft/utils';
 
 const BACKSPACE = 8;
 
@@ -98,7 +98,6 @@ export class TitleContentEditor
   renderEdit(): JSX.Element {
 
     const html = { __html: this.state.text };
-    const style = this.props.styles ? this.props.styles : {};
 
     return (
       <h2
@@ -116,9 +115,9 @@ export class TitleContentEditor
   render() : JSX.Element {
     if (this.props.editMode) {
       return this.renderEdit();
-    } else {
-      return this.renderView();
     }
+
+    return this.renderView();
   }
 
 }

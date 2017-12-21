@@ -1,18 +1,18 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Choice } from '../common/Choice';
-import { FeedbackEditor } from '../part/FeedbackEditor';
-import { TextInput, InlineForm, Button } from '../common/controls';
+import { Button } from '../common/controls';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import guid from 'utils/guid';
-import { Question, QuestionProps, QuestionState,
- Section, SectionContent, SectionControl, SectionHeader } from './Question';
 import {
-  InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
+    Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
+    SectionHeader,
+} from './Question';
+import {
+  InputList, InputListItem, ItemOption, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
 import { convert } from 'utils/format';
 import { DragTypes } from 'utils/drag';
@@ -34,15 +34,6 @@ const HTML_CONTENT_EDITOR_STYLE = {
   borderStyle: 'none',
   borderWith: 1,
   borderColor: '#AAAAAA',
-};
-
-// tslint:disable-next-line
-const ChoiceFeedback = (props) => {
-  return (
-    <div className="choice-feedback clearfix">
-      {props.children}
-    </div>
-  );
 };
 
 export const updateChoiceValuesAndRefs =
@@ -293,7 +284,7 @@ export class MultipleChoice
   }
 
   renderAdditionalSections() {
-    const { editMode, itemModel, partModel } = this.props;
+    const { editMode, itemModel } = this.props;
 
     return ([
       <Section key="choices" className="choices">

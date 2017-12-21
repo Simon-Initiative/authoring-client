@@ -9,16 +9,15 @@ export function getHtmlDetails(html : contentTypes.Html, length = MAX_LENGTH) : 
 
   if (block === undefined) {
     return '';
-  } else {
-    return maxLength(block.getText(), MAX_LENGTH);
   }
 
+  return maxLength(block.getText(), MAX_LENGTH);
 }
 
 function maxLength(text: string, length: number) : string {
   if (text.length <= length) {
     return text;
-  } else {
-    return text.substr(0, length - 3) + '...';
   }
+
+  return text.substr(0, length - 3) + '...';
 }
