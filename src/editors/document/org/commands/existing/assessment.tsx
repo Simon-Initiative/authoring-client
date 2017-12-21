@@ -1,23 +1,21 @@
 import { AbstractCommand } from '../command';
-import * as Immutable from 'immutable';
-import * as models from '../../../../../data/models';
-import * as t from '../../../../../data/contentTypes';
-import { AssessmentSelection, AssessmentsToDisplay } 
-  from '../../../../../utils/selection/AssessmentSelection';
-import createGuid from '../../../../../utils/guid';
+import * as models from 'data/models';
+import * as t from 'data/contentTypes';
+import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
+import createGuid from 'utils/guid';
 
 import { insertNode } from '../../utils';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
   onInsert(org, parent, context, services, resolve, reject, assessment) {
-   
+
     services.dismissModal();
-    
+
     const id = createGuid();
     const resourceref = new t.ResourceRef().with({ idref: assessment.resource.id });
     const item = new t.Item().with({ resourceref, id });
-    
+
     resolve(insertNode(org, parent.guid, item, parent.children.size));
   }
 
@@ -30,16 +28,16 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
   }
 
   execute(
-    org: models.OrganizationModel, 
+    org: models.OrganizationModel,
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
-    
+
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
           toDisplay={AssessmentsToDisplay.Summative}
           courseId={context.courseId}
-          onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)} 
+          onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
     });
   }

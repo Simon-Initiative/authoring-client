@@ -1,4 +1,3 @@
-import { getKey } from '../common';
 import createGuid from '../../utils/guid';
 
 export function getChildren(item) : Object[] {

@@ -1,17 +1,10 @@
 import * as persistence from 'data/persistence';
 import { CourseModel, ModelTypes, WorkbookPageModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
 import { Resource } from 'data//contentTypes';
 import * as Immutable from 'immutable';
-import { requestActions } from './requests';
-import { credentials, getHeaders } from './utils/credentials';
-import { viewDocument } from './view';
 import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
-import { configuration } from './utils/config';
-import { dismissScopedMessages } from './messages';
-import { Scope } from 'types/messages';
 
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';

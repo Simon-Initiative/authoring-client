@@ -1,16 +1,11 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppContext } from '../../common/AppContext';
 import * as models from '../../../data/models';
-import { Maybe } from 'tsmonad';
-import { AppServices } from '../../common/AppServices';
-import guid from '../../../utils/guid';
-import { renderDraggableTreeNode, canAcceptDrop,
-  SourceNodeType, renderDropTarget } from '../../content/org/drag/utils';
+import { renderDropTarget } from '../../content/org/drag/utils';
 import { DragHandle } from 'components/common/DragHandle';
 import { DraggableNode } from './DraggableNode';
-import { NodeTypes, getExpandId } from './traversal';
+import { getExpandId, NodeTypes } from './traversal';
 import { canHandleDrop } from './utils';
 import { EditableCaption } from './EditableCaption';
 import { Caption } from './Caption';
@@ -103,7 +98,7 @@ export class TreeNode
   render() : JSX.Element {
 
     const { model, parentModel, indexWithinParent,
-      depth, context, editMode, onReposition, isExpanded } = this.props;
+      depth, editMode, onReposition, isExpanded } = this.props;
 
     const hasHiddenChildren =
       <span>

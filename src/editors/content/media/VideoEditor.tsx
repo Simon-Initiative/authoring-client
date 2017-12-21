@@ -1,21 +1,13 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 
 import { ContentState } from 'draft-js';
 
-import { Video }  from '../../../data/content/html/video';
-import { AppServices } from '../../common/AppServices';
+import { Video } from '../../../data/content/html/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
-import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 
 import { TabContainer } from '../common/TabContainer';
 
@@ -126,7 +118,7 @@ export class VideoEditor
   }
 
   renderOther() {
-    const { titleContent, caption, cite, popout, alternate } = this.props.model;
+    const { titleContent, caption, popout } = this.props.model;
 
     return (
       <div style={ { marginTop: '30px' } }>
@@ -188,8 +180,7 @@ export class VideoEditor
 
 
   renderSizing() {
-    const { titleContent, caption, cite, popout, alternate,
-      width, height } = this.props.model;
+    const { width, height } = this.props.model;
 
     return (
       <div style={ { marginTop: '70px', marginLeft: '75px' } }>

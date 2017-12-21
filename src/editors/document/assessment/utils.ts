@@ -111,8 +111,6 @@ export function chooseRelative(
  */
 export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
 
-  const questions = [];
-
   const pages = model.pages.toArray();
 
   // The type of the assessment is restricted (i.e. cannot be changed) if

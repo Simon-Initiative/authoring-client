@@ -2,14 +2,10 @@ import * as React from 'react';
 
 import * as contentTypes from '../../../../../data/contentTypes';
 import { Table as TableType } from '../../../../../data/content/html/table';
-import { CellData } from '../../../../../data/content/html/celldata';
 import { CellHeader } from '../../../../../data/content/html/cellheader';
-
-import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps,
-  InteractiveRendererState } from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalTableEditor from '../../../table/ModalTableEditor';
 import { Html } from '../../../../../data/content/html';
 import AutoHideEditRemove from './AutoHideEditRemove';

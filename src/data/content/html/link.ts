@@ -1,12 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
 import { Image } from './image';
-
-import { ContentState } from 'draft-js';
 
 export type LinkParams = {
   target?: string,
@@ -35,7 +30,7 @@ export class Link extends Immutable.Record(defaultContent) {
   internal: boolean;
   title: string;
   guid: string;
-  
+
   constructor(params?: LinkParams) {
     super(augment(params));
   }
@@ -48,7 +43,7 @@ export class Link extends Immutable.Record(defaultContent) {
     const t = (root as any).link;
 
     let model = new Link({ guid });
-    
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -64,11 +59,11 @@ export class Link extends Immutable.Record(defaultContent) {
 
     const children = getChildren(t);
 
-    if (children instanceof Array 
+    if (children instanceof Array
       && children.length === 1 && (children[0] as any).image !== undefined) {
       model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
     }
-    
+
     return model;
   }
 
@@ -78,7 +73,7 @@ export class Link extends Immutable.Record(defaultContent) {
         '@title': this.title,
         '@href': this.href,
         '@target': this.target,
-        '@internal': this.internal ? 'true' : 'false',  
+        '@internal': this.internal ? 'true' : 'false',
       },
     };
 

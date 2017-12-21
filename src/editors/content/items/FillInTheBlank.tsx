@@ -1,17 +1,16 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import {
-  AbstractItemPartEditor,
-  AbstractItemPartEditorProps,
-  AbstractItemPartEditorState,
+    AbstractItemPartEditor, AbstractItemPartEditorProps,
+    AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { Choice } from '../common/Choice';
 import { FeedbackEditor } from '../part/FeedbackEditor';
 import { ItemLabel } from './ItemLabel';
-import { TextInput, InlineForm, Button } from '../common/controls';
+import { Button, InlineForm, TextInput } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import { Section, SectionHeader, SectionContent, SectionControl } from '../question/Question';
+import { Section, SectionContent, SectionControl, SectionHeader } from '../question/Question';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -196,7 +195,6 @@ export class FillInTheBlank
       context,
       itemModel,
       partModel,
-      onEdit,
     } = this.props;
 
     const responses = partModel.responses.toArray();

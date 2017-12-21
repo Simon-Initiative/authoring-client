@@ -6,10 +6,10 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { InsertInputRefCommand } from '../question/commands';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown.tsx';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import { Question, QuestionProps, QuestionState,
-  Section, SectionHeader, SectionContent, Tab } from './Question';
+import {
+  Question, QuestionProps, QuestionState, Section, SectionContent, SectionHeader,
+} from './Question';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';

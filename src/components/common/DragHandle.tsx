@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { DragSource } from 'react-dnd';
 
 import './DragHandle.scss';
 

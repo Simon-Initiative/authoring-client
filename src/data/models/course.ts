@@ -1,8 +1,6 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
-import guid from '../../utils/guid';
-import { getKey } from '../common';
-import { isNullOrUndefined, isArray } from 'util';
+import { isNullOrUndefined } from 'util';
 import { LegacyTypes } from '../types';
 
 export type CourseModelParams = {

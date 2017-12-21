@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import { ContentState, Modifier, SelectionState } from 'draft-js';
 import guid from 'utils/guid';
-import { getAllEntities } from 'data/content/html/changes';
 
 export function updateData(contentBlock, contentState, blockData) {
 
@@ -20,10 +19,6 @@ export function updateData(contentBlock, contentState, blockData) {
 }
 
 function changeForBlock(contentState: ContentState, block) : ContentState {
-
-  const blockKey = block.key;
-  const characterList = block.characterList;
-
   if (block.type === 'atomic') {
 
     // Extract the id from the entity data and change it
@@ -47,8 +42,6 @@ function changeForBlock(contentState: ContentState, block) : ContentState {
         copy[key] = data[key];
       }
 
-      const updatedState = contentState.createEntity(
-        entity.type, entity.mutability, copy);
       const createdKey = contentState.getLastCreatedEntityKey();
       const range = new SelectionState({
         anchorKey: block.key,

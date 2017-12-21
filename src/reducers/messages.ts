@@ -1,15 +1,9 @@
 import * as Immutable from 'immutable';
 import * as Messages from 'types/messages';
-
 import {
-  ShowMessageAction,
-  DismissScopedMessages,
-  DismissSpecificMessageAction,
-  SHOW_MESSAGE,
-  DISMISS_SCOPED_MESSAGES,
-  DISMISS_SPECIFIC_MESSAGE,
+    DISMISS_SCOPED_MESSAGES, DISMISS_SPECIFIC_MESSAGE, DismissScopedMessages,
+    DismissSpecificMessageAction, SHOW_MESSAGE, ShowMessageAction,
 } from 'actions/messages';
-
 import { OtherAction } from './utils';
 
 export type MessageAction =

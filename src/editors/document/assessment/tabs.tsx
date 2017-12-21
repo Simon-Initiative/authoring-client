@@ -1,8 +1,9 @@
 import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
-import { Node as AssessmentNode, Question, Content,
-  Pool, PoolRef, Selection } from 'data/contentTypes';
+import {
+  Content, Node as AssessmentNode, Question, Selection,
+} from 'data/contentTypes';
 import { getHtmlDetails } from '../../content/common/details';
 import { DragHandle } from './DragHandle';
 
@@ -110,8 +111,6 @@ const Label = (props) => {
   return <small className="mb-1">{props.children}</small>;
 };
 
-const Pill = props => <span className="badge badge-default badge-pill">{props.children}</span>;
-
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
   return (
@@ -159,7 +158,6 @@ const UnsupportedTab = (props: TabProps) => {
 };
 
 const PoolTab = (props: TabProps) => {
-  const p = ((props.node as Selection).source as Pool);
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">
@@ -174,7 +172,6 @@ const PoolTab = (props: TabProps) => {
 };
 
 const PoolRefTab = (props: TabProps) => {
-  const p = ((props.node as Selection).source as Pool);
   return (
     <Tab {...props} tooltip={selection(props.node as Selection)}>
       <div className="d-flex w-100 justify-content-between">

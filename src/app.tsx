@@ -1,34 +1,29 @@
 import 'babel-polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Iterable } from 'immutable';
 import * as persistence from './data/persistence';
-import * as models from './data/models';
 import thunkMiddleware from 'redux-thunk';
-import { createStore, applyMiddleware, Store } from 'redux';
+import { applyMiddleware, createStore, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
-import {} from 'node';
 import { createLogger } from 'redux-logger';
 import { UserInfo } from './reducers/user';
-import { getUserName, getQueryVariable } from './utils/params';
+import { getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
 import { loadCourse } from 'actions/course';
-import Main from './Main.controller';
 import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { courseChanged } from './actions/course';
 
 import { ApplicationRoot } from './ApplicationRoot';
+// import application styles
+import 'stylesheets/index.scss';
 
 // attach global variables to window
 (window as any).React = React;
 
-// import application styles
-import 'stylesheets/index.scss';
 
 const loggerMiddleware = (createLogger as any)();
 

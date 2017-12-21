@@ -1,6 +1,5 @@
 import * as React from 'react';
-import * as contentTypes from '../../../../../data/contentTypes';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 
 import './InputRef.scss';

@@ -1,14 +1,12 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import {
-  AbstractItemPartEditor,
-  AbstractItemPartEditorProps,
-  AbstractItemPartEditorState,
+    AbstractItemPartEditor, AbstractItemPartEditorProps,
+    AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
 import { TabularFeedback } from '../part/TabularFeedback';
 import { ItemLabel } from './ItemLabel';
 import { Checkbox, Select } from '../common/controls';
-import guid from '../../../utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
@@ -93,7 +91,6 @@ export class Text
       partModel,
       itemModel,
       editMode,
-      onEdit,
       onFocus,
       onBlur,
       onRemove,

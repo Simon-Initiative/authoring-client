@@ -4,8 +4,6 @@ import * as models from '../../../data/models';
 
 import * as contentTypes from '../../../data/contentTypes';
 
-import { canAcceptDrop } from '../../content/org/drag/utils';
-
 
 export function canHandleDrop(
   id: string, sourceModel, parentModel,

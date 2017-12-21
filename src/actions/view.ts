@@ -3,7 +3,6 @@ import * as models from 'data/models';
 import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
 import * as courseActions from 'actions/course';
-import { Page } from 'data/content/assessment/page';
 
 function isDifferentCourse(getState, courseId) : boolean {
   const course: models.CourseModel = getState().course;

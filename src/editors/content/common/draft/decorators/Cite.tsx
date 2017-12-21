@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { CiteEditor } from '../../../links/CiteEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';

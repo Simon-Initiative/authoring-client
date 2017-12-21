@@ -1,10 +1,11 @@
 import * as models from 'data/models';
 import * as Immutable from 'immutable';
-import { Sequence, Sequences, Unit, Module, Resource,
-  Section, Include, Item } from 'data/contentTypes';
+import {
+  Include, Item, Module, Resource, Section, Sequence, Sequences, Unit,
+} from 'data/contentTypes';
 import * as persistence from 'data//persistence';
 import { viewOrganizations } from 'actions/view';
-import { courseChanged, updateCourseResources } from 'actions/course';
+import { updateCourseResources } from 'actions/course';
 import guid from 'utils/guid';
 import { LegacyTypes } from 'data/types';
 

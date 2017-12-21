@@ -1,16 +1,8 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { Title }  from '../../../data/content/html/title';
-import { Caption }  from '../../../data/content/html/caption';
-import { Cite }  from '../../../data/content/html/cite';
-import { Html } from '../../../data/content/html';
-import { AppServices } from '../../common/AppServices';
+import { Title } from '../../../data/content/html/title';
+import { Caption } from '../../../data/content/html/caption';
+import { Cite } from '../../../data/content/html/cite';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
 import { RichTextEditor } from '../common/RichTextEditor';
 
 export type LabeledType = {
@@ -75,9 +67,6 @@ export class LabeledEditor
   render() : JSX.Element {
 
     const { titleContent, caption, cite } = this.props.model;
-
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
 
     return (
       <div>

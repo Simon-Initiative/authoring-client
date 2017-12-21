@@ -1,9 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
-import { NodeId, NodeState, Nodes, HasGuid,
-  ChildrenAccessor, ChildrenMutator,
-  TreeRenderer } from './types';
+import { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from './types';
 
 // Determines whether two things that might be nodes
 // are the same node.  In the context of our tree

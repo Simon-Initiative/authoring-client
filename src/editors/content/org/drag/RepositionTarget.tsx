@@ -1,10 +1,9 @@
 import * as React from 'react';
-import guid from '../../../../utils/guid';
 import { DropTarget } from 'react-dnd';
 import { DragTypes } from '../../../../utils/drag';
 
 export interface RepositionTarget {
-  
+
 }
 
 export interface RepositionTargetProps {
@@ -27,35 +26,35 @@ const boxTarget = {
     }
 
     props.onDrop(
-      component.props.draggedItem.sourceModel, component.props.draggedItem.parentModel.guid, 
+      component.props.draggedItem.sourceModel, component.props.draggedItem.parentModel.guid,
       props.parentModel, props.index);
   },
   canDrop(props, monitor) {
     return props.canAcceptId(
-      monitor.getItem().id, 
-      monitor.getItem().sourceModel, 
-      monitor.getItem().parentModel, 
-      monitor.getItem().originalIndex, 
-      props.index, 
+      monitor.getItem().id,
+      monitor.getItem().sourceModel,
+      monitor.getItem().parentModel,
+      monitor.getItem().originalIndex,
+      props.index,
       props.parentModel);
   },
 };
 
 
 /**
- * Isolate the drag and drop assessment node reordering. 
+ * Isolate the drag and drop assessment node reordering.
  */
 @DropTarget(DragTypes.AssessmentNode, boxTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop(),
   draggedItem: monitor.getItem(),
-}))export class RepositionTarget 
+}))export class RepositionTarget
   extends React.Component<RepositionTargetProps, RepositionTargetState> {
-    
+
   constructor(props) {
     super(props);
-    
+
 
   }
 
@@ -63,7 +62,6 @@ const boxTarget = {
 
     const isOver = (this.props as any).isOver;
     const canDrop = (this.props as any).canDrop;
-    const draggedItem = (this.props as any).draggedItem;
 
     const opacity = (isOver && canDrop) ? 1.0 : 0.0;
 
@@ -76,7 +74,7 @@ const boxTarget = {
 
     return (this.props as any).connectDropTarget(
       <div style={style}/>,
-    ); 
+    );
   }
 
 }

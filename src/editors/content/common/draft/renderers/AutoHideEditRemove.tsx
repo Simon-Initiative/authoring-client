@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Button } from '../../Button';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 export interface AutoHideEditRemoveState {

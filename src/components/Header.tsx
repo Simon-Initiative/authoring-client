@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { ViewActions } from '../actions/view';
 import { CourseModel } from 'data/models';
-import { buildFeedbackFromCurrent } from '../utils/feedback';
 import { UserInfo } from 'reducers/user';
 
 import './Header.scss';

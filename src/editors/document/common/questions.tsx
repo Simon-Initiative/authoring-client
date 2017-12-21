@@ -9,7 +9,6 @@ import { AppServices } from '../../common/AppServices';
 import { QuestionEditor } from '../../content/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
-import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
 import { LegacyTypes } from '../../../data/types';
 
 export type Props = {

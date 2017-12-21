@@ -1,11 +1,10 @@
-import * as models from '../../../data/models';
-import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
+import { RegisterLocks, UnregisterLocks } from 'types/locks';
 
-import {onFailureCallback, onSaveCompletedCallback,
-  PersistenceStrategy } from './PersistenceStrategy';
+import {
+  onFailureCallback, onSaveCompletedCallback, PersistenceStrategy,
+} from './PersistenceStrategy';
 
 export interface AbstractPersistenceStrategy {
   successCallback: onSaveCompletedCallback;

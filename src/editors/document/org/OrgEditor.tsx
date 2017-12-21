@@ -2,35 +2,19 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
-import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { QuestionEditor } from '../../content/question/QuestionEditor';
-import { ContentEditor } from '../../content/content/ContentEditor';
-import { SelectionEditor } from '../../content/selection/SelectionEditor';
-import { UnsupportedEditor } from '../../content/unsupported/UnsupportedEditor';
-import { Select } from '../../content/common/Select';
-import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
-import { Resource } from '../../../data/content/resource';
 import { viewDocument } from '../../../actions/view';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
-import { LegacyTypes } from '../../../data/types';
-import guid from '../../../utils/guid';
 import { Command } from './commands/command';
-import * as persistence from '../../../data/persistence';
-import { render, getExpandId } from './traversal';
+import { getExpandId, render } from './traversal';
 import { collapseNodes, expandNodes } from '../../../actions/expand';
-import { renderDraggableTreeNode,
-  canAcceptDrop, SourceNodeType } from '../../content/org/drag/utils';
+import { SourceNodeType } from '../../content/org/drag/utils';
 import { insertNode, removeNode, updateNode } from './utils';
 import { TreeNode } from './TreeNode';
-import { ActionDropdown } from './ActionDropdown';
 import { Actions } from './Actions';
-import { Row } from './Row';
 import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
-import { DragDropContext } from 'react-dnd';
 import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 

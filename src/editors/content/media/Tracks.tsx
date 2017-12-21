@@ -1,16 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 
-import { Track }  from '../../../data/content/html/track';
-import { AppServices } from '../../common/AppServices';
+import { Track } from '../../../data/content/html/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { TrackEditor } from './TrackEditor';
-import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 
 export interface TracksProps
   extends AbstractContentEditorProps<Immutable.OrderedMap<string, Track>> {

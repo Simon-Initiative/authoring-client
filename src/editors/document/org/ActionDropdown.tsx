@@ -1,9 +1,7 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import * as models from '../../../data/models';
 import { AppContext } from '../../common/AppContext';
-import { RemoveCommand } from './commands/remove';
 import { Command } from './commands/command';
 import { NodeTypes } from './traversal';
 

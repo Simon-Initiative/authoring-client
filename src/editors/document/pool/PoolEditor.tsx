@@ -9,8 +9,6 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from '../assessment/Outline';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import guid from '../../../utils/guid';
-import { DragDropContext } from 'react-dnd';
 import { renderAssessmentNode } from '../common/questions';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';

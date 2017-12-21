@@ -1,6 +1,4 @@
 import * as Immutable from 'immutable';
-
-import createGuid from 'utils/guid';
 import { augment } from 'data/content/common';
 
 

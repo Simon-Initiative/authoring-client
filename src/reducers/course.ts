@@ -1,18 +1,10 @@
-import { Map } from 'immutable';
+import { CourseModel } from 'data/models';
 import {
-  CourseModel,
-} from 'data/models';
-import {
-  CourseChangedAction,
-  COURSE_CHANGED,
-  UpdateCourseResourcesAction,
-  UPDATE_COURSE_RESOURCES,
+    COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
+    UpdateCourseResourcesAction,
 } from 'actions/course';
 
-import {
-  ENTER_APPLICATION_VIEW,
-  EnterApplicationViewAction,
-} from 'actions/view';
+import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/view';
 
 import { OtherAction } from './utils';
 

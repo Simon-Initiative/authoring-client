@@ -5,7 +5,6 @@ import { augment, getChildren } from '../common';
 import { Row } from './row';
 import { CellData } from './celldata';
 import { getKey } from '../../common';
-import { Param } from './param';
 
 export type TableParams = {
   id?: string,

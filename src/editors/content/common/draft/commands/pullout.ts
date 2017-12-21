@@ -1,12 +1,10 @@
 import * as Immutable from 'immutable';
-import { insertBlocksAfter, createTitle,
-  stateFromKey, containerPrecondition } from './common';
+import { containerPrecondition, createTitle, insertBlocksAfter, stateFromKey } from './common';
 import { EntityTypes, generateRandomKey } from 'data/content/html/common';
 import { AbstractCommand } from '../../command';
 import {
-  EditorState, RichUtils, SelectionState, ContentBlock, Modifier, CharacterMetadata,
+  CharacterMetadata, ContentBlock, EditorState,
 } from 'draft-js';
-
 
 
 export class InsertPulloutCommand extends AbstractCommand<EditorState> {

@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Button } from '../common/controls';
-import { FeedbackEditor } from './FeedbackEditor';
 import { FeedbackRow } from './FeedbackRow';
 
 export interface TabularFeedback {
@@ -77,11 +76,6 @@ export abstract class TabularFeedback
   }
 
   render() : JSX.Element {
-
-    const expanded =
-        <Button editMode={this.props.editMode}
-          type="link" onClick={this.onAdd}>Add Feedback</Button>;
-
     const rows = this.renderRows();
 
     return (

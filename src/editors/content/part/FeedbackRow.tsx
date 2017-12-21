@@ -1,11 +1,5 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Collapse, Button } from '../common/controls';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
-import { AuthoringActionsHandler, AuthoringActions } from '../../../actions/authoring';
-import { AppServices } from '../../common/AppServices';
-import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';

@@ -2,11 +2,9 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
-import { isNullOrUndefined, isArray } from 'util';
+import { isArray } from 'util';
 import { ContentState } from 'draft-js';
 import { LegacyTypes } from '../types';
-
-const emptyContent = ContentState.createFromText('');
 
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
@@ -57,7 +55,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   static fromPersistence(json: Object): WorkbookPageModel {
     let model = new WorkbookPageModel();
-      
+
     const wb = (json as any);
     model = model.with({ resource: contentTypes.Resource.fromPersistence(wb) });
     model = model.with({ guid: wb.guid });
@@ -72,7 +70,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
     } else {
       workbook = wb.doc.workbook_page;
     }
-      
+
     workbook['#array'].forEach((item) => {
 
       const key = getKey(item);
@@ -88,12 +86,12 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         default:
       }
     });
-      
+
     return model;
   }
 
-  toPersistence(): Object {        
-    
+  toPersistence(): Object {
+
     const doc = [{
       workbook_page: {
         '@id': this.resource.id,
@@ -103,11 +101,11 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         ],
       },
     }];
-    
+
     const root = {
       doc,
     };
-      
+
     return Object.assign({}, this.resource, root, this.lock.toPersistence());
   }
 }

@@ -57,11 +57,9 @@ function createNewBucket(
     .find(d => (d.model as any).title === NEW_BUCKET_TITLE);
 
     if (doc === undefined) {
-      let createdDoc = null;
       // Create and then lock it
       persistence.createDocument(courseId, createFn())
         .then((doc) => {
-          createdDoc = doc;
           resolve({ doc, wasCreated: true });
         })
         .catch(err => reject(err));

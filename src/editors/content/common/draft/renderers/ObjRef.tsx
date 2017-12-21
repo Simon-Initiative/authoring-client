@@ -1,17 +1,7 @@
 import * as React from 'react';
-import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps,
-  InteractiveRendererState} from './InteractiveRenderer';
-import * as persistence from 'data/persistence';
-
-import { BlockProps } from './properties';
-import { Select } from '../../Select';
-import { Button } from '../../Button';
-import { PurposeTypes } from 'data/content/html/common';
-import { handleInsertion } from './common';
-import { LegacyTypes } from 'data/types';
-
-import ResourceSelection from 'utils/selection/ResourceSelection';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 
 import './wbinline.scss';
 

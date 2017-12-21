@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { Dropdown, DropdownItem } from '../../Dropdown';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import { BlockProps } from './properties';
 
 import { Select } from '../../Select';
 import './markers.scss';

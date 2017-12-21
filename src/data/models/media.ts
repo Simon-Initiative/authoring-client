@@ -1,8 +1,5 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
-import guid from '../../utils/guid';
-import { getKey } from '../common';
-import { isNullOrUndefined, isArray } from 'util';
 import * as types from '../types';
 
 export type MediaModelParams = {

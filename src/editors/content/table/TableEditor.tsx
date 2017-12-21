@@ -1,18 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Row, Cell }  from '../../../data/content/html/row';
-import { CellData }  from '../../../data/content/html/celldata';
-import { CellHeader }  from '../../../data/content/html/cellheader';
+import { Cell, Row } from '../../../data/content/html/row';
+import { CellData } from '../../../data/content/html/celldata';
+import { CellHeader } from '../../../data/content/html/cellheader';
 import { Html } from '../../../data/content/html';
-import { AppServices } from '../../common/AppServices';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { InputLabel } from '../common/InputLabel';
 
 export interface TableEditorProps extends AbstractContentEditorProps<contentTypes.Table> {
 

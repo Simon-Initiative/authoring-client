@@ -1,12 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
-import { user as userActions } from './actions/user';
 import { modalActions } from './actions/modal';
-import { ServerInformation } from './reducers/server';
-import { UserInfo } from './reducers/user';
 import * as viewActions from './actions/view';
 import { loadCourse } from 'actions/course';
 import * as contentTypes from './data/contentTypes';
@@ -238,7 +234,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
 
   render(): JSX.Element {
-    const { modal, user, onDispatch } = this.props;
+    const { modal, user } = this.props;
 
     if (user === null) {
       return null;
@@ -253,8 +249,6 @@ export default class Main extends React.Component<MainProps, MainState> {
     }
 
     const currentView = this.getView(getPathName(this.props.location.pathname));
-
-    const logoutUrl = user !== null ? user.logoutUrl : '';
 
     return (
         <div className="main">

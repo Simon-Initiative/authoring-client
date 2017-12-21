@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Maybe } from 'tsmonad';
 import * as Types from './types';
-import guid from '../../../utils/guid';
 import { DropTarget } from 'react-dnd';
 import { DragTypes } from '../../../utils/drag';
 
@@ -66,10 +65,6 @@ const boxTarget = {
 
     const isOver = (this.props as any).isOver;
     const canDrop = (this.props as any).canDrop;
-    const draggedItem = (this.props as any).draggedItem;
-
-    const delta =  draggedItem === null ? 0 : draggedItem.originalIndex - this.props.index;
-
     const classes = 'reposition-target ' + ((isOver && canDrop) ? 'reposition-target-active' : '');
 
     return (this.props as any).connectDropTarget(

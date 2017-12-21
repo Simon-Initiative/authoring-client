@@ -1,8 +1,5 @@
 import { connect } from 'react-redux';
-import { List } from 'immutable';
 import OrgEditor from './OrgEditor';
-import { loadCourse } from 'actions/course';
-import { Title } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel } from 'data/models';
 

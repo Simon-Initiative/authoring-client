@@ -3,9 +3,6 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-
-import { Source } from './source';
-import { Track } from './track';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
 import { Title } from './title';

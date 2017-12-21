@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ContentState, EditorState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
@@ -10,7 +9,6 @@ import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering';
 import { MultipartInput } from './MultipartInput';
-import { Command } from '../common/command';
 import { EntityTypes } from '../../../data/content/html/common';
 import { Skill } from 'types/course';
 import { changes, removeInputRef } from '../../../data/content/html/changes';

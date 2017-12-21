@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import guid from 'utils/guid';
 import * as persistence from 'data/persistence';
-import * as models from 'data/models';
 import * as viewActions from 'actions/view';
 import { showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';

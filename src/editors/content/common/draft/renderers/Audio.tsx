@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Audio as AudioType } from '../../../../../data/content/html/audio';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState} from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { AudioEditor } from '../../../media/AudioEditor';
 import { buildUrl } from '../../../../../utils/path';
@@ -20,11 +19,11 @@ export interface AudioProps extends InteractiveRendererProps {
 }
 
 export interface AudioState extends InteractiveRendererState {
-  
+
 }
 
 export interface AudioProps {
-  
+
 }
 
 
@@ -46,13 +45,13 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
         services={b.services}
 
         model={this.props.data.audio}
-        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onCancel={() => this.props.blockProps.services.dismissModal()}
         onInsert={(audio) => {
           this.props.blockProps.services.dismissModal();
           this.props.blockProps.onEdit({ audio });
         }
       }>
-        <AudioEditor 
+        <AudioEditor
           model={this.props.data.audio}
           context={b.context}
           services={b.services}
@@ -74,12 +73,12 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
     if (sources.size > 0) {
       const src = sources.first().src;
       fullSrc = buildUrl(
-      this.props.blockProps.context.baseUrl, 
-      this.props.blockProps.context.courseId, 
-      this.props.blockProps.context.resourcePath, 
+      this.props.blockProps.context.baseUrl,
+      this.props.blockProps.context.courseId,
+      this.props.blockProps.context.resourcePath,
       src);
     }
-    
+
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}

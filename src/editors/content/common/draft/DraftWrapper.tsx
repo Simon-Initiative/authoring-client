@@ -3,38 +3,36 @@ import * as Immutable from 'immutable';
 
 import { Maybe } from 'tsmonad';
 
-import {Editor, EditorState, CompositeDecorator, ContentState, SelectionState,
-  ContentBlock, CharacterMetadata,
-  convertFromRaw, convertToRaw, AtomicBlockUtils, RichUtils, Modifier } from 'draft-js';
-import { CommandProcessor, Command } from '../command';
+import {
+  CharacterMetadata, ContentBlock, ContentState, Editor,
+  EditorState, Modifier, RichUtils, SelectionState,
+} from 'draft-js';
+import { Command, CommandProcessor } from '../command';
 
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
-import { determineChangeType, SelectionChangeType,
-  getCursorPosition, hasSelection, getPosition, cloneDuplicatedEntities } from './utils';
-import { BlockProps } from './renderers/properties';
-import { AuthoringActions } from '../../../../actions/authoring';
+import {
+    cloneDuplicatedEntities, determineChangeType, getCursorPosition, getPosition, hasSelection,
+    SelectionChangeType,
+} from './utils';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
 import * as common from '../../../../data/content/html/common';
 import { Html } from '../../../../data/contentTypes';
-import { getRendererByName, BlockRenderer } from './renderers/registry';
+import { getRendererByName } from './renderers/registry';
 import { buildCompositeDecorator } from './decorators/composite';
-import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/content/html/changes';
 import handleBackspace from './keyhandlers/backspace';
-import { insertBlocksAfter, containerPrecondition } from './commands/common';
-import { wouldViolateSchema, validateSchema } from './paste';
+import { containerPrecondition, insertBlocksAfter } from './commands/common';
+import { validateSchema, wouldViolateSchema } from './paste';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
-export type ChangePreviewer = (current: Html, next: Html) => Html;
-
 import './DraftWrapper.scss';
 
+export type ChangePreviewer = (current: Html, next: Html) => Html;
+
 const SHIFT_KEY = 16;
-const ENTER_KEY = 13;
 const ALT_KEY = 18;
-const PADDING = 0;
 
 export interface DraftWrapperProps {
   onEdit: (html : Html) => void;
@@ -162,64 +160,6 @@ const BlockRendererFactory = (props) => {
   return React.createElement((viewer as any), childProps);
 };
 
-
-function splitBlockInContentState(
-  contentState: ContentState,
-  selectionState: SelectionState,
-): ContentState {
-
-  const key = selectionState.getAnchorKey();
-  const offset = selectionState.getAnchorOffset();
-  const blockMap = contentState.getBlockMap();
-  const blockToSplit = blockMap.get(key);
-
-  const text = blockToSplit.getText();
-  const chars = blockToSplit.getCharacterList();
-
-  const blockAbove = blockToSplit.merge({
-    text: text.slice(0, offset),
-    characterList: chars.slice(0, offset),
-  });
-
-  const dataAbove = blockAbove.data.toJSON();
-
-  const toPreserve = Object.keys(dataAbove)
-    .filter(key => key.startsWith('oli') || key === 'semanticContext')
-    .reduce(
-      (o, key) => {
-        o[key] = dataAbove[key];
-        return o;
-      },
-      {});
-
-  const keyBelow = common.generateRandomKey();
-  const blockBelow = blockAbove.merge({
-    key: keyBelow,
-    text: text.slice(offset),
-    characterList: chars.slice(offset),
-    data: Immutable.Map(toPreserve),
-  });
-
-  const blocksBefore = blockMap.toSeq().takeUntil(v => v === blockToSplit);
-  const blocksAfter = blockMap.toSeq().skipUntil(v => v === blockToSplit).rest();
-  const newBlocks = blocksBefore.concat(
-    [[blockAbove.getKey(), blockAbove], [blockBelow.getKey(), blockBelow]],
-    blocksAfter,
-  ).toOrderedMap();
-
-  return contentState.merge({
-    blockMap: newBlocks,
-    selectionBefore: selectionState,
-    selectionAfter: selectionState.merge({
-      anchorKey: keyBelow,
-      anchorOffset: 0,
-      focusKey: keyBelow,
-      focusOffset: 0,
-      isBackward: false,
-    }),
-  });
-}
-
 function appendText(contentBlock, contentState, text) {
 
   const targetRange = new SelectionState({
@@ -237,8 +177,6 @@ function appendText(contentBlock, contentState, text) {
 }
 
 function addSpaceAfterEntity(editorState, block) {
-
-  const blockKey = block.key;
   const characterList = block.characterList;
   if (block.type !== 'atomic' && (!characterList.isEmpty() && characterList.last().getEntity())) {
     const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
@@ -254,9 +192,6 @@ type StateAndSeen = { editorState: EditorState, seenIds: Object };
 function deDupeIds(stateAndSeen: StateAndSeen, block) {
 
   const { editorState, seenIds } = stateAndSeen;
-
-  const blockKey = block.key;
-  const characterList = block.characterList;
 
   const id = block.data === undefined || block.data === null
     ? undefined
@@ -715,7 +650,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       if (nextProps.content.contentState !== current
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
 
-        const selection = nextProps.content.contentState.getSelectionBefore();
         this.lastContent = nextProps.content.contentState;
         const newEditorState = EditorState.push(
           this.state.editorState, nextProps.content.contentState);

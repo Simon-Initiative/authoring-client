@@ -1,5 +1,6 @@
-import { EditorState, Modifier, ContentState,
-  SelectionState, ContentBlock, Entity } from 'draft-js';
+import {
+  ContentBlock, ContentState, EditorState, Entity, Modifier, SelectionState,
+} from 'draft-js';
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
 import { validateSchema } from '../paste';
@@ -193,8 +194,6 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
     const key = blockBefore.getEntityAt(0);
     const blockKey = blockBefore.key;
     const entity = currentContent.getEntity(key);
-
-    const data : common.BlockData = entity.getData();
 
     let oppositeSentinel;
     let direction;

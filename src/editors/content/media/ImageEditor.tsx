@@ -1,23 +1,15 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 import * as persistence from '../../../data/persistence';
-import { Image }  from '../../../data/content/html/image';
-import { AppServices } from '../../common/AppServices';
+import { Image } from '../../../data/content/html/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
-import { Sources } from './Sources';
-import { Tracks } from './Tracks';
-import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
+import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
-import { Collapse } from '../common/Collapse';
-import { Checkbox } from '../common/Checkbox';
 import { TabContainer } from '../common/TabContainer';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
@@ -94,7 +86,6 @@ export class ImageEditor
 
   onFileChange(e) {
     const file = e.target.files[0];
-    const src = file.name;
 
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {
@@ -157,10 +148,6 @@ export class ImageEditor
   }
 
   renderSource() {
-
-    const { titleContent, caption, cite, popout, alternate,
-      width, height, alt, valign } = this.props.model;
-
     const { src } = this.props.model;
     let srcDisplay;
     if (!this.state.failure) {
@@ -211,8 +198,7 @@ export class ImageEditor
   }
 
   renderSizing() {
-    const { titleContent, caption, cite, popout, alternate,
-      width, height, alt, valign } = this.props.model;
+    const { width, height } = this.props.model;
 
     return (
       <div style={ { marginTop: '70px', marginLeft: '75px' } }>
@@ -261,8 +247,7 @@ export class ImageEditor
   }
 
   renderOther() {
-    const { titleContent, caption, cite, popout, alternate,
-      width, height, alt, valign } = this.props.model;
+    const { titleContent, caption, popout, alt, valign } = this.props.model;
 
     return (
       <div style={ { marginTop: '30px' } }>

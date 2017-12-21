@@ -1,12 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { Command } from './commands/command';
 import { NodeTypes } from './traversal';
-import { ActionDropdown } from './ActionDropdown';
 
 export interface Row {
-  
+
 }
 
 export interface RowProps {
@@ -18,13 +16,13 @@ export interface RowProps {
 }
 
 export interface RowState {
-  
+
 }
 
 
-export class Row 
+export class Row
   extends React.PureComponent<RowProps, RowState> {
-    
+
   constructor(props) {
     super(props);
   }
@@ -43,9 +41,6 @@ export class Row
   }
 
   render() : JSX.Element {
-
-    const { model, index, children, processCommand, labels } = this.props;
-
     return null;
   }
 

@@ -1,14 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
-import { ActivityLink }  from '../../../data/content/html/activity_link';
-import { AppServices } from '../../common/AppServices';
+import { ActivityLink } from '../../../data/content/html/activity_link';
 import { PurposeTypes } from '../../../data/content/html/common';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 import { LegacyTypes } from '../../../data/types';
 
 export interface ActivityLinkEditorProps extends AbstractContentEditorProps<ActivityLink> {
@@ -82,7 +78,7 @@ export class ActivityLinkEditor
 
   render() : JSX.Element {
 
-    const { idref, purpose, target } = this.props.model;
+    const { purpose, target } = this.props.model;
 
     return (
       <div className="itemWrapper">

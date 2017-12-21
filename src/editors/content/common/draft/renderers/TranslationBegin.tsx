@@ -1,25 +1,22 @@
 import * as React from 'react';
-import { Dropdown, DropdownItem } from '../../Dropdown';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState } from './InteractiveRenderer';
-import { BlockProps } from './properties';
-
-import { Select } from '../../Select';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import './markers.scss';
 
 export interface TranslationBeginProps extends InteractiveRendererProps {
-  
+
 }
 
 export interface TranslationBeginState extends InteractiveRendererState {
-  
+
 }
 
 export interface TranslationBegin {
-  
+
 }
 
-export class TranslationBegin 
+export class TranslationBegin
   extends InteractiveRenderer<TranslationBeginProps, TranslationBeginState> {
 
   constructor(props) {
@@ -27,7 +24,7 @@ export class TranslationBegin
   }
 
   render() {
-    
+
     return (
       <span ref={c => this.focusComponent = c} className="TranslationSentinel">
         Translation&nbsp;

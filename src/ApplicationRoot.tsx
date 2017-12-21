@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Main from './Main.controller';
+
 const Provider = (require('react-redux') as RR).Provider;
 
 interface ApplicationRootProps {

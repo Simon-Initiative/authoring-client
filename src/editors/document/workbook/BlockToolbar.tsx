@@ -1,13 +1,9 @@
 import * as React from 'react';
 
 import { EditorState } from 'draft-js';
-
-import { EntityTypes } from '../../../data/content/html/common';
-import { HtmlToolbar, HtmlToolbarButton } from '../../content/html/TypedToolbar';
-import { CommandProcessor } from '../../content/common/command';
-import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
+import { HtmlToolbar } from '../../content/html/TypedToolbar';
 import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
-import { flowBlock, bodyBlock } from '../../content/common/toolbar/Configs';
+import { bodyBlock, flowBlock } from '../../content/common/toolbar/Configs';
 
 interface BlockToolbarProps extends ToolbarProps<EditorState> {  
   

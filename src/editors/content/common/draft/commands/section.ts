@@ -1,9 +1,10 @@
 import * as Immutable from 'immutable';
-import { insertBlocksAfter, createTitle, stateFromKey, containerPrecondition } from './common';
+import { containerPrecondition, createTitle, insertBlocksAfter, stateFromKey } from './common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 import { AbstractCommand } from '../../command';
-import { EditorState, RichUtils, SelectionState,
-  ContentBlock, Modifier, CharacterMetadata} from 'draft-js';
+import {
+  CharacterMetadata, ContentBlock, EditorState,
+} from 'draft-js';
 
 
 export class InsertSectionCommand extends AbstractCommand<EditorState> {

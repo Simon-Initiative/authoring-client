@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { CommandProcessor, Command } from '../command';
-import { AppContext } from '../../../common/AppContext';
+import { Command, CommandProcessor } from '../command';
 
 export interface ToolbarProps<DataType> {
   commandProcessor?: CommandProcessor<DataType>;

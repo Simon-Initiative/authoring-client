@@ -4,19 +4,14 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Button } from '../common/controls';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import { Remove } from 'components/common/Remove';
 import { convert } from 'utils/format';
 import { Html } from 'data/content/html.ts';
-import createGuid from 'utils/guid';
 import {
-  InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
+  InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
 import {
-  modelWithDefaultFeedback, getGeneratedResponseBody, getGeneratedResponseScore,
+    getGeneratedResponseBody, getGeneratedResponseScore,
+    modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { CombinationsMap } from 'types/combinations';
 
@@ -27,13 +22,6 @@ import './ChoiceFeedback.scss';
 // the glob notation, but as a side effect, analyzing which choices were made
 // will no longer be possible
 export const AUTOGEN_MAX_CHOICES = 12;
-
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
   input?: string;
@@ -193,7 +181,7 @@ export abstract class ChoiceFeedback
   }
 
   renderResponses() {
-    const { choices, model, context, services, editMode, onEdit } = this.props;
+    const { choices, model, context, services, editMode } = this.props;
 
     // get default feedback details
     const defaultFeedbackBody = getGeneratedResponseBody(model);

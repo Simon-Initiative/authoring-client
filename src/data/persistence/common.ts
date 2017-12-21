@@ -1,15 +1,10 @@
 import * as Immutable from 'immutable';
 import { CourseId, DocumentId } from '../types';
 import * as models from '../models';
-import { credentials, getHeaders, getFormHeaders } from '../../actions/utils/credentials';
-import { configuration } from '../../actions/utils/config';
-import { Resource } from '../content/resource';
-import { UserInfo } from '../content/user_info';
-import { isArray } from 'util';
+import { credentials, getHeaders } from '../../actions/utils/credentials';
+import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
 
 const fetch = (window as any).fetch;
-
-import { forceLogin, refreshTokenIfInvalid } from '../../actions/utils/keycloak';
 
 function handleError(err, reject) {
   if (err.message && err.message === 'Unauthorized') {

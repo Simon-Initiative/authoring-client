@@ -1,5 +1,4 @@
 import { AbstractCommand } from '../command';
-import * as Immutable from 'immutable';
 import * as models from '../../../../../data/models';
 import { AppServices } from '../../../../common/AppServices';
 import * as t from '../../../../../data/contentTypes';

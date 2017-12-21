@@ -1,20 +1,11 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as t from '../../../data/contentTypes';
 import * as models from '../../../data/models';
 import { AppContext } from '../../common/AppContext';
-import { Maybe } from 'tsmonad';
-import { AppServices } from '../../common/AppServices';
-import guid from '../../../utils/guid';
-import { DraggableNode } from './DraggableNode';
-import { NodeTypes, getExpandId } from './traversal';
-import { canHandleDrop } from './utils';
+import { getExpandId } from './traversal';
 import { Command } from './commands/command';
-import { ActionDropdown } from './ActionDropdown';
-import { TextInput } from '../../content/common/TextInput';
 import { Remove } from './Remove';
-import { ADD_NEW_COMMANDS, ADD_EXISTING_COMMANDS } from './commands/map';
-import { RemoveCommand } from './commands/remove';
+import { ADD_EXISTING_COMMANDS, ADD_NEW_COMMANDS } from './commands/map';
 
 import './EditableCaption.scss';
 
@@ -153,7 +144,7 @@ export class EditableCaption
 
   render() : JSX.Element {
 
-    const { model, depth, editMode } = this.props;
+    const { model } = this.props;
 
     if (this.state.isEditing) {
       return (

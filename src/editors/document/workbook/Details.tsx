@@ -1,8 +1,6 @@
 import * as React from 'react';
-import guid from '../../../utils/guid';
 import * as models from '../../../data/models';
 import { TextInput } from '../../content/common/TextInput';
-import { Maybe } from 'tsmonad';
 
 export interface Details {
 

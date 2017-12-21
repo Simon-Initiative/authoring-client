@@ -1,10 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { NodeId, NodeState, Nodes, HasGuid,
-  ChildrenAccessor, ChildrenMutator,
-  TreeRenderer } from 'editors/common/tree/types';
-
-import { removeNode, updateNode, insertNode } from 'editors/common/tree/utils';
+import { ChildrenAccessor, ChildrenMutator, NodeId, Nodes } from 'editors/common/tree/types';
+import { insertNode, removeNode, updateNode } from 'editors/common/tree/utils';
 
 type TestNode = {
   value: number,

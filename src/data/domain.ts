@@ -1,4 +1,3 @@
-
 import * as contentTypes from './contentTypes';
 import * as models from './models';
 

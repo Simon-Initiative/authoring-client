@@ -44,7 +44,7 @@ const NodeSource = {
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging(),
 }))
-export class DraggableNode<NodeType>
+export class DraggableNode
   extends React.PureComponent<DraggableNodeProps, {}> {
 
   constructor(props) {

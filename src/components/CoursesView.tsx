@@ -2,14 +2,8 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as viewActions from 'actions/view';
-
-import { LegacyTypes } from 'data/types';
-import * as models from 'data/models';
-import * as contentTypes from 'data/contentTypes';
-import * as courseActions from 'actions/course';
 import * as messageActions from 'actions/messages';
 import * as Messages from 'types/messages';
-import { hasRole } from 'actions/utils/keycloak';
 import { Maybe } from 'tsmonad';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 
@@ -129,7 +123,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
       .sort((a, b) => a.title.localeCompare(b.title))
       .map((c, i) => {
 
-        const { guid, id, version, title, description, buildStatus } = c;
+        const { guid, version, title, buildStatus } = c;
 
         const isReady = buildStatus === 'READY';
 

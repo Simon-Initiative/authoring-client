@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { CodeBlock as CodeBlockType } from '../../../../../data/content/html/codeblock';
 import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState} from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Select, Checkbox, TextInput } from '../../controls';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
+import { Checkbox, Select, TextInput } from '../../controls';
 
 import './markers.scss';
 
@@ -17,11 +17,11 @@ export interface CodeBlockProps extends InteractiveRendererProps {
 }
 
 export interface CodeBlockState extends InteractiveRendererState {
-  
+
 }
 
 export interface CodeBlockProps {
-  
+
 }
 
 
@@ -105,7 +105,7 @@ class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
             onEdit={this.onHighlightEdit}
           />
         </form>
-        <PreformattedText onEdit={this.onSourceEdit} 
+        <PreformattedText onEdit={this.onSourceEdit}
           src={this.props.data.codeblock.source} editMode={this.props.blockProps.editMode} />
       </div>);
   }

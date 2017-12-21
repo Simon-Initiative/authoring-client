@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from 'data//contentTypes';
 import { Maybe } from 'tsmonad';
 
 import * as Tree from 'editors/common/tree';

@@ -1,12 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../data/contentTypes';
-import { AppContext } from '../../editors/common/AppContext';
-import * as models from '../../data/models';
-import { Maybe } from 'tsmonad';
 import { Title } from './Title';
-import { AppServices } from '../../editors/common/AppServices';
-import guid from '../../utils/guid';
 import { Remove } from 'components/common/Remove';
 
 export interface Objective {

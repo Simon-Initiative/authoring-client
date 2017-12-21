@@ -1,4 +1,3 @@
-import * as Immutable from 'immutable';
 import { ContentState, Modifier, SelectionState } from 'draft-js';
 import guid from 'utils/guid';
 import { getAllEntities } from 'data/content/html/changes';

@@ -1,9 +1,7 @@
 import * as Immutable from 'immutable';
 
 import { Html } from '../html';
-import createGuid from '../../../utils/guid';
 import { augment } from '../common';
-import { getKey } from '../../common';
 
 export type HintParams = {
   targets?: string,

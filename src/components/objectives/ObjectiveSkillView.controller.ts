@@ -1,14 +1,13 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
-import { Skill, LearningObjective } from 'data/contentTypes';
+import { LearningObjective, Skill } from 'data/contentTypes';
 import ObjectiveSkillView from './ObjectiveSkillView';
-import { CourseModel } from 'data/models';
 import { setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
 import * as Messages from 'types/messages';
-import { showMessage, dismissSpecificMessage } from 'actions/messages';
+import { dismissSpecificMessage, showMessage } from 'actions/messages';
 import * as lockActions from 'actions/locks';
-import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
+import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
 
 interface StateProps {
   skills: any;

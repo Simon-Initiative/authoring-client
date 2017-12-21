@@ -1,19 +1,15 @@
-
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Button } from '../common/controls';
-import { DragDropContext } from 'react-dnd';
 import { convert } from 'utils/format';
-import {
-  InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
-} from 'editors/content/common/InputList.tsx';
+import { InputList, InputListItem } from 'editors/content/common/InputList.tsx';
 import { updateChoiceValuesAndRefs } from './MultipleChoice';
 import {
-  modelWithDefaultFeedback, getGeneratedResponseBody, getGeneratedResponseScore,
+    getGeneratedResponseBody, getGeneratedResponseScore,
+    modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { AUTOGEN_MAX_CHOICES } from '../part/ChoiceFeedback';
 import { CombinationsMap } from 'types/combinations';

@@ -1,6 +1,5 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId } from '../types';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 
 /**

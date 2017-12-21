@@ -1,18 +1,12 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { Row } from './row';
-import { getKey } from '../../common';
-import { Param } from './param';
 
 import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
-
 import { toPersistence } from './topersistence';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './todraft';
+
+const emptyContent = ContentState.createFromText('');
 
 export type CellDataParams = {
   align?: string,

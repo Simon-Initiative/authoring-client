@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as t from '../../../data/contentTypes';
 
 export type IsNodeExpanded = (guid: string) => boolean;
@@ -20,8 +19,6 @@ export function render(
   nodeRenderers: any, positionAtLevels: object) : React.Component[] {
 
   const elements = [];
-
-  const arr = sequences.children.toArray();
 
   let i = -1;
 
@@ -48,8 +45,6 @@ export function renderHelper(
   if (isExpanded(getExpandId(node))
     && node.contentType !== t.OrganizationContentTypes.Item
     && node.contentType !== t.OrganizationContentTypes.Include) {
-
-    const arr = (node.children as any).toArray();
 
     let i = -1;
 

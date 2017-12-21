@@ -1,4 +1,4 @@
-import { ContentState, ContentBlock, EntityMap, Entity, Modifier, SelectionState } from 'draft-js';
+import { ContentBlock, ContentState, Entity, Modifier, SelectionState } from 'draft-js';
 import * as Immutable from 'immutable';
 import { EntityTypes } from './common';
 import { Html } from '../html';

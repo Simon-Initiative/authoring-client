@@ -4,14 +4,12 @@ import { EntityTypes } from '../../../../../data/content/html/common';
 
 import { AppServices } from '../../../../common/AppServices';
 import { AppContext } from '../../../../common/AppContext';
-import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
 import MediaSelection from '../../../../../utils/selection/MediaSelection';
 import { createAttachment } from '../../../../../utils/selection/upload';
 import { fileToBase64 } from '../../../../../utils/file';
 import { InsertBlockEntityCommand } from '../../draft/commands/insert';
-import { appendText } from '../../draft/commands/common';
 import { AbstractCommand } from '../../command';
-import { EditorState, ContentState, SelectionState, Modifier, AtomicBlockUtils } from 'draft-js';
+import { EditorState } from 'draft-js';
 
 export class InsertMediaCommand extends AbstractCommand<EditorState> {
 

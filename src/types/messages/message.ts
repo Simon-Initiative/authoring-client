@@ -1,7 +1,4 @@
-import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
-
-import createGuid from 'utils/guid';
 import { augment } from 'data/content/common';
 
 import { TitledContent } from './titled';

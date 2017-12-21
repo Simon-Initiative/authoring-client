@@ -1,4 +1,3 @@
-import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { Question, QuestionProps, QuestionState } from './Question';
 

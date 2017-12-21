@@ -1,6 +1,4 @@
 import * as Immutable from 'immutable';
-
-import { Html } from '../html';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Supplement } from './supplement';

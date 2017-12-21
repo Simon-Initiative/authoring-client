@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as types from '../../data/types';
 import * as contentTypes from '../../data/contentTypes';
 
 import ModalSelection from '../../utils/selection/ModalSelection';

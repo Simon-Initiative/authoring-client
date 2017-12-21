@@ -3,27 +3,22 @@
 
 import * as contentTypes from '../src/data/contentTypes';
 import * as models from '../src/data/models';
-import { ContentState } from 'draft-js';
-
-import {} from 'node';
 
 const assessment = require('./assessment.json');
-const workbook_page = require('./master-workbook.json');
-
-import {} from 'jasmine';
+const workbookPage = require('./master-workbook.json');
 
 it('WorkbookPageModel', () => {
 
   // A complete test of converting back and forth from
   // persistence to object model and back:
-  let model = models.WorkbookPageModel.fromPersistence(workbook_page);
-  let persisted = model.toPersistence();
-  
+  let model = models.WorkbookPageModel.fromPersistence(workbookPage);
+  const persisted = model.toPersistence();
+
   model = models.WorkbookPageModel.fromPersistence(persisted);
-  
+
   // Now verify that all the pieces and parts are present:
   expect(model.head.title.text).toBe('This is the title');
-  
+
 });
 
 const dont = (s, f) => { return 1; };
@@ -33,13 +28,13 @@ dont('AssessmentModel', () => {
   // A complete test of converting back and forth from
   // persistence to object model and back:
   let model = models.AssessmentModel.fromPersistence(assessment);
-  console.log('1')
-  let persisted = model.toPersistence();
-  
+  console.log('1');
+  const persisted = model.toPersistence();
+
   model = models.AssessmentModel.fromPersistence(persisted);
-  
+
   // Now verify that all the pieces and parts are present:
-  console.log('here')
+  console.log('here');
   expect(model.title.text).toBe('Tutor');
   expect(model.nodes.size).toBe(0);
   expect(model.pages.size).toBe(1);
@@ -60,12 +55,15 @@ dont('AssessmentModel', () => {
   const mc = (items[0] as contentTypes.MultipleChoice);
   expect(mc.shuffle).toBe(true);
   expect(mc.choices.toArray()[0].value).toBe('correct');
-  expect(mc.choices.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is the correct choice');
+  expect(mc.choices.toArray()[0].body.contentState.getBlocksAsArray()[0].getText())
+    .toBe('This is the correct choice');
   expect(mc.choices.toArray()[1].value).toBe('incorrect');
-  expect(mc.choices.toArray()[1].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is an incorrect choice');
+  expect(mc.choices.toArray()[1].body.contentState.getBlocksAsArray()[0].getText())
+    .toBe('This is an incorrect choice');
   expect(mc.choices.toArray()[2].value).toBe('incorrect2');
-  expect(mc.choices.toArray()[2].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is also an incorrect choice');
-  
+  expect(mc.choices.toArray()[2].body.contentState.getBlocksAsArray()[0].getText())
+    .toBe('This is also an incorrect choice');
+
   const parts = question.parts.toArray();
   expect(parts.length).toBe(1);
 
@@ -74,12 +72,14 @@ dont('AssessmentModel', () => {
   expect(responses.length).toBe(3);
   expect(responses[0].match).toBe('correct');
   expect(responses[0].score).toBe('10');
-  expect(responses[0].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is feedback for a correct choice');
-  
+  expect(responses[0].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText())
+    .toBe('This is feedback for a correct choice');
+
   expect(responses[1].match).toBe('*');
   expect(responses[1].score).toBe('0');
-  expect(responses[1].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText()).toBe('This is feedback for an incorrect choice');
-  
+  expect(responses[1].feedback.toArray()[0].body.contentState.getBlocksAsArray()[0].getText())
+    .toBe('This is feedback for an incorrect choice');
+
   const hints = part.hints.toArray();
   expect(hints.length).toBe(1);
   const hintBlocks = hints[0].body.contentState.getBlocksAsArray();

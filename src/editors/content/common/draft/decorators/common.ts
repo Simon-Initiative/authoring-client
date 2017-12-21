@@ -1,4 +1,4 @@
-import { ContentState, ContentBlock } from 'draft-js';
+import { ContentBlock, ContentState } from 'draft-js';
 
 export type Decorator = {
   component : any,

@@ -1,20 +1,12 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import { ContentState } from 'draft-js';
 
-import { Audio }  from '../../../data/content/html/audio';
-import { AppServices } from '../../common/AppServices';
+import { Audio } from '../../../data/content/html/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
-import { LabeledType, LabeledEditor } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 
 import { TabContainer } from '../common/TabContainer';
 
@@ -110,7 +102,7 @@ export class AudioEditor
   }
 
   renderOther() {
-    const { titleContent, caption, cite, popout, alternate } = this.props.model;
+    const { titleContent, caption, popout } = this.props.model;
 
     return (
       <div style={ { marginTop: '30px' } }>
