@@ -23,6 +23,7 @@ const reducers = combineReducers({
   requests,       // the current pending async requests
   server,         // server specific info (time skew, etc)
   skills,         // all known skills for the current course
+  user,           // Information about current user, null if not logged in
 });
 
 export default reducers;
