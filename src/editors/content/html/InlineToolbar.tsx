@@ -8,12 +8,12 @@ import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
 import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowInline } from '../../content/common/toolbar/Configs';
 
-interface InlineToolbarProps extends ToolbarProps<EditorState> {  
-  
+interface InlineToolbarProps extends ToolbarProps<EditorState> {
+
 }
 
 interface InlineToolbar {
-  
+
 }
 
 class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
@@ -36,6 +36,5 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
   }
 
 }
-
 
 export default InlineToolbar;

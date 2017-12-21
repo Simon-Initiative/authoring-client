@@ -1,0 +1,92 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+@import 'oli/zindex';
+
+.input-list {
+  @include disable-select;
+
+  .input-list-item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+
+    .input-list-item-label {
+      display: flex;
+      flex-direction: row;
+      margin-right: 10px;
+      padding-top: 6px;
+
+      .label-text {
+        min-width: 16px;
+      }
+
+      .item-drag-handle {
+        margin-top: 4px;
+        margin-left: 10px;
+      }
+    }
+
+    .input-list-item-content {
+      flex: 1;
+      display: block;
+      position: relative;
+      border: solid 2px transparent;
+
+      &.drop-hover {
+        border: dashed 2px #f4bf42;
+        border-radius: 5px;
+
+        & > * {
+          opacity: 0.3;
+        }
+
+        .drop-target-container {
+          position: absolute;
+          opacity: 1;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: $reposition-target - 1;
+        }
+      }
+
+      .input-list-item-controls {
+
+      }
+
+      .input-list-item-content-title {
+        font-size: 1em;
+
+      }
+
+      .input-list-item-options {
+        display: flex;
+        flex-direction: row;
+
+        & > * {
+          margin-right: 10px;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        .option-label {
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          color: $gray-dark;
+        }
+      }
+    }
+
+    .remove-btn {
+      padding-top: 8px;
+      width: 26px;
+    }
+
+    .content-title-btn-offset {
+      margin-top: 1.5em;
+    }
+  }
+}

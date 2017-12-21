@@ -23,6 +23,8 @@ import CreateCourseView from './components/CreateCourseView';
 import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
+import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-dnd';
 import Messages from './components/message/Messages.controller';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -128,6 +130,7 @@ interface MainState {
 /**
  * Main React Component
  */
+@DragDropContext(HTML5Backend)
 export default class Main extends React.Component<MainProps, MainState> {
   modalActions: Object;
   viewActions: Object;

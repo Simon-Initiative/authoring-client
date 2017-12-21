@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { ContentState, CharacterMetadata, ContentBlock, 
+import { ContentState, CharacterMetadata, ContentBlock,
   EntityMap, convertToRaw, convertFromRaw } from 'draft-js';
 
 import { CodeBlock } from './codeblock';
@@ -11,12 +11,12 @@ import guid from '../../../utils/guid';
 import * as common from './common';
 import { Block, BlockIterator, BlockProvider } from './provider';
 
-// Translation routine from draft model to persistence model 
+// Translation routine from draft model to persistence model
 
 
 // A mapping of inline sytles to the persistence
 // object trees needed to represent them.  Functions
-// are present here to provide a poor-man's immutability. 
+// are present here to provide a poor-man's immutability.
 const styleContainers = {
   BOLD: () => ({ em: { '@style': 'bold' } }),
   ITALIC: () => ({ em: { '@style': 'italic' } }),
@@ -80,13 +80,13 @@ function translate(content: common.RawDraft, state: ContentState, inlineText: bo
 
   // Create a top-level container for the object tree to root itself into
   const root = { body: { '#array': [] } };
-  const context = [root.body['#array']];  
+  const context = [root.body['#array']];
 
   // Start iterating through the blocks, converting them as we go.
   // The iterator pattern is used here instead of a for-loop since some
   // blocks are processed as groups - so we need to be able to provide
-  // the iterator to the block processing function so that it can 
-  // access additional blocks if needed. 
+  // the iterator to the block processing function so that it can
+  // access additional blocks if needed.
   const iterator = new BlockProvider(content.blocks, state);
   while (iterator.hasNext()) {
     translateBlock(iterator, content.entityMap, context);
@@ -102,17 +102,18 @@ function translate(content: common.RawDraft, state: ContentState, inlineText: bo
         delete p.p['@id'];
         delete p.p['@title'];
         return [p.p];
-      } else if (p.p['#array'] !== undefined) {
+      }
+      if (p.p['#array'] !== undefined) {
         return p.p['#array'];
       }
     } else {
       return root.body['#array'];
     }
-    
+
   } else {
     return root.body;
   }
-  
+
 }
 
 
@@ -120,7 +121,7 @@ function translate(content: common.RawDraft, state: ContentState, inlineText: bo
 function translateBlock(
   iterator : BlockIterator,
   entityMap : common.RawEntityMap, context: Stack) {
-  
+
   const block = iterator.next();
   const rawBlock = block.rawBlock;
   const draftBlock = block.block;
@@ -171,10 +172,10 @@ function translateBlock(
     translateAtomic('activity', rawBlock, draftBlock, entityMap, context);
   } else if (isHeaderBlock(rawBlock)) {
     translateHeaderBlock(rawBlock, draftBlock, entityMap, context);
-  } else { 
+  } else {
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
-  
+
 }
 
 
@@ -185,14 +186,14 @@ const top = (stack : Stack) => {
     push: (o) => {
       if (s !== undefined) {
         s.push(o);
-      } 
+      }
     },
   };
-    
+
 };
 
 function handleSentinelTransition(
-  type: common.EntityTypes, iterator: BlockIterator, 
+  type: common.EntityTypes, iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap, context: Stack) {
 
   if (type.endsWith('_end')) {
@@ -226,109 +227,109 @@ function handleSentinelTransition(
   } else if (type === common.EntityTypes.meaning_begin) {
     translateMeaning(iterator, rawBlock, entityMap, context);
 
-  } 
+  }
 
 }
 
 function getSentinelType(
   rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap) : common.EntityTypes {
-  
+
   if (rawBlock.type === 'atomic') {
     const entity : common.RawEntity = entityMap[rawBlock.entityRanges[0].key];
     if (entity.type.endsWith('_begin') || entity.type.endsWith('_end')) {
       return (entity.type as common.EntityTypes);
-    } 
-  } 
-  return null; 
+    }
+  }
+  return null;
 }
 
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block; 
+  const { data, type } = block;
   return (type === 'unstyled');
 }
 
 function isHeaderBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block; 
+  const { data, type } = block;
   return (type.startsWith('header'));
 }
 
 function isQuoteBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block; 
+  const { data, type } = block;
   return (type === 'blockquote');
 }
 
 function isFormulaBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block; 
+  const { data, type } = block;
   return (type === 'formula');
 }
 
 function isBasicCodeBlock(block : common.RawContentBlock) : boolean {
-  const { data, type } = block; 
+  const { data, type } = block;
   return (type === 'code');
 }
 
 function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block; 
+  const { type } = block;
   return (type === 'unordered-list-item');
 }
 
 function isOrderedListBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block; 
+  const { type } = block;
   return (type === 'ordered-list-item');
 }
 
 function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block; 
+  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'codeblock';
-  } 
-  return false; 
+  }
+  return false;
 }
 
 function isTable(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block; 
+  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'table';
-  } 
-  return false; 
+  }
+  return false;
 }
 
 function isCustom(
-  customType: string, 
+  customType: string,
   block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  
-  const { type } = block; 
+
+  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === customType;
-  } 
-  return false; 
+  }
+  return false;
 }
 
 function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block; 
+  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'wb_inline';
-  } 
-  return false; 
+  }
+  return false;
 }
 
 function isObjRef(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  const { type } = block; 
+  const { type } = block;
   if (block.type === 'atomic') {
     const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
     return entity.type === 'objref';
-  } 
-  return false; 
+  }
+  return false;
 }
 
 function translateList(
-  listType : string, 
-  rawBlock : common.RawContentBlock, 
-  block: ContentBlock, iterator : BlockIterator, 
+  listType : string,
+  rawBlock : common.RawContentBlock,
+  block: ContentBlock, iterator : BlockIterator,
   entityMap : common.RawEntityMap, context: Stack) {
 
   // Create the object representing the list type (ol, ul)
@@ -376,7 +377,7 @@ function translateList(
 
 function translateAtomic(
   type: string,
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const item = entityMap[rawBlock.entityRanges[0].key].data[type];
@@ -385,14 +386,14 @@ function translateAtomic(
 
 
 function translateUnsupported(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
 }
 
 function translateCodeBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const codeblock : CodeBlock = entityMap[rawBlock.entityRanges[0].key].data.codeblock;
@@ -400,7 +401,7 @@ function translateCodeBlock(
 }
 
 function translateTable(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const table : Table = entityMap[rawBlock.entityRanges[0].key].data.table;
@@ -408,7 +409,7 @@ function translateTable(
 }
 
 function translateWbInline(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const wb : WbInline = entityMap[rawBlock.entityRanges[0].key].data.wbinline;
@@ -416,7 +417,7 @@ function translateWbInline(
 }
 
 function translateObjRef(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const objref : Object = entityMap[rawBlock.entityRanges[0].key].data;
@@ -424,16 +425,16 @@ function translateObjRef(
 }
 
 function translateSection(
-  iterator: BlockIterator, 
-  rawBlock: common.RawContentBlock, 
+  iterator: BlockIterator,
+  rawBlock: common.RawContentBlock,
   entityMap : common.RawEntityMap, context: Stack) {
 
   let block = iterator.peek();
   let title;
-  if (block !== null 
-    && block.rawBlock.type === 'atomic' 
+  if (block !== null
+    && block.rawBlock.type === 'atomic'
     && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_begin) {
-    
+
     // Move past the title start
     block = iterator.next();
 
@@ -446,15 +447,15 @@ function translateSection(
     // Move past the title_end block
     block = iterator.peek();
     while (block !== null) {
-      if (block.rawBlock.type === 'atomic' 
+      if (block.rawBlock.type === 'atomic'
         && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
         block = iterator.next();
         break;
       }
       block = iterator.next();
     }
-    
-    
+
+
   } else {
     title = {
       title: {
@@ -468,9 +469,9 @@ function translateSection(
 
   const purpose = entityMap[rawBlock.entityRanges[0].key].data.purpose;
 
-  const s = { 
+  const s = {
     section: {
-      '@id': id, 
+      '@id': id,
       '@title': titleAttr,
       '#array': [title, {
         body: {
@@ -491,19 +492,19 @@ function translateSection(
 
 
 function translatePullout(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
 
   const id = extractId(rawBlock);
   const title = extractTitle(rawBlock);
-  
+
   const p = {
     pullout: {
       '@type': entityMap[rawBlock.entityRanges[0].key].data.subType,
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
@@ -514,7 +515,7 @@ function translatePullout(
 }
 
 function translateDefinition(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const term = entityMap[rawBlock.entityRanges[0].key].data.term;
@@ -530,7 +531,7 @@ function translateDefinition(
   const p = {
     definition: {
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
@@ -541,7 +542,7 @@ function translateDefinition(
 }
 
 function translateTitle(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
@@ -551,7 +552,7 @@ function translateTitle(
       '#array': arr,
     },
   };
-  
+
   top(context).push(p);
 
   // Get the content of the title
@@ -563,7 +564,7 @@ function translateTitle(
   // Move past the title_end block
   block = iterator.peek();
   while (block !== null) {
-    if (block.rawBlock.type === 'atomic' 
+    if (block.rawBlock.type === 'atomic'
       && entityMap[
         block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
       block = iterator.next();
@@ -575,12 +576,12 @@ function translateTitle(
 }
 
 function translatePronunciation(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const src = entityMap[rawBlock.entityRanges[0].key].data.type;
   const type = entityMap[rawBlock.entityRanges[0].key].data.srcType;
-  
+
   const arr = [];
 
   const id = extractId(rawBlock);
@@ -590,7 +591,7 @@ function translatePronunciation(
     pronunciation: {
       '@type': type,
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
@@ -600,7 +601,7 @@ function translatePronunciation(
   // Get the content of the pronunciation
   let block = iterator.next();
 
-  if (block.rawBlock.type === 'atomic' 
+  if (block.rawBlock.type === 'atomic'
     && entityMap[
       block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
 
@@ -614,7 +615,7 @@ function translatePronunciation(
   // Move past the pronunciation_end block
   block = iterator.peek();
   while (block !== null) {
-    if (block.rawBlock.type === 'atomic' 
+    if (block.rawBlock.type === 'atomic'
       && entityMap[
         block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
       block = iterator.next();
@@ -626,7 +627,7 @@ function translatePronunciation(
 }
 
 function translatePureInline(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
 
   if (rawBlock.inlineStyleRanges.length === 0
@@ -637,11 +638,11 @@ function translatePureInline(
 
   }
 
-  
+
 }
 
 function translateTranslation(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
@@ -652,17 +653,17 @@ function translateTranslation(
   const p = {
     translation: {
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
 
   top(context).push(p);
-  
+
   // Get the content of the translation
   let block = iterator.next();
 
-  if (block.rawBlock.type === 'atomic' 
+  if (block.rawBlock.type === 'atomic'
     && entityMap[
       block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
 
@@ -676,7 +677,7 @@ function translateTranslation(
   // Move past the translation_end block
   block = iterator.peek();
   while (block !== null) {
-    if (block.rawBlock.type === 'atomic' 
+    if (block.rawBlock.type === 'atomic'
       && entityMap[
         block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
       block = iterator.next();
@@ -688,7 +689,7 @@ function translateTranslation(
 }
 
 function translateMaterial(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
@@ -708,7 +709,7 @@ function translateMaterial(
 }
 
 function translateMeaning(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const arr = [];
@@ -719,7 +720,7 @@ function translateMeaning(
   const p = {
     meaning: {
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
@@ -733,15 +734,15 @@ function processTitle(
   rawBlock: common.RawContentBlock, block: ContentBlock, entityMap: common.RawEntityMap) {
   if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
     return { title: { '#text': (rawBlock.text === '' ? ' ' : rawBlock.text) } };
-  } else {
-    const title = { title: { '#array': [] } };
-    translateTextBlock(rawBlock, block, entityMap, title.title['#array']);
-    return title;
   }
+
+  const title = { title: { '#array': [] } };
+  translateTextBlock(rawBlock, block, entityMap, title.title['#array']);
+  return title;
 }
 
 function translateExample(
-  iterator: BlockIterator, 
+  iterator: BlockIterator,
   rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const id = extractId(rawBlock);
@@ -751,7 +752,7 @@ function translateExample(
   const e = {
     example: {
       '#array': arr,
-      '@id': id, 
+      '@id': id,
       '@title': title,
     },
   };
@@ -762,7 +763,7 @@ function translateExample(
 }
 
 function translateHeaderBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   // Convert it to a paragraph:
@@ -770,7 +771,7 @@ function translateHeaderBlock(
 }
 
 function translateParagraph(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const id = extractId(rawBlock);
@@ -783,26 +784,25 @@ function translateParagraph(
     top(context).push(p);
     translateTextBlock(rawBlock, block, entityMap, p.p['#array']);
   }
-
 }
 
 function extractId(rawBlock : common.RawContentBlock) {
   if (rawBlock.data === undefined || rawBlock.data.id === undefined) {
     return 'a' + guid();
-  } else {
-    return rawBlock.data.id;
   }
+
+  return rawBlock.data.id;
 }
 function extractTitle(rawBlock : common.RawContentBlock) {
   if (rawBlock.data === undefined || rawBlock.data.title === undefined) {
     return '';
-  } else {
-    return rawBlock.data.title;
   }
+
+  return rawBlock.data.title;
 }
 
 function translateQuoteBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const id = extractId(rawBlock);
@@ -819,7 +819,7 @@ function translateQuoteBlock(
 }
 
 function translateFormulaBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const id = extractId(rawBlock);
@@ -836,7 +836,7 @@ function translateFormulaBlock(
 }
 
 function translateBasicCodeBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   const id = extractId(rawBlock);
@@ -853,22 +853,22 @@ function translateBasicCodeBlock(
 }
 
 function combineIntervals(rawBlock: common.RawContentBlock) : InlineOrEntity[] {
-  
-  const intervals : InlineOrEntity[] = 
+
+  const intervals : InlineOrEntity[] =
     [...rawBlock.entityRanges, ...rawBlock.inlineStyleRanges]
     .sort((a,b) => {
       if (a.offset - b.offset === 0) {
         return a.length - b.length;
-      } else {
-        return a.offset - b.offset;
       }
+
+      return a.offset - b.offset;
     });
-  
+
   return intervals;
 }
 
 function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
-  
+
   for (let i = 0; i < intervals.length - 1; i += 1) {
     const a = intervals[i];
     const b = intervals[i + 1];
@@ -882,36 +882,36 @@ function hasOverlappingIntervals(intervals : InlineOrEntity[]) : boolean {
 
 function translateOverlappingGroup(
   offset: number,
-  length: number, 
+  length: number,
   ranges: InlineOrEntity[],
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap) : Object[] {
 
   const container = [];
 
-  // Walk through each group of overlapping styles 
+  // Walk through each group of overlapping styles
   // and create the necessary objects, using the Draft per-character style support
   const chars : Immutable.List<CharacterMetadata> = block.getCharacterList();
 
   let current = chars.get(offset).getStyle();
   let begin = offset;
 
-  // createStyleTree is a helper function to create the object tree of 
-  // potentially nested styles for a specific range.  
+  // createStyleTree is a helper function to create the object tree of
+  // potentially nested styles for a specific range.
 
   // set is an Immutable OrderedSet of style strings ('BOLD', 'ITALIC')
   // that represent the styles applied to the range of start-end. An example
-  // of what it would create 
+  // of what it would create
 
   // { sub: { var: "#text": "some text"}}
   const createStyleTree = (set, start, end) => {
-    
+
     // A placeholder for the first style object
     const root = { root: {} };
     let last = root;
 
     set.toArray().forEach((s) => {
-      
+
       // For each style, create the object representation for that style
       if (s !== undefined) {
         const container = styleContainers[s];
@@ -921,11 +921,11 @@ function translateOverlappingGroup(
         } else {
           style = Object.assign({}, container());
         }
-        
+
         // Now root this style object into the parent style
         const key = common.getKey(last);
         last[key][common.getKey(style)] = style[common.getKey(style)];
-        last = style; 
+        last = style;
       }
     });
 
@@ -939,13 +939,13 @@ function translateOverlappingGroup(
   // Walk through each character at a time, finding when the
   // style set that applies to the character differ from the previous
   // character.  For these transitions we create a style tree and
-  // push it into the container. 
+  // push it into the container.
   for (let i = offset; i < (offset + length); i += 1) {
     const c : CharacterMetadata = chars.get(i);
     const allStyles : Immutable.OrderedSet<string> = c.getStyle();
 
     if (!allStyles.equals(current)) {
-      
+
       createStyleTree(current, begin, i);
       current = allStyles;
       begin = i;
@@ -953,18 +953,18 @@ function translateOverlappingGroup(
   }
 
   createStyleTree(
-    chars.get(offset + length - 1).getStyle(), 
+    chars.get(offset + length - 1).getStyle(),
     begin, (offset + length));
-    
+
   return container;
 }
 
-// Group all overlapping ranges 
+// Group all overlapping ranges
 function groupOverlappingRanges(ranges: InlineOrEntity[]) : OverlappingRanges[] {
 
-  const groups : OverlappingRanges[] 
+  const groups : OverlappingRanges[]
     = [{ offset: ranges[0].offset, length: ranges[0].length, ranges: [ranges[0]] }];
-  
+
   for (let i = 1; i < ranges.length; i += 1) {
     const s = ranges[i];
     const g = groups[groups.length - 1];
@@ -981,16 +981,16 @@ function groupOverlappingRanges(ranges: InlineOrEntity[]) : OverlappingRanges[] 
 }
 
 function isLinkRange(er: common.RawEntity) : boolean {
-  
+
   switch (er.type) {
     case common.EntityTypes.activity_link:
     case common.EntityTypes.link:
     case common.EntityTypes.xref:
       return true;
-    default: 
+    default:
       return false;
   }
-  
+
 }
 
 function getLinkRanges(
@@ -1007,16 +1007,16 @@ function subsumes(a: InlineOrEntity, b: InlineOrEntity) : boolean {
 function overlaps(a: InlineOrEntity, b: InlineOrEntity) : boolean {
   if (a.offset < b.offset) {
     return a.offset + a.length > b.offset;
-  } else {
-    return b.offset + b.length > a.offset;
   }
+
+  return b.offset + b.length > a.offset;
 }
 
 
 // Splits styles that overlap the specified linkRange. For example, in the following
 // The text "This is some" is bold and the text "some text" is the text for a link.
 // This function would split the bold interval so that there would be two intervals,
-// one for "This is " and another for "some".  This is necessary because the 
+// one for "This is " and another for "some".  This is necessary because the
 // persistence representation of links requires nesting of their text content, and
 // so to do that property we need to make sure no other styles overlap the link
 
@@ -1041,25 +1041,25 @@ function splitOverlappingStyles(
           updatedInlines.push(
             { offset: s.offset, length: linkEndOffset - s.offset, style: s.style });
           updatedInlines.push(
-            { offset: linkEndOffset + 1, 
+            { offset: linkEndOffset + 1,
               length: sEndOffset - (linkEndOffset + 1), style: s.style });
 
         } else {
 
           updatedInlines.push(
             { offset: s.offset, length: linkRange.offset - s.offset, style: s.style });
-           
+
           if (sEndOffset > linkEndOffset) {
             updatedInlines.push(
               { offset: linkRange.offset, length: linkRange.length, style: s.style });
             updatedInlines.push(
-              { offset: linkRange.offset + linkRange.length, 
+              { offset: linkRange.offset + linkRange.length,
                 length: sEndOffset - (linkEndOffset), style: s.style });
-          
+
           } else {
             updatedInlines.push(
               { offset: linkRange.offset, length: sEndOffset - linkRange.offset, style: s.style });
-         
+
           }
         }
       }
@@ -1073,16 +1073,16 @@ function splitOverlappingStyles(
 }
 
 function processOverlappingStyles(
-  group: OverlappingRanges, rawBlock : common.RawContentBlock, 
+  group: OverlappingRanges, rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap) : Object[] {
 
   const linkRanges = group.ranges
     .filter((range) => {
       if (isEntityRange(range)) {
         return isLinkRange(entityMap[range.key]);
-      } else {
-        return false;
       }
+
+      return false;
     });
 
   // We should only have at most one link range.
@@ -1094,48 +1094,46 @@ function processOverlappingStyles(
       const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
       entity[common.getKey(entity)][common.ARRAY] = [{ '#text': text }];
       return [entity];
-    
-    } else {
 
-      const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);
-      const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
-
-      const minusLink = group.ranges.filter((range) => {
-        if (isEntityRange(range)) {
-          return !isLinkRange(entityMap[range.key]);
-        } else {
-          return true;
-        }
-      });
-
-      entity[common.getKey(entity)][common.ARRAY] 
-        = translateOverlappingGroup(group.offset, 
-                                    group.length, minusLink, rawBlock, block, entityMap);
-    
-      return [entity];
     }
 
-  } else if (group.ranges.length === 1) {
-    
+    const text = rawBlock.text.substr(group.ranges[0].offset, group.ranges[0].length);
+    const entity = translateInlineEntity(linkRanges[0] as common.RawEntityRange, text, entityMap);
+
+    const minusLink = group.ranges.filter((range) => {
+      if (isEntityRange(range)) {
+        return !isLinkRange(entityMap[range.key]);
+      }
+
+      return true;
+    });
+
+    entity[common.getKey(entity)][common.ARRAY]
+      = translateOverlappingGroup(group.offset,
+                                  group.length, minusLink, rawBlock, block, entityMap);
+
+    return [entity];
+
+  }
+  if (group.ranges.length === 1) {
+
     const item : InlineOrEntity = group.ranges[0];
     return [translateInline(item, rawBlock.text, entityMap)];
-    
-  } else {
 
-    return translateOverlappingGroup(
-      group.offset, group.length, group.ranges, rawBlock, block, entityMap);
   }
 
+  return translateOverlappingGroup(
+    group.offset, group.length, group.ranges, rawBlock, block, entityMap);
 }
 
 function translateOverlapping(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
 
-  // Find all entityRanges that are links - we are going to have to 
-  // nest containing styles underneath the object that we create for the link 
+  // Find all entityRanges that are links - we are going to have to
+  // nest containing styles underneath the object that we create for the link
   const linkRanges : common.RawEntityRange[] = getLinkRanges(rawBlock, entityMap);
-  
+
   // For each link range, identify any overlapping styles and split them so that
   // no styles overlap these ranges (it is okay to have a style be entirely within
   // a link range
@@ -1143,7 +1141,7 @@ function translateOverlapping(
 
   // Chunk the entity ranges and inline styles into separate groups - where
   // only intervals that overlap each other belong to the same group. A group
-  // could very likely contain just one interval. 
+  // could very likely contain just one interval.
   const groups = groupOverlappingRanges(combineIntervals(rawBlock));
 
   // Create a bare text tag for the first unstyled part, if one exists
@@ -1158,7 +1156,7 @@ function translateOverlapping(
   for (let i = 0; i < groups.length; i += 1) {
     const g = groups[i];
 
-    // Process a group of overlapping styles and push the processed 
+    // Process a group of overlapping styles and push the processed
     // styles into our container
     processOverlappingStyles(g, rawBlock, block, entityMap)
       .forEach(processed => container.push(processed));
@@ -1169,35 +1167,34 @@ function translateOverlapping(
     if (endOrNext > (g.offset + g.length)) {
       container.push({ '#text': rawBlock.text.substring((g.offset + g.length), endOrNext) });
     }
-    
+
   }
 }
 
 
 function translateInline(
   s : InlineOrEntity, text : string, entityMap : common.RawEntityMap) : Object {
-  
+
   if (isInlineStyle(s)) {
     return translateInlineStyle(s, text, entityMap);
-  } else {
-    const { offset, length } = s;
-    const obj = translateInlineEntity(s, text, entityMap);
+  }
 
-    const sub = text.substr(s.offset, s.length);
+  const { offset, length } = s;
+  const obj = translateInlineEntity(s, text, entityMap);
 
-    const key = common.getKey(obj);
+  const sub = text.substr(s.offset, s.length);
 
-    if (inlineTerminalTags[key]) {
-      return obj;
-    } else {
-      if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
-        obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
-      }
-    }
+  const key = common.getKey(obj);
 
+  if (inlineTerminalTags[key]) {
     return obj;
   }
 
+  if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
+    obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
+  }
+
+  return obj;
 }
 
 function translateInlineStyle(
@@ -1208,15 +1205,16 @@ function translateInlineStyle(
 
   if (common.emStyles[mappedStyle] !== undefined) {
     return { em: { '@style': mappedStyle, '#text': substr } };
-  } else if (mappedStyle !== undefined && mappedStyle !== null) {
+  }
+  if (mappedStyle !== undefined && mappedStyle !== null) {
 
     const value = {};
     value[mappedStyle] = { '#text': substr };
     return value;
 
-  } else {
-    return { em: { '@style': 'bold', '#text': substr } };
   }
+
+  return { em: { '@style': 'bold', '#text': substr } };
 }
 
 function pastedLink(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -1266,24 +1264,24 @@ function inlineImage(s : common.RawEntityRange, text : string, entityMap : commo
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  
+
   return data.activity_link.toPersistence(toPersistence);
-  
+
 }
 
 
 function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  
+
   return data.cite.toPersistence(toPersistence);
-  
+
 }
 
 function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-  
+
   return data.xref.toPersistence(toPersistence);
 }
 
@@ -1300,7 +1298,7 @@ function input_ref(s : common.RawEntityRange, text : string, entityMap : common.
   if (item[type]['$type'] !== undefined) {
     delete item[type]['$type'];
   }
-  
+
   return item;
 }
 
@@ -1310,7 +1308,7 @@ function quote(s : common.RawEntityRange, text : string, entityMap : common.RawE
 
   const item = {};
   item[type] = data;
-  
+
   return item;
 }
 
@@ -1320,10 +1318,9 @@ function math(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   if (data['#cdata'] !== undefined) {
     return { 'm:math': { '#cdata': data['#cdata'] } };
-  } else {
-    return { '#math': data['#math'] };
   }
-  
+
+  return { '#math': data['#math'] };
 }
 
 function translateInlineEntity(
@@ -1333,9 +1330,9 @@ function translateInlineEntity(
   if (entityHandlers[type] !== undefined) {
     const obj = entityHandlers[type](s, text, entityMap);
     return obj;
-  } else {
-    return data;
   }
+
+  return data;
 }
 
 function isInlineStyle(range : InlineOrEntity) : range is common.RawInlineStyle {
@@ -1347,7 +1344,7 @@ function isEntityRange(range : InlineOrEntity) : range is common.RawEntityRange 
 }
 
 function translateNonOverlapping(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, intervals : InlineOrEntity[],
   entityMap : common.RawEntityMap, container: Object[]) {
 
@@ -1368,10 +1365,10 @@ function translateNonOverlapping(
     if (endOrNext > (s.offset + s.length)) {
       container.push({ '#text': rawBlock.text.substring((s.offset + s.length), endOrNext) });
     }
-    
+
   }
 
-  // Post process to identify inline formula sentinels and reparent the 
+  // Post process to identify inline formula sentinels and reparent the
   // styles underneath a singular formula tag
   let begin = null;
   let end = null;
@@ -1392,14 +1389,14 @@ function translateNonOverlapping(
 
     (container[begin] as any).formula['#array'] = deleted;
   }
-    
+
 }
 
 
 function translateTextBlock(
-  rawBlock : common.RawContentBlock, 
+  rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
-  
+
   const intervals = combineIntervals(rawBlock);
 
   if (hasOverlappingIntervals(intervals)) {

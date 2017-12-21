@@ -14,7 +14,7 @@ export interface ToolbarProps {
   redoEnabled: boolean;
 }
 
-export class Toolbar extends React.PureComponent<ToolbarProps, {}> {
+export class Toolbar extends React.Component<ToolbarProps, {}> {
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.undoEnabled !== this.props.undoEnabled ||

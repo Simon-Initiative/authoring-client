@@ -6,7 +6,6 @@ import { AppContext } from '../../common/AppContext';
 import { Maybe } from 'tsmonad';
 import { AppServices } from '../../common/AppServices';
 import guid from '../../../utils/guid';
-import { DragHandle } from '../../content/org/drag/DragHandle';
 import { DraggableNode } from './DraggableNode';
 import { NodeTypes, getExpandId } from './traversal';
 import { canHandleDrop } from './utils';
