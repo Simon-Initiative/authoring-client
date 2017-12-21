@@ -22,12 +22,14 @@ import { AggregateModel,
   UnifiedObjectivesModel, UnifiedSkillsModel, buildAggregateModel,
   unifySkills, unifyObjectives } from './persistence';
 import * as Messages from 'types/messages';
+import { UserInfo } from 'reducers/user';
 import { Row } from './Row';
 
 import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
+  user: UserInfo;
   course: models.CourseModel;
   dispatch: any;
   expanded: any;
@@ -166,7 +168,8 @@ export class ObjectiveSkillView
   failureEncountered(error: string) {
     this.setState({ isSavePending: false });
 
-    this.failureMessage = Maybe.just(buildPersistenceFailureMessage(error));
+    this.failureMessage = Maybe.just(buildPersistenceFailureMessage(
+      error, this.props.user.profile));
     this.failureMessage.lift(m => this.props.showMessage(m));
   }
 

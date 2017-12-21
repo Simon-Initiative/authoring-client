@@ -1,6 +1,6 @@
 import * as Messages from 'types/messages';
 import * as Immutable from 'immutable';
-
+import { UserProfile } from 'types/user';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 
 export function buildReportProblemAction(
@@ -16,14 +16,15 @@ export function buildReportProblemAction(
   };
 }
 
-export function buildPersistenceFailureMessage(reason: string) {
+export function buildPersistenceFailureMessage(reason: string, user: UserProfile) {
+
+  const name = user.firstName + ' ' + user.lastName;
 
   if (reason === 'Bad Request') {
 
     const content = new Messages.TitledContent().with({
       title: 'Cannot save.',
       message: 'There was a problem saving your changes. Try reverting recent changes.',
-
     });
     return new Messages.Message().with({
       content,
@@ -31,15 +32,14 @@ export function buildPersistenceFailureMessage(reason: string) {
       scope: Messages.Scope.Resource,
       severity: Messages.Severity.Error,
       canUserDismiss: false,
-      actions: Immutable.List([this.buildReportProblemAction(reason)]),
+      actions: Immutable.List([buildReportProblemAction(reason, name, user.email)]),
     });
 
   }
 
   const content = new Messages.TitledContent().with({
     title: 'Cannot save.',
-    message: 'An error \'' + reason + '\'was encountered trying to save your changes.',
-
+    message: 'An unknown error was encountered trying to save your changes.',
   });
   return new Messages.Message().with({
     content,
@@ -47,7 +47,7 @@ export function buildPersistenceFailureMessage(reason: string) {
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Error,
     canUserDismiss: true,
-    actions: Immutable.List([this.buildReportProblemAction(reason)]),
+    actions: Immutable.List([buildReportProblemAction(reason, name, user.email)]),
   });
 
 

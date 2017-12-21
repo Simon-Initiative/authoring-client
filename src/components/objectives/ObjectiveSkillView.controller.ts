@@ -10,6 +10,7 @@ import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 interface StateProps {
   skills: any;
+  user: any;
 }
 
 interface DispatchProps {
@@ -29,10 +30,11 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { skills } = state;
+  const { skills, user } = state;
 
   return {
     skills,
+    user,
   };
 };
 

@@ -89,7 +89,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         this.props.onDispatch(messageActions.showMessage(message));
         this.setState({ editingAllowed: false });
       } else {
-        this.failedMessage = buildPersistenceFailureMessage(reason);
+        this.failedMessage = buildPersistenceFailureMessage(reason, this.props.profile);
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       }
     };
