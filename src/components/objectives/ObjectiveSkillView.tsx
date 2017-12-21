@@ -26,6 +26,8 @@ import * as Messages from 'types/messages';
 import { UserInfo } from 'reducers/user';
 import { Row } from './Row';
 
+import { RegisterLocks, UnregisterLocks } from 'types/locks';
+
 import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
@@ -42,6 +44,8 @@ export interface ObjectiveSkillViewProps {
   onUpdateObjectives: (objectives: Immutable.OrderedMap<string,
     contentTypes.LearningObjective>) => void;
   showMessage: (message: Messages.Message) => void;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
   dismissMessage: (message: Messages.Message) => void;
 }
 
@@ -115,8 +119,16 @@ export class ObjectiveSkillView
   }
 
   releaseAllLocks(documents) {
-    documents.forEach(
-      d => persistence.releaseLock(this.props.course.guid, d._id));
+
+    const courseId = this.props.course.guid;
+    const locks = documents.map(d => ({ courseId, documentId: d._id }));
+
+    locks.forEach((lock) => {
+      const { courseId, documentId } = lock;
+      persistence.releaseLock(courseId, documentId);
+    });
+
+    this.props.unregisterLocks(locks);
   }
 
   buildModels() {
@@ -137,6 +149,16 @@ export class ObjectiveSkillView
 
         } else {
 
+          if (aggregateModel.isLocked) {
+
+            const locks = [...aggregateModel.objectives, ...aggregateModel.skills]
+              .map(d => ({ courseId: this.props.course.guid, documentId: d._id }));
+            this.props.registerLocks(locks);
+
+          } else {
+            this.props.showMessage(buildReadOnlyMessage(aggregateModel.lockDetails, undefined));
+          }
+
           const skills = unifySkills(aggregateModel);
           const objectives = unifyObjectives(aggregateModel);
 
@@ -151,9 +173,7 @@ export class ObjectiveSkillView
             skills,
           });
 
-          if (!aggregateModel.isLocked) {
-            this.props.showMessage(buildReadOnlyMessage(aggregateModel.lockDetails, undefined));
-          }
+
         }
 
       });

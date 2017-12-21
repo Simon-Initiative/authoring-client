@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { choices } from './choices';
 import { course } from './course';
 import { expanded } from './expanded';
+import { locks } from './locks';
 import { messages } from './messages';
 import { modal } from './modal';
 import { objectives } from './objectives';
@@ -15,6 +16,7 @@ const reducers = combineReducers({
   choices,        // Supporting data for choices
   course,         // Information about current course
   expanded,       // preserves expaned state of tree UIs
+  locks,          // The current, registered document locks
   messages,       // Active application messages
   modal,          // modal display state
   objectives,     // The current learning objectives

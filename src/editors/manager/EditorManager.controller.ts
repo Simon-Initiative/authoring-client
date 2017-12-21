@@ -2,9 +2,11 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import EditorManager from './EditorManager';
 import { courseChanged } from 'actions/course';
+import * as lockActions from 'actions/locks';
 import { CourseModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { Skill, LearningObjective } from 'data/contentTypes';
+import { RegisterLocks, UnregisterLocks, AcquiredLock } from 'types/locks';
 
 interface StateProps {
   expanded: any;
@@ -15,6 +17,8 @@ interface StateProps {
 interface DispatchProps {
   onCourseChanged: (model: CourseModel) => any;
   onDispatch: (...args: any[]) => any;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 interface OwnProps {
@@ -41,6 +45,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(courseChanged(model));
     },
     onDispatch: dispatch,
+    registerLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.registerLocks(locks));
+    },
+    unregisterLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.unregisterLocks(locks));
+    },
   };
 };
 

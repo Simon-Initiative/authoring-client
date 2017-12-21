@@ -23,6 +23,7 @@ import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
+import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { Skill, LearningObjective } from 'data//contentTypes';
 import './EditorManager.scss';
 
@@ -37,6 +38,8 @@ export interface EditorManagerProps {
   objectives: Immutable.Map<string, LearningObjective>;
   onCourseChanged: (model: models.CourseModel) => any;
   onDispatch: (...args: any[]) => any;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 export interface EditorManagerState {
@@ -132,6 +135,8 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       document, userName,
       this.onSaveCompleted,
       this.onSaveFailure,
+      this.props.registerLocks,
+      this.props.unregisterLocks,
     ).then((editingAllowed) => {
       if (!this.componentDidUnmount) {
         this.setState({ editingAllowed });
