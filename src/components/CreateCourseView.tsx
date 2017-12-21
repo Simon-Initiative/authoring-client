@@ -2,7 +2,6 @@ import * as React from 'react';
 import guid from '../utils/guid';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
-import * as courseActions from '../actions/course';
 import * as viewActions from '../actions/view';
 import { isNullOrUndefined } from 'util';
 
@@ -21,7 +20,6 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
 
   constructor(props) {
     super(props);
-    this.onClickCancel = this.onClickCancel.bind(this);
 
     this.state = {
       waiting: false,
@@ -32,13 +30,13 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
   startCreation(title: string) {
     const g = guid();
     const id = title.toLowerCase().split(' ')[0] + '-' + g.substring(g.lastIndexOf('-') + 1);
-    const model = new models.CourseModel({ id, version: '1.0', title });
+    const model = new models.CourseModel({ id, title, version: '1.0' });
 
     persistence.createDocument(null, model)
       .then((document) => {
         // Get an updated course content package payload
         if (document.model.modelType === models.ModelTypes.CourseModel) {
-          this.props.dispatch(courseActions.viewCourse(document._courseId));
+          this.props.dispatch(viewActions.viewCourse(document._courseId));
         }
       })
       .catch((err) => {
@@ -57,10 +55,6 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     this.setState({ waiting: true }, () => this.startCreation(title));
   }
 
-  onClickCancel() {
-    viewActions.viewAllCourses();
-  }
-
   render() {
 
     const inputs = (
@@ -68,10 +62,6 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
         <button onClick={this.createCourse.bind(this)}
                 className="btn btn-secondary btn-lg btn-block outline serif">
           Create Course
-        </button>
-        <button onClick={this.onClickCancel}
-                className="btn btn-cancel btn-lg btn-block serif">
-          Cancel
         </button>
       </div>
     );

@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar.controller';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as viewActions from 'actions/view';
@@ -142,8 +141,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     return (
       <div className="resource-view container-fluid new">
         <div className="row">
-          <NavigationBar/>
-          <div className="col-sm-9 col-md-10 document">
+          <div className="col-sm-12 col-md-12 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">

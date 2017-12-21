@@ -1,6 +1,25 @@
 @import 'oli/typography';
 
 .main {
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .main-header {
+    flex: 0 0 auto;
+  }
+
+  .main-content {
+    flex: 1 1 auto;
+    position: relative;/* need this to position inner content */
+    overflow-y: scroll;
+  }
+
+  .main-footer {
+    flex: 0 0 auto;
+  }
+
   .editor {
 
     h2 {
@@ -8,4 +27,5 @@
       display: inline-block;
     }
   }
+
 }
