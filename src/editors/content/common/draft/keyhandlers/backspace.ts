@@ -1,4 +1,4 @@
-import { EditorState, Modifier, ContentState, 
+import { EditorState, Modifier, ContentState,
   SelectionState, ContentBlock, Entity } from 'draft-js';
 import * as Immutable from 'immutable';
 import * as common from '../../../../../data/content/html/common';
@@ -7,34 +7,35 @@ import { validateSchema } from '../paste';
 
 export default function handle(
   editorState: EditorState, onChange: (e: EditorState) => void) : string {
-  
+
   const ss = editorState.getSelection();
   const start = ss.getStartOffset();
 
   // Handle backspacing when there is a selection. We
-  // need to make sure that the removal of the fragment 
+  // need to make sure that the removal of the fragment
   // associated with the selection does not result in a document
   // with invalid schema.
   if (!ss.isCollapsed()) {
     const updated = Modifier.removeRange(
-      editorState.getCurrentContent(), 
+      editorState.getCurrentContent(),
       ss, ss.getIsBackward() ? 'backward' : 'forward');
     if (!validateSchema(updated)) {
       return 'handled';
-    } else {
-      return 'not-handled';
     }
+
+    return 'not-handled';
   }
 
   const currentBlock = editorState.getCurrentContent().getBlockForKey(ss.getAnchorKey());
-  
 
-  // Handle backspacing at the beginning of a block to 
+
+  // Handle backspacing at the beginning of a block to
   // account for removing sentinel blocks
   if (start === 0) {
     return handleBackspaceAtBeginning(editorState, onChange);
-  } else if (start === currentBlock.text.length) {
-    // Handle backspacing at the forced space that exists 
+  }
+  if (start === currentBlock.text.length) {
+    // Handle backspacing at the forced space that exists
     // when an entity is the last thing in a block
     const entityBefore = getEntityBefore(start - 1, editorState);
     if (entityBefore !== null) {
@@ -48,21 +49,18 @@ export default function handle(
       });
       onChange(EditorState.forceSelection(editorState, moveBackward));
       return 'handled';
-    } else {
-      return 'not-handled';
     }
-    
-  } else {
-    const entityBefore = getEntityBefore(start, editorState);
-    if (entityBefore !== null) {
-      return handleBackspaceAtEntity(entityBefore, editorState, onChange);
-    }
-    
+
+    return 'not-handled';
+  }
+
+  const entityBefore = getEntityBefore(start, editorState);
+  if (entityBefore !== null) {
+    return handleBackspaceAtEntity(entityBefore, editorState, onChange);
   }
 
   // Handle backspacing to delete an immutable entity
-  
-  
+
   return 'not-handled';
 }
 
@@ -86,7 +84,7 @@ function removeRange(
 }
 
 function handleBackspaceAtEntity(
-  entity: Entity, 
+  entity: Entity,
   editorState: EditorState, onChange: (e: EditorState) => void) {
 
   const currentContent = editorState.getCurrentContent();
@@ -96,7 +94,7 @@ function handleBackspaceAtEntity(
   const key = currentContentBlock.getKey();
 
   let updatedContent;
-  
+
   if (entity.type === common.EntityTypes.formula_begin) {
     // We must find and remove the corresponding end
     const endPosition = findPositionOfEntity(
@@ -108,7 +106,7 @@ function handleBackspaceAtEntity(
     if (endPosition !== -1) {
       updatedContent = removeRange(currentContent, start - 1, endPosition + 1, key);
     }
-      
+
   } else if (entity.type === common.EntityTypes.formula_end) {
     // We must find and remove the corresponding begin
     const startPosition = findPositionOfEntity(
@@ -136,14 +134,14 @@ function handleBackspaceAtEntity(
   onChange(
     EditorState.forceSelection(
       EditorState.push(editorState, updatedContent, 'backspace-character'), newSelection));
-  
+
   return 'handled';
 
 }
 
 function findPositionOfEntity(
   type: common.EntityTypes,
-  contentBlock: ContentBlock, 
+  contentBlock: ContentBlock,
   contentState: ContentState,
   start: number, direction: number) : number {
 
@@ -161,7 +159,7 @@ function findPositionOfEntity(
   }
 
   return -1;
-  
+
 }
 
 function getEntityBefore(position: number, editorState: EditorState) : Entity {
@@ -183,15 +181,15 @@ function getEntityBefore(position: number, editorState: EditorState) : Entity {
 }
 
 function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: EditorState) => void) {
-    
+
   const ss = editorState.getSelection();
   const anchorKey = ss.getAnchorKey();
   const currentContent = editorState.getCurrentContent();
   const currentContentBlock = currentContent.getBlockForKey(anchorKey);
   const blockBefore = currentContent.getBlockBefore(currentContentBlock.getKey());
-    
+
   if (blockBefore !== undefined && blockBefore !== null && blockBefore.getType() === 'atomic') {
-    
+
     const key = blockBefore.getEntityAt(0);
     const blockKey = blockBefore.key;
     const entity = currentContent.getEntity(key);
@@ -218,7 +216,7 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
     } else {
       return 'not-handled';
     }
-  
+
     // Go ahead and remove the two sentinel blocks and all blocks in between
     const arr = currentContent.getBlocksAsArray();
     let newArr = [];
@@ -255,9 +253,9 @@ function handleBackspaceAtBeginning(editorState: EditorState, onChange: (e: Edit
     });
 
     onChange(EditorState.push(editorState, updatedContent, 'remove-range'));
-    
+
     return 'handled';
-        
+
   }
   return 'not-handled';
 }

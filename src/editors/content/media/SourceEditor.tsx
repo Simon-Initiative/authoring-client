@@ -43,7 +43,8 @@ export class SourceEditor
   shouldComponentUpdate(nextProps, nextState: SourceEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.failure !== this.state.failure) {
+    }
+    if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;

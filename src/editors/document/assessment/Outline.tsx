@@ -25,9 +25,9 @@ export function getChildren(node: AssessmentNode)
     case 'Selection':
       if (node.source.contentType === 'Pool') {
         return Maybe.just(node.source.questions);
-      } else {
-        return Maybe.nothing<AssessmentNode>();
       }
+
+      return Maybe.nothing<AssessmentNode>();
     default:
       return Maybe.nothing<AssessmentNode>();
   }
@@ -38,9 +38,9 @@ export function setChildren(node: AssessmentNode, children) : AssessmentNode {
     case 'Selection':
       if (node.source.contentType === 'Pool') {
         return node.with({ source: node.source.with({ questions: children }) });
-      } else {
-        return node;
       }
+
+      return node;
     default:
       return node;
   }
@@ -76,7 +76,8 @@ const canHandleDrop : Tree.CanDropHandler<AssessmentNode> = (
     // A question can be repositioned anywhere
     return true;
 
-  } else if (nodeBeingDropped.contentType === 'Content') {
+  }
+  if (nodeBeingDropped.contentType === 'Content') {
 
     // A content cannot be repositioned into a selection
     return newParent.caseOf({
@@ -84,7 +85,8 @@ const canHandleDrop : Tree.CanDropHandler<AssessmentNode> = (
       nothing: () => true,
     });
 
-  } else if (nodeBeingDropped.contentType === 'Selection') {
+  }
+  if (nodeBeingDropped.contentType === 'Selection') {
 
     // A selection cannot be repositioned into another selection
     return newParent.caseOf({
@@ -92,7 +94,8 @@ const canHandleDrop : Tree.CanDropHandler<AssessmentNode> = (
       nothing: () => true,
     });
 
-  } else if (nodeBeingDropped.contentType === 'Unsupported') {
+  }
+  if (nodeBeingDropped.contentType === 'Unsupported') {
 
     // Do not allow repositioning of unsupported elements to
     // another parent

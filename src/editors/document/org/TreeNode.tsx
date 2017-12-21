@@ -95,9 +95,9 @@ export class TreeNode
   getAdaptiveNumber() {
     if (this.props.parentModel.contentType !== contentTypes.OrganizationContentTypes.Section) {
       return this.props.numberAtLevel;
-    } else {
-      return '';
     }
+
+    return '';
   }
 
   render() : JSX.Element {

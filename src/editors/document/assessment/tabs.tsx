@@ -33,10 +33,9 @@ export function renderTab(
       if (node.source.contentType === 'PoolRef') {
         return <PoolRefTab
           node={node} nodeState={nodeState} handlers={handlers}/>;
-      } else {
-        return <PoolTab
-          node={node} nodeState={nodeState} handlers={handlers}/>;
       }
+      return <PoolTab
+        node={node} nodeState={nodeState} handlers={handlers}/>;
     default:
       return <UnsupportedTab
         node={node} nodeState={nodeState} handlers={handlers}/>;
@@ -70,32 +69,30 @@ const label = (question: Question) : string => {
 
   if (question.items.size === 0) {
     return 'Input';
-  } else {
+  }
 
-    // Look at first item and base label off of that
-    const item = question.items.first();
+  // Look at first item and base label off of that
+  const item = question.items.first();
 
-    switch (item.contentType) {
+  switch (item.contentType) {
 
-      case 'MultipleChoice':
-        if (item.select === 'single') {
-          return 'Multiple Choice';
-        } else {
-          return 'Check All That Apply';
-        }
-      case 'Ordering':
-        return 'Ordering';
-      case 'Essay':
-        return 'Essay';
-      case 'ShortAnswer':
-        return 'Short Answer';
-      case 'Text':
-      case 'Numeric':
-      case 'FillInTheBlank':
-        return 'Input';
-      default:
-        return 'Question';
-    }
+    case 'MultipleChoice':
+      if (item.select === 'single') {
+        return 'Multiple Choice';
+      }
+      return 'Check All That Apply';
+    case 'Ordering':
+      return 'Ordering';
+    case 'Essay':
+      return 'Essay';
+    case 'ShortAnswer':
+      return 'Short Answer';
+    case 'Text':
+    case 'Numeric':
+    case 'FillInTheBlank':
+      return 'Input';
+    default:
+      return 'Question';
   }
 
 };

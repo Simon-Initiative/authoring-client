@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { EditorState, AtomicBlockUtils, SelectionState, 
+import { EditorState, AtomicBlockUtils, SelectionState,
   Modifier, ContentState, CharacterMetadata, ContentBlock } from 'draft-js';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 
@@ -29,13 +29,13 @@ export function stateFromKey(key: string) : SelectionState {
 }
 
 // A reusable precondition that allows commands to be executed when
-// the current editor selection anchor point is not within a 
+// the current editor selection anchor point is not within a
 // set of entity containers specified by entity begin and entity end types
 export function containerPrecondition(
   selection: SelectionState, contentState: ContentState,
   beginTypes: EntityTypes[], endTypes: EntityTypes[]) : boolean {
 
-  // Do not allow a pullout to be inserted inside of another pullout, 
+  // Do not allow a pullout to be inserted inside of another pullout,
   // or example.  They are allowed to be inserted inside of sections.
   const insertionPointKey = selection.getAnchorKey();
   const blocks = contentState.getBlocksAsArray();
@@ -64,7 +64,7 @@ export function containerPrecondition(
       return depthCount === 0;
     }
   }
-  
+
   return true;
 
 }
@@ -100,10 +100,10 @@ export function isAtomic(contentBlock: ContentBlock) : boolean {
 // 2) The last block is an atomic block
 // BUT, we do not do this if inserting the block would
 // then allow the user to place text where they should
-// not. 
+// not.
 export function shouldInsertBlock(
   selection: SelectionState, contentState: ContentState, blockKey: string) : boolean {
-  
+
   const block = contentState.getBlockForKey(blockKey);
 
   if (block !== null && isAtomic(block)) {
@@ -114,27 +114,26 @@ export function shouldInsertBlock(
       const nextBlock = contentState.getBlockForKey(nextBlockKey);
       return isAtomic(nextBlock)
           && containerPrecondition(
-            selection, contentState, 
-            [EntityTypes.definition_begin], 
+            selection, contentState,
+            [EntityTypes.definition_begin],
             [EntityTypes.definition_end]);
-        
 
-    } else {
-      return true;  // Case 2
+
     }
 
-  } else {
-    return false;
+    return true;
   }
+
+  return false;
 }
 
 // Create draft representation of a title, populating the blocks array
 export function createTitle(currentContent, blocks) {
-  
+
   const beginBlockKey = generateRandomKey();
   const contentKey = generateRandomKey();
   const endBlockKey = generateRandomKey();
-  
+
   let content = currentContent;
 
   content = content.createEntity(
@@ -160,13 +159,13 @@ export function createTitle(currentContent, blocks) {
   blocks.push(
     new ContentBlock(
       { type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }));
-  
+
   return content;
 }
 
 // Insert an array of blocks after a particular block referenced by blockKey
 export function insertBlocksAfter(
-  contentState: ContentState, blockKey: string, 
+  contentState: ContentState, blockKey: string,
   blocks: ContentBlock[]) : ContentState {
 
   const blockMap = contentState.getBlockMap();

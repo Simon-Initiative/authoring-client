@@ -28,7 +28,8 @@ function collectAssessmentQuestions(model: AssessmentModel) : Question[] {
 
           if (node.contentType === 'Question') {
             return [...questions, node];
-          } else if (node.contentType === 'Selection') {
+          }
+          if (node.contentType === 'Selection') {
             if (node.source.contentType === 'Pool') {
               return [...questions, ...node.source.questions.toArray()];
             }

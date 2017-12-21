@@ -28,14 +28,14 @@ export class InsertMediaCommand extends AbstractCommand<EditorState> {
   }
 
   onInsert(editorState: EditorState, context, services, resolve, reject, type, file) {
-   
+
     fileToBase64(file)
       .then(base64data => createAttachment(file.name, base64data, file.type, context.documentId))
-      .then(src =>  {
+      .then((src) =>  {
 
         services.dismissModal();
 
-        const data = { src };    
+        const data = { src };
 
         const delegate = new InsertBlockEntityCommand(this.type, 'IMMUTABLE', data);
         delegate.execute(editorState, context, services)
@@ -43,27 +43,29 @@ export class InsertMediaCommand extends AbstractCommand<EditorState> {
           .catch(err => reject(err));
 
       })
-      .catch(err => {
+      .catch((err) => {
         services.dismissModal();
 
         reject(err);
       });
-            
-   
+
+
   }
 
   onCancel(services) {
     services.dismissModal();
   }
 
-  execute(editorState: EditorState, context: AppContext, services: AppServices) : Promise<EditorState> {
-    
+  execute(
+    editorState: EditorState, context: AppContext, services: AppServices,
+  ): Promise<EditorState> {
+
     return new Promise((resolve, reject) => {
       services.displayModal(
         <MediaSelection
           accept={this.accept}
           type={this.mediaType}
-          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)} 
+          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
     });
   }

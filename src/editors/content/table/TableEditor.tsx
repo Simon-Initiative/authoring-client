@@ -145,9 +145,9 @@ export class TableEditor
       />;
     if (cell.contentType === 'CellData') {
       return <td style={ { width, verticalAlign } } key={cell.guid}>{editor}</td>;
-    } else {
-      return <th style={ { width, verticalAlign } } key={cell.guid}>{editor}</th>;
     }
+
+    return <th style={ { width, verticalAlign } } key={cell.guid}>{editor}</th>;
   }
 
   renderDeleteColumn() {
@@ -161,9 +161,9 @@ export class TableEditor
           </td>);
       }
       return <tr>{tds}</tr>;
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   renderRow(row: Row, inlineToolbar: any, blockToolbar: any, insertionToolbar: any) {

@@ -8,7 +8,7 @@ import { canAcceptDrop } from '../../content/org/drag/utils';
 
 
 export function canHandleDrop(
-  id: string, sourceModel, parentModel, 
+  id: string, sourceModel, parentModel,
   originalIndex, newIndex, newParentModel) : boolean {
 
   let accepts = false;
@@ -26,7 +26,7 @@ export function canHandleDrop(
         child => child.contentType === contentTypes.OrganizationContentTypes.Unit);
     } else if  (sourceModel.contentType === contentTypes.OrganizationContentTypes.Include) {
       accepts = true;
-    } 
+    }
 
   } else if (newParentModel.contentType === contentTypes.OrganizationContentTypes.Unit) {
     const t = sourceModel.contentType;
@@ -47,7 +47,7 @@ export function canHandleDrop(
       || t === contentTypes.OrganizationContentTypes.Item)
       && sourceModel.guid !== newParentModel.guid;
 
-  } 
+  }
 
   if (accepts) {
 
@@ -58,20 +58,19 @@ export function canHandleDrop(
 
       // We do not accept the drop if it isn't repositioning. In other words,
       // one cannot drag and drop an item in the drop slots directly above and below
-      // the item 
+      // the item
       return delta !== 0 && delta !== 1;
 
-    } else {
-      return true;
     }
 
-  } else {
-    return false;
+    return true;
   }
+
+  return false;
 }
 
 export function removeNode(
-  model : models.OrganizationModel, 
+  model : models.OrganizationModel,
   nodeGuid: string) : models.OrganizationModel {
 
   const sequences = model.sequences.children;
@@ -94,7 +93,7 @@ export function insertNode(
 
   return model.with({ sequences: model.sequences.with(
     { children: (model.sequences.children.map(
-      insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() as any), 
+      insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() as any),
     }) });
 }
 
@@ -104,7 +103,7 @@ export function updateNode(
   childToUpdate: any) : models.OrganizationModel {
 
   // If the child is a top level sequence just handle it
-  // explicitly 
+  // explicitly
   if (model.sequences.children.has(childToUpdate.guid)) {
     return model.with({ sequences: model.sequences.with(
       { children: model.sequences.children.set(childToUpdate.guid, childToUpdate) })});
@@ -112,37 +111,36 @@ export function updateNode(
 
   return model.with({ sequences: model.sequences.with(
     { children: (model.sequences.children.map(
-      updateChild.bind(undefined, childToUpdate)).toOrderedMap() as any), 
+      updateChild.bind(undefined, childToUpdate)).toOrderedMap() as any),
     }) });
 }
 
 
 function updateChild(
-  child: any, 
+  child: any,
   parentNode: any) {
-  
+
   if (parentNode.children !== undefined && parentNode.children.get(child.guid) !== undefined) {
     return parentNode.with({ children: parentNode.children.set(child.guid, child) });
 
-  } else {
-
-    // Recurse if the current node has children
-    return parentNode.children !== undefined && parentNode.children.size > 0
-      ? parentNode.with(
-        { children: parentNode.children.map(
-          updateChild.bind(undefined, child)).toOrderedMap() }) 
-      : parentNode;
   }
+
+  // Recurse if the current node has children
+  return parentNode.children !== undefined && parentNode.children.size > 0
+    ? parentNode.with(
+      { children: parentNode.children.map(
+        updateChild.bind(undefined, child)).toOrderedMap() })
+    : parentNode;
 }
 
 
 function filterChildren(
-  guidToRemove: string, 
+  guidToRemove: string,
   children: Immutable.OrderedMap<string, any>) : Immutable.OrderedMap<string, any> {
 
   const filtered = children.filter(c => c.guid !== guidToRemove);
   const mapped = filtered
-    .map(c => c.children !== undefined 
+    .map(c => c.children !== undefined
       ? c.with({ children: filterChildren(guidToRemove, c.children) }) : c);
 
   return mapped
@@ -153,10 +151,10 @@ function filterChildren(
 
 function insertChild(
   targetParentGuid: string,
-  childToAdd: any, 
+  childToAdd: any,
   index: number,
   parentNode: any) {
-  
+
   if (parentNode.guid === targetParentGuid) {
 
     // Insert the node, don't recurse
@@ -170,7 +168,7 @@ function insertChild(
 
       if (n.guid !== childToAdd.guid) {
         nodes = nodes.set(n.guid, n);
-      } 
+      }
     });
 
     if (index === arr.length) {
@@ -179,15 +177,14 @@ function insertChild(
 
     return parentNode.with({ children: nodes });
 
-  } else {
-
-    // Recurse if the current node has children
-    return parentNode.children !== undefined && parentNode.children.size > 0
-      ? parentNode.with(
-        { children: parentNode.children.map(
-          insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() }) 
-      : parentNode;
   }
+
+  // Recurse if the current node has children
+  return parentNode.children !== undefined && parentNode.children.size > 0
+    ? parentNode.with(
+      { children: parentNode.children.map(
+        insertChild.bind(undefined, targetParentGuid, childToAdd, index)).toOrderedMap() })
+    : parentNode;
 }
 
 

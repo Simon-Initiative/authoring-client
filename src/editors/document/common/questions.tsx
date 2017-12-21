@@ -42,7 +42,8 @@ export function renderAssessmentNode(
             onRemove={() => onRemove(n.guid)}
             />;
 
-  } else if (n.contentType === 'Content') {
+  }
+  if (n.contentType === 'Content') {
     return <ContentEditor
             key={n.guid}
             editMode={props.editMode}
@@ -52,7 +53,8 @@ export function renderAssessmentNode(
             onEdit={c => onEdit(n.guid, c)}
             onRemove={() => onRemove(n.guid)}
             />;
-  } else if (n.contentType === 'Selection') {
+  }
+  if (n.contentType === 'Selection') {
     return <SelectionEditor
             key={n.guid}
             isParentAssessmentGraded={isParentAssessmentGraded}

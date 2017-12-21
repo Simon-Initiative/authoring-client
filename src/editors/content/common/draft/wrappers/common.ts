@@ -16,8 +16,7 @@ export function isEntityType(type: EntityTypes, block: ContentBlock, content: Co
     const entity = content.getEntity(key);
     return entity.type === type;
 
-  } else {
-    return false;
   }
-  
+
+  return false;
 }

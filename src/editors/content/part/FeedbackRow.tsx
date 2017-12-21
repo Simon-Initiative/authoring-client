@@ -13,7 +13,7 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 
 export interface FeedbackRow {
-  
+
 }
 
 export interface FeedbackRowProps extends AbstractContentEditorProps<contentTypes.Response> {
@@ -29,9 +29,9 @@ export interface FeedbackRowState {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class FeedbackRow 
+export abstract class FeedbackRow
   extends AbstractContentEditor<contentTypes.Response, FeedbackRowProps, FeedbackRowState> {
-    
+
   constructor(props) {
     super(props);
 
@@ -53,7 +53,8 @@ export abstract class FeedbackRow
   }
 
   onFeedbackEdit(model: contentTypes.Feedback) {
-    const response = this.props.model.with({ feedback: this.props.model.feedback.set(model.guid, model) });
+    const response = this.props.model.with({
+      feedback: this.props.model.feedback.set(model.guid, model) });
     this.props.onEdit(response);
   }
 
@@ -69,7 +70,7 @@ export abstract class FeedbackRow
 
   renderMatch(response: contentTypes.Response) {
     return (
-      <input 
+      <input
         disabled={!this.props.editMode}
         style={{ width:'65px', outline: 'none', display: 'inline' }}
         onChange={this.onMatch.bind(this)}
@@ -78,7 +79,7 @@ export abstract class FeedbackRow
 
   renderScore(response: contentTypes.Response) {
     return (
-      <input 
+      <input
         disabled={!this.props.editMode}
         style={{ width:'65px', outline: 'none', display: 'inline' }}
         type="number"
@@ -110,18 +111,18 @@ export abstract class FeedbackRow
       borderColor: '#AAAAAA',
     };
     return (
-      <HtmlContentEditor 
+      <HtmlContentEditor
         editorStyles={bodyStyle}
         inlineToolbar={inlineToolbar}
         blockToolbar={blockToolbar}
         inlineInsertionToolbar={insertionToolbar}
         {...this.props}
         model={feedback.body}
-        onEdit={this.onBodyEdit} 
+        onEdit={this.onBodyEdit}
         />
     );
   }
-  
+
   render() : JSX.Element {
     const r = this.props.model;
     return (
@@ -129,7 +130,7 @@ export abstract class FeedbackRow
         <td style={{ width: '100px' }}>{this.renderMatch(r)}</td>
         <td style={{ width: '100px' }}>{this.renderScore(r)}</td>
         <td>{this.renderFeedback(r)}</td>
-        <td><span className="closebtn input-group-addon" 
+        <td><span className="closebtn input-group-addon"
           onClick={() => this.props.onRemove(this.props.model)}>&times;</span>
         </td>
       </tr>

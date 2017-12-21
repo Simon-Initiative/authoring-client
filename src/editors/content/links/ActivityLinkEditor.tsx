@@ -54,9 +54,11 @@ export class ActivityLinkEditor
   shouldComponentUpdate(nextProps, nextState: ActivityLinkEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.activities !== this.state.activities) {
+    }
+    if (nextState.activities !== this.state.activities) {
       return true;
     }
+
     return false;
   }
 

@@ -73,9 +73,11 @@ export class ImageEditor
   shouldComponentUpdate(nextProps, nextState: ImageEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.failure !== this.state.failure) {
+    }
+    if (nextState.failure !== this.state.failure) {
       return true;
-    } else if (nextState.isDefaultSizing !== this.state.isDefaultSizing) {
+    }
+    if (nextState.isDefaultSizing !== this.state.isDefaultSizing) {
       return true;
     }
     return false;

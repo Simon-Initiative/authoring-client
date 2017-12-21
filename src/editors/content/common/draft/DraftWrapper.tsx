@@ -244,9 +244,9 @@ function addSpaceAfterEntity(editorState, block) {
     const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
     return EditorState.push(editorState, modifiedContent, editorState.getLastChangeType());
 
-  } else {
-    return editorState;
   }
+
+  return editorState;
 }
 
 type StateAndSeen = { editorState: EditorState, seenIds: Object };
@@ -276,12 +276,13 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
       seenIds,
     };
 
-  } else if (id !== undefined) {
+  }
+  if (id !== undefined) {
     seenIds[id] = true;
     return { editorState, seenIds };
-  } else {
-    return stateAndSeen;
   }
+
+  return stateAndSeen;
 }
 
 
@@ -694,10 +695,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (newState) {
       this.onChange(newState);
       return 'handled';
-    } else {
-      return 'not-handled';
     }
 
+    return 'not-handled';
   }
 
 
@@ -845,10 +845,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           {clonedToolbar}
         </div>;
 
-    } else {
-      return null;
     }
 
+    return null;
   }
 
   isAtEmptyBlock() : boolean {
@@ -897,17 +896,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           {clonedToolbar}
         </div>;
 
-    } else {
-      return null;
     }
 
+    return null;
   }
 
   blockStyleFn(contentBlock: ContentBlock) {
     const type = contentBlock.getType();
     if (type === 'formula') {
       return 'formulaDiv';
-    } else if (type === 'code') {
+    }
+    if (type === 'code') {
       return 'codeDiv';
     }
   }
@@ -954,13 +953,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           common.EntityTypes.translation_end])) {
 
         return true;
-      } else {
-        return false;
       }
-    } else {
-      return true;
+
+      return false;
     }
 
+    return true;
   }
 
   renderExpander() {
@@ -994,9 +992,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             </button>
           );
 
-        } else {
-          return null;
         }
+
+        return null;
       },
       nothing: () => null,
     });

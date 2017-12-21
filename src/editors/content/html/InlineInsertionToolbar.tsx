@@ -8,12 +8,12 @@ import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
 import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowInsertion } from '../../content/common/toolbar/Configs';
 
-interface InlineInsertionToolbarProps extends ToolbarProps<EditorState> {  
-  
+interface InlineInsertionToolbarProps extends ToolbarProps<EditorState> {
+
 }
 
 interface InlineInsertionToolbar {
-  
+
 }
 
 class InlineInsertionToolbar extends React.PureComponent<InlineInsertionToolbarProps, {}> {
@@ -23,9 +23,9 @@ class InlineInsertionToolbar extends React.PureComponent<InlineInsertionToolbarP
       return React.Children.map(this.props.children, (child) => {
         return React.cloneElement(child as any);
       });
-    } else {
-      return [];
     }
+
+    return [];
   }
 
   render() {

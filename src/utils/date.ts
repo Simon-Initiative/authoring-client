@@ -13,7 +13,7 @@ export function determineServerTimeSkewInMs() : Promise<number> {
       });
   });
 }
- 
+
 export function compareDates(a: Date, b: Date) : number {
   return a.valueOf() - b.valueOf();
 }
@@ -49,33 +49,46 @@ function relativeTo(dateFrom: Date, dateNow: Date) : string {
 
   if (delta >= (MS_IN_YEAR * 2)) {
     return  Math.floor(delta / MS_IN_YEAR) + ' years ago';
-  } else if (delta >= (MS_IN_YEAR - MS_IN_MONTH)) {
-    return 'a year ago';
-  } else if (delta >= (MS_IN_MONTH * 2)) {
-    return Math.floor(delta / MS_IN_MONTH) + ' months ago';
-  } else if (delta > (MS_IN_MONTH)) {
-    return 'a month ago';
-  } else if (delta >= (MS_IN_WEEK * 2)) {
-    return  Math.floor(delta / MS_IN_WEEK) + ' weeks ago';
-  } else if (delta >= MS_IN_WEEK - MS_IN_DAY) {
-    return 'a week ago';
-  } else if (delta >= MS_IN_DAY * 2) {
-    return Math.floor(delta / MS_IN_DAY) + ' days ago';
-  } else if (delta >= MS_IN_DAY) {
-    return 'a day ago';
-  } else if (delta >= MS_IN_HOUR * 2) {
-    return Math.floor(delta / MS_IN_HOUR) + ' hours ago';
-  } else if (delta >= MS_IN_HOUR) {
-    return 'an hour ago';
-  } else if (delta >= MS_IN_MINUTE * 2) {
-    return Math.floor(delta / MS_IN_MINUTE) + ' minutes ago';
-  } else if (delta >= MS_IN_MINUTE) {
-    return 'a minute ago';
-  } else if (delta >= 7 * MS_IN_SECOND) {
-    return Math.floor(delta / MS_IN_SECOND) + ' seconds ago';
-  } else if (delta >= 2 * MS_IN_SECOND) {
-    return 'a few seconds ago';
-  } else {
-    return 'just now';
   }
+  if (delta >= (MS_IN_YEAR - MS_IN_MONTH)) {
+    return 'a year ago';
+  }
+  if (delta >= (MS_IN_MONTH * 2)) {
+    return Math.floor(delta / MS_IN_MONTH) + ' months ago';
+  }
+  if (delta > (MS_IN_MONTH)) {
+    return 'a month ago';
+  }
+  if (delta >= (MS_IN_WEEK * 2)) {
+    return  Math.floor(delta / MS_IN_WEEK) + ' weeks ago';
+  }
+  if (delta >= MS_IN_WEEK - MS_IN_DAY) {
+    return 'a week ago';
+  }
+  if (delta >= MS_IN_DAY * 2) {
+    return Math.floor(delta / MS_IN_DAY) + ' days ago';
+  }
+  if (delta >= MS_IN_DAY) {
+    return 'a day ago';
+  }
+  if (delta >= MS_IN_HOUR * 2) {
+    return Math.floor(delta / MS_IN_HOUR) + ' hours ago';
+  }
+  if (delta >= MS_IN_HOUR) {
+    return 'an hour ago';
+  }
+  if (delta >= MS_IN_MINUTE * 2) {
+    return Math.floor(delta / MS_IN_MINUTE) + ' minutes ago';
+  }
+  if (delta >= MS_IN_MINUTE) {
+    return 'a minute ago';
+  }
+  if (delta >= 7 * MS_IN_SECOND) {
+    return Math.floor(delta / MS_IN_SECOND) + ' seconds ago';
+  }
+  if (delta >= 2 * MS_IN_SECOND) {
+    return 'a few seconds ago';
+  }
+
+  return 'just now';
 }

@@ -7,12 +7,12 @@ import { ToolbarButton } from '../../content/common/toolbar/ToolbarButton';
 import { ToolbarProps } from '../../content/common/toolbar/Toolbar';
 import { flowBlock, bodyBlock } from '../../content/common/toolbar/Configs';
 
-interface BlockToolbarProps extends ToolbarProps<EditorState> {  
-  
+interface BlockToolbarProps extends ToolbarProps<EditorState> {
+
 }
 
 interface BlockToolbar {
-  
+
 }
 
 
@@ -23,9 +23,9 @@ class BlockToolbar extends React.PureComponent<BlockToolbarProps, {}> {
       return React.Children.map(this.props.children, (child) => {
         return React.cloneElement(child as any);
       });
-    } else {
-      return [];
     }
+
+    return [];
   }
 
   render() {

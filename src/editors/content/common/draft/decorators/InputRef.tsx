@@ -18,7 +18,8 @@ const InputRef = (props) => {
           <option value="sample1">Dropdown</option>
         </select>
     );
-  } else if (data.$type === 'Numeric') {
+  }
+  if (data.$type === 'Numeric') {
     const classes = 'form-control form-control-sm ' + selected;
     return (
         <input
@@ -29,7 +30,8 @@ const InputRef = (props) => {
           value="Numeric"/>
     );
 
-  } else if (data.$type === 'Text') {
+  }
+  if (data.$type === 'Text') {
     const classes = 'form-control form-control-sm ' + selected;
     return (
         <input
@@ -40,21 +42,18 @@ const InputRef = (props) => {
           value="Text"/>
     );
 
-  } else {
-    const classes = 'form-control form-control-sm ' + selected;
-    return (
-        <input
-          data-offset-key={props.offsetKey}
-          style={{ width:'65px', marginRight: '2px', display: 'inline' }}
-          disabled
-          className={classes}
-          value={data.$type}/>
-    );
   }
 
+  const classes = 'form-control form-control-sm ' + selected;
+  return (
+      <input
+        data-offset-key={props.offsetKey}
+        style={{ width:'65px', marginRight: '2px', display: 'inline' }}
+        disabled
+        className={classes}
+        value={data.$type}/>
+  );
 };
-
-
 
 export default function (props: Object) : Decorator {
   return {

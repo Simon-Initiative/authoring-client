@@ -16,7 +16,9 @@ export class ToggleStyleCommand extends AbstractCommand<EditorState> {
     const updateStyle = RichUtils.toggleInlineStyle(editorState, this.style);
 
     const key : string = editorState.getSelection().getAnchorKey();
-    return Promise.resolve(EditorState.acceptSelection(updateStyle, SelectionState.createEmpty(key)));
+    return Promise.resolve(EditorState.acceptSelection(
+      updateStyle, SelectionState.createEmpty(key)),
+    );
   }
 }
 

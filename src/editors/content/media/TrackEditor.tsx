@@ -47,7 +47,8 @@ export class TrackEditor
   shouldComponentUpdate(nextProps, nextState: TrackEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.failure !== this.state.failure) {
+    }
+    if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;
