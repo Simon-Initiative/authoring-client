@@ -6,10 +6,11 @@ import { CourseModel } from 'data/models';
 import { setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
 import * as Messages from 'types/messages';
-import { showMessage } from 'actions/messages';
+import { showMessage, dismissSpecificMessage } from 'actions/messages';
 
 interface StateProps {
   skills: any;
+  user: any;
 }
 
 interface DispatchProps {
@@ -18,6 +19,7 @@ interface DispatchProps {
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps {
@@ -28,10 +30,11 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { skills } = state;
+  const { skills, user } = state;
 
   return {
     skills,
+    user,
   };
 };
 
@@ -51,6 +54,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     showMessage: (message: Messages.Message) => {
       dispatch(showMessage(message));
+    },
+    dismissMessage: (message: Messages.Message) => {
+      dispatch(dismissSpecificMessage(message));
     },
   };
 };
