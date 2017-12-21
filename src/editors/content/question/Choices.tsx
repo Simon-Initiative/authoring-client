@@ -17,6 +17,7 @@ import {
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { AUTOGEN_MAX_CHOICES } from '../part/ChoiceFeedback';
 import { CombinationsMap } from 'types/combinations';
+import { DragTypes } from 'utils/drag';
 
 export interface ChoicesProps {
   itemModel: any;
@@ -113,16 +114,12 @@ export class Choices
   onReorderChoices(originalIndex, newIndex) {
     const { onEdit, itemModel, partModel } = this.props;
 
-    // indexOffset makes up for the missing item in the list when splicing,
-    // this is only an issue if the new item position is less than the current one
-    const indexOffset = originalIndex > newIndex ? 1 : 0;
-
     // convert OrderedMap to shallow javascript array
     const choices = itemModel.choices.toArray();
 
     // remove selected choice from array and insert it into new position
     const choice = choices.splice(originalIndex, 1)[0];
-    choices.splice((newIndex - 1) + indexOffset, 0, choice);
+    choices.splice(newIndex, 0, choice);
 
     // update item model
     let updatedItemModel = itemModel;
@@ -170,6 +167,7 @@ export class Choices
         index={index}
         isDraggable={!itemModel.shuffle}
         onDragDrop={this.onReorderChoices}
+        dragType={DragTypes.Choice}
         body={choice.body}
         onEdit={body => this.onChoiceEdit(choice.with({ body }))}
         onRemove={() => this.onRemoveChoice(choice)} />

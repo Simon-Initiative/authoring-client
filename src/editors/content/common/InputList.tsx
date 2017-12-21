@@ -35,45 +35,31 @@ export const InputList: React.StatelessComponent<InputListProps> = ({
   );
 };
 
-interface InputItemDropTargetProps {
+export interface InputListItemProps {
+  className?: string;
+  id: string;
+  label: string;
+  contentTitle?: string;
+  context: AppContext;
+  services: AppServices;
+  body: Html;
+  options?: any;
+  controls?: any;
+  editMode: boolean;
+  onEdit: (body: Html) => void;
+  onRemove?: (id: string) => void;
+
+  // required props if draggable
+  isDraggable?: boolean;
+  index?: number;
+  connectDragSource?: any;
+  connectDragPreview?: any;
+  onDragDrop?: (originalIndex: number, newIndex: number) => void;
+  dragType?: string;
+  isDragging?: boolean;
   connectDropTarget?: any;
   isHovered?: boolean;
-  index: number;
   canDrop?: boolean;
-  onDragDrop?: (originalIndex: number, newIndex: number) => void;
-}
-
-interface InputItemDropTargetState {
-
-}
-
-const target = {
-  drop(props, monitor) {
-    const originalIndex = monitor.getItem().index;
-    props.onDragDrop(originalIndex, props.index);
-  },
-  canDrop(props, monitor) {
-    const originalIndex = monitor.getItem().index;
-    return !(props.index === originalIndex || props.index === (originalIndex + 1));
-  },
-};
-
-@DropTarget(DragTypes.Choice, target, (connect, monitor) => {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isHovered: monitor.isOver(),
-    canDrop: monitor.canDrop(),
-  };
-})
-class InputItemDropTarget
-  extends React.Component<InputItemDropTargetProps, InputItemDropTargetState> {
-  render() {
-    const { connectDropTarget, isHovered, canDrop } = this.props;
-
-    return connectDropTarget(
-      <div className={`drop-target ${isHovered && canDrop ? 'hover' :''}`} />,
-    );
-  }
 }
 
 const source = {
@@ -92,35 +78,31 @@ const source = {
   },
 };
 
-const sourceCollect = (connect, monitor) => {
+const target = {
+  drop(props, monitor) {
+    const originalIndex = monitor.getItem().index;
+    props.onDragDrop(originalIndex, props.index);
+  },
+  canDrop(props, monitor) {
+    const originalIndex = monitor.getItem().index;
+    return !(props.index === originalIndex);
+  },
+};
+
+@DragSource(({ dragType }) => dragType || DragTypes.InputItem, source, (connect, monitor) => {
   return {
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
     isDragging: monitor.isDragging(),
   };
-};
-
-export interface InputListItemProps {
-  className?: string;
-  id: string;
-  label: string;
-  contentTitle?: string;
-  context: AppContext;
-  services: AppServices;
-  body: Html;
-  options?: any;
-  controls?: any;
-  editMode: boolean;
-  isDraggable?: boolean;
-  index?: number;                   // required if draggable
-  connectDragSource?: any;          // required if draggable
-  connectDragPreview?: any;         // required if draggable
-  onDragDrop?: (originalIndex: number, newIndex: number) => void;
-  onEdit: (body: Html) => void;
-  onRemove?: (id: string) => void;
-}
-
-@DragSource(DragTypes.Choice, source, sourceCollect)
+})
+@DropTarget(({ dragType }) => dragType || DragTypes.InputItem, target, (connect, monitor) => {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isHovered: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+  };
+})
 export class InputListItem extends React.PureComponent<InputListItemProps> {
   render() {
     const {
@@ -135,13 +117,17 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
       options,
       controls,
       editMode,
+      onEdit,
+      onRemove,
       isDraggable,
       index,
       connectDragSource,
       connectDragPreview,
       onDragDrop,
-      onEdit,
-      onRemove,
+      isDragging,
+      connectDropTarget,
+      isHovered,
+      canDrop,
     } = this.props;
 
     const elementChildren = React.Children.toArray(children)
@@ -157,7 +143,7 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
       (child: React.ReactElement<any>): boolean => child.type === ItemControl,
     );
 
-    return (
+    return connectDropTarget(
       <div className={`input-list-item ${className || ''}`}>
         <div className="input-list-item-label">
           <div className="label-text">
@@ -168,26 +154,29 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
           )}
           {controls}
         </div>
-        <div className="input-list-item-content">
-          <div className="drop-target-container">
-            <InputItemDropTarget index={index} onDragDrop={onDragDrop} />
-          </div>
-          {contentTitle
-            ? (<div className="input-list-item-content-title">{contentTitle}</div>)
-            : (null)
-          }
-          <HtmlContentEditor
-            editorStyles={HTML_CONTENT_EDITOR_STYLE}
-            inlineToolbar={<InlineToolbar/>}
-            blockToolbar={<BlockToolbar/>}
-            inlineInsertionToolbar={<InlineInsertionToolbar/>}
-            context={context}
-            services={services}
-            editMode={editMode}
-            model={body}
-            onEdit={onEdit} />
-          {options}
-        </div>
+        {connectDragPreview(
+          <div className={`input-list-item-content ${isHovered && canDrop ? 'drop-hover' : ''}`}>
+            {isHovered && canDrop
+              ? (<div className="drop-target-container"/>)
+              : (null)
+            }
+            {contentTitle
+                ? (<div className="input-list-item-content-title">{contentTitle}</div>)
+                : (null)
+              }
+              <HtmlContentEditor
+                editorStyles={HTML_CONTENT_EDITOR_STYLE}
+                inlineToolbar={<InlineToolbar/>}
+                blockToolbar={<BlockToolbar/>}
+                inlineInsertionToolbar={<InlineInsertionToolbar/>}
+                context={context}
+                services={services}
+                editMode={editMode}
+                model={body}
+                onEdit={onEdit} />
+              {options}
+            </div>,
+        )}
         {onRemove
           ? (
             <Remove
@@ -199,7 +188,7 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
             <span className="remove-btn"></span>
           )
         }
-      </div>
+      </div>,
     );
   }
 }

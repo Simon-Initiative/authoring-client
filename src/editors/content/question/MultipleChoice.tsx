@@ -15,6 +15,7 @@ import {
   InputList, InputListItem, ItemOptions, ItemOption, ItemControl, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
 import { convert } from 'utils/format';
+import { DragTypes } from 'utils/drag';
 
 import './MultipleChoice.scss';
 
@@ -267,6 +268,7 @@ export class MultipleChoice
           isDraggable={!itemModel.shuffle}
           index={i}
           onDragDrop={this.onReorderChoices}
+          dragType={DragTypes.Choice}
           body={choice.body}
           onEdit={body => this.onChoiceEdit(choice.with({ body }))}
           onRemove={() => this.onRemoveChoice.bind(this, choice, response)}
