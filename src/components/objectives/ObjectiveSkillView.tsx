@@ -13,7 +13,7 @@ import * as viewActions from '../../actions/view';
 import { DuplicateListingInput } from './DuplicateListingInput';
 import guid from '../../utils/guid';
 import { RowType } from './types';
-import { LockDetails, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import { LockDetails, renderLocked, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
 import { buildReportProblemAction, buildPersistenceFailureMessage } from 'utils/error';
 
 import { ExistingSkillSelection } from './ExistingSkillSelection';
@@ -586,8 +586,7 @@ export class ObjectiveSkillView
     return (
       <div className="objective-skill-view container-fluid new">
         <div className="row">
-          <NavigationBar />
-          <div className="col-sm-9 col-md-10 document">
+          <div className="col-sm-12 col-md-12 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">

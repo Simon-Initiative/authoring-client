@@ -2,10 +2,26 @@ import history from 'utils/history';
 import * as models from 'data/models';
 import { dismissScopedMessages } from './messages';
 import { Scope } from 'types/messages';
+import * as courseActions from 'actions/course';
+import { Page } from 'data/content/assessment/page';
 
 function isDifferentCourse(getState, courseId) : boolean {
   const course: models.CourseModel = getState().course;
   return course === null || course.id !== courseId;
+}
+
+
+export type ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+export const ENTER_APPLICATION_VIEW : ENTER_APPLICATION_VIEW = 'ENTER_APPLICATION_VIEW';
+
+export type EnterApplicationViewAction = {
+  type: ENTER_APPLICATION_VIEW,
+};
+
+function enterApplicationView() : EnterApplicationViewAction {
+  return {
+    type: ENTER_APPLICATION_VIEW,
+  };
 }
 
 // Helpers for defining async view actions that dismiss
@@ -13,17 +29,40 @@ function isDifferentCourse(getState, courseId) : boolean {
 
 function transitionCourseView(destination, courseId, dispatch, getState) {
 
-  const scope = isDifferentCourse(getState, courseId)
-  ? Scope.Package : Scope.Resource;
-  dispatch(dismissScopedMessages(scope));
+  if (isDifferentCourse(getState, courseId)) {
 
-  history.push(destination);
+    dispatch(dismissScopedMessages(Scope.Package));
+
+    dispatch(courseActions.loadCourse(courseId)).then((c) => {
+      history.push(destination);
+    });
+  } else {
+    dispatch(dismissScopedMessages(Scope.Resource));
+    history.push(destination);
+  }
+
 }
 
 function transitionApplicationView(destination, dispatch) {
   dispatch(dismissScopedMessages(Scope.Application));
+  dispatch(enterApplicationView());
   history.push(destination);
 }
+
+
+export type ViewActions = {
+  viewCreateCourse: () => void,
+  viewImportCourse: () => void,
+  viewAllCourses: () => void,
+  viewDocument: (documentId: string, courseId: string) => void,
+  viewSkills: (courseId: string) => void,
+  viewObjectives: (courseId: string) => void,
+  viewOrganizations: (courseId: string) => void,
+  viewPages: (courseId: string) => void,
+  viewFormativeAssessments: (courseId: string) => void,
+  viewSummativeAssessments: (courseId: string) => void,
+  viewPools: (courseId: string) => void,
+};
 
 // The view transition actions:
 
@@ -77,4 +116,17 @@ export function viewPools(courseId: string) {
 
 export function viewAllCourses() {
   return transitionApplicationView.bind(undefined, '/');
+}
+
+
+export function viewCourse(courseId: string) {
+  return function (dispatch) {
+    dispatch(courseActions.loadCourse(courseId)).then((c) => {
+
+      // This ensures that we wipe any messages displayed from
+      // another course
+      dispatch(dismissScopedMessages(Scope.Package));
+      dispatch(viewDocument(courseId, courseId));
+    });
+  };
 }
