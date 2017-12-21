@@ -15,8 +15,6 @@ import { renderAssessmentNode } from '../common/questions';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 
-import HTML5Backend from 'react-dnd-html5-backend';
-
 import './PoolEditor.scss';
 
 interface PoolEditor {
@@ -32,7 +30,6 @@ interface PoolEditorState extends AbstractEditorState {
   currentNode: contentTypes.Node;
 }
 
-@DragDropContext(HTML5Backend)
 class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorProps,
   PoolEditorState>  {

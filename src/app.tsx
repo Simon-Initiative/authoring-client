@@ -30,22 +30,7 @@ import { ApplicationRoot } from './ApplicationRoot';
 // import application styles
 import 'stylesheets/index.scss';
 
-const loggerMiddleware = (createLogger as any)({
-  stateTransformer: (state) => {
-    const newState = {};
-
-    // if state item is immutable, convert to JS for logging purposes
-    for (const i of Object.keys(state)) {
-      if (Iterable.isIterable(state[i])) {
-        newState[i] = state[i].toJS();
-      } else {
-        newState[i] = state[i];
-      }
-    }
-
-    return newState;
-  },
-});
+const loggerMiddleware = (createLogger as any)();
 
 function initStoreWithState(state) {
   const store = createStore(

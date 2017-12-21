@@ -46,7 +46,7 @@ const defaultContent = {
 };
 
 export class Audio extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Audio';
   id: string;
   title: string;
@@ -61,7 +61,7 @@ export class Audio extends Immutable.Record(defaultContent) {
   caption: Caption;
   cite: Cite;
   guid: string;
-  
+
   constructor(params?: AudioParams) {
     super(augment(params));
   }
@@ -70,12 +70,23 @@ export class Audio extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Audio {
+    return this.with({
+      id: createGuid(),
+      alternate: this.alternate.clone(),
+      titleContent: this.titleContent.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string, toDraft) : Audio {
 
     const t = (root as any).audio;
 
     let model = new Audio({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -93,9 +104,9 @@ export class Audio extends Immutable.Record(defaultContent) {
     if (t['@controls'] !== undefined) {
       model = model.with({ controls: t['@controls'] === 'true' });
     }
-    
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -124,19 +135,19 @@ export class Audio extends Immutable.Record(defaultContent) {
           model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
-          
+
       }
     });
 
-    // Adjust the model to move the contents of the 'src' attribute 
+    // Adjust the model to move the contents of the 'src' attribute
     // into a 'source' element. This allows us to access legacy audio elements data
-    // through the proper channel. 
+    // through the proper channel.
     if (model.src !== '' && model.sources.size === 0) {
       const source = new Source({ src: model.src });
       const sources = model.sources.set(source.guid, source);
       model = model.with({ sources });
     }
-    
+
     return model;
   }
 
@@ -166,7 +177,7 @@ export class Audio extends Immutable.Record(defaultContent) {
         '@type': this.type,
         '@controls': this.controls ? 'true' : 'false',
         '#array': children,
-      }, 
+      },
     };
   }
 }

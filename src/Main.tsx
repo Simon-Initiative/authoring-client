@@ -8,12 +8,13 @@ import { modalActions } from './actions/modal';
 import { ServerInformation } from './reducers/server';
 import { UserInfo } from './reducers/user';
 import * as viewActions from './actions/view';
+import { loadCourse } from 'actions/course';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
 import { LegacyTypes } from './data/types';
 
-import Header from './components/Header';
+import Header from './components/Header.controller';
 import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
@@ -22,6 +23,8 @@ import CreateCourseView from './components/CreateCourseView';
 import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
 import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
+import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-dnd';
 import Messages from './components/message/Messages.controller';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -127,6 +130,7 @@ interface MainState {
 /**
  * Main React Component
  */
+@DragDropContext(HTML5Backend)
 export default class Main extends React.Component<MainProps, MainState> {
   modalActions: Object;
   viewActions: Object;
@@ -148,6 +152,33 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     // Fire off the async request to determine server time skew
     onDispatch(setServerTimeSkew());
+
+    this.loadCourseIfNecessary(this.props);
+  }
+
+  loadCourseIfNecessary(props: MainProps) {
+
+    const { course, location, onDispatch } = props;
+    const url = getPathName(location.pathname);
+
+    switch (url) {
+      case '/':
+      case '/create':
+      case '/import':
+        return;
+      default:
+        const courseId = url.substr(url.indexOf('-') + 1);
+        if (course === null || course.guid !== courseId) {
+          onDispatch(loadCourse(courseId));
+        }
+    }
+
+  }
+
+  componentWillReceiveProps(nextProps: MainProps) {
+    if (this.props.location.pathname !== nextProps.location.pathname) {
+      this.loadCourseIfNecessary(nextProps);
+    }
   }
 
   renderResource(resource: ResourceList) {
@@ -227,12 +258,16 @@ export default class Main extends React.Component<MainProps, MainState> {
 
     return (
         <div className="main">
-          <Messages/>
-          <Header dispatch={onDispatch}
-            name={user.profile.firstName + ' ' + user.profile.lastName}
-            email={user.profile.email}
-            logoutUrl={logoutUrl}/>
-          {currentView}
+          <div className="main-header">
+            <Messages/>
+            <Header/>
+          </div>
+          <div className="main-content">
+            {currentView}
+          </div>
+          <div className="main-footer">
+            <Footer/>
+          </div>
           {modalDisplay}
         </div>
     );

@@ -6,7 +6,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import guid from '../../../utils/guid';
 import { MultipleChoice } from './MultipleChoice';
 import { Essay } from './Essay';
-import { CheckAllThatApply } from './CheckAllThatApply';
+import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering';
 import { MultipartInput } from './MultipartInput';
@@ -298,7 +298,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+    }
+    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
         <MultipleChoice
           context={this.props.context}
@@ -320,7 +321,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
+    }
+    if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
         <CheckAllThatApply
           context={this.props.context}
@@ -342,7 +344,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'ShortAnswer') {
+    }
+    if (item.contentType === 'ShortAnswer') {
       return (
         <ShortAnswer
           context={this.props.context}
@@ -364,7 +367,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'Ordering') {
+    }
+    if (item.contentType === 'Ordering') {
       return (
         <Ordering
           context={this.props.context}
@@ -386,7 +390,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'Essay') {
+    }
+    if (item.contentType === 'Essay') {
       return (
         <Essay
           context={this.props.context}
@@ -419,4 +424,3 @@ export class QuestionEditor
     );
   }
 }
-
