@@ -330,8 +330,10 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       if (waitBufferElapsed) {
         return this.renderWaiting();
       }
+
       return null;
     }
+
     const courseId = (course as models.CourseModel).guid;
     const courseLabel = (course as models.CourseModel).id;
     const version = (course as models.CourseModel).version;

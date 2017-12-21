@@ -48,31 +48,30 @@ export type Tab = {
 const getLabelForQuestion = (question: contentTypes.Question): string => {
   if (question.items.size === 0) {
     return 'Input Question';
-  } else {
+  }
 
-    // Look at first item and base label off of that
-    const item = question.items.first();
+  // Look at first item and base label off of that
+  const item = question.items.first();
 
-    switch (item.contentType) {
-      case 'MultipleChoice':
-        if (item.select === 'single') {
-          return 'Multiple Choice Question';
-        } else {
-          return 'Check All That Apply Question';
-        }
-      case 'Ordering':
-        return 'Ordering Question';
-      case 'Essay':
-        return 'Essay Question';
-      case 'ShortAnswer':
-        return 'Short Answer Question';
-      case 'Text':
-      case 'Numeric':
-      case 'FillInTheBlank':
-        return 'Input Question';
-      default:
-        return 'Question';
-    }
+  switch (item.contentType) {
+    case 'MultipleChoice':
+      if (item.select === 'single') {
+        return 'Multiple Choice Question';
+      }
+
+      return 'Check All That Apply Question';
+    case 'Ordering':
+      return 'Ordering Question';
+    case 'Essay':
+      return 'Essay Question';
+    case 'ShortAnswer':
+      return 'Short Answer Question';
+    case 'Text':
+    case 'Numeric':
+    case 'FillInTheBlank':
+      return 'Input Question';
+    default:
+      return 'Question';
   }
 };
 
@@ -114,7 +113,9 @@ type OptionControlProps = {
 
 export const OptionControl: React.StatelessComponent<OptionControlProps>
   = ({ name, onClick, children }) => (
-  <div className={`control ${convertStringToCSS(name)}`} onClick={e => onClick && onClick(e, name)}>
+  <div
+    className={`control clickable ${convertStringToCSS(name)}`}
+    onClick={e => onClick && onClick(e, name)}>
     <div className="control-label">{name}</div>
     {children}
   </div>

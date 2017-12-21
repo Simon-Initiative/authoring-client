@@ -11,7 +11,7 @@ import { CommandProcessor, Command } from '../command';
 import { wrappers } from './wrappers/wrappers';
 import { ContentWrapper } from './wrappers/common';
 import { determineChangeType, SelectionChangeType,
-  getCursorPosition, hasSelection, getPosition } from './utils';
+  getCursorPosition, hasSelection, getPosition, cloneDuplicatedEntities } from './utils';
 import { BlockProps } from './renderers/properties';
 import { AuthoringActions } from '../../../../actions/authoring';
 import { AppServices } from '../../../common/AppServices';
@@ -24,9 +24,9 @@ import { getAllEntities, EntityInfo, EntityRange } from '../../../../data/conten
 import handleBackspace from './keyhandlers/backspace';
 import { insertBlocksAfter, containerPrecondition } from './commands/common';
 import { wouldViolateSchema, validateSchema } from './paste';
-
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import guid from '../../../../utils/guid';
+import { updateData } from 'data/content/common/clone';
 export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 import './DraftWrapper.scss';
@@ -236,22 +236,6 @@ function appendText(contentBlock, contentState, text) {
 
 }
 
-function updateData(contentBlock, contentState, blockData) {
-
-  const targetRange = new SelectionState({
-    anchorKey: contentBlock.key,
-    focusKey: contentBlock.key,
-    anchorOffset: 0,
-    focusOffset: contentBlock.text.length,
-  });
-
-  return Modifier.setBlockData(
-    contentState,
-    targetRange,
-    blockData);
-
-}
-
 function addSpaceAfterEntity(editorState, block) {
 
   const blockKey = block.key;
@@ -299,7 +283,6 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
     return stateAndSeen;
   }
 }
-
 
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
@@ -367,7 +350,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
         if (contentChange) {
 
-          contentState = this.cloneDuplicatedEntities(contentState);
+          contentState = cloneDuplicatedEntities(contentState);
 
           editorState = EditorState.push(editorState, contentState);
 
@@ -634,56 +617,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.forceContentChangeWithSelection(
       contentState, 'insert-fragment', selection);
-  }
-
-  getSingularKey(o) {
-    if (Object.keys(o).length === 1) {
-      return Object.keys(o)[0];
-    } else {
-      return null;
-    }
-  }
-
-  cloneDuplicatedEntities(current: ContentState) : ContentState {
-
-    let contentState = current;
-    const entities = getAllEntities(contentState);
-
-    // Find any duplicated entities and clone them
-    const seenKeys = {};
-    entities.forEach((e) => {
-      if (seenKeys[e.entityKey] === undefined) {
-        seenKeys[e.entityKey] = e;
-      } else {
-        // This is a duplicate, clone it
-
-        const copy = Object.assign({}, e.entity.data);
-
-        // If the data has an id, generate a new one to
-        // avoid duplication
-        if (copy.id !== undefined) {
-          copy.id = guid();
-        } else {
-          const key = this.getSingularKey(copy);
-          if (key !== null && copy[key].id !== undefined) {
-            copy[key] = copy[key].with({ id: guid() });
-          }
-        }
-
-        contentState = contentState.createEntity(
-          e.entity.type, e.entity.mutability, copy);
-        const createdKey = contentState.getLastCreatedEntityKey();
-        const range = new SelectionState({
-          anchorKey: e.range.contentBlock.key,
-          focusKey: e.range.contentBlock.key,
-          anchorOffset: e.range.start,
-          focusOffset: e.range.end,
-        });
-        contentState = Modifier.applyEntity(contentState, range, createdKey);
-      }
-    });
-
-    return contentState;
   }
 
   blockRenderer(block) {
@@ -1078,7 +1011,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   render() {
 
-    let editorStyle : any = this.props.editorStyles !== undefined
+    const editorStyle : any = this.props.editorStyles !== undefined
       ? Object.assign({}, this.props.editorStyles)
       : Object.assign({}, styles.editor);
 

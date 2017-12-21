@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-
+import { cloneContent } from '../common/clone';
 import { ContentState } from 'draft-js';
 
 const emptyContent = ContentState.createFromText(' ');
@@ -26,14 +26,14 @@ const defaultContent = {
 };
 
 export class Cite extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Cite';
   title: string;
   id: string;
   entry: string;
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: CiteParams) {
     super(augment(params));
   }
@@ -42,12 +42,20 @@ export class Cite extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Cite {
+    return this.with({
+      content: cloneContent(this.content),
+      id: createGuid(),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string, toDraft) : Cite {
 
     const t = (root as any).cite;
 
     let model = new Cite({ guid, content: emptyContent });
-    
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -59,9 +67,9 @@ export class Cite extends Immutable.Record(defaultContent) {
     }
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {
-      model = model.with({ content: toDraft(getChildren(t)) });  
-    } 
-    
+      model = model.with({ content: toDraft(getChildren(t)) });
+    }
+
     return model;
   }
 

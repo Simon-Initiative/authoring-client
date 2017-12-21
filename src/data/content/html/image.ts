@@ -46,7 +46,7 @@ const defaultContent = {
 };
 
 export class Image extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Image';
   id: string;
   title: string;
@@ -62,7 +62,7 @@ export class Image extends Immutable.Record(defaultContent) {
   caption: Caption;
   cite: Cite;
   guid: string;
-  
+
   constructor(params?: ImageParams) {
     super(augment(params));
   }
@@ -71,12 +71,23 @@ export class Image extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Image {
+    return this.with({
+      id: createGuid(),
+      alternate: this.alternate.clone(),
+      titleContent: this.titleContent.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string, toDraft) : Image {
 
     const t = (root as any).image;
 
     let model = new Image({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -103,10 +114,10 @@ export class Image extends Immutable.Record(defaultContent) {
     if (t['@vertical-align'] !== undefined) {
       model = model.with({ valign: t['@vertical-align'] });
     }
-    
-    
+
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -129,7 +140,7 @@ export class Image extends Immutable.Record(defaultContent) {
           model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
-          
+
       }
     });
 
@@ -150,13 +161,13 @@ export class Image extends Immutable.Record(defaultContent) {
       image: {
         '@id': this.id,
         '@title': this.title,
-        '@src': this.src === '' ? 'https://via.placeholder.com/400x300' 
+        '@src': this.src === '' ? 'https://via.placeholder.com/400x300'
           + '?text=Click+to+edit+image' : this.src,
         '@alt': this.alt,
         '@style': this.style,
         '@vertical-align': this.valign,
         '#array': children,
-      }, 
+      },
     };
 
     if (this.height.trim() !== '') {

@@ -6,7 +6,7 @@ import * as models from '../../data/models';
 import { Maybe } from 'tsmonad';
 import { Title } from './Title';
 import { AppServices } from '../../editors/common/AppServices';
-import { Remove } from './Remove';
+import { Remove } from 'components/common/Remove';
 
 import guid from '../../utils/guid';
 

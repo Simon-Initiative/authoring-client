@@ -1,0 +1,54 @@
+@import 'oli/zindex';
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+
+  .choice-item {
+    display: flex;
+    flex-direction: row;
+
+    .choice-label {
+      vertical-align: middle;
+      margin-right: 10px;
+      padding-top: 6px;
+      min-width: 16px;
+    }
+
+    .choice-content {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .dragHandleGrab {
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+
+    .remove-btn {
+      padding-top: 8px;
+    }
+  }
+
+  .choice-drop-target-container {
+    position: relative;
+
+    .choice-drop-target {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #f4bf42;
+      height: 10px;
+      width: 100%;
+      margin-bottom: 8px;
+      z-index: $reposition-target;
+      opacity: 0;
+
+      &.hover {
+        opacity: 1;
+      }
+    }
+  }
+}
