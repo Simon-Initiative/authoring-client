@@ -12,13 +12,13 @@ import guid from 'utils/guid';
 import { configuration } from 'actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
 import { AppServices, DispatchBasedServices } from '../common/AppServices';
-import { buildFeedbackFromCurrent } from 'utils/feedback';
 import {
   onFailureCallback,
   onSaveCompletedCallback,
   PersistenceStrategy,
 } from './persistence/PersistenceStrategy';
 import { LockDetails, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import { buildReportProblemAction, buildPersistenceFailureMessage } from 'utils/error';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
@@ -84,7 +84,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       }
     };
     this.onSaveFailure = (reason: any) => {
-
       if (reason === 'Forbidden') {
 
         const message = buildLockExpiredMessage({ label: 'Reload',
@@ -92,38 +91,8 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
         this.props.onDispatch(messageActions.showMessage(message));
         this.setState({ editingAllowed: false });
-
-      } else if (reason === 'Bad Request') {
-
-        const content = new Messages.TitledContent().with({
-          title: 'Cannot save.',
-          message: 'There was a problem saving your changes. Try undoing recent changes.',
-
-        });
-        this.failedMessage = new Messages.Message().with({
-          guid: 'PersistenceProblem',
-          scope: Messages.Scope.Resource,
-          severity: Messages.Severity.Error,
-          canUserDismiss: false,
-          actions: Immutable.List([this.buildReportProblemAction(reason)]),
-          content,
-        });
-        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       } else {
-
-        const content = new Messages.TitledContent().with({
-          title: 'Cannot save.',
-          message: 'An error \'' + reason + '\'was encountered trying to save your changes.',
-
-        });
-        this.failedMessage = new Messages.Message().with({
-          guid: 'UnknownError',
-          scope: Messages.Scope.Resource,
-          severity: Messages.Severity.Error,
-          canUserDismiss: true,
-          actions: Immutable.List([this.buildReportProblemAction(reason)]),
-          content,
-        });
+        this.failedMessage = buildPersistenceFailureMessage(reason, this.props.profile);
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       }
     };
@@ -153,7 +122,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
     const doc = document.with({ model });
     const undoRedoGuid = guid();
-    this.setState({ document: doc, undoRedoGuid }, () => this.persistenceStrategy.save(doc));
+    this.setState({ undoRedoGuid, document: doc }, () => this.persistenceStrategy.save(doc));
   }
 
   initPersistence(document: persistence.Document) {
@@ -233,12 +202,16 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
           title: 'Cannot load resource.',
           message: 'There was a problem loading this course resource.',
         });
+
+        const { profile } = this.props;
+        const name = profile.firstName + ' ' + profile.lastName;
+
         this.failedMessage = new Messages.Message().with({
+          content,
           scope: Messages.Scope.Resource,
           severity: Messages.Severity.Error,
           canUserDismiss: false,
-          actions: Immutable.List([this.buildReportProblemAction(failure)]),
-          content,
+          actions: Immutable.List([buildReportProblemAction(failure, name, profile.email)]),
         });
         this.props.onDispatch(messageActions.showMessage(this.failedMessage));
 
@@ -345,22 +318,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     );
   }
 
-  buildReportProblemAction(failure) : Messages.MessageAction {
-    const { documentId, profile } = this.props;
-
-    const url = buildFeedbackFromCurrent(
-      profile.firstName + ' ' + profile.lastName,
-      profile.email,
-    );
-
-    return {
-      label: 'Report Problem',
-      execute: (message, dispatch) => {
-        window.open(url, 'ReportProblemTab');
-      },
-    };
-  }
-
   render(): JSX.Element {
     const { course, documentId, expanded, userId, onDispatch } = this.props;
     const {
@@ -373,51 +330,52 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
     if (failure !== null) {
       return null;
-    } else if (document === null || editingAllowed === null) {
+    }
+    if (document === null || editingAllowed === null) {
       if (waitBufferElapsed) {
         return this.renderWaiting();
-      } else {
-        return null;
       }
-    } else {
-      const courseId = (course as models.CourseModel).guid;
-      const courseLabel = (course as models.CourseModel).id;
-      const version = (course as models.CourseModel).version;
 
-      const childProps: AbstractEditorProps<any> = {
-        model: document.model,
-        expanded: expanded.has(documentId)
-          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
-          : Maybe.nothing<Immutable.Set<string>>(),
-        context: {
-          documentId,
-          userId,
-          courseId,
-          resourcePath: this.determineBaseUrl((document.model as any).resource),
-          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-          courseModel: course,
-          undoRedoGuid,
-          skills: this.props.skills,
-          objectives: this.props.objectives,
-        },
-        dispatch: onDispatch,
-        onEdit: this.onEdit,
-        onUndoRedoEdit: this.onUndoRedoEdit,
-        services: new DispatchBasedServices(
-          onDispatch,
-          course,
-        ),
-        editMode: editingAllowed,
-      };
-
-      const registeredEditor = lookUpByName(document.model.modelType);
-      const editor = React.createElement((registeredEditor.component as any), childProps);
-
-      return (
-        <div className="editor-manager">
-          {editor}
-        </div>
-      );
+      return null;
     }
+
+    const courseId = (course as models.CourseModel).guid;
+    const courseLabel = (course as models.CourseModel).id;
+    const version = (course as models.CourseModel).version;
+
+    const childProps: AbstractEditorProps<any> = {
+      model: document.model,
+      expanded: expanded.has(documentId)
+        ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+        : Maybe.nothing<Immutable.Set<string>>(),
+      context: {
+        documentId,
+        userId,
+        courseId,
+        undoRedoGuid,
+        resourcePath: this.determineBaseUrl((document.model as any).resource),
+        baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
+        courseModel: course,
+        skills: this.props.skills,
+        objectives: this.props.objectives,
+      },
+      dispatch: onDispatch,
+      onEdit: this.onEdit,
+      onUndoRedoEdit: this.onUndoRedoEdit,
+      services: new DispatchBasedServices(
+        onDispatch,
+        course,
+      ),
+      editMode: editingAllowed,
+    };
+
+    const registeredEditor = lookUpByName(document.model.modelType);
+    const editor = React.createElement((registeredEditor.component as any), childProps);
+
+    return (
+      <div className="editor-manager">
+        {editor}
+      </div>
+    );
   }
 }

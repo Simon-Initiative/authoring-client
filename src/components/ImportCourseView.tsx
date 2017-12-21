@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import guid from 'utils/guid';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
-import * as courseActions from 'actions/course';
 import * as viewActions from 'actions/view';
 import { showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
@@ -28,9 +27,9 @@ function buildImportMessage() : Messages.Message {
   });
 
   return new Messages.Message().with({
+    content,
     actions: Immutable.List([Messages.RELOAD_ACTION]),
     canUserDismiss: true,
-    content,
     severity: Messages.Severity.Information,
     scope: Messages.Scope.Resource,
   });
@@ -41,7 +40,6 @@ export class ImportCourseView
 
   constructor(props) {
     super(props);
-    this.onCancel = this.onCancel.bind(this);
     this.onImport = this.onImport.bind(this);
   }
 
@@ -59,10 +57,6 @@ export class ImportCourseView
     this.props.dispatch(showMessage(buildImportMessage()));
   }
 
-  onCancel() {
-    viewActions.viewAllCourses();
-  }
-
   render() {
 
     const inputs = (
@@ -70,11 +64,6 @@ export class ImportCourseView
         <button onClick={this.onImport.bind(this)}
                 className="btn btn-secondary btn-lg btn-block outline serif">
           Import Course
-        </button>
-        <button onClick={this.onCancel}
-                style={{ color: 'white ' }}
-                className="btn btn-cancel btn-lg btn-block serif">
-          Cancel
         </button>
       </div>
     );

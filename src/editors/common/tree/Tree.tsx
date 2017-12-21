@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import { Maybe } from 'tsmonad';
 import { removeNode, insertNode, isSameNode } from './utils';
 
@@ -61,7 +60,6 @@ export interface TreeProps<NodeType extends Types.HasGuid> {
 /**
  * Reusable tree component.
  */
-@DragDropContext(HTML5Backend)
 export class Tree<NodeType extends Types.HasGuid>
   extends React.PureComponent<TreeProps<NodeType>, {}> {
 

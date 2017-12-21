@@ -1,7 +1,7 @@
 
 import WorkbookPageEditor from '../document/workbook/WorkbookPageEditor.controller';
 import AssessmentEditor from '../document/assessment/AssessmentEditor.controller';
-import CourseEditor from '../document/course/CourseEditor';
+import CourseEditor from '../document/course/CourseEditor.controller';
 import OrgEditor from '../document/org/OrgEditor.controller';
 import PoolEditor from '../document/pool/PoolEditor.controller';
 
