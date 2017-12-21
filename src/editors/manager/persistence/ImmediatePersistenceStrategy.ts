@@ -31,15 +31,15 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
    * to seamlessly handle conflicts. 
    */
   saveDocument(initialDoc: persistence.Document, 
-    remainingRetries: number,
-    initialResolve: any, initialReject: any)
+               remainingRetries: number,
+               initialResolve: any, initialReject: any)
     : Promise<persistence.Document> {
 
-      return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
-        let toSave = initialDoc;
+      const toSave = initialDoc;
 
-        persistence.persistDocument(toSave)
+      persistence.persistDocument(toSave)
           .then(result => {
             initialResolve !== undefined ? initialResolve(result) : resolve(result);
           })
@@ -49,18 +49,18 @@ export class ImmediatePersistenceStrategy extends AbstractPersistenceStrategy {
             } else {
               persistence.retrieveDocument(initialDoc._courseId, initialDoc._id)
                 .then(doc => {
-                  let updated = toSave.with({_rev: doc._rev});
+                  const updated = toSave.with({ _rev: doc._rev });
                   this.saveDocument(updated, --remainingRetries,
-                    initialResolve === undefined ? resolve : initialResolve,
-                    initialReject === undefined ? reject : initialReject);
+                                    initialResolve === undefined ? resolve : initialResolve,
+                                    initialReject === undefined ? reject : initialReject);
                 })
                 .catch(err => {
                   initialReject !== undefined ? initialReject(err) : reject(err);
-                })
+                });
             }
             
           });
-      });
+    });
   }
   
   doDestroy() {

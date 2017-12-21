@@ -49,9 +49,9 @@ function migrateNodesToPage(model: AssessmentModel) {
         (page, node) => {
           if (node.contentType !== 'Unsupported') {
             return page.with({ nodes: page.nodes.set(node.guid, node) });
-          } else {
-            return page;
           }
+
+          return page;
         },
         page);
 

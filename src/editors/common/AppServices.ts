@@ -183,24 +183,24 @@ export class DispatchBasedServices implements AppServices {
 
     if (found !== undefined && found !== null) {
       return Promise.resolve(extract(found));
-    } else {
-      return new Promise((resolve, reject) => {
-        persistence.retrieveCoursePackage(this.courseModel.guid)
-        .then((doc) => {
-
-          if (doc.model.modelType === 'CourseModel') {
-            const found = find(doc.model);
-            if (found !== undefined && found !== null) {
-              resolve(extract(found));
-
-              this.dispatch(courseActions.courseChanged(doc.model));
-
-            } else {
-              reject('Could not find resource');
-            }
-          }
-        });
-      });
     }
+
+    return new Promise((resolve, reject) => {
+      persistence.retrieveCoursePackage(this.courseModel.guid)
+      .then((doc) => {
+
+        if (doc.model.modelType === 'CourseModel') {
+          const found = find(doc.model);
+          if (found !== undefined && found !== null) {
+            resolve(extract(found));
+
+            this.dispatch(courseActions.courseChanged(doc.model));
+
+          } else {
+            reject('Could not find resource');
+          }
+        }
+      });
+    });
   }
 }

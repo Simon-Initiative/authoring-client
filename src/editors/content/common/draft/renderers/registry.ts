@@ -7,7 +7,7 @@ export interface BlockRenderer {
 }
 
 export function register(name: string, viewer: Object, editor: Object) {
-  RendererRegistry[name] = { viewer, editor}; 
+  RendererRegistry[name] = { viewer, editor }; 
 }
 
 export function getRendererByName(name: string) : BlockRenderer {

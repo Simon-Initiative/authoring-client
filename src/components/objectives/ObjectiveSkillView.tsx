@@ -472,6 +472,7 @@ export class ObjectiveSkillView
         const set = this.props.expanded.get('objectives');
         return set.includes(guid);
       }
+
       return true;
     };
 

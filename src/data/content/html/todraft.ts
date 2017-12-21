@@ -424,9 +424,9 @@ function table(item: Object, context: ParsingContext) {
 function getInlineHandler(key: string) : InlineHandler {
   if (inlineHandlers[key] !== undefined) {
     return inlineHandlers[key];
-  } else {
-    return applyStyle.bind(undefined, 'UNSUPPORTED');
   }
+
+  return applyStyle.bind(undefined, 'UNSUPPORTED');
 }
 
 function isVirtualParagraph(persistenceFormat: Object) {
@@ -451,10 +451,9 @@ function isVirtualParagraph(persistenceFormat: Object) {
 function isEmptyContent(obj) {
   if (obj instanceof Array) {
     return obj.length === 0 || (obj.length === 1 && Object.keys(obj[0]).length === 0);
-  } else {
-    return Object.keys(obj).length === 0;
   }
 
+  return Object.keys(obj).length === 0;
 }
 
 export function toDraft(persistenceFormat: Object) : ContentState {
@@ -471,7 +470,8 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   if (isEmptyContent(persistenceFormat)) {
     addNewBlock(draft, {});
     return convertFromRaw(draft);
-  } else if (isVirtualParagraph(persistenceFormat)) {
+  }
+  if (isVirtualParagraph(persistenceFormat)) {
 
     if (persistenceFormat['#array'] !== undefined) {
       paragraph(
@@ -505,9 +505,9 @@ export function toDraft(persistenceFormat: Object) : ContentState {
 function getBlockStyleForDepth(depth: number) : string {
   if (common.sectionBlockStyles[depth] === undefined) {
     return 'header-six';
-  } else {
-    return common.sectionBlockStyles[depth];
   }
+
+  return common.sectionBlockStyles[depth];
 }
 
 // This is the same code that Draft.js uses to determine
@@ -570,13 +570,15 @@ function getChildren(item: Object, ignore = null) : Object[] {
 
   if (item[key][common.ARRAY] !== undefined) {
     return item[key][common.ARRAY].filter(c => common.getKey(c) !== ignore);
-  } else if (item[key][common.TEXT] !== undefined) {
-    return [item[key]];
-  } else if (item[key][common.CDATA] !== undefined) {
-    return [item[key]];
-  } else {
+  }
+  if (item[key][common.TEXT] !== undefined) {
     return [item[key]];
   }
+  if (item[key][common.CDATA] !== undefined) {
+    return [item[key]];
+  }
+
+  return [item[key]];
 }
 
 function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {

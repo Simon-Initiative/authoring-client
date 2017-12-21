@@ -12,11 +12,12 @@ export function getChildren(item) : Object[] {
 export function augment(params) {
   if (params === undefined) {
     return { guid: createGuid() };
-  } else if (params.guid === undefined) {
-    return Object.assign({}, params, { guid: createGuid() });
-  } else {
-    return params;
   }
+  if (params.guid === undefined) {
+    return Object.assign({}, params, { guid: createGuid() });
+  }
+
+  return params;
 }
 
 

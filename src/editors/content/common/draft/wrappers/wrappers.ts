@@ -4,5 +4,5 @@ import { Example } from './Example';
 
 export const wrappers = [
   Pullout,
-  Example
+  Example,
 ];

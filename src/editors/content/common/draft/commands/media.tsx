@@ -35,7 +35,7 @@ export class InsertMediaCommand extends AbstractCommand<EditorState> {
 
         services.dismissModal();
 
-        const data = {src};    
+        const data = { src };    
 
         const delegate = new InsertBlockEntityCommand(this.type, 'IMMUTABLE', data);
         delegate.execute(editorState, context, services)

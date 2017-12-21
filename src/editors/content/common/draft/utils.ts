@@ -25,8 +25,6 @@ export function getCursorPosition() {
   }
 }
 
-  /*tslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }]*/
-
 export function getPosition() {
   const selection = document.getSelection();
   if (selection.rangeCount === 0) return null;
@@ -36,6 +34,7 @@ export function getPosition() {
 
   let top = clientRects.item(0);
   for (let i = 0; i < clientRects.length; i = i + 1) {
+
     const c = clientRects.item(i);
     if (c.top < top.top) {
       top = c;
@@ -90,6 +89,7 @@ export function getCaretPosition(editableDiv) {
   let caretPos = 0;
   let sel;
   let range;
+
   if (window.getSelection) {
     sel = window.getSelection();
     if (sel.rangeCount) {
@@ -100,7 +100,9 @@ export function getCaretPosition(editableDiv) {
     }
   } else if ((document as any).selection && (document as any).selection.createRange) {
     range = (document as any).selection.createRange();
+
     if (range.parentElement() === editableDiv) {
+
       const tempEl = document.createElement('span');
       editableDiv.insertBefore(tempEl, editableDiv.firstChild);
       const tempRange = range.duplicate();

@@ -82,11 +82,11 @@ export function loadCourse(courseId: string) {
           return updatedModel;
 
         }
+
         dispatch(courseChanged(document.model));
         dispatch(fetchSkills(courseId));
         dispatch(fetchObjectives(courseId));
         return document.model;
-
       }
 
     })

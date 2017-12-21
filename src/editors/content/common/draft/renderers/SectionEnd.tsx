@@ -4,7 +4,7 @@ import './markers.scss';
 
 export const SectionEnd = (props) => {
   return (
-    <span className='SectionSentinel' onClick={handleInsertion.bind(undefined, props)}>
+    <span className="SectionSentinel" onClick={handleInsertion.bind(undefined, props)}>
       section end 
     </span>);
 };

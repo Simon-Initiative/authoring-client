@@ -89,9 +89,9 @@ export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Pr
         resolve(false);
       });
     });
-  } else {
-    return Promise.resolve(true);
   }
+
+  return Promise.resolve(true);
 }
 
 export function hasRole(role: string) : boolean {

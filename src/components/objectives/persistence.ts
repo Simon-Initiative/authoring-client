@@ -135,17 +135,16 @@ export function buildAggregateModel(courseId: string, userName: string) : Promis
             if ((lockResult as any).lockedBy === userName) {
               return Promise.all([...objectives, ...skills]
                 .map(d => persistence.acquireLock(courseId, d._id)));
-            } else {
-              resolve({
-                objectives,
-                skills,
-                lockDetails: lockResult,
-                isLocked: false,
-                objectiveBucket,
-                skillBucket,
-              });
             }
 
+            resolve({
+              objectives,
+              skills,
+              lockDetails: lockResult,
+              isLocked: false,
+              objectiveBucket,
+              skillBucket,
+            });
           })
           .then((lockResults: LockDetails[]) => {
             resolve({

@@ -59,9 +59,9 @@ function tagInputRefsWithType(model: Question) {
       if ((c as any).id !== undefined) {
         p[(c as any).id] = c;
         return p;
-      } else {
-        return p;
       }
+
+      return p;
     },
     {});
 
@@ -71,9 +71,9 @@ function tagInputRefsWithType(model: Question) {
         if (byId[info.entity.data['@input']] !== undefined) {
           const type = byId[info.entity.data['@input']].contentType;
           return contentState.mergeEntityData(info.entityKey, { $type: type });
-        } else {
-          return contentState;
         }
+
+        return contentState;
       },
       model.body.contentState);
 

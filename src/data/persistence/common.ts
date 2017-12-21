@@ -28,11 +28,11 @@ export type HttpRequestParams = {
 };
 
 export function authenticatedFetch(params: HttpRequestParams) {
-  
+
   const method = params.method ? params.method : 'GET';
   const headers = params.headers ? params.headers : getHeaders(credentials);
   const hasTextResult = params.hasTextResult ? params.hasTextResult : false;
-  
+
   const { body, url } = params;
 
   return new Promise((resolve, reject) => {
@@ -43,14 +43,13 @@ export function authenticatedFetch(params: HttpRequestParams) {
       if (!tokenIsValid) {
         forceLogin();
         return;
-
-      } else {
-        return fetch(url, {
-          method,
-          headers,
-          body,
-        });
       }
+
+      return fetch(url, {
+        method,
+        headers,
+        body,
+      });
     })
     .then((response) => {
       if (!response.ok) {
@@ -64,7 +63,7 @@ export function authenticatedFetch(params: HttpRequestParams) {
     });
 
   });
-  
+
 }
 
 export type RevisionId = string;

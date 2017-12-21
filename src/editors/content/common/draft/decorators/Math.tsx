@@ -76,10 +76,10 @@ class Math extends React.PureComponent<MathProps, any> {
 }
 
 
-export default function(props: Object) : Decorator {
+export default function (props: Object) : Decorator {
   return {
     strategy: byType.bind(undefined, EntityTypes.math),
     component: Math,
     props,
   };
-};
+}

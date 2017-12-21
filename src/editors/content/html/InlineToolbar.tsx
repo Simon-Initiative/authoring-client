@@ -23,9 +23,9 @@ class InlineToolbar extends React.PureComponent<InlineToolbarProps, {}> {
       return React.Children.map(this.props.children, (child) => {
         return React.cloneElement(child as any);
       });
-    } else {
-      return [];
     }
+
+    return [];
   }
 
   render() {

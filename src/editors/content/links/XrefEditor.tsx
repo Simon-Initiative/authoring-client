@@ -50,7 +50,8 @@ export class XrefEditor
   shouldComponentUpdate(nextProps, nextState: XrefEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.resources !== this.state.resources) {
+    }
+    if (nextState.resources !== this.state.resources) {
       return true;
     }
     return false;

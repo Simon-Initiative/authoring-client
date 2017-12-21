@@ -14,7 +14,7 @@ export class InsertExampleCommand extends AbstractCommand<EditorState> {
     return containerPrecondition(
       editorState.getSelection(), editorState.getCurrentContent(),
       [EntityTypes.pullout_begin, EntityTypes.example_begin], 
-      [EntityTypes.pullout_end, EntityTypes.example_end]
+      [EntityTypes.pullout_end, EntityTypes.example_end],
     );
   }
 
@@ -31,22 +31,22 @@ export class InsertExampleCommand extends AbstractCommand<EditorState> {
     content = content.createEntity(EntityTypes.example_begin, 'IMMUTABLE', { type: 'example_begin' });
     const beginKey = content.getLastCreatedEntityKey();
 
-    content = content.createEntity(EntityTypes.example_end, 'IMMUTABLE', { type: 'example_end', beginBlockKey});
+    content = content.createEntity(EntityTypes.example_end, 'IMMUTABLE', { type: 'example_end', beginBlockKey });
     const endKey = content.getLastCreatedEntityKey();
 
-    const beginCharList = Immutable.List().push(new CharacterMetadata({entity: beginKey}));
+    const beginCharList = Immutable.List().push(new CharacterMetadata({ entity: beginKey }));
     const emptyCharList = Immutable.List().push(new CharacterMetadata());
-    const endCharList = Immutable.List().push(new CharacterMetadata({entity: endKey}));
+    const endCharList = Immutable.List().push(new CharacterMetadata({ entity: endKey }));
 
     const titleBlocks = [];
     content = createTitle(content, titleBlocks);
 
     const blocks = [
-      new ContentBlock({type: 'atomic', key: beginBlockKey, text: ' ', characterList: beginCharList}),
+      new ContentBlock({ type: 'atomic', key: beginBlockKey, text: ' ', characterList: beginCharList }),
       ...titleBlocks,
-      new ContentBlock({type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList}),
-      new ContentBlock({type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList}),
-      new ContentBlock({type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList})
+      new ContentBlock({ type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList }),
+      new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
+      new ContentBlock({ type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList }),
     ];
 
     content = insertBlocksAfter(content, key, blocks);

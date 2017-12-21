@@ -31,13 +31,13 @@ const monthsToOrdinal = {
 function convertHour(hour: number, isPM: boolean) : number {
   if (isPM) {
     return hour === 12 ? 12 : hour + 12;
-  } else {
-    return hour === 12 ? 0 : hour;
   }
+
+  return hour === 12 ? 0 : hour;
 }
 
 function parseDate(value: string) : Date {
-  
+
   const p = value.split(' ');
   const t = p[3].split(':');
 
@@ -53,7 +53,7 @@ function parseDate(value: string) : Date {
 export class Resource extends Immutable.Record(
   {contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
     dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
-  
+
   contentType: 'Resource';
   rev: number;
   guid: string;
@@ -63,7 +63,7 @@ export class Resource extends Immutable.Record(
   dateCreated: Date;
   dateUpdated: Date;
   fileNode: FileNode;
-  
+
   constructor(params?: ResourceParams) {
     params ? super(params) : super();
   }
@@ -75,19 +75,19 @@ export class Resource extends Immutable.Record(
   static fromPersistence(root: Object) : Resource {
     const a = (root as any);
     const model = new Resource({
-      rev: a.rev, 
-      guid: a.guid, 
-      id: a.id, 
-      type: a.type, 
+      rev: a.rev,
+      guid: a.guid,
+      id: a.id,
+      type: a.type,
       title: a.title,
-      dateCreated: a.dateCreated === undefined || a.dateCreate === null 
+      dateCreated: a.dateCreated === undefined || a.dateCreate === null
         ? new Date() : parseDate(a.dateCreated),
-      dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null 
+      dateUpdated: a.dateUpdated === undefined || a.dateUpdated === null
         ? new Date() : parseDate(a.dateUpdated),
-      fileNode: isNullOrUndefined(a.fileNode) 
+      fileNode: isNullOrUndefined(a.fileNode)
         ? new FileNode() : FileNode.fromPersistence(a.fileNode),
     });
-    
+
     return model;
   }
 

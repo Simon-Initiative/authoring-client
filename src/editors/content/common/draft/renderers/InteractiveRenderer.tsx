@@ -22,8 +22,8 @@ export abstract class InteractiveRenderer<P extends InteractiveRendererProps, S 
     super(props);
 
     this.state = (Object.assign({}, { 
-        editMode: false   
-    }, childState) as S);
+      editMode: false,   
+    },                          childState) as S);
 
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
@@ -39,17 +39,17 @@ export abstract class InteractiveRenderer<P extends InteractiveRendererProps, S 
 
       setTimeout(() => {
         if (!currentTarget.contains(document.activeElement)) {
-          this.setState({editMode: false});
+          this.setState({ editMode: false });
           this.props.blockProps.onLockChange(false);
         }
-      }, 0);
+      },         0);
     
     }
   }
 
   onFocus() {
     if (!this.state.editMode) {
-      this.setState({editMode: true}, () => this.focusComponent.focus());
+      this.setState({ editMode: true }, () => this.focusComponent.focus());
       this.props.blockProps.onLockChange(true);
     }
   }

@@ -9,5 +9,5 @@ export const Example : ContentWrapper = {
   
   isBeginBlock: isEntityType.bind(undefined, EntityTypes.example_begin),
   isEndBlock: isEntityType.bind(undefined, EntityTypes.example_end),
-  component: buildDivWrapper('pulloutWrapper')
+  component: buildDivWrapper('pulloutWrapper'),
 };

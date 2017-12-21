@@ -23,14 +23,14 @@ export class Collapse extends React.PureComponent<CollapseProps, CollapseState> 
     this.id = guid();
 
     this.state = {
-      collapsed: true
-    }
+      collapsed: true,
+    };
 
     this.onClick = this.onClick.bind(this);
   }
 
   onClick() {
-    this.setState({ collapsed: !this.state.collapsed});
+    this.setState({ collapsed: !this.state.collapsed });
   }
 
   render() {
