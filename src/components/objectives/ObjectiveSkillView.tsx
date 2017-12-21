@@ -7,13 +7,14 @@ import * as models from '../../data/models';
 import * as contentTypes from '../../data/contentTypes';
 import { connect } from 'react-redux';
 import { collapseNodes, expandNodes } from '../../actions/expand';
-import NavigationBar from '../navigation/NavigationBar.controller';
 import { AppServices, DispatchBasedServices } from '../../editors/common/AppServices';
 import * as viewActions from '../../actions/view';
 import { DuplicateListingInput } from './DuplicateListingInput';
 import guid from '../../utils/guid';
 import { RowType } from './types';
-import { LockDetails, renderLocked, buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import {
+  LockDetails, renderLocked, buildLockExpiredMessage, buildReadOnlyMessage,
+} from 'utils/lock';
 import { buildReportProblemAction, buildPersistenceFailureMessage } from 'utils/error';
 
 import { ExistingSkillSelection } from './ExistingSkillSelection';
