@@ -149,7 +149,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
             </Button>
             {this.renderChoices()}
           </TabSectionContent>
-        </TabSection>,
+        </TabSection>
         <TabSection key="feedback" className="feedback">
           <TabSectionHeader title="Feedback"/>
           <TabSectionContent>

@@ -116,42 +116,36 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <TabSection className="question" key="question">
-        <TabSectionHeader title="Question">
-          <div className="control insert-item">
-              Insert:&nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
-                Numeric
-              </button>
-              &nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
-                Text
-              </button>
-              &nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertFillInTheBlank(
-                  fillInTheBlankCommand, canInsertAnotherPart)}>
-                Dropdown
-              </button>
+      <div className="question" key="question">
+        <div className="control insert-item">
+            <span>Insert:</span>
+            <button className="btn btn-sm btn-link" type="button"
+              onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
+              Numeric
+            </button>
+            <button className="btn btn-sm btn-link" type="button"
+              onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
+              Text
+            </button>
+            <button className="btn btn-sm btn-link" type="button"
+              onClick={() => this.onInsertFillInTheBlank(
+                fillInTheBlankCommand, canInsertAnotherPart)}>
+              Dropdown
+            </button>
 
-          </div>
-        </TabSectionHeader>
-        <TabSectionContent>
-          <HtmlContentEditor
-            ref={c => this.htmlEditor = c}
-            editMode={editMode}
-            services={services}
-            context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={insertionToolbar}
-            blockToolbar={<BlockToolbar/>}
-            model={body}
-            onEdit={onBodyEdit} />
-          </TabSectionContent>
-      </TabSection>
+        </div>
+        <HtmlContentEditor
+          ref={c => this.htmlEditor = c}
+          editMode={editMode}
+          services={services}
+          context={context}
+          editorStyles={bodyStyle}
+          inlineToolbar={<InlineToolbar/>}
+          inlineInsertionToolbar={insertionToolbar}
+          blockToolbar={<BlockToolbar/>}
+          model={body}
+          onEdit={onBodyEdit} />
+      </div>
     );
   }
 
