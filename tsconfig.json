@@ -12,7 +12,6 @@
         "inlineSourceMap": false,
         "noEmitHelpers": false,
         "alwaysStrict": true,
-        "noUnusedLocals": true,
         "outDir": "./dev",
         "baseUrl": ".",
         "paths": {

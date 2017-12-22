@@ -144,7 +144,7 @@ gulp.task('enableCors', function(cb) {
 });
 
 gulp.task('tslint', function(cb) {
-  return exec("./node_modules/tslint/bin/tslint -c tslint.json 'src/**/*.ts*'",(error, stdout, stderr) => {
+  return exec("./node_modules/tslint/bin/tslint -p . -c tslint.json 'src/**/*.ts*'",(error, stdout, stderr) => {
     console.log(stdout);
     cb();
   });
