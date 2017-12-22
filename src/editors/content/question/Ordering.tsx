@@ -6,9 +6,11 @@ import { TabularFeedback } from '../part/TabularFeedback';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
-    Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
-    SectionHeader,
+    Question, QuestionProps, QuestionState,
 } from './Question';
+import {
+  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
 
@@ -122,42 +124,50 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       .map((c, i) => this.renderChoice(c, i));
   }
 
-  renderAdditionalSections() {
+  renderDetails() {
     const { context, services, editMode, itemModel, partModel } = this.props;
 
-    return ([
-      <Section key="choices" className="choices">
-        <SectionHeader title="Choices">
-          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <input
-              className="toggle toggle-light"
-              type="checkbox"
-              checked={itemModel.shuffle} />
-            <label className="toggle-btn"></label>
-          </SectionControl>
-        </SectionHeader>
-        <SectionContent>
-          <Button
-            editMode={editMode}
-            type="link"
-            onClick={this.onAddChoice}>
-            Add Choice
-          </Button>
-          {this.renderChoices()}
-        </SectionContent>
-      </Section>,
-      <Section key="feedback" className="feedback">
-        <SectionHeader title="Feedback"/>
-        <SectionContent>
-          <TabularFeedback
-              context={context}
-              services={services}
+    return (
+      <React.Fragment>
+        <TabSection key="choices" className="choices">
+          <TabSectionHeader title="Choices">
+            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+              <input
+                className="toggle toggle-light"
+                type="checkbox"
+                readOnly
+                checked={itemModel.shuffle} />
+              <label className="toggle-btn"></label>
+            </TabOptionControl>
+          </TabSectionHeader>
+          <TabSectionContent>
+            <Button
               editMode={editMode}
-              model={partModel}
-              onEdit={this.onPartEdit} />
-        </SectionContent>
-      </Section>,
-    ]);
+              type="link"
+              onClick={this.onAddChoice}>
+              Add Choice
+            </Button>
+            {this.renderChoices()}
+          </TabSectionContent>
+        </TabSection>,
+        <TabSection key="feedback" className="feedback">
+          <TabSectionHeader title="Feedback"/>
+          <TabSectionContent>
+            <TabularFeedback
+                context={context}
+                services={services}
+                editMode={editMode}
+                model={partModel}
+                onEdit={this.onPartEdit} />
+          </TabSectionContent>
+        </TabSection>
+      </React.Fragment>
+    );
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 }
 

@@ -1,8 +1,15 @@
 import * as React from 'react';
+import { convertStringToCSS } from 'utils/style';
 
 import './TabContainer.scss';
 
+export type TabElement = {
+  label: string;
+  content: JSX.Element;
+};
+
 export interface TabContainerProps {
+  className?: string;
   labels: string[];
 }
 
@@ -49,8 +56,10 @@ export class TabContainer
   }
 
   render() {
+    const { className } = this.props;
+
     return (
-      <div className="tab-container">
+      <div className={`tab-container ${className || ''}`}>
         <div className="tab-header">
           {this.renderTabs()}
         </div>
@@ -63,3 +72,67 @@ export class TabContainer
 
 }
 
+type TabProps = {
+  className?: string;
+};
+
+export const Tab: React.StatelessComponent<TabProps> = ({
+  className,
+  children,
+}) => (
+  <div className={`tab ${className || ''}`}>
+    {children}
+  </div>
+);
+
+type TabSectionHeaderProps = {
+  className?: string;
+  title: string,
+};
+
+export const TabSectionHeader: React.StatelessComponent<TabSectionHeaderProps> = ({
+  className,
+  title,
+  children,
+}) => (
+  <div className={`tab-section-header ${className || ''}`}>
+    <h3>{title}</h3>
+    <div className="flex-spacer" />
+    <div className="controls">
+      {children}
+    </div>
+  </div>
+);
+
+type TabSectionContentProps = {
+  className?: string;
+};
+
+export const TabSectionContent:
+  React.StatelessComponent<TabSectionContentProps> = ({ children, className }) => (
+  <div className={`tab-section-content ${className || ''}`}>{children}</div>
+);
+
+type TabSectionProps = {
+  className?: string,
+};
+
+export const TabSection: React.StatelessComponent<TabSectionProps> = ({ className, children }) => (
+  <div className={`tab-section ${className || ''}`}>{children}</div>
+);
+
+type TabOptionControlProps = {
+  className?: string;
+  name: string,
+  onClick?: (e, name: string) => void;
+};
+
+export const TabOptionControl: React.StatelessComponent<TabOptionControlProps>
+  = ({ name, onClick, children, className }) => (
+  <div
+    className={`control clickable ${convertStringToCSS(name)} ${className || ''}`}
+    onClick={e => onClick && onClick(e, name)}>
+    <div className="control-label">{name}</div>
+    {children}
+  </div>
+);

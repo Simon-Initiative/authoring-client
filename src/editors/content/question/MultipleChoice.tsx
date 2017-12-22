@@ -8,9 +8,12 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import guid from 'utils/guid';
 import {
-    Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
-    SectionHeader,
+    Question, QuestionProps, QuestionState,
 } from './Question';
+
+import {
+  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
 import {
   InputList, InputListItem, ItemOption, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
@@ -283,31 +286,38 @@ export class MultipleChoice
     );
   }
 
-  renderAdditionalSections() {
+  renderDetails() {
     const { editMode, itemModel } = this.props;
 
-    return ([
-      <Section key="choices" className="choices">
-        <SectionHeader title="Choices">
-          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <input
-              className="toggle toggle-light"
-              type="checkbox"
-              readOnly
-              checked={itemModel.shuffle} />
-            <label className="toggle-btn"></label>
-          </SectionControl>
-        </SectionHeader>
-        <SectionContent>
-          <Button
-            editMode={editMode}
-            type="link"
-            onClick={this.onAddChoice}>
-            Add Choice
-          </Button>
-          {this.renderChoices()}
-        </SectionContent>
-      </Section>,
-    ]);
+    return (
+      <React.Fragment>
+        <TabSection key="choices" className="choices">
+          <TabSectionHeader title="Choices">
+            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+              <input
+                className="toggle toggle-light"
+                type="checkbox"
+                readOnly
+                checked={itemModel.shuffle} />
+              <label className="toggle-btn"></label>
+            </TabOptionControl>
+          </TabSectionHeader>
+          <TabSectionContent>
+            <Button
+              editMode={editMode}
+              type="link"
+              onClick={this.onAddChoice}>
+              Add Choice
+            </Button>
+            {this.renderChoices()}
+          </TabSectionContent>
+        </TabSection>
+      </React.Fragment>
+    );
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 }

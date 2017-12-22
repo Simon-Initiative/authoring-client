@@ -10,7 +10,9 @@ import { ItemLabel } from './ItemLabel';
 import { Button, InlineForm, TextInput } from '../common/controls';
 import guid from 'utils/guid';
 import { ResponseMultEditor } from './ResponseMult';
-import { Section, SectionContent, SectionControl, SectionHeader } from '../question/Question';
+import {
+  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -248,30 +250,31 @@ export class FillInTheBlank
     } = this.props;
 
     return (
-      <Section className="choices">
+      <TabSection className="choices">
 
         <ItemLabel label="Dropdown" editMode={this.props.editMode}
           onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
 
         <br/>
 
-        <SectionHeader title="Choices">
-          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+        <TabSectionHeader title="Choices">
+          <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input
               className="toggle toggle-light"
               type="checkbox"
+              readOnly
               checked={itemModel.shuffle} />
             <label className="toggle-btn"></label>
-          </SectionControl>
-        </SectionHeader>
-        <SectionContent>
+          </TabOptionControl>
+        </TabSectionHeader>
+        <TabSectionContent>
           <div style={ { display: 'inline' } }>
             <Button editMode={editMode}
               type="link" onClick={this.onAddChoice}>Add Choice</Button>
           </div>
           {this.renderChoices()}
-        </SectionContent>
-      </Section>
+        </TabSectionContent>
+      </TabSection>
     );
   }
 }

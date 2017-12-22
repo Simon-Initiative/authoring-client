@@ -6,10 +6,12 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { InsertInputRefCommand } from '../question/commands';
-import { TabContainer } from 'editors/content/common/TabContainer';
 import {
-  Question, QuestionProps, QuestionState, Section, SectionContent, SectionHeader,
+  Question, QuestionProps, QuestionState,
 } from './Question';
+import {
+  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';
@@ -53,6 +55,18 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     if (canInsertAnotherPart()) {
       this.htmlEditor.process(fillInTheBlankCommand);
     }
+  }
+
+  /** Implement parent absract methods */
+  renderDetails() {
+    // we are rendering our own details tabs,
+    // therefore do not render the parent details tab
+    return false;
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 
   /**
@@ -102,8 +116,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <Section className="question" key="question">
-        <SectionHeader title="Question">
+      <TabSection className="question" key="question">
+        <TabSectionHeader title="Question">
           <div className="control insert-item">
               Insert:&nbsp;&nbsp;
               <button className="btn btn-sm btn-link" type="button"
@@ -123,8 +137,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               </button>
 
           </div>
-        </SectionHeader>
-        <SectionContent>
+        </TabSectionHeader>
+        <TabSectionContent>
           <HtmlContentEditor
             ref={c => this.htmlEditor = c}
             editMode={editMode}
@@ -136,8 +150,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             blockToolbar={<BlockToolbar/>}
             model={body}
             onEdit={onBodyEdit} />
-          </SectionContent>
-      </Section>
+          </TabSectionContent>
+      </TabSection>
     );
   }
 
