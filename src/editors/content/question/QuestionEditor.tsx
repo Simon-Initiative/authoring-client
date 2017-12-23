@@ -7,7 +7,7 @@ import { MultipleChoice } from './MultipleChoice';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
-import { Ordering } from './Ordering';
+import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
 import { EntityTypes } from '../../../data/content/html/common';
 import { Skill } from 'types/course';

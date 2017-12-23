@@ -55,7 +55,7 @@ export { Supplement } from './content/org/supplement';
 export { Supplements } from './content/org/supplements';
 export { Unit } from './content/org/unit';
 export { Unordered } from './content/org/unordered';
-export { AudienceTypes, DependencyTypes, GrainSizes, 
+export { AudienceTypes, DependencyTypes, GrainSizes,
   ConditionTypes, PurposeTypes, ScoringModes, CategoryTypes } from './content/org/types';
 
 export { ContentTypes as OrganizationContentTypes } from './content/org/types';
@@ -73,12 +73,16 @@ import { MultipleChoice } from './content/assessment/multiple_choice';
 import { Numeric } from './content/assessment/numeric';
 import { Unsupported } from './content/unsupported';
 
-export type QuestionItem = 
+export type QuestionItem =
   Essay |
-  MultipleChoice | 
-  FillInTheBlank | 
-  Ordering | 
-  Numeric | 
-  ShortAnswer | 
-  Text | 
+  MultipleChoice |
+  FillInTheBlank |
+  Ordering |
+  Numeric |
+  ShortAnswer |
+  Text |
   Unsupported;
+
+export type ChoiceQuestionItem =
+  MultipleChoice |
+  Ordering;

@@ -165,16 +165,16 @@ export class FillInTheBlank
       editMode,
     } = this.props;
 
-    return (
-      <Choice
-        key={choice.guid}
-        context={context}
-        services={services}
-        editMode={editMode}
-        model={choice}
-        onEdit={this.onChoiceEdit}
-        onRemove={() => this.onRemoveChoice(choice, response)} />
-    );
+    // return (
+    //   <Choice
+    //     key={choice.guid}
+    //     context={context}
+    //     services={services}
+    //     editMode={editMode}
+    //     model={choice}
+    //     onEdit={this.onChoiceEdit}
+    //     onRemove={() => this.onRemoveChoice(choice, response)} />
+    // );
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {

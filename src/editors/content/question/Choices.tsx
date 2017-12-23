@@ -6,7 +6,7 @@ import { AppContext } from 'editors/common/AppContext';
 import { Button } from '../common/controls';
 import { convert } from 'utils/format';
 import { InputList, InputListItem } from 'editors/content/common/InputList.tsx';
-import { updateChoiceValuesAndRefs } from './MultipleChoice';
+import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import {
     getGeneratedResponseBody, getGeneratedResponseScore,
     modelWithDefaultFeedback,
@@ -75,7 +75,7 @@ export class Choices
     );
   }
 
-  onRemoveChoice(choice: contentTypes.Choice) {
+  onRemoveChoice(choiceId: string) {
     const {
       itemModel, partModel, onGetChoiceCombinations, onEdit,
     } = this.props;
@@ -83,11 +83,11 @@ export class Choices
     let updatedItemModel = itemModel;
     let updatedPartModel = partModel;
     updatedItemModel = itemModel.with({
-      choices: itemModel.choices.delete(choice.guid),
+      choices: itemModel.choices.delete(choiceId),
     });
 
     // update models with new choices and references
-    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
     updatedItemModel = updatedModels.itemModel;
     updatedPartModel = updatedModels.partModel;
 
@@ -131,7 +131,7 @@ export class Choices
     });
 
     // update models with new choices and references
-    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel, onEdit);
+    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
     updatedItemModel = updatedModels.itemModel;
     updatedPartModel = updatedModels.partModel;
 
@@ -148,26 +148,26 @@ export class Choices
       this.props.partModel);
   }
 
-  renderChoice(choice: contentTypes.Choice, index: number) {
+  renderChoices() {
     const { context, services, editMode, itemModel } = this.props;
 
-    return (
-      <InputListItem
-        key={choice.guid}
-        className="choice"
-        id={choice.guid}
-        label={convert.toAlphaNotation(index)}
-        context={context}
-        services={services}
-        editMode={editMode}
-        index={index}
-        isDraggable={!itemModel.shuffle}
-        onDragDrop={this.onReorderChoices}
-        dragType={DragTypes.Choice}
-        body={choice.body}
-        onEdit={body => this.onChoiceEdit(choice.with({ body }))}
-        onRemove={() => this.onRemoveChoice(choice)} />
-    );
+    return itemModel.choices
+      .toArray()
+      .map((choice, index) => {
+        return (
+          <Choice
+            key={choice.guid}
+            index={index}
+            choice={choice}
+            allowReorder={!itemModel.shuffle}
+            context={context}
+            services={services}
+            editMode={editMode}
+            onReorderChoice={this.onReorderChoices}
+            onEditChoice={this.onChoiceEdit}
+            onRemove={choiceId => this.onRemoveChoice(choiceId)} />
+        );
+      });
   }
 
   render() : JSX.Element {
@@ -181,13 +181,9 @@ export class Choices
         onClick={this.onAddChoice}>
         Add Choice
       </Button>
-      <InputList>
-      {
-        itemModel.choices
-          .toArray()
-          .map((c, i) => this.renderChoice(c, i))
-      }
-      </InputList>
+      <ChoiceList>
+        {this.renderChoices()}
+      </ChoiceList>
       </div>
     );
   }
