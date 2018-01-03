@@ -9,14 +9,13 @@ import { InsertInputRefCommand } from '../question/commands';
 import {
   Question, QuestionProps, QuestionState,
 } from './Question';
-import {
-  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
-} from 'editors/content/common/TabContainer';
+import { TabContainer } from 'editors/content/common/TabContainer';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';
 
 import './MultipartInput.scss';
+import { Button } from 'editors/content/common/Button';
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
@@ -36,7 +35,11 @@ export interface MultipartInputState extends QuestionState {
 export class MultipartInput extends Question<MultipartInputProps, MultipartInputState> {
   constructor(props: MultipartInputProps) {
     super(props);
-    this.setClassname('multipart-input');
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'multipart-input';
   }
 
   onInsertNumeric(numericCommand, canInsertAnotherPart) {
@@ -150,7 +153,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, hideGradingCriteria } = this.props;
+    const { model, hideGradingCriteria, editMode, onRemove } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
@@ -222,6 +225,15 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             'Other',
+          ]}
+          controls={[
+            <Button
+                type="link"
+                className="btn-remove"
+                editMode={editMode}
+                onClick={() => onRemove(item, parts[index])}>
+              <i className="fa fa-trash" /> Remove
+            </Button>,
           ]}>
 
           {getTabFromContentType(item, parts[index], this.props)}

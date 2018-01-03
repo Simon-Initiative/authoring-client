@@ -11,6 +11,7 @@ export type TabElement = {
 export interface TabContainerProps {
   className?: string;
   labels: string[];
+  controls?: JSX.Element[];
 }
 
 export interface TabContainerState {
@@ -35,7 +36,6 @@ export class TabContainer
   }
 
   renderTabs() {
-
     const tabs = this.props.labels
       .map((title, index) => {
         const active = index === this.state.currentTabIndex ? 'active' : '';
@@ -51,6 +51,16 @@ export class TabContainer
     );
   }
 
+  renderTabControls() {
+    const { controls } = this.props;
+
+    return controls && controls.map((control, i) => (
+      <div key={`control-${i}`} className="tab-control">
+        {control}
+      </div>
+    ));
+  }
+
   renderCurrentTab() {
     return React.Children.toArray(this.props.children)[this.state.currentTabIndex];
   }
@@ -62,6 +72,8 @@ export class TabContainer
       <div className={`tab-container ${className || ''}`}>
         <div className="tab-header">
           {this.renderTabs()}
+          <div className="flex-spacer" />
+          {this.renderTabControls()}
         </div>
         <div className="tab-content">
           {this.renderCurrentTab()}
@@ -124,15 +136,18 @@ export const TabSection: React.StatelessComponent<TabSectionProps> = ({ classNam
 type TabOptionControlProps = {
   className?: string;
   name: string,
+  hideLabel?: boolean,
   onClick?: (e, name: string) => void;
 };
 
 export const TabOptionControl: React.StatelessComponent<TabOptionControlProps>
-  = ({ name, onClick, children, className }) => (
+  = ({ name, hideLabel, onClick, children, className }) => (
   <div
     className={`control clickable ${convertStringToCSS(name)} ${className || ''}`}
     onClick={e => onClick && onClick(e, name)}>
-    <div className="control-label">{name}</div>
+    {!hideLabel &&
+      <div className="control-label">{name}</div>
+    }
     {children}
   </div>
 );

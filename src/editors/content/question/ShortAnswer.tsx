@@ -5,7 +5,7 @@ import {
   Question, QuestionProps, QuestionState,
 } from './Question';
 import {
-  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+  TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
@@ -25,10 +25,13 @@ export class ShortAnswer
   constructor(props) {
     super(props);
 
-    this.setClassname('short-answer');
-
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'short-answer';
   }
 
   onWhitespaceChange(whitespace) {

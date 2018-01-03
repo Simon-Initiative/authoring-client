@@ -1,18 +1,16 @@
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Choice } from '../common/Choice';
-import { FeedbackEditor } from '../part/FeedbackEditor';
-import { ItemLabel } from './ItemLabel';
-import { Button, InlineForm, TextInput } from '../common/controls';
+import { Button } from '../common/controls';
 import guid from 'utils/guid';
-import { ResponseMultEditor } from './ResponseMult';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
+import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -22,14 +20,6 @@ export interface FillInTheBlankProps
 export interface FillInTheBlankState extends AbstractItemPartEditorState {
 
 }
-
-const ChoiceFeedback = (props) => {
-  return (
-    <div className="choice-feedback clearfix">
-      {props.children}
-    </div>
-  );
-};
 
 /**
  * FillInTheBlank Question Editor
@@ -48,6 +38,7 @@ export class FillInTheBlank
     this.onEditMult = this.onEditMult.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
+    this.onReorderChoices = this.onReorderChoices.bind(this);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
@@ -62,28 +53,6 @@ export class FillInTheBlank
       { responses: partModel.responses.set(updated.guid, updated) },
     );
     onEdit(itemModel, part);
-  }
-
-  renderFeedback(
-    choice: contentTypes.Choice,
-    response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    const {
-      context,
-      services,
-      editMode,
-    } = this.props;
-
-    return (
-      <FeedbackEditor
-        key={feedback.guid}
-        context={context}
-        services={services}
-        editMode={editMode}
-        model={feedback}
-        showLabel={true}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)}
-        onEdit={this.onFeedbackEdit.bind(this, response)} />
-    );
   }
 
   onAddChoice() {
@@ -108,7 +77,7 @@ export class FillInTheBlank
     onEdit(newItemModel, newPartModel);
   }
 
-  onRemoveChoice(choice, response) {
+  onRemoveChoice(choiceId: string, response: contentTypes.Response) {
     const {
       itemModel,
       partModel,
@@ -116,14 +85,14 @@ export class FillInTheBlank
     } = this.props;
 
     const newItemModel = itemModel.with(
-      { choices: itemModel.choices.delete(choice.guid) });
+      { choices: itemModel.choices.delete(choiceId) });
     const newPartModel = partModel.with(
       { responses: partModel.responses.delete(response.guid) });
 
     onEdit(newItemModel, newPartModel);
   }
 
-  onChoiceEdit(c) {
+  onChoiceEdit(choice: contentTypes.Choice) {
     const {
       itemModel,
       partModel,
@@ -132,8 +101,42 @@ export class FillInTheBlank
 
     onEdit(
       itemModel.with(
-      { choices: itemModel.choices.set(c.guid, c) }),
+      { choices: itemModel.choices.set(choice.guid, choice) }),
       partModel);
+  }
+
+  onReorderChoices(originalIndex: number, newIndex: number) {
+    const { onEdit, itemModel, partModel } = this.props;
+
+    // indexOffset makes up for the missing item in the list when splicing,
+    // this is only an issue if the new item position is less than the current one
+    const indexOffset = originalIndex > newIndex ? 1 : 0;
+
+    // convert OrderedMap to shallow javascript array
+    const choices = itemModel.choices.toArray();
+
+    // remove selected choice from array and insert it into new position
+    const choice = choices.splice(originalIndex, 1)[0];
+    choices.splice((newIndex - 1) + indexOffset, 0, choice);
+
+    // update item model
+    const updatedItemModel = itemModel.with({
+      // set choices to a new OrderedMap with updated choice ordering
+      choices: choices.reduce(
+        (acc, c) => {
+          return acc.set(c.guid, c);
+        },
+        OrderedMap<string, contentTypes.Choice>(),
+      ),
+    });
+
+    // update models with new choices and references
+    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+
+    onEdit(
+      newModels.itemModel,
+      newModels.partModel,
+    );
   }
 
   onToggleShuffle() {
@@ -146,7 +149,7 @@ export class FillInTheBlank
     onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
-  onEditMult(mult) {
+  onEditMult(mult: contentTypes.ResponseMult) {
     const {
       itemModel,
       partModel,
@@ -156,25 +159,6 @@ export class FillInTheBlank
     const responseMult = partModel.responseMult.set(mult.guid, mult);
     const newPartModel = partModel.with({ responseMult });
     onEdit(itemModel, newPartModel);
-  }
-
-  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response) {
-    const {
-      context,
-      services,
-      editMode,
-    } = this.props;
-
-    // return (
-    //   <Choice
-    //     key={choice.guid}
-    //     context={context}
-    //     services={services}
-    //     editMode={editMode}
-    //     model={choice}
-    //     onEdit={this.onChoiceEdit}
-    //     onRemove={() => this.onRemoveChoice(choice, response)} />
-    // );
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
@@ -191,56 +175,32 @@ export class FillInTheBlank
   }
 
   renderChoices() {
-    const {
-      editMode,
-      services,
-      context,
-      itemModel,
-      partModel,
-    } = this.props;
+    const { context, services, editMode, partModel, itemModel } = this.props;
 
     const responses = partModel.responses.toArray();
-    const mult = partModel.responseMult.toArray();
     const choices = itemModel.choices.toArray();
 
-    const rendered = [];
-
-    for (let i = 0; i < choices.length; i += 1) {
-      const c = choices[i];
-
-      let renderedFeedback = null;
-
-      if (responses.length > i) {
-        if (responses[i].feedback.size > 0) {
-          const f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(c, responses[i], f);
-        }
-      } else if (mult.length > 0) {
-        renderedFeedback = mult.map(m => <ResponseMultEditor
-            editMode={editMode}
-            services={services}
-            context={context}
-            model={m}
-            onEdit={this.onEditMult}
-          />);
-      }
-
-      if (responses.length > i) {
-        rendered.push(
-          <ChoiceFeedback key={c.guid}>
-            {this.renderChoice(c, responses[i])}
-            {renderedFeedback}
-            <InlineForm position="right">
-              <TextInput editMode={editMode}
-                label="Score" value={responses[i].score} type="number" width="75px"
-                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-            </InlineForm>
-          </ChoiceFeedback>,
-        );
-      }
-    }
-
-    return rendered;
+    return choices.map((choice, i) => {
+      const response = responses[i];
+      return (
+        <Choice
+          key={choice.guid}
+          index={i}
+          choice={choice}
+          allowFeedback
+          allowScore
+          response={response}
+          allowReorder={!itemModel.shuffle}
+          context={context}
+          services={services}
+          editMode={editMode}
+          onReorderChoice={this.onReorderChoices}
+          onEditChoice={this.onChoiceEdit}
+          onEditFeedback={this.onFeedbackEdit}
+          onEditScore={this.onScoreEdit}
+          onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+      );
+    });
   }
 
   render() {
@@ -251,12 +211,6 @@ export class FillInTheBlank
 
     return (
       <TabSection className="choices">
-
-        <ItemLabel label="Dropdown" editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
-
-        <br/>
-
         <TabSectionHeader title="Choices">
           <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <input
@@ -272,7 +226,9 @@ export class FillInTheBlank
             <Button editMode={editMode}
               type="link" onClick={this.onAddChoice}>Add Choice</Button>
           </div>
-          {this.renderChoices()}
+          <ChoiceList>
+            {this.renderChoices()}
+          </ChoiceList>
         </TabSectionContent>
       </TabSection>
     );

@@ -3,16 +3,11 @@ import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { Html } from 'data/content/html.ts';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { DragTypes } from 'utils/drag';
-import { DragSource, DropTarget } from 'react-dnd';
-import { Remove } from 'components/common/Remove';
-import { DragHandle } from 'components/common/DragHandle.tsx';
 import { convert } from 'utils/format';
 import {
   InputList, InputListItem, ItemOption, ItemOptions, ItemOptionFlex,

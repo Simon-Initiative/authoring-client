@@ -2,14 +2,13 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from '../common/Choice';
-import { TabularFeedback } from '../part/TabularFeedback';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
     Question, QuestionProps, QuestionState,
 } from './Question';
 import {
-  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceFeedback } from '../part/ChoiceFeedback';
@@ -31,14 +30,17 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   constructor(props) {
     super(props);
 
-    this.setClassname('ordering');
-
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
     this.onReorderChoices = this.onReorderChoices.bind(this);
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'ordering';
   }
 
   onToggleShuffle() {
@@ -63,10 +65,10 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
-  onChoiceEdit(c) {
+  onChoiceEdit(choice: contentTypes.Choice) {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
+      { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
       this.props.partModel);
   }
 
@@ -96,7 +98,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   // }
 
   onRemoveChoice(choice: contentTypes.Choice) {
-    const { itemModel, partModel } = this.props;
+    const { partModel } = this.props;
 
     const updatedItemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.delete(choice.guid) });
@@ -109,7 +111,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.props.onEdit(newModels.itemModel, newModels.partModel);
   }
 
-  onReorderChoices(originalIndex, newIndex) {
+  onReorderChoices(originalIndex: number, newIndex: number) {
     const { onEdit, itemModel, partModel } = this.props;
 
     // convert OrderedMap to shallow javascript array
@@ -167,7 +169,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
   renderDetails() {
     const {
-      context, services, editMode, itemModel, partModel, onGetChoiceCombinations,
+      editMode, itemModel, partModel, onGetChoiceCombinations,
     } = this.props;
 
     return (

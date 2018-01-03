@@ -2,21 +2,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { Button } from '../common/controls';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
 import guid from 'utils/guid';
 import {
     Question, QuestionProps, QuestionState,
 } from './Question';
 
 import {
-  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { ItemOption, ItemOptions } from 'editors/content/common/InputList.tsx';
-import { convert } from 'utils/format';
-import { DragTypes } from 'utils/drag';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 
 import './MultipleChoice.scss';
@@ -31,13 +24,6 @@ export interface MultipleChoiceState
 
 }
 
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
-
 /**
  * The content editor for HtmlContent.
  */
@@ -47,8 +33,6 @@ export class MultipleChoice
   constructor(props) {
     super(props);
 
-    this.setClassname('multiple-choice');
-
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
@@ -56,6 +40,11 @@ export class MultipleChoice
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
     this.onReorderChoices = this.onReorderChoices.bind(this);
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'multiple-choice';
   }
 
   onToggleShuffle() {
@@ -86,12 +75,12 @@ export class MultipleChoice
     onEdit(updatedItemModel, updatedPartModel);
   }
 
-  onChoiceEdit(c) {
+  onChoiceEdit(choice: contentTypes.Choice) {
     const { partModel, itemModel, onEdit } = this.props;
 
     onEdit(
       itemModel.with({
-        choices: itemModel.choices.set(c.guid, c),
+        choices: itemModel.choices.set(choice.guid, choice),
       }),
       partModel);
   }
@@ -116,7 +105,7 @@ export class MultipleChoice
     onEdit(itemModel, updatedPartModel);
   }
 
-  onRemoveChoice(choiceId, response) {
+  onRemoveChoice(choiceId: string, response: contentTypes.Response) {
     const { partModel, itemModel, onEdit } = this.props;
 
     const updatedItemModel = itemModel.with(
@@ -131,7 +120,7 @@ export class MultipleChoice
     onEdit(updatedItemModel, updatePartModel);
   }
 
-  onReorderChoices(originalIndex, newIndex) {
+  onReorderChoices(originalIndex: number, newIndex: number) {
     const { onEdit, itemModel, partModel } = this.props;
 
     // indexOffset makes up for the missing item in the list when splicing,

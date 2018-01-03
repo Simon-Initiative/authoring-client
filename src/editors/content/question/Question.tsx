@@ -89,10 +89,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
   abstract renderDetails(): JSX.Element | boolean;
   abstract renderAdditionalTabs(): TabElement[] | boolean;
-
-  setClassname(className) {
-    this.className = className;
-  }
+  abstract getClassName(): string;
 
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
@@ -290,12 +287,15 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <Tab className="hints-tab">
         <TabSection className="hints">
-          <Hints
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            model={part}
-            onEdit={hints => this.onHintsEdit(hints, item, part)} />
+          <TabSectionHeader title="Hints"/>
+          <TabSectionContent>
+            <Hints
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              model={part}
+              onEdit={hints => this.onHintsEdit(hints, item, part)} />
+          </TabSectionContent>
         </TabSection>
       </Tab>
     );
@@ -307,17 +307,15 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <Tab className="other-tab">
         <TabSection className="other">
-          <div className="section-header">
-            <h3>Explanation</h3>
-          </div>
-          <div className="section-content">
+          <TabSectionHeader title="Explanation"/>
+          <TabSectionContent>
             <ExplanationEditor
               context={context}
               services={services}
               editMode={editMode}
               model={part.explanation}
               onEdit={explanation => this.onExplanationEdit(explanation, item, part)} />
-          </div>
+          </TabSectionContent>
         </TabSection>
       </Tab>
     );
@@ -366,7 +364,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     return (
       <div
-        className={`question ${this.className || ''}`}
+        className={`question ${this.getClassName() || ''}`}
         onFocus={() => onFocus(model.id)}
         onBlur={() => onBlur(model.id)}>
 

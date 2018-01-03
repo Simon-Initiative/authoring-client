@@ -4,10 +4,11 @@ import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { TabularFeedback } from '../part/TabularFeedback';
-import { ItemLabel } from './ItemLabel';
 import { Checkbox, Select } from '../common/controls';
-import { ResponseMultEditor } from './ResponseMult';
+import {
+  TabSection, TabSectionContent, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
+import { Feedback } from '../part/Feedback';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 
@@ -30,7 +31,6 @@ export class Text
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
-    this.onEditMult = this.onEditMult.bind(this);
   }
 
   onPartEdit(partModel: contentTypes.Part) {
@@ -72,92 +72,48 @@ export class Text
     onEdit(itemModel.with({ inputSize }), partModel);
   }
 
-  onEditMult(mult) {
+  render() {
     const {
-      partModel,
-      itemModel,
-      onEdit,
-    } = this.props;
-
-    const responseMult = partModel.responseMult.set(mult.guid, mult);
-    const newPartModel = partModel.with({ responseMult });
-    onEdit(itemModel, newPartModel);
-  }
-
-  render() : JSX.Element {
-    const {
-      context,
-      services,
-      partModel,
-      itemModel,
       editMode,
-      onFocus,
-      onBlur,
-      onRemove,
+      itemModel,
+      partModel,
     } = this.props;
-
-    let feedback;
-
-    if (partModel.responseMult.size > 0) {
-
-      feedback = partModel.responseMult
-        .toArray().map(m => <ResponseMultEditor
-          editMode={editMode}
-          services={services}
-          context={context}
-          model={m}
-          onEdit={this.onEditMult}
-        />);
-    } else {
-
-      feedback = <TabularFeedback
-            input={itemModel.id}
-            editMode={editMode}
-            services={services}
-            context={context}
-            model={partModel}
-            onEdit={this.onPartEdit}
-          />;
-    }
-
-    const controls = (
-      <div style={{ display: 'inline' }}>
-        <Select
-          editMode={editMode}
-          label="Whitespace"
-          value={itemModel.whitespace}
-          onChange={this.onWhitespaceChange}>
-          <option value="preserve">Preserve</option>
-          <option value="trim">Trim</option>
-          <option value="normalize">Normalize</option>
-        </Select>
-        <Select editMode={editMode}
-          label="Size" value={itemModel.inputSize} onChange={this.onSizeChange}>
-          <option value="small">small</option>
-          <option value="medium">medium</option>
-          <option value="large">large</option>
-        </Select>
-
-        <Checkbox editMode={editMode}
-          label="Case Sensitive"
-          value={itemModel.caseSensitive}
-          onEdit={this.onCaseSensitive} />
-      </div>);
 
     return (
-      <div className="itemPart"
-        onFocus={() => onFocus(itemModel.id)}
-        onBlur={() => onBlur(itemModel.id)}>
-        <ItemLabel
-          label="Text"
-          editMode={editMode}
-          onClick={() => onRemove(itemModel, partModel)} />
+      <TabSection className="numeric">
+        <TabSectionHeader title="Details"/>
+        <TabSectionContent>
+          <Select
+            editMode={editMode}
+            label="Whitespace"
+            value={itemModel.whitespace}
+            onChange={this.onWhitespaceChange}>
+            <option value="preserve">Preserve</option>
+            <option value="trim">Trim</option>
+            <option value="normalize">Normalize</option>
+          </Select>
+          <Select editMode={editMode}
+            label="Size" value={itemModel.inputSize} onChange={this.onSizeChange}>
+            <option value="small">small</option>
+            <option value="medium">medium</option>
+            <option value="large">large</option>
+          </Select>
 
-        {controls}
-
-        {feedback}
-
-      </div>
+          <Checkbox editMode={editMode}
+            label="Case Sensitive"
+            value={itemModel.caseSensitive}
+            onEdit={this.onCaseSensitive} />
+        </TabSectionContent>
+        <TabSection key="feedback" className="feedback">
+          <TabSectionHeader title="Feedback"/>
+          <TabSectionContent>
+            <Feedback
+              {...this.props}
+              model={partModel}
+              onEdit={this.onPartEdit} />
+          </TabSectionContent>
+        </TabSection>
+      </TabSection>
     );
   }
 

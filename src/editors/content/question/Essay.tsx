@@ -17,8 +17,11 @@ export class Essay
 
   constructor(props) {
     super(props);
+  }
 
-    this.setClassname('essay');
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'essay';
   }
 
   renderDetails() {
