@@ -9,13 +9,14 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
-import { TabContainer } from 'editors/content/common/TabContainer';
+import {
+  TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
+} from 'editors/content/common/TabContainer';
 import { Hints } from '../part/Hints';
 import { ExplanationEditor } from '../part/ExplanationEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
-import { convertStringToCSS } from 'utils//style';
 
 import './Question.scss';
 
@@ -34,11 +35,6 @@ export interface QuestionProps<ModelType>
 export interface QuestionState {
 
 }
-
-export type Tab = {
-  label: string,
-  content: JSX.Element,
-};
 
 const getLabelForQuestion = (question: contentTypes.Question): string => {
   if (question.items.size === 0) {
@@ -70,59 +66,13 @@ const getLabelForQuestion = (question: contentTypes.Question): string => {
   }
 };
 
-type SectionHeaderProps = {
-  title: string,
-};
-
-export const SectionHeader: React.StatelessComponent<SectionHeaderProps> = ({
-  title,
-  children,
-}) => (
-  <div className={`section-header`}>
-    <h3>{title}</h3>
-    <div className="flex-spacer" />
-    <div className="controls">
-      {children}
-    </div>
-  </div>
-);
-
-type SectionContentProps = {};
-
-export const SectionContent: React.StatelessComponent<SectionContentProps> = ({ children }) => (
-  <div className={`section-content`}>{children}</div>
-);
-
-type SectionProps = {
-  className?: string,
-};
-
-export const Section: React.StatelessComponent<SectionProps> = ({ className, children }) => (
-  <div className={`section ${className}`}>{children}</div>
-);
-
-type OptionControlProps = {
-  name: string,
-  onClick?: (e, name: string) => void;
-};
-
-export const OptionControl: React.StatelessComponent<OptionControlProps>
-  = ({ name, onClick, children }) => (
-  <div
-    className={`control clickable ${convertStringToCSS(name)}`}
-    onClick={e => onClick && onClick(e, name)}>
-    <div className="control-label">{name}</div>
-    {children}
-  </div>
-);
-
-export const SectionControl = OptionControl;
+export const OptionControl = TabOptionControl;
 
 /**
  * The content editor for HtmlContent.
  */
-export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S extends QuestionState>
-  extends React.Component<P, S> {
+export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
+  S extends QuestionState> extends React.Component<P, S> {
   htmlEditor: CommandProcessor<EditorState>;
   className: string;
 
@@ -136,6 +86,9 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     this.onHintsEdit = this.onHintsEdit.bind(this);
     this.onExplanationEdit = this.onExplanationEdit.bind(this);
   }
+
+  abstract renderDetails(): JSX.Element | boolean;
+  abstract renderAdditionalTabs(): TabElement[] | boolean;
 
   setClassname(className) {
     this.className = className;
@@ -250,16 +203,14 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     } = this.props;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '50px',
       borderStyle: 'none',
       borderWith: '1px',
       borderColor: '#AAAAAA',
     };
 
     return (
-      <Section className="question" key="question">
-        <SectionHeader title="Question"/>
-        <SectionContent>
+      <div className="question" key="question">
           <HtmlContentEditor
             ref={c => this.htmlEditor = c}
             editMode={editMode}
@@ -271,41 +222,33 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
             blockToolbar={<BlockToolbar/>}
             model={body}
             onEdit={onBodyEdit} />
-        </SectionContent>
-      </Section>
+      </div>
     );
   }
 
-  renderAdditionalSections() {
-    return [];
-  }
-
-  renderSections() {
+  renderDetailsTab() {
     return (
-      <div className="sections">
-        {[
-          this.renderQuestionSection(),
-          ...this.renderAdditionalSections(),
-        ]}
-      </div>
+      <Tab className="details-tab">
+        {this.renderDetails()}
+      </Tab>
     );
   }
 
   renderSkillsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
     return (
-      <div className="skills-tab tab-content">
-        <Section className="skills">
-          <SectionHeader title="Attached Skills"/>
-          <SectionContent>
+      <Tab className="skills-tab">
+        <TabSection className="skills">
+          <TabSectionHeader title="Attached Skills"/>
+          <TabSectionContent>
             <ConceptsEditor
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
               model={part.concepts}
               onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
-          </SectionContent>
-        </Section>
-      </div>
+          </TabSectionContent>
+        </TabSection>
+      </Tab>
     );
   }
 
@@ -318,8 +261,8 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     } = this.props;
 
     return (
-      <div className="grading-tab tab-content">
-        <Section className="grading">
+      <Tab className="grading-tab">
+        <TabSection className="grading">
           <Button
             editMode={editMode}
             type="link"
@@ -338,23 +281,23 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
                 editMode={editMode} />
             ))
           }
-        </Section>
-      </div>
+        </TabSection>
+      </Tab>
     );
   }
 
   renderHintsTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
     return (
-      <div className="hints-tab tab-content">
-        <Section className="hints">
+      <Tab className="hints-tab">
+        <TabSection className="hints">
           <Hints
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
             model={part}
             onEdit={hints => this.onHintsEdit(hints, item, part)} />
-        </Section>
-      </div>
+        </TabSection>
+      </Tab>
     );
   }
 
@@ -362,8 +305,8 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
     const { context, services, editMode } = this.props;
 
     return (
-      <div className="other-tab tab-content">
-        <Section className="other">
+      <Tab className="other-tab">
+        <TabSection className="other">
           <div className="section-header">
             <h3>Explanation</h3>
           </div>
@@ -375,29 +318,39 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
               model={part.explanation}
               onEdit={explanation => this.onExplanationEdit(explanation, item, part)} />
           </div>
-        </Section>
-      </div>
+        </TabSection>
+      </Tab>
     );
   }
+
 
   renderItemParts(): JSX.Element[] {
     const { model, hideGradingCriteria } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
+    const showAdditionalTabs = this.renderAdditionalTabs() !== true
+      && this.renderAdditionalTabs() !== false;
+
     return items.map((item, index) => (
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
-            'Skills',
-            'Hints',
+            ...(this.renderDetails() ? ['Details'] : []),
+            ...(this.renderSkillsTab(item, parts[index]) ? ['Skills'] : []),
+            ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
-            'Other',
+            ...(showAdditionalTabs
+                && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
+            ...(this.renderOtherTab(item, parts[index]) ? ['Other'] : []),
           ]}>
 
+          {this.renderDetailsTab()}
           {this.renderSkillsTab(item, parts[index])}
           {this.renderHintsTab(item, parts[index])}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
+          {showAdditionalTabs && (this.renderAdditionalTabs() as TabElement[])
+            .map(tab => tab.content)}
           {this.renderOtherTab(item, parts[index])}
         </TabContainer>
       </div>
@@ -413,13 +366,13 @@ export class Question<P extends QuestionProps<contentTypes.QuestionItem>, S exte
 
     return (
       <div
-        className={`question ${this.className}`}
+        className={`question ${this.className || ''}`}
         onFocus={() => onFocus(model.id)}
         onBlur={() => onBlur(model.id)}>
 
         {this.renderQuestionTitle()}
         {this.renderOptions()}
-        {this.renderSections()}
+        {this.renderQuestionSection()}
         {this.renderItemParts()}
       </div>
     );

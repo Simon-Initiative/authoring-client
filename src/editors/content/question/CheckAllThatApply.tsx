@@ -2,9 +2,11 @@ import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { AUTOGEN_MAX_CHOICES, ChoiceFeedback } from '../part/ChoiceFeedback';
 import {
-    OptionControl, Question, QuestionProps, QuestionState, Section, SectionContent, SectionControl,
-    SectionHeader,
+    OptionControl, Question, QuestionProps, QuestionState,
 } from './Question';
+import {
+  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
 import { Choices } from './Choices';
 import { CombinationsMap } from 'types/combinations';
 
@@ -77,47 +79,54 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     ];
   }
 
-  renderAdditionalSections() {
+  renderDetails() {
     const {
       context, services, editMode, itemModel,
       partModel, onGetChoiceCombinations, onEdit,
     } = this.props;
 
-    return ([
-      <Section key="choices" className="choices">
-        <SectionHeader title="Choices">
-          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <input
-              className="toggle toggle-light"
-              type="checkbox"
-              readOnly
-              checked={itemModel.shuffle} />
-            <label className="toggle-btn"></label>
-          </SectionControl>
-        </SectionHeader>
-        <SectionContent>
-          <Choices
-            onEdit={onEdit}
-            context={context}
-            services={services}
-            editMode={editMode}
-            partModel={partModel}
-            itemModel={itemModel}
-            onGetChoiceCombinations={onGetChoiceCombinations} />
-        </SectionContent>
-      </Section>,
-      <Section key="feedback" className="feedback">
-        <SectionHeader title="Feedback"/>
-        <SectionContent>
-          <ChoiceFeedback
-            {...this.props}
-            model={partModel}
-            choices={itemModel.choices.toArray()}
-            onGetChoiceCombinations={onGetChoiceCombinations}
-            onEdit={this.onPartEdit} />
-        </SectionContent>
-      </Section>,
-    ]);
+    return (
+      <React.Fragment>
+        <TabSection key="choices" className="choices">
+          <TabSectionHeader title="Choices">
+            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+              <input
+                className="toggle toggle-light"
+                type="checkbox"
+                readOnly
+                checked={itemModel.shuffle} />
+              <label className="toggle-btn"></label>
+            </TabOptionControl>
+          </TabSectionHeader>
+          <TabSectionContent>
+            <Choices
+              onEdit={onEdit}
+              context={context}
+              services={services}
+              editMode={editMode}
+              partModel={partModel}
+              itemModel={itemModel}
+              onGetChoiceCombinations={onGetChoiceCombinations} />
+          </TabSectionContent>
+        </TabSection>
+        <TabSection key="feedback" className="feedback">
+          <TabSectionHeader title="Feedback"/>
+          <TabSectionContent>
+            <ChoiceFeedback
+              {...this.props}
+              model={partModel}
+              choices={itemModel.choices.toArray()}
+              onGetChoiceCombinations={onGetChoiceCombinations}
+              onEdit={this.onPartEdit} />
+          </TabSectionContent>
+        </TabSection>
+      </React.Fragment>
+    );
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 
 }

@@ -2,6 +2,8 @@
 @import 'oli/mixins';
 
 .question {
+  margin: 15px 0;
+
   .options {
     display: flex;
     flex-direction: row;
@@ -38,45 +40,7 @@
     }
   }
 
-  .section {
-    border-bottom: 1px solid $gray-lighter;
-    padding: 15px 0;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .section-header {
-      display: flex;
-      flex-direction: row;
-      margin: 10px 0;
-
-      h3 {
-        font-size: 1rem;
-        font-weight: 600;
-      }
-
-      .controls {
-        font-size: 0.8rem;
-        @include disable-select;
-
-        & > * {
-          display: flex;
-          flex-direction: row;
-        }
-
-        .control {
-          cursor: pointer;
-
-          .control-label {
-            margin: 0 10px;
-          }
-        }
-      }
-    }
-
-    .section-content {
-      @include enable-select;
-    }
+  .details-tab {
+    border-bottom: none;
   }
 }

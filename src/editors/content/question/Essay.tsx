@@ -20,4 +20,14 @@ export class Essay
 
     this.setClassname('essay');
   }
+
+  renderDetails() {
+    // no details
+    return false;
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
+  }
 }

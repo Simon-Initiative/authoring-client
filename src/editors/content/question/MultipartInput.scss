@@ -1,6 +1,14 @@
 .multipart-input {
   .control {
     &.insert-item {
+      & > * {
+        margin-right: 10px;
+
+        &::last-child {
+          margin-right: 0;
+        }
+      }
+
       button {
         padding: 0;
       }
