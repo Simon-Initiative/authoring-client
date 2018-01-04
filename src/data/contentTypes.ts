@@ -82,7 +82,3 @@ export type QuestionItem =
   ShortAnswer |
   Text |
   Unsupported;
-
-export type ChoiceQuestionItem =
-  MultipleChoice |
-  Ordering;
