@@ -55,7 +55,7 @@ const resetAllScores = (partModel: contentTypes.Part) => {
 
 export interface MultipleChoiceProps
     extends QuestionProps<contentTypes.MultipleChoice> {
-  advScoringInit: boolean;
+  advancedScoringInitialized: boolean;
   advancedScoring: boolean;
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
@@ -87,11 +87,11 @@ export class MultipleChoice
 
   componentDidMount() {
     const {
-      partModel, model, advScoringInit, advancedScoring, onToggleAdvancedScoring,
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
     } = this.props;
 
     // initialize advanced scoring if its not already
-    if (!advScoringInit) {
+    if (!advancedScoringInitialized) {
       onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));
     }
   }

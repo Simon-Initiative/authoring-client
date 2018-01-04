@@ -3,7 +3,7 @@ import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AUTOGEN_MAX_CHOICES, ChoiceFeedback } from '../part/ChoiceFeedback';
 import {
-    OptionControl, Question, QuestionProps, QuestionState,
+  Question, QuestionProps, QuestionState,
 } from './Question';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
