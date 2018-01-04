@@ -1,9 +1,7 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Button } from '../common/controls';
 import { convert } from 'utils/format';
 import { Html } from 'data/content/html.ts';
 import {

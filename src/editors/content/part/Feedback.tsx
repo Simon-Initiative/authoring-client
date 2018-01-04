@@ -1,8 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Button } from '../common/controls';
 import { Html } from 'data/content/html.ts';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
