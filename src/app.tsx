@@ -8,7 +8,7 @@ import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
 import { createLogger } from 'redux-logger';
-import { UserInfo } from './reducers/user';
+import { UserState } from './reducers/user';
 import { getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
@@ -49,8 +49,8 @@ function historyRequiresCourseLoad() {
     && window.location.hash.indexOf('-') !== -1;
 }
 
-function tryLogin() : Promise<UserInfo> {
-  return new Promise<UserInfo>((resolve, reject) => {
+function tryLogin() : Promise<UserState> {
+  return new Promise<UserState>((resolve, reject) => {
     initialize(
       (profile, logoutUrl, accountManagementUrl) =>
         resolve({ profile, logoutUrl, user: profile.username, userId: profile.id }),

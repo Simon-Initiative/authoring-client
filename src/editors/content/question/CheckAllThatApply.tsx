@@ -15,6 +15,7 @@ import {
     getGeneratedResponseBody, getGeneratedResponseScore,
     modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
@@ -185,17 +186,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       this.props.partModel);
   }
 
-  renderAdditionalOptions() {
-    return [
-      <OptionControl key="advanced" name="Advanced" onClick={this.onToggleAdvanced}>
-        <div className="control">
-          <input className="toggle toggle-light" type="checkbox" checked={false} />
-          <label className="toggle-btn"></label>
-        </div>
-      </OptionControl>,
-    ];
-  }
-
   renderChoices() {
     const { context, services, editMode, itemModel } = this.props;
 
@@ -229,12 +219,10 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
             <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-              <input
-                className="toggle toggle-light"
-                type="checkbox"
-                readOnly
-                checked={itemModel.shuffle} />
-              <label className="toggle-btn"></label>
+              <ToggleSwitch checked={itemModel.shuffle} />
+            </TabOptionControl>
+            <TabOptionControl key="advanced" name="Advanced" onClick={this.onToggleAdvanced}>
+              <ToggleSwitch checked={false} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>

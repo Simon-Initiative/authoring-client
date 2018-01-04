@@ -5,11 +5,14 @@ type ServerActions =
     serverActions.serverTimeSkewAction |
     OtherAction;
 
-export type ServerInformation = {
+export type ServerState = {
   timeSkewInMs: number,
 };
 
-export function server(state = { timeSkewInMs: 0 }, action: ServerActions): ServerInformation {
+export function server(
+  state: ServerState = { timeSkewInMs: 0 },
+  action: ServerActions,
+): ServerState {
   switch (action.type) {
     case serverActions.SERVER_TIME_SKEW:
       return { timeSkewInMs: action.skewInMs };

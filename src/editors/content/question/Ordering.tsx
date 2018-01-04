@@ -13,6 +13,7 @@ import {
 import { CombinationsMap } from 'types/combinations';
 import { ChoiceFeedback } from '../part/ChoiceFeedback';
 import { convert } from 'utils/format';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
@@ -177,12 +178,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
             <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-              <input
-                className="toggle toggle-light"
-                type="checkbox"
-                readOnly
-                checked={itemModel.shuffle} />
-              <label className="toggle-btn"></label>
+              <ToggleSwitch checked={itemModel.shuffle} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>

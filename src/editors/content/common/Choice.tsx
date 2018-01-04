@@ -10,8 +10,9 @@ import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
-  InputList, InputListItem, ItemOption, ItemOptions, ItemOptionFlex,
+  InputList, InputListItem, ItemControls, ItemControl, ItemOptions, ItemOption, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
+import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
 
@@ -72,6 +73,7 @@ export interface ChoiceProps  {
   response?: contentTypes.Response;
   allowFeedback?: boolean;
   allowScore?: boolean;
+  allowSimpleSelect?: boolean;
   allowReorder?: boolean;
   editMode: boolean;
   context: AppContext;
@@ -80,6 +82,7 @@ export interface ChoiceProps  {
   onEditChoice: (choice: contentTypes.Choice) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
+  onToggleSimpleSelect?: (response: contentTypes.Response) => void;
   onRemove: (choiceId: string) => void;
 }
 
@@ -94,16 +97,19 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
   constructor(props) {
     super(props);
+
   }
 
   render() {
     const {
       choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
       onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
+      allowSimpleSelect, onToggleSimpleSelect,
     } = this.props;
 
     let feedbackEditor;
     let scoreEditor;
+    let selected;
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
 
@@ -130,6 +136,8 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             onChange={({ target: { value } }) => onEditScore(response, value) } />
         </div>
       );
+
+      selected = response.score !== '0';
     }
 
     return (
@@ -147,6 +155,21 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         body={choice.body}
         onEdit={body => onEditChoice(choice.with({ body }))}
         onRemove={id => onRemove(id)}
+        controls={
+          <ItemControls>
+            {allowSimpleSelect
+              ? (
+                <ItemControl className={`simple-select ${selected ? 'selected' : ''}`}>
+                  <Button type="link" editMode={editMode}
+                    onClick={() => response && onToggleSimpleSelect(response)} >
+                  <i className={`fa ${selected ? 'fa-check-circle' : 'fa-check-circle-o'}`} />
+                  </Button>
+                </ItemControl>
+              )
+              : (null)
+            }
+          </ItemControls>
+        }
         options={
           <ItemOptions>
             {allowFeedback

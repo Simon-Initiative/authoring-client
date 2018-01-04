@@ -14,7 +14,7 @@ type ActionTypes =
   | UpdateCourseResourcesAction
   | OtherAction;
 
-type CourseState = CourseModel;
+export type CourseState = CourseModel;
 
 const initialState = null;
 

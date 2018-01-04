@@ -1,16 +1,32 @@
 import { combineReducers } from 'redux';
 
-import { choices } from './choices';
-import { course } from './course';
-import { expanded } from './expanded';
-import { locks } from './locks';
-import { messages } from './messages';
-import { modal } from './modal';
-import { objectives } from './objectives';
-import { requests } from './requests';
-import { server } from './server';
-import { skills } from './skills';
-import { user } from './user';
+import { choices, ChoicesState } from './choices';
+import { course, CourseState } from './course';
+import { expanded, ExpandedState } from './expanded';
+import { locks, LocksState } from './locks';
+import { messages, MessageState } from './messages';
+import { modal, ModalState } from './modal';
+import { objectives, ObjectiveState } from './objectives';
+import { requests, RequestsState } from './requests';
+import { server, ServerState } from './server';
+import { skills, SkillsState } from './skills';
+import { user, UserState } from './user';
+import { questionEditor, QuestionEditorState } from './questionEditor';
+
+export interface State {
+  choices: ChoicesState;
+  course: CourseState;
+  expanded: ExpandedState;
+  locks: LocksState;
+  messages: MessageState;
+  modal: ModalState;
+  objectives: ObjectiveState;
+  requests: RequestsState;
+  server: ServerState;
+  skills: SkillsState;
+  user: UserState;
+  questionEditor: QuestionEditorState;
+}
 
 const reducers = combineReducers({
   choices,        // Supporting data for choices
@@ -24,6 +40,7 @@ const reducers = combineReducers({
   server,         // server specific info (time skew, etc)
   skills,         // all known skills for the current course
   user,           // Information about current user, null if not logged in
+  questionEditor,
 });
 
 export default reducers;

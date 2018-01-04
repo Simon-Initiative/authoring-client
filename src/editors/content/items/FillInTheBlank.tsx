@@ -11,6 +11,7 @@ import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface FillInTheBlankProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -213,12 +214,7 @@ export class FillInTheBlank
       <TabSection className="choices">
         <TabSectionHeader title="Choices">
           <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <input
-              className="toggle toggle-light"
-              type="checkbox"
-              readOnly
-              checked={itemModel.shuffle} />
-            <label className="toggle-btn"></label>
+            <ToggleSwitch checked={itemModel.shuffle} />
           </TabOptionControl>
         </TabSectionHeader>
         <TabSectionContent>

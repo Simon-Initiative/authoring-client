@@ -7,14 +7,14 @@ type UserAction =
   userActions.loginSuccessAction |
   OtherAction;
 
-export type UserInfo = {
+export type UserState = {
   user: string,
   userId: string,
   logoutUrl: string,
   profile: UserProfile,
 };
 
-export function user(state : UserInfo = null, action: UserAction) : UserInfo {
+export function user(state: UserState = null, action: UserAction): UserState {
   switch (action.type) {
     case userActions.LOGIN_SUCCESS:
       return {

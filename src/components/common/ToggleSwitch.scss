@@ -1,0 +1,65 @@
+@import 'oli/colors';
+
+.toggle-switch {
+  input[type="checkbox"].toggle {
+    display: none;
+
+    // add default box-sizing for this scope
+    &,
+    &:after,
+    &:before,
+    & *,
+    & *:after,
+    & *:before,
+    & + .toggle-btn {
+      box-sizing: border-box;
+      &::selection {
+        background: none;
+      }
+    }
+
+    + .toggle-btn {
+      outline: 0;
+      display: block;
+      width: 2.5em;
+      height: 1.5em;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      background: $gray-lighter;
+      border-radius: 2em;
+      border: 1px solid $gray-lighter;
+      padding: 2px;
+      transition: all .4s ease;
+
+      &:after,
+      &:before {
+        position: relative;
+        display: block;
+        content: "";
+        width: 55%;
+        height: 100%;
+      }
+
+      &:after {
+        left: 0;
+        border-radius: 50%;
+        background: #fff;
+        transition: all .2s ease;
+      }
+
+      &:before {
+        display: none;
+      }
+    }
+
+    &:checked + .toggle-btn {
+      background: #9FD6AE;
+      border-color: #9FD6AE;
+    }
+
+    &:checked + .toggle-btn:after {
+      left: 45%;
+    }
+  }
+}
