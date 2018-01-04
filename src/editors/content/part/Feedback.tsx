@@ -28,7 +28,6 @@ export abstract class Feedback
     super(props);
 
     this.onResponseEdit = this.onResponseEdit.bind(this);
-    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onResponseRemove = this.onResponseRemove.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
@@ -42,23 +41,6 @@ export abstract class Feedback
     });
 
     onEdit(updatedModel);
-  }
-
-  onResponseAdd() {
-    const feedback = new contentTypes.Feedback();
-    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-
-    const response = new contentTypes.Response({
-      score: '0',
-      match: '',
-      feedback: feedbacks.set(feedback.guid, feedback),
-    });
-
-    const model = this.props.model.with({
-      responses: this.props.model.responses.set(response.guid, response),
-    });
-
-    this.props.onEdit(model);
   }
 
   onResponseRemove(response) {
@@ -173,10 +155,6 @@ export abstract class Feedback
   render() : JSX.Element {
     return (
       <div className="feedback">
-        <Button editMode={this.props.editMode}
-          type="link" onClick={this.onResponseAdd}>
-          Add Feedback
-        </Button>
         <InputList className="feedback-items">
           {this.renderResponses()}
         </InputList>

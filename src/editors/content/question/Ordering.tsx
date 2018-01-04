@@ -35,6 +35,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
+    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
     this.onReorderChoices = this.onReorderChoices.bind(this);
   }
@@ -77,26 +78,24 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  // updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
-  //   // For each response, adjust matches that may have
-  //   // utilized the removedValue...
+  onResponseAdd() {
+    const { partModel } = this.props;
 
-  //   return partModel;
-  // }
+    const feedback = new contentTypes.Feedback();
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
-  // updateChoiceValues(itemModel: contentTypes.Ordering) : contentTypes.Ordering {
+    const response = new contentTypes.Response({
+      score: '0',
+      match: '',
+      feedback: feedbacks.set(feedback.guid, feedback),
+    });
 
-  //   const choices = itemModel.choices.toArray();
-  //   let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
+    const updatedPartModel = partModel.with({
+      responses: partModel.responses.set(response.guid, response),
+    });
 
-  //   choices.forEach((choice, index) => {
-  //     const value = convert.toAlphaNotation(index);
-  //     const updated = choice.with({ value });
-  //     newChoices = newChoices.set(updated.guid, updated);
-  //   });
-
-  //   return itemModel.with({ choices: newChoices });
-  // }
+    this.onPartEdit(updatedPartModel);
+  }
 
   onRemoveChoice(choice: contentTypes.Choice) {
     const { partModel } = this.props;
@@ -177,24 +176,35 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
+            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onAddChoice}>
+                Add Choice
+              </Button>
+            </TabOptionControl>
             <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
               <ToggleSwitch checked={itemModel.shuffle} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
-            <Button
-              editMode={editMode}
-              type="link"
-              onClick={this.onAddChoice}>
-              Add Choice
-            </Button>
             <ChoiceList className="ordering-question-choices">
               {this.renderChoices()}
             </ChoiceList>
           </TabSectionContent>
         </TabSection>
         <TabSection key="feedback" className="feedback">
-          <TabSectionHeader title="Feedback"/>
+          <TabSectionHeader title="Feedback">
+            <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onResponseAdd}>
+                Add Feedback
+              </Button>
+            </TabOptionControl>
+          </TabSectionHeader>
           <TabSectionContent>
             <ChoiceFeedback
               {...this.props}

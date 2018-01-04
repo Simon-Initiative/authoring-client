@@ -1,7 +1,15 @@
+@import 'oli/colors';
+
 .multiple-choice {
   .multiple-choice-choices {
     .choice {
       margin-bottom: 25px;
     }
+  }
+
+  .instruction-label {
+    font-size: 0.9rem;
+    color: $gray-dark;
+    margin-bottom: 5px;
   }
 }

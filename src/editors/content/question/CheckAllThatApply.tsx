@@ -36,6 +36,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
+    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
@@ -80,6 +81,25 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
+  }
+
+  onResponseAdd() {
+    const { partModel } = this.props;
+
+    const feedback = new contentTypes.Feedback();
+    const feedbacks = OrderedMap<string, contentTypes.Feedback>();
+
+    const response = new contentTypes.Response({
+      score: '0',
+      match: '',
+      feedback: feedbacks.set(feedback.guid, feedback),
+    });
+
+    const updatedPartModel = partModel.with({
+      responses: partModel.responses.set(response.guid, response),
+    });
+
+    this.onPartEdit(updatedPartModel);
   }
 
   onAddChoice() {
@@ -218,6 +238,14 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
+            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onAddChoice}>
+                Add Choice
+              </Button>
+            </TabOptionControl>
             <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
               <ToggleSwitch checked={itemModel.shuffle} />
             </TabOptionControl>
@@ -227,12 +255,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
           </TabSectionHeader>
           <TabSectionContent>
             <div className="choices">
-              <Button
-                editMode={editMode}
-                type="link"
-                onClick={this.onAddChoice}>
-                Add Choice
-              </Button>
               <ChoiceList>
                 {this.renderChoices()}
               </ChoiceList>
@@ -240,7 +262,16 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
           </TabSectionContent>
         </TabSection>
         <TabSection key="feedback" className="feedback">
-          <TabSectionHeader title="Feedback"/>
+          <TabSectionHeader title="Feedback">
+            <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onResponseAdd}>
+                Add Feedback
+              </Button>
+            </TabOptionControl>
+          </TabSectionHeader>
           <TabSectionContent>
             <ChoiceFeedback
               {...this.props}

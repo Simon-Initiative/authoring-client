@@ -213,15 +213,19 @@ export class FillInTheBlank
     return (
       <TabSection className="choices">
         <TabSectionHeader title="Choices">
+          <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+            <Button
+              editMode={editMode}
+              type="link"
+              onClick={this.onAddChoice}>
+              Add Choice
+            </Button>
+          </TabOptionControl>
           <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <ToggleSwitch checked={itemModel.shuffle} />
           </TabOptionControl>
         </TabSectionHeader>
         <TabSectionContent>
-          <div style={ { display: 'inline' } }>
-            <Button editMode={editMode}
-              type="link" onClick={this.onAddChoice}>Add Choice</Button>
-          </div>
           <ChoiceList>
             {this.renderChoices()}
           </ChoiceList>

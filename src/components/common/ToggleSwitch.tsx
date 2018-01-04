@@ -16,9 +16,12 @@ export const ToggleSwitch: React.StatelessComponent<ToggleSwitchProps> = ({
 }) => {
   return (
     <div className={`toggle-switch ${className || ''}`} onClick={onClick}>
-      <input className="toggle toggle-light" type="checkbox" readOnly checked={checked} />
+      <input
+        className="toggle toggle-light"
+        type="checkbox"
+        readOnly
+        checked={checked || false} />
       <label className="toggle-btn"></label>
     </div>
   );
 };
-

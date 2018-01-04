@@ -66,7 +66,7 @@ export interface MultipleChoiceState
 }
 
 /**
- * The content editor for HtmlContent.
+ * The content editor for Multiple Choice Question
  */
 export class MultipleChoice
    extends Question<MultipleChoiceProps, MultipleChoiceState> {
@@ -75,7 +75,7 @@ export class MultipleChoice
     super(props);
 
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
-    this.onToggleScoring = this.onToggleScoring.bind(this);
+    this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
     this.onToggleSimpleSelect = this.onToggleSimpleSelect.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
@@ -111,7 +111,7 @@ export class MultipleChoice
     onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
-  onToggleScoring() {
+  onToggleAdvanced() {
     const {
       itemModel, partModel, model, onToggleAdvancedScoring, advancedScoring, onEdit,
     } = this.props;
@@ -275,20 +275,23 @@ export class MultipleChoice
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
+            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onAddChoice}>
+                Add Choice
+              </Button>
+            </TabOptionControl>
             <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
               <ToggleSwitch checked={itemModel.shuffle} />
             </TabOptionControl>
-            <TabOptionControl key="advancedscoring" name="Advanced" onClick={this.onToggleScoring}>
+            <TabOptionControl key="advancedscoring" name="Advanced" onClick={this.onToggleAdvanced}>
               <ToggleSwitch checked={advancedScoring} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
-            <Button
-              editMode={editMode}
-              type="link"
-              onClick={this.onAddChoice}>
-              Add Choice
-            </Button>
+            <div className="instruction-label">Select the correct choice</div>
             <ChoiceList className="multiple-choice-choices">
               {this.renderChoices()}
             </ChoiceList>
