@@ -73,7 +73,7 @@ export const OptionControl = TabOptionControl;
  * Question Component
  */
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
-  S extends QuestionState> extends React.Component<P, S> {
+  S extends QuestionState> extends React.PureComponent<P, S> {
   htmlEditor: CommandProcessor<EditorState>;
   className: string;
 
