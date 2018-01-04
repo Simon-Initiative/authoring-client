@@ -6,8 +6,10 @@ import { PoolTitleEditor } from './PoolTitleEditor';
 import { Collapse, Select, TextInput } from '../common/controls';
 import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
-import { RemovableContent } from '../common/RemovableContent';
 import { Skill } from 'types/course';
+import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+
+import './SelectionEditor.scss';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
@@ -21,7 +23,7 @@ export interface SelectionState {
 
 
 /**
- * The content editor for HtmlContent.
+ * Selection Editor Component
  */
 export class SelectionEditor
   extends AbstractContentEditor<contentTypes.Selection, SelectionProps, SelectionState> {
@@ -90,26 +92,30 @@ export class SelectionEditor
     }
   }
 
+  renderTitle() {
+    const { model, onRemove } = this.props;
+
+    const title = model.source.contentType === 'Pool'
+      ? 'Pool' : 'Shared Pool';
+
+    return (
+      <ContentTitle title={title} onRemove={() => onRemove(model.guid)} />
+    );
+  }
+
   render() : JSX.Element {
-
-    const label : any = {
-      fontFamily: 'sans-serif',
-      lineHeight: 1.25,
-      fontSize: '13',
-      position: 'relative',
-      top: '-6',
-      color: '#606060',
-    };
-
     const controls = (
-      <div>
-        <span style={label}>Insert new: </span>
+      <div className="controls">
         {
-          this.props.model.source.contentType === 'Pool' &&
-          <AddQuestion
-            editMode={this.props.editMode}
-            onQuestionAdd={this.onAddQuestion.bind(this)}
-            isSummative={true}/>
+          this.props.model.source.contentType === 'Pool' && (
+            <div className="insert-toolbar">
+              <span>Insert New:</span>
+              <AddQuestion
+                editMode={this.props.editMode}
+                onQuestionAdd={this.onAddQuestion.bind(this)}
+                isSummative={true}/>
+            </div>
+          )
         }
         <form className="form-inline">
           <Select editMode={this.props.editMode}
@@ -145,9 +151,6 @@ export class SelectionEditor
         </form>
       </div>);
 
-    const caption = this.props.model.source.contentType === 'Pool'
-      ? 'Pool' : 'Shared Pool';
-
     let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
       titleEditor =
@@ -163,11 +166,8 @@ export class SelectionEditor
     }
 
     return (
-      <RemovableContent
-        editMode={this.props.editMode}
-        onRemove={this.props.onRemove.bind(this, this.props.model.guid)}
-        title={caption}
-        associatedClasses="">
+      <div className="selection-editor">
+          {this.renderTitle()}
 
           {controls}
 
@@ -175,7 +175,7 @@ export class SelectionEditor
 
           {this.renderSource()}
 
-      </RemovableContent>
+      </div>
     );
   }
 

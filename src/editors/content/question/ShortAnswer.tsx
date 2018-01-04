@@ -46,7 +46,7 @@ export class ShortAnswer
     return (
       <React.Fragment>
         <TabSection key="choices" className="choices">
-          <TabSectionHeader title="Options"/>
+          <TabSectionHeader title="Details"/>
           <TabSectionContent>
             <div style={{ display: 'inline' }}>
               <Select

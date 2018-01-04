@@ -34,15 +34,10 @@
   }
 
   .tab-section {
-    border-bottom: 1px solid $gray-lighter;
     padding: 15px 0;
 
     &:first-child {
       padding: 0;
-    }
-
-    &:last-child {
-      border-bottom: none;
     }
 
     .tab-section-header {

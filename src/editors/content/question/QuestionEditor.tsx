@@ -27,7 +27,7 @@ export interface QuestionEditorState {
 }
 
 /**
- * The content editor for HtmlContent.
+ * Question Editor Component
  */
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {

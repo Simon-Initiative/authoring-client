@@ -89,7 +89,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     } = this.props;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '50px',
       borderStyle: 'none',
       borderWith: '1px',
       borderColor: '#AAAAAA',
@@ -119,7 +119,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <div className="question" key="question">
+      <div className="question-body" key="question">
         <div className="control insert-item">
             <span>Insert:</span>
             <button className="btn btn-sm btn-link" type="button"

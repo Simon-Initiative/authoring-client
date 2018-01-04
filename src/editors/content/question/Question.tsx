@@ -17,6 +17,7 @@ import { ExplanationEditor } from '../part/ExplanationEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
+import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 
 import './Question.scss';
 
@@ -69,7 +70,7 @@ const getLabelForQuestion = (question: contentTypes.Question): string => {
 export const OptionControl = TabOptionControl;
 
 /**
- * The content editor for HtmlContent.
+ * Question Component
  */
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
   S extends QuestionState> extends React.Component<P, S> {
@@ -126,23 +127,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   renderQuestionTitle(): JSX.Element {
-    const { onRemoveQuestion } = this.props;
+    const { model, onRemoveQuestion } = this.props;
 
     return (
-      <div className="question-title">
-        <div className="title">{getLabelForQuestion(this.props.model)}</div>
-        <div className="flex-spacer"/>
-        <div
-          className="action-btn action-btn-duplicate"
-          onClick={() => { console.log(`onClick: duplicate - NOT IMPLEMENTED`); }}>
-          <i className="fa fa-copy" />
-        </div>
-        <div
-          className="action-btn action-btn-remove"
-          onClick={onRemoveQuestion}>
-          <i className="fa fa-trash-o" />
-        </div>
-      </div>
+      <ContentTitle
+          title={getLabelForQuestion(model)}
+          onRemove={onRemoveQuestion} />
     );
   }
 
@@ -207,7 +197,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     };
 
     return (
-      <div className="question" key="question">
+      <div className="question-body" key="question">
           <HtmlContentEditor
             ref={c => this.htmlEditor = c}
             editMode={editMode}
@@ -270,6 +260,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                key={c.guid}
                 onRemove={this.onCriteriaRemove}
                 model={c}
                 onEdit={this.onCriteriaEdit}
@@ -343,13 +334,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(this.renderOtherTab(item, parts[index]) ? ['Other'] : []),
           ]}>
 
-          {this.renderDetailsTab()}
-          {this.renderSkillsTab(item, parts[index])}
-          {this.renderHintsTab(item, parts[index])}
+          {this.renderDetails() ? this.renderDetailsTab() : null}
+          {this.renderSkillsTab(item, parts[index]) ?
+            this.renderSkillsTab(item, parts[index]) : null}
+          {this.renderHintsTab(item, parts[index]) ?
+            this.renderHintsTab(item, parts[index]) : null}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
           {showAdditionalTabs && (this.renderAdditionalTabs() as TabElement[])
             .map(tab => tab.content)}
-          {this.renderOtherTab(item, parts[index])}
+          {this.renderOtherTab(item, parts[index]) ?
+            this.renderOtherTab(item, parts[index]) : null}
         </TabContainer>
       </div>
     ));

@@ -104,15 +104,13 @@ export class Text
             value={itemModel.caseSensitive}
             onEdit={this.onCaseSensitive} />
         </TabSectionContent>
-        <TabSection key="feedback" className="feedback">
-          <TabSectionHeader title="Feedback"/>
-          <TabSectionContent>
-            <Feedback
-              {...this.props}
-              model={partModel}
-              onEdit={this.onPartEdit} />
-          </TabSectionContent>
-        </TabSection>
+        <TabSectionHeader title="Feedback"/>
+        <TabSectionContent key="feedback" className="feedback">
+          <Feedback
+            {...this.props}
+            model={partModel}
+            onEdit={this.onPartEdit} />
+        </TabSectionContent>
       </TabSection>
     );
   }

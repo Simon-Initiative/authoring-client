@@ -73,15 +73,13 @@ export class Numeric
             <option value="scientific">Scientific</option>
           </Select>
         </TabSectionContent>
-        <TabSection key="feedback" className="feedback">
-          <TabSectionHeader title="Feedback"/>
-          <TabSectionContent>
-            <Feedback
-              {...this.props}
-              model={partModel}
-              onEdit={this.onPartEdit} />
-          </TabSectionContent>
-        </TabSection>
+        <TabSectionHeader title="Feedback"/>
+        <TabSectionContent key="feedback" className="feedback">
+          <Feedback
+            {...this.props}
+            model={partModel}
+            onEdit={this.onPartEdit} />
+        </TabSectionContent>
       </TabSection>
     );
   }

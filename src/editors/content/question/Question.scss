@@ -2,8 +2,6 @@
 @import 'oli/mixins';
 
 .question {
-  margin: 15px 0;
-
   .options {
     display: flex;
     flex-direction: row;
@@ -26,10 +24,8 @@
         cursor: pointer;
       }
 
-      &.grading {
-        select {
-          margin-top: -5px
-        }
+      select {
+        margin-top: -5px
       }
 
       &:first-child {
@@ -38,6 +34,10 @@
         }
       }
     }
+  }
+
+  .question-body {
+    margin: 15px 0;
   }
 
   .details-tab {
