@@ -50,7 +50,7 @@ export class Choices
     } = this.props;
 
     const count = itemModel.choices.size;
-    const value = String.fromCharCode(65 + count);
+    const value = convert.toAlphaNotation(count);
 
     const choice = new contentTypes.Choice().with({ value });
 
