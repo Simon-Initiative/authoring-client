@@ -1,7 +1,7 @@
 @import 'oli/colors';
 @import 'oli/mixins';
 
-.choice-feedback {
+.feedbacks {
   @include disable-select;
 
   .feedback-items {

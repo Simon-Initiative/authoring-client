@@ -1,19 +1,21 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Choice } from '../common/Choice';
-import { TabularFeedback } from '../part/TabularFeedback';
+import { ChoiceList, Choice, updateChoiceValuesAndRefs } from '../common/Choice';
 import { Button } from '../common/controls';
 import guid from '../../../utils/guid';
 import {
     Question, QuestionProps, QuestionState,
 } from './Question';
 import {
-  TabContainer, Tab, TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
+import { CombinationsMap } from 'types/combinations';
+import { ChoiceFeedback } from '../part/ChoiceFeedback';
+import { convert } from 'utils/format';
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
-
+  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
 export interface OrderingState extends QuestionState {
@@ -28,13 +30,17 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   constructor(props) {
     super(props);
 
-    this.setClassname('ordering');
-
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
     this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
     this.onPartEdit = this.onPartEdit.bind(this);
     this.onRemoveChoice = this.onRemoveChoice.bind(this);
+    this.onReorderChoices = this.onReorderChoices.bind(this);
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'ordering';
   }
 
   onToggleShuffle() {
@@ -49,7 +55,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
   onAddChoice() {
     const count = this.props.itemModel.choices.size;
-    const value = this.toLetter(count);
+    const value = convert.toAlphaNotation(count);
 
     const choice = new contentTypes.Choice().with({ value, guid: guid() });
 
@@ -59,73 +65,112 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     this.props.onEdit(itemModel, this.props.partModel);
   }
 
-  onChoiceEdit(c) {
+  onChoiceEdit(choice: contentTypes.Choice) {
     this.props.onEdit(
       this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
+      { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
       this.props.partModel);
-  }
-
-  toLetter(index) {
-    return String.fromCharCode(65 + index);
-  }
-
-  renderChoice(choice: contentTypes.Choice, index: number) {
-    return <Choice
-              key={choice.guid}
-              label={'Choice ' + this.toLetter(index)}
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
-              model={choice}
-              onEdit={this.onChoiceEdit}
-              onRemove={this.onRemoveChoice.bind(this, choice)}
-              />;
   }
 
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
-    // For each response, adjust matches that may have
-    // utilized the removedValue...
+  // updateChoiceReferences(removedValue, partModel: contentTypes.Part) : contentTypes.Part {
+  //   // For each response, adjust matches that may have
+  //   // utilized the removedValue...
 
-    return partModel;
-  }
+  //   return partModel;
+  // }
 
-  updateChoiceValues(itemModel: contentTypes.Ordering) : contentTypes.Ordering {
+  // updateChoiceValues(itemModel: contentTypes.Ordering) : contentTypes.Ordering {
 
-    const choices = itemModel.choices.toArray();
-    let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
+  //   const choices = itemModel.choices.toArray();
+  //   let newChoices = Immutable.OrderedMap<string, contentTypes.Choice>();
 
-    choices.forEach((choice, index) => {
-      const value = this.toLetter(index);
-      const updated = choice.with({ value });
-      newChoices = newChoices.set(updated.guid, updated);
-    });
+  //   choices.forEach((choice, index) => {
+  //     const value = convert.toAlphaNotation(index);
+  //     const updated = choice.with({ value });
+  //     newChoices = newChoices.set(updated.guid, updated);
+  //   });
 
-    return itemModel.with({ choices: newChoices });
-  }
+  //   return itemModel.with({ choices: newChoices });
+  // }
 
   onRemoveChoice(choice: contentTypes.Choice) {
-    let itemModel = this.props.itemModel.with(
+    const { partModel } = this.props;
+
+    const updatedItemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.delete(choice.guid) });
 
-    itemModel = this.updateChoiceValues(itemModel);
-    const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
+    // itemModel = this.updateChoiceValues(itemModel);
+    // const partModel = this.updateChoiceReferences(choice.value, this.props.partModel);
 
-    this.props.onEdit(itemModel, partModel);
+    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+
+    this.props.onEdit(newModels.itemModel, newModels.partModel);
+  }
+
+  onReorderChoices(originalIndex: number, newIndex: number) {
+    const { onEdit, itemModel, partModel } = this.props;
+
+    // convert OrderedMap to shallow javascript array
+    const choices = itemModel.choices.toArray();
+
+    // remove selected choice from array and insert it into new position
+    const choice = choices.splice(originalIndex, 1)[0];
+    choices.splice(newIndex, 0, choice);
+
+    // update item model
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = itemModel.with({
+      // set choices to a new OrderedMap with updated choice ordering
+      choices: choices.reduce(
+        (acc, c) => {
+          return acc.set(c.guid, c);
+        },
+        Immutable.OrderedMap<string, contentTypes.Choice>(),
+      ),
+    });
+
+    // update models with new choices and references
+    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+    updatedItemModel = updatedModels.itemModel;
+    updatedPartModel = updatedModels.partModel;
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+    );
   }
 
   renderChoices() {
+    const { itemModel, context, services, editMode } = this.props;
+
     return this.props.itemModel.choices
       .toArray()
-      .map((c, i) => this.renderChoice(c, i));
+      .map((choice, index) => {
+        return (
+          <Choice
+            key={choice.guid}
+            index={index}
+            choice={choice}
+            allowReorder={!itemModel.shuffle}
+            context={context}
+            services={services}
+            editMode={editMode}
+            onReorderChoice={this.onReorderChoices}
+            onEditChoice={this.onChoiceEdit}
+            onRemove={choiceId => this.onRemoveChoice(choice)} />
+        );
+      });
   }
 
   renderDetails() {
-    const { context, services, editMode, itemModel, partModel } = this.props;
+    const {
+      editMode, itemModel, partModel, onGetChoiceCombinations,
+    } = this.props;
 
     return (
       <React.Fragment>
@@ -147,18 +192,20 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
               onClick={this.onAddChoice}>
               Add Choice
             </Button>
-            {this.renderChoices()}
+            <ChoiceList className="ordering-question-choices">
+              {this.renderChoices()}
+            </ChoiceList>
           </TabSectionContent>
         </TabSection>
         <TabSection key="feedback" className="feedback">
           <TabSectionHeader title="Feedback"/>
           <TabSectionContent>
-            <TabularFeedback
-                context={context}
-                services={services}
-                editMode={editMode}
-                model={partModel}
-                onEdit={this.onPartEdit} />
+            <ChoiceFeedback
+              {...this.props}
+              model={partModel}
+              choices={itemModel.choices.toArray()}
+              onGetChoiceCombinations={onGetChoiceCombinations}
+              onEdit={this.onPartEdit} />
           </TabSectionContent>
         </TabSection>
       </React.Fragment>
