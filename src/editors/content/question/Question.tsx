@@ -84,7 +84,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
     this.onConceptsEdit = this.onConceptsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
-    this.onExplanationEdit = this.onExplanationEdit.bind(this);
   }
 
   abstract renderDetails(): JSX.Element | boolean;
@@ -120,12 +119,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const { onEdit } = this.props;
 
     onEdit(item, part.with({ hints }));
-  }
-
-  onExplanationEdit(explanation, item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    const { onEdit } = this.props;
-
-    onEdit(item, part.with({ explanation }));
   }
 
   renderQuestionTitle(): JSX.Element {
@@ -301,28 +294,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     );
   }
 
-  renderOtherTab(item: contentTypes.QuestionItem, part: contentTypes.Part): JSX.Element {
-    const { context, services, editMode } = this.props;
-
-    return (
-      <Tab className="other-tab">
-        <TabSection className="other">
-          <div className="section-header">
-            <h3>Explanation</h3>
-          </div>
-          <div className="section-content">
-            <ExplanationEditor
-              context={context}
-              services={services}
-              editMode={editMode}
-              model={part.explanation}
-              onEdit={explanation => this.onExplanationEdit(explanation, item, part)} />
-          </div>
-        </TabSection>
-      </Tab>
-    );
-  }
-
 
   renderItemParts(): JSX.Element[] {
     const { model, hideGradingCriteria } = this.props;
@@ -342,7 +313,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
                 && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
-            ...(this.renderOtherTab(item, parts[index]) ? ['Other'] : []),
           ]}>
 
           {this.renderDetailsTab()}
@@ -351,7 +321,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
           {showAdditionalTabs && (this.renderAdditionalTabs() as TabElement[])
             .map(tab => tab.content)}
-          {this.renderOtherTab(item, parts[index])}
         </TabContainer>
       </div>
     ));
