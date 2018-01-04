@@ -24,7 +24,6 @@ import './ChoiceFeedback.scss';
 export const AUTOGEN_MAX_CHOICES = 12;
 
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
-  input?: string;
   choices: contentTypes.Choice[];
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
@@ -75,15 +74,12 @@ export abstract class ChoiceFeedback
     const feedback = new contentTypes.Feedback();
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
-    let response = new contentTypes.Response({
+    const response = new contentTypes.Response({
       score: '0',
       match: '',
       feedback: feedbacks.set(feedback.guid, feedback),
     });
 
-    if (this.props.input !== undefined) {
-      response = response.with({ input: this.props.input });
-    }
     const model = this.props.model.with({
       responses: this.props.model.responses.set(response.guid, response),
     });
@@ -222,13 +218,13 @@ export abstract class ChoiceFeedback
           className="response"
           id={response.guid}
           label={response.isDefault ? '' : `${i + 1}`}
-          contentTitle={response.isDefault ? 'All Other Choices' : ''}
+          contentTitle={response.isDefault ? 'Other Feedback' : ''}
           context={context}
           services={services}
           editMode={editMode}
           body={response.feedbackBody}
           onEdit={body => response.onEdit(body, response.item)}
-          onRemove={() => this.onResponseRemove(response.item)}
+          onRemove={response.isDefault ? undefined : () => this.onResponseRemove(response.item)}
           options={
           <ItemOptions>
             {!response.isDefault

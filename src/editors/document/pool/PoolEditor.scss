@@ -1,8 +1,6 @@
 @import 'oli/typography';
 
 .pool-editor {
-
-
   .outline {
     display: flex;
     flex-direction: row;
@@ -11,10 +9,6 @@
   }
 
   .nodeContainer {
-    border-style: solid solid solid none;
-    border-radius: 3px;
-    border-width: 1;
-    border-color: #CCCCCC;
     width: 100%;
   }
 
