@@ -105,5 +105,24 @@
 			box-shadow: 0 0 0 0px rgba(2,117,216,.25);
 			outline: none;
 		}
+
+		&.btn-cancel, &.btn-danger, &.btn-remove {
+			color: $remove;
+			background-color: inherit;
+			border: inherit;
+
+			&:hover {
+				color: darken($remove, 10%);
+				background-color: inherit;
+				border-color: inherit;
+			}
+
+			&:active {
+				color: darken($remove, 15%);
+				background-color: inherit;
+				border-color: inherit;
+			}
+		}
+
 	}
 }

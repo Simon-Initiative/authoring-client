@@ -4,10 +4,11 @@ import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { TabularFeedback } from '../part/TabularFeedback';
-import { ItemLabel } from './ItemLabel';
 import { Select } from '../common/controls';
-import { ResponseMultEditor } from './ResponseMult';
+import {
+  TabSection, TabSectionContent, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
+import { Feedback } from '../part/Feedback';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 
@@ -50,62 +51,36 @@ export class Numeric
     this.props.onEdit(this.props.itemModel, partModel);
   }
 
-  render() : JSX.Element {
-
-    let feedback;
-
-    if (this.props.partModel.responseMult.size > 0) {
-
-      feedback = this.props.partModel.responseMult
-        .toArray().map(m => <ResponseMultEditor
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          model={m}
-          onEdit={this.onEditMult.bind(this)}
-        />);
-    } else {
-
-      feedback = <TabularFeedback
-            input={this.props.itemModel.id}
-            editMode={this.props.editMode}
-            services={this.props.services}
-            context={this.props.context}
-            model={this.props.partModel}
-            onEdit={this.onPartEdit}
-          />;
-    }
-
-    const controls = (
-      <div style={{ display: 'inline' }}>
-        <Select editMode={this.props.editMode}
-          label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
-          <option value="small">Small</option>
-          <option value="medium">Medium</option>
-          <option value="large">Large</option>
-        </Select>
-        <Select editMode={this.props.editMode}
-          label="Notation" value={this.props.itemModel.notation} onChange={this.onNotationChange}>
-          <option value="automatic">Automatic</option>
-          <option value="decimal">Decimal</option>
-          <option value="scientific">Scientific</option>
-        </Select>
-      </div>);
+  render() {
+    const {
+      partModel,
+    } = this.props;
 
     return (
-      <div
-        className="itemPart"
-        onFocus={() => this.props.onFocus(this.props.itemModel.id)}
-        onBlur={() => this.props.onBlur(this.props.itemModel.id)}>
-
-        <ItemLabel label="Numeric" editMode={this.props.editMode}
-          onClick={() => this.props.onRemove(this.props.itemModel, this.props.partModel)}/>
-
-        {controls}
-
-        {feedback}
-
-      </div>
+      <TabSection className="numeric">
+        <TabSectionHeader title="Details"/>
+        <TabSectionContent>
+          <Select editMode={this.props.editMode}
+            label="Size" value={this.props.itemModel.inputSize} onChange={this.onSizeChange}>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </Select>
+          <Select editMode={this.props.editMode}
+            label="Notation" value={this.props.itemModel.notation} onChange={this.onNotationChange}>
+            <option value="automatic">Automatic</option>
+            <option value="decimal">Decimal</option>
+            <option value="scientific">Scientific</option>
+          </Select>
+        </TabSectionContent>
+        <TabSectionHeader title="Feedback"/>
+        <TabSectionContent key="feedback" className="feedback">
+          <Feedback
+            {...this.props}
+            model={partModel}
+            onEdit={this.onPartEdit} />
+        </TabSectionContent>
+      </TabSection>
     );
   }
 

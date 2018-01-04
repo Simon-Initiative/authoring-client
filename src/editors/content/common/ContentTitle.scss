@@ -1,0 +1,50 @@
+@import 'oli/colors';
+@import 'oli/mixins';
+
+.content-title {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  @include disable-select;
+
+  .title {
+    font-size: 1.3em;
+  }
+
+  .action-btn {
+    cursor: pointer;
+
+    i {
+      padding: 6px;
+    }
+
+    &.action-btn-duplicate {
+      &:hover {
+        i {
+          color: darken($selection, 10%);
+        }
+      }
+
+      &:active {
+        i {
+          color: darken($selection, 15%);
+        }
+      }
+    }
+
+    &.action-btn-remove {
+      &:hover {
+        i {
+          color: darken($remove, 10%);
+        }
+      }
+
+      &:active {
+        i {
+          color: darken($remove, 15%);
+        }
+      }
+    }
+  }
+}

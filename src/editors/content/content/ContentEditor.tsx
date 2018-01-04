@@ -7,7 +7,9 @@ import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { Select } from '../common/controls';
-import { RemovableContent } from '../common/RemovableContent';
+import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+
+import './ContentEditor.scss';
 
 type IdTypes = {
   availability: string,
@@ -54,12 +56,32 @@ export class ContentEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderTitle() {
+    const { model, onRemove } = this.props;
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
+    return (
+      <ContentTitle title="Content" onRemove={() => onRemove(model.guid)} />
+    );
+  }
 
+  renderOptions() {
+    const { editMode, model } = this.props;
+
+    return (
+      <div className="content-options">
+        <Select onChange={this.onAvailability} label="Availability"
+          editMode={editMode}
+          value={model.availability}>
+          <option value="always">Always</option>
+          <option value="instructor_only">Instructor Only</option>
+          <option value="feedback_only">Feedback Only</option>
+          <option value="never">Never</option>
+        </Select>
+      </div>
+    );
+  }
+
+  renderBody() {
     const bodyStyle = {
       minHeight: '30px',
       borderStyle: 'none',
@@ -68,32 +90,28 @@ export class ContentEditor
     };
 
     return (
-      <RemovableContent
-        editMode={this.props.editMode}
-        onRemove={() => this.props.onRemove(this.props.model.guid)}
-        title="Content"
-        associatedClasses="">
-
-        <Select onChange={this.onAvailability} label="Availability"
-          editMode={this.props.editMode}
-          value={this.props.model.availability}>
-          <option value="always">Always</option>
-          <option value="instructor_only">Instructor Only</option>
-          <option value="feedback_only">Feedback Only</option>
-          <option value="never">Never</option>
-        </Select>
-
+      <div className="content-body">
         <HtmlContentEditor
           editorStyles={bodyStyle}
-          inlineToolbar={inlineToolbar}
-          blockToolbar={blockToolbar}
-          inlineInsertionToolbar={insertionToolbar}
+          inlineToolbar={<InlineToolbar/>}
+          blockToolbar={<BlockToolbar/>}
+          inlineInsertionToolbar={<InlineInsertionToolbar/>}
           {...this.props}
           model={this.props.model.body}
           onEdit={this.onBodyEdit}
           />
+      </div>
+    );
+  }
 
-      </RemovableContent>);
+  render() : JSX.Element {
+
+    return (
+      <div className="content-editor">
+        {this.renderTitle()}
+        {this.renderOptions()}
+        {this.renderBody()}
+      </div>
+    );
   }
 }
-
