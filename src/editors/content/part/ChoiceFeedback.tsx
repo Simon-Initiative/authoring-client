@@ -1,29 +1,22 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Button } from '../common/controls';
 import { convert } from 'utils/format';
 import { Html } from 'data/content/html.ts';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
 import {
-    getGeneratedResponseBody, getGeneratedResponseScore,
-    modelWithDefaultFeedback,
+  AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseBody,
+  getGeneratedResponseScore, modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { CombinationsMap } from 'types/combinations';
 
 import './ChoiceFeedback.scss';
 
-// This sets the limit for the number of choices to use the autogenerate
-// feedback combinations feature. When exceeded, the editor will switch to
-// the glob notation, but as a side effect, analyzing which choices were made
-// will no longer be possible
-export const AUTOGEN_MAX_CHOICES = 12;
-
 export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
+  simpleFeedback?: boolean;
   choices: contentTypes.Choice[];
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
@@ -42,7 +35,6 @@ export abstract class ChoiceFeedback
     super(props);
 
     this.onResponseEdit = this.onResponseEdit.bind(this);
-    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onResponseRemove = this.onResponseRemove.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
@@ -68,22 +60,6 @@ export abstract class ChoiceFeedback
     );
 
     onEdit(updatedModel);
-  }
-
-  onResponseAdd() {
-    const feedback = new contentTypes.Feedback();
-    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-
-    const response = new contentTypes.Response({
-      score: '0',
-      match: '',
-      feedback: feedbacks.set(feedback.guid, feedback),
-    });
-
-    const model = this.props.model.with({
-      responses: this.props.model.responses.set(response.guid, response),
-    });
-    this.props.onEdit(model);
   }
 
   onResponseRemove(response) {
@@ -177,20 +153,22 @@ export abstract class ChoiceFeedback
   }
 
   renderResponses() {
-    const { choices, model, context, services, editMode } = this.props;
+    const { choices, model, context, services, editMode, simpleFeedback } = this.props;
 
     // get default feedback details
     const defaultFeedbackBody = getGeneratedResponseBody(model);
     const defaultFeedbackScore = getGeneratedResponseScore(model);
 
-    // this methods takes the list of responses, filters out the auto-generated feedback
+    // this code takes the list of responses, filters out the auto-generated feedback
     // elements and replaces them with a single psudo-feedback element which covers all
     // other combinations of choices. By chaining these methods and adding some renderOpts,
     // we can distinguish between real responses and the psuedo one and reuse the feedback
     // rendering code
-    return this.props.model.responses.toArray()
-      // filter out all auto generated responses (identified by AUTOGEN string in name field)
-      .filter(r => !r.name || !r.name.match(/^AUTOGEN.*/))
+
+    // filter out all auto generated responses (identified by AUTOGEN string in name field)
+    const userResponses = model.responses.toArray().filter(autogenResponseFilter);
+
+    return userResponses
       // add some metadata for smarter rendering along-side psudo-feedback element
       .map(r => ({
         guid: r.guid,
@@ -217,17 +195,23 @@ export abstract class ChoiceFeedback
           key={response.guid}
           className="response"
           id={response.guid}
-          label={response.isDefault ? '' : `${i + 1}`}
-          contentTitle={response.isDefault ? 'Other Feedback' : ''}
+          label={response.isDefault || simpleFeedback ? '' : `${i + 1}`}
+          contentTitle={
+            response.isDefault ? 'Other Feedback' : ''
+            || simpleFeedback ? 'Correct' : ''
+          }
           context={context}
           services={services}
           editMode={editMode}
           body={response.feedbackBody}
           onEdit={body => response.onEdit(body, response.item)}
-          onRemove={response.isDefault ? undefined : () => this.onResponseRemove(response.item)}
+          onRemove={response.isDefault || userResponses.length === 1
+            ? null
+            : () => this.onResponseRemove(response.item)
+          }
           options={
           <ItemOptions>
-            {!response.isDefault
+            {!response.isDefault && !simpleFeedback
               ? (
                 <ItemOption className="matches" label="Matching Choices" flex>
                   <Typeahead
@@ -248,17 +232,23 @@ export abstract class ChoiceFeedback
                 )
               )
             }
-            <ItemOption className="score" label="Score">
-              <div className="input-group">
-                <input
-                  type="number"
-                  className="form-control input-sm form-control-sm"
-                  disabled={!this.props.editMode}
-                  value={response.score}
-                  onChange={({ target: { value } }) => response.onScoreEdit(response.item, value)}
-                  />
-              </div>
-            </ItemOption>
+            {!simpleFeedback
+              ? (
+                <ItemOption className="score" label="Score">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control input-sm form-control-sm"
+                      disabled={!this.props.editMode}
+                      value={response.score}
+                      onChange={({ target: { value } }) =>
+                        response.onScoreEdit(response.item, value)}
+                      />
+                  </div>
+                </ItemOption>
+              )
+              : (null)
+            }
           </ItemOptions>
           } />
       ));
@@ -267,10 +257,6 @@ export abstract class ChoiceFeedback
   render() : JSX.Element {
     return (
       <div className="choice-feedback">
-        <Button editMode={this.props.editMode}
-          type="link" onClick={this.onResponseAdd}>
-          Add Feedback
-        </Button>
         <InputList className="feedback-items">
           {this.renderResponses()}
         </InputList>

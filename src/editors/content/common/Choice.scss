@@ -1,3 +1,4 @@
+@import 'oli/colors';
 @import 'oli/zindex';
 
 .choice {
@@ -30,6 +31,40 @@
     .remove-btn {
       padding-top: 8px;
     }
+  }
+
+  .simple-select {
+    .btn-link {
+      font-size: 24px;
+      color: $gray-light;
+      padding: 0;
+
+      &:hover {
+        color: lighten($emerald, 20%);
+      }
+
+      &:active {
+        color: $emerald;
+      }
+    }
+
+    &.selected {
+      .btn-link {
+        color: $emerald;
+
+        &:hover {
+          color: $emerald;
+        }
+
+        &:active {
+          color: lighten($emerald, 20%);
+        }
+      }
+    }
+  }
+
+  &.input-list-item .input-list-item-label .input-list-item-controls .input-list-item-control.simple-select {
+    margin-top: 0;
   }
 
   .choice-drop-target-container {

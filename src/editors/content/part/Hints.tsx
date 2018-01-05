@@ -27,16 +27,8 @@ export abstract class Hints
   constructor(props) {
     super(props);
 
-    this.onAddHint = this.onAddHint.bind(this);
     this.onHintEdit = this.onHintEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
-  }
-
-  onAddHint() {
-    const { onEdit } = this.props;
-
-    const hint = new contentTypes.Hint();
-    onEdit(this.props.model.hints.set(hint.guid, hint));
   }
 
   onHintEdit(hint: contentTypes.Hint) {
@@ -67,13 +59,6 @@ export abstract class Hints
   render() : JSX.Element {
     return (
       <div className="hints">
-        <Button
-          editMode={this.props.editMode}
-          type="link"
-          onClick={this.onAddHint}>
-          Add Hint
-        </Button>
-
         {this.renderHints()}
       </div>
     );

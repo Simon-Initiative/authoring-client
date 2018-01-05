@@ -340,14 +340,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <button
           disabled={!this.props.editMode || isInline}
           type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPool}>Pool</button>
-
-          <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPoolRef}>Pool Reference</button>
+          onClick={this.onAddPoolRef}>Question Pool</button>
 
       </div>
     );

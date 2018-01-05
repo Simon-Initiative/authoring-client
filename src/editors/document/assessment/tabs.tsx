@@ -164,7 +164,7 @@ const PoolTab = (props: TabProps) => {
         <div>
         <DragHandle connectDragSource={props.connectDragSource}/>
         &nbsp;
-        <Label {...props}>Pool</Label>
+        <Label {...props}>Embedded Pool</Label>
         </div>
       </div>
     </Tab>
@@ -178,7 +178,7 @@ const PoolRefTab = (props: TabProps) => {
       <div>
         <DragHandle connectDragSource={props.connectDragSource}/>
         &nbsp;
-        <Label {...props}>Shared Pool</Label>
+        <Label {...props}>Question Pool</Label>
         </div>
       </div>
     </Tab>
