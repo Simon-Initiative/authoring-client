@@ -14,8 +14,8 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import './MultipleChoice.scss';
 
-const isComplexScoring = (partModel: contentTypes.Part) => {
-  const responses = partModel.responses.toArray();
+export const isComplexScoring = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.filter(r => !r.name.match(/^AUTOGEN/)).toArray();
 
   // scoring is complex (advanced mode) if scores exist for multiple
   // responses OR score is not 0 or 1
@@ -38,7 +38,7 @@ const isComplexScoring = (partModel: contentTypes.Part) => {
   return isAdvancedScoringMode;
 };
 
-const resetAllScores = (partModel: contentTypes.Part) => {
+export const resetAllScores = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
   const updatedResponses = responses.reduce(
@@ -126,7 +126,7 @@ export class MultipleChoice
     onToggleAdvancedScoring(model.guid);
   }
 
-  onToggleSimpleSelect(response: contentTypes.Response) {
+  onToggleSimpleSelect(response: contentTypes.Response, choice: contentTypes.Choice) {
     const { itemModel, partModel, onEdit } = this.props;
 
     let updatedPartModel = resetAllScores(partModel);
@@ -252,7 +252,10 @@ export class MultipleChoice
           choice={choice}
           allowFeedback
           allowScore={advancedScoring}
-          allowSimpleSelect
+          simpleSelectProps={{
+            selected: response.score !== '0',
+            onToggleSimpleSelect: this.onToggleSimpleSelect,
+          }}
           response={response}
           allowReorder={!itemModel.shuffle}
           context={context}
@@ -262,7 +265,6 @@ export class MultipleChoice
           onEditChoice={this.onChoiceEdit}
           onEditFeedback={this.onFeedbackEdit}
           onEditScore={this.onScoreEdit}
-          onToggleSimpleSelect={this.onToggleSimpleSelect}
           onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
       );
     });

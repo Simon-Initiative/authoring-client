@@ -73,16 +73,18 @@ export interface ChoiceProps  {
   response?: contentTypes.Response;
   allowFeedback?: boolean;
   allowScore?: boolean;
-  allowSimpleSelect?: boolean;
   allowReorder?: boolean;
   editMode: boolean;
   context: AppContext;
   services: AppServices;
+  simpleSelectProps?: {
+    onToggleSimpleSelect: (response: contentTypes.Response, choice: contentTypes.Choice) => void;
+    selected?: boolean;
+  };
   onReorderChoice?: (originalIndex: number, newIndex: number) => void;
   onEditChoice: (choice: contentTypes.Choice) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
-  onToggleSimpleSelect?: (response: contentTypes.Response) => void;
   onRemove: (choiceId: string) => void;
 }
 
@@ -104,12 +106,11 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     const {
       choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
       onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
-      allowSimpleSelect, onToggleSimpleSelect,
+      simpleSelectProps,
     } = this.props;
 
     let feedbackEditor;
     let scoreEditor;
-    let selected;
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
 
@@ -136,8 +137,6 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
             onChange={({ target: { value } }) => onEditScore(response, value) } />
         </div>
       );
-
-      selected = response.score !== '0';
     }
 
     return (
@@ -157,12 +156,17 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         onRemove={id => onRemove(id)}
         controls={
           <ItemControls>
-            {allowSimpleSelect
+            {simpleSelectProps
               ? (
-                <ItemControl className={`simple-select ${selected ? 'selected' : ''}`}>
+                <ItemControl
+                  className={`simple-select ${simpleSelectProps.selected ? 'selected' : ''}`}>
                   <Button type="link" editMode={editMode}
-                    onClick={() => response && onToggleSimpleSelect(response)} >
-                  <i className={`fa ${selected ? 'fa-check-circle' : 'fa-check-circle-o'}`} />
+                    onClick={() =>
+                      response && simpleSelectProps.onToggleSimpleSelect(response, choice)} >
+                  <i
+                    className={`fa ${simpleSelectProps.selected
+                      ? 'fa-check-circle' : 'fa-check-circle-o'}`
+                    } />
                   </Button>
                 </ItemControl>
               )
