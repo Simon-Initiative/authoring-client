@@ -5,14 +5,14 @@ import { Skill } from 'data//contentTypes';
 import { OtherAction } from './utils';
 
 export type SkillAction = SetSkillsAction | UpdateSkillsAction | OtherAction;
-export type SkillState = Map<string, Skill>;
+export type SkillsState = Map<string, Skill>;
 
-const initialState: SkillState = Map<string, Skill>();
+const initialState: SkillsState = Map<string, Skill>();
 
 export const skills = (
-  state: SkillState = initialState,
+  state: SkillsState = initialState,
   action: SkillAction,
-) : SkillState => {
+) : SkillsState => {
   switch (action.type) {
     case SET_SKILLS:
       return action.skills;

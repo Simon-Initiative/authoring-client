@@ -9,11 +9,14 @@ type ExpandCollapseAction =
   collapseNodesAction |
   OtherAction;
 
+export type ExpandedState = Immutable.Map<string, Immutable.Set<String>>;
+
 const defaultState = Immutable.Map<string, Immutable.Set<String>>();
 
 export function expanded(
-  state : Immutable.Map<string, Immutable.Set<String>> = defaultState,
-  action: ExpandCollapseAction) {
+  state : ExpandedState = defaultState,
+  action: ExpandCollapseAction,
+): ExpandedState {
 
   switch (action.type) {
     case COLLAPSE_NODES:

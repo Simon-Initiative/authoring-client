@@ -80,6 +80,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   constructor(props) {
     super(props);
 
+    this.onAddHint = this.onAddHint.bind(this);
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
@@ -90,6 +91,13 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   abstract renderDetails(): JSX.Element | boolean;
   abstract renderAdditionalTabs(): TabElement[] | boolean;
   abstract getClassName(): string;
+
+  onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
+    const { onEdit } = this.props;
+
+    const hint = new contentTypes.Hint();
+    this.onHintsEdit(part.hints.set(hint.guid, hint), item, part);
+  }
 
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
@@ -241,14 +249,18 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     } = this.props;
 
     return (
-      <Tab className="grading-tab">
-        <TabSection className="grading">
-          <Button
-            editMode={editMode}
-            type="link"
-            onClick={this.onCriteriaAdd}>
-            Add Grading Criteria
-          </Button>
+      <Tab className="criteria-tab">
+        <TabSection className="criteria">
+          <TabSectionHeader title="Grading Criteria">
+            <TabOptionControl key="add-cirteria" name="Add Criteria" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onCriteriaAdd}>
+                Add Criteria
+              </Button>
+            </TabOptionControl>
+          </TabSectionHeader>
 
           {partModel.criteria.toArray()
             .map(c => (
@@ -271,7 +283,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <Tab className="hints-tab">
         <TabSection className="hints">
-          <TabSectionHeader title="Hints"/>
+          <TabSectionHeader title="Hints">
+            <TabOptionControl key="add-hint" name="Add Hint" hideLabel>
+              <Button
+                editMode={this.props.editMode}
+                type="link"
+                onClick={() => this.onAddHint(item, part)}>
+                Add Hint
+              </Button>
+            </TabOptionControl>
+          </TabSectionHeader>
           <TabSectionContent>
             <Hints
               context={this.props.context}

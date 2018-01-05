@@ -176,6 +176,21 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
   }
 }
 
+export interface ItemControlsProps {
+  className?: string;
+}
+
+export const ItemControls: React.StatelessComponent<ItemControlProps> = ({
+  className,
+  children,
+}) => {
+  return (
+    <div className={`input-list-item-controls ${className || ''}`}>
+      {children}
+    </div>
+  );
+};
+
 export interface ItemControlProps {
   className?: string;
 }
