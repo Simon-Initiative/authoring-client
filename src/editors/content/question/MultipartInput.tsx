@@ -17,12 +17,14 @@ import { Numeric } from '../items/Numeric';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 
+type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
+
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
-  canInsertAnotherPart: (e: any) => void;
+  canInsertAnotherPart: PartAddPredicate;
 }
 
 export interface MultipartInputState extends QuestionState {
@@ -42,20 +44,20 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return 'multipart-input';
   }
 
-  onInsertNumeric(numericCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertNumeric(numericCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Numeric')) {
       this.htmlEditor.process(numericCommand);
     }
   }
 
-  onInsertText(textCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertText(textCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Text')) {
       this.htmlEditor.process(textCommand);
     }
   }
 
-  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('FillInTheBlank')) {
       this.htmlEditor.process(fillInTheBlankCommand);
     }
   }
