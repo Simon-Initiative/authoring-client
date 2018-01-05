@@ -20,7 +20,7 @@ import {
   UnifiedSkillsModel, unifyObjectives, unifySkills,
 } from './persistence';
 import * as Messages from 'types/messages';
-import { UserInfo } from 'reducers/user';
+import { UserState } from 'reducers/user';
 import { Row } from './Row';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
@@ -29,7 +29,7 @@ import './ObjectiveSkillView.scss';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
-  user: UserInfo;
+  user: UserState;
   course: models.CourseModel;
   dispatch: any;
   expanded: any;

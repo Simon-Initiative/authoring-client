@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { ViewActions } from '../actions/view';
 import { CourseModel } from 'data/models';
-import { UserInfo } from 'reducers/user';
+import { UserState } from 'reducers/user';
 
 import './Header.scss';
 
 export interface HeaderProps {
   course: CourseModel;
-  user: UserInfo;
+  user: UserState;
   viewActions: ViewActions;
 }
 

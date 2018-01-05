@@ -10,8 +10,9 @@ import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
-  InputList, InputListItem, ItemOption, ItemOptions, ItemOptionFlex,
+  InputList, InputListItem, ItemControls, ItemControl, ItemOptions, ItemOption, ItemOptionFlex,
 } from 'editors/content/common/InputList.tsx';
+import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
 
@@ -76,6 +77,10 @@ export interface ChoiceProps  {
   editMode: boolean;
   context: AppContext;
   services: AppServices;
+  simpleSelectProps?: {
+    onToggleSimpleSelect: (response: contentTypes.Response, choice: contentTypes.Choice) => void;
+    selected?: boolean;
+  };
   onReorderChoice?: (originalIndex: number, newIndex: number) => void;
   onEditChoice: (choice: contentTypes.Choice) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
@@ -94,12 +99,14 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
   constructor(props) {
     super(props);
+
   }
 
   render() {
     const {
       choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
       onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
+      simpleSelectProps,
     } = this.props;
 
     let feedbackEditor;
@@ -147,6 +154,26 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         body={choice.body}
         onEdit={body => onEditChoice(choice.with({ body }))}
         onRemove={id => onRemove(id)}
+        controls={
+          <ItemControls>
+            {simpleSelectProps
+              ? (
+                <ItemControl
+                  className={`simple-select ${simpleSelectProps.selected ? 'selected' : ''}`}>
+                  <Button type="link" editMode={editMode}
+                    onClick={() =>
+                      response && simpleSelectProps.onToggleSimpleSelect(response, choice)} >
+                  <i
+                    className={`fa ${simpleSelectProps.selected
+                      ? 'fa-check-circle' : 'fa-check-circle-o'}`
+                    } />
+                  </Button>
+                </ItemControl>
+              )
+              : (null)
+            }
+          </ItemControls>
+        }
         options={
           <ItemOptions>
             {allowFeedback

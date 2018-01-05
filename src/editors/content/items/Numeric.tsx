@@ -1,12 +1,13 @@
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Select } from '../common/controls';
+import { Select, Button } from '../common/controls';
 import {
-  TabSection, TabSectionContent, TabSectionHeader,
+  TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
 
@@ -28,6 +29,7 @@ export class Numeric
     super(props);
 
     this.onPartEdit = this.onPartEdit.bind(this);
+    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onSizeChange = this.onSizeChange.bind(this);
     this.onNotationChange = this.onNotationChange.bind(this);
     this.onEditMult = this.onEditMult.bind(this);
@@ -35,6 +37,25 @@ export class Numeric
 
   onPartEdit(partModel: contentTypes.Part) {
     this.props.onEdit(this.props.itemModel, partModel);
+  }
+
+  onResponseAdd() {
+    const { partModel } = this.props;
+
+    const feedback = new contentTypes.Feedback();
+    const feedbacks = OrderedMap<string, contentTypes.Feedback>();
+
+    const response = new contentTypes.Response({
+      score: '0',
+      match: '',
+      feedback: feedbacks.set(feedback.guid, feedback),
+    });
+
+    const updatedPartModel = partModel.with({
+      responses: partModel.responses.set(response.guid, response),
+    });
+
+    this.onPartEdit(updatedPartModel);
   }
 
   onSizeChange(inputSize) {
@@ -54,6 +75,7 @@ export class Numeric
   render() {
     const {
       partModel,
+      editMode,
     } = this.props;
 
     return (
@@ -73,7 +95,16 @@ export class Numeric
             <option value="scientific">Scientific</option>
           </Select>
         </TabSectionContent>
-        <TabSectionHeader title="Feedback"/>
+        <TabSectionHeader title="Feedback">
+          <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
+            <Button
+              editMode={editMode}
+              type="link"
+              onClick={this.onResponseAdd}>
+              Add Feedback
+            </Button>
+          </TabOptionControl>
+        </TabSectionHeader>
         <TabSectionContent key="feedback" className="feedback">
           <Feedback
             {...this.props}

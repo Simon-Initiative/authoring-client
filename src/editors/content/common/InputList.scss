@@ -24,6 +24,18 @@
         margin-top: 4px;
         margin-left: 10px;
       }
+
+      .input-list-item-controls {
+        display: flex;
+        flex-direction: row;
+        margin: 0 5px;
+
+        .input-list-item-control {
+          margin-top: 4px;
+          margin-left: 10px;
+        }
+      }
+
     }
 
     .input-list-item-content {
@@ -49,10 +61,6 @@
           right: 0;
           z-index: $reposition-target - 1;
         }
-      }
-
-      .input-list-item-controls {
-
       }
 
       .input-list-item-content-title {

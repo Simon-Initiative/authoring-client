@@ -1,12 +1,17 @@
 import { requestActions } from '../actions/requests';
 import { OtherAction } from './utils';
 
-type RequestAction = 
+type RequestAction =
   requestActions.startRequestAction |
   requestActions.endRequestAction |
   OtherAction;
 
-export function requests(state : requestActions.startRequestAction[] = [], action: RequestAction) {
+export type RequestsState = requestActions.startRequestAction[];
+
+export function requests(
+  state: RequestsState = [],
+  action: RequestAction,
+): RequestsState {
   switch (action.type) {
     case requestActions.START_REQUEST:
       return [...state, action];

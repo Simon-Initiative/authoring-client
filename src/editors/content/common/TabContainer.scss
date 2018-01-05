@@ -69,6 +69,11 @@
           .control-label {
             margin: 0 10px;
           }
+
+          /** fix for buttons in controls */
+          button {
+            margin-top: -10px;
+          }
         }
       }
     }
