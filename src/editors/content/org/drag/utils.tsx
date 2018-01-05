@@ -10,18 +10,17 @@ export type DestinationNodeType = t.Sequences | t.Sequence | t.Unit | t.Module |
 
 
 export function renderDraggableTreeNode(
-  model: any, parentModel: any, renderedNode, canHandleDrop, 
+  model: any, parentModel: any, renderedNode, canHandleDrop,
   onReorderNode, editMode, indexWithinParent) {
 
-  const elements = [];
   const key = parentModel.guid + '-draggable-' + model.guid;
 
   const bottomTarget = indexWithinParent === parentModel.children.size - 1
-    ? <RepositionTarget 
+    ? <RepositionTarget
       key={key}
-      index={indexWithinParent + 1} 
+      index={indexWithinParent + 1}
       parentModel={parentModel}
-      canAcceptId={canHandleDrop}  
+      canAcceptId={canHandleDrop}
       onDrop={onReorderNode}/>
     : null;
 
@@ -34,17 +33,17 @@ export function renderDraggableTreeNode(
     <div style={outerStyle}>
 
       <div style={node}>
-      <DraggableNode key={key} id={model.guid} editMode={editMode} 
+      <DraggableNode key={key} id={model.guid} editMode={editMode}
         index={indexWithinParent} source={model} parentModel={parentModel}>
         {renderedNode}</DraggableNode>
       </div>
 
       <div style={topDrop}>
-        <RepositionTarget 
+        <RepositionTarget
           key={key}
-          index={indexWithinParent} 
+          index={indexWithinParent}
           parentModel={parentModel}
-          canAcceptId={canHandleDrop}  
+          canAcceptId={canHandleDrop}
           onDrop={onReorderNode}/>
       </div>
       <div style={bottomDrop}>
@@ -57,30 +56,30 @@ export function renderDraggableTreeNode(
 export type TypePredicate = (droppedType : SourceNodeType) => boolean;
 
 export function canAcceptDrop(
-  acceptsTypePredicate : TypePredicate, 
+  acceptsTypePredicate : TypePredicate,
   sourceModel : SourceNodeType,
-  destinationModel : DestinationNodeType, 
+  destinationModel : DestinationNodeType,
   sourceIndex : number,
   destinationIndex: number,
   sourceParentGuid: string) : boolean {
 
   const accepts = acceptsTypePredicate(sourceModel);
 
-  
+
   return accepts;
 }
 
 export function renderDropTarget(
   index: number, parentModel: any, canHandleDrop, onReorderNode, forItemGuid) {
-  
+
   const key = parentModel.guid + '-' + forItemGuid;
 
   return (
-    <RepositionTarget 
+    <RepositionTarget
       key={key}
-      index={index} 
+      index={index}
       parentModel={parentModel}
-      canAcceptId={canHandleDrop}  
+      canAcceptId={canHandleDrop}
       onDrop={onReorderNode}/>
   );
 }

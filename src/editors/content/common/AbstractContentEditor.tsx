@@ -1,6 +1,4 @@
 import * as React from 'react';
-
-import * as models from 'data/models';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 

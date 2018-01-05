@@ -5,7 +5,6 @@ import { augment, getChildren } from '../common';
 import { Row } from './row';
 import { CellData } from './celldata';
 import { getKey } from '../../common';
-import { Param } from './param';
 
 export type TableParams = {
   id?: string,
@@ -43,7 +42,7 @@ export class Table extends Immutable.Record(defaultContent) {
   title: string;
   rows: Immutable.OrderedMap<string, Row>;
   guid: string;
-  
+
   constructor(params?: TableParams) {
     super(augment(params));
   }
@@ -52,12 +51,20 @@ export class Table extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Table {
+    return this.with({
+      id: createGuid(),
+      rows: this.rows.map(r => r.clone()).toOrderedMap(),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string) : Table {
 
     const t = (root as any).table;
 
     let model = new Table({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -72,9 +79,9 @@ export class Table extends Immutable.Record(defaultContent) {
     if (t['@rowstyle'] !== undefined) {
       model = model.with({ rowstyle: t['@rowstyle'] });
     }
-    
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -83,11 +90,11 @@ export class Table extends Immutable.Record(defaultContent) {
           model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
-    
+
+
     return model;
   }
 
@@ -104,7 +111,7 @@ export class Table extends Immutable.Record(defaultContent) {
         '@title': this.title,
         '@rowstyle': this.rowstyle,
         '#array': rows,
-      }, 
+      },
     };
   }
 }

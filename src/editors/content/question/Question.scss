@@ -24,10 +24,8 @@
         cursor: pointer;
       }
 
-      &.grading {
-        select {
-          margin-top: -5px
-        }
+      select {
+        margin-top: -5px
       }
 
       &:first-child {
@@ -38,45 +36,23 @@
     }
   }
 
-  .section {
-    border-bottom: 1px solid $gray-lighter;
-    padding: 15px 0;
+  .question-body {
+    margin: 15px 0;
+  }
 
-    &:last-child {
-      border-bottom: none;
+  .details-tab {
+    border-bottom: none;
+  }
+
+  .skills-tab {
+    .concepts-editor {
+      margin: 0;
     }
+  }
 
-    .section-header {
-      display: flex;
-      flex-direction: row;
-      margin: 10px 0;
-
-      h3 {
-        font-size: 1rem;
-        font-weight: 600;
-      }
-
-      .controls {
-        font-size: 0.8rem;
-        @include disable-select;
-
-        & > * {
-          display: flex;
-          flex-direction: row;
-        }
-
-        .control {
-          cursor: pointer;
-
-          .control-label {
-            margin: 0 10px;
-          }
-        }
-      }
-    }
-
-    .section-content {
-      @include enable-select;
-    }
+  .instruction-label {
+    font-size: 0.9rem;
+    color: $gray-dark;
+    margin-bottom: 5px;
   }
 }

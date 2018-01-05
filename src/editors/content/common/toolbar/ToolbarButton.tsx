@@ -10,7 +10,7 @@ export type ToolbarButtonProps<DataType> = {
 };
 
 export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonProps<DataType>, {}> {
-  
+
   buttonRef: any;
 
   constructor(props) {
@@ -30,9 +30,9 @@ export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonPr
   onClick() {
     this.props.processor.process(this.props.command);
   }
-  
+
   render() {
-    const { command, icon, tooltip } = this.props;
+    const { icon } = this.props;
     const iconClasses = 'icon icon-' + icon;
     const style = {
       color: 'white',
@@ -42,15 +42,15 @@ export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonPr
     };
 
     return (
-      <button 
+      <button
         ref={a => this.buttonRef = a}
         onClick={this.onClick}
-        disabled={!this.props.processor.checkPrecondition(this.props.command)} 
+        disabled={!this.props.processor.checkPrecondition(this.props.command)}
         data-toggle="tooltip"
         data-placement="top"
         title={this.props.tooltip}
-        type="button" 
-        className="btn" 
+        type="button"
+        className="btn"
         style={buttonStyle}>
         <i style={style} className={iconClasses}></i>
       </button>

@@ -1,13 +1,17 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
-import { Skill, LearningObjective } from 'data/contentTypes';
+import { LearningObjective, Skill } from 'data/contentTypes';
 import ObjectiveSkillView from './ObjectiveSkillView';
-import { CourseModel } from 'data/models';
 import { setSkills, updateSkills } from 'actions/skills';
 import { setObjectives, updateObjectives } from 'actions/objectives';
+import * as Messages from 'types/messages';
+import { dismissSpecificMessage, showMessage } from 'actions/messages';
+import * as lockActions from 'actions/locks';
+import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
 
 interface StateProps {
   skills: any;
+  user: any;
 }
 
 interface DispatchProps {
@@ -15,6 +19,10 @@ interface DispatchProps {
   onUpdateSkills: (skills: OrderedMap<string, Skill>) => void;
   onSetObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
   onUpdateObjectives: (objectives: OrderedMap<string, LearningObjective>) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 interface OwnProps {
@@ -25,10 +33,11 @@ interface OwnProps {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { skills } = state;
+  const { skills, user } = state;
 
   return {
     skills,
+    user,
   };
 };
 
@@ -45,6 +54,18 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onUpdateObjectives: (objs: OrderedMap<string, LearningObjective>) => {
       dispatch(updateObjectives(objs));
+    },
+    showMessage: (message: Messages.Message) => {
+      dispatch(showMessage(message));
+    },
+    dismissMessage: (message: Messages.Message) => {
+      dispatch(dismissSpecificMessage(message));
+    },
+    registerLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.registerLocks(locks));
+    },
+    unregisterLocks: (locks: AcquiredLock[]) => {
+      dispatch(lockActions.unregisterLocks(locks));
     },
   };
 };

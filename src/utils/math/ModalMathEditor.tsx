@@ -1,8 +1,5 @@
 import * as React from 'react';
 
-import * as types from '../../data/types';
-import * as persistence from '../../data/persistence';
-
 import ModalSelection from '../selection/ModalSelection';
 import { MathEditor } from './MathEditor';
 

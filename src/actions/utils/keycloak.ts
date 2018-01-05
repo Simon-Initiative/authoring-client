@@ -1,6 +1,7 @@
 import { UserProfile } from 'types/user';
-import { credentials, getHeaders } from './credentials';
+import { credentials } from './credentials';
 import { configuration } from './config';
+
 const keyCloak = require('keycloak-js');
 
 export type LoginSuccessCallback =
@@ -89,9 +90,9 @@ export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Pr
         resolve(false);
       });
     });
-  } else {
-    return Promise.resolve(true);
   }
+
+  return Promise.resolve(true);
 }
 
 export function hasRole(role: string) : boolean {

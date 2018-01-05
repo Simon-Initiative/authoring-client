@@ -1,15 +1,11 @@
 import * as persistence from 'data/persistence';
 import { CourseModel, ModelTypes, WorkbookPageModel } from 'data/models';
-import { LegacyTypes } from 'data/types';
 import { Resource } from 'data//contentTypes';
 import * as Immutable from 'immutable';
-import { requestActions } from './requests';
-import { credentials, getHeaders } from './utils/credentials';
-import { viewDocument } from './view';
 import { fetchSkills } from './skills';
 import { fetchObjectives } from './objectives';
 import { PLACEHOLDER_ITEM_ID } from '../data/content/org/common';
-import { configuration } from './utils/config';
+
 
 export type COURSE_CHANGED = 'course/COURSE_CHANGED';
 export const COURSE_CHANGED: COURSE_CHANGED = 'course/COURSE_CHANGED';
@@ -29,8 +25,8 @@ export type UpdateCourseResourcesAction = {
 
 export const updateCourseResources = (resources: Immutable.OrderedMap<string, Resource>)
   : UpdateCourseResourcesAction => ({
-    type: UPDATE_COURSE_RESOURCES,
     resources,
+    type: UPDATE_COURSE_RESOURCES,
   });
 
 
@@ -39,9 +35,10 @@ export const updateCourseResources = (resources: Immutable.OrderedMap<string, Re
  * @param model - course model
  */
 export const courseChanged = (model: CourseModel): CourseChangedAction => ({
-  type: COURSE_CHANGED,
   model,
+  type: COURSE_CHANGED,
 });
+
 
 
 function createPlaceholderPage(courseId: string) {
@@ -77,12 +74,12 @@ export function loadCourse(courseId: string) {
           dispatch(fetchObjectives(courseId));
           return updatedModel;
 
-        } else {
-          dispatch(courseChanged(document.model));
-          dispatch(fetchSkills(courseId));
-          dispatch(fetchObjectives(courseId));
-          return document.model;
         }
+
+        dispatch(courseChanged(document.model));
+        dispatch(fetchSkills(courseId));
+        dispatch(fetchObjectives(courseId));
+        return document.model;
       }
 
     })
@@ -90,10 +87,5 @@ export function loadCourse(courseId: string) {
   };
 }
 
-export function viewCourse(courseId: string) {
-  return function (dispatch) {
-    dispatch(loadCourse(courseId)).then(c => viewDocument(courseId, courseId));
-  };
-}
 
 

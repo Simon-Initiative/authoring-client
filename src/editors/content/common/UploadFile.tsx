@@ -1,13 +1,9 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
-import { EntityTypes } from '../../../data/content/html/common';
 
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
-import ResourceSelection from '../../../utils/selection/ResourceSelection';
 import MediaSelection from '../../../utils/selection/MediaSelection';
-import { createAttachment } from '../../../utils/selection/upload';
-import { fileToBase64 } from '../../../utils/file';
 
 function onInsert(context, services, resolve, reject, type, file) {
    

@@ -1,4 +1,3 @@
-import { appendText } from './common';
 import { AbstractCommand } from '../../command';
 import { EditorState, RichUtils, SelectionState } from 'draft-js';
 

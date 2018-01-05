@@ -5,7 +5,9 @@ import * as persistence from 'data/persistence';
 import * as contentTypes from 'data/contentTypes';
 import * as view from 'actions/view';
 import * as courseActions from 'actions/course';
+import * as messageActions from 'actions/messages';
 import * as models from 'data/models';
+import * as Messages from 'types/messages';
 import guid from 'utils/guid';
 
 import { fetchSkills } from 'actions/skills';
@@ -23,6 +25,10 @@ export interface AppServices {
 
   // Request to view a document with the specified document id.
   viewDocument: (documentId: types.DocumentId, courseId: string) => void;
+
+  displayMessage: (message: Messages.Message) => void;
+
+  dismissMessage: (message: Messages.Message) => void;
 
   createWorkbookPage: (title: string, courseId: string) => Promise<persistence.Document>;
 
@@ -68,8 +74,17 @@ export class DispatchBasedServices implements AppServices {
     this.courseModel = courseModel;
   }
 
+
+  displayMessage(message: Messages.Message) {
+    this.dispatch(messageActions.showMessage(message));
+  }
+
+  dismissMessage(message: Messages.Message) {
+    this.dispatch(messageActions.dismissSpecificMessage(message));
+  }
+
   viewDocument(documentId: string, courseId: string) {
-    view.viewDocument(documentId, courseId);
+    this.dispatch(view.viewDocument(documentId, courseId));
   }
 
   createWorkbookPage(title: string, courseId: string) : Promise<persistence.Document> {
@@ -168,24 +183,24 @@ export class DispatchBasedServices implements AppServices {
 
     if (found !== undefined && found !== null) {
       return Promise.resolve(extract(found));
-    } else {
-      return new Promise((resolve, reject) => {
-        persistence.retrieveCoursePackage(this.courseModel.guid)
-        .then((doc) => {
-
-          if (doc.model.modelType === 'CourseModel') {
-            const found = find(doc.model);
-            if (found !== undefined && found !== null) {
-              resolve(extract(found));
-
-              this.dispatch(courseActions.courseChanged(doc.model));
-
-            } else {
-              reject('Could not find resource');
-            }
-          }
-        });
-      });
     }
+
+    return new Promise((resolve, reject) => {
+      persistence.retrieveCoursePackage(this.courseModel.guid)
+      .then((doc) => {
+
+        if (doc.model.modelType === 'CourseModel') {
+          const found = find(doc.model);
+          if (found !== undefined && found !== null) {
+            resolve(extract(found));
+
+            this.dispatch(courseActions.courseChanged(doc.model));
+
+          } else {
+            reject('Could not find resource');
+          }
+        }
+      });
+    });
   }
 }

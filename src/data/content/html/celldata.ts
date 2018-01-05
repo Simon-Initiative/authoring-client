@@ -1,17 +1,12 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { Row } from './row';
-import { getKey } from '../../common';
-import { Param } from './param';
 
 import { ContentState } from 'draft-js';
+import { toPersistence } from './topersistence';
+import { cloneContent } from '../common/clone';
+import { toDraft } from './todraft';
 
 const emptyContent = ContentState.createFromText('');
-
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
 
 export type CellDataParams = {
   align?: string,
@@ -31,14 +26,14 @@ const defaultContent = {
 };
 
 export class CellData extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'CellData';
   align: string;
   colspan: string;
   rowspan: string;
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: CellDataParams) {
     super(augment(params));
   }
@@ -47,12 +42,18 @@ export class CellData extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : CellData {
+    return this.with({
+      content: cloneContent(this.content),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : CellData {
 
     const t = (root as any).td;
 
     let model = new CellData({ guid });
-    
+
     if (t['@colspan'] !== undefined) {
       model = model.with({ colspan: t['@colspan'] });
     }
@@ -68,7 +69,7 @@ export class CellData extends Immutable.Record(defaultContent) {
     } else {
       model = model.with({ content: toDraft(getChildren(t)) });
     }
-    
+
     return model;
   }
 

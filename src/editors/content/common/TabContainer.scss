@@ -16,16 +16,105 @@
         border-top-right-radius: 0px;
 
         &:hover {
-          border-bottom: 2px solid $selection;
+          border-bottom: 2px solid lighten($selection, 10%);
           margin-bottom: -2px;
         }
       }
 
       .nav-item.show .nav-link, .nav-link.active {
         background-color: transparent;
-        border-color: #ddd #ddd transparent;
-        border-bottom: 2px solid $white;
+        border-bottom: 2px solid $selection;
         margin-bottom: -2px;
+      }
+    }
+
+    .tab-control {
+      padding: .5rem 1rem;
+    }
+  }
+
+  .tab-section {
+    padding: 15px 0;
+
+    &:first-child {
+      padding: 0;
+    }
+
+    .tab-section-header {
+      display: flex;
+      flex-direction: row;
+      margin: 10px 0;
+
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: row;
+        font-size: 0.8rem;
+        @include disable-select;
+        margin: 10px 0;
+
+        & > * {
+          display: flex;
+          flex-direction: row;
+        }
+
+        .control {
+          margin: 0 5px;
+          cursor: pointer;
+
+          .control-label {
+            margin: 0 10px;
+          }
+
+          /** fix for buttons in controls */
+          button {
+            margin-top: -10px;
+          }
+        }
+      }
+    }
+
+    .tab-section-content {
+      @include enable-select;
+    }
+
+    .tab-section-options {
+      display: flex;
+      flex-direction: row;
+      font-size: 0.8rem;
+      padding-top: 15px;
+      @include disable-select;
+
+      & > * {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .option,
+      .control {
+        .control-label {
+          margin: 0 10px;
+        }
+
+        &.clickable {
+          cursor: pointer;
+        }
+
+        &.grading {
+          select {
+            margin-top: -5px
+          }
+        }
+
+        &:first-child {
+          .control-label {
+            margin-left: 0;
+          }
+        }
       }
     }
   }

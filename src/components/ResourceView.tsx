@@ -1,18 +1,13 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import NavigationBar from './navigation/NavigationBar.controller';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as viewActions from 'actions/view';
-import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
+import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { Resource } from 'data/content/resource';
-import { courseChanged, updateCourseResources } from 'actions/course';
-import * as contentTypes from 'data/contentTypes';
-import { SortableTable, DataRow, ColumnComparator, SortDirection } from './common/SortableTable';
+import { updateCourseResources } from 'actions/course';
+import { SortableTable, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
-import guid from 'utils/guid';
 
 import './ResourceView.scss';
 
@@ -37,12 +32,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   constructor(props) {
     super(props);
-
-    this.viewActions = bindActionCreators((viewActions as any), this.props.dispatch);
   }
 
   clickResource(id) {
-    viewActions.viewDocument(id, this.props.course.guid);
+    this.props.dispatch(viewActions.viewDocument(id, this.props.course.guid));
   }
 
   createResource(e) {
@@ -144,8 +137,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     return (
       <div className="resource-view container-fluid new">
         <div className="row">
-          <NavigationBar viewActions={this.viewActions}/>
-          <div className="col-sm-9 col-md-10 document">
+          <div className="col-sm-12 col-md-12 document">
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">

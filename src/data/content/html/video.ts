@@ -54,7 +54,7 @@ const defaultContent = {
 };
 
 export class Video extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Video';
   id: string;
   title: string;
@@ -73,7 +73,7 @@ export class Video extends Immutable.Record(defaultContent) {
   caption: Caption;
   cite: Cite;
   guid: string;
-  
+
   constructor(params?: VideoParams) {
     super(augment(params));
   }
@@ -82,12 +82,23 @@ export class Video extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Video {
+    return this.with({
+      id: createGuid(),
+      alternate: this.alternate.clone(),
+      titleContent: this.titleContent.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string, toDraft) : Video {
 
     const t = (root as any).video;
 
     let model = new Video({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -117,9 +128,9 @@ export class Video extends Immutable.Record(defaultContent) {
     if (t['@controls'] !== undefined) {
       model = model.with({ controls: t['@controls'] === 'true' });
     }
-    
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -148,10 +159,10 @@ export class Video extends Immutable.Record(defaultContent) {
           model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -185,7 +196,7 @@ export class Video extends Immutable.Record(defaultContent) {
         '@width': this.width,
         '@controls': this.controls ? 'true' : 'false',
         '#array': children,
-      }, 
+      },
     };
   }
 }

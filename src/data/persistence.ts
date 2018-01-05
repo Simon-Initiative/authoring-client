@@ -15,6 +15,10 @@ export { createWebContent } from './persistence/webcontent';
 export { developerRegistration } from './persistence/developer';
 
 export {
+  PreviewSuccess,
+  PreviewResult,
+  PreviewNotSetUp,
+  initiatePreview,
   retrieveDocument,
   bulkFetchDocuments,
   listenToDocument,

@@ -1,7 +1,6 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
-import { Maybe } from 'tsmonad';
 import { getKey } from '../common';
 
 import { LegacyTypes } from '../types';

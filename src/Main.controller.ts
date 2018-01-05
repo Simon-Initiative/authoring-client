@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import { CourseModel } from 'data/models';
-import { Maybe } from 'tsmonad';
 import Main from './Main';
 
 interface StateProps {
@@ -26,7 +25,6 @@ const mapStateToProps = (state): StateProps => {
     course,
     expanded,
     server,
-    titles,
   } = state;
 
   return {

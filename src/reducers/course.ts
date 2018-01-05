@@ -1,17 +1,20 @@
-import { Map } from 'immutable';
+import { CourseModel } from 'data/models';
 import {
-  CourseModel,
-} from 'data/models';
-import {
-  CourseChangedAction,
-  COURSE_CHANGED,
-  UpdateCourseResourcesAction,
-  UPDATE_COURSE_RESOURCES,
+    COURSE_CHANGED, CourseChangedAction, UPDATE_COURSE_RESOURCES,
+    UpdateCourseResourcesAction,
 } from 'actions/course';
+
+import { ENTER_APPLICATION_VIEW, EnterApplicationViewAction } from 'actions/view';
+
 import { OtherAction } from './utils';
 
-type ActionTypes = CourseChangedAction | UpdateCourseResourcesAction | OtherAction;
-type CourseState = CourseModel;
+type ActionTypes =
+  EnterApplicationViewAction
+  | CourseChangedAction
+  | UpdateCourseResourcesAction
+  | OtherAction;
+
+export type CourseState = CourseModel;
 
 const initialState = null;
 
@@ -24,6 +27,8 @@ export const course = (
       return action.model;
     case UPDATE_COURSE_RESOURCES:
       return state.with({ resources: state.resources.merge(action.resources) });
+    case ENTER_APPLICATION_VIEW:
+      return initialState;
     default:
       return state;
   }

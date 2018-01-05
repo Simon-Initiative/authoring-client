@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
 import PoolEditor from './PoolEditor';
 import { fetchSkills } from 'actions/skills';
-import { Title, Skill } from 'types/course';
+import { Skill } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
 import { PoolModel } from 'data/models';
 

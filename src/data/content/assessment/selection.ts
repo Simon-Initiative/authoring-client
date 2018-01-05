@@ -1,9 +1,7 @@
 import * as Immutable from 'immutable';
-
-import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
-import { getChildren, augment } from '../common';
+import { augment, getChildren } from '../common';
 import { Pool } from './pool';
 import { PoolRef } from './pool_ref';
 

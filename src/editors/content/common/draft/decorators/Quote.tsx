@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 
 class Quote extends React.PureComponent<any, any> {

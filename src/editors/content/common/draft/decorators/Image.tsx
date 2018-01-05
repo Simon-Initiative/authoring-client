@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
-import { Button } from '../../Button';
 
 class Image extends React.PureComponent<any, any> {
 

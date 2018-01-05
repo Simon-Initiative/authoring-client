@@ -1,10 +1,8 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-
-import { NodeId, NodeState, Nodes,
-  RenderedNode, NodeRenderer, Handlers, HasGuid,
-  ChildrenAccessor, ChildrenMutator,
-  TreeRenderer } from './types';
+import {
+  ChildrenAccessor, Handlers, HasGuid, NodeId, NodeRenderer, Nodes, RenderedNode,
+} from './types';
 
 // Given a collection of root nodes (nodes) and a way to navigate
 // through their tree structure (getChildren) render only

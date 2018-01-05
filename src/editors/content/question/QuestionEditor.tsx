@@ -1,16 +1,14 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ContentState, EditorState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import { MultipleChoice } from './MultipleChoice';
+import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
-import { CheckAllThatApply } from './CheckAllThatApply';
+import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
-import { Ordering } from './Ordering';
+import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
-import { Command } from '../common/command';
 import { EntityTypes } from '../../../data/content/html/common';
 import { Skill } from 'types/course';
 import { changes, removeInputRef } from '../../../data/content/html/changes';
@@ -29,7 +27,7 @@ export interface QuestionEditorState {
 }
 
 /**
- * The content editor for HtmlContent.
+ * Question Editor Component
  */
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
@@ -60,11 +58,8 @@ export class QuestionEditor
     this.canInsertAnotherPart = this.canInsertAnotherPart.bind(this);
     this.onBodyEdit = this.onBodyEdit.bind(this);
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
-    this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onGradingChange = this.onGradingChange.bind(this);
-    this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
-    this.onAddOrdering = this.onAddOrdering.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
@@ -94,11 +89,17 @@ export class QuestionEditor
     this.setState({ activeItemId });
   }
 
-  canInsertAnotherPart(): boolean {
-    const restricted = this.props.isParentAssessmentGraded
-      === undefined || this.props.isParentAssessmentGraded;
+  canInsertAnotherPart(
+    question: contentTypes.Question,
+    contentTypeToAdd: 'Numeric' | 'Text' | 'FillInTheBlank'): boolean {
 
-    return !restricted || this.props.model.items.size === 0;
+    if (!this.props.isParentAssessmentGraded) {
+      return true;
+    }
+
+    // For summative, require that all the items be of the type type
+    return question.items.size === 0
+      || question.items.first().contentType === contentTypeToAdd;
   }
 
   onBodyEdit(body) {
@@ -174,37 +175,6 @@ export class QuestionEditor
     this.props.onEdit(model);
   }
 
-
-  onAddMultipleChoice(select) {
-
-    if (!this.canInsertAnotherPart()) return;
-
-    let item = new contentTypes.MultipleChoice();
-
-    const value = select === 'multiple' ? 'A' : guid().replace('-', '');
-    const match = select === 'multiple' ? 'A' : value;
-
-    const choice = new contentTypes.Choice({ value, guid: guid() });
-    const feedback = new contentTypes.Feedback();
-    let response = new contentTypes.Response({ match });
-    response = response.with({ guid: guid(),
-      feedback: response.feedback.set(feedback.guid, feedback) });
-
-    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
-    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
-      .set(response.guid, response);
-
-    item = item.with({ guid: guid(), select, choices });
-
-    let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
-
-    let part = new contentTypes.Part();
-    part = part.with({ guid: guid(), responses });
-    model = model.with({ parts: model.parts.set(part.guid, part) });
-
-    this.props.onEdit(model);
-  }
-
   onRemove(itemModel: contentTypes.QuestionItem, partModel) {
 
     const items = this.props.model.items.delete(itemModel.guid);
@@ -225,41 +195,6 @@ export class QuestionEditor
   onGradingChange(grading) {
 
     this.props.onEdit(this.props.model.with({ grading }));
-  }
-
-  onAddShortAnswer(e) {
-    e.preventDefault();
-
-    if (!this.canInsertAnotherPart()) return;
-
-
-    const item = new contentTypes.ShortAnswer();
-    let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
-
-    let part = new contentTypes.Part();
-    const response = new contentTypes.Response({ match: '*', score: '1' });
-
-    part = part.with({ responses: part.responses.set(response.guid, response) });
-    model = model.with({ parts: model.parts.set(part.guid, part) });
-
-    this.props.onEdit(model);
-  }
-
-  onAddOrdering(e) {
-    e.preventDefault();
-    if (!this.canInsertAnotherPart()) return;
-
-    const value = 'A';
-
-    const choice = new contentTypes.Choice().with({ value, guid: guid() });
-    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
-    const item = new contentTypes.Ordering().with({ choices });
-    let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
-
-    const part = new contentTypes.Part();
-    model = model.with({ parts: model.parts.set(part.guid, part) });
-
-    this.props.onEdit(model);
   }
 
   renderQuestionBody(): JSX.Element {
@@ -293,12 +228,13 @@ export class QuestionEditor
           fillInTheBlankCommand={this.fillInTheBlankCommand}
           numericCommand={this.numericCommand}
           textCommand={this.textCommand}
-          canInsertAnotherPart={() => this.canInsertAnotherPart()}
+          canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
           model={this.props.model}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+    }
+    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
         <MultipleChoice
           context={this.props.context}
@@ -320,7 +256,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
+    }
+    if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
         <CheckAllThatApply
           context={this.props.context}
@@ -342,7 +279,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'ShortAnswer') {
+    }
+    if (item.contentType === 'ShortAnswer') {
       return (
         <ShortAnswer
           context={this.props.context}
@@ -364,7 +302,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'Ordering') {
+    }
+    if (item.contentType === 'Ordering') {
       return (
         <Ordering
           context={this.props.context}
@@ -386,7 +325,8 @@ export class QuestionEditor
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
-    } else if (item.contentType === 'Essay') {
+    }
+    if (item.contentType === 'Essay') {
       return (
         <Essay
           context={this.props.context}
@@ -419,4 +359,3 @@ export class QuestionEditor
     );
   }
 }
-

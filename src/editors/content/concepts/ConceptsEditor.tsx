@@ -4,10 +4,8 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { Skill } from 'types/course';
 import * as contentTypes from 'data/contentTypes';
 import {
-  AbstractContentEditor,
-  AbstractContentEditorProps,
+  AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { TextInput, InlineForm, Button, Checkbox } from 'editors/content/common/controls';
 
 import './ConceptsEditor.scss';
 
@@ -63,9 +61,6 @@ export default class ConceptsEditor
   }
 
   render() : JSX.Element {
-
-    const skills = this.props.model.toArray();
-
     const options = this.props.context.skills
       .toArray()
       .map(s => ({ id: s.id, title: s.title }));

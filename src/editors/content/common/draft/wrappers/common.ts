@@ -1,12 +1,12 @@
 import { EntityTypes } from '../../../../../data/content/html/common';
-import { ContentState, ContentBlock} from 'draft-js';
+import { ContentBlock, ContentState } from 'draft-js';
 
 export type BlockIdentifier = (block: ContentBlock, content: ContentState) => boolean;
 
 export type ContentWrapper = {
   component : any,
   isBeginBlock: BlockIdentifier,
-  isEndBlock: BlockIdentifier
+  isEndBlock: BlockIdentifier,
 };
 
 export function isEntityType(type: EntityTypes, block: ContentBlock, content: ContentState) {
@@ -16,8 +16,7 @@ export function isEntityType(type: EntityTypes, block: ContentBlock, content: Co
     const entity = content.getEntity(key);
     return entity.type === type;
 
-  } else {
-    return false;
   }
-  
+
+  return false;
 }

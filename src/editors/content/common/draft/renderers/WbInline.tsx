@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { WbInline as WbInlineType } from '../../../../../data/content/html/wbinline';
-import PreformattedText from './PreformattedText';
-import { InteractiveRenderer, InteractiveRendererProps,
-  InteractiveRendererState} from './InteractiveRenderer';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import * as persistence from '../../../../../data/persistence';
-
-import { BlockProps } from './properties';
 import { Select } from '../../Select';
 import { Button } from '../../Button';
 import { PurposeTypes } from '../../../../../data/content/html/common';

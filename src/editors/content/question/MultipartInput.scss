@@ -1,6 +1,26 @@
+@import 'oli/colors';
+
 .multipart-input {
+  .question {
+    /** true up dropdown (custom-select) style with other input styles */
+    .custom-select {
+      padding-top: 0;
+      padding-bottom: 0;
+      color: #495057;
+      margin-right: 2px !important;
+    }
+  }
+
   .control {
     &.insert-item {
+      & > * {
+        margin-right: 10px;
+
+        &::last-child {
+          margin-right: 0;
+        }
+      }
+
       button {
         padding: 0;
       }
@@ -9,6 +29,24 @@
         cursor: pointer;
         left: -75;
       }
+    }
+  }
+
+  .item-part-editor {
+    .tab-control {
+      .btn-remove {
+        color: $black;
+        font-size: 0.8em;
+        padding: 0;
+
+        &:hover, &:active {
+          text-decoration: none;
+        }
+      }
+    }
+
+    .choices .choice {
+      margin-bottom: 25px;
     }
   }
 }

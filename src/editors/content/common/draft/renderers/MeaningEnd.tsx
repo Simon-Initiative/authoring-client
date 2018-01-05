@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { handleInsertion } from './common';
 import './markers.scss';
 
 export const MeaningEnd = (props) => {

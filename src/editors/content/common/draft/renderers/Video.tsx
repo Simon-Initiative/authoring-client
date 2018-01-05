@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Video as VideoType } from '../../../../../data/content/html/video';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState} from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { VideoEditor } from '../../../media/VideoEditor';
 import { buildUrl } from '../../../../../utils/path';
@@ -20,11 +19,11 @@ export interface VideoProps extends InteractiveRendererProps {
 }
 
 export interface VideoState extends InteractiveRendererState {
-  
+
 }
 
 export interface VideoProps {
-  
+
 }
 
 
@@ -46,13 +45,13 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         services={b.services}
 
         model={this.props.data.video}
-        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onCancel={() => this.props.blockProps.services.dismissModal()}
         onInsert={(video) => {
           this.props.blockProps.services.dismissModal();
           this.props.blockProps.onEdit({ video });
         }
       }>
-        <VideoEditor 
+        <VideoEditor
           model={this.props.data.video}
           context={b.context}
           services={b.services}
@@ -74,12 +73,12 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
     if (sources.size > 0) {
       const src = sources.first().src;
       fullSrc = buildUrl(
-      this.props.blockProps.context.baseUrl, 
-      this.props.blockProps.context.courseId, 
-      this.props.blockProps.context.resourcePath, 
+      this.props.blockProps.context.baseUrl,
+      this.props.blockProps.context.courseId,
+      this.props.blockProps.context.resourcePath,
       src);
     }
-    
+
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}

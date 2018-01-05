@@ -11,11 +11,11 @@ export function fileToBase64(file: Blob) : Promise<string> {
       const result = reader.result;
       const base64data = result.substring(result.indexOf(',') + 1);
       resolve(base64data);
-    }, false);
+    },                      false);
 
     reader.addEventListener('error', () => {
       reject(reader.error);
-    }, false);
+    },                      false);
 
     reader.readAsDataURL(file);
     

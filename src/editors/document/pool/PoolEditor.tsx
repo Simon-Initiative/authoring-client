@@ -9,14 +9,10 @@ import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from '../assessment/Outline';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import guid from '../../../utils/guid';
-import { DragDropContext } from 'react-dnd';
 import { renderAssessmentNode } from '../common/questions';
 import { findNodeByGuid } from '../assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
-
-import HTML5Backend from 'react-dnd-html5-backend';
 
 import './PoolEditor.scss';
 
@@ -33,7 +29,6 @@ interface PoolEditorState extends AbstractEditorState {
   currentNode: contentTypes.Node;
 }
 
-@DragDropContext(HTML5Backend)
 class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorProps,
   PoolEditorState>  {

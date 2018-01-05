@@ -1,13 +1,9 @@
-
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { ContentState, EditorState, ContentBlock, convertToRaw, SelectionState } from 'draft-js';
+import { EditorState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
-import { CommandProcessor, Command } from '../common/command';
-import { AppServices } from '../../common/AppServices';
+import { Command, CommandProcessor } from '../common/command';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
 
 
 export type ChangePreviewer = (

@@ -1,12 +1,8 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
-import { Link }  from '../../../data/content/html/link';
-import { AppServices } from '../../common/AppServices';
+import { Link } from '../../../data/content/html/link';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
-import { Button } from '../common/Button';
 
 export interface LinkEditorProps extends AbstractContentEditorProps<Link> {
 

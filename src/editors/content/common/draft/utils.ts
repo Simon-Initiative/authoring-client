@@ -1,15 +1,12 @@
-
-import { SelectionState } from 'draft-js';
+import { ContentState, Modifier, SelectionState } from 'draft-js';
+import guid from 'utils/guid';
+import { getAllEntities } from 'data/content/html/changes';
 
 export enum SelectionChangeType {
-  Initial, 
+  Initial,
   None,  // no change at all
   CursorPosition, // only the cursor position changed
-  Selection // an actual selection change occurred
-}
-
-const log = (ss) => {
-  // console.log(ss.getAnchorKey() + '(' + ss.getAnchorOffset() + ') - ' + ss.getFocusKey() + '(' + ss.getFocusOffset() + ')');
+  Selection, // an actual selection change occurred
 }
 
 export function getCursorPosition() {
@@ -25,36 +22,35 @@ export function getCursorPosition() {
   } catch (err) {
     return null;
   }
-    
-  }
+}
 
 export function getPosition() {
-    const selection = document.getSelection();
-    if (selection.rangeCount === 0) return null;
+  const selection = document.getSelection();
+  if (selection.rangeCount === 0) return null;
 
-    const range = selection.getRangeAt(0);
-    const clientRects = range.getClientRects();
+  const range = selection.getRangeAt(0);
+  const clientRects = range.getClientRects();
 
-    let top = clientRects.item(0);
-    for (let i = 0; i < clientRects.length; i++) {
-      let c = clientRects.item(i);
-      if (c.top < top.top) {
-        top = c;
-      }
+  let top = clientRects.item(0);
+  for (let i = 0; i < clientRects.length; i = i + 1) {
+
+    const c = clientRects.item(i);
+    if (c.top < top.top) {
+      top = c;
     }
-
-    return top;
   }
+
+  return top;
+}
 
 
 export function hasSelection(ss: SelectionState) {
   if (ss.getAnchorKey() !== ss.getFocusKey()) {
     return true;
-  } else if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
+  } if (ss.getAnchorOffset() !== ss.getFocusOffset()) {
     return true;
-  } else {
-    return false; 
   }
+  return false;
 }
 
 export function removeHTML(text : string) : string {
@@ -66,11 +62,11 @@ export function removeHTML(text : string) : string {
 
 export function setCaretPosition(editableDiv, positionIndex) {
   editableDiv.focus();
-  var textNode = editableDiv.firstChild;
-  var range = document.createRange();
+  const textNode = editableDiv.firstChild;
+  const range = document.createRange();
   range.setStart(textNode, positionIndex);
   range.setEnd(textNode, positionIndex);
-  var sel = window.getSelection();
+  const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(range);
 }
@@ -89,24 +85,28 @@ export function getSelectionRange(editableDiv) : Object {
 
 
 export function getCaretPosition(editableDiv) {
-  var caretPos = 0,
-    sel, range;
+  let caretPos = 0;
+  let sel;
+  let range;
+
   if (window.getSelection) {
     sel = window.getSelection();
     if (sel.rangeCount) {
       range = sel.getRangeAt(0);
-      if (range.commonAncestorContainer.parentNode == editableDiv) {
+      if (range.commonAncestorContainer.parentNode === editableDiv) {
         caretPos = range.endOffset;
       }
     }
   } else if ((document as any).selection && (document as any).selection.createRange) {
     range = (document as any).selection.createRange();
-    if (range.parentElement() == editableDiv) {
-      var tempEl = document.createElement("span");
+
+    if (range.parentElement() === editableDiv) {
+
+      const tempEl = document.createElement('span');
       editableDiv.insertBefore(tempEl, editableDiv.firstChild);
-      var tempRange = range.duplicate();
+      const tempRange = range.duplicate();
       tempRange.moveToElementText(tempEl);
-      tempRange.setEndPoint("EndToEnd", range);
+      tempRange.setEndPoint('EndToEnd', range);
       caretPos = tempRange.text.length;
     }
   }
@@ -114,13 +114,14 @@ export function getCaretPosition(editableDiv) {
 }
 
 
-export function determineChangeType(previous: SelectionState, current: SelectionState) : SelectionChangeType {
+export function determineChangeType(
+  previous: SelectionState, current: SelectionState): SelectionChangeType {
 
   if (previous === null) {
     return SelectionChangeType.Initial;
   }
 
-  // if identifical, then no change 
+  // if identifical, then no change
   if (previous.getAnchorKey() === current.getAnchorKey()
     && previous.getAnchorOffset() === current.getAnchorOffset()
     && previous.getFocusKey() === current.getFocusKey()
@@ -134,8 +135,55 @@ export function determineChangeType(previous: SelectionState, current: Selection
 
   if (!currentHasSelection && !previousHasSelection) {
     return SelectionChangeType.CursorPosition;
-  } else {
-    return SelectionChangeType.Selection;
   }
+  return SelectionChangeType.Selection;
 
+}
+
+function getSingularKey(o) {
+  if (Object.keys(o).length === 1) {
+    return Object.keys(o)[0];
+  }
+  return null;
+}
+
+export function cloneDuplicatedEntities(current: ContentState) : ContentState {
+  let contentState = current;
+  const entities = getAllEntities(contentState);
+
+  // Find any duplicated entities and clone them
+  const seenKeys = {};
+  entities.forEach((e) => {
+    if (seenKeys[e.entityKey] === undefined) {
+      seenKeys[e.entityKey] = e;
+    } else {
+      // This is a duplicate, clone it
+
+      const copy = Object.assign({}, e.entity.data);
+
+      // If the data has an id, generate a new one to
+      // avoid duplication
+      if (copy.id !== undefined) {
+        copy.id = guid();
+      } else {
+        const key = getSingularKey(copy);
+        if (key !== null && copy[key].id !== undefined) {
+          copy[key] = copy[key].with({ id: guid() });
+        }
+      }
+
+      contentState = contentState.createEntity(
+        e.entity.type, e.entity.mutability, copy);
+      const createdKey = contentState.getLastCreatedEntityKey();
+      const range = new SelectionState({
+        anchorKey: e.range.contentBlock.key,
+        focusKey: e.range.contentBlock.key,
+        anchorOffset: e.range.start,
+        focusOffset: e.range.end,
+      });
+      contentState = Modifier.applyEntity(contentState, range, createdKey);
+    }
+  });
+
+  return contentState;
 }

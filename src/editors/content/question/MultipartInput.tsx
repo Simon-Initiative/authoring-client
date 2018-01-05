@@ -6,22 +6,25 @@ import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { InsertInputRefCommand } from '../question/commands';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown.tsx';
+import {
+  Question, QuestionProps, QuestionState,
+} from './Question';
 import { TabContainer } from 'editors/content/common/TabContainer';
-import { Question, QuestionProps, QuestionState,
-  Section, SectionHeader, SectionContent, Tab } from './Question';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';
 
 import './MultipartInput.scss';
+import { Button } from 'editors/content/common/Button';
+
+type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
-  canInsertAnotherPart: (e: any) => void;
+  canInsertAnotherPart: PartAddPredicate;
 }
 
 export interface MultipartInputState extends QuestionState {
@@ -34,25 +37,41 @@ export interface MultipartInputState extends QuestionState {
 export class MultipartInput extends Question<MultipartInputProps, MultipartInputState> {
   constructor(props: MultipartInputProps) {
     super(props);
-    this.setClassname('multipart-input');
   }
 
-  onInsertNumeric(numericCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'multipart-input';
+  }
+
+  onInsertNumeric(numericCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Numeric')) {
       this.htmlEditor.process(numericCommand);
     }
   }
 
-  onInsertText(textCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertText(textCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Text')) {
       this.htmlEditor.process(textCommand);
     }
   }
 
-  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('FillInTheBlank')) {
       this.htmlEditor.process(fillInTheBlankCommand);
     }
+  }
+
+  /** Implement parent absract methods */
+  renderDetails() {
+    // we are rendering our own details tabs,
+    // therefore do not render the parent details tab
+    return false;
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 
   /**
@@ -72,29 +91,34 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     } = this.props;
 
     const bodyStyle = {
-      minHeight: '30px',
+      minHeight: '50px',
       borderStyle: 'none',
       borderWith: '1px',
       borderColor: '#AAAAAA',
     };
 
-    const multipartButtons = [
-      <HtmlToolbarButton
+    const multipartButtons = [];
+    if (canInsertAnotherPart('FillInTheBlank')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Dropdown"
         key="server"
         icon="server"
-        command={fillInTheBlankCommand}/>,
-      <HtmlToolbarButton
+        command={fillInTheBlankCommand}/>);
+    }
+    if (canInsertAnotherPart('Numeric')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Numeric Input"
         key="info"
         icon="info"
-        command={numericCommand}/>,
-      <HtmlToolbarButton
+        command={numericCommand}/>);
+    }
+    if (canInsertAnotherPart('Text')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Text Input"
         key="i-cursor"
         icon="i-cursor"
-        command={textCommand}/>,
-    ];
+        command={textCommand}/>);
+    }
 
     const insertionToolbar =
       <InlineInsertionToolbar>
@@ -102,47 +126,44 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       </InlineInsertionToolbar>;
 
     return (
-      <Section className="question" key="question">
-        <SectionHeader title="Question">
-          <div className="control insert-item">
-              Insert:&nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
-                Numeric
-              </button>
-              &nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
-                Text
-              </button>
-              &nbsp;&nbsp;
-              <button className="btn btn-sm btn-link" type="button"
-                onClick={() => this.onInsertFillInTheBlank(
-                  fillInTheBlankCommand, canInsertAnotherPart)}>
-                Dropdown
-              </button>
+      <div className="question-body" key="question">
+        <div className="control insert-item">
+            <span>Insert:</span>
+            <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
+              onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
+              Numeric
+            </button>
+            <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
+              onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
+              Text
+            </button>
+            <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
+              onClick={() => this.onInsertFillInTheBlank(
+                fillInTheBlankCommand, canInsertAnotherPart)}>
+              Dropdown
+            </button>
 
-          </div>
-        </SectionHeader>
-        <SectionContent>
-          <HtmlContentEditor
-            ref={c => this.htmlEditor = c}
-            editMode={editMode}
-            services={services}
-            context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={insertionToolbar}
-            blockToolbar={<BlockToolbar/>}
-            model={body}
-            onEdit={onBodyEdit} />
-          </SectionContent>
-      </Section>
+        </div>
+        <HtmlContentEditor
+          ref={c => this.htmlEditor = c}
+          editMode={editMode}
+          services={services}
+          context={context}
+          editorStyles={bodyStyle}
+          inlineToolbar={<InlineToolbar/>}
+          inlineInsertionToolbar={insertionToolbar}
+          blockToolbar={<BlockToolbar/>}
+          model={body}
+          onEdit={onBodyEdit} />
+      </div>
     );
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, hideGradingCriteria } = this.props;
+    const { model, hideGradingCriteria, editMode, onRemove } = this.props;
     const items = model.items.toArray();
     const parts = model.parts.toArray();
 
@@ -213,14 +234,21 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             'Skills',
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
-            'Other',
+          ]}
+          controls={[
+            <Button
+                type="link"
+                className="btn-remove"
+                editMode={editMode}
+                onClick={() => onRemove(item, parts[index])}>
+              <i className="fa fa-trash" /> Remove
+            </Button>,
           ]}>
 
           {getTabFromContentType(item, parts[index], this.props)}
           {this.renderSkillsTab(item, parts[index])}
           {this.renderHintsTab(item, parts[index])}
           {!hideGradingCriteria ? this.renderGradingCriteriaTab(item, parts[index]) : null}
-          {this.renderOtherTab(item, parts[index])}
         </TabContainer>
       </div>
     ));

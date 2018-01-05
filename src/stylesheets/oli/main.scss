@@ -4,7 +4,6 @@
 @import './layout';
 @import './variables';
 @import './tables';
-@import './toggles';
 @import './typography';
 @import '../editors/content/common/draft/DraftWrapper';
 @import './sortabletree.scss';
@@ -17,6 +16,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	font-family: $sans-font;
 	outline: none;
+	overflow: hidden;
 }
 
 #app {

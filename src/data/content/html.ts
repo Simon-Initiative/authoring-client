@@ -2,8 +2,8 @@ import * as Immutable from 'immutable';
 import { ContentState } from 'draft-js';
 import { toPersistence } from './html/topersistence';
 import { toDraft } from './html/todraft';
-import createGuid from '../../utils/guid';
 import { augment } from './common';
+import { cloneContent } from './common/clone';
 
 const emptyContent = ContentState.createFromText('');
 
@@ -16,7 +16,7 @@ export type HtmlParams = {
 const defaultHtmlParams = {
   contentType: 'Html',
   contentState: emptyContent,
-  guid: '',
+  guid: undefined,
 };
 
 export class Html extends Immutable.Record(defaultHtmlParams) {
@@ -25,7 +25,7 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
 
   contentState: ContentState;
   guid: string;
-  
+
   constructor(params?: HtmlParams) {
     super(augment(params));
   }
@@ -36,6 +36,12 @@ export class Html extends Immutable.Record(defaultHtmlParams) {
 
   toPersistence() : any {
     return toPersistence(this.contentState);
+  }
+
+  clone() {
+    return new Html().with({
+      contentState: cloneContent(this.contentState),
+    });
   }
 
   static fromText(text: string) : Html {

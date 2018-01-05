@@ -1,12 +1,4 @@
 import * as React from 'react';
-import { AppServices } from '../../common/AppServices';
-import {
-  toggleInlineStyle,
-  toggleBlockType,
-  insertInlineEntity,
-  AuthoringActionsHandler,
-} from '../../../actions/authoring';
-import { EntityTypes } from '../../../data/content/html/common';
 
 import './UndoRedoToolbar.scss';
 
@@ -17,7 +9,7 @@ export interface UndoRedoToolbarProps {
   redoEnabled: boolean;
 }
 
-export class UndoRedoToolbar extends React.PureComponent<UndoRedoToolbarProps, {}> {
+export class UndoRedoToolbar extends React.Component<UndoRedoToolbarProps, {}> {
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.undoEnabled !== this.props.undoEnabled ||
@@ -30,8 +22,8 @@ export class UndoRedoToolbar extends React.PureComponent<UndoRedoToolbarProps, {
         disabled={!enabled}
         onClick={handler}
         type="button"
-        className="btn">
-        <i className={`icon icon-${icon}`}></i>
+        className="toolbar-btn">
+        <i className={`fa fa-${icon}`}></i>
       </button>
     );
   }

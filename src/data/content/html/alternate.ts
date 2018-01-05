@@ -1,15 +1,12 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
-
+import { cloneContent } from '../common/clone';
 import { toPersistence } from './topersistence';
 import { toDraft } from './todraft';
+
+const emptyContent = ContentState.createFromText('');
 
 export type AlternateParams = {
   title?: string,
@@ -27,13 +24,13 @@ const defaultContent = {
 };
 
 export class Alternate extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Alternate';
   title: string;
   idref: string;
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: AlternateParams) {
     super(augment(params));
   }
@@ -42,21 +39,28 @@ export class Alternate extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Alternate {
+    return this.with({
+      content: cloneContent(this.content),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Alternate {
 
     const t = (root as any).alternate;
 
     let model = new Alternate({ guid });
-    
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
     if (t['@idref'] !== undefined) {
       model = model.with({ idref: t['@idref'] });
     }
-    
+
     model = model.with({ content: toDraft(getChildren(t)) });
-    
+
     return model;
   }
 

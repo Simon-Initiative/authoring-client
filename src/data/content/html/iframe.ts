@@ -3,9 +3,6 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-
-import { Source } from './source';
-import { Track } from './track';
 import { Popout } from './popout';
 import { Alternate } from './alternate';
 import { Title } from './title';
@@ -42,7 +39,7 @@ const defaultContent = {
 };
 
 export class IFrame extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'IFrame';
   id: string;
   title: string;
@@ -55,7 +52,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
   caption: Caption;
   cite: Cite;
   guid: string;
-  
+
   constructor(params?: IFrameParams) {
     super(augment(params));
   }
@@ -64,12 +61,23 @@ export class IFrame extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : IFrame {
+    return this.with({
+      id: createGuid(),
+      alternate: this.alternate.clone(),
+      titleContent: this.titleContent.clone(),
+      caption: this.caption.clone(),
+      cite: this.cite.clone(),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string, toDraft) : IFrame {
 
     const t = (root as any).iframe;
 
     let model = new IFrame({ guid });
-    
+
     if (t['@id'] !== undefined) {
       model = model.with({ id: t['@id'] });
     } else {
@@ -87,9 +95,9 @@ export class IFrame extends Immutable.Record(defaultContent) {
     if (t['@width'] !== undefined) {
       model = model.with({ width: t['@width'] });
     }
-    
+
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -112,10 +120,10 @@ export class IFrame extends Immutable.Record(defaultContent) {
           model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -137,7 +145,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
         '@height': this.height,
         '@width': this.width,
         '#array': children,
-      }, 
+      },
     };
   }
 }

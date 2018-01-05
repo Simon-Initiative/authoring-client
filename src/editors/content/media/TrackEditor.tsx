@@ -1,17 +1,12 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as contentTypes from '../../../data/contentTypes';
 import * as persistence from '../../../data/persistence';
 
-import { Track }  from '../../../data/content/html/track';
-import { AppServices } from '../../common/AppServices';
-import { uploadFile } from '../common/UploadFile';
+import { Track } from '../../../data/content/html/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
 
 import { TextInput } from '../common/TextInput';
-import { InputLabel } from '../common/InputLabel';
 import { Button } from '../common/Button';
 
 export interface TrackEditorProps extends AbstractContentEditorProps<Track> {
@@ -47,7 +42,8 @@ export class TrackEditor
   shouldComponentUpdate(nextProps, nextState: TrackEditorState) {
     if (nextProps.model !== this.props.model) {
       return true;
-    } else if (nextState.failure !== this.state.failure) {
+    }
+    if (nextState.failure !== this.state.failure) {
       return true;
     }
     return false;
@@ -81,7 +77,6 @@ export class TrackEditor
 
   onFileChange(e) {
     const file = e.target.files[0];
-    const src = file.name;
 
     persistence.createWebContent(this.props.context.courseId, file)
     .then((result) => {

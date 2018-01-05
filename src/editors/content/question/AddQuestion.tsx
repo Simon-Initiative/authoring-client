@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
 import { ContentState } from 'draft-js';
+
 const defaultInputBody = ContentState.createFromText('Add numeric, text, or dropdown components');
 
 export interface AddQuestion {

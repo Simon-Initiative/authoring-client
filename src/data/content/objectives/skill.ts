@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-import createGuid from '../../../utils/guid';
 
 export type SkillParams = {
   id?: string,
@@ -26,7 +25,7 @@ const defaultContent = {
 };
 
 export class Skill extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Skill';
   id: string;
   guid: string;
@@ -66,28 +65,27 @@ export class Skill extends Immutable.Record(defaultContent) {
     }
 
     getChildren(skill).forEach((item) => {
-      
+
       const key = getKey(item);
-      const id = createGuid();
-     
+
       switch (key) {
         case '#text':
           model = model.with({ title: item['#text'] });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    const s = { 
+    const s = {
       skill: {
         '@id': this.id,
         '#array': [{ '#text': this.title }],
-      }, 
+      },
     };
 
     if (this.p !== '') {

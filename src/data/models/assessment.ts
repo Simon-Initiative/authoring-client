@@ -3,7 +3,7 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { assessmentTemplate } from '../activity_templates';
-import { isNullOrUndefined, isArray } from 'util';
+import { isArray, isNullOrUndefined } from 'util';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
@@ -49,9 +49,9 @@ function migrateNodesToPage(model: AssessmentModel) {
         (page, node) => {
           if (node.contentType !== 'Unsupported') {
             return page.with({ nodes: page.nodes.set(node.guid, node) });
-          } else {
-            return page;
           }
+
+          return page;
         },
         page);
 

@@ -1,9 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
-import * as persistence from '../../../data/persistence';
-import * as models from '../../../data/models';
-import * as types from '../../../data/types';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import { handleKey, unhandleKey } from './keyhandlers';

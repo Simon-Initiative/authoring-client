@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 
 import { Html } from '../html';
 import { augment } from '../common';
-import { getKey } from '../../common';
 
 export type ContentParams = {
   availability?: string,

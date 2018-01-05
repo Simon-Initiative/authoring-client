@@ -1,27 +1,26 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
 import { UserProfile } from 'types/user';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import * as courseActions from 'actions/course';
+import * as messageActions from 'actions/messages';
+import * as Messages from 'types/messages';
 import guid from 'utils/guid';
 import { configuration } from 'actions/utils/config';
 import { AbstractEditorProps } from '../document/common/AbstractEditor';
-import { AppServices, DispatchBasedServices } from '../common/AppServices';
-import { buildFeedbackFromCurrent } from 'utils/feedback';
+import { DispatchBasedServices } from '../common/AppServices';
 import {
-  onFailureCallback,
-  onSaveCompletedCallback,
-  PersistenceStrategy,
+  onFailureCallback, onSaveCompletedCallback, PersistenceStrategy,
 } from './persistence/PersistenceStrategy';
-import { LockDetails, renderLocked } from 'utils/lock';
+import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
+import { buildPersistenceFailureMessage, buildReportProblemAction } from 'utils/error';
 import { ListeningApproach } from './ListeningApproach';
 import { lookUpByName } from './registry';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
-import { Skill, LearningObjective } from 'data//contentTypes';
+import { RegisterLocks, UnregisterLocks } from 'types/locks';
+import { LearningObjective, Skill } from 'data//contentTypes';
 import './EditorManager.scss';
 
 export interface EditorManagerProps {
@@ -35,6 +34,8 @@ export interface EditorManagerProps {
   objectives: Immutable.Map<string, LearningObjective>;
   onCourseChanged: (model: models.CourseModel) => any;
   onDispatch: (...args: any[]) => any;
+  registerLocks: RegisterLocks;
+  unregisterLocks: UnregisterLocks;
 }
 
 export interface EditorManagerState {
@@ -53,6 +54,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
   onSaveFailure: onFailureCallback;
   stopListening: boolean;
   waitBufferTimer: any;
+  failedMessage: Messages.Message;
 
   constructor(props) {
     super(props);
@@ -66,14 +68,28 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       undoRedoGuid: guid(),
     };
 
+    this.failedMessage = null;
     this.componentDidUnmount = false;
     this.persistenceStrategy = null;
     this.onEdit = this.onEdit.bind(this);
     this.onUndoRedoEdit = this.onUndoRedoEdit.bind(this);
-    this.onSaveCompleted = (doc: persistence.Document) => {};
+    this.onSaveCompleted = (doc: persistence.Document) => {
+      if (this.failedMessage !== null) {
+        this.props.onDispatch(messageActions.dismissSpecificMessage(this.failedMessage));
+        this.failedMessage = null;
+      }
+    };
     this.onSaveFailure = (reason: any) => {
       if (reason === 'Forbidden') {
+
+        const message = buildLockExpiredMessage({ label: 'Reload',
+          execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
+
+        this.props.onDispatch(messageActions.showMessage(message));
         this.setState({ editingAllowed: false });
+      } else {
+        this.failedMessage = buildPersistenceFailureMessage(reason, this.props.profile);
+        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
       }
     };
   }
@@ -102,7 +118,7 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
 
     const doc = document.with({ model });
     const undoRedoGuid = guid();
-    this.setState({ document: doc, undoRedoGuid }, () => this.persistenceStrategy.save(doc));
+    this.setState({ undoRedoGuid, document: doc }, () => this.persistenceStrategy.save(doc));
   }
 
   initPersistence(document: persistence.Document) {
@@ -115,9 +131,21 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
       document, userName,
       this.onSaveCompleted,
       this.onSaveFailure,
+      this.props.registerLocks,
+      this.props.unregisterLocks,
     ).then((editingAllowed) => {
       if (!this.componentDidUnmount) {
         this.setState({ editingAllowed });
+
+        if (!editingAllowed) {
+
+          const lockDetails = this.persistenceStrategy.getLockDetails();
+          const message = buildReadOnlyMessage(lockDetails, { label: 'Reload',
+            execute: () => this.fetchDocument(this.props.course.guid, this.props.documentId)});
+          this.props.onDispatch(messageActions.showMessage(message));
+        } else {
+          this.props.onDispatch(messageActions.dismissScopedMessages(Messages.Scope.Resource));
+        }
 
         const listeningApproach: ListeningApproach
           = lookUpByName(document.model.modelType).listeningApproach;
@@ -165,6 +193,24 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         this.setState({ document });
       })
       .catch((failure) => {
+
+        const content = new Messages.TitledContent().with({
+          title: 'Cannot load resource.',
+          message: 'There was a problem loading this course resource.',
+        });
+
+        const { profile } = this.props;
+        const name = profile.firstName + ' ' + profile.lastName;
+
+        this.failedMessage = new Messages.Message().with({
+          content,
+          scope: Messages.Scope.Resource,
+          severity: Messages.Severity.Error,
+          canUserDismiss: false,
+          actions: Immutable.List([buildReportProblemAction(failure, name, profile.email)]),
+        });
+        this.props.onDispatch(messageActions.showMessage(this.failedMessage));
+
         this.setState({ failure });
       });
   }
@@ -268,46 +314,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     );
   }
 
-  renderError() {
-    const { documentId, profile } = this.props;
-    const { failure } = this.state;
-
-    const url = buildFeedbackFromCurrent(
-      profile.firstName + ' ' + profile.lastName,
-      profile.email,
-    );
-
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-2">
-            &nbsp;
-          </div>
-          <div className="col-8">
-            <div className="alert alert-danger" role="alert">
-              <h4 className="alert-heading">Problem encountered!</h4>
-              <p>
-                A problem was encountered while trying to render the
-                course material.
-              </p>
-              <p className="mb-0">Resource id:</p>
-              <pre>{documentId}</pre>
-
-              <p className="mb-0">Error:</p>
-              <pre className="mb-0">{failure}</pre>
-              <br/>
-              <br/>
-              <a target="_blank" href={url}>Report this Error</a>
-            </div>
-          </div>
-          <div className="col-2">
-            &nbsp;
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   render(): JSX.Element {
     const { course, documentId, expanded, userId, onDispatch } = this.props;
     const {
@@ -319,56 +325,51 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     } = this.state;
 
     if (failure !== null) {
-      return this.renderError();
-    } else if (document === null || editingAllowed === null) {
+      return null;
+    }
+    if (document === null || editingAllowed === null) {
       if (waitBufferElapsed) {
         return this.renderWaiting();
-      } else {
-        return null;
       }
-    } else {
-      const courseId = (course as models.CourseModel).guid;
-      const courseLabel = (course as models.CourseModel).id;
-      const version = (course as models.CourseModel).version;
 
-      const childProps: AbstractEditorProps<any> = {
-        model: document.model,
-        expanded: expanded.has(documentId)
-          ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
-          : Maybe.nothing<Immutable.Set<string>>(),
-        context: {
-          documentId,
-          userId,
-          courseId,
-          resourcePath: this.determineBaseUrl((document.model as any).resource),
-          baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
-          courseModel: course,
-          undoRedoGuid,
-          skills: this.props.skills,
-          objectives: this.props.objectives,
-        },
-        dispatch: onDispatch,
-        onEdit: this.onEdit,
-        onUndoRedoEdit: this.onUndoRedoEdit,
-        services: new DispatchBasedServices(
-          onDispatch,
-          course,
-        ),
-        editMode: editingAllowed,
-      };
-
-      const registeredEditor = lookUpByName(document.model.modelType);
-      const editor = React.createElement((registeredEditor.component as any), childProps);
-
-      return (
-        <div className="editor-manager">
-          {editingAllowed ?
-            null
-            : renderLocked(this.persistenceStrategy.getLockDetails())
-          }
-          {editor}
-        </div>
-      );
+      return null;
     }
+
+    const courseId = (course as models.CourseModel).guid;
+
+    const childProps: AbstractEditorProps<any> = {
+      model: document.model,
+      expanded: expanded.has(documentId)
+        ? Maybe.just<Immutable.Set<string>>(expanded.get(documentId))
+        : Maybe.nothing<Immutable.Set<string>>(),
+      context: {
+        documentId,
+        userId,
+        courseId,
+        undoRedoGuid,
+        resourcePath: this.determineBaseUrl((document.model as any).resource),
+        baseUrl: configuration.protocol + configuration.hostname + '/webcontents',
+        courseModel: course,
+        skills: this.props.skills,
+        objectives: this.props.objectives,
+      },
+      dispatch: onDispatch,
+      onEdit: this.onEdit,
+      onUndoRedoEdit: this.onUndoRedoEdit,
+      services: new DispatchBasedServices(
+        onDispatch,
+        course,
+      ),
+      editMode: editingAllowed,
+    };
+
+    const registeredEditor = lookUpByName(document.model.modelType);
+    const editor = React.createElement((registeredEditor.component as any), childProps);
+
+    return (
+      <div className="editor-manager">
+        {editor}
+      </div>
+    );
   }
 }

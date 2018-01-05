@@ -1,9 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import { Maybe } from 'tsmonad';
-import { removeNode, insertNode, isSameNode } from './utils';
+import { insertNode, isSameNode, removeNode } from './utils';
 
 import { buildRenderer as buildDivRenderer } from './types/div';
 
@@ -61,7 +59,6 @@ export interface TreeProps<NodeType extends Types.HasGuid> {
 /**
  * Reusable tree component.
  */
-@DragDropContext(HTML5Backend)
 export class Tree<NodeType extends Types.HasGuid>
   extends React.PureComponent<TreeProps<NodeType>, {}> {
 
@@ -105,7 +102,7 @@ export class Tree<NodeType extends Types.HasGuid>
 
   render() {
 
-    const { selected, treeType, nodes, editMode, canHandleDrop,
+    const { selected, nodes, editMode, canHandleDrop,
       expandedNodes, getChildren, renderNodeComponent } = this.props;
 
     const handlers : Types.Handlers = {

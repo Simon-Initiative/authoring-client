@@ -14,32 +14,31 @@ export function findNodeByGuid(
   // Check top level nodes first
   if (nodes.has(guid)) {
     return Maybe.just(nodes.get(guid));
-  } else {
-
-    // Check contents of all embedded pools next
-    return nodes
-      .toArray()
-      .reduce(
-        (node, p) => {
-          if (p.contentType === 'Selection') {
-            if (p.source.contentType === 'Pool') {
-              const pool : contentTypes.Pool = p.source;
-              return node.caseOf({
-                just: n => node,
-                nothing: () => {
-                  const n = pool.questions.get(guid);
-                  return n === undefined
-                    ? Maybe.nothing<contentTypes.Node>()
-                    : Maybe.just(n);
-                },
-              });
-            }
-          }
-          return node;
-        },
-        Maybe.nothing<contentTypes.Node>());
-
   }
+
+  // Check contents of all embedded pools next
+  return nodes
+    .toArray()
+    .reduce(
+      (node, p) => {
+        if (p.contentType === 'Selection') {
+          if (p.source.contentType === 'Pool') {
+            const pool : contentTypes.Pool = p.source;
+            return node.caseOf({
+              just: n => node,
+              nothing: () => {
+                const n = pool.questions.get(guid);
+                return n === undefined
+                  ? Maybe.nothing<contentTypes.Node>()
+                  : Maybe.just(n);
+              },
+            });
+          }
+        }
+        return node;
+      },
+      Maybe.nothing<contentTypes.Node>());
+
 }
 
 
@@ -55,34 +54,33 @@ export function locateNextOfKin(
   // Check top level nodes first
   if (nodes.has(guid)) {
     return chooseRelative(nodes, guid, Maybe.nothing<contentTypes.Node>());
-  } else {
-
-    // Check contents of all embedded pools next
-    return nodes
-      .toArray()
-      .reduce(
-        (node, p) => {
-          if (p.contentType === 'Selection') {
-            if (p.source.contentType === 'Pool') {
-              const pool : contentTypes.Pool = p.source;
-              return node.caseOf({
-                just: n => node,
-                nothing: () => {
-                  const n = pool.questions.get(guid);
-                  if (n !== undefined) {
-                    return chooseRelative(
-                      pool.questions, guid,
-                      Maybe.just(p));
-                  }
-                },
-              });
-            }
-          }
-          return node;
-        },
-        Maybe.nothing<contentTypes.Node>());
-
   }
+
+  // Check contents of all embedded pools next
+  return nodes
+    .toArray()
+    .reduce(
+      (node, p) => {
+        if (p.contentType === 'Selection') {
+          if (p.source.contentType === 'Pool') {
+            const pool : contentTypes.Pool = p.source;
+            return node.caseOf({
+              just: n => node,
+              nothing: () => {
+                const n = pool.questions.get(guid);
+                if (n !== undefined) {
+                  return chooseRelative(
+                    pool.questions, guid,
+                    Maybe.just(p));
+                }
+              },
+            });
+          }
+        }
+        return node;
+      },
+      Maybe.nothing<contentTypes.Node>());
+
 }
 
 export function chooseRelative(
@@ -98,12 +96,12 @@ export function chooseRelative(
 
   if (nodes.size === 1) {
     return parent;
-  } else if (nodes.size === index + 1) {
+  }
+  if (nodes.size === index + 1) {
     return Maybe.just(arr[index - 1]);
-  } else {
-    return Maybe.just(arr[index + 1]);
   }
 
+  return Maybe.just(arr[index + 1]);
 }
 
 /**
@@ -112,8 +110,6 @@ export function chooseRelative(
  * @param model the assessment model
  */
 export function typeRestrictedByModel(model: models.AssessmentModel) : boolean {
-
-  const questions = [];
 
   const pages = model.pages.toArray();
 

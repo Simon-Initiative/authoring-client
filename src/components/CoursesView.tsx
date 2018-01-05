@@ -1,14 +1,11 @@
 import * as React from 'react';
-
+import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as viewActions from 'actions/view';
-
-import { LegacyTypes } from 'data/types';
-import * as models from 'data/models';
-import * as contentTypes from 'data/contentTypes';
-import * as courseActions from 'actions/course';
-import { hasRole } from 'actions/utils/keycloak';
+import * as messageActions from 'actions/messages';
+import * as Messages from 'types/messages';
 import { Maybe } from 'tsmonad';
+import { buildFeedbackFromCurrent } from 'utils/feedback';
 
 import './CoursesView.scss';
 
@@ -30,6 +27,37 @@ export interface CoursesViewState {
   courses: Maybe<CourseDescription[]>;
 }
 
+
+function buildReportProblemAction() : Messages.MessageAction {
+
+  const url = buildFeedbackFromCurrent(
+    '',
+    '',
+  );
+
+  return {
+    label: 'Report Problem',
+    execute: (message, dispatch) => {
+      window.open(url, 'ReportProblemTab');
+    },
+  };
+}
+
+function buildErrorMessage() : Messages.Message {
+
+  const content = new Messages.TitledContent().with({
+    title: 'Error contacting server.',
+    message: 'Try reloading the page. If the problem persists, please contact support.',
+  });
+
+  return new Messages.Message().with({
+    content,
+    actions: Immutable.List([buildReportProblemAction(), Messages.RELOAD_ACTION]),
+    severity: Messages.Severity.Error,
+    scope: Messages.Scope.Application,
+  });
+}
+
 class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState> {
   onSelect: (id: string) => void;
 
@@ -39,16 +67,16 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
     this.state = { courses: Maybe.nothing<CourseDescription[]>() };
     this.createCourse = this.createCourse.bind(this);
     this.onSelect = (id) => {
-      this.props.dispatch(courseActions.viewCourse(id));
+      this.props.dispatch(viewActions.viewCourse(id));
     };
   }
 
   createCourse() {
-    viewActions.viewCreateCourse();
+    this.props.dispatch(viewActions.viewCreateCourse());
   }
 
   importExisting() {
-    viewActions.viewImportCourse();
+    this.props.dispatch(viewActions.viewImportCourse());
   }
 
 
@@ -67,19 +95,9 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
       })
       .catch((err) => {
         console.log(err);
+        this.props.dispatch(messageActions.showMessage(buildErrorMessage()));
       });
 
-  }
-
-  renderBanner() {
-    return (
-      <div className="create-course">
-
-        <p className="lead">
-          Welcome to the OLI course authoring platform.
-        </p>
-      </div>
-    );
   }
 
   renderActionBar() {
@@ -105,7 +123,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
       .sort((a, b) => a.title.localeCompare(b.title))
       .map((c, i) => {
 
-        const { guid, id, version, title, description, buildStatus } = c;
+        const { guid, version, title, buildStatus } = c;
 
         const isReady = buildStatus === 'READY';
 
@@ -163,7 +181,6 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   render() {
     return (
       <div className="courses-view">
-        {this.renderBanner()}
 
         <div className="my-course-packages">
 

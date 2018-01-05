@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 
 import * as types from '../types';
 import * as contentTypes from '../contentTypes';
-import { getKey } from '../common';
 import guid from '../../utils/guid';
 
 export type PoolModelParams = {

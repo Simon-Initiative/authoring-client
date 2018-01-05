@@ -25,7 +25,7 @@ var config = {
   srcDir: "./src",
   devDir: "./dev",
   distDir: "./dist"
-}
+};
 
 var setupChalk = $.util.colors.bgYellow;
 var setupLog = function(str) {
@@ -144,7 +144,7 @@ gulp.task('enableCors', function(cb) {
 });
 
 gulp.task('tslint', function(cb) {
-  return exec("./node_modules/tslint/bin/tslint -c tslint.json 'src/**/*.ts*'",(error, stdout, stderr) => {
+  return exec("./node_modules/tslint/bin/tslint -p . -c tslint.json 'src/**/*.ts*'",(error, stdout, stderr) => {
     console.log(stdout);
     cb();
   });
@@ -229,8 +229,7 @@ gulp.task('serve', function(callback) {
 
   new WebpackDevServer(compiler, {
 
-      path: webpackDevConfig.output.path,
-      // webpack-dev-server options
+    // webpack-dev-server options
       contentBase: webpackDevConfig.devServer.contentBase,
       // or: contentBase: "http://128.237.220.60/",
 
@@ -242,6 +241,7 @@ gulp.task('serve', function(callback) {
 
       // webpack-dev-middleware options
       quiet: false,
+      disableHostCheck: true,
       noInfo: false,
       lazy: false,
       filename: "main.js",

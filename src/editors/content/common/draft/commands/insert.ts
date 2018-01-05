@@ -1,6 +1,6 @@
 import { appendText } from './common';
 import { AbstractCommand } from '../../command';
-import { EditorState, ContentState, SelectionState, Modifier, AtomicBlockUtils } from 'draft-js';
+import { AtomicBlockUtils, EditorState, Modifier, SelectionState } from 'draft-js';
 
 export class InsertBlockEntityCommand
  extends AbstractCommand<EditorState> {

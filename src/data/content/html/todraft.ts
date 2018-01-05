@@ -1,6 +1,4 @@
-import * as Immutable from 'immutable';
-
-import { ContentState, ContentBlock, EntityMap, convertToRaw, convertFromRaw } from 'draft-js';
+import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from './common';
 import { CodeBlock } from './codeblock';
 import { WbInline } from './wbinline';
@@ -41,7 +39,6 @@ type WorkingBlock = {
   entities : common.RawEntityRange[],
 };
 
-type BlockHandler = (item: Object, context: ParsingContext) => void;
 type InlineHandler = (
   offset: number, length: number, item: Object,
   context: ParsingContext,
@@ -115,8 +112,6 @@ const inlineHandlers = {
 };
 
 function activityLinkBlock(item: Object, context: ParsingContext) {
-  const children = getChildren(item);
-
   const blockContext = {
     fullText: '',
     markups : [],
@@ -154,15 +149,6 @@ function em(
 
   workingBlock.markups.push({ offset, length, style });
 }
-
-function image(
-  offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
-
-  const style = common.styleMap[item[common.getKey(item)][common.STYLE]];
-  workingBlock.markups.push({ offset, length, style });
-}
-
 
 function extractAttrs(item: Object) : Object {
   const key = common.getKey(item);
@@ -343,9 +329,6 @@ function formulaBlock(item: Object, context: ParsingContext) {
 }
 
 function inputRefBlock(item: Object, context: ParsingContext) {
-
-  const children = getChildren(item);
-
   const blockContext = {
     fullText: ' ',
     markups : [],
@@ -424,9 +407,9 @@ function table(item: Object, context: ParsingContext) {
 function getInlineHandler(key: string) : InlineHandler {
   if (inlineHandlers[key] !== undefined) {
     return inlineHandlers[key];
-  } else {
-    return applyStyle.bind(undefined, 'UNSUPPORTED');
   }
+
+  return applyStyle.bind(undefined, 'UNSUPPORTED');
 }
 
 function isVirtualParagraph(persistenceFormat: Object) {
@@ -451,10 +434,9 @@ function isVirtualParagraph(persistenceFormat: Object) {
 function isEmptyContent(obj) {
   if (obj instanceof Array) {
     return obj.length === 0 || (obj.length === 1 && Object.keys(obj[0]).length === 0);
-  } else {
-    return Object.keys(obj).length === 0;
   }
 
+  return Object.keys(obj).length === 0;
 }
 
 export function toDraft(persistenceFormat: Object) : ContentState {
@@ -471,7 +453,8 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   if (isEmptyContent(persistenceFormat)) {
     addNewBlock(draft, {});
     return convertFromRaw(draft);
-  } else if (isVirtualParagraph(persistenceFormat)) {
+  }
+  if (isVirtualParagraph(persistenceFormat)) {
 
     if (persistenceFormat['#array'] !== undefined) {
       paragraph(
@@ -502,14 +485,6 @@ export function toDraft(persistenceFormat: Object) : ContentState {
   return convertFromRaw(draft);
 }
 
-function getBlockStyleForDepth(depth: number) : string {
-  if (common.sectionBlockStyles[depth] === undefined) {
-    return 'header-six';
-  } else {
-    return common.sectionBlockStyles[depth];
-  }
-}
-
 // This is the same code that Draft.js uses to determine
 // random block keys:
 
@@ -533,8 +508,6 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
 
 
 function listHandler(listBlockType, item: Object, context: ParsingContext) {
-  const key = common.getKey(item);
-
   const children = getChildren(item);
 
   children.forEach((listItem) => {
@@ -570,13 +543,15 @@ function getChildren(item: Object, ignore = null) : Object[] {
 
   if (item[key][common.ARRAY] !== undefined) {
     return item[key][common.ARRAY].filter(c => common.getKey(c) !== ignore);
-  } else if (item[key][common.TEXT] !== undefined) {
-    return [item[key]];
-  } else if (item[key][common.CDATA] !== undefined) {
-    return [item[key]];
-  } else {
+  }
+  if (item[key][common.TEXT] !== undefined) {
     return [item[key]];
   }
+  if (item[key][common.CDATA] !== undefined) {
+    return [item[key]];
+  }
+
+  return [item[key]];
 }
 
 function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {
@@ -686,18 +661,6 @@ function arrayHandler(item: Object, context: ParsingContext) {
   item['#array'].forEach(item => parse(item, context));
 }
 
-function createSimpleTitle(
-  title: string, context: ParsingContext, type: string, beginBlockKey: string) {
-
-  const values = {
-    type,
-    text: title,
-    data: { type: 'title', beginBlockKey },
-  };
-  addNewBlock(context.draft, values);
-}
-
-
 function section(item: Object, context: ParsingContext) {
 
   const key = common.getKey(item);
@@ -754,9 +717,6 @@ function pullout(item: Object, context: ParsingContext) {
 }
 
 function definition(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
   const terms = getChildren(item).filter(c => common.getKey(c) === 'term');
   const term = terms.length === 0 ? 'unknown term ' : (terms[0] as any).term[common.TEXT];
 
@@ -809,9 +769,6 @@ function pronunciation(item: Object, context: ParsingContext) {
 }
 
 function translation(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
   // Create the beginning block
   const beginData : common.TranslationBegin = {
     type: 'translation_begin',
@@ -832,9 +789,6 @@ function translation(item: Object, context: ParsingContext) {
 }
 
 function meaning(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
   // Create the beginning block
   const beginData : common.MeaningBegin = {
     type: 'meaning_begin',
@@ -855,9 +809,6 @@ function meaning(item: Object, context: ParsingContext) {
 }
 
 function material(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
   // Create the beginning block
   const beginData : common.MaterialBegin = {
     type: 'material_begin',
@@ -878,15 +829,6 @@ function material(item: Object, context: ParsingContext) {
 }
 
 function title(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
-  // Create the beginning block
-  const beginData : common.TitleBegin = {
-    type: 'title_begin',
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.title_begin, beginData, context);
-
   // Handle the children
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
@@ -921,9 +863,6 @@ function processTitle(
 }
 
 function example(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
   // Create the beginning block
   const beginData : common.ExampleBegin = {
     type: 'example_begin',

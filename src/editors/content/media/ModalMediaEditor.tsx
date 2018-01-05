@@ -1,6 +1,4 @@
 import * as React from 'react';
-
-import * as contentTypes from '../../../data/contentTypes';
 import ModalSelection from '../../../utils/selection/ModalSelection';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';

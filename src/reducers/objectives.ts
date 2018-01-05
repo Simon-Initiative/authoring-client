@@ -1,13 +1,8 @@
 import { Map } from 'immutable';
 
 import {
-  SetObjectivesAction,
-  UpdateObjectivesAction,
-  SET_OBJECTIVES,
-  UPDATE_OBJECTIVES,
+  SET_OBJECTIVES, SetObjectivesAction, UPDATE_OBJECTIVES, UpdateObjectivesAction,
 } from 'actions/objectives';
-
-import * as models from 'data/models';
 import { LearningObjective } from 'data//contentTypes';
 import { OtherAction } from './utils';
 

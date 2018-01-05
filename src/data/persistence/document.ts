@@ -1,8 +1,7 @@
 import { authenticatedFetch, Document } from './common';
 import { configuration } from '../../actions/utils/config';
-import { CourseId, DocumentId , LegacyTypes } from '../types';
+import { CourseId, DocumentId, LegacyTypes } from '../types';
 import * as models from '../models';
-import { Resource } from '../content/resource';
 
 /**
  * Retrieve a document, given a course and document id.
@@ -23,6 +22,52 @@ export function retrieveDocument(
         _rev: json.rev,
         model: models.createModel(json),
       });
+    });
+}
+
+
+
+export interface PreviewNotSetUp {
+  type: 'PreviewNotSetUp';
+  message: string[];
+}
+
+export interface PreviewSuccess {
+  type: 'PreviewSuccess';
+  admitCode: string;
+  sectionUrl: string;
+  activityUrl: string;
+}
+
+// Previewing can result in one of two responses from the server
+export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
+
+/**
+ * Initiates a resource preview.
+ * @param courseId the course guid
+ * @param documentId the document guid to preview
+ */
+export function initiatePreview(
+  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+
+  return authenticatedFetch({ url })
+    .then((json : any) => {
+
+      if (json.message !== undefined) {
+        return {
+          type: 'PreviewNotSetUp',
+          message: json.message as string[],
+        } as PreviewNotSetUp;
+      }
+      const { admitCode, sectionUrl, activityUrl } = json;
+      return {
+        admitCode,
+        sectionUrl,
+        activityUrl,
+        type: 'PreviewSuccess',
+      } as PreviewSuccess;
     });
 }
 

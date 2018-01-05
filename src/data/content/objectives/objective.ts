@@ -1,10 +1,8 @@
 import * as Immutable from 'immutable';
-
 import { Maybe } from 'tsmonad';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { KnowledgeCategory, LearningProcess } from './types';
-import createGuid from '../../../utils/guid';
 
 
 export type LearningObjectiveParams = {
@@ -27,7 +25,7 @@ const defaultContent = {
 };
 
 export class LearningObjective extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'LearningObjective';
   id: string;
   guid: string;
@@ -35,7 +33,7 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
   category: Maybe<KnowledgeCategory>;
   process: Maybe<LearningProcess>;
   skills: Immutable.List<string>;
-  
+
   constructor(params?: LearningObjectiveParams) {
     super(augment(params));
   }
@@ -58,30 +56,29 @@ export class LearningObjective extends Immutable.Record(defaultContent) {
     if (o['@category'] !== undefined) {
       model = model.with({ category: Maybe.just<KnowledgeCategory>(o['@category']) });
     }
-    
+
     getChildren(o).forEach((item) => {
-      
+
       const key = getKey(item);
-      const id = createGuid();
-     
+
       switch (key) {
         case '#text':
           model = model.with({ title: item['#text'] });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    const o = { 
+    const o = {
       objective: {
         '@id': this.id,
         '#array': [{ '#text': this.title }],
-      }, 
+      },
     };
 
     this.process.lift(p => o.objective['@process'] = p);

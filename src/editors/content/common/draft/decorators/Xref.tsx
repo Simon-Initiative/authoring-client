@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Decorator, byType } from './common';
+import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/html/common';
 import { XrefEditor } from '../../../links/XrefEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
@@ -24,7 +24,7 @@ class Xref extends React.PureComponent<any, any> {
         services={b.services}
 
         model={data.xref}
-        onCancel={() => this.props.services.dismissModal()} 
+        onCancel={() => this.props.services.dismissModal()}
         onInsert={(xref) => {
           this.props.services.dismissModal();
           const data = {
@@ -35,7 +35,7 @@ class Xref extends React.PureComponent<any, any> {
           this.props.onEdit(contentState);
         }
       }>
-        <XrefEditor 
+        <XrefEditor
           model={data.xref}
           context={b.context}
           services={b.services}
@@ -46,11 +46,10 @@ class Xref extends React.PureComponent<any, any> {
   }
 
   render() : JSX.Element {
-    const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     return (
       <a
-        className="editor-link"  
-        data-offset-key={this.props.offsetKey} 
+        className="editor-link"
+        data-offset-key={this.props.offsetKey}
         ref={a => this.a = a} onClick={this.onClick}>
         {this.props.children}
       </a>

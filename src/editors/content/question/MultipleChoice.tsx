@@ -1,45 +1,104 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Choice } from '../common/Choice';
-import { FeedbackEditor } from '../part/FeedbackEditor';
-import { TextInput, InlineForm, Button } from '../common/controls';
+import { Button } from '../common/controls';
 import guid from 'utils/guid';
-import { Question, QuestionProps, QuestionState,
- Section, SectionContent, SectionControl, SectionHeader } from './Question';
+import {
+    Question, QuestionProps, QuestionState,
+} from './Question';
+import {
+  TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
+} from 'editors/content/common/TabContainer';
+import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
+
+import './MultipleChoice.scss';
+
+export const isComplexScoring = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.filter(r => !r.name.match(/^AUTOGEN/)).toArray();
+
+  // scoring is complex (advanced mode) if scores exist for multiple
+  // responses OR score is not 0 or 1
+  let prevEncounteredScore = false;
+  const isAdvancedScoringMode = responses.reduce(
+    (acc, val, i) => {
+      const score = +val.score;
+      if (prevEncounteredScore && score !== 0) {
+        return true;
+      }
+      if (score !== 0) {
+        prevEncounteredScore = true;
+      }
+
+      return acc || (score !== 0 && score !== 1);
+    },
+    false,
+  );
+
+  return isAdvancedScoringMode;
+};
+
+export const resetAllScores = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.toArray();
+
+  const updatedResponses = responses.reduce(
+    (acc, r) => acc.set(r.guid, r.with({ score: '0' })),
+    partModel.responses,
+  );
+
+  const updatedPartModel = partModel.with({
+    responses: updatedResponses,
+  });
+
+  return updatedPartModel;
+};
 
 export interface MultipleChoiceProps
-  extends QuestionProps<contentTypes.MultipleChoice> {
-
+    extends QuestionProps<contentTypes.MultipleChoice> {
+  advancedScoringInitialized: boolean;
+  advancedScoring: boolean;
+  onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
 export interface MultipleChoiceState
-  extends QuestionState {
+    extends QuestionState {
 
-  }
-
-// tslint:disable-next-line
-const ChoiceFeedback = (props) => {
-  return (
-    <div className="choice-feedback clearfix">
-      {props.children}
-    </div>
-  );
-};
+}
 
 /**
- * The content editor for HtmlContent.
+ * The content editor for Multiple Choice Question
  */
 export class MultipleChoice
-  extends Question<MultipleChoiceProps, MultipleChoiceState> {
+   extends Question<MultipleChoiceProps, MultipleChoiceState> {
 
   constructor(props) {
     super(props);
 
-    this.setClassname('multiple-choice');
-
-    this.onAddChoice = this.onAddChoice.bind(this);
     this.onToggleShuffle = this.onToggleShuffle.bind(this);
+    this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
+    this.onToggleSimpleSelect = this.onToggleSimpleSelect.bind(this);
+    this.onAddChoice = this.onAddChoice.bind(this);
     this.onChoiceEdit = this.onChoiceEdit.bind(this);
+    this.onFeedbackEdit = this.onFeedbackEdit.bind(this);
+    this.onScoreEdit = this.onScoreEdit.bind(this);
+    this.onRemoveChoice = this.onRemoveChoice.bind(this);
+    this.onReorderChoices = this.onReorderChoices.bind(this);
+  }
+
+  componentDidMount() {
+    const {
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
+    } = this.props;
+
+    // initialize advanced scoring if its not already
+    if (!advancedScoringInitialized) {
+      onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));
+    }
+  }
+
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'multiple-choice';
   }
 
   onToggleShuffle() {
@@ -52,7 +111,38 @@ export class MultipleChoice
     onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
   }
 
+  onToggleAdvanced() {
+    const {
+      itemModel, partModel, model, onToggleAdvancedScoring, advancedScoring, onEdit,
+    } = this.props;
+
+    // if switching from advanced mode and scoring is complex, reset all scores
+    // so they are valid in simple mode. Otherwise, we can leave the scores as-is
+    if (advancedScoring && isComplexScoring(partModel)) {
+      const updatedPartModel = resetAllScores(partModel);
+      onEdit(itemModel, updatedPartModel);
+    }
+
+    onToggleAdvancedScoring(model.guid);
+  }
+
+  onToggleSimpleSelect(response: contentTypes.Response, choice: contentTypes.Choice) {
+    const { itemModel, partModel, onEdit } = this.props;
+
+    let updatedPartModel = resetAllScores(partModel);
+
+    updatedPartModel = updatedPartModel.with({
+      responses: updatedPartModel.responses.set(
+        response.guid, response.with({ score: response.score === '0' ? '1' : '0' }),
+      ),
+    });
+
+    onEdit(itemModel, updatedPartModel);
+  }
+
   onAddChoice() {
+    const { partModel, itemModel, onEdit } = this.props;
+
     const value = guid().replace('-', '');
     const match = value;
     const choice = new contentTypes.Choice({ value });
@@ -60,136 +150,161 @@ export class MultipleChoice
     let response = new contentTypes.Response({ match });
     response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(choice.guid, choice) });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(response.guid, response) });
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.set(choice.guid, choice) });
+    const updatedPartModel = partModel.with(
+      { responses: partModel.responses.set(response.guid, response) });
 
-    this.props.onEdit(itemModel, partModel);
+    onEdit(updatedItemModel, updatedPartModel);
   }
 
-  onChoiceEdit(c) {
-    this.props.onEdit(
-      this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
-      this.props.partModel);
+  onChoiceEdit(choice: contentTypes.Choice) {
+    const { partModel, itemModel, onEdit } = this.props;
+
+    onEdit(
+      itemModel.with({
+        choices: itemModel.choices.set(choice.guid, choice),
+      }),
+      partModel);
   }
 
   onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
-    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
-    const part = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(updated.guid, updated) });
-    this.props.onEdit(this.props.itemModel, part);
-  }
+    const { partModel, itemModel, onEdit } = this.props;
 
-  renderChoice(choice: contentTypes.Choice, response : contentTypes.Response) {
-    return (
-      <Choice
-        key={choice.guid}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        model={choice}
-        onEdit={this.onChoiceEdit}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)} />
-    );
+    const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
+    const part = partModel.with(
+      { responses: partModel.responses.set(updated.guid, updated) });
+    onEdit(itemModel, part);
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
-    const updated = response.with({ score });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.set(updated.guid, updated) },
+    const { partModel, itemModel, onEdit } = this.props;
+
+    const updatedScore = response.with({ score });
+    const updatedPartModel = partModel.with(
+      { responses: partModel.responses.set(updatedScore.guid, updatedScore) },
     );
-    this.props.onEdit(this.props.itemModel, partModel);
+
+    onEdit(itemModel, updatedPartModel);
   }
 
-  renderFeedback(
-    choice: contentTypes.Choice,
-    response : contentTypes.Response,
-    feedback: contentTypes.Feedback,
-  ) {
-    return (
-      <FeedbackEditor
-        key={feedback.guid}
-        context={this.props.context}
-        services={this.props.services}
-        editMode={this.props.editMode}
-        showLabel={true}
-        model={feedback}
-        onRemove={this.onRemoveChoice.bind(this, choice, response)}
-        onEdit={this.onFeedbackEdit.bind(this, response)} />
-    );
+  onRemoveChoice(choiceId: string, response: contentTypes.Response) {
+    const { partModel, itemModel, onEdit } = this.props;
+
+    const updatedItemModel = itemModel.with(
+      { choices: itemModel.choices.delete(choiceId) });
+
+    let updatePartModel = partModel;
+    if (response) {
+      updatePartModel = partModel.with(
+        { responses: partModel.responses.delete(response.guid) });
+    }
+
+    onEdit(updatedItemModel, updatePartModel);
   }
 
-  onRemoveChoice(choice, response) {
-    const itemModel = this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.delete(choice.guid) });
-    const partModel = this.props.partModel.with(
-      { responses: this.props.partModel.responses.delete(response.guid) });
+  onReorderChoices(originalIndex: number, newIndex: number) {
+    const { onEdit, itemModel, partModel } = this.props;
 
-    this.props.onEdit(itemModel, partModel);
+    // indexOffset makes up for the missing item in the list when splicing,
+    // this is only an issue if the new item position is less than the current one
+    const indexOffset = originalIndex > newIndex ? 1 : 0;
+
+    // convert OrderedMap to shallow javascript array
+    const choices = itemModel.choices.toArray();
+
+    // remove selected choice from array and insert it into new position
+    const choice = choices.splice(originalIndex, 1)[0];
+    choices.splice((newIndex - 1) + indexOffset, 0, choice);
+
+    // update item model
+    const updatedItemModel = itemModel.with({
+      // set choices to a new OrderedMap with updated choice ordering
+      choices: choices.reduce(
+        (acc, c) => {
+          return acc.set(c.guid, c);
+        },
+        Immutable.OrderedMap<string, contentTypes.Choice>(),
+      ),
+    });
+
+    // update models with new choices and references
+    const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+
+    onEdit(
+      newModels.itemModel,
+      newModels.partModel,
+    );
   }
 
   renderChoices() {
-    const responses = this.props.partModel.responses.toArray();
-    const choices = this.props.itemModel.choices.toArray();
+    const { context, services, editMode, partModel, itemModel, advancedScoring } = this.props;
 
-    const rendered = [];
+    const responses = partModel.responses.toArray();
+    const choices = itemModel.choices.toArray();
 
-    for (let i = 0; i < choices.length; i += 1) {
-      const c = choices[i];
-
-      let renderedFeedback = null;
-      let renderedScore = null;
-
-      if (responses.length > i) {
-        if (responses[i].feedback.size > 0) {
-          const f = responses[i].feedback.first();
-          renderedFeedback = this.renderFeedback(c, responses[i], f);
-
-          renderedScore = <InlineForm position="right">
-              <TextInput editMode={this.props.editMode}
-                label="Score" value={responses[i].score} type="number" width="75px"
-                onEdit={this.onScoreEdit.bind(this, responses[i])}/>
-            </InlineForm>;
-        }
-      }
-
-      rendered.push(
-        <ChoiceFeedback key={c.guid}>
-          {this.renderChoice(c, responses[i])}
-          {renderedFeedback}
-          {renderedScore}
-        </ChoiceFeedback>);
-    }
-
-    return rendered;
+    return choices.map((choice, i) => {
+      const response = responses[i];
+      return (
+        <Choice
+          key={choice.guid}
+          index={i}
+          choice={choice}
+          allowFeedback
+          allowScore={advancedScoring}
+          simpleSelectProps={{
+            selected: response.score !== '0',
+            onToggleSimpleSelect: this.onToggleSimpleSelect,
+          }}
+          response={response}
+          allowReorder={!itemModel.shuffle}
+          context={context}
+          services={services}
+          editMode={editMode}
+          onReorderChoice={this.onReorderChoices}
+          onEditChoice={this.onChoiceEdit}
+          onEditFeedback={this.onFeedbackEdit}
+          onEditScore={this.onScoreEdit}
+          onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+      );
+    });
   }
 
-  renderAdditionalSections() {
-    const { editMode, itemModel, partModel } = this.props;
+  renderDetails() {
+    const { editMode, itemModel, advancedScoring } = this.props;
 
-    return ([
-      <Section key="choices" className="choices">
-        <SectionHeader title="Choices">
-          <SectionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <input
-              className="toggle toggle-light"
-              type="checkbox"
-              checked={itemModel.shuffle} />
-            <label className="toggle-btn"></label>
-          </SectionControl>
-        </SectionHeader>
-        <SectionContent>
-          <Button
-            editMode={editMode}
-            type="link"
-            onClick={this.onAddChoice}>
-            Add Choice
-          </Button>
-          {this.renderChoices()}
-        </SectionContent>
-      </Section>,
-    ]);
+    return (
+      <React.Fragment>
+        <TabSection key="choices" className="choices">
+          <TabSectionHeader title="Choices">
+            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+              <Button
+                editMode={editMode}
+                type="link"
+                onClick={this.onAddChoice}>
+                Add Choice
+              </Button>
+            </TabOptionControl>
+            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
+              <ToggleSwitch checked={itemModel.shuffle} />
+            </TabOptionControl>
+            <TabOptionControl key="advancedscoring" name="Advanced" onClick={this.onToggleAdvanced}>
+              <ToggleSwitch checked={advancedScoring} />
+            </TabOptionControl>
+          </TabSectionHeader>
+          <TabSectionContent>
+            <div className="instruction-label">Select the correct choice</div>
+            <ChoiceList className="multiple-choice-choices">
+              {this.renderChoices()}
+            </ChoiceList>
+          </TabSectionContent>
+        </TabSection>
+      </React.Fragment>
+    );
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 }

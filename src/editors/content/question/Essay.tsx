@@ -1,4 +1,3 @@
-import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { Question, QuestionProps, QuestionState } from './Question';
 
@@ -18,7 +17,20 @@ export class Essay
 
   constructor(props) {
     super(props);
+  }
 
-    this.setClassname('essay');
+  /** Implement required abstract method to set className */
+  getClassName() {
+    return 'essay';
+  }
+
+  renderDetails() {
+    // no details
+    return false;
+  }
+
+  renderAdditionalTabs() {
+    // no additional tabs
+    return false;
   }
 }

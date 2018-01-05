@@ -1,14 +1,7 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import * as contentTypes from '../../data/contentTypes';
-import { AppContext } from '../../editors/common/AppContext';
-import * as models from '../../data/models';
-import { Maybe } from 'tsmonad';
 import { Title } from './Title';
-import { AppServices } from '../../editors/common/AppServices';
-import { Remove } from './Remove';
-
-import guid from '../../utils/guid';
+import { Remove } from 'components/common/Remove';
 
 
 export interface Skill {
@@ -47,7 +40,7 @@ export class Skill
 
   render() : JSX.Element {
 
-    const { model, title, editMode, mouseOver, isExpanded } = this.props;
+    const { model, title, editMode, mouseOver } = this.props;
 
     const remove = mouseOver && editMode
       ? <Remove editMode={this.props.editMode}

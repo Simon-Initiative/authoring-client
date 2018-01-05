@@ -1,11 +1,10 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../../../data/content/html/common';
-import { Activity } from '../../../../../data/content/html/activity';
-import { AppServices } from '../../../../common/AppServices';
-import { AppContext } from '../../../../common/AppContext';
-import { AssessmentSelection, AssessmentsToDisplay } 
-  from '../../../../../utils/selection/AssessmentSelection';
+import { EntityTypes } from 'data/content/html/common';
+import { Activity } from 'data/content/html/activity';
+import { AppServices } from 'editors/common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
 import { InsertBlockEntityCommand } from '../../draft/commands/insert';
 import { AbstractCommand } from '../../command';
 import { EditorState } from 'draft-js';
@@ -13,9 +12,9 @@ import { EditorState } from 'draft-js';
 export class InsertActivityCommand extends AbstractCommand<EditorState> {
 
   onInsert(editorState: EditorState, context, services, resolve, reject, assessment) {
-   
+
     services.dismissModal();
-    
+
     const data = { activity: new Activity({ idref: assessment.resource.id }) };
 
     const delegate = new InsertBlockEntityCommand(EntityTypes.activity, 'IMMUTABLE', data);
@@ -29,15 +28,15 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
   }
 
   execute(
-    editorState: EditorState, context: AppContext, 
+    editorState: EditorState, context: AppContext,
     services: AppServices) : Promise<EditorState> {
-    
+
     return new Promise((resolve, reject) => {
       services.displayModal(
         <AssessmentSelection
           toDisplay={AssessmentsToDisplay.Summative}
           courseId={context.courseId}
-          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)} 
+          onInsert={this.onInsert.bind(this, editorState, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
     });
   }

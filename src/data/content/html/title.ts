@@ -1,15 +1,12 @@
 import * as Immutable from 'immutable';
-
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
 
 import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
-
+import { cloneContent } from '../common/clone';
 import { toPersistence } from './topersistence';
 import { toDraft } from './todraft';
+
+const emptyContent = ContentState.createFromText('');
 
 export type TitleParams = {
   content?: ContentState,
@@ -23,11 +20,11 @@ const defaultContent = {
 };
 
 export class Title extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Title';
   content: ContentState;
   guid: string;
-  
+
   constructor(params?: TitleParams) {
     super(augment(params));
   }
@@ -36,13 +33,20 @@ export class Title extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Title {
+    return this.with({
+      content: cloneContent(this.content),
+    });
+  }
+
+
   static fromPersistence(root: Object, guid: string) : Title {
 
     const t = (root as any).title;
 
     let model = new Title({ guid });
     model = model.with({ content: toDraft(getChildren(t)) });
-    
+
     return model;
   }
 

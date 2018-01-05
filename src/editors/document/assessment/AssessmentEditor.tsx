@@ -3,25 +3,19 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { Skill } from 'types/course';
 import { PageSelection } from './PageSelection';
-import { Toolbar } from './Toolbar';
-import { Select } from '../../content/common/Select';
 import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
-import { Resource } from '../../../data/content/resource';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
-import * as persistence from '../../../data/persistence';
-import { typeRestrictedByModel, findNodeByGuid, locateNextOfKin } from './utils';
+import { findNodeByGuid, locateNextOfKin } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
-import { Outline, getChildren, setChildren } from './Outline';
+import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
 import { hasUnknownSkill } from 'utils/skills';
 
@@ -323,25 +317,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   renderAdd() {
-
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
-
-    const slash : any = {
-      fontFamily: 'sans-serif',
-      lineHeight: 1.25,
-      position: 'relative',
-      top: '0',
-      color: '#606060',
-    };
-
-    const label : any = {
-      fontFamily: 'sans-serif',
-      lineHeight: 1.25,
-      fontSize: '13',
-      position: 'relative',
-      top: '0',
-      color: '#606060',
-    };
 
     return (
       <div className="add-menu">
@@ -364,14 +340,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <button
           disabled={!this.props.editMode || isInline}
           type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPool}>Pool</button>
-
-          <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPoolRef}>Pool Reference</button>
+          onClick={this.onAddPoolRef}>Question Pool</button>
 
       </div>
     );

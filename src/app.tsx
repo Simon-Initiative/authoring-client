@@ -1,57 +1,31 @@
 import 'babel-polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Iterable } from 'immutable';
 import * as persistence from './data/persistence';
-import * as models from './data/models';
 import thunkMiddleware from 'redux-thunk';
-import { createStore, applyMiddleware, Store } from 'redux';
+import { applyMiddleware, createStore, Store } from 'redux';
 import 'whatwg-fetch';
 import { initialize } from './actions/utils/keycloak';
 import { configuration } from './actions/utils/config';
-import {} from 'node';
-import Perf from 'react-addons-perf';
 import { createLogger } from 'redux-logger';
-import { UserInfo } from './reducers/user';
-import { getUserName, getQueryVariable } from './utils/params';
+import { UserState } from './reducers/user';
+import { getQueryVariable } from './utils/params';
 import history from './utils/history';
 import rootReducer from './reducers';
 import { loadCourse } from 'actions/course';
-import Main from './Main.controller';
+import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-import { courseChanged } from './actions/course';
 
-// import redux provider
-const Provider = (require('react-redux') as RR).Provider;
-
-// attach global variables to window
-(window as any).React = React;
-(window as any).Perf = Perf;
-
+import { ApplicationRoot } from './ApplicationRoot';
 // import application styles
 import 'stylesheets/index.scss';
 
-interface RR {
-  Provider: any;
-}
+// attach global variables to window
+(window as any).React = React;
 
-const loggerMiddleware = (createLogger as any)({
-  stateTransformer: (state) => {
-    const newState = {};
 
-    // if state item is immutable, convert to JS for logging purposes
-    for (const i of Object.keys(state)) {
-      if (Iterable.isIterable(state[i])) {
-        newState[i] = state[i].toJS();
-      } else {
-        newState[i] = state[i];
-      }
-    }
-
-    return newState;
-  },
-});
+const loggerMiddleware = (createLogger as any)();
 
 function initStoreWithState(state) {
   const store = createStore(
@@ -75,27 +49,32 @@ function historyRequiresCourseLoad() {
     && window.location.hash.indexOf('-') !== -1;
 }
 
-function tryLogin() : Promise<UserInfo> {
-  return new Promise<UserInfo>((resolve, reject) => {
+function tryLogin() : Promise<UserState> {
+  return new Promise<UserState>((resolve, reject) => {
     initialize(
       (profile, logoutUrl, accountManagementUrl) =>
-        resolve({ user: profile.username, profile, userId: profile.id, logoutUrl }),
+        resolve({ profile, logoutUrl, user: profile.username, userId: profile.id }),
       err => reject(err),
       configuration.protocol + configuration.hostname);
   });
 }
 
-function render(store, current) {
+function render(store, current) : Promise<boolean> {
 
   // Now do the initial rendering
-  ReactDOM.render(
-      <Provider store={store}>
-        <Main location={current}/>
-      </Provider>,
-      document.getElementById('app'));
+  return new Promise((resolve, reject) => {
+    ReactDOM.render(
+      <AppContainer>
+        <CurrentApplicationRoot store={store} location={current}/>
+      </AppContainer>,
+      document.getElementById('app'), () => resolve(true));
+  });
 
 }
 
+
+let store : Store<any> = null;
+let CurrentApplicationRoot = ApplicationRoot;
 
 function main() {
   // Application specific initialization
@@ -111,8 +90,6 @@ function main() {
     search: '',
   };
 
-  let store : Store<any> = null;
-
   tryLogin()
     .then((user) => {
 
@@ -126,10 +103,9 @@ function main() {
 
         userInfo = user;
         return store.dispatch(loadCourse(courseId));
-      } else {
-        render(store, current);
-        return;
       }
+      render(store, current);
+
     })
     .then((model) => {
       render(store, current);
@@ -142,3 +118,32 @@ function main() {
 
 main();
 
+history.listen((current) => {
+
+  render(store, current)
+    .then(result => window.scrollTo(0, 0));
+});
+
+function clearHeldLocks() {
+  return function (dispatch, getState) {
+    if (getState().locks.size > 0) {
+      getState().locks
+        .toArray()
+        .forEach(({ courseId, documentId }) => persistence.releaseLock(courseId, documentId));
+    }
+  };
+}
+
+window.addEventListener('beforeunload', (event) => {
+  if (store !== null) {
+    store.dispatch(clearHeldLocks());
+  }
+});
+
+if ((module as any).hot) {
+  (module as any).hot.accept('./ApplicationRoot', () => {
+    CurrentApplicationRoot = require('./ApplicationRoot').ApplicationRoot;
+
+    render(store, window.location);
+  });
+}

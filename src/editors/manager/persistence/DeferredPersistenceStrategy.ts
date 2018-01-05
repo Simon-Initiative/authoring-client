@@ -1,9 +1,4 @@
-
 import * as persistence from '../../../data/persistence';
-import * as models from '../../../data/models';
-
-import { PersistenceStrategy, onSaveCompletedCallback, 
-  onFailureCallback } from './PersistenceStrategy';
 import { AbstractPersistenceStrategy } from './AbstractPersistenceStrategy';
 
 export interface DeferredPersistenceStrategy {
@@ -11,7 +6,7 @@ export interface DeferredPersistenceStrategy {
   timerStart: number;
   quietPeriodInMs: number;
   maxDeferredTimeInMs: number;
-  pending: persistence.Document;   // A document that is pending save 
+  pending: persistence.Document;   // A document that is pending save
   inFlight: persistence.Document;  // Document that is in flight
   flushResolve: any;               // Function to call to resolve inflight requests after destroy
 }
@@ -19,7 +14,7 @@ export interface DeferredPersistenceStrategy {
 /**
  * A persistence strategy that waits until user edits have ceased
  * for a specific amount of time but will auto save when a maximum
- * wait period has exceeded. 
+ * wait period has exceeded.
  */
 export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
@@ -39,9 +34,9 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
   }
 
   save(doc: persistence.Document) {
-    
+
     this.pending = doc;
-    
+
     if (this.inFlight === null) {
       this.queueSave();
     }
@@ -49,23 +44,23 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
 
   queueSave() {
 
-    const startTimer = 
+    const startTimer =
       () => setTimeout(
         () => {
           this.timer = null;
           this.persist();
-        }, 
+        },
         this.quietPeriodInMs);
 
     if (this.timer !== null) {
-      
+
       clearTimeout(this.timer);
       this.timer = null;
 
       if (this.now() - this.timerStart > this.maxDeferredTimeInMs) {
         this.persist();
       } else {
-        this.timer = startTimer(); 
+        this.timer = startTimer();
       }
     } else {
       this.timerStart = this.now();
@@ -76,7 +71,7 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
   persist() : Promise<{}> {
 
     return new Promise((resolve, reject) => {
-      this.inFlight = this.pending; 
+      this.inFlight = this.pending;
       this.pending = null;
 
       persistence.persistDocument(this.inFlight)
@@ -92,7 +87,7 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           }
 
           this.inFlight = null;
-          
+
           if (this.pending !== null) {
             this.pending = this.pending.with({ _rev: result._rev });
             this.queueSave();
@@ -100,7 +95,7 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
           resolve(result);
         })
         .catch((err) => {
-          
+
           this.inFlight = null;
           if (this.failureCallback !== null) {
             this.lockDetails = null;
@@ -122,29 +117,28 @@ export class DeferredPersistenceStrategy extends AbstractPersistenceStrategy {
     if (this.timer !== null) {
       clearTimeout(this.timer);
     }
-    
+
     // Handle the case where we have a pending change, but
-    // there isn't anything in flight. We simply persist 
-    // the pending change. 
+    // there isn't anything in flight. We simply persist
+    // the pending change.
     if (this.inFlight === null && this.pending !== null) {
       return this.persist();
 
-    } else if (this.inFlight !== null) {
+    }
+    if (this.inFlight !== null) {
       // Handle the case where we have a persistence request
-      // in flight.  In this case we have to wait for that 
-      // in flight request to complete. 
-   
+      // in flight.  In this case we have to wait for that
+      // in flight request to complete.
+
       return new Promise((resolve, reject) => {
         // Flush pending changes:
         this.flushResolve = resolve;
-      });    
-      
-    // Neither in flight or pending save, so there is nothing
-    // to do. 
-    } else {
-      return Promise.resolve({});
-    }
-    
-  }
+      });
 
+    // Neither in flight or pending save, so there is nothing
+    // to do.
+    }
+
+    return Promise.resolve({});
+  }
 }

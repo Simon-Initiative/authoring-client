@@ -3,8 +3,6 @@ import * as Immutable from 'immutable';
 import { Html } from '../html';
 import { augment } from '../common';
 
-import { getKey } from '../../common';
-
 export type ChoiceParams = {
   value?: string,
   color?: string,
@@ -27,27 +25,28 @@ function simplifyBody(body: Object) : Object {
     if (arr.length === 1) {
       if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
         return { '#text': arr[0].p['#text'] };
-      } else if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+      }
+      if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
         const c = arr[0].p;
         delete c['@id'];
         delete c['@title'];
         return c;
       }
     }
-  } 
+  }
 
   return body;
-  
+
 }
 
 export class Choice extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Choice';
   value: string;
   color: string;
   body: Html;
   guid: string;
-  
+
   constructor(params?: ChoiceParams) {
     super(augment(params));
   }
@@ -63,8 +62,8 @@ export class Choice extends Immutable.Record(defaultContent) {
 
     if (Object.keys(choice).length === 1 && choice['@value'] !== undefined) {
       choice['#text'] = choice['@value'];
-    } 
-    
+    }
+
     const body = Html.fromPersistence(choice, '');
     model = model.with({ body });
 
@@ -74,7 +73,7 @@ export class Choice extends Immutable.Record(defaultContent) {
     if (choice['@color'] !== undefined) {
       model = model.with({ color: choice['@color'] });
     }
-    
+
     return model;
   }
 
@@ -91,7 +90,7 @@ export class Choice extends Immutable.Record(defaultContent) {
 
     root.choice['@value'] = this.value;
     root.choice['@color'] = this.color;
-    
+
     return root;
   }
 }

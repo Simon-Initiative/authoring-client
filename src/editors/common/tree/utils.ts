@@ -1,9 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
-import { NodeId, NodeState, Nodes, HasGuid,
-  ChildrenAccessor, ChildrenMutator,
-  TreeRenderer } from './types';
+import { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from './types';
 
 // Determines whether two things that might be nodes
 // are the same node.  In the context of our tree
@@ -52,19 +50,18 @@ export function removeNode<NodeType extends HasGuid>(
   // just simply remove it and we are done.
   if (nodes.has(idToRemove)) {
     return nodes.delete(idToRemove);
-  } else {
-
-    // Otherwise, we need to look at the children of
-    // each of these nodes, recursively, and attempt to
-    // remove the node deeper in the tree.
-    return nodes
-      .map(node => getChildren(node).caseOf({
-        just: nodes =>
-          setChildren(node, removeNode(idToRemove, nodes, getChildren, setChildren)),
-        nothing: () => node,
-      }))
-      .toOrderedMap();
   }
+
+  // Otherwise, we need to look at the children of
+  // each of these nodes, recursively, and attempt to
+  // remove the node deeper in the tree.
+  return nodes
+    .map(node => getChildren(node).caseOf({
+      just: nodes =>
+        setChildren(node, removeNode(idToRemove, nodes, getChildren, setChildren)),
+      nothing: () => node,
+    }))
+    .toOrderedMap();
 }
 
 // Helper insertion function.
@@ -111,17 +108,16 @@ export function insertNode<NodeType extends HasGuid>(
 
         return nodes.set(parentId, updatedParent);
 
-      } else {
-
-        return nodes
-        .map(node => getChildren(node).caseOf({
-          just: nodes =>
-            setChildren(node, insertNode(
-              targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
-          nothing: () => node,
-        }))
-        .toOrderedMap();
       }
+
+      return nodes
+      .map(node => getChildren(node).caseOf({
+        just: nodes =>
+          setChildren(node, insertNode(
+            targetParentId, childId, childToAdd, index, nodes, getChildren, setChildren)),
+        nothing: () => node,
+      }))
+      .toOrderedMap();
     },
     nothing: () => {
       return insert(nodes, childId, childToAdd, index);
@@ -148,18 +144,17 @@ export function updateNode<NodeType extends HasGuid>(
   // just simply update it and we are done.
   if (currentNodes.has(idToUpdate)) {
     return currentNodes.set(idToUpdate, newNode);
-  } else {
-
-    // Otherwise, we need to look at the children of
-    // each of these nodes, recursively, and attempt to
-    // update the node deeper in the tree.
-    return currentNodes
-      .map(node => getChildren(node).caseOf({
-        just: nodes =>
-          setChildren(node, updateNode(idToUpdate, newNode, nodes, getChildren, setChildren)),
-        nothing: () => node,
-      }))
-      .toOrderedMap();
   }
+
+  // Otherwise, we need to look at the children of
+  // each of these nodes, recursively, and attempt to
+  // update the node deeper in the tree.
+  return currentNodes
+    .map(node => getChildren(node).caseOf({
+      just: nodes =>
+        setChildren(node, updateNode(idToUpdate, newNode, nodes, getChildren, setChildren)),
+      nothing: () => node,
+    }))
+    .toOrderedMap();
 }
 

@@ -16,11 +16,11 @@ import { Link } from '../../../../data/content/html/link';
 import { ActivityLink } from '../../../../data/content/html/activity_link';
 import { Xref } from '../../../../data/content/html/xref';
 import { Cite } from '../../../../data/content/html/cite';
-import { Activity } from '../../../../data/content/html/activity';
 
 import guid from '../../../../utils/guid';
 
 import * as commands from '../draft/commands';
+
 const math 
   = '<math xmlns=\'http://www.w3.org/1998/Math/MathML\' display=\'inline\'><mo>&sum;</mo></math>';
 const defaultMathML = { '#cdata': math };

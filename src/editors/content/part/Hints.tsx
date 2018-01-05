@@ -3,9 +3,8 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
-import guid from '../../../utils/guid';
 import { HintEditor } from './HintEditor';
-import { TextInput, InlineForm, Button, Checkbox, Collapse } from '../common/controls';
+import { Button } from '../common/controls';
 
 export interface HintsProps {
   model: contentTypes.Part;
@@ -28,16 +27,8 @@ export abstract class Hints
   constructor(props) {
     super(props);
 
-    this.onAddHint = this.onAddHint.bind(this);
     this.onHintEdit = this.onHintEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
-  }
-
-  onAddHint() {
-    const { onEdit } = this.props;
-
-    const hint = new contentTypes.Hint();
-    onEdit(this.props.model.hints.set(hint.guid, hint));
   }
 
   onHintEdit(hint: contentTypes.Hint) {
@@ -68,13 +59,6 @@ export abstract class Hints
   render() : JSX.Element {
     return (
       <div className="hints">
-        <Button
-          editMode={this.props.editMode}
-          type="link"
-          onClick={this.onAddHint}>
-          Add Hint
-        </Button>
-
         {this.renderHints()}
       </div>
     );

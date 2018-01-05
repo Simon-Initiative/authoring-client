@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import { removeHTML, getCaretPosition, setCaretPosition } from '../utils';
+import { getCaretPosition, setCaretPosition } from '../utils';
 
 require('./PreformattedText.scss');
 
 const BACKSPACE = 8;
- 
+
 interface PreformattedText {
   _onChange: any;
   _onKeyPress: any;
@@ -20,7 +20,7 @@ export interface PreformattedTextProps {
   onFocus?: () => void;
   onBlur?: () => void;
   editMode: boolean;
-  src: string; 
+  src: string;
   styleName? : string;
 }
 
@@ -28,7 +28,7 @@ export interface PreformattedTextState {
   src: string;
 }
 
-class PreformattedText extends React.PureComponent<PreformattedTextProps, PreformattedTextState> {
+class PreformattedText extends React.Component<PreformattedTextProps, PreformattedTextState> {
 
   public static defaultProps: Partial<PreformattedTextProps> = {
     styleName: 'PreformattedText-code',
@@ -56,9 +56,9 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
     const currentText = target.innerText;
 
     this.setState(
-      { src: currentText }, 
+      { src: currentText },
       () => setCaretPosition(target, this.caretPosition + this.direction));
-    
+
     // Persist this change
     this.props.onEdit({ src: currentText });
   }
@@ -71,7 +71,7 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
       this.direction = 1;
     }
 
-    // Keep track of the position of caret 
+    // Keep track of the position of caret
     this.caretPosition = getCaretPosition(e.target);
 
 
@@ -82,11 +82,11 @@ class PreformattedText extends React.PureComponent<PreformattedTextProps, Prefor
   }
 
   render() : JSX.Element {
-    
+
     // We cannot use JSX here to render this div because
     // the TypeScript type definitions do not seem to
     // recognize 'suppressContentEditableWarning' as a valid
-    // property. 
+    // property.
 
     return React.createElement(('pre' as any), {
       ref: component => this.pre = component,

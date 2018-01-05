@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { IFrame as IFrameType } from '../../../../../data/content/html/iframe';
-import { InteractiveRenderer, InteractiveRendererProps, 
-  InteractiveRendererState} from './InteractiveRenderer';
-import { BlockProps } from './properties';
-import { Button } from '../../Button';
+import {
+  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
+} from './InteractiveRenderer';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { IFrameEditor } from '../../../media/IFrameEditor';
 import { buildUrl } from '../../../../../utils/path';
@@ -20,11 +19,11 @@ export interface IFrameProps extends InteractiveRendererProps {
 }
 
 export interface IFrameState extends InteractiveRendererState {
-  
+
 }
 
 export interface IFrameProps {
-  
+
 }
 
 
@@ -46,13 +45,13 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
         services={b.services}
 
         model={this.props.data.iframe}
-        onCancel={() => this.props.blockProps.services.dismissModal()} 
+        onCancel={() => this.props.blockProps.services.dismissModal()}
         onInsert={(iframe) => {
           this.props.blockProps.services.dismissModal();
           this.props.blockProps.onEdit({ iframe });
         }
       }>
-        <IFrameEditor 
+        <IFrameEditor
           model={this.props.data.iframe}
           context={b.context}
           services={b.services}
@@ -70,9 +69,9 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
 
     const { src, height, width } = this.props.data.iframe;
     const fullSrc = buildUrl(
-        this.props.blockProps.context.baseUrl, 
-        this.props.blockProps.context.courseId, 
-        this.props.blockProps.context.resourcePath, 
+        this.props.blockProps.context.baseUrl,
+        this.props.blockProps.context.courseId,
+        this.props.blockProps.context.resourcePath,
         src);
 
     return (
@@ -81,7 +80,7 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
           editMode={this.props.blockProps.editMode} >
           <iframe src={fullSrc} height={height} width={width}/>
         </AutoHideEditRemove>
-        
+
       </div>);
   }
 }

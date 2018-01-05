@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
-import { ContentBlock, ContentState, Entity, CharacterMetadata } from 'draft-js';
-import { shouldInsertBlock, insertBlocksAfter } from '../commands/common';
+import { CharacterMetadata, ContentBlock, ContentState, Entity } from 'draft-js';
+import { insertBlocksAfter, shouldInsertBlock } from '../commands/common';
 import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
 
 export function handleInsertion(props : any) {

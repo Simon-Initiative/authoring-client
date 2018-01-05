@@ -5,7 +5,7 @@ import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
 import { Hint } from './hint';
-import { getChildren, defaultIdGuid } from '../common';
+import { defaultIdGuid, getChildren } from '../common';
 
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';

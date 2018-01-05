@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { AssessmentModel, PoolModel } from 'data/models';
-import { Question, Part } from 'data/contentTypes';
+import { Part, Question } from 'data/contentTypes';
 import { Skill } from 'types/course';
 
 // Does an assessment or standalone pool contain at least one
@@ -28,7 +28,8 @@ function collectAssessmentQuestions(model: AssessmentModel) : Question[] {
 
           if (node.contentType === 'Question') {
             return [...questions, node];
-          } else if (node.contentType === 'Selection') {
+          }
+          if (node.contentType === 'Selection') {
             if (node.source.contentType === 'Pool') {
               return [...questions, ...node.source.questions.toArray()];
             }

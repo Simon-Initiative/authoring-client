@@ -7,20 +7,20 @@ export function buildUrl(
 
   // Handle legacy image content
   if (file.startsWith('..')) {
-    return baseUrl 
+    return baseUrl
       + '/' + courseId
-      + '/' + resourcePath 
+      + '/' + resourcePath
       + '/' + file;
-  
+
   // Absolute URLs
-  } else if (file.startsWith('http://') || file.startsWith('https://')) {
+  }
+  if (file.startsWith('http://') || file.startsWith('https://')) {
     return file;
 
   // Files uploaded via the course editor
-  } else {
-    return baseUrl 
-      + '/' + courseId
-      + '/' + file;
   }
 
+  return baseUrl
+    + '/' + courseId
+    + '/' + file;
 }

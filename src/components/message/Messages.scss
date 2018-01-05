@@ -1,0 +1,18 @@
+
+.message-enter {
+  opacity: 0.01;
+}
+
+.message-enter.message-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.message-leave {
+  opacity: 1;
+}
+
+.message-leave.message-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
