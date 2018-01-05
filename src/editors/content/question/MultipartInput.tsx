@@ -17,12 +17,14 @@ import { Numeric } from '../items/Numeric';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
 
+type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
+
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
   textCommand: InsertInputRefCommand;
-  canInsertAnotherPart: (e: any) => void;
+  canInsertAnotherPart: PartAddPredicate;
 }
 
 export interface MultipartInputState extends QuestionState {
@@ -42,20 +44,20 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return 'multipart-input';
   }
 
-  onInsertNumeric(numericCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertNumeric(numericCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Numeric')) {
       this.htmlEditor.process(numericCommand);
     }
   }
 
-  onInsertText(textCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertText(textCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('Text')) {
       this.htmlEditor.process(textCommand);
     }
   }
 
-  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart) {
-    if (canInsertAnotherPart()) {
+  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart: PartAddPredicate) {
+    if (canInsertAnotherPart('FillInTheBlank')) {
       this.htmlEditor.process(fillInTheBlankCommand);
     }
   }
@@ -95,23 +97,28 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       borderColor: '#AAAAAA',
     };
 
-    const multipartButtons = [
-      <HtmlToolbarButton
+    const multipartButtons = [];
+    if (canInsertAnotherPart('FillInTheBlank')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Dropdown"
         key="server"
         icon="server"
-        command={fillInTheBlankCommand}/>,
-      <HtmlToolbarButton
+        command={fillInTheBlankCommand}/>);
+    }
+    if (canInsertAnotherPart('Numeric')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Numeric Input"
         key="info"
         icon="info"
-        command={numericCommand}/>,
-      <HtmlToolbarButton
+        command={numericCommand}/>);
+    }
+    if (canInsertAnotherPart('Text')) {
+      multipartButtons.push(<HtmlToolbarButton
         tooltip="Insert Text Input"
         key="i-cursor"
         icon="i-cursor"
-        command={textCommand}/>,
-    ];
+        command={textCommand}/>);
+    }
 
     const insertionToolbar =
       <InlineInsertionToolbar>
@@ -123,14 +130,17 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         <div className="control insert-item">
             <span>Insert:</span>
             <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
               onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
               Numeric
             </button>
             <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
               onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
               Text
             </button>
             <button className="btn btn-sm btn-link" type="button"
+              disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
               onClick={() => this.onInsertFillInTheBlank(
                 fillInTheBlankCommand, canInsertAnotherPart)}>
               Dropdown
