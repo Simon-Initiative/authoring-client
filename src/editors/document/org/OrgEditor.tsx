@@ -317,17 +317,12 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderDetails() {
-    const { onUpdateTitle } = this.props;
-
     return (
       <div className="org-tab">
         <Details
           editMode={this.props.editMode}
           model={this.props.model}
-          onEdit={(model) => {
-            onUpdateTitle({ id: model.get('id'), title: model.get('title') });
-            this.handleEdit(model);
-          }}/>
+          onEdit={model => this.handleEdit(model)}/>
       </div>
     );
   }
