@@ -42,6 +42,8 @@ function changeForBlock(contentState: ContentState, block) : ContentState {
         copy[key] = data[key];
       }
 
+      const updatedState = contentState.createEntity(
+        entity.type, entity.mutability, copy);
       const createdKey = contentState.getLastCreatedEntityKey();
       const range = new SelectionState({
         anchorKey: block.key,
@@ -49,7 +51,7 @@ function changeForBlock(contentState: ContentState, block) : ContentState {
         anchorOffset: 0,
         focusOffset: 1,
       });
-      return Modifier.applyEntity(contentState, range, createdKey);
+      return Modifier.applyEntity(updatedState, range, createdKey);
     }
     return contentState;
 

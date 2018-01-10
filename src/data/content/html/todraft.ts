@@ -829,6 +829,13 @@ function material(item: Object, context: ParsingContext) {
 }
 
 function title(item: Object, context: ParsingContext) {
+
+  // Create the beginning block
+  const beginData : common.TitleBegin = {
+    type: 'title_begin',
+  };
+  addAtomicBlock(common.EntityTypes.title_begin, beginData, context);
+
   // Handle the children
   const children = getChildren(item);
   children.forEach(subItem => parse(subItem, context));
