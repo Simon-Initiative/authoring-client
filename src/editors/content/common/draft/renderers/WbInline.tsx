@@ -33,9 +33,6 @@ export interface WbInlineProps {
 
 export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> {
 
-  title: string;
-  guid: string;
-
   constructor(props) {
     super(props, { });
 
@@ -48,11 +45,12 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
   }
 
   onClick() {
-    if (this.guid !== null) {
-      this.props.blockProps.services.viewDocument(
-        this.guid,
+    const guid = this.props.blockProps.context.courseModel.resourcesById.get(
+      this.props.data.wbinline.idRef).guid;
+
+    this.props.blockProps.services.viewDocument(
+        guid,
         this.props.blockProps.context.courseId);
-    }
   }
 
   onPurposeEdit(purpose) {
@@ -102,12 +100,16 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
       .resourcesById.get(this.props.data.wbinline.idRef).title
       : 'Loading...';
 
+    const canLoad = this.props.blockProps.context.courseModel
+      .resourcesById.has(this.props.data.wbinline.idRef);
+
     return (
       <div className="wbinline"
         ref={c => this.focusComponent = c} onFocus={this.onFocus}
         onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
         <b>Inline Assessment:</b>&nbsp;&nbsp;&nbsp;
         <button onClick={this.onClick} type="button"
+          disabled={!canLoad}
           className="btn btn-link">{title}</button>
         <Button editMode={this.props.blockProps.editMode}
           onClick={this.onSelectActivity}>Edit</Button>
