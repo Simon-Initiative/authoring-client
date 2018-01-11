@@ -89,8 +89,6 @@ export function preview(courseId: string, resource: Resource) {
 
     return dispatch(invokePreview(resource))
       .then((result: persistence.PreviewResult) => {
-        console.log('preview action finished');
-        console.dir(result);
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
           dispatch(showMessage(message));

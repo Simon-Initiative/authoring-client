@@ -67,7 +67,6 @@ export function initiatePreview(
     .then((json : any) => {
 
       if (json.message !== undefined) {
-        console.log('preview result ' + json.message);
         if (json.message === null || json.message === 'pending') {
           return {
             type: 'PreviewPending',

@@ -47,8 +47,6 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
     persistence.initiatePreview(courseId, documentId)
       .then((result) => {
-        console.log('Preview.tsx result');
-        console.dir(result);
         if (result.type === 'PreviewSuccess') {
           this.setState({ previewUrl: Maybe.just(result.activityUrl || result.sectionUrl) });
         } else if (result.type === 'PreviewPending') {
