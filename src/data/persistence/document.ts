@@ -29,17 +29,17 @@ export function retrieveDocument(
 
 export interface PreviewNotSetUp {
   type: 'PreviewNotSetUp';
-  message: string[];
+  message: string;
 }
 
 export interface PreviewPending {
   type: 'PreviewPending';
-  message: string[];
+  message: string;
 }
 
 export interface MissingFromOrganization {
   type: 'MissingFromOrganization';
-  message: string[];
+  message: string;
 }
 
 export interface PreviewSuccess {
@@ -67,21 +67,22 @@ export function initiatePreview(
     .then((json : any) => {
 
       if (json.message !== undefined) {
-        if (json.message.length === 1 && json.message[0] === 'pending') {
+        console.log('preview result ' + json.message);
+        if (json.message === 'pending') {
           return {
             type: 'PreviewPending',
-            message: json.message as string[],
+            message: json.message,
           } as PreviewPending;
         }
-        if (json.message.length === 1 && json.message[0] === 'missing') {
+        if (json.message === 'missing') {
           return {
             type: 'MissingFromOrganization',
-            message: json.message as string[],
+            message: json.message,
           } as MissingFromOrganization;
         }
         return {
           type: 'PreviewNotSetUp',
-          message: json.message as string[],
+          message: json.message,
         } as PreviewNotSetUp;
       }
       const { admitCode, sectionUrl, activityUrl } = json;

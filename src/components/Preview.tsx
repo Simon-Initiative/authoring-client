@@ -47,9 +47,9 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
   componentDidMount() {
     this.props.previewUrl.caseOf({
-      nothing: () => () => this.checkOnProgress(),
-      just: url => () => true,
-    })();
+      nothing: () => this.checkOnProgress(),
+      just: url => true,
+    });
   }
 
   componentWillUnmount() {

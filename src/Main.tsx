@@ -207,7 +207,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     }
     if (url.startsWith('/preview')) {
       if (url.indexOf('-') > 0) {
-        const documentId = url.substr(8, url.indexOf('-') - 1);
+        const documentId = url.substring(8, url.indexOf('-'));
         const courseId = url.substr(url.indexOf('-') + 1);
         return <Preview
             previewUrl={Maybe.nothing()}
