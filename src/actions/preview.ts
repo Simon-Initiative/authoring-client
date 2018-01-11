@@ -25,6 +25,9 @@ export function preview(courseId: string, resource: Resource) {
         } else if (result.type === 'PreviewPending') {
           window.open('/#preview' + resource.guid + '+' + courseId, 'PreviewTab');
         }
+      }).catch((err) => {
+        const message = buildUnknownErrorMessage(err);
+        dispatch(showMessage(message));
       });
   };
 
@@ -81,3 +84,38 @@ function buildNotSetUpMessage() {
 }
 
 
+function buildReportProblemAction() : Messages.MessageAction {
+
+  const url = buildFeedbackFromCurrent(
+    '',
+    '',
+  );
+
+  return {
+    label: 'Report Problem',
+    execute: (message, dispatch) => {
+      window.open(url, 'ReportProblemTab');
+    },
+  };
+}
+
+
+function buildUnknownErrorMessage(error: string) {
+
+  const actions = [buildReportProblemAction()];
+
+  const content = new Messages.TitledContent().with({
+    title: 'Cannot preview',
+    message: 'An error was encountered trying to preview this page.'
+      + ' Try again and if the problem persists contact support.',
+  });
+  return new Messages.Message().with({
+    content,
+    guid: 'PreviewProblem',
+    scope: Messages.Scope.Resource,
+    severity: Messages.Severity.Error,
+    canUserDismiss: true,
+    actions: Immutable.List(actions),
+  });
+
+}

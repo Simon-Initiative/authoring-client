@@ -5,10 +5,11 @@ export interface Actions {
 }
 
 export interface ActionsProps {
-  onPreview: () => void;
+  onPreview: () => Promise<any>;
 }
 
 export interface ActionsState {
+  waitingOnPreview: boolean;
 }
 
 export class Actions
@@ -16,6 +17,18 @@ export class Actions
 
   constructor(props) {
     super(props);
+
+    this.state = { waitingOnPreview: false };
+  }
+
+  renderWait() {
+    return <span><i className={'fa fa-circle-o-notch fa-spin'}></i> Preview</span>;
+  }
+
+  onPreview() {
+    this.setState(
+      { waitingOnPreview: true },
+      () => this.props.onPreview().then(() => this.setState({ waitingOnPreview: false })));
   }
 
   render() {
@@ -31,9 +44,10 @@ export class Actions
         </dd>
           <dt className="col-sm-2 justify-content-right">
         <button
-          onClick={() => this.props.onPreview()}
+          disabled={this.state.waitingOnPreview}
+          onClick={() => this.onPreview()}
           className="btn btn-block btn-primary">
-          Preview
+          { this.state.waitingOnPreview ? this.renderWait() : 'Preview'}
         </button></dt>
 
         <dd className="col-sm-10">
