@@ -89,6 +89,8 @@ export function preview(courseId: string, resource: Resource) {
 
     return dispatch(invokePreview(resource))
       .then((result: persistence.PreviewResult) => {
+        console.log('preview action finished');
+        console.dir(result);
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
           dispatch(showMessage(message));
@@ -96,7 +98,10 @@ export function preview(courseId: string, resource: Resource) {
           const message = buildNotSetUpMessage();
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
-          window.open('/#preview?url=' + encodeURIComponent(result.activityUrl), courseId);
+          window.open(
+            '/#preview?url='
+              + encodeURIComponent(result.activityUrl || result.sectionUrl),
+            courseId);
         } else if (result.type === 'PreviewPending') {
           window.open('/#preview' + resource.guid + '-' + courseId, courseId);
         }

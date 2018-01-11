@@ -26,7 +26,17 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
   }
 
   renderWait() {
-    return <span><i className={'fa fa-circle-o-notch fa-spin'}></i> Preview in progress</span>;
+    return (
+      <div className="jumbotron">
+        <h4>Setting up the preview</h4>
+        <p className="lead">One moment while we set up the preview of this course resource.</p>
+        <hr className="my-4"/>
+        <p>Depending on how many changes have been made
+          to the course package since the last preview,
+          this may take several minutes.
+        </p>
+      </div>
+    );
   }
 
   checkOnProgress() {
@@ -37,9 +47,11 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
     persistence.initiatePreview(courseId, documentId)
       .then((result) => {
+        console.log('Preview.tsx result');
+        console.dir(result);
         if (result.type === 'PreviewSuccess') {
-          this.setState({ previewUrl: Maybe.just(result.activityUrl) });
-        } else if (result.type === 'PreviewNotSetUp') {
+          this.setState({ previewUrl: Maybe.just(result.activityUrl || result.sectionUrl) });
+        } else if (result.type === 'PreviewPending') {
           this.timerId = Maybe.just(window.setTimeout(() => this.checkOnProgress(), 10000));
         }
       });
