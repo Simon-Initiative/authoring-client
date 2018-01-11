@@ -9,12 +9,13 @@ import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
 import { LegacyTypes } from './data/types';
-
+import { Maybe } from 'tsmonad';
 import Header from './components/Header.controller';
 import Footer from './components/Footer';
 import CoursesView from './components/CoursesView';
 import DocumentView from './components/DocumentView';
 import ResourceView from './components/ResourceView';
+import Preview from './components/Preview';
 import CreateCourseView from './components/CreateCourseView';
 import ObjectiveSkillView from './components/objectives/ObjectiveSkillView.controller';
 import { ImportCourseView } from './components/ImportCourseView';
@@ -203,6 +204,20 @@ export default class Main extends React.Component<MainProps, MainState> {
     }
     if (url === '/import') {
       return <ImportCourseView dispatch={onDispatch}/>;
+    }
+    if (url.startsWith('/preview')) {
+      if (url.indexOf('-') > 0) {
+        const documentId = url.substr(8, url.indexOf('-') - 1);
+        const courseId = url.substr(url.indexOf('-') + 1);
+        return <Preview
+            previewUrl={Maybe.nothing()}
+            documentId={documentId}
+            courseId={courseId}/>;
+      }
+      const previewUrl = decodeURIComponent(url.substr(url.indexOf('url=') + 4));
+      return <Preview
+            previewUrl={Maybe.just(previewUrl)}/>;
+
     }
     if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView

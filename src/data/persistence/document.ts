@@ -32,6 +32,16 @@ export interface PreviewNotSetUp {
   message: string[];
 }
 
+export interface PreviewPending {
+  type: 'PreviewPending';
+  message: string[];
+}
+
+export interface MissingFromOrganization {
+  type: 'MissingFromOrganization';
+  message: string[];
+}
+
 export interface PreviewSuccess {
   type: 'PreviewSuccess';
   admitCode: string;
@@ -40,7 +50,8 @@ export interface PreviewSuccess {
 }
 
 // Previewing can result in one of two responses from the server
-export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
+export type PreviewResult =
+  PreviewSuccess | PreviewNotSetUp | MissingFromOrganization | PreviewPending;
 
 /**
  * Initiates a resource preview.
@@ -56,6 +67,18 @@ export function initiatePreview(
     .then((json : any) => {
 
       if (json.message !== undefined) {
+        if (json.message.length === 1 && json.message[0] === 'pending') {
+          return {
+            type: 'PreviewPending',
+            message: json.message as string[],
+          } as PreviewPending;
+        }
+        if (json.message.length === 1 && json.message[0] === 'missing') {
+          return {
+            type: 'MissingFromOrganization',
+            message: json.message as string[],
+          } as MissingFromOrganization;
+        }
         return {
           type: 'PreviewNotSetUp',
           message: json.message as string[],
