@@ -49,7 +49,7 @@ export interface PreviewSuccess {
   activityUrl: string;
 }
 
-// Previewing can result in one of two responses from the server
+// Previewing can result in one of these responses from the server
 export type PreviewResult =
   PreviewSuccess | PreviewNotSetUp | MissingFromOrganization | PreviewPending;
 
