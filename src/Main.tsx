@@ -23,6 +23,9 @@ import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from './components/message/Messages.controller';
+import * as Msg from 'types/messages';
+import { getQueryVariableFromString } from 'utils/params';
+import * as messageActions from 'actions//messages';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -206,17 +209,30 @@ export default class Main extends React.Component<MainProps, MainState> {
       return <ImportCourseView dispatch={onDispatch}/>;
     }
     if (url.startsWith('/preview')) {
-      if (url.indexOf('-') > 0) {
-        const documentId = url.substring(8, url.indexOf('-'));
-        const courseId = url.substr(url.indexOf('-') + 1);
-        return <Preview
-            previewUrl={Maybe.nothing()}
-            documentId={documentId}
-            courseId={courseId}/>;
-      }
-      const previewUrl = decodeURIComponent(url.substr(url.indexOf('url=') + 4));
+
+      const documentId = url.substring(8, url.indexOf('-'));
+      const hasParams = url.indexOf('?') !== -1;
+      const courseId = hasParams
+        ? url.substring(url.indexOf('-') + 1, url.indexOf('?'))
+        : url.substr(url.indexOf('-') + 1);
+      const query = url.substr(url.indexOf('?') + 1);
+      const previewUrl = getQueryVariableFromString('url', query);
+      const shouldRefresh = getQueryVariableFromString('refresh', query) === 'true';
+
+      const maybePreviewUrl = previewUrl === null
+        ? Maybe.nothing<string>() : Maybe.just(previewUrl);
+
       return <Preview
-            previewUrl={Maybe.just(previewUrl)}/>;
+          showMessage={(message: Msg.Message) => {
+            this.props.onDispatch(messageActions.showMessage(message));
+          }}
+          dismissMessage={(message: Msg.Message) => {
+            this.props.onDispatch(messageActions.dismissSpecificMessage(message));
+          }}
+          shouldRefresh={shouldRefresh}
+          previewUrl={maybePreviewUrl}
+          documentId={documentId}
+          courseId={courseId}/>;
 
     }
     if (url.startsWith('/objectives-') && course) {

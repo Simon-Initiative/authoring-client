@@ -44,6 +44,7 @@ export interface MissingFromOrganization {
 
 export interface PreviewSuccess {
   type: 'PreviewSuccess';
+  message: string;
   admitCode: string;
   sectionUrl: string;
   activityUrl: string;
@@ -59,38 +60,44 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+  courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
+    + (isRefresh ? '?refresh=true' : '');
 
   return authenticatedFetch({ url })
     .then((json : any) => {
 
-      if (json.message !== undefined) {
-        if (json.message === null || json.message === 'pending') {
-          return {
-            type: 'PreviewPending',
-            message: json.message,
-          } as PreviewPending;
-        }
-        if (json.message === 'missing') {
-          return {
-            type: 'MissingFromOrganization',
-            message: json.message,
-          } as MissingFromOrganization;
-        }
+      const message = json.message !== undefined ? json.message : '';
+      const admitCode = json.admitCode !== undefined ? json.admitCode : '';
+
+      if (json.message === 'pending' && admitCode === '') {
         return {
-          type: 'PreviewNotSetUp',
-          message: json.message,
-        } as PreviewNotSetUp;
+          type: 'PreviewPending',
+          message,
+        } as PreviewPending;
       }
-      const { admitCode, sectionUrl, activityUrl } = json;
+      if (json.admitCode !== '') {
+        const { sectionUrl, activityUrl } = json;
+
+        return {
+          message,
+          admitCode,
+          sectionUrl,
+          activityUrl,
+          type: 'PreviewSuccess',
+        } as PreviewSuccess;
+      }
+      if (json.message === 'missing') {
+        return {
+          type: 'MissingFromOrganization',
+          message,
+        } as MissingFromOrganization;
+      }
       return {
-        admitCode,
-        sectionUrl,
-        activityUrl,
-        type: 'PreviewSuccess',
-      } as PreviewSuccess;
+        type: 'PreviewNotSetUp',
+        message,
+      } as PreviewNotSetUp;
     });
 }
 
