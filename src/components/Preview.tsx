@@ -46,25 +46,6 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
     this.timerId = Maybe.nothing();
   }
 
-  renderWait() {
-    return (
-      <div className="jumbotron">
-        <h4>One moment while we set up the preview...</h4>
-        <p className="lead"></p>
-        <hr className="my-4"/>
-        <p>
-          This page will auto-refresh and display your preview
-          when it is ready.
-        </p>
-        <p>Depending on how many changes have been made
-          to the course package since the last preview,
-          this may take several minutes.
-        </p>
-
-      </div>
-    );
-  }
-
   checkOnProgress() {
 
     this.timerId = Maybe.nothing();
@@ -113,7 +94,7 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
       just: url => buildIFrame(url),
       nothing: () => this.state.previewUrl.caseOf({
         just: url => buildIFrame(url),
-        nothing: () => this.renderWait(),
+        nothing: () => null,
       }),
     });
 

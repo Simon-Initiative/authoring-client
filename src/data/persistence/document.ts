@@ -68,33 +68,36 @@ export function initiatePreview(
   return authenticatedFetch({ url })
     .then((json : any) => {
 
-      if (json.message !== undefined) {
-        if (json.message === null || json.message === 'pending') {
-          return {
-            type: 'PreviewPending',
-            message: json.message,
-          } as PreviewPending;
-        }
-        if (json.message === 'missing') {
-          return {
-            type: 'MissingFromOrganization',
-            message: json.message,
-          } as MissingFromOrganization;
-        }
-        return {
-          type: 'PreviewNotSetUp',
-          message: json.message,
-        } as PreviewNotSetUp;
-      }
-      const { admitCode, sectionUrl, activityUrl } = json;
       const message = json.message !== undefined ? json.message : '';
+      const admitCode = json.admitCode !== undefined ? json.admitCode : '';
+
+      if (json.message === 'pending' && admitCode === '') {
+        return {
+          type: 'PreviewPending',
+          message,
+        } as PreviewPending;
+      }
+      if (json.admitCode !== '') {
+        const { sectionUrl, activityUrl } = json;
+
+        return {
+          message,
+          admitCode,
+          sectionUrl,
+          activityUrl,
+          type: 'PreviewSuccess',
+        } as PreviewSuccess;
+      }
+      if (json.message === 'missing') {
+        return {
+          type: 'MissingFromOrganization',
+          message,
+        } as MissingFromOrganization;
+      }
       return {
+        type: 'PreviewNotSetUp',
         message,
-        admitCode,
-        sectionUrl,
-        activityUrl,
-        type: 'PreviewSuccess',
-      } as PreviewSuccess;
+      } as PreviewNotSetUp;
     });
 }
 

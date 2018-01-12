@@ -98,8 +98,8 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
           window.open(
-            '/#preview?url='
-              + encodeURIComponent(result.activityUrl || result.sectionUrl)
+            '/#preview' + resource.guid + '-' + courseId
+              + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
               + (refresh ? '&refresh=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
