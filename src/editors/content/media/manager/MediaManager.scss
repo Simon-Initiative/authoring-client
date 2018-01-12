@@ -1,8 +1,10 @@
 @import 'oli/colors';
+@import 'oli/mixins';
 
 .media-manager {
   display: flex;
   flex-direction: column;
+  @include disable-select;
 
   .media-toolbar {
     display: flex;

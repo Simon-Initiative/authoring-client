@@ -23,7 +23,7 @@ const mediaItems = [{
   mediaType: '',
   mimeType: '',
   iconUrl: '',
-  name: 'HelloWorld.docx',
+  name: 'Hello sdfasdf asasdf asfa sad sas dfasf asdf sdfa.docx',
 },{
   mediaType: '',
   mimeType: '',
@@ -33,7 +33,7 @@ const mediaItems = [{
   mediaType: '',
   mimeType: '',
   iconUrl: '',
-  name: 'Module1.pptx',
+  name: 'Module1.zip',
 },{
   mediaType: '',
   mimeType: '',
@@ -54,6 +54,21 @@ const mediaItems = [{
   mimeType: '',
   iconUrl: '',
   name: 'Stats3.png',
+},{
+  mediaType: '',
+  mimeType: '',
+  iconUrl: '',
+  name: 'Stats4.txt',
+},{
+  mediaType: '',
+  mimeType: '',
+  iconUrl: '',
+  name: 'file.css',
+},{
+  mediaType: '',
+  mimeType: '',
+  iconUrl: '',
+  name: 'file.js',
 }];
 
 const renderMediaGrid = () => {
