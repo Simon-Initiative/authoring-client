@@ -53,7 +53,7 @@ function isResourceInOrgHelper(org: OrganizationModel, resource: Resource, node)
 }
 
 // The action to invoke preview.
-function invokePreview(resource: Resource) {
+function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
   return function (dispatch, getState) : Promise<persistence.PreviewResult> {
 
     const { course } = getState();
@@ -62,7 +62,7 @@ function invokePreview(resource: Resource) {
       fetchOrg(course.guid, determineDefaultOrg(course))
         .then((model) => {
           if (isResourceInOrg(model, resource)) {
-            return persistence.initiatePreview(course.guid, resource.guid);
+            return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
           }
           resolve({
             message: 'missing',
@@ -83,11 +83,11 @@ function invokePreview(resource: Resource) {
   };
 }
 
-export function preview(courseId: string, resource: Resource) {
+export function preview(courseId: string, resource: Resource, isRefreshAttempt: boolean) {
 
   return function (dispatch) : Promise<any> {
 
-    return dispatch(invokePreview(resource))
+    return dispatch(invokePreview(resource, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -96,9 +96,11 @@ export function preview(courseId: string, resource: Resource) {
           const message = buildNotSetUpMessage();
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
+          const refresh = result.message === 'pending';
           window.open(
             '/#preview?url='
-              + encodeURIComponent(result.activityUrl || result.sectionUrl),
+              + encodeURIComponent(result.activityUrl || result.sectionUrl)
+              + (refresh ? '&refresh=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
           window.open('/#preview' + resource.guid + '-' + courseId, courseId);

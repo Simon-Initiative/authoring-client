@@ -44,6 +44,7 @@ export interface MissingFromOrganization {
 
 export interface PreviewSuccess {
   type: 'PreviewSuccess';
+  message: string;
   admitCode: string;
   sectionUrl: string;
   activityUrl: string;
@@ -59,9 +60,10 @@ export type PreviewResult =
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+  courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
+    + (isRefresh ? '?=refresh=true' : '');
 
   return authenticatedFetch({ url })
     .then((json : any) => {
@@ -85,7 +87,9 @@ export function initiatePreview(
         } as PreviewNotSetUp;
       }
       const { admitCode, sectionUrl, activityUrl } = json;
+      const message = json.message !== undefined ? json.message : '';
       return {
+        message,
         admitCode,
         sectionUrl,
         activityUrl,

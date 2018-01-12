@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       return dispatch(fetchObjectives(courseId));
     },
     preview: (courseId: string, resource: Resource) => {
-      return dispatch(preview(courseId, resource));
+      return dispatch(preview(courseId, resource, false));
     },
   };
 };

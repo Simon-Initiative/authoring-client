@@ -23,6 +23,9 @@ import { PLACEHOLDER_ITEM_ID } from './data/content/org/common';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import Messages from './components/message/Messages.controller';
+import * as Msg from 'types/messages';
+import { getQueryVariableFromString } from 'utils/params';
+import * as messageActions from 'actions//messages';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -210,12 +213,29 @@ export default class Main extends React.Component<MainProps, MainState> {
         const documentId = url.substring(8, url.indexOf('-'));
         const courseId = url.substr(url.indexOf('-') + 1);
         return <Preview
+            showMessage={(message: Msg.Message) => {
+              this.props.onDispatch(messageActions.showMessage(message));
+            }}
+            dismissMessage={(message: Msg.Message) => {
+              this.props.onDispatch(messageActions.dismissSpecificMessage(message));
+            }}
+            shouldRefresh={false}
             previewUrl={Maybe.nothing()}
             documentId={documentId}
             courseId={courseId}/>;
       }
-      const previewUrl = decodeURIComponent(url.substr(url.indexOf('url=') + 4));
+      const query = url.substr(url.indexOf('?') + 1);
+      const previewUrl = getQueryVariableFromString('url', query);
+      const shouldRefresh = getQueryVariableFromString('refresh', query) === 'true';
+
       return <Preview
+            showMessage={(message: Msg.Message) => {
+              this.props.onDispatch(messageActions.showMessage(message));
+            }}
+            dismissMessage={(message: Msg.Message) => {
+              this.props.onDispatch(messageActions.dismissSpecificMessage(message));
+            }}
+            shouldRefresh={shouldRefresh}
             previewUrl={Maybe.just(previewUrl)}/>;
 
     }
