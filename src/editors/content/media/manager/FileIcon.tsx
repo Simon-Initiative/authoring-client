@@ -5,9 +5,9 @@ import { getFileExtensionGlyph, getFileExtensionColor } from './utils';
 
 export interface FileIconProps {
   className?: string;
-  size: number[];
   filename: string;
   extension: string;
+  url: string;
 }
 
 /**
@@ -15,16 +15,16 @@ export interface FileIconProps {
  */
 export const FileIcon: React.StatelessComponent<FileIconProps> = ({
   className,
-  size,
   filename,
   extension,
+  url,
 }) => {
   const extColor = getFileExtensionColor(extension);
   const extGlyph = getFileExtensionGlyph(extension);
 
   return (
-    <div className={`media-icon ${className || ''}`} style={{ paddingLeft: '20%' }}>
-      <svg x="0" y="0" width={size[0]} height={size[1]} viewBox="0, 0, 512, 512">
+    <div className={`media-icon ${className || ''}`} style={{ padding: 5 }}>
+      <svg x="0" y="0" width="100%" height="80%" viewBox="0, 0, 512, 512">
         <defs>
           <linearGradient
               id="Gradient_1"

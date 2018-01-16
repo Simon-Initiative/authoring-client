@@ -17,66 +17,141 @@ const onEditClick = () => {
 const mediaItems = [{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: 'http://ichef.bbci.co.uk/wwfeatures/wm/live/1280_640/images/live/p0/2v/dp/p02vdpfn.jpg',
   name: 'Stats1.png',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Hello sdfasdf asasdf asfa sad sas dfasf asdf sdfa.docx',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Syllabus.pdf',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Module1.zip',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Lecture1.pptx',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Sheet.xlsx',
+  selected: true,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Stats2',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: 'http://www.startupremarkable.com/wp-content/uploads/2015/02/a-book-a-week-image.jpg',
   name: 'Stats3.png',
+  selected: true,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'Stats4.txt',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
+  name: 'Lecture1.pptx',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Sheet.xlsx',
+  selected: true,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Stats2',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: 'http://www.startupremarkable.com/wp-content/uploads/2015/02/a-book-a-week-image.jpg',
+  name: 'Stats3.png',
+  selected: true,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Stats4.txt',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Lecture1.pptx',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Sheet.xlsx',
+  selected: true,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Stats2',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: 'http://www.startupremarkable.com/wp-content/uploads/2015/02/a-book-a-week-image.jpg',
+  name: 'Stats3.png',
+  selected: true,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
+  name: 'Stats4.txt',
+  selected: false,
+},{
+  mediaType: '',
+  mimeType: '',
+  url: '',
   name: 'file.css',
+  selected: false,
 },{
   mediaType: '',
   mimeType: '',
-  iconUrl: '',
+  url: '',
   name: 'file.js',
+  selected: false,
 }];
 
 const renderMediaGrid = () => {
   return (
     <ol>
       {mediaItems.map(item => (
-        <li key={item.name}>
-          <MediaIcon size={[56, 56]} filename={item.name} />
+        <li key={item.name} className={`media-item ${item.selected ? 'selected' : ''}`}>
+          <input
+              type="checkbox"
+              className="selection-check"
+              value={`${item.selected}`} />
+          <MediaIcon filename={item.name} url={item.url} />
           <div className="name">{item.name}</div>
         </li>
       ))}

@@ -5,8 +5,8 @@ import { isImage } from './utils';
 
 export interface MediaIconProps {
   className?: string;
-  size: number[];
   filename: string;
+  url: string;
 }
 
 const getMediaIconRenderer = (extension: string) => {
@@ -22,8 +22,8 @@ const getMediaIconRenderer = (extension: string) => {
  */
 export const MediaIcon: React.StatelessComponent<MediaIconProps> = ({
   className,
-  size,
   filename,
+  url,
 }) => {
   const extensionMatches = filename.match(/\.[^.]+/);
   const extension = extensionMatches ? extensionMatches[0].substr(1, 3).toLowerCase() : '';
@@ -32,7 +32,7 @@ export const MediaIcon: React.StatelessComponent<MediaIconProps> = ({
 
   return (
     <div className={`media-icon ${className || ''}`}>
-      <Icon size={size} filename={filename} extension={extension} />
+      <Icon filename={filename} extension={extension} url={url} />
     </div>
   );
 };
