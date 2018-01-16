@@ -130,8 +130,8 @@ function buildMissingFromOrgMessage(courseId) {
 
   const content = new Messages.TitledContent().with({
     title: 'Cannot preview.',
-    message: 'The page is not present in any organization.'
-      + ' Click \'Edit Org\' to add to an organization',
+    message: 'Page not included in default organization.'
+      + ' Click \'Edit Org\' to edit the organization',
   });
   return new Messages.Message().with({
     content,
