@@ -229,6 +229,7 @@ export default class Main extends React.Component<MainProps, MainState> {
           dismissMessage={(message: Msg.Message) => {
             this.props.onDispatch(messageActions.dismissSpecificMessage(message));
           }}
+          email={this.props.user.profile.email}
           shouldRefresh={shouldRefresh}
           previewUrl={maybePreviewUrl}
           documentId={documentId}
