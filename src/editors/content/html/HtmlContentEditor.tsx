@@ -31,7 +31,7 @@ export interface HtmlContentEditorProps extends AbstractContentEditorProps<conte
 
 export interface HtmlContentEditorState {
 
-
+  hasError: boolean;
 }
 
 /**
@@ -49,7 +49,10 @@ export class HtmlContentEditor
     this.onChange = this.onChange.bind(this);
     this.container = null;
     this.draft = null;
+
+    this.state = { hasError: false };
   }
+
 
 
   onChange(content: contentTypes.Html) {
@@ -57,7 +60,7 @@ export class HtmlContentEditor
   }
 
   onSelectionChange(selectionState) {
-    this.setState({ selectionState });
+
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -75,6 +78,13 @@ export class HtmlContentEditor
 
   process(command: Command<EditorState>) {
     this.draft.process(command);
+  }
+
+
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    this.setState({ hasError: true });
+    console.log(error);
   }
 
   checkPrecondition(command: Command<EditorState>) {
@@ -103,7 +113,7 @@ export class HtmlContentEditor
             context={this.props.context}
             content={this.props.model}
             undoRedoGuid={this.props.context.undoRedoGuid}
-            locked={!this.props.editMode}
+            locked={!this.props.editMode || this.state.hasError}
             onEdit={this.onChange} />
 
       </div>);
