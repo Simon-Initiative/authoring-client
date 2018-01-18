@@ -98,7 +98,7 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
     };
 
     if (rows.length > 0) {
-      renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.map(renderCell)}</tr>);
+      renderedRows = rows.map(r => <tr key={r.guid}>{r.cells.toArray().map(renderCell)}</tr>);
     } else {
       renderedRows = empty;
     }

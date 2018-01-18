@@ -84,10 +84,23 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       'Last Updated',
     ];
 
-    const comparators = [
-      (direction, a, b) => direction === SortDirection.Ascending
+    const safeCompare = (direction, a, b) => {
+      if (a.title === null && b.title === null) {
+        return 0;
+      }
+      if (a.title === null) {
+        return direction === SortDirection.Ascending ? 1 : -1;
+      }
+      if (b.title === null) {
+        return direction === SortDirection.Ascending ? -1 : 1;
+      }
+      return direction === SortDirection.Ascending
         ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title),
+        : b.title.localeCompare(a.title);
+    };
+
+    const comparators = [
+      safeCompare,
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
