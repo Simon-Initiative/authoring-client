@@ -1,25 +1,30 @@
 var path = require('path');
 var webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: [
-        'webpack-dev-server/client?http://dev.local:3000',
-        'webpack/hot/only-dev-server',
-        'react-hot-loader/patch',
-        './src/app.tsx'
-    ],
+    entry: {
+        app: './src/app.tsx',
+        vendor: [
+            'react', 'immutable', 'tsmonad', 'draft-js', 'react-addons-css-transition-group',
+            'react-dom', 'react-addons-shallow-compare', 'react-dnd', 'react-dnd-html5-backend',
+            'react-hot-loader', 'react-redux', 'redux', 'redux-logger', 'redux-thunk'
+        ]
+    },
     output: {
-        path: __dirname + '/dev',
-        filename: "bundle.js",
-        publicPath: '/',
-        sourcePrefix: ''
+        path: path.resolve(__dirname, 'dev'),
+        filename: "[name].[hash].js"
     },
     externals: {
     },
     devtool: 'source-map',
     devServer: {
-        contentBase: path.join(__dirname, "dev"),
-        historyApiFallback: true
+        contentBase: __dirname,
+        historyApiFallback: true,
+        hot: true,
+        disableHostCheck: true,
+        port: 9000,
+        host: '0.0.0.0'
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
@@ -39,6 +44,7 @@ module.exports = {
     module: {
         unknownContextCritical: false,
         rules: [
+            { test: /\.html$/, loader: "underscore-template-loader" },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
@@ -75,6 +81,17 @@ module.exports = {
 
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+            template: '!!underscore-template-loader!./index.html'
+        }),
+        new webpack.HashedModuleIdsPlugin(),
+        new webpack.NamedModulesPlugin(),
+        new webpack.optimize.CommonsChunkPlugin({
+          name: 'vendor'
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+          name: 'manifest'
+        })
     ]
 };

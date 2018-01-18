@@ -5,6 +5,8 @@ import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
 
+const IMAGE = require('../../../../../../assets/400x300.png');
+
 class Image extends React.PureComponent<any, any> {
 
   a: any;
@@ -13,12 +15,12 @@ class Image extends React.PureComponent<any, any> {
     super(props);
 
     this.onClick = this.onClick.bind(this);
-    
+
   }
 
   onClick() {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    
+
     const b = this.props;
     this.props.services.displayModal(
       <ModalMediaEditor
@@ -27,7 +29,7 @@ class Image extends React.PureComponent<any, any> {
         services={b.services}
 
         model={data.image}
-        onCancel={() => this.props.services.dismissModal()} 
+        onCancel={() => this.props.services.dismissModal()}
         onInsert={(image) => {
           this.props.services.dismissModal();
 
@@ -40,7 +42,7 @@ class Image extends React.PureComponent<any, any> {
           this.props.onEdit(contentState);
         }
       }>
-        <ImageEditor 
+        <ImageEditor
           model={data.image}
           context={b.context}
           services={b.services}
@@ -54,21 +56,21 @@ class Image extends React.PureComponent<any, any> {
 
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const src = data.image.src;
-    
+
     let fullSrc;
     if (src === '') {
-      fullSrc = 'assets/400x300.png';
+      fullSrc = IMAGE;
     } else {
       fullSrc = buildUrl(
-        this.props.context.baseUrl, 
-        this.props.context.courseId, 
-        this.props.context.resourcePath, 
+        this.props.context.baseUrl,
+        this.props.context.courseId,
+        this.props.context.resourcePath,
         src);
     }
-    
+
     return (
       <span data-offset-key={this.props.offsetKey}>
-        <img 
+        <img
           onClick={this.onClick}
           src={fullSrc}
           height={data.image.height}

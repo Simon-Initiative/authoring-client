@@ -56,8 +56,7 @@ gulp.task('setupDist', function() {
   gulp.src('./assets/*')
         .pipe(gulp.dest(config.distDir + '/assets'));
 
-  var patterns = ["./index.html",
-                  "/../assets/*",
+  var patterns = ["/../assets/*",
                   config.srcDir + '/vendor/**/*.*'];
 
   setupLog("Patterns: " + patterns);
@@ -76,9 +75,8 @@ gulp.task('setupDev', function() {
   gulp.src('./icons/fonts/icomoon*')
         .pipe(gulp.dest(config.devDir + '/assets/fonts'));
 
-  var patterns = [config.srcDir + "/../index.html",
-                  config.srcDir + "/../assets/*",
-                   config.srcDir + '/vendor/**/*.*'];
+  var patterns = [config.srcDir + "/../assets/*",
+                  config.srcDir + '/vendor/**/*.*'];
 
   setupLog("Patterns: " + patterns);
 
