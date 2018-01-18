@@ -111,9 +111,7 @@ class Header extends React.PureComponent<HeaderProps, {}> {
           {this.props.course ? this.renderPackageActions() : this.renderApplicationLabel()}
         </div>
         <div className="header-logout">
-          <Link action={() => window.open(this.props.user.logoutUrl)}>
-            Logout
-          </Link>
+          <a className="header-link" href={this.props.user.logoutUrl}>Logout</a>
         </div>
       </div>
     );

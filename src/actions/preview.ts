@@ -8,32 +8,6 @@ import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 
-interface MissingFromOrganization {
-  type: 'MissingFromOrganization';
-  model: OrganizationModel;
-}
-
-interface PreviewSuccess {
-  type: 'PreviewSuccess';
-  url: string;
-}
-
-interface UnknownPreviewError {
-  type: 'UnknownPreviewError';
-  error: string;
-}
-
-interface PreviewNotSetUp {
-  type: 'PreviewNotSetUp';
-}
-
-// The four different results that we can get from attempting to
-// preview a resource
-export type PreviewResult =
-  PreviewNotSetUp |            // Preview may not be set up for this course
-  MissingFromOrganization |    // The resource might not be included in the default org
-  PreviewSuccess |             // We successfully previewed the resource
-  UnknownPreviewError;         // We encountered some unknown problem
 
 // Determine which org is the 'default' org in use by preview
 function determineDefaultOrg(model: CourseModel) : Resource {
@@ -79,8 +53,8 @@ function isResourceInOrgHelper(org: OrganizationModel, resource: Resource, node)
 }
 
 // The action to invoke preview.
-function invokePreview(resource: Resource) {
-  return function (dispatch, getState) : Promise<PreviewResult> {
+function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
+  return function (dispatch, getState) : Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
@@ -88,31 +62,20 @@ function invokePreview(resource: Resource) {
       fetchOrg(course.guid, determineDefaultOrg(course))
         .then((model) => {
           if (isResourceInOrg(model, resource)) {
-            return persistence.initiatePreview(course.guid, resource.guid);
+            return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
           }
           resolve({
-            model,
+            message: 'missing',
             type: 'MissingFromOrganization',
           });
         })
         .then((result : persistence.PreviewResult) => {
-
-          if (result.type === 'PreviewNotSetUp') {
-            resolve({
-              type: 'PreviewNotSetUp',
-            });
-          } else {
-            resolve({
-              type: 'PreviewSuccess',
-              url: result.activityUrl !== undefined ? result.activityUrl : result.sectionUrl,
-            });
-          }
-
+          resolve(result);
         })
         .catch((error) => {
           resolve({
-            error,
-            type: 'UnknownPreviewError',
+            message: 'not set up',
+            type: 'PreviewNotSetUp',
           });
         });
     });
@@ -120,25 +83,31 @@ function invokePreview(resource: Resource) {
   };
 }
 
-
-export function preview(courseId: string, resource: Resource) {
+export function preview(courseId: string, resource: Resource, isRefreshAttempt: boolean) {
 
   return function (dispatch) : Promise<any> {
 
-    return dispatch(invokePreview(resource))
-      .then((result: PreviewResult) => {
+    return dispatch(invokePreview(resource, isRefreshAttempt))
+      .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
-          const message = buildMissingFromOrgMessage(courseId, result.model);
+          const message = buildMissingFromOrgMessage(courseId);
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewNotSetUp') {
           const message = buildNotSetUpMessage();
           dispatch(showMessage(message));
-        } else if (result.type === 'UnknownPreviewError') {
-          const message = buildUnknownErrorMessage(result.error);
-          dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
-          window.open(result.url, 'PreviewTab');
+          const refresh = result.message === 'pending';
+          window.open(
+            '/#preview' + resource.guid + '-' + courseId
+              + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
+              + (refresh ? '&refresh=true' : ''),
+            courseId);
+        } else if (result.type === 'PreviewPending') {
+          window.open('/#preview' + resource.guid + '-' + courseId, courseId);
         }
+      }).catch((err) => {
+        const message = buildUnknownErrorMessage(err);
+        dispatch(showMessage(message));
       });
   };
 
@@ -146,23 +115,23 @@ export function preview(courseId: string, resource: Resource) {
 
 
 function buildEditOrgAction(
-  courseId: string, label: string, model: OrganizationModel) : Messages.MessageAction {
+  courseId: string, label: string) : Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(viewActions.viewDocument(model.resource.guid, courseId));
+      dispatch(viewActions.viewOrganizations(courseId));
     },
   };
 }
 
-function buildMissingFromOrgMessage(courseId, model: OrganizationModel) {
+function buildMissingFromOrgMessage(courseId) {
 
-  const actions = [buildEditOrgAction(courseId, 'Edit Org', model)];
+  const actions = [buildEditOrgAction(courseId, 'Edit Org')];
 
   const content = new Messages.TitledContent().with({
     title: 'Cannot preview.',
-    message: 'The page is missing from the default organization.'
-      + ' Click \'Edit Org\' to edit this organization',
+    message: 'Page not included in default organization.'
+      + ' Click \'Edit Org\' to edit the organization',
   });
   return new Messages.Message().with({
     content,
@@ -174,7 +143,6 @@ function buildMissingFromOrgMessage(courseId, model: OrganizationModel) {
   });
 
 }
-
 
 function buildNotSetUpMessage() {
 
@@ -231,4 +199,3 @@ function buildUnknownErrorMessage(error: string) {
   });
 
 }
-

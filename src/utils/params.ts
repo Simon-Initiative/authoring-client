@@ -3,7 +3,12 @@
 
 export function getQueryVariable(variable: string) : string {
   const query = window.location.search.substring(1);
-  const vars = query.split('&');
+  return getQueryVariableFromString(variable, query);
+}
+
+
+export function getQueryVariableFromString(variable: string, str: string) : string {
+  const vars = str.split('&');
   for (let i = 0; i < vars.length; i += 1) {
     const pair = vars[i].split('=');
     if (decodeURIComponent(pair[0]) === variable) {
@@ -12,6 +17,7 @@ export function getQueryVariable(variable: string) : string {
   }
   return null;
 }
+
 
 export function getUserName() : string {
   const value = getQueryVariable('user');

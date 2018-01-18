@@ -29,18 +29,30 @@ export function retrieveDocument(
 
 export interface PreviewNotSetUp {
   type: 'PreviewNotSetUp';
-  message: string[];
+  message: string;
+}
+
+export interface PreviewPending {
+  type: 'PreviewPending';
+  message: string;
+}
+
+export interface MissingFromOrganization {
+  type: 'MissingFromOrganization';
+  message: string;
 }
 
 export interface PreviewSuccess {
   type: 'PreviewSuccess';
+  message: string;
   admitCode: string;
   sectionUrl: string;
   activityUrl: string;
 }
 
-// Previewing can result in one of two responses from the server
-export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
+// Previewing can result in one of these responses from the server
+export type PreviewResult =
+  PreviewSuccess | PreviewNotSetUp | MissingFromOrganization | PreviewPending;
 
 /**
  * Initiates a resource preview.
@@ -48,26 +60,44 @@ export type PreviewResult = PreviewSuccess | PreviewNotSetUp;
  * @param documentId the document guid to preview
  */
 export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId): Promise<PreviewResult> {
+  courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`;
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
+    + (isRefresh ? '?refresh=true' : '');
 
   return authenticatedFetch({ url })
     .then((json : any) => {
 
-      if (json.message !== undefined) {
+      const message = json.message !== undefined ? json.message : '';
+      const admitCode = json.admitCode !== undefined ? json.admitCode : '';
+
+      if (json.message === 'pending' && admitCode === '') {
         return {
-          type: 'PreviewNotSetUp',
-          message: json.message as string[],
-        } as PreviewNotSetUp;
+          type: 'PreviewPending',
+          message,
+        } as PreviewPending;
       }
-      const { admitCode, sectionUrl, activityUrl } = json;
+      if (json.admitCode !== '') {
+        const { sectionUrl, activityUrl } = json;
+
+        return {
+          message,
+          admitCode,
+          sectionUrl,
+          activityUrl,
+          type: 'PreviewSuccess',
+        } as PreviewSuccess;
+      }
+      if (json.message === 'missing') {
+        return {
+          type: 'MissingFromOrganization',
+          message,
+        } as MissingFromOrganization;
+      }
       return {
-        admitCode,
-        sectionUrl,
-        activityUrl,
-        type: 'PreviewSuccess',
-      } as PreviewSuccess;
+        type: 'PreviewNotSetUp',
+        message,
+      } as PreviewNotSetUp;
     });
 }
 
