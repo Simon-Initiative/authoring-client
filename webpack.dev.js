@@ -6,14 +6,29 @@ module.exports = {
     entry: {
         app: './src/app.tsx',
         vendor: [
-            'react', 'immutable', 'tsmonad', 'draft-js', 'react-addons-css-transition-group',
-            'react-dom', 'react-addons-shallow-compare', 'react-dnd', 'react-dnd-html5-backend',
-            'react-hot-loader', 'react-redux', 'redux', 'redux-logger', 'redux-thunk'
+            'draft-js',
+            'history',
+            'immutable',
+            'json-beautify',
+            'keycloak-js',
+            'react',
+            'react-addons-css-transition-group',
+            'react-addons-shallow-compare',
+            'react-bootstrap-typeahead',
+            'react-dnd',
+            'react-dnd-html5-backend',
+            'react-dom',
+            'react-redux',
+            'redux',
+            'redux-logger',
+            'redux-thunk',
+            'tsmonad',
+            'whatwg-fetch'
         ]
     },
     output: {
         path: path.resolve(__dirname, 'dev'),
-        filename: "[name].[hash].js"
+        filename: '[name].[hash].js'
     },
     externals: {
     },
@@ -28,7 +43,7 @@ module.exports = {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: ['.ts', '.tsx', '.js'],
         // Add webpack aliases for top level imports
         alias: {
             actions: path.resolve(__dirname, 'src/actions'),
@@ -44,14 +59,14 @@ module.exports = {
     module: {
         unknownContextCritical: false,
         rules: [
-            { test: /\.html$/, loader: "underscore-template-loader" },
+            { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
               use: [
-                  { loader: "style-loader"},
-                  { loader: "css-loader"},
-                  { loader: "sass-loader",
+                  { loader: 'style-loader'},
+                  { loader: 'css-loader'},
+                  { loader: 'sass-loader',
                     options: {
                         includePaths: [
                             path.join(__dirname, 'src/stylesheets'),

@@ -7,60 +7,39 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const pathsToClean = ['dist'];
 const cleanOptions = {};
 
-const uglifyOptions = {
-    compress: {
-      arrows: false,
-      booleans: false,
-      collapse_vars: false,
-      comparisons: false,
-      computed_props: false,
-      hoist_funs: false,
-      hoist_props: false,
-      hoist_vars: false,
-      if_return: false,
-      inline: false,
-      join_vars: false,
-      keep_infinity: true,
-      loops: false,
-      negate_iife: false,
-      properties: false,
-      reduce_funcs: false,
-      reduce_vars: false,
-      sequences: false,
-      side_effects: false,
-      switches: false,
-      top_retain: false,
-      toplevel: false,
-      typeofs: false,
-      unused: false,
-
-      // Switch off all types of compression except those needed to convince
-      // react-devtools that we're using a production build
-      conditionals: true,
-      dead_code: true,
-      evaluate: true,
-      },
-      mangle: true,
-  };
-
 module.exports = {
     entry: {
         app: './src/app.tsx',
         vendor: [
-            'react', 'immutable', 'tsmonad', 'draft-js', 'react-addons-css-transition-group',
-            'react-dom', 'react-addons-shallow-compare', 'react-dnd', 'react-dnd-html5-backend',
-            'react-hot-loader', 'react-redux', 'redux', 'redux-logger', 'redux-thunk'
+            'draft-js',
+            'history',
+            'immutable',
+            'json-beautify',
+            'keycloak-js',
+            'react',
+            'react-addons-css-transition-group',
+            'react-addons-shallow-compare',
+            'react-bootstrap-typeahead',
+            'react-dnd',
+            'react-dnd-html5-backend',
+            'react-dom',
+            'react-redux',
+            'redux',
+            'redux-logger',
+            'redux-thunk',
+            'tsmonad',
+            'whatwg-fetch'
         ]
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: "[name].[hash].js"
+        filename: '[name].[chunkhash].js'
     },
     externals: {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: ['.ts', '.tsx', '.js'],
 
         // Add webpack aliases for top level imports
         alias: {
@@ -76,8 +55,8 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        "process.env": {
-            NODE_ENV: JSON.stringify("production")
+        'process.env': {
+            NODE_ENV: JSON.stringify('production')
         }
       }),
       new CleanWebpackPlugin(pathsToClean, cleanOptions),
@@ -92,18 +71,18 @@ module.exports = {
       new webpack.optimize.CommonsChunkPlugin({
         name: 'manifest'
       }),
-      new UglifyJsPlugin({ uglifyOptions })
+      new UglifyJsPlugin()
     ],
     module: {
         rules: [
-            { test: /\.html$/, loader: "underscore-template-loader" },
+            { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
               use: [
-                  { loader: "style-loader"},
-                  { loader: "css-loader"},
-                  { loader: "sass-loader",
+                  { loader: 'style-loader'},
+                  { loader: 'css-loader'},
+                  { loader: 'sass-loader',
                     options: {
                         includePaths: [
                             path.join(__dirname, 'src/stylesheets'),
