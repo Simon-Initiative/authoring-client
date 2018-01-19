@@ -18,3 +18,21 @@ export function createWebContent(courseId: string, file): Promise<string> {
   return authenticatedFetch({ method, url, headers, body })
     .then(result => result[0].fileNode.pathTo);
 }
+
+/**
+ * Fetches all webcontent for the course, returns a Promise to resolve to
+ * a list of webcontents
+ */
+export function fetchWebContent(courseId: string, offset?: number, count?: number): Promise<any> {
+
+  const method = 'GET';
+  const url = `${configuration.baseUrl}/${courseId}/webcontents`;
+  const headers = getFormHeaders(credentials);
+  const query = Object.assign(
+    {},
+    offset !== undefined ? { offset } : {},
+    count !== undefined ? { count } : {},
+  );
+
+  return authenticatedFetch({ method, url, headers, query });
+}

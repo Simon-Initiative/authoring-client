@@ -11,7 +11,7 @@ import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
-import { MediaManager } from './manager/MediaManager';
+import { MediaManager } from './manager/MediaManager.controller';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -191,8 +191,10 @@ export class ImageEditor
   // }
 
   renderSource() {
+    const { context, model, onEdit } = this.props;
+
     return (
-      <MediaManager />
+      <MediaManager context={context} model={model} onEdit={onEdit} />
     );
   }
 

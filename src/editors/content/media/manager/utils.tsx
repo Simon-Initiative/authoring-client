@@ -2,8 +2,8 @@ import * as React from 'react';
 
 const MimeTypes = require('./mime-types.json');
 
-export const isImage = (extension) => {
-  return MimeTypes[extension] && MimeTypes[extension].match(/^image\//);
+export const isImage = (mimeType) => {
+  return mimeType.match(/^image\//);
 };
 
 export const getFileExtensionColor = (extension) => {

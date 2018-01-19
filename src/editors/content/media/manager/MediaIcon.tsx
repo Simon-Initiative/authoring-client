@@ -6,11 +6,12 @@ import { isImage } from './utils';
 export interface MediaIconProps {
   className?: string;
   filename: string;
+  mimeType: string;
   url: string;
 }
 
-const getMediaIconRenderer = (extension: string) => {
-  if (isImage(extension)) {
+const getMediaIconRenderer = (mimeType: string) => {
+  if (isImage(mimeType)) {
     return ImageIcon;
   }
 
@@ -23,12 +24,13 @@ const getMediaIconRenderer = (extension: string) => {
 export const MediaIcon: React.StatelessComponent<MediaIconProps> = ({
   className,
   filename,
+  mimeType,
   url,
 }) => {
   const extensionMatches = filename.match(/\.[^.]+/);
   const extension = extensionMatches ? extensionMatches[0].substr(1, 3).toLowerCase() : '';
 
-  const Icon = getMediaIconRenderer(extension);
+  const Icon = getMediaIconRenderer(mimeType);
 
   return (
     <div className={`media-icon ${className || ''}`}>
