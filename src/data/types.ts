@@ -18,7 +18,7 @@ export enum LegacyTypes {
 
 export type PaginatedResponse<T> = {
   offset: number;
-  count: number;
+  limit: number;
   order: string;
   orderBy: string;
   numResults: number;
