@@ -1,4 +1,4 @@
-import { Map, List, Record } from 'immutable';
+import { Map, List, Record, OrderedMap } from 'immutable';
 import {
   FETCH_MEDIA_PAGE,
   FetchMediaPageAction,
@@ -43,7 +43,7 @@ export const media = (
       return state.set(
         courseId,
         mediaLibrary.with({
-          items: List<string>(),
+          items: OrderedMap<string, MediaItem>(),
         }),
       );
     }
@@ -56,10 +56,8 @@ export const media = (
       return state.set(
         courseId,
         mediaLibrary.with({
-          data: mediaLibrary.data.merge(items.reduce((acc, i) => acc.set(i.guid, i), Map())),
-          items: List<string>(mediaLibrary.items.toArray().concat(
-            // concat new items, dedupe with existing ones
-            items.toArray().map(i => i.guid))),
+          items: mediaLibrary.items
+            .merge(items.reduce((acc, i) => acc.set(i.guid, i), OrderedMap())),
           totalItems,
           isLoading: false,
         }),
