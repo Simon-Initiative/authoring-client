@@ -2,14 +2,13 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Button } from 'editors/content/common/Button';
-import { Dropdown } from 'editors/content/common/Dropdown';
 import { MediaIcon } from './MediaIcon';
 import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
+import { extractFileName } from '../utils';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
-import { FileNode } from 'data/content/file_node';
 
 import './MediaManager.scss';
 
@@ -130,8 +129,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   onFileUpload(file) {
-    const { context: { courseId }, model, mimeFilter, onEdit,
-      onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
+      onResetMedia } = this.props;
     const { searchText } = this.state;
 
     persistence.createWebContent(courseId, file)
@@ -187,7 +186,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   renderMediaGrid () {
     const { media, selectionType } = this.props;
-    const { selection, searchText } = this.state;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -204,17 +202,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       nothing: () => [],
     });
 
-    let filenameCache = Immutable.Map<string, string>();
-    const getFilename = (path) => {
-      if (!filenameCache.has(path)) {
-        const pathParts = path.split('/');
-        filenameCache = filenameCache.set(path, pathParts[pathParts.length - 1]);
-      }
-
-      return filenameCache.get(path);
-    };
-
-
     return (
       <React.Fragment>
         <ol ref={el => this.scrollContent = el}>
@@ -229,10 +216,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   checked={this.isSelected(item.guid)}
                   onClick={() => this.onSelect(item.guid)} />
               <MediaIcon
-                  filename={getFilename(item.pathTo)}
+                  filename={extractFileName(item.pathTo)}
                   mimeType={item.mimeType}
                   url={this.adjust(item.pathTo)} />
-              <div className="name">{getFilename(item.pathTo)}</div>
+              <div className="name">{extractFileName(item.pathTo)}</div>
             </li>
           ))}
         </ol>

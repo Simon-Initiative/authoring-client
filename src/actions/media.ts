@@ -1,10 +1,12 @@
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { FileNode } from 'data/content/file_node';
 import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { MediaItem } from 'types/media';
+import * as messageActions from 'actions/messages';
+import * as Messages from 'types/messages';
 
 const MEDIA_PAGE_SIZE = 40;
 
@@ -68,8 +70,20 @@ export const fetchCourseMedia = (
         return Maybe.just(items);
       })
       .catch((err) => {
-        // TODO: do some better error handling than this
-        console.error('Failed to fetch course media', err);
+        const content = new Messages.TitledContent().with({
+          title: 'Failed to load media',
+          message: 'There was a problem loading media for this course. '
+            + 'Please check your internet connection and try again.',
+        });
+
+        const failedMessage = new Messages.Message().with({
+          content,
+          scope: Messages.Scope.Resource,
+          severity: Messages.Severity.Error,
+          canUserDismiss: true,
+        });
+
+        dispatch(messageActions.showMessage(failedMessage));
 
         return Maybe.nothing();
       });

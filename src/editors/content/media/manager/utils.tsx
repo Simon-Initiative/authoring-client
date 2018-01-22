@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-const MimeTypes = require('./mime-types.json');
-
 export const isImage = (mimeType) => {
   return mimeType.match(/^image\//);
 };

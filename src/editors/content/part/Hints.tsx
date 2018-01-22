@@ -4,7 +4,6 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 import { HintEditor } from './HintEditor';
-import { Button } from '../common/controls';
 
 export interface HintsProps {
   model: contentTypes.Part;

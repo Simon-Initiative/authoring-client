@@ -1,14 +1,10 @@
 import * as React from 'react';
 import { ContentState } from 'draft-js';
-import * as persistence from '../../../data/persistence';
 import { Image } from '../../../data/content/html/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
@@ -88,7 +84,7 @@ export class ImageEditor
   }
 
   onSourceSelectionChange(selection: MediaItem[]) {
-    const { model, onEdit } = this.props;
+    const { onEdit } = this.props;
 
     if (selection[0]) {
       onEdit(this.props.model.with({ src: this.adjust(selection[0].pathTo) }));

@@ -1,4 +1,4 @@
-import { Map, List, Record, OrderedMap } from 'immutable';
+import { Map, OrderedMap } from 'immutable';
 import {
   FETCH_MEDIA_PAGE,
   FetchMediaPageAction,
@@ -8,9 +8,6 @@ import {
   ReceiveMediaPageAction,
 } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
-import { MediaItem } from 'types/media';
-import { OtherAction } from './utils';
-import { course } from 'reducers/course';
 
 export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction;
 

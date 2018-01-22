@@ -1,5 +1,4 @@
 import { connect, Dispatch } from 'react-redux';
-import { Map } from 'immutable';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
 import { fetchCourseMediaNextPage, resetMedia } from 'actions/media';
@@ -7,7 +6,6 @@ import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
 import { AppContext } from 'editors/common/AppContext';
 import { MediaManager, SELECTION_TYPE } from './MediaManager';
-import { media } from 'reducers/media';
 
 interface StateProps {
   media: Maybe<OrderedMediaLibrary>;
