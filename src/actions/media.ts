@@ -6,7 +6,20 @@ import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { MediaItem } from 'types/media';
 
-const MEDIA_PAGE_SIZE = 20;
+const MEDIA_PAGE_SIZE = 50;
+
+export type FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
+export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
+
+export type FetchMediaPageAction = {
+  type: FETCH_MEDIA_PAGE,
+  courseId: string,
+};
+
+export const fetchMediaPage = (courseId: string): FetchMediaPageAction => ({
+  type: FETCH_MEDIA_PAGE,
+  courseId,
+});
 
 export type RECEIVE_MEDIA_PAGE = 'media/RECEIVE_MEDIA_PAGE';
 export const RECEIVE_MEDIA_PAGE: RECEIVE_MEDIA_PAGE = 'media/RECEIVE_MEDIA_PAGE';
@@ -15,23 +28,27 @@ export type ReceiveMediaPageAction = {
   type: RECEIVE_MEDIA_PAGE,
   courseId: string,
   items: List<MediaItem>,
+  totalItems: number,
 };
 
 export const ReceiveMediaPageAction = (
-  courseId: string, items: List<MediaItem>): ReceiveMediaPageAction => ({
+  courseId: string, items: List<MediaItem>, totalItems: number): ReceiveMediaPageAction => ({
     type: RECEIVE_MEDIA_PAGE,
     courseId,
     items,
+    totalItems,
   });
 
-export const fetchCourseMedia = (courseId: string, offset?: number, count?: number) => (
+export const fetchCourseMedia = (courseId: string, offset?: number, limit?: number) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
-    return persistence.fetchWebContent(courseId, offset, count)
+    dispatch(fetchMediaPage(courseId));
+
+    return persistence.fetchWebContent(courseId, offset, limit)
       .then((response) => {
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
 
-        dispatch(ReceiveMediaPageAction(courseId, items));
+        dispatch(ReceiveMediaPageAction(courseId, items, response.totalResults));
 
         return Maybe.just(items);
       })
@@ -46,8 +63,10 @@ export const fetchCourseMedia = (courseId: string, offset?: number, count?: numb
 
 export const fetchCourseMediaNextPage = (courseId: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
-    const count = MEDIA_PAGE_SIZE;
-    const offset = getState().media.get(courseId).items.size;
-    return dispatch(fetchCourseMedia(courseId, offset, count));
+    const limit = MEDIA_PAGE_SIZE;
+    const offset = getState().media.get(courseId)
+      ? getState().media.get(courseId).items.size
+      : 0;
+    return dispatch(fetchCourseMedia(courseId, offset, limit));
   }
 );

@@ -15,3 +15,13 @@ export enum LegacyTypes {
   webcontent = 'x-oli-webcontent',
   assessment2_pool = 'x-oli-assessment2-pool',
 }
+
+export type PaginatedResponse<T> = {
+  offset: number;
+  count: number;
+  order: string;
+  orderBy: string;
+  numResults: number;
+  totalResults: number;
+  results: T[];
+};

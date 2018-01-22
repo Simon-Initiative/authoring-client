@@ -8,15 +8,18 @@ import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
+import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 
 import './MediaManager.scss';
+
+const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 
 export interface MediaManagerProps {
   className?: string;
   model: Media;
   onEdit: (updated: Media) => void;
   context: AppContext;
-  media: Maybe<Immutable.Map<string, MediaItem>>;
+  media: Maybe<OrderedMediaLibrary>;
   onLoadCourseMediaNextPage: () => void;
 }
 
@@ -24,14 +27,51 @@ export interface MediaManagerProps {
  * MediaManager React MediaManager
  */
 export class MediaManager extends React.PureComponent<MediaManagerProps> {
+  scrollView: HTMLElement;
+  scrollContent: HTMLElement;
+  scrollViewListener: EventListener;
+
+  constructor(props) {
+    super(props);
+
+    this.onScroll = this.onScroll.bind(this);
+  }
+
   componentDidMount() {
     const { onLoadCourseMediaNextPage } = this.props;
 
     onLoadCourseMediaNextPage();
   }
 
+  componentWillUnmount() {
+    this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+  }
+
   onUploadClick(id: string) {
     (window as any).$('#' + id).trigger('click');
+  }
+
+  setupScrollListener(scrollView: HTMLElement) {
+    if (!scrollView) {
+      return;
+    }
+
+    this.scrollView = scrollView;
+    this.scrollView.addEventListener('scroll', this.onScroll);
+  }
+
+  onScroll() {
+    const { media, onLoadCourseMediaNextPage } = this.props;
+
+    const isLoadingMedia = media.caseOf({
+      just: ml => ml.isLoading,
+      nothing: () => false,
+    });
+
+    if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
+        > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
+      onLoadCourseMediaNextPage();
+    }
   }
 
   adjust(path) {
@@ -42,8 +82,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
     for (let i = 0; i < dirCount; i += 1) {
       updated = '../' + updated;
     }
-
-    console.log('updated', updated);
 
     return updated;
   }
@@ -63,8 +101,14 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   renderMediaGrid () {
     const { media } = this.props;
 
+    const isLoadingMedia = media.caseOf({
+      just: ml => ml.isLoading,
+      nothing: () => false,
+    });
+
     const mediaItems: MediaItem[] = media.caseOf({
-      just: i => i.toArray(),
+      // just: ml => ml.getItems(),
+      just: ml => ml.items.map(i => ml.data.get(i)).toArray(),
       nothing: () => [],
     });
 
@@ -79,21 +123,32 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
     };
 
     return (
-      <ol>
-        {mediaItems.map(item => (
-          <li key={item.guid} className={`media-item ${false ? 'selected' : ''}`}>
-            <input
-                type="checkbox"
-                className="selection-check"
-                checked={false} />
-            <MediaIcon
-                filename={getFilename(item.pathTo)}
-                mimeType={item.mimeType}
-                url={this.adjust(item.pathTo)} />
-            <div className="name">{getFilename(item.pathTo)}</div>
-          </li>
-        ))}
-      </ol>
+      <React.Fragment>
+        <ol ref={el => this.scrollContent = el}>
+          {mediaItems.map(item => (
+            <li key={item.guid} className={`media-item ${false ? 'selected' : ''}`}>
+              <input
+                  type="checkbox"
+                  className="selection-check"
+                  checked={false} />
+              <MediaIcon
+                  filename={getFilename(item.pathTo)}
+                  mimeType={item.mimeType}
+                  url={this.adjust(item.pathTo)} />
+              <div className="name">{getFilename(item.pathTo)}</div>
+            </li>
+          ))}
+        </ol>
+        {true
+          ? (
+            <div className="loading">
+              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+              Hang on while we load more items...
+            </div>
+          )
+          : null
+        }
+      </React.Fragment>
     );
   }
 
@@ -136,10 +191,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
         <div className="media-content">
           <ol className="media-sidebar">
             <li className="active">All Media</li>
-            <li className="">Unit 1</li>
-            <li className="">Unit 2</li>
+            {/* <li className="">Unit 1</li>
+            <li className="">Unit 2</li> */}
           </ol>
-          <div className="media-grid">
+          <div className="media-grid" ref={el => this.setupScrollListener(el)}>
             {this.renderMediaGrid()}
           </div>
         </div>
