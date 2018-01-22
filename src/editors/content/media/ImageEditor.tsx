@@ -12,7 +12,8 @@ import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
-import { MIMETYPE_FILTERS } from './manager/MediaManager';
+import { MIMETYPE_FILTERS, SELECTION_TYPE } from './manager/MediaManager';
+import { MediaItem } from 'types/media';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -41,7 +42,7 @@ export class ImageEditor
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onAltEdit = this.onAltEdit.bind(this);
     this.onValignEdit = this.onValignEdit.bind(this);
-    this.onFileChange = this.onFileChange.bind(this);
+    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
 
@@ -86,22 +87,12 @@ export class ImageEditor
     return updated;
   }
 
-  onFileChange(e) {
-    const file = e.target.files[0];
+  onSourceSelectionChange(selection: MediaItem[]) {
+    const { model, onEdit } = this.props;
 
-    persistence.createWebContent(this.props.context.courseId, file)
-    .then((result) => {
-      this.setState(
-        { failure: false },
-        () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
-    })
-    .catch((err) => {
-      this.setState({ failure: true });
-    });
-  }
-
-  openFileDialog(id) {
-    (window as any).$('#' + id).trigger('click');
+    if (selection[0]) {
+      onEdit(this.props.model.with({ src: this.adjust(selection[0].pathTo) }));
+    }
   }
 
   onLabeledEdit(model: LabeledType) {
@@ -149,54 +140,14 @@ export class ImageEditor
     );
   }
 
-  // renderSource() {
-  //   const { src } = this.props.model;
-  //   let srcDisplay;
-  //   if (!this.state.failure) {
-  //     const contents = (src === '' || src.indexOf('via.placeholder.com') !== -1)
-  //       ? '' : extractFileName(src);
-  //     srcDisplay = <input type="text" id="disabledTextInput"
-  //       className="form-control" placeholder={contents} readOnly/>;
-  //   } else {
-  //     srcDisplay =
-  //       <div className="alert alert-danger" role="alert">
-  //         <strong>Failed</strong> Rename the file and try again
-  //       </div>;
-  //   }
-  //   const id : string = guid();
-
-  //   return (
-  //     <div style={ { marginTop: '70px' } }>
-
-  //       {this.row('Image', '6', <div className="input-group">
-  //         <input
-  //           id={id}
-  //           style={ { display: 'none' } }
-  //           accept="image/*"
-  //           onChange={this.onFileChange}
-  //           type="file"
-  //         />
-  //         {srcDisplay}
-  //         <span className="input-group-btn">
-  //           <Button editMode={this.props.editMode}
-  //         onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
-  //         </span>
-  //       </div>)}
-
-  //       {this.row('', '6', <span className="form-text text-muted">
-  //         Browse to and select an image file from your computer to upload
-  //       </span>)}
-
-  //     </div>
-  //   );
-  // }
-
   renderSource() {
     const { context, model, onEdit } = this.props;
 
     return (
       <MediaManager context={context} model={model}
-        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE} />
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+        selectionType={SELECTION_TYPE.SINGLE}
+        onSelectionChange={this.onSourceSelectionChange} />
     );
   }
 

@@ -6,7 +6,7 @@ import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
 import { MediaItem } from 'types/media';
 
-const MEDIA_PAGE_SIZE = 50;
+const MEDIA_PAGE_SIZE = 40;
 
 export type FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
 export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
@@ -53,11 +53,12 @@ export const ReceiveMediaPageAction = (
   });
 
 export const fetchCourseMedia = (
-    courseId: string, offset?: number, limit?: number, mimeFilter?: string) => (
+    courseId: string, offset?: number, limit?: number, mimeFilter?: string,
+    pathFilter?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     dispatch(fetchMediaPage(courseId));
 
-    return persistence.fetchWebContent(courseId, offset, limit, mimeFilter)
+    return persistence.fetchWebContent(courseId, offset, limit, mimeFilter, pathFilter)
       .then((response) => {
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
@@ -75,12 +76,13 @@ export const fetchCourseMedia = (
   }
 );
 
-export const fetchCourseMediaNextPage = (courseId: string, mimeFilter?: string) => (
+export const fetchCourseMediaNextPage = (
+    courseId: string, mimeFilter?: string, pathFilter?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     const limit = MEDIA_PAGE_SIZE;
     const offset = getState().media.get(courseId)
       ? getState().media.get(courseId).items.size
       : 0;
-    return dispatch(fetchCourseMedia(courseId, offset, limit, mimeFilter));
+    return dispatch(fetchCourseMedia(courseId, offset, limit, mimeFilter, pathFilter));
   }
 );

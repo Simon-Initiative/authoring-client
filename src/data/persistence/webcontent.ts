@@ -27,7 +27,7 @@ export function createWebContent(courseId: string, file): Promise<string> {
  */
 export function fetchWebContent(
     courseId: string, offset?: number, limit?: number,
-    mimeFilter?: string): Promise<PaginatedResponse<WebContent>> {
+    mimeFilter?: string, pathFilter?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${courseId}/webcontents`;
@@ -37,6 +37,7 @@ export function fetchWebContent(
     offset !== undefined ? { offset } : {},
     limit !== undefined ? { limit } : {},
     mimeFilter !== undefined ? { mimeFilter } : {},
+    pathFilter !== undefined ? { pathFilter } : {},
   );
 
   return authenticatedFetch({ method, url, headers, query }).then(res =>

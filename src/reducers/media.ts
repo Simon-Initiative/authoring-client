@@ -31,21 +31,17 @@ export const media = (
 
       return state.set(
         courseId,
-        mediaLibrary.with({ isLoading: true }),
+        mediaLibrary.with({
+          isLoading: true,
+        }),
       );
     }
     case RESET_MEDIA: {
       const { courseId } = action;
 
-      // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
-
       return state.set(
         courseId,
-        mediaLibrary.with({
-          items: OrderedMap<string, MediaItem>(),
-          isLoading: false,
-        }),
+        new OrderedMediaLibrary(),
       );
     }
     case RECEIVE_MEDIA_PAGE: {
@@ -60,6 +56,7 @@ export const media = (
           items: mediaLibrary.items
             .merge(items.reduce((acc, i) => acc.set(i.guid, i), OrderedMap())),
           totalItems,
+          totalItemsLoaded: mediaLibrary.totalItemsLoaded + items.size,
           isLoading: false,
         }),
       );

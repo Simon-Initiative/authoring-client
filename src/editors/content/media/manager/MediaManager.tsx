@@ -9,30 +9,44 @@ import guid from 'utils/guid';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
+import { FileNode } from 'data/content/file_node';
 
 import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 
-export const MIMETYPE_FILTERS = {
-  IMAGE: 'image',
-};
+export enum MIMETYPE_FILTERS {
+  IMAGE = 'image',
+}
+
+export enum SELECTION_TYPE {
+  MULTI,
+  SINGLE,
+  NONE,
+}
 
 export interface MediaManagerProps {
   className?: string;
   model: Media;
-  onEdit: (updated: Media) => void;
   context: AppContext;
   media: Maybe<OrderedMediaLibrary>;
   mimeFilter?: string;
-  onLoadCourseMediaNextPage: (typeFilter: string) => void;
-  onClose: () => void;
+  selectionType: SELECTION_TYPE;
+  onEdit: (updated: Media) => void;
+  onLoadCourseMediaNextPage: (mimeFilter: string, pathFilter) => void;
+  onResetMedia: () => void;
+  onSelectionChange: (selection: MediaItem[]) => void;
+}
+
+export interface MediaManagerState {
+  selection: Immutable.List<string>;
+  searchText: '';
 }
 
 /**
  * MediaManager React Component
  */
-export class MediaManager extends React.PureComponent<MediaManagerProps> {
+export class MediaManager extends React.PureComponent<MediaManagerProps, MediaManagerState> {
   scrollView: HTMLElement;
   scrollContent: HTMLElement;
   scrollViewListener: EventListener;
@@ -40,20 +54,29 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   constructor(props) {
     super(props);
 
+    this.state = {
+      selection: Immutable.List<string>(),
+      searchText: undefined,
+    };
+
     this.onScroll = this.onScroll.bind(this);
+    this.isSelected = this.isSelected.bind(this);
+    this.onSelect = this.onSelect.bind(this);
+    this.onSearch = this.onSearch.bind(this);
   }
 
   componentDidMount() {
     const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
+    const { searchText } = this.state;
 
-    onLoadCourseMediaNextPage(mimeFilter);
+    onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
   }
 
   componentWillUnmount() {
-    const { onClose } = this.props;
+    const { onResetMedia } = this.props;
 
     this.scrollView.removeEventListener('scroll', this.scrollViewListener);
-    onClose();
+    onResetMedia();
   }
 
   onUploadClick(id: string) {
@@ -71,6 +94,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
 
   onScroll() {
     const { media, mimeFilter, onLoadCourseMediaNextPage } = this.props;
+    const { searchText } = this.state;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -89,7 +113,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
 
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
         > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
-      onLoadCourseMediaNextPage(mimeFilter);
+      onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
     }
   }
 
@@ -106,19 +130,64 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   }
 
   onFileUpload(file) {
-    const { context: { courseId }, model, onEdit } = this.props;
+    const { context: { courseId }, model, mimeFilter, onEdit,
+      onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { searchText } = this.state;
 
-    persistence.createWebContent(courseId, file);
-    // .then((result) => {
-    //   onEdit(model.with({ src: this.adjust(result) }));
-    // })
-    // .catch((err) => {
-    //   this.setState({ failure: true });
-    // });
+    persistence.createWebContent(courseId, file)
+      .then((result) => {
+        onResetMedia();
+        onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
+      });
+  }
+
+  isSelected(guid) {
+    const { selection } = this.state;
+
+    return !!selection.find(s => s === guid);
+  }
+
+  onSelect(guid) {
+    const { media, selectionType, onSelectionChange } = this.props;
+    const { selection } = this.state;
+
+    let updatedSelection = selection;
+
+    if (selectionType === SELECTION_TYPE.SINGLE) {
+      // clear the current selection
+      updatedSelection = Immutable.List([guid]);
+    } else if (selectionType === SELECTION_TYPE.MULTI) {
+      if (this.isSelected(guid)) {
+        // unselect item
+        updatedSelection = updatedSelection.remove(updatedSelection.findIndex(s => s === guid));
+      } else {
+        // select item
+        updatedSelection = updatedSelection.push(guid);
+      }
+    } else {
+      return;
+    }
+
+    this.setState({
+      selection: updatedSelection,
+    });
+
+    const mediaLibrary = media.valueOr(null);
+    if (mediaLibrary) {
+      onSelectionChange(updatedSelection.map(s => mediaLibrary.getItem(s)).toArray());
+    }
+  }
+
+  onSearch(searchText: string) {
+    const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
+
+    onResetMedia();
+    onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
   }
 
   renderMediaGrid () {
-    const { media } = this.props;
+    const { media, selectionType } = this.props;
+    const { selection, searchText } = this.state;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -126,12 +195,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
     });
 
     const allItemsLoaded = media.caseOf({
-      just: ml => ml.items.size >= ml.totalItems,
+      just: ml => ml.allItemsLoaded(),
       nothing: () => false,
     });
 
     const mediaItems: MediaItem[] = media.caseOf({
-      // just: ml => ml.getItems(),
       just: ml => ml.getItems(),
       nothing: () => [],
     });
@@ -146,15 +214,20 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
       return filenameCache.get(path);
     };
 
+
     return (
       <React.Fragment>
         <ol ref={el => this.scrollContent = el}>
           {mediaItems.map(item => (
-            <li key={item.guid} className={`media-item ${false ? 'selected' : ''}`}>
+            <li key={item.guid}
+                className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                  + `${selectionType !== SELECTION_TYPE.NONE ? 'selectable' : ''}`}
+                onClick={() => this.onSelect(item.guid)}>
               <input
                   type="checkbox"
                   className="selection-check"
-                  checked={false} />
+                  checked={this.isSelected(item.guid)}
+                  onClick={() => this.onSelect(item.guid)} />
               <MediaIcon
                   filename={getFilename(item.pathTo)}
                   mimeType={item.mimeType}
@@ -177,7 +250,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   }
 
   render() {
-    const { className } = this.props;
+    const { className, mimeFilter } = this.props;
+    const { searchText } = this.state;
 
     const id = guid();
 
@@ -187,7 +261,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
             <input
               id={id}
               style={ { display: 'none' } }
-              accept="image/*"
+              accept={`${mimeFilter}*`}
               onChange={({ target: { files } }) => this.onFileUpload(files[0])}
               type="file" />
           <Button
@@ -208,7 +282,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
             <input
                 type="text"
                 className="form-control"
-                placeholder="Search" />
+                placeholder="Search"
+                value={searchText}
+                onChange={({ target: { value } }) => this.onSearch(value)} />
           </div>
           </div>
         </div>
