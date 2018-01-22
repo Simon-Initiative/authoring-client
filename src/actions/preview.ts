@@ -58,28 +58,7 @@ function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
 
     const { course } = getState();
 
-    return new Promise((resolve, reject) => {
-      fetchOrg(course.guid, determineDefaultOrg(course))
-        .then((model) => {
-          if (isResourceInOrg(model, resource)) {
-            return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
-          }
-          resolve({
-            message: 'missing',
-            type: 'MissingFromOrganization',
-          });
-        })
-        .then((result : persistence.PreviewResult) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          resolve({
-            message: 'not set up',
-            type: 'PreviewNotSetUp',
-          });
-        });
-    });
-
+    return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
   };
 }
 
