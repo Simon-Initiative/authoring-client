@@ -16,6 +16,7 @@ const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
+  ALL = '',
 }
 
 export enum SELECTION_TYPE {
