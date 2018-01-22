@@ -2,7 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import { Map } from 'immutable';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
-import { fetchCourseMediaNextPage, clearMedia } from 'actions/media';
+import { fetchCourseMediaNextPage, resetMedia } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
 import { AppContext } from 'editors/common/AppContext';
@@ -37,7 +37,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(fetchCourseMediaNextPage(ownProps.context.courseId, mimeFilter));
     },
     onClose: () => {
-      dispatch(clearMedia(ownProps.context.courseId));
+      dispatch(resetMedia(ownProps.context.courseId));
     },
   };
 };

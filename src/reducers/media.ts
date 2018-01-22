@@ -2,8 +2,8 @@ import { Map, List, Record, OrderedMap } from 'immutable';
 import {
   FETCH_MEDIA_PAGE,
   FetchMediaPageAction,
-  CLEAR_MEDIA,
-  ClearMediaAction,
+  RESET_MEDIA,
+  ResetMediaAction,
   RECEIVE_MEDIA_PAGE,
   ReceiveMediaPageAction,
 } from 'actions/media';
@@ -12,7 +12,7 @@ import { MediaItem } from 'types/media';
 import { OtherAction } from './utils';
 import { course } from 'reducers/course';
 
-export type ActionTypes = FetchMediaPageAction | ClearMediaAction | ReceiveMediaPageAction;
+export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction;
 
 export type MediaState = Map<string, OrderedMediaLibrary>;
 
@@ -34,7 +34,7 @@ export const media = (
         mediaLibrary.with({ isLoading: true }),
       );
     }
-    case CLEAR_MEDIA: {
+    case RESET_MEDIA: {
       const { courseId } = action;
 
       // get existing media library or initialize a new one
@@ -44,6 +44,7 @@ export const media = (
         courseId,
         mediaLibrary.with({
           items: OrderedMap<string, MediaItem>(),
+          isLoading: false,
         }),
       );
     }

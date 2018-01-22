@@ -21,16 +21,16 @@ export const fetchMediaPage = (courseId: string): FetchMediaPageAction => ({
   courseId,
 });
 
-export type CLEAR_MEDIA = 'media/CLEAR_MEDIA';
-export const CLEAR_MEDIA: CLEAR_MEDIA = 'media/CLEAR_MEDIA';
+export type RESET_MEDIA = 'media/RESET_MEDIA';
+export const RESET_MEDIA: RESET_MEDIA = 'media/RESET_MEDIA';
 
-export type ClearMediaAction = {
-  type: CLEAR_MEDIA,
+export type ResetMediaAction = {
+  type: RESET_MEDIA,
   courseId: string,
 };
 
-export const clearMedia = (courseId: string): ClearMediaAction => ({
-  type: CLEAR_MEDIA,
+export const resetMedia = (courseId: string): ResetMediaAction => ({
+  type: RESET_MEDIA,
   courseId,
 });
 
