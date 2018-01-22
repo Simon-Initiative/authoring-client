@@ -97,6 +97,8 @@ export const fetchCourseMediaNextPage = (
     const offset = getState().media.get(courseId)
       ? getState().media.get(courseId).items.size
       : 0;
-    return dispatch(fetchCourseMedia(courseId, offset, limit, mimeFilter, pathFilter));
+    return dispatch(fetchCourseMedia(
+      courseId, offset, limit, mimeFilter !== '' ? mimeFilter : undefined,
+      pathFilter !== '' ? pathFilter : undefined));
   }
 );

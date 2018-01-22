@@ -69,7 +69,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
     const { searchText } = this.state;
 
-    onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText);
   }
 
   componentWillUnmount() {
@@ -113,7 +113,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
         > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
-      onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
+      onLoadCourseMediaNextPage(mimeFilter, searchText);
     }
   }
 
@@ -137,7 +137,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     persistence.createWebContent(courseId, file)
       .then((result) => {
         onResetMedia();
-        onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
+        onLoadCourseMediaNextPage(mimeFilter, searchText);
       });
   }
 
@@ -182,7 +182,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
 
     onResetMedia();
-    onLoadCourseMediaNextPage(mimeFilter, searchText && searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText);
   }
 
   renderMediaGrid () {
