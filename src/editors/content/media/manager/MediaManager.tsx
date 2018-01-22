@@ -19,7 +19,7 @@ export enum MIMETYPE_FILTERS {
   ALL = '',
 }
 
-export enum SELECTION_TYPE {
+export enum SELECTION_TYPES {
   MULTI,
   SINGLE,
   NONE,
@@ -31,7 +31,7 @@ export interface MediaManagerProps {
   context: AppContext;
   media: Maybe<OrderedMediaLibrary>;
   mimeFilter?: string;
-  selectionType: SELECTION_TYPE;
+  selectionType: SELECTION_TYPES;
   onEdit: (updated: Media) => void;
   onLoadCourseMediaNextPage: (mimeFilter: string, pathFilter) => void;
   onResetMedia: () => void;
@@ -153,10 +153,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     let updatedSelection = selection;
 
-    if (selectionType === SELECTION_TYPE.SINGLE) {
+    if (selectionType === SELECTION_TYPES.SINGLE) {
       // clear the current selection
       updatedSelection = Immutable.List([guid]);
-    } else if (selectionType === SELECTION_TYPE.MULTI) {
+    } else if (selectionType === SELECTION_TYPES.MULTI) {
       if (this.isSelected(guid)) {
         // unselect item
         updatedSelection = updatedSelection.remove(updatedSelection.findIndex(s => s === guid));
@@ -209,7 +209,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           {mediaItems.map(item => (
             <li key={item.guid}
                 className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
-                  + `${selectionType !== SELECTION_TYPE.NONE ? 'selectable' : ''}`}
+                  + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
                 onClick={() => this.onSelect(item.guid)}>
               <input
                   type="checkbox"

@@ -8,7 +8,7 @@ import { TextInput } from '../common/TextInput';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
-import { MIMETYPE_FILTERS, SELECTION_TYPE } from './manager/MediaManager';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
@@ -142,7 +142,7 @@ export class ImageEditor
     return (
       <MediaManager context={context} model={model}
         onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE}
-        selectionType={SELECTION_TYPE.SINGLE}
+        selectionType={SELECTION_TYPES.SINGLE}
         onSelectionChange={this.onSourceSelectionChange} />
     );
   }

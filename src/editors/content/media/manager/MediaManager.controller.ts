@@ -5,7 +5,7 @@ import { fetchCourseMediaNextPage, resetMedia } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
 import { AppContext } from 'editors/common/AppContext';
-import { MediaManager, SELECTION_TYPE } from './MediaManager';
+import { MediaManager, SELECTION_TYPES } from './MediaManager';
 
 interface StateProps {
   media: Maybe<OrderedMediaLibrary>;
@@ -21,7 +21,7 @@ interface OwnProps {
   model: Media;
   context: AppContext;
   mimeFilter?: string;
-  selectionType: SELECTION_TYPE;
+  selectionType: SELECTION_TYPES;
   onEdit: (updated: Media) => void;
   onSelectionChange: (selection: MediaItem[]) => void;
 }
