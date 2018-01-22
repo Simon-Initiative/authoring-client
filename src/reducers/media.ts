@@ -46,7 +46,8 @@ export const media = (
         mediaLibrary.with({
           data: mediaLibrary.data.merge(items.reduce((acc, i) => acc.set(i.guid, i), Map())),
           items: List<string>(mediaLibrary.items.toArray().concat(
-            items.toArray().map(i => i.guid))),
+            // concat new items, dedupe with existing ones
+            items.filter(i => !mediaLibrary.items.contains(i.guid)).toArray().map(i => i.guid))),
           totalItems,
           isLoading: false,
         }) as OrderedMediaLibrary,

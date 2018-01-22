@@ -108,7 +108,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
 
     const mediaItems: MediaItem[] = media.caseOf({
       // just: ml => ml.getItems(),
-      just: ml => ml.items.map(i => ml.data.get(i)).toArray(),
+      just: ml => ml.getItems(),
       nothing: () => [],
     });
 
