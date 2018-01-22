@@ -1,8 +1,9 @@
 import { Map, List, Record } from 'immutable';
-// import * as Immutable from 'immutable';
 import {
   FETCH_MEDIA_PAGE,
   FetchMediaPageAction,
+  CLEAR_MEDIA,
+  ClearMediaAction,
   RECEIVE_MEDIA_PAGE,
   ReceiveMediaPageAction,
 } from 'actions/media';
@@ -11,7 +12,7 @@ import { MediaItem } from 'types/media';
 import { OtherAction } from './utils';
 import { course } from 'reducers/course';
 
-export type ActionTypes = FetchMediaPageAction | ReceiveMediaPageAction;
+export type ActionTypes = FetchMediaPageAction | ClearMediaAction | ReceiveMediaPageAction;
 
 export type MediaState = Map<string, OrderedMediaLibrary>;
 
@@ -25,32 +26,43 @@ export const media = (
     case FETCH_MEDIA_PAGE: {
       const { courseId } = action;
 
+      // get existing media library or initialize a new one
       const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
 
       return state.set(
-        // key the media library by courseId
         courseId,
-        // get existing media library or initialize a new one and apply changes
-        mediaLibrary.set('isLoading', true) as OrderedMediaLibrary,
+        mediaLibrary.with({ isLoading: true }),
+      );
+    }
+    case CLEAR_MEDIA: {
+      const { courseId } = action;
+
+      // get existing media library or initialize a new one
+      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+
+      return state.set(
+        courseId,
+        mediaLibrary.with({
+          items: List<string>(),
+        }),
       );
     }
     case RECEIVE_MEDIA_PAGE: {
       const { courseId, items, totalItems } = action;
 
+      // get existing media library or initialize a new one
       const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
 
       return state.set(
-        // key the media library by courseId
         courseId,
-        // get existing media library or initialize a new one and apply changes
         mediaLibrary.with({
           data: mediaLibrary.data.merge(items.reduce((acc, i) => acc.set(i.guid, i), Map())),
           items: List<string>(mediaLibrary.items.toArray().concat(
             // concat new items, dedupe with existing ones
-            items.filter(i => !mediaLibrary.items.contains(i.guid)).toArray().map(i => i.guid))),
+            items.toArray().map(i => i.guid))),
           totalItems,
           isLoading: false,
-        }) as OrderedMediaLibrary,
+        }),
       );
     }
     default:

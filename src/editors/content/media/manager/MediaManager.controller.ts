@@ -2,7 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import { Map } from 'immutable';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
-import { fetchCourseMediaNextPage } from 'actions/media';
+import { fetchCourseMediaNextPage, clearMedia } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
 import { AppContext } from 'editors/common/AppContext';
@@ -13,7 +13,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onLoadCourseMediaNextPage: () => void;
+  onLoadCourseMediaNextPage: (mimeFilter?: string) => void;
+  onClose: () => void;
 }
 
 interface OwnProps {
@@ -21,6 +22,7 @@ interface OwnProps {
   model: Media;
   onEdit: (updated: Media) => void;
   context: AppContext;
+  mimeFilter?: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
@@ -31,8 +33,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onLoadCourseMediaNextPage: () => {
-      dispatch(fetchCourseMediaNextPage(ownProps.context.courseId));
+    onLoadCourseMediaNextPage: (mimeFilter) => {
+      dispatch(fetchCourseMediaNextPage(ownProps.context.courseId, mimeFilter));
+    },
+    onClose: () => {
+      dispatch(clearMedia(ownProps.context.courseId));
     },
   };
 };

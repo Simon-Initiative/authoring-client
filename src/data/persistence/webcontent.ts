@@ -26,9 +26,8 @@ export function createWebContent(courseId: string, file): Promise<string> {
  * a list of webcontents
  */
 export function fetchWebContent(
-    courseId: string,
-    offset?: number,
-    limit?: number): Promise<PaginatedResponse<WebContent>> {
+    courseId: string, offset?: number, limit?: number,
+    mimeFilter?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${courseId}/webcontents`;
@@ -37,6 +36,7 @@ export function fetchWebContent(
     {},
     offset !== undefined ? { offset } : {},
     limit !== undefined ? { limit } : {},
+    mimeFilter !== undefined ? { mimeFilter } : {},
   );
 
   return authenticatedFetch({ method, url, headers, query }).then(res =>

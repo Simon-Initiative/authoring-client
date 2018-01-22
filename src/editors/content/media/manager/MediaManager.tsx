@@ -14,17 +14,23 @@ import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 
+export const MIMETYPE_FILTERS = {
+  IMAGE: 'image',
+};
+
 export interface MediaManagerProps {
   className?: string;
   model: Media;
   onEdit: (updated: Media) => void;
   context: AppContext;
   media: Maybe<OrderedMediaLibrary>;
-  onLoadCourseMediaNextPage: () => void;
+  mimeFilter?: string;
+  onLoadCourseMediaNextPage: (typeFilter: string) => void;
+  onClose: () => void;
 }
 
 /**
- * MediaManager React MediaManager
+ * MediaManager React Component
  */
 export class MediaManager extends React.PureComponent<MediaManagerProps> {
   scrollView: HTMLElement;
@@ -38,13 +44,16 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   }
 
   componentDidMount() {
-    const { onLoadCourseMediaNextPage } = this.props;
+    const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
 
-    onLoadCourseMediaNextPage();
+    onLoadCourseMediaNextPage(mimeFilter);
   }
 
   componentWillUnmount() {
+    const { onClose } = this.props;
+
     this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+    onClose();
   }
 
   onUploadClick(id: string) {
@@ -61,16 +70,26 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
   }
 
   onScroll() {
-    const { media, onLoadCourseMediaNextPage } = this.props;
+    const { media, mimeFilter, onLoadCourseMediaNextPage } = this.props;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
       nothing: () => false,
     });
 
+    const allItemsLoaded = media.caseOf({
+      just: ml => ml.items.size >= ml.totalItems,
+      nothing: () => false,
+    });
+
+    if (allItemsLoaded) {
+      this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+      return;
+    }
+
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
         > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
-      onLoadCourseMediaNextPage();
+      onLoadCourseMediaNextPage(mimeFilter);
     }
   }
 
@@ -103,6 +122,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
+      nothing: () => false,
+    });
+
+    const allItemsLoaded = media.caseOf({
+      just: ml => ml.items.size >= ml.totalItems,
       nothing: () => false,
     });
 
@@ -139,11 +163,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps> {
             </li>
           ))}
         </ol>
-        {true
+        {isLoadingMedia && !allItemsLoaded
           ? (
             <div className="loading">
               <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-              Hang on while we load more items...
+              Hang on while more items are loaded...
             </div>
           )
           : null

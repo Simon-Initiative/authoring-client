@@ -12,6 +12,7 @@ import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
+import { MIMETYPE_FILTERS } from './manager/MediaManager';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -194,7 +195,8 @@ export class ImageEditor
     const { context, model, onEdit } = this.props;
 
     return (
-      <MediaManager context={context} model={model} onEdit={onEdit} />
+      <MediaManager context={context} model={model}
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE} />
     );
   }
 

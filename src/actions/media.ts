@@ -21,6 +21,19 @@ export const fetchMediaPage = (courseId: string): FetchMediaPageAction => ({
   courseId,
 });
 
+export type CLEAR_MEDIA = 'media/CLEAR_MEDIA';
+export const CLEAR_MEDIA: CLEAR_MEDIA = 'media/CLEAR_MEDIA';
+
+export type ClearMediaAction = {
+  type: CLEAR_MEDIA,
+  courseId: string,
+};
+
+export const clearMedia = (courseId: string): ClearMediaAction => ({
+  type: CLEAR_MEDIA,
+  courseId,
+});
+
 export type RECEIVE_MEDIA_PAGE = 'media/RECEIVE_MEDIA_PAGE';
 export const RECEIVE_MEDIA_PAGE: RECEIVE_MEDIA_PAGE = 'media/RECEIVE_MEDIA_PAGE';
 
@@ -39,11 +52,12 @@ export const ReceiveMediaPageAction = (
     totalItems,
   });
 
-export const fetchCourseMedia = (courseId: string, offset?: number, limit?: number) => (
+export const fetchCourseMedia = (
+    courseId: string, offset?: number, limit?: number, mimeFilter?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     dispatch(fetchMediaPage(courseId));
 
-    return persistence.fetchWebContent(courseId, offset, limit)
+    return persistence.fetchWebContent(courseId, offset, limit, mimeFilter)
       .then((response) => {
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
@@ -61,12 +75,12 @@ export const fetchCourseMedia = (courseId: string, offset?: number, limit?: numb
   }
 );
 
-export const fetchCourseMediaNextPage = (courseId: string) => (
+export const fetchCourseMediaNextPage = (courseId: string, mimeFilter?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     const limit = MEDIA_PAGE_SIZE;
     const offset = getState().media.get(courseId)
       ? getState().media.get(courseId).items.size
       : 0;
-    return dispatch(fetchCourseMedia(courseId, offset, limit));
+    return dispatch(fetchCourseMedia(courseId, offset, limit, mimeFilter));
   }
 );
