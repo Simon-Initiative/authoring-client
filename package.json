@@ -59,6 +59,8 @@
     "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "del-cli": "^1.1.0",
     "jasmine": "^2.5.3",
     "jest": "^18.1.0"
   },
@@ -85,12 +87,17 @@
     },
     "testRegex": "test.*-test.(ts|tsx|js)$",
     "collectCoverage": true,
-    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine-env.js"
+    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine-env.js",
+    "cacheDirectory": "./node_modules/.cache/jest"
   },
   "scripts": {
-    "dev": "./node_modules/.bin/webpack-dev-server --watch --config=./webpack.dev.js",
-    "dist": "./node_modules/.bin/webpack --config=./webpack.dist.js",
-    "jenkins-test": "./node_modules/.bin/jest > ./test-out/results.txt 2>&1",
-    "test": "./node_modules/.bin/jest --watch"
+    "build": "npm run clean && npm run lint && npm run test && npm run dist",
+    "clean": "del coverage/** dev/** dist/** !dist/.gitkeep test-out/** !test-out/.gitkeep",
+    "dev": "webpack-dev-server --watch --config=./webpack.dev.js",
+    "dist": "webpack --config=./webpack.dist.js",
+    "lint": "tslint -p . -c tslint.json 'src/**/*.ts*'",
+    "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
+    "test": "jest > ./test-out/results.txt 2>&1",
+    "test:watch": "jest --watch"
   }
 }
