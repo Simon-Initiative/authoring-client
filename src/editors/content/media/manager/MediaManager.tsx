@@ -144,7 +144,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   isSelected(guid) {
     const { selection } = this.state;
 
-    return !!selection.find(s => s === guid);
+    return selection.includes(guid);
   }
 
   onSelect(guid) {
@@ -249,7 +249,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             <input
               id={id}
               style={ { display: 'none' } }
-              accept={`${mimeFilter}*`}
+              accept={`${mimeFilter}/*`}
               onChange={({ target: { files } }) => this.onFileUpload(files[0])}
               type="file" />
           <Button
