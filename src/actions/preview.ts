@@ -9,49 +9,6 @@ import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 
 
-// Determine which org is the 'default' org in use by preview
-function determineDefaultOrg(model: CourseModel) : Resource {
-
-  // Take the first org that contains "Default" in the title
-  const containsDefaultTitle = model.resources
-    .toArray()
-    .filter(r => r.type === LegacyTypes.organization && r.id.indexOf('default') !== -1);
-
-  if (containsDefaultTitle.length > 0) {
-    return containsDefaultTitle[0];
-  }
-  // Or just take the first one.  There is guaranteed to be at least one.
-  return model.resources
-  .toArray()
-  .filter(r => r.type === LegacyTypes.organization)[0];
-}
-
-// Retrieve the org model from server
-function fetchOrg(courseId: string, resource: Resource) : Promise<OrganizationModel> {
-  return persistence.retrieveDocument(courseId, resource.guid)
-    .then(doc => doc.model as OrganizationModel);
-}
-
-// Determine if a resource is present as an Item in this org
-function isResourceInOrg(org: OrganizationModel, resource: Resource) : boolean {
-  return org.sequences.children
-    .toArray()
-    .some(n => isResourceInOrgHelper(org, resource, n));
-}
-
-// Recursive helper
-function isResourceInOrgHelper(org: OrganizationModel, resource: Resource, node) : boolean {
-  if (node.contentType === 'Item') {
-    return node.resourceref.idref === resource.id;
-  }
-  if (node.children) {
-    return node.children
-      .toArray()
-      .some(n => isResourceInOrgHelper(org, resource, n));
-  }
-  return false;
-}
-
 // The action to invoke preview.
 function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
   return function (dispatch, getState) : Promise<persistence.PreviewResult> {
@@ -109,8 +66,8 @@ function buildMissingFromOrgMessage(courseId) {
 
   const content = new Messages.TitledContent().with({
     title: 'Cannot preview.',
-    message: 'Page not included in default organization.'
-      + ' Click \'Edit Org\' to edit the organization',
+    message: 'Page not included in any organization.'
+      + ' Click \'Edit Org\' to add to an organization',
   });
   return new Messages.Message().with({
     content,
