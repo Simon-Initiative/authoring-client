@@ -1,6 +1,8 @@
 import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
+import { PaginatedResponse } from 'data/types';
+import { WebContent } from 'data/content/webcontent';
 
 /**
  * Uploads a file, receives a promise to deliver path on server
@@ -17,4 +19,27 @@ export function createWebContent(courseId: string, file): Promise<string> {
 
   return authenticatedFetch({ method, url, headers, body })
     .then(result => result[0].fileNode.pathTo);
+}
+
+/**
+ * Fetches all webcontent for the course, returns a Promise to resolve to
+ * a list of webcontents
+ */
+export function fetchWebContent(
+    courseId: string, offset?: number, limit?: number,
+    mimeFilter?: string, pathFilter?: string): Promise<PaginatedResponse<WebContent>> {
+
+  const method = 'GET';
+  const url = `${configuration.baseUrl}/${courseId}/webcontents`;
+  const headers = getFormHeaders(credentials);
+  const query = Object.assign(
+    {},
+    offset !== undefined ? { offset } : {},
+    limit !== undefined ? { limit } : {},
+    mimeFilter !== undefined ? { mimeFilter } : {},
+    pathFilter !== undefined ? { pathFilter } : {},
+  );
+
+  return authenticatedFetch({ method, url, headers, query }).then(res =>
+    (res as PaginatedResponse<WebContent>));
 }

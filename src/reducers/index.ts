@@ -4,6 +4,7 @@ import { choices, ChoicesState } from './choices';
 import { course, CourseState } from './course';
 import { expanded, ExpandedState } from './expanded';
 import { locks, LocksState } from './locks';
+import { media, MediaState } from './media';
 import { messages, MessageState } from './messages';
 import { modal, ModalState } from './modal';
 import { objectives, ObjectiveState } from './objectives';
@@ -18,6 +19,7 @@ export interface State {
   course: CourseState;
   expanded: ExpandedState;
   locks: LocksState;
+  media: MediaState;
   messages: MessageState;
   modal: ModalState;
   objectives: ObjectiveState;
@@ -33,6 +35,7 @@ const reducers = combineReducers({
   course,         // Information about current course
   expanded,       // preserves expaned state of tree UIs
   locks,          // The current, registered document locks
+  media,          // Course media state
   messages,       // Active application messages
   modal,          // modal display state
   objectives,     // The current learning objectives

@@ -10,6 +10,8 @@ import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../com
 
 import './CourseEditor.scss';
 
+const THUMBNAIL = require('../../../../assets/ph-courseView.png');
+
 export interface CourseEditorProps extends AbstractEditorProps<models.CourseModel> {
   courseChanged: (model: models.CourseModel) => void;
 }
@@ -172,7 +174,7 @@ class CourseEditor
                 <div className="col-3">Thumbnail<br/><br/>
                 </div>
                 <div className="col-9">
-                  <img src="assets/ph-courseView.png" className="img-fluid" alt=""></img>
+                  <img src={THUMBNAIL} className="img-fluid" alt=""></img>
                 </div>
               </div>
               {adminRow}

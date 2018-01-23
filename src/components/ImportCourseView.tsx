@@ -7,6 +7,8 @@ import * as Messages from 'types/messages';
 
 import './ImportCourseView.scss';
 
+const BOOK_IMAGE = require('../../assets/book.svg');
+
 export interface ImportCourseViewProps {
   dispatch: any;
 }
@@ -66,8 +68,12 @@ export class ImportCourseView
       </div>
     );
 
+    const imageViaStyle = {
+      backgroundImage: 'url(' + BOOK_IMAGE + ')',
+    };
+
     return (
-      <div className="import-course-view full container-fluid">
+      <div style={imageViaStyle} className="import-course-view full container-fluid">
         <div className="row">
           <div className="col-md-12">
             <h1>Import an existing course content package</h1>

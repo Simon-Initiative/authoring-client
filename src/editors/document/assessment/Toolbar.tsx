@@ -23,7 +23,7 @@ export class Toolbar extends React.Component<ToolbarProps, {}> {
         onClick={handler}
         type="button"
         className="btn">
-        <i className={`'icon icon-${icon}`} />
+        <i className={`fa fa-${icon}`} />
       </button>
     );
   }

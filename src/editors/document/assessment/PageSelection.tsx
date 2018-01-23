@@ -73,7 +73,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
               onClick={this.props.onRemove.bind(this, page)}
               type="button"
               className="btn btn-sm btn-outline-secondary">
-              <i className="icon icon-remove"></i>
+              <i className="fa fa-close"></i>
             </button>
           </span>
         </td>
