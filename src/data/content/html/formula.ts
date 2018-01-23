@@ -1,52 +1,53 @@
 import * as Immutable from 'immutable';
+
+import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { Text } from './text';
 
-export type TitleParams = {
-  text?: Text
+export type FormulaParams = {
+  text?: Text,
   guid?: string,
 };
 
 const defaultContent = {
-  contentType: 'Title',
+  contentType: 'Formula',
   text: new Text(),
   guid: '',
 };
 
-export class Title extends Immutable.Record(defaultContent) {
+export class Formula extends Immutable.Record(defaultContent) {
 
-  contentType: 'Title';
+  contentType: 'Formula';
   text: Text;
   guid: string;
 
-  constructor(params?: TitleParams) {
+  constructor(params?: FormulaParams) {
     super(augment(params));
   }
 
-  with(values: TitleParams) {
+  with(values: FormulaParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Title {
+  clone() : Formula {
     return this.with({
       text: this.text.clone(),
     });
   }
 
+  static fromPersistence(root: Object, guid: string) : Formula {
 
-  static fromPersistence(root: Object, guid: string) : Title {
-
-    const t = (root as any).title;
+    const t = (root as any).formula;
 
     const text = new Text().with({ content: getChildren(t) });
-    return new Title({ guid, text });
+    return new Formula({ guid, text });
 
   }
 
   toPersistence() : Object {
 
     return {
-      title: {
+      formula: {
         '#array': this.text.toPersistence(),
       },
     };

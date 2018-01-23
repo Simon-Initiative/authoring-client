@@ -1,3 +1,5 @@
+
+
 export type PurposeType = {
   value: string,
   label: string,
@@ -19,28 +21,6 @@ export const PurposeTypes : PurposeType[] = [
 
 export enum EntityTypes {
 
-  // Block Sentinels
-  pullout_begin = 'pullout_begin',
-  pullout_end = 'pullout_end',
-  example_begin = 'example_begin',
-  example_end = 'example_end',
-  figure_begin = 'figure_begin',
-  figure_end = 'figure_end',
-  section_begin = 'section_begin',
-  section_end = 'section_end',
-  title_begin = 'title_begin',
-  title_end = 'title_end',
-  definition_begin = 'definition_begin',
-  definition_end = 'definition_end',
-  pronunciation_begin = 'pronunciation_begin',
-  pronunciation_end = 'pronunciation_end',
-  translation_begin = 'translation_begin',
-  translation_end = 'translation_end',
-  meaning_begin = 'meaning_begin',
-  meaning_end = 'meaning_end',
-  material_begin = 'material_begin',
-  material_end = 'material_end',
-
   // Inline sentinels
   formula_begin = 'formula_begin',
   formula_end = 'formula_end',
@@ -60,23 +40,12 @@ export enum EntityTypes {
   cite = 'cite',
   image = 'image',
   input_ref = 'input_ref',
-  
-  // Block entities
-  codeblock = 'codeblock',
-  objref = 'objref',
-  wb_inline = 'wb_inline',
-  table = 'table',
-  audio = 'audio',
-  video = 'video',
-  youtube = 'youtube',
-  unsupported = 'unsupported',
-  iframe = 'iframe',
-  activity = 'activity',
+
 }
 
-export type BlockData = 
-  PulloutBegin | PulloutEnd | 
-  SectionBegin | SectionEnd | 
+export type BlockData =
+  PulloutBegin | PulloutEnd |
+  SectionBegin | SectionEnd |
   ExampleBegin | ExampleEnd |
   DefinitionBegin | DefinitionEnd |
   TitleBegin | TitleEnd |

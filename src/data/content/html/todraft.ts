@@ -16,6 +16,52 @@ import { Cite } from './cite';
 import guid from '../../../utils/guid';
 
 
+export function toDraft(persistenceFormat: Object) : ContentState {
+
+  const draft : common.RawDraft = {
+    entityMap : {},
+    blocks : [],
+  };
+
+  // Sometimes serialization results in a top-level object
+  // that has just #text or just an array of inline styles. We
+  // handle this simply by treating it as a paragraph.
+
+  if (isEmptyContent(persistenceFormat)) {
+    addNewBlock(draft, {});
+    return convertFromRaw(draft);
+  }
+  if (isVirtualParagraph(persistenceFormat)) {
+
+    if (persistenceFormat['#array'] !== undefined) {
+      paragraph(
+        { p: persistenceFormat },
+        { draft, depth: 0 });
+    } else {
+      paragraph(persistenceFormat, { draft, depth: 0 });
+    }
+
+  } else {
+    if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
+      persistenceFormat.forEach(entry => parse(entry, { draft, depth: 0 }));
+
+    } else {
+      parse(persistenceFormat, { draft, depth: 0 });
+    }
+
+  }
+
+  return convertFromRaw(draft);
+}
+
+
+const blockHandlers = {
+  p: paragraph,
+  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
+  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
+  '#array': arrayHandler,
+};
+
 // Translation routines to convert from persistence model to draft model
 
 const inlineTerminalTags = {};
@@ -44,43 +90,6 @@ type InlineHandler = (
   context: ParsingContext,
   workingBlock: WorkingBlock,
   blockBeforeChildren: WorkingBlock) => void;
-
-const ol = listHandler.bind(undefined, 'ordered-list-item');
-const ul = listHandler.bind(undefined, 'unordered-list-item');
-
-const blockHandlers = {
-  objref,
-  'wb:inline': wb_inline,
-  activity_link: activityLinkBlock,
-  pullout,
-  example,
-  definition,
-  pronunciation,
-  material,
-  translation,
-  meaning,
-  title,
-  p: paragraph,
-  section,
-  body,
-  ol,
-  ul,
-  codeblock,
-  activity,
-  table,
-  audio,
-  image: imageBlock,
-  formula: formulaBlock,
-  quote: quoteBlock,
-  code: codeBlock,
-  iframe,
-  input_ref: inputRefBlock,
-  video,
-  youtube,
-  '#text': pureTextBlockHandler.bind(undefined, common.TEXT),
-  '#cdata': pureTextBlockHandler.bind(undefined, common.CDATA),
-  '#array': arrayHandler,
-};
 
 const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
@@ -270,139 +279,6 @@ function formulaInline(
     offset + length + 1, 1, item, context, workingBlock);
 }
 
-function wb_inline(item: Object, context: ParsingContext) {
-  const wb = WbInline.fromPersistence(item, '');
-  addAtomicBlock(common.EntityTypes.wb_inline, { wbinline: wb }, context);
-}
-
-function activity(item: Object, context: ParsingContext) {
-  const activity = Activity.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.activity, { activity }, context);
-}
-
-function codeblock(item: Object, context: ParsingContext) {
-
-  const codeblock = CodeBlock.fromPersistence(item, '');
-  addAtomicBlock(common.EntityTypes.codeblock, { codeblock }, context);
-}
-
-function quoteBlock(item: Object, context: ParsingContext) {
-
-  const children = getChildren(item);
-
-  const blockContext = {
-    fullText: '',
-    markups : [],
-    entities : [],
-  };
-
-  children.forEach(subItem => processInline(subItem, context, blockContext));
-
-  addNewBlock(context.draft, {
-    data: extractIdTitle(item),
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    type: 'blockquote',
-  });
-}
-
-function formulaBlock(item: Object, context: ParsingContext) {
-
-  const children = getChildren(item);
-
-  const blockContext = {
-    fullText: '',
-    markups : [],
-    entities : [],
-  };
-
-  children.forEach(subItem => processInline(subItem, context, blockContext));
-
-  addNewBlock(context.draft, {
-    data: extractIdTitle(item),
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    type: 'formula',
-  });
-}
-
-function inputRefBlock(item: Object, context: ParsingContext) {
-  const blockContext = {
-    fullText: ' ',
-    markups : [],
-    entities : [],
-  };
-
-  insertEntity(
-    'IMMUTABLE', common.EntityTypes.input_ref,
-    0, 1, item, context, blockContext);
-
-  addNewBlock(context.draft, {
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-  });
-}
-
-function codeBlock(item: Object, context: ParsingContext) {
-
-  const children = getChildren(item);
-
-  const blockContext = {
-    fullText: '',
-    markups : [],
-    entities : [],
-  };
-
-  children.forEach(subItem => processInline(subItem, context, blockContext));
-
-  addNewBlock(context.draft, {
-    data: extractIdTitle(item),
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    type: 'code',
-  });
-}
-
-function audio(item: Object, context: ParsingContext) {
-
-  const audio = Audio.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.audio, { audio }, context);
-}
-
-function imageBlock(item: Object, context: ParsingContext) {
-
-  const image = Image.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.image, { image }, context);
-}
-
-function video(item: Object, context: ParsingContext) {
-
-  const video = Video.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.video, { video }, context);
-}
-
-function iframe(item: Object, context: ParsingContext) {
-
-  const iframe = IFrame.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.iframe, { iframe }, context);
-}
-
-function youtube(item: Object, context: ParsingContext) {
-
-  const youtube = YouTube.fromPersistence(item, '', toDraft);
-  addAtomicBlock(common.EntityTypes.youtube, { youtube }, context);
-}
-
-function table(item: Object, context: ParsingContext) {
-
-  const table = Table.fromPersistence(item, '');
-  addAtomicBlock(common.EntityTypes.table, { table }, context);
-}
-
 
 function getInlineHandler(key: string) : InlineHandler {
   if (inlineHandlers[key] !== undefined) {
@@ -439,51 +315,6 @@ function isEmptyContent(obj) {
   return Object.keys(obj).length === 0;
 }
 
-export function toDraft(persistenceFormat: Object) : ContentState {
-
-  const draft : common.RawDraft = {
-    entityMap : {},
-    blocks : [],
-  };
-
-  // Sometimes serialization results in a top-level object
-  // that has just #text or just an array of inline styles. We
-  // handle this simply by treating it as a paragraph.
-
-  if (isEmptyContent(persistenceFormat)) {
-    addNewBlock(draft, {});
-    return convertFromRaw(draft);
-  }
-  if (isVirtualParagraph(persistenceFormat)) {
-
-    if (persistenceFormat['#array'] !== undefined) {
-      paragraph(
-        { p: persistenceFormat },
-        { draft, depth: 0 });
-    } else {
-      paragraph(persistenceFormat, { draft, depth: 0 });
-    }
-
-  } else {
-    if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
-      persistenceFormat.forEach(entry => parse(entry, { draft, depth: 0 }));
-
-    } else {
-      parse(persistenceFormat, { draft, depth: 0 });
-    }
-
-  }
-
-  if (draft.blocks.length === 0 ||
-    draft.blocks[draft.blocks.length - 1].type === 'atomic') {
-    // Add a final empty block that will ensure that we have content past
-    // any last positioned atomic blocks. This allows the user to click
-    // past the last atomic block and begin inserting new text
-    addNewBlock(draft, {});
-  }
-
-  return convertFromRaw(draft);
-}
 
 // This is the same code that Draft.js uses to determine
 // random block keys:
@@ -506,31 +337,6 @@ function addNewBlock(params : common.RawDraft, values : Object) : common.RawCont
   return block;
 }
 
-
-function listHandler(listBlockType, item: Object, context: ParsingContext) {
-  const children = getChildren(item);
-
-  children.forEach((listItem) => {
-
-    const children = getChildren(listItem);
-
-    const blockContext = {
-      fullText: '',
-      markups : [],
-      entities : [],
-    };
-
-    children.forEach(subItem => processInline(subItem, context, blockContext));
-
-    addNewBlock(context.draft, {
-      data: extractIdTitle(item),
-      text: blockContext.fullText,
-      inlineStyleRanges: blockContext.markups,
-      entityRanges: blockContext.entities,
-      type: listBlockType,
-    });
-  });
-}
 
 function getChildren(item: Object, ignore = null) : Object[] {
 
@@ -661,251 +467,6 @@ function arrayHandler(item: Object, context: ParsingContext) {
   item['#array'].forEach(item => parse(item, context));
 }
 
-function section(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-  const beginData : common.SectionBegin = {
-    type: 'section_begin',
-    purpose: extractAttrs(item)['@purpose'],
-  };
-
-  const beginBlock = addAtomicBlock(common.EntityTypes.section_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Create a content block displaying the title text
-  processTitle(item, context);
-
-  // parse the body
-  context.depth += 1;
-  parse(item[key][common.ARRAY][1], context);
-  context.depth -= 1;
-
-  // Create then ending block
-  const endData : common.SectionEnd = {
-    type: 'section_end',
-    purpose: extractAttrs(item)['@purpose'],
-  };
-  addAtomicBlock(common.EntityTypes.section_end, endData, context);
-}
-
-function pullout(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
-  // Create the beginning block
-  const beginData : common.PulloutBegin = {
-    type: 'pullout_begin',
-    subType: item[key]['@type'],
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.pullout_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Process the title
-  processTitle(item, context);
-
-  // Handle the children, excluding 'title'
-  const children = getChildren(item, 'title');
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create then ending block
-  const endData : common.PulloutEnd = {
-    type: 'pullout_end',
-    subType: item[key]['@type'],
-  };
-  addAtomicBlock(common.EntityTypes.pullout_end, endData, context);
-
-}
-
-function definition(item: Object, context: ParsingContext) {
-  const terms = getChildren(item).filter(c => common.getKey(c) === 'term');
-  const term = terms.length === 0 ? 'unknown term ' : (terms[0] as any).term[common.TEXT];
-
-  // Create the beginning block
-  const beginData : common.DefinitionBegin = {
-    type: 'definition_begin',
-    term,
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.definition_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Handle the children, excluding 'term'
-  const children = getChildren(item, 'term');
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.DefinitionEnd = {
-    type: 'definition_end',
-  };
-  addAtomicBlock(common.EntityTypes.definition_end, endData, context);
-
-}
-
-function pronunciation(item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
-  const src = item[key]['@src'];
-  const srcType = item[key]['@type'];
-
-  // Create the beginning block
-  const beginData : common.PronunciationBegin = {
-    type: 'pronunciation_begin',
-    src,
-    srcType,
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.pronunciation_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Handle the children
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.PronunciationEnd = {
-    type: 'pronunciation_end',
-  };
-  addAtomicBlock(common.EntityTypes.pronunciation_end, endData, context);
-
-}
-
-function translation(item: Object, context: ParsingContext) {
-  // Create the beginning block
-  const beginData : common.TranslationBegin = {
-    type: 'translation_begin',
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.translation_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Handle the children
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.TranslationEnd = {
-    type: 'translation_end',
-  };
-  addAtomicBlock(common.EntityTypes.translation_end, endData, context);
-
-}
-
-function meaning(item: Object, context: ParsingContext) {
-  // Create the beginning block
-  const beginData : common.MeaningBegin = {
-    type: 'meaning_begin',
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.meaning_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Handle the children
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.MeaningEnd = {
-    type: 'meaning_end',
-  };
-  addAtomicBlock(common.EntityTypes.meaning_end, endData, context);
-
-}
-
-function material(item: Object, context: ParsingContext) {
-  // Create the beginning block
-  const beginData : common.MaterialBegin = {
-    type: 'material_begin',
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.material_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Handle the children
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.MaterialEnd = {
-    type: 'material_end',
-  };
-  addAtomicBlock(common.EntityTypes.material_end, endData, context);
-
-}
-
-function title(item: Object, context: ParsingContext) {
-
-  // Create the beginning block
-  const beginData : common.TitleBegin = {
-    type: 'title_begin',
-  };
-  addAtomicBlock(common.EntityTypes.title_begin, beginData, context);
-
-  // Handle the children
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.TitleEnd = {
-    type: 'title_end',
-  };
-  addAtomicBlock(common.EntityTypes.title_end, endData, context);
-
-}
-
-function processTitle(
-  item: Object, context: ParsingContext) {
-
-  const key = common.getKey(item);
-
-  // There are three options:
-  // 1. A title element is present (which can contain rich text) OR
-  // 2. A title attribute is present with text OR
-  // 3. A title attribute is present with empty string or the title attribute is missing
-  const titleAttribute = item[key][common.TITLE];
-  const titleElements = getChildren(item).filter(c => common.getKey(c) === 'title');
-
-  if (titleElements.length === 1) {
-    title(titleElements[0], context); // case 1
-  } else if (titleAttribute !== undefined && titleAttribute !== '') {
-    title({ title: { '#text': titleAttribute } }, context); // case 2
-  } else {
-    title({ title: { '#text': ' ' } }, context); // case 3
-  }
-}
-
-function example(item: Object, context: ParsingContext) {
-  // Create the beginning block
-  const beginData : common.ExampleBegin = {
-    type: 'example_begin',
-  };
-  const beginBlock = addAtomicBlock(common.EntityTypes.example_begin, beginData, context);
-  beginBlock.data = extractIdTitle(item);
-
-  // Process the title
-  processTitle(item, context);
-
-  // Handle the children, ignoring 'title'
-  const children = getChildren(item, 'title');
-  children.forEach(subItem => parse(subItem, context));
-
-  // Create the ending block
-  const endData : common.ExampleEnd = {
-    type: 'example_end',
-  };
-  addAtomicBlock(common.EntityTypes.example_end, endData, context);
-
-}
-
-function body(item: Object, context: ParsingContext) {
-
-  const children = getChildren(item);
-  children.forEach(subItem => parse(subItem, context));
-}
-
-function handleUnsupported(item: Object, context: ParsingContext) {
-  addAtomicBlock(common.EntityTypes.unsupported, item, context);
-}
-
-function objref(item: Object, context: ParsingContext) {
-  addAtomicBlock(common.EntityTypes.objref, item, context);
-}
-
 function addAtomicBlock(
   type: string, item: Object, context: ParsingContext) : common.RawContentBlock {
   const entityKey = common.generateRandomKey();
@@ -926,8 +487,7 @@ function addAtomicBlock(
 
 function parse(item: Object, context: ParsingContext) {
 
-  // item is an object with one key.  That key will be either 'section' or 'title'
-  // or 'body' or 'p' or ...
+  // item is an object with one key.
 
   // Get the key and then get the registered key handler
   const key = common.getKey(item);
@@ -941,7 +501,8 @@ function parse(item: Object, context: ParsingContext) {
   const handler = blockHandlers[key];
 
   if (handler === undefined) {
-    handleUnsupported(item, context);
+    console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
+    console.dir(item);
 
   } else {
     handler(item, context);

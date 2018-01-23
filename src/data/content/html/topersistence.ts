@@ -4,9 +4,6 @@ import {
   CharacterMetadata, ContentBlock, ContentState, convertToRaw,
 } from 'draft-js';
 
-import { CodeBlock } from './codeblock';
-import { WbInline } from './wbinline';
-import { Table } from './table';
 import guid from '../../../utils/guid';
 import * as common from './common';
 import { BlockIterator, BlockProvider } from './provider';
@@ -67,7 +64,7 @@ const entityHandlers = {
 
 // Converts the draft ContentState object to the HtmlContent format
 // (which ultimately is serialized and stored in persistence)
-export function toPersistence(state: ContentState, inlineText = false) : Object {
+export function fromDraft(state: ContentState, inlineText = false) : Object {
 
   const rawContent = convertToRaw(state);
   return translate(rawContent, state, inlineText);
@@ -113,8 +110,6 @@ function translate(content: common.RawDraft, state: ContentState, inlineText: bo
 
 }
 
-
-
 function translateBlock(
   iterator : BlockIterator,
   entityMap : common.RawEntityMap, context: Stack) {
@@ -123,12 +118,7 @@ function translateBlock(
   const rawBlock = block.rawBlock;
   const draftBlock = block.block;
 
-  const sentinelType = getSentinelType(rawBlock, entityMap);
-
-  if (sentinelType !== null) {
-    handleSentinelTransition(sentinelType, iterator, rawBlock, entityMap, context);
-
-  } else if (isParagraphBlock(rawBlock)) {
+  if (isParagraphBlock(rawBlock)) {
 
     // If the last block is an empty paragraph, do not translate it
     if (rawBlock.text === ' ' && iterator.peek() === null) {
@@ -137,45 +127,11 @@ function translateBlock(
 
     translateParagraph(rawBlock, draftBlock, entityMap, context);
 
-  } else if (isOrderedListBlock(rawBlock)) {
-    translateList('ol', rawBlock, draftBlock, iterator, entityMap, context);
-  } else if (isUnorderedListBlock(rawBlock)) {
-    translateList('ul', rawBlock, draftBlock, iterator, entityMap, context);
-  } else if (isTable(rawBlock, entityMap)) {
-    translateTable(rawBlock, draftBlock, entityMap, context);
-  } else if (isCodeBlock(rawBlock, entityMap)) {
-    translateCodeBlock(rawBlock, draftBlock, entityMap, context);
-  } else if (isQuoteBlock(rawBlock)) {
-    translateQuoteBlock(rawBlock, draftBlock, entityMap, context);
-  } else if (isBasicCodeBlock(rawBlock)) {
-    translateBasicCodeBlock(rawBlock, draftBlock, entityMap, context);
-  } else if (isFormulaBlock(rawBlock)) {
-    translateFormulaBlock(rawBlock, draftBlock, entityMap, context);
-  } else if (isWbInline(rawBlock, entityMap)) {
-    translateWbInline(rawBlock, draftBlock, entityMap, context);
-  } else if (isObjRef(rawBlock, entityMap)) {
-    translateObjRef(rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('image', rawBlock, entityMap)) {
-    translateAtomic('image', rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('audio', rawBlock, entityMap)) {
-    translateAtomic('audio', rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('video', rawBlock, entityMap)) {
-    translateAtomic('video', rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('youtube', rawBlock, entityMap)) {
-    translateAtomic('youtube', rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('iframe', rawBlock, entityMap)) {
-    translateAtomic('iframe', rawBlock, draftBlock, entityMap, context);
-  } else if (isCustom('activity', rawBlock, entityMap)) {
-    translateAtomic('activity', rawBlock, draftBlock, entityMap, context);
-  } else if (isHeaderBlock(rawBlock)) {
-    translateHeaderBlock(rawBlock, draftBlock, entityMap, context);
   } else {
     translateUnsupported(rawBlock, draftBlock, entityMap, context);
   }
 
 }
-
-
 
 const top = (stack : Stack) => {
   const s = stack[stack.length - 1];
@@ -189,191 +145,9 @@ const top = (stack : Stack) => {
 
 };
 
-function handleSentinelTransition(
-  type: common.EntityTypes, iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap, context: Stack) {
-
-  if (type.endsWith('_end')) {
-    // Simply pop the context stack
-    context.pop();
-
-  } else if (type === common.EntityTypes.section_begin) {
-    translateSection(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.pullout_begin) {
-    translatePullout(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.example_begin) {
-    translateExample(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.definition_begin) {
-    translateDefinition(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.title_begin) {
-    translateTitle(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.material_begin) {
-    translateMaterial(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.pronunciation_begin) {
-    translatePronunciation(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.translation_begin) {
-    translateTranslation(iterator, rawBlock, entityMap, context);
-
-  } else if (type === common.EntityTypes.meaning_begin) {
-    translateMeaning(iterator, rawBlock, entityMap, context);
-
-  }
-
-}
-
-function getSentinelType(
-  rawBlock: common.RawContentBlock, entityMap: common.RawEntityMap) : common.EntityTypes {
-
-  if (rawBlock.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[rawBlock.entityRanges[0].key];
-    if (entity.type.endsWith('_begin') || entity.type.endsWith('_end')) {
-      return (entity.type as common.EntityTypes);
-    }
-  }
-  return null;
-}
-
 function isParagraphBlock(block : common.RawContentBlock) : boolean {
   const { type } = block;
   return (type === 'unstyled');
-}
-
-function isHeaderBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type.startsWith('header'));
-}
-
-function isQuoteBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type === 'blockquote');
-}
-
-function isFormulaBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type === 'formula');
-}
-
-function isBasicCodeBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type === 'code');
-}
-
-function isUnorderedListBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type === 'unordered-list-item');
-}
-
-function isOrderedListBlock(block : common.RawContentBlock) : boolean {
-  const { type } = block;
-  return (type === 'ordered-list-item');
-}
-
-function isCodeBlock(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  if (block.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
-    return entity.type === 'codeblock';
-  }
-  return false;
-}
-
-function isTable(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  if (block.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
-    return entity.type === 'table';
-  }
-  return false;
-}
-
-function isCustom(
-  customType: string,
-  block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-
-  if (block.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
-    return entity.type === customType;
-  }
-  return false;
-}
-
-function isWbInline(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  if (block.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
-    return entity.type === 'wb_inline';
-  }
-  return false;
-}
-
-function isObjRef(block : common.RawContentBlock, entityMap: common.RawEntityMap) : boolean {
-  if (block.type === 'atomic') {
-    const entity : common.RawEntity = entityMap[block.entityRanges[0].key];
-    return entity.type === 'objref';
-  }
-  return false;
-}
-
-function translateList(
-  listType : string,
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, iterator : BlockIterator,
-  entityMap : common.RawEntityMap, context: Stack) {
-
-  // Create the object representing the list type (ol, ul)
-  const list = {};
-  list[listType] = { '#array': [] };
-  const container = list[listType]['#array'];
-
-  const listBlockType = rawBlock.type;
-
-
-  top(context).push(list);
-
-  let rb = rawBlock;
-  let b = block;
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  list[listType]['@id'] = id;
-  list[listType]['@title'] = title;
-
-  // To translate a list we have iterate through the blocks
-  // to find the transition out of blocks of this list type.
-  while (true) {
-
-    if (rb.inlineStyleRanges.length === 0) {
-      container.push({ li: { '#text': rb.text } });
-    } else {
-      const li = { li: { '#array': [] } };
-      container.push(li);
-      translateTextBlock(rb, b, entityMap, li.li['#array']);
-    }
-
-    let nextBlock = iterator.peek();
-    if (nextBlock === null || nextBlock.block.type !== listBlockType) {
-      break;
-    }
-
-    nextBlock = iterator.next();
-    rb = nextBlock.rawBlock;
-    b = nextBlock.block;
-  }
-
-}
-
-function translateAtomic(
-  type: string,
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const item = entityMap[rawBlock.entityRanges[0].key].data[type];
-  top(context).push(item.toPersistence(toPersistence));
 }
 
 
@@ -382,239 +156,6 @@ function translateUnsupported(
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
 
   top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
-}
-
-function translateCodeBlock(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const codeblock : CodeBlock = entityMap[rawBlock.entityRanges[0].key].data.codeblock;
-  top(context).push(codeblock.toPersistence());
-}
-
-function translateTable(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const table : Table = entityMap[rawBlock.entityRanges[0].key].data.table;
-  top(context).push(table.toPersistence());
-}
-
-function translateWbInline(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const wb : WbInline = entityMap[rawBlock.entityRanges[0].key].data.wbinline;
-  top(context).push(wb.toPersistence());
-}
-
-function translateObjRef(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const objref : Object = entityMap[rawBlock.entityRanges[0].key].data;
-  top(context).push(objref);
-}
-
-function translateSection(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock,
-  entityMap : common.RawEntityMap, context: Stack) {
-
-  let block = iterator.peek();
-  let title;
-  if (block !== null
-    && block.rawBlock.type === 'atomic'
-    && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_begin) {
-
-    // Move past the title start
-    block = iterator.next();
-
-    // Get the title
-    block = iterator.next();
-
-    // Process the title content
-    title = processTitle(block.rawBlock, block.block, entityMap);
-
-    // Move past the title_end block
-    block = iterator.peek();
-    while (block !== null) {
-      if (block.rawBlock.type === 'atomic'
-        && entityMap[block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
-        block = iterator.next();
-        break;
-      }
-      block = iterator.next();
-    }
-
-
-  } else {
-    title = {
-      title: {
-        '#text': ' ',
-      },
-    };
-  }
-
-  const id = extractId(rawBlock);
-  const titleAttr = extractTitle(rawBlock);
-
-  const purpose = entityMap[rawBlock.entityRanges[0].key].data.purpose;
-
-  const s = {
-    section: {
-      '@id': id,
-      '@title': titleAttr,
-      '#array': [title, {
-        body: {
-          '#array': [],
-        },
-      }],
-    },
-  };
-
-  if (purpose !== undefined && purpose !== null && purpose.trim() !== '') {
-    s.section['@purpose'] = purpose;
-  }
-
-  top(context).push(s);
-  context.push((s.section['#array'][1] as any).body['#array']);
-
-}
-
-
-function translatePullout(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const arr = [];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const p = {
-    pullout: {
-      '@type': entityMap[rawBlock.entityRanges[0].key].data.subType,
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(p);
-  context.push(p.pullout['#array']);
-
-}
-
-function translateDefinition(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const term = entityMap[rawBlock.entityRanges[0].key].data.term;
-  const arr = [{
-    term: {
-      '#text': term,
-    },
-  }];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const p = {
-    definition: {
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(p);
-  context.push(p.definition['#array']);
-
-}
-
-function translateTitle(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const arr = [];
-
-  const p = {
-    title: {
-      '#array': arr,
-    },
-  };
-
-  top(context).push(p);
-
-  // Get the content of the title
-  let block = iterator.next();
-
-  // Process the content
-  translatePureInline(block.rawBlock, block.block, entityMap, arr);
-
-  // Move past the title_end block
-  block = iterator.peek();
-  while (block !== null) {
-    if (block.rawBlock.type === 'atomic'
-      && entityMap[
-        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.title_end) {
-      block = iterator.next();
-      break;
-    }
-    block = iterator.next();
-  }
-
-}
-
-function translatePronunciation(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const type = entityMap[rawBlock.entityRanges[0].key].data.srcType;
-
-  const arr = [];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const p = {
-    pronunciation: {
-      '@type': type,
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(p);
-
-  // Get the content of the pronunciation
-  let block = iterator.next();
-
-  if (block.rawBlock.type === 'atomic'
-    && entityMap[
-      block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
-
-    arr.push({ '#text': ' ' });
-
-  } else {
-    // Process the content
-    translatePureInline(block.rawBlock, block.block, entityMap, arr);
-  }
-
-  // Move past the pronunciation_end block
-  block = iterator.peek();
-  while (block !== null) {
-    if (block.rawBlock.type === 'atomic'
-      && entityMap[
-        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.pronunciation_end) {
-      block = iterator.next();
-      break;
-    }
-    block = iterator.next();
-  }
-
 }
 
 function translatePureInline(
@@ -629,133 +170,6 @@ function translatePureInline(
 
   }
 
-
-}
-
-function translateTranslation(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const arr = [];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const p = {
-    translation: {
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(p);
-
-  // Get the content of the translation
-  let block = iterator.next();
-
-  if (block.rawBlock.type === 'atomic'
-    && entityMap[
-      block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
-
-    arr.push({ '#text': ' ' });
-
-  } else {
-    // Process the content
-    translatePureInline(block.rawBlock, block.block, entityMap, arr);
-  }
-
-  // Move past the translation_end block
-  block = iterator.peek();
-  while (block !== null) {
-    if (block.rawBlock.type === 'atomic'
-      && entityMap[
-        block.rawBlock.entityRanges[0].key].type === common.EntityTypes.translation_end) {
-      block = iterator.next();
-      break;
-    }
-    block = iterator.next();
-  }
-
-}
-
-function translateMaterial(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const arr = [];
-
-  const p = {
-    material: {
-      '#array': arr,
-    },
-  };
-
-  top(context).push(p);
-  context.push(p.material['#array']);
-
-}
-
-function translateMeaning(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const arr = [];
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const p = {
-    meaning: {
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(p);
-  context.push(p.meaning['#array']);
-
-}
-
-function processTitle(
-  rawBlock: common.RawContentBlock, block: ContentBlock, entityMap: common.RawEntityMap) {
-  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    return { title: { '#text': (rawBlock.text === '' ? ' ' : rawBlock.text) } };
-  }
-
-  const title = { title: { '#array': [] } };
-  translateTextBlock(rawBlock, block, entityMap, title.title['#array']);
-  return title;
-}
-
-function translateExample(
-  iterator: BlockIterator,
-  rawBlock: common.RawContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  const arr = [];
-  const e = {
-    example: {
-      '#array': arr,
-      '@id': id,
-      '@title': title,
-    },
-  };
-
-  top(context).push(e);
-  context.push(e.example['#array']);
-
-}
-
-function translateHeaderBlock(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  // Convert it to a paragraph:
-  translateParagraph(rawBlock, block, entityMap, context);
 }
 
 function translateParagraph(
@@ -787,57 +201,6 @@ function extractTitle(rawBlock : common.RawContentBlock) {
   }
 
   return rawBlock.data.title;
-}
-
-function translateQuoteBlock(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ quote: { '#text': rawBlock.text, '@id': id, '@title': title } });
-  } else {
-    const p = { quote: { '#array': [], '@id': id, '@title': title } };
-    top(context).push(p);
-    translateTextBlock(rawBlock, block, entityMap, p.quote['#array']);
-  }
-
-}
-
-function translateFormulaBlock(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ formula: { '#text': rawBlock.text, '@id': id, '@title': title } });
-  } else {
-    const p = { formula: { '#array': [], '@id': id, '@title': title } };
-    top(context).push(p);
-    translateTextBlock(rawBlock, block, entityMap, p.formula['#array']);
-  }
-
-}
-
-function translateBasicCodeBlock(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {
-
-  const id = extractId(rawBlock);
-  const title = extractTitle(rawBlock);
-
-  if (rawBlock.inlineStyleRanges.length === 0 && rawBlock.entityRanges.length === 0) {
-    top(context).push({ code: { '#text': rawBlock.text, '@id': id, '@title': title } });
-  } else {
-    const p = { code: { '#array': [], '@id': id, '@title': title } };
-    top(context).push(p);
-    translateTextBlock(rawBlock, block, entityMap, p.code['#array']);
-  }
-
 }
 
 function combineIntervals(rawBlock: common.RawContentBlock) : InlineOrEntity[] {
@@ -1230,7 +593,7 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
   const { data } = entityMap[s.key];
-  return data.link.toPersistence(toPersistence);
+  return data.link.toPersistence(fromDraft);
 }
 
 function formula_begin(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -1245,14 +608,14 @@ function inlineImage(s : common.RawEntityRange, text : string, entityMap : commo
 
   const { data } = entityMap[s.key];
 
-  return data.image.toPersistence(toPersistence);
+  return data.image.toPersistence(fromDraft);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
 
-  return data.activity_link.toPersistence(toPersistence);
+  return data.activity_link.toPersistence(fromDraft);
 
 }
 
@@ -1261,7 +624,7 @@ function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.cite.toPersistence(toPersistence);
+  return data.cite.toPersistence(fromDraft);
 
 }
 
@@ -1269,7 +632,7 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.xref.toPersistence(toPersistence);
+  return data.xref.toPersistence(fromDraft);
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
