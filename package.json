@@ -99,7 +99,7 @@
     "dist": "webpack --config=./webpack.dist.js",
     "lint": "tslint -p . -c tslint.json 'src/**/*.ts*'",
     "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
-    "test": "JEST_HTML_REPORTER_OUTPUT_PATH=./test-out/$(git symbolic-ref HEAD 2>/dev/null | cut -d\"/\" -f 3)-results.html JEST_HTML_REPORTER_PAGE_TITLE=$(git symbolic-ref HEAD 2>/dev/null | cut -d\"/\" -f 3)\\ Test\\ Report jest",
+    "test": "JEST_HTML_REPORTER_OUTPUT_PATH=./test-out/results.html jest",
     "test:watch": "jest --watch"
   }
 }
