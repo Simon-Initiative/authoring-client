@@ -22,6 +22,10 @@ const buildNodes = (start: number, count: number) => {
   return Immutable.OrderedMap<NodeId, TestNode>(arr);
 };
 
+it('fail', () => {
+  expect(true).toBeDefined(false);
+});
+
 it('top level remove', () => {
 
   const get : ChildrenAccessor<TestNode> = n => Maybe.nothing<Nodes<TestNode>>();

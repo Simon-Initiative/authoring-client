@@ -16,6 +16,7 @@ import { loadCourse } from 'actions/course';
 import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
+import guid from 'utils/guid';
 
 import { ApplicationRoot } from './ApplicationRoot';
 // import application styles
