@@ -55,14 +55,14 @@ export class Objective
     } else if (isExpanded) {
       titleBlock = <div>
                 <span >
-                <i className="icon icon-caret-down"></i>
+                <i className="fa fa-caret-down"></i>
                 </span>&nbsp;
                 <b>Objective:</b> {title}
               </div>;
     } else {
       titleBlock = <div>
                 <span >
-                <i className="icon icon-caret-right"></i>
+                <i className="fa fa-caret-right"></i>
                 </span>&nbsp;
                 <b>Objective:</b> {title}
               </div>;

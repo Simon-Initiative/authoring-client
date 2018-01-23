@@ -17,7 +17,8 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
-test-out
+test-out/**
+!test-out/.gitkeep
 junitresults.xml
 
 couch/data
@@ -49,7 +50,8 @@ jspm_packages
 
 # App specific stuff
 dev
-dist
+dist/**
+!dist/.gitkeep
 /course-editor.iml
 /.idea/
 /.project

@@ -1,19 +1,45 @@
 var path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
+const pathsToClean = ['dist'];
+const cleanOptions = {};
 
 module.exports = {
-    entry: "./src/app.tsx",
+    entry: {
+        app: './src/app.tsx',
+        vendor: [
+            'draft-js',
+            'history',
+            'immutable',
+            'json-beautify',
+            'keycloak-js',
+            'react',
+            'react-addons-css-transition-group',
+            'react-addons-shallow-compare',
+            'react-bootstrap-typeahead',
+            'react-dnd',
+            'react-dnd-html5-backend',
+            'react-dom',
+            'react-redux',
+            'redux',
+            'redux-logger',
+            'redux-thunk',
+            'tsmonad',
+            'whatwg-fetch'
+        ]
+    },
     output: {
-        path: __dirname + '/dist',
-        filename: "bundle.js",
-        sourcePrefix: ''
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].[chunkhash].js'
     },
     externals: {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: ['.ts', '.tsx', '.js'],
 
         // Add webpack aliases for top level imports
         alias: {
@@ -29,20 +55,35 @@ module.exports = {
     },
     plugins: [
       new webpack.DefinePlugin({
-        "process.env": {
-            NODE_ENV: JSON.stringify("production")
+        'process.env': {
+            NODE_ENV: JSON.stringify('production')
         }
-      })
+      }),
+      new CleanWebpackPlugin(pathsToClean, cleanOptions),
+      new HtmlWebpackPlugin({
+         template: '!!underscore-template-loader!./index.html',
+         inject: false
+      }),
+      new webpack.HashedModuleIdsPlugin(),
+      new webpack.NamedModulesPlugin(),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor'
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'manifest'
+      }),
+      new UglifyJsPlugin()
     ],
     module: {
         rules: [
+            { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
               use: [
-                  { loader: "style-loader"},
-                  { loader: "css-loader"},
-                  { loader: "sass-loader",
+                  { loader: 'style-loader'},
+                  { loader: 'css-loader'},
+                  { loader: 'sass-loader',
                     options: {
                         includePaths: [
                             path.join(__dirname, 'src/stylesheets'),

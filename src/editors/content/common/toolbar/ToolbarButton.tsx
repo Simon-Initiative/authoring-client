@@ -33,7 +33,7 @@ export class ToolbarButton<DataType> extends React.PureComponent<ToolbarButtonPr
 
   render() {
     const { icon } = this.props;
-    const iconClasses = 'icon icon-' + icon;
+    const iconClasses = 'fa fa-' + icon;
     const style = {
       color: 'white',
     };

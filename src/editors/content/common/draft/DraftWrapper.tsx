@@ -902,8 +902,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         if (this.shouldShowExpander()) {
 
           const iconClasses = this.state.blockToolbarShown
-            ? 'icon icon-minus'
-            : 'icon icon-plus';
+            ? 'fa fa-minus'
+            : 'fa fa-plus';
 
           const style = {
             color: 'black',

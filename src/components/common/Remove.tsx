@@ -11,7 +11,7 @@ export const Remove = (props) => {
         onClick={props.onRemove}
         type="button"
         className="btn btn-sm">
-        <i className="icon icon-remove"></i>
+        <i className="fa fa-close"></i>
       </button>
     </span>
   );

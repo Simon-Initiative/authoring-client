@@ -20,20 +20,12 @@
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.22.0",
     "babel-preset-stage-0": "^6.22.0",
+    "clean-webpack-plugin": "^0.1.17",
     "css-loader": "^0.26.1",
-    "del": "^2.2.2",
     "draft-js": "Simon-Initiative/draft-js#testing-merge",
     "file-loader": "^0.10.0",
-    "gulp": "^3.9.1",
-    "gulp-chmod": "^2.0.0",
-    "gulp-if": "^2.0.2",
-    "gulp-load-plugins": "^1.4.0",
-    "gulp-open": "^2.0.0",
-    "gulp-print": "^2.0.1",
-    "gulp-run": "^1.7.1",
-    "gulp-shell": "^0.5.2",
-    "gulp-util": "^3.0.8",
     "history": "^4.6.1",
+    "html-webpack-plugin": "^2.30.1",
     "immutable": "^3.8.1",
     "jasmine-reporters": "^2.2.0",
     "json-beautify": "^1.0.1",
@@ -53,7 +45,6 @@
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "run-sequence": "^1.2.2",
     "sass-loader": "4.1.1",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.0",
@@ -61,16 +52,17 @@
     "tslint-config-airbnb": "^5.4.2",
     "tsmonad": "^0.7.2",
     "typescript": "2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "underscore-template-loader": "^0.8.0",
     "webpack": "3.10.0",
     "webpack-dev-server": "2.9.7",
-    "whatwg-fetch": "^2.0.2",
-    "yargs": "^6.6.0"
+    "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "del-cli": "^1.1.0",
     "jasmine": "^2.5.3",
-    "jest": "^18.1.0",
-    "uglify-js": "^3.0.15",
-    "uglifyjs-webpack-plugin": "^0.4.3"
+    "jest": "^18.1.0"
   },
   "jest": {
     "verbose": true,
@@ -80,6 +72,7 @@
       "js"
     ],
     "moduleNameMapper": {
+      "^assets/(.*)": "<rootDir>/src/assets/$1",
       "^actions/(.*)": "<rootDir>/src/actions/$1",
       "^components/(.*)": "<rootDir>/src/components/$1",
       "^data/(.*)": "<rootDir>/src/data/$1",
@@ -94,6 +87,17 @@
     },
     "testRegex": "test.*-test.(ts|tsx|js)$",
     "collectCoverage": true,
-    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine-env.js"
+    "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine-env.js",
+    "cacheDirectory": "./node_modules/.cache/jest"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run lint && npm run test && npm run dist",
+    "clean": "del coverage/** dev/** dist/** !dist !dist/.gitkeep test-out/** !test-out !test-out/.gitkeep",
+    "dev": "webpack-dev-server --watch --config=./webpack.dev.js",
+    "dist": "webpack --config=./webpack.dist.js",
+    "lint": "tslint -p . -c tslint.json 'src/**/*.ts*'",
+    "lint:watch": "chokidar \"src/**/*.ts*\" -c \"echo Running lint... && tslint -p . -c tslint.json 'src/**/*.ts*' && echo Linting Passed.\" --initial --verbose",
+    "test": "jest > ./test-out/results.txt 2>&1",
+    "test:watch": "jest --watch"
   }
 }
