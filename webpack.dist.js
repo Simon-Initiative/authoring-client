@@ -61,7 +61,8 @@ module.exports = {
       }),
       new CleanWebpackPlugin(pathsToClean, cleanOptions),
       new HtmlWebpackPlugin({
-         template: '!!underscore-template-loader!./index.html'
+         template: '!!underscore-template-loader!./index.html',
+         inject: false
       }),
       new webpack.HashedModuleIdsPlugin(),
       new webpack.NamedModulesPlugin(),

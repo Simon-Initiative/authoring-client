@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        app: './src/app.tsx',
+        app: ['react-hot-loader/patch', './src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
@@ -98,7 +98,8 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-            template: '!!underscore-template-loader!./index.html'
+            template: '!!underscore-template-loader!./index.html',
+            inject: false
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.NamedModulesPlugin(),
