@@ -285,7 +285,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   mimeType={item.mimeType}
                   url={this.adjust(item.pathTo)} />
               <div className="name">
-                {stringFormat.ellipsize((item.pathTo), MAX_NAME_LENGTH, 5)}
+                {stringFormat.ellipsize(extractFileName(item.pathTo), MAX_NAME_LENGTH, 5)}
               </div>
             </li>
           ))}
