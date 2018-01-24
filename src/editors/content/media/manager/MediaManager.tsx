@@ -6,6 +6,7 @@ import { MediaIcon } from './MediaIcon';
 import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
 import { extractFileName } from '../utils';
+import { stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
@@ -13,6 +14,7 @@ import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
+const MAX_NAME_LENGTH = 26;
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
@@ -282,7 +284,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   filename={extractFileName(item.pathTo)}
                   mimeType={item.mimeType}
                   url={this.adjust(item.pathTo)} />
-              <div className="name">{extractFileName(item.pathTo)}</div>
+              <div className="name">
+                {stringFormat.ellipsize((item.pathTo), MAX_NAME_LENGTH, 5)}
+              </div>
             </li>
           ))}
         </ol>
