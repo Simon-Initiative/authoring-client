@@ -28,6 +28,38 @@
         }
       }
     }
+
+    .layout-control {
+      button {
+        height: 38px;
+        color: $gray;
+        border: 1px solid #ced4da;
+        border-right: none;
+
+        &:first-child {
+          border-top-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+        }
+
+        &:last-child {
+          border-right: 1px solid #ced4da;
+          border-top-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+        }
+
+        &:hover {
+          background-color: $gray-light;
+          color: $white;
+        }
+
+        &:active, &.selected {
+          background-color: $gray;
+          color: $white;
+          border-color: #ced4da;
+          box-shadow: none;
+        }
+      }
+    }
   }
 
   .media-content {
@@ -61,7 +93,7 @@
       }
     }
 
-    .media-grid {
+    .media-items {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -72,60 +104,132 @@
         display: block;
         margin: 0 auto;
         padding: 5px 10px;
-        width: 100%;
+        min-width: 100%;
 
-        li {
-          position: relative;
-          float: left;
-          margin: 5px 5px 55px;
-          list-style: none;
-          border: 1px solid rgba(255,255,255,0);
-          width: 120px;
-          height: 60px;
-          border: 1px solid transparent;
-
-          &.selectable {
-            cursor: pointer;
-
-            &:hover {
-              border: 1px solid $selection;
-
-              .selection-check {
-                display: block;
-              }
-            }
-
-            &:active, &.selected {
-              background-color: rgba($selection, 0.3);
-              border: 1px solid $selection;
-
-              .selection-check {
-                display: block;
-              }
-            }
-          }
-
-          .selection-check {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            display: none;
-          }
-
-          .name {
-            position: absolute;
-            top: 60px;
-            left: 0;
-            margin: 0 auto;
-            padding: 5px 0;
+        &.media-grid {
+          li.media-item {
+            position: relative;
+            float: left;
+            margin: 5px 5px 55px;
+            list-style: none;
+            border: 1px solid rgba(255,255,255,0);
             width: 120px;
-            max-height: 45px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow: hidden;
-            text-align: center;
-            vertical-align: top;
-            line-height: 20px;
+            height: 60px;
+            border: 1px solid transparent;
+
+            .selection-check {
+              position: absolute;
+              top: 5px;
+              left: 5px;
+              display: none;
+            }
+
+            .media-icon {
+              width: 118px;
+              height: 58px;
+              text-align: center;
+              overflow: hidden;
+            }
+
+            .name {
+              position: absolute;
+              top: 60px;
+              left: 0;
+              margin: 0 auto;
+              padding: 5px 0;
+              width: 120px;
+              max-height: 45px;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              overflow: hidden;
+              text-align: center;
+              vertical-align: top;
+              line-height: 20px;
+            }
+
+            &.selectable {
+              cursor: pointer;
+
+              &:hover {
+                border: 1px solid $selection;
+
+                .selection-check {
+                  display: block;
+                }
+              }
+
+              &:active, &.selected {
+                background-color: rgba($selection, 0.3);
+                border: 1px solid $selection;
+
+                .selection-check {
+                  display: block;
+                }
+              }
+            }
+          }
+        }
+
+        &.media-list {
+          li.media-item {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+            list-style: none;
+            border: 1px solid rgba(255,255,255,0);
+            // width: 120px;
+            height: 32px;
+            line-height: 32px;
+            vertical-align: middle;
+            border: 1px solid transparent;
+
+            &:nth-child(odd) {
+              background-color: lighten($gray-lightest, 5%);
+            }
+
+            .selection-check {
+              display: none;
+              visibility: hidden;
+              height: 32px;
+              margin: 0 10px;
+              line-height: 32px;
+              vertical-align: middle;
+              text-align: center;
+              cursor: pointer;
+            }
+
+            .name {
+              flex: 1;
+              padding: 0 5px;
+              vertical-align: baseline;
+              overflow: visible;
+              white-space: nowrap;
+            }
+
+            &.selectable {
+              cursor: pointer;
+
+              .selection-check {
+                display: block;
+              }
+
+              &:hover {
+                border: 1px solid $selection;
+
+                .selection-check {
+                  visibility: visible;
+                }
+              }
+
+              &:active, &.selected {
+                background-color: rgba($selection, 0.3);
+                border: 1px solid $selection;
+
+                .selection-check {
+                  visibility: visible;
+                }
+              }
+            }
           }
         }
       }
