@@ -25,6 +25,11 @@ export enum SELECTION_TYPES {
   NONE,
 }
 
+export enum LAYOUTS {
+  GRID,
+  LIST,
+}
+
 export interface MediaManagerProps {
   className?: string;
   model: Media;
@@ -41,6 +46,7 @@ export interface MediaManagerProps {
 export interface MediaManagerState {
   selection: Immutable.List<string>;
   searchText: '';
+  layout: LAYOUTS;
 }
 
 /**
@@ -57,12 +63,14 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     this.state = {
       selection: Immutable.List<string>(),
       searchText: undefined,
+      layout: LAYOUTS.GRID,
     };
 
     this.onScroll = this.onScroll.bind(this);
     this.isSelected = this.isSelected.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onSearch = this.onSearch.bind(this);
+    this.onChangeLayout = this.onChangeLayout.bind(this);
   }
 
   componentDidMount() {
@@ -141,6 +149,12 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       });
   }
 
+  onChangeLayout(newLayout: LAYOUTS) {
+    this.setState({
+      layout: newLayout,
+    });
+  }
+
   isSelected(guid) {
     const { selection } = this.state;
 
@@ -185,7 +199,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     onLoadCourseMediaNextPage(mimeFilter, searchText);
   }
 
-  renderMediaGrid () {
+  renderMediaList() {
     const { media, selectionType } = this.props;
 
     const isLoadingMedia = media.caseOf({
@@ -205,7 +219,55 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     return (
       <React.Fragment>
-        <ol ref={el => this.scrollContent = el}>
+        <ol className="media-list" ref={el => this.scrollContent = el}>
+          {mediaItems.map(item => (
+            <li key={item.guid}
+                className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                  + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
+                onClick={() => this.onSelect(item.guid)}>
+              <input
+                  type="checkbox"
+                  className="selection-check"
+                  checked={this.isSelected(item.guid)}
+                  onClick={() => this.onSelect(item.guid)} />
+              <div className="name">{item.pathTo}</div>
+            </li>
+          ))}
+        </ol>
+        {isLoadingMedia && !allItemsLoaded
+          ? (
+            <div className="loading">
+              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+              Hang on while more items are loaded...
+            </div>
+          )
+          : null
+        }
+      </React.Fragment>
+    );
+  }
+
+  renderMediaGrid() {
+    const { media, selectionType } = this.props;
+
+    const isLoadingMedia = media.caseOf({
+      just: ml => ml.isLoading,
+      nothing: () => false,
+    });
+
+    const allItemsLoaded = media.caseOf({
+      just: ml => ml.allItemsLoaded(),
+      nothing: () => false,
+    });
+
+    const mediaItems: MediaItem[] = media.caseOf({
+      just: ml => ml.getItems(),
+      nothing: () => [],
+    });
+
+    return (
+      <React.Fragment>
+        <ol className="media-grid" ref={el => this.scrollContent = el}>
           {mediaItems.map(item => (
             <li key={item.guid}
                 className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
@@ -239,7 +301,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   render() {
     const { className, mimeFilter } = this.props;
-    const { searchText } = this.state;
+    const { searchText, layout } = this.state;
 
     const id = guid();
 
@@ -258,22 +320,34 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               onClick={() => this.onUploadClick(id)}>
             <i className="fa fa-upload" /> Upload
           </Button>
+          <div className="media-toolbar-item layout-control">
+            <button
+              className={`btn btn-outline-primary ${layout === LAYOUTS.GRID ? 'selected' : ''}`}
+              onClick={() => this.onChangeLayout(LAYOUTS.GRID)}>
+              <i className="fa fa-th" />
+            </button>
+            <button
+              className={`btn btn-outline-primary ${layout === LAYOUTS.LIST ? 'selected' : ''}`}
+              onClick={() => this.onChangeLayout(LAYOUTS.LIST)}>
+              <i className="fa fa-th-list" />
+            </button>
+          </div>
           <div className="media-toolbar-item flex-spacer"/>
           <div className="media-toolbar-item sort-control">
             Sort: Newest <i className="fa fa-angle-down" />
           </div>
           <div className="media-toolbar-item search">
-          <div className="input-group">
-            <span className="input-group-addon">
-              <i className="fa fa-search" />
-            </span>
-            <input
-                type="text"
-                className="form-control"
-                placeholder="Search"
-                value={searchText}
-                onChange={({ target: { value } }) => this.onSearch(value)} />
-          </div>
+            <div className="input-group">
+              <span className="input-group-addon">
+                <i className="fa fa-search" />
+              </span>
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search"
+                  value={searchText}
+                  onChange={({ target: { value } }) => this.onSearch(value)} />
+            </div>
           </div>
         </div>
         <div className="media-content">
@@ -282,8 +356,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             {/* <li className="">Unit 1</li>
             <li className="">Unit 2</li> */}
           </ol>
-          <div className="media-grid" ref={el => this.setupScrollListener(el)}>
-            {this.renderMediaGrid()}
+          <div className="media-items" ref={el => this.setupScrollListener(el)}>
+            {layout === LAYOUTS.GRID
+              ? (this.renderMediaGrid())
+              : (this.renderMediaList())
+            }
           </div>
         </div>
       </div>
