@@ -1,6 +1,7 @@
 import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 
+
 export enum TreeType {
   DIV,
   TABLE, // Not supported yet

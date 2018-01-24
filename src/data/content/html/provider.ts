@@ -15,14 +15,14 @@ export interface BlockIterator {
 export interface BlockProvider {
   blocks : common.RawContentBlock[];
   state : ContentState;
-  index : number; 
+  index : number;
 }
 
 export class BlockProvider implements BlockIterator {
 
   constructor(blocks : common.RawContentBlock[], state: ContentState) {
     this.blocks = blocks;
-    this.state = state; 
+    this.state = state;
     this.index = 0;
   }
 
@@ -32,8 +32,8 @@ export class BlockProvider implements BlockIterator {
       return null;
     }
 
-    const block = { 
-      rawBlock: this.blocks[this.index], 
+    const block = {
+      rawBlock: this.blocks[this.index],
       block: this.state.getBlockForKey(this.blocks[this.index].key),
     };
     this.index += 1;
@@ -41,13 +41,13 @@ export class BlockProvider implements BlockIterator {
   }
 
   peek() : Block {
-    
+
     if (this.index === this.blocks.length) {
       return null;
     }
-    
-    const block = { 
-      rawBlock: this.blocks[this.index], 
+
+    const block = {
+      rawBlock: this.blocks[this.index],
       block: this.state.getBlockForKey(this.blocks[this.index].key),
     };
     return block;

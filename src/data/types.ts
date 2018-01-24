@@ -15,3 +15,7 @@ export enum LegacyTypes {
   webcontent = 'x-oli-webcontent',
   assessment2_pool = 'x-oli-assessment2-pool',
 }
+
+export interface HasGuid {
+  guid: string;
+}
