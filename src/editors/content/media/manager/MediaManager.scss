@@ -107,7 +107,7 @@
         min-width: 100%;
 
         &.media-grid {
-          li {
+          li.media-item {
             position: relative;
             float: left;
             margin: 5px 5px 55px;
@@ -122,6 +122,13 @@
               top: 5px;
               left: 5px;
               display: none;
+            }
+
+            .media-icon {
+              width: 118px;
+              height: 58px;
+              text-align: center;
+              overflow: hidden;
             }
 
             .name {
@@ -164,7 +171,7 @@
         }
 
         &.media-list {
-          li {
+          li.media-item {
             display: flex;
             flex-direction: row;
             position: relative;
