@@ -4,6 +4,8 @@ import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
 import * as Messages from 'types/messages';
 
+import './Preview.scss';
+
 export interface PreviewProps {
   email: string;
   documentId?: string;
@@ -108,7 +110,7 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
   render() {
 
-    const buildIFrame = url => <iframe height="100%" width="100%" src={url} />;
+    const buildIFrame = url => <iframe className="preview-iframe" src={url} />;
 
 
     const iframeOrWait = this.props.previewUrl.caseOf({
