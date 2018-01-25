@@ -26,6 +26,24 @@
         i {
           margin: 5px;
         }
+
+        button {
+          cursor: pointer;
+        }
+
+        .sort-btn {
+          margin-top: -10px;
+          font-size: initial;
+
+          &.dropdown-toggle {
+            box-shadow: none;
+          }
+
+          &:active {
+            background-color: initial;
+            color: $selection;
+          }
+        }
       }
     }
 
@@ -48,8 +66,7 @@
         }
 
         &:hover {
-          background-color: $gray-light;
-          color: $white;
+          background-color: $gray-lightest;
         }
 
         &:active, &.selected {

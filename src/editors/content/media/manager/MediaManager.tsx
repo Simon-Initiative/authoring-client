@@ -32,6 +32,45 @@ export enum LAYOUTS {
   LIST,
 }
 
+const SORT_MAPPINGS = {
+  Newest: {
+    orderBy: 'dateCreated',
+    order: 'desc',
+    icon: 'fa fa-calendar',
+  },
+  Oldest: {
+    orderBy: 'dateCreated',
+    order: 'asc',
+    icon: 'fa fa-calendar',
+  },
+  'Name A-Z': {
+    orderBy: 'pathTo',
+    order: 'asc',
+    icon: 'fa fa-sort-alpha-asc',
+  },
+  'Name Z-A': {
+    orderBy: 'pathTo',
+    order: 'desc',
+    icon: 'fa fa-sort-alpha-desc',
+  },
+  Type: {
+    orderBy: 'mimeType',
+    order: 'asc',
+    icon: 'fa fa-file-image-o',
+  },
+  Size: {
+    orderBy: 'fileSize',
+    order: 'asc',
+    icon: 'fa fa-sort-numeric-asc',
+  },
+};
+
+const getSortMappingKey = (orderBy: string, order?: string) => {
+  return Object.keys(SORT_MAPPINGS).find(key =>
+    orderBy === SORT_MAPPINGS[key].orderBy
+    && (order === undefined || order === SORT_MAPPINGS[key].order));
+};
+
 export interface MediaManagerProps {
   className?: string;
   model: Media;
@@ -40,14 +79,18 @@ export interface MediaManagerProps {
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
   onEdit: (updated: Media) => void;
-  onLoadCourseMediaNextPage: (mimeFilter: string, pathFilter) => void;
+  onLoadCourseMediaNextPage: (
+    mimeFilter: string, pathFilter: string,
+    orderBy: string, order: string) => void;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
 }
 
 export interface MediaManagerState {
   selection: Immutable.List<string>;
-  searchText: '';
+  searchText: string;
+  orderBy: string;
+  order: string;
   layout: LAYOUTS;
 }
 
@@ -65,6 +108,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     this.state = {
       selection: Immutable.List<string>(),
       searchText: undefined,
+      orderBy: SORT_MAPPINGS.Newest.orderBy,
+      order: SORT_MAPPINGS.Newest.order,
       layout: LAYOUTS.GRID,
     };
 
@@ -77,9 +122,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   componentDidMount() {
     const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
-    onLoadCourseMediaNextPage(mimeFilter, searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
   }
 
   componentWillUnmount() {
@@ -104,7 +149,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   onScroll() {
     const { media, mimeFilter, onLoadCourseMediaNextPage } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -123,7 +168,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
         > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
-      onLoadCourseMediaNextPage(mimeFilter, searchText);
+      onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
     }
   }
 
@@ -142,12 +187,12 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   onFileUpload(file) {
     const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
     persistence.createWebContent(courseId, file)
       .then((result) => {
         onResetMedia();
-        onLoadCourseMediaNextPage(mimeFilter, searchText);
+        onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
       });
   }
 
@@ -196,9 +241,24 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   onSearch(searchText: string) {
     const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { orderBy, order } = this.state;
 
     onResetMedia();
-    onLoadCourseMediaNextPage(mimeFilter, searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
+  }
+
+  onSortChange(sortKey: string) {
+    const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { searchText } = this.state;
+
+    this.setState({
+      orderBy: SORT_MAPPINGS[sortKey].orderBy,
+      order: SORT_MAPPINGS[sortKey].order,
+    });
+
+    onResetMedia();
+    onLoadCourseMediaNextPage(
+      mimeFilter, searchText, SORT_MAPPINGS[sortKey].orderBy, SORT_MAPPINGS[sortKey].order);
   }
 
   renderMediaList() {
@@ -305,7 +365,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
   render() {
     const { className, mimeFilter } = this.props;
-    const { searchText, layout } = this.state;
+    const { searchText, layout, orderBy, order } = this.state;
 
     const id = guid();
 
@@ -337,8 +397,26 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             </button>
           </div>
           <div className="media-toolbar-item flex-spacer"/>
-          <div className="media-toolbar-item sort-control">
-            Sort: Newest <i className="fa fa-angle-down" />
+          <div className="media-toolbar-item sort-control dropdown">
+            Sort By:
+            <button
+                className="btn btn-secondary dropdown-toggle sort-btn"
+                type="button" id="dropdownMenu2"
+                data-toggle="dropdown">
+              <i className={SORT_MAPPINGS[getSortMappingKey(orderBy, order)].icon} />
+              {` ${getSortMappingKey(orderBy, order)}`}
+            </button>
+            <div className="dropdown-menu">
+              {Object.keys(SORT_MAPPINGS).map(sortKey =>
+                <button
+                  type="button"
+                  className="dropdown-item"
+                  onClick={() => this.onSortChange(sortKey)}>
+                  <i className={SORT_MAPPINGS[sortKey].icon} />
+                  {` ${sortKey}`}
+                </button>,
+              )}
+            </div>
           </div>
           <div className="media-toolbar-item search">
             <div className="input-group">
