@@ -56,11 +56,12 @@ export const ReceiveMediaPageAction = (
 
 export const fetchCourseMedia = (
     courseId: string, offset?: number, limit?: number, mimeFilter?: string,
-    pathFilter?: string) => (
+    pathFilter?: string, orderBy?: string, order?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     dispatch(fetchMediaPage(courseId));
 
-    return persistence.fetchWebContent(courseId, offset, limit, mimeFilter, pathFilter)
+    return persistence.fetchWebContent(
+        courseId, offset, limit, mimeFilter, pathFilter, orderBy, order)
       .then((response) => {
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
@@ -91,14 +92,14 @@ export const fetchCourseMedia = (
 );
 
 export const fetchCourseMediaNextPage = (
-    courseId: string, mimeFilter?: string, pathFilter?: string) => (
+    courseId: string, mimeFilter?: string, pathFilter?: string,
+    orderBy?: string, order?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
     const limit = MEDIA_PAGE_SIZE;
     const offset = getState().media.get(courseId)
       ? getState().media.get(courseId).items.size
       : 0;
     return dispatch(fetchCourseMedia(
-      courseId, offset, limit, mimeFilter !== '' ? mimeFilter : undefined,
-      pathFilter !== '' ? pathFilter : undefined));
+      courseId, offset, limit, mimeFilter, pathFilter, orderBy, order));
   }
 );

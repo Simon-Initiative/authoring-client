@@ -1,8 +1,4 @@
-
-
 export const convert = {
-
-
 
   // Converts a zero-based index to an alpha notation.
   //
@@ -39,5 +35,26 @@ export const convert = {
 
     return result;
 
+  },
+};
+
+export const stringFormat = {
+  /**
+   * Returns a truncated version of a string with elipsis
+   * @param text string to truncate
+   * @param maxLength max length of the truncated string
+   * @param postfixLength optional length of the end part of the truncated string to include
+   */
+  ellipsize: (text: string, maxLength: number, postfixLength: number = 0) => {
+    if (maxLength <= postfixLength + 3) {
+      throw Error('maxLength must be greater than postfixLength + 3');
+    }
+    if (text.length > maxLength) {
+      const front = text.substr(0, Math.min(maxLength, text.length) - 3 - postfixLength);
+
+      return `${front}...${text.substr(text.length - postfixLength, text.length)}`;
+    }
+
+    return text;
   },
 };
