@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-import { Image } from './image';
+import { Image } from '../html/image';
 import { Maybe } from 'tsmonad';
 
 export type ActivityParams = {
@@ -26,7 +26,7 @@ export class Activity extends Immutable.Record(defaultContent) {
   purpose: string;
   image: Maybe<Image>;
   guid: string;
-  
+
   constructor(params?: ActivityParams) {
     super(augment(params));
   }
@@ -39,7 +39,7 @@ export class Activity extends Immutable.Record(defaultContent) {
     const t = (root as any).activity;
 
     let model = new Activity({ guid });
-    
+
     if (t['@idref'] !== undefined) {
       model = model.with({ idref: t['@idref'] });
     }
@@ -48,7 +48,7 @@ export class Activity extends Immutable.Record(defaultContent) {
     }
 
     getChildren(t).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -59,7 +59,7 @@ export class Activity extends Immutable.Record(defaultContent) {
         default:
       }
     });
-    
+
     return model;
   }
 

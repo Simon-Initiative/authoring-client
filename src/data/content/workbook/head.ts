@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
-import { Title } from './title';
-import { augment, getChildren } from './common';
-import createGuid from '../../utils/guid';
-import { getKey } from '../common';
+import { Title } from '../html/title';
+import { augment, getChildren } from '../common';
+import createGuid from 'utils/guid';
+import { getKey } from '../../common';
 
 export type HeadParams = {
   title?: Title,
@@ -12,19 +12,19 @@ export type HeadParams = {
 };
 
 const defaultContent = {
-  contentType: 'Head', 
-  guid: '', 
+  contentType: 'Head',
+  guid: '',
   title: new Title(),
   objrefs: Immutable.List<string>(),
 };
 
 export class Head extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Head';
   title: Title;
   guid: string;
   objrefs: Immutable.List<string>;
-  
+
   constructor(params?: HeadParams) {
     super(augment(params));
   }
@@ -39,26 +39,26 @@ export class Head extends Immutable.Record(defaultContent) {
     const head = (root as any).head;
 
     getChildren(head).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case 'objref':
-          objrefs = objrefs.push(((item as any).objref['@idref']));        
-          break;  
+          objrefs = objrefs.push(((item as any).objref['@idref']));
+          break;
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
-          break;            
+          break;
         default:
       }
     });
 
-    model = model.with ({ objrefs });  
-      
+    model = model.with ({ objrefs });
+
     return model;
   }
-  
+
   toPersistence() : Object {
     return {
       head: {

@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-import { Param } from './param';
+import { Param } from '../html/param';
 
 export type WbInlineParams = {
   idRef?: string,
@@ -27,7 +27,7 @@ const defaultContent = {
 };
 
 export class WbInline extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'WbInline';
   idRef: string;
   src: string;
@@ -36,7 +36,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
   purpose: string;
   params: Immutable.OrderedMap<string, Param>;
   guid: string;
-  
+
   constructor(params?: WbInlineParams) {
     super(augment(params));
   }
@@ -50,7 +50,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
     const wb = (root as any)['wb:inline'];
 
     let model = new WbInline({ guid });
-    
+
     if (wb['@idref'] !== undefined) {
       model = model.with({ idRef: wb['@idref'] });
     }
@@ -68,7 +68,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
     }
 
     getChildren(wb).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -77,11 +77,11 @@ export class WbInline extends Immutable.Record(defaultContent) {
           model = model.with({ params: model.params.set(id, Param.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
-    
+
+
     return model;
   }
 
