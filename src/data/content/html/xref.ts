@@ -1,9 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-
-import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
+import { LinkContent } from '../types/link';
 
 
 export type XrefParams = {
@@ -11,7 +8,7 @@ export type XrefParams = {
   idref?: string,
   page?: string,
   title?: string,
-  content?: ContentState,
+  content?: LinkContent,
   guid?: string,
 };
 
@@ -21,20 +18,20 @@ const defaultContent = {
   idref: '',
   page: '',
   title: '',
-  content: emptyContent,
+  content: LinkContent,
   guid: '',
 };
 
 export class Xref extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Xref';
-  content: ContentState;
+  content: LinkContent;
   target: string;
   idref: string;
   page: string;
   title: string;
   guid: string;
-  
+
   constructor(params?: XrefParams) {
     super(augment(params));
   }
@@ -48,7 +45,7 @@ export class Xref extends Immutable.Record(defaultContent) {
     const t = (root as any).xref;
 
     let model = new Xref({ guid });
-    
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -61,9 +58,9 @@ export class Xref extends Immutable.Record(defaultContent) {
     if (t['@page'] !== undefined) {
       model = model.with({ page: t['@page'] });
     }
-    
-    model = model.with({ content: toDraft(getChildren(t)) });
-    
+
+    model = model.with({ content: LinkContent.fromPersistence(getChildren(t), '') });
+
     return model;
   }
 

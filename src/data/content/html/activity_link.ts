@@ -1,16 +1,13 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-
-import { ContentState } from 'draft-js';
-
-const emptyContent = ContentState.createFromText('');
+import { LinkContent } from '../types/link';
 
 export type ActivityLinkParams = {
   target?: string,
   idref?: string,
   purpose?: string,
   title?: string,
-  content?: ContentState,
+  content?: LinkContent,
   guid?: string,
 };
 
@@ -20,20 +17,20 @@ const defaultContent = {
   idref: '',
   purpose: 'checkpoint',
   title: '',
-  content: emptyContent,
+  content: new LinkContent(),
   guid: '',
 };
 
 export class ActivityLink extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'ActivityLink';
-  content: ContentState;
+  content: LinkContent;
   target: string;
   idref: string;
   purpose: string;
   title: string;
   guid: string;
-  
+
   constructor(params?: ActivityLinkParams) {
     super(augment(params));
   }
@@ -47,7 +44,7 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
     const t = (root as any).activity_link;
 
     let model = new ActivityLink({ guid });
-    
+
     if (t['@title'] !== undefined) {
       model = model.with({ title: t['@title'] });
     }
@@ -60,9 +57,9 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
     if (t['@purpose'] !== undefined) {
       model = model.with({ purpose: t['@purpose'] });
     }
-    
-    model = model.with({ content: toDraft(getChildren(t)) });
-    
+
+    model = model.with({ content: LinkContent.fromPersistence(t, '') });
+
     return model;
   }
 

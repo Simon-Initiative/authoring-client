@@ -1,22 +1,22 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { Text } from './text';
+import { TextContent } from '../types/text';
 
 export type TitleParams = {
-  text?: Text
+  text?: TextContent
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Title',
-  text: new Text(),
+  text: new TextContent(),
   guid: '',
 };
 
 export class Title extends Immutable.Record(defaultContent) {
 
   contentType: 'Title';
-  text: Text;
+  text: TextContent;
   guid: string;
 
   constructor(params?: TitleParams) {
@@ -38,7 +38,7 @@ export class Title extends Immutable.Record(defaultContent) {
 
     const t = (root as any).title;
 
-    const text = new Text().with({ content: getChildren(t) });
+    const text = TextContent.fromPersistence(getChildren(t), '');
     return new Title({ guid, text });
 
   }

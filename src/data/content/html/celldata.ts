@@ -1,18 +1,13 @@
 import * as Immutable from 'immutable';
+import { InlineContent } from '../types/inline';
 import { augment, getChildren } from '../common';
-
-import { ContentState } from 'draft-js';
-import { toPersistence } from './topersistence';
-import { cloneContent } from '../common/clone';
-import { toDraft } from './todraft';
-
-const emptyContent = ContentState.createFromText('');
+import createGuid from 'utils/guid';
 
 export type CellDataParams = {
   align?: string,
   colspan?: string,
   rowspan?: string,
-  content?: ContentState,
+  content?: InlineContent,
   guid?: string,
 };
 
@@ -21,7 +16,7 @@ const defaultContent = {
   align: 'left',
   colspan: '1',
   rowspan: '1',
-  content: emptyContent,
+  content: new InlineContent(),
   guid: '',
 };
 
@@ -31,7 +26,7 @@ export class CellData extends Immutable.Record(defaultContent) {
   align: string;
   colspan: string;
   rowspan: string;
-  content: ContentState;
+  content: InlineContent;
   guid: string;
 
   constructor(params?: CellDataParams) {
@@ -44,7 +39,7 @@ export class CellData extends Immutable.Record(defaultContent) {
 
   clone() : CellData {
     return this.with({
-      content: cloneContent(this.content),
+      content: this.content.clone(),
     });
   }
 
@@ -64,11 +59,7 @@ export class CellData extends Immutable.Record(defaultContent) {
       model = model.with({ align: t['@align'] });
     }
 
-    if (t['#text'] !== undefined) {
-      model = model.with({ content: toDraft(t) });
-    } else {
-      model = model.with({ content: toDraft(getChildren(t)) });
-    }
+    model = model.with({ content: InlineContent.fromPersistence(t, createGuid()) });
 
     return model;
   }
@@ -79,7 +70,7 @@ export class CellData extends Immutable.Record(defaultContent) {
         '@colspan': this.colspan,
         '@rowspan': this.rowspan,
         '@align': this.align,
-        '#array': toPersistence(this.content)['#array'],
+        '#array': this.content.toPersistence(),
       },
     };
   }

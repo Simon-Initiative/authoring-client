@@ -1,65 +1,65 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { FlowContent } from '../types/flow';
+import { InlineContent } from '../types/inline';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 
-export type LiParams = {
+export type DtParams = {
   title?: Maybe<string>,
-  content?: FlowContent,
+  content?: InlineContent,
   guid?: string,
 };
 
 const defaultContent = {
-  contentType: 'Li',
+  contentType: 'Dt',
   title: Maybe.nothing(),
-  content: new FlowContent(),
+  content: new InlineContent(),
   guid: '',
 };
 
-export class Li extends Immutable.Record(defaultContent) {
+export class Dt extends Immutable.Record(defaultContent) {
 
-  contentType: 'Li';
+  contentType: 'Dt';
   title: Maybe<string>;
-  content: FlowContent;
+  content: InlineContent;
   guid: string;
 
-  constructor(params?: LiParams) {
+  constructor(params?: DtParams) {
     super(augment(params));
   }
 
-  with(values: LiParams) {
+  with(values: DtParams) {
     return this.merge(values) as this;
   }
 
-  clone() : Li {
+  clone() : Dt {
     return this.with({
       content: this.content.clone(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Li {
+  static fromPersistence(root: Object, guid: string) : Dt {
 
-    const t = (root as any).li;
+    const t = (root as any).dt;
 
-    let model = new Li().with({ guid });
+    let model = new Dt().with({ guid });
 
     if (t['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: FlowContent.fromPersistence(t, createGuid()) });
+    model = model.with({ content: InlineContent.fromPersistence(t, createGuid()) });
 
     return model;
   }
 
   toPersistence() : Object {
-    const li = {
-      li: {
+    const dt = {
+      dt: {
         '#array': this.content.toPersistence(),
       },
     };
-    this.title.lift(t => li.li['@title'] = t);
-    return li;
+    this.title.lift(t => dt.dt['@title'] = t);
+    return dt;
   }
 }

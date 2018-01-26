@@ -1,53 +1,48 @@
 import * as Immutable from 'immutable';
 import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from './common';
-import { Image } from './image';
-import { Link as HyperLink } from './link';
-import { Xref } from './xref';
-import { ActivityLink } from './activity_link';
-import { Cite } from './cite';
 import guid from '../../../utils/guid';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
-import { toDraft } from './todraft';
-import { fromDraft } from './topersistence';
+import { toDraft } from './draft/todraft';
+import { fromDraft } from './draft/topersistence';
 
 const emptyContent = ContentState.createFromText(' ');
 
-export type TextParams = {
+export type ContiguousTextParams = {
   content?: ContentState,
   guid?: string,
 };
 
 const defaultContent = {
-  contentType: 'Text',
+  contentType: 'ContiguousText',
   content: emptyContent,
   guid: '',
 };
 
-export class Text extends Immutable.Record(defaultContent) {
+export class ContiguousText extends Immutable.Record(defaultContent) {
 
-  contentType: 'Text';
+  contentType: 'ContiguousText';
   content: ContentState;
   guid: string;
 
-  constructor(params?: TextParams) {
+  constructor(params?: ContiguousTextParams) {
     super(augment(params));
   }
 
-  with(values: TextParams) {
+  with(values: ContiguousTextParams) {
     return this.merge(values) as this;
   }
 
 
-  clone() : Text {
+  clone() : ContiguousText {
     return this.with({
       content: cloneContent(this.content),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Text {
-    return new Text({ guid, content: toDraft(root) });
+  static fromPersistence(root: Object[], guid: string) : ContiguousText {
+    return new ContiguousText({ guid, content: toDraft(root) });
   }
 
   toPersistence() : Object {

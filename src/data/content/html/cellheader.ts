@@ -1,18 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-
-import { ContentState } from 'draft-js';
-import { cloneContent } from '../common/clone';
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
-
-const emptyContent = ContentState.createFromText('');
+import { InlineContent } from '../types/inline';
 
 export type CellHeaderParams = {
   align?: string,
   colspan?: string,
   rowspan?: string,
-  content?: ContentState,
+  content?: InlineContent,
   guid?: string,
 };
 
@@ -21,7 +15,7 @@ const defaultContent = {
   align: 'left',
   colspan: '1',
   rowspan: '1',
-  content: emptyContent,
+  content: new InlineContent(),
   guid: '',
 };
 
@@ -31,7 +25,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
   align: string;
   colspan: string;
   rowspan: string;
-  content: ContentState;
+  content: InlineContent;
   guid: string;
 
   constructor(params?: CellHeaderParams) {
@@ -45,7 +39,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
 
   clone() : CellHeader {
     return this.with({
-      content: cloneContent(this.content),
+      content: this.content.clone(),
     });
   }
 
@@ -66,9 +60,9 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     }
 
     if (t['#text'] !== undefined) {
-      model = model.with({ content: toDraft(t) });
+      model = model.with({ content: InlineContent.fromPersistence(t, '') });
     } else {
-      model = model.with({ content: toDraft(getChildren(t)) });
+      model = model.with({ content: InlineContent.fromPersistence(getChildren(t), '') });
     }
 
     return model;
@@ -80,7 +74,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
         '@colspan': this.colspan,
         '@rowspan': this.rowspan,
         '@align': this.align,
-        '#array': toPersistence(this.content, true),
+        '#array': this.content.toPersistence(),
       },
     };
   }

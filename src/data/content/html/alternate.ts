@@ -1,17 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
+import { TextContent } from '../types/text';
 
-import { ContentState } from 'draft-js';
-import { cloneContent } from '../common/clone';
-import { toPersistence } from './topersistence';
-import { toDraft } from './todraft';
-
-const emptyContent = ContentState.createFromText('');
 
 export type AlternateParams = {
   title?: string,
   idref?: string,
-  content?: ContentState,
+  content?: TextContent,
   guid?: string,
 };
 
@@ -19,7 +14,7 @@ const defaultContent = {
   contentType: 'Alternate',
   title: '',
   idref: '',
-  content: emptyContent,
+  content: new TextContent(),
   guid: '',
 };
 
@@ -28,7 +23,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
   contentType: 'Alternate';
   title: string;
   idref: string;
-  content: ContentState;
+  content: TextContent;
   guid: string;
 
   constructor(params?: AlternateParams) {
@@ -42,7 +37,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
 
   clone() : Alternate {
     return this.with({
-      content: cloneContent(this.content),
+      content: this.content.clone(),
     });
   }
 
@@ -59,7 +54,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
       model = model.with({ idref: t['@idref'] });
     }
 
-    model = model.with({ content: toDraft(getChildren(t)) });
+    model = model.with({ content: TextContent.fromPersistence(getChildren(t), '') });
 
     return model;
   }
@@ -69,7 +64,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
       alternate: {
         '@title': this.title,
         '@idref': this.idref,
-        '#array': toPersistence(this.content, true),
+        '#array': this.content.toPersistence(),
       },
     };
   }

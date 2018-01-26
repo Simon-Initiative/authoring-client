@@ -1,55 +1,29 @@
 import { ContentState, convertFromRaw } from 'draft-js';
-import * as common from './common';
-import { CodeBlock } from './codeblock';
-import { WbInline } from './wbinline';
-import { Table } from './table';
-import { Audio } from './audio';
-import { Image } from './image';
-import { IFrame } from './iframe';
-import { Video } from './video';
-import { YouTube } from './youtube';
-import { Link as HyperLink } from './link';
-import { Xref } from './xref';
-import { ActivityLink } from './activity_link';
-import { Activity } from './activity';
-import { Cite } from './cite';
-import guid from '../../../utils/guid';
+import * as common from '../common';
+import { CodeBlock } from '../codeblock';
+import { WbInline } from '../wbinline';
+import { Table } from '../table';
+import { Audio } from '../audio';
+import { Image } from '../image';
+import { IFrame } from '../iframe';
+import { Video } from '../video';
+import { YouTube } from '../youtube';
+import { Link as HyperLink } from '../link';
+import { Xref } from '../xref';
+import { ActivityLink } from '../activity_link';
+import { Activity } from '../activity';
+import { Cite } from '../cite';
+import guid from 'utils/guid';
 
 
-export function toDraft(persistenceFormat: Object) : ContentState {
+export function toDraft(toParse: Object[]) : ContentState {
 
   const draft : common.RawDraft = {
     entityMap : {},
     blocks : [],
   };
 
-  // Sometimes serialization results in a top-level object
-  // that has just #text or just an array of inline styles. We
-  // handle this simply by treating it as a paragraph.
-
-  if (isEmptyContent(persistenceFormat)) {
-    addNewBlock(draft, {});
-    return convertFromRaw(draft);
-  }
-  if (isVirtualParagraph(persistenceFormat)) {
-
-    if (persistenceFormat['#array'] !== undefined) {
-      paragraph(
-        { p: persistenceFormat },
-        { draft, depth: 0 });
-    } else {
-      paragraph(persistenceFormat, { draft, depth: 0 });
-    }
-
-  } else {
-    if (persistenceFormat instanceof Array && persistenceFormat.length > 0) {
-      persistenceFormat.forEach(entry => parse(entry, { draft, depth: 0 }));
-
-    } else {
-      parse(persistenceFormat, { draft, depth: 0 });
-    }
-
-  }
+  toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
 
   return convertFromRaw(draft);
 }
@@ -288,33 +262,6 @@ function getInlineHandler(key: string) : InlineHandler {
   return applyStyle.bind(undefined, 'UNSUPPORTED');
 }
 
-function isVirtualParagraph(persistenceFormat: Object) {
-
-  let children = null;
-  if (persistenceFormat['#array'] !== undefined) {
-    children = persistenceFormat['#array'];
-  } else {
-    children = getChildren(persistenceFormat);
-  }
-
-  if (children !== null && children.length > 0) {
-    const firstKey = common.getKey(children[0]);
-    return firstKey === '#cdata'
-      || firstKey === '#text'
-      || (inlineHandlers[firstKey] !== undefined && blockHandlers[firstKey] === undefined);
-  }
-
-  return false;
-}
-
-function isEmptyContent(obj) {
-  if (obj instanceof Array) {
-    return obj.length === 0 || (obj.length === 1 && Object.keys(obj[0]).length === 0);
-  }
-
-  return Object.keys(obj).length === 0;
-}
-
 
 // This is the same code that Draft.js uses to determine
 // random block keys:
@@ -465,24 +412,6 @@ function pureTextBlockHandler(key: string, item: Object, context: ParsingContext
 
 function arrayHandler(item: Object, context: ParsingContext) {
   item['#array'].forEach(item => parse(item, context));
-}
-
-function addAtomicBlock(
-  type: string, item: Object, context: ParsingContext) : common.RawContentBlock {
-  const entityKey = common.generateRandomKey();
-  const values = {
-    type: 'atomic',
-    text: ' ',
-    entityRanges: [{ offset: 0, length: 1, key: entityKey }],
-  };
-  const block = addNewBlock(context.draft, values);
-  context.draft.entityMap[entityKey] = {
-    type,
-    mutability: 'IMMUTABLE',
-    data: item,
-  };
-
-  return block;
 }
 
 function parse(item: Object, context: ParsingContext) {

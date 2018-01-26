@@ -1,24 +1,22 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
+import { MaterialContent } from '../types/material';
 
 export type MaterialParams = {
-  enable?: boolean,
-  content?: string,
+  content?: MaterialContent,
   guid?: string,
 };
 
 const defaultContent = {
-  contentType: 'material',
-  enable: true,
-  content: '',
+  contentType: 'Material',
+  content: new MaterialContent(),
   guid: '',
 };
 
 export class Material extends Immutable.Record(defaultContent) {
 
-  contentType: 'material';
-  enable: boolean;
-  content: string;
+  contentType: 'Material';
+  content: MaterialContent;
   guid: string;
 
   constructor(params?: MaterialParams) {
@@ -29,19 +27,23 @@ export class Material extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() {
+    return this.with({
+      content: this.content.clone(),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Material {
 
     const cb = (root as any).material;
 
-    let model = new Material({ guid });
-
-    return model;
+    return new Material({ guid, content: MaterialContent.fromPersistence(cb, '') });
   }
 
   toPersistence() : Object {
     return {
       material: {
-
+        '#array': this.content.toPersistence(),
       },
     };
   }

@@ -4,8 +4,8 @@ import {
   CharacterMetadata, ContentBlock, ContentState, convertToRaw,
 } from 'draft-js';
 
-import guid from '../../../utils/guid';
-import * as common from './common';
+import guid from 'utils/guid';
+import * as common from '../common';
 import { BlockIterator, BlockProvider } from './provider';
 
 // Translation routine from draft model to persistence model
