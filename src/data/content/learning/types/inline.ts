@@ -64,7 +64,7 @@ export class InlineContent extends Immutable.Record(defaultContent)
     return SUPPORTED_ELEMENTS;
   }
 
-  static fromPersistence(root: Object, guid: string) : InlineContent {
+  fromPersistence(root: Object, guid: string) : InlineContent {
 
     const content = parseInlineContent(root);
     return new InlineContent({ guid, content });
