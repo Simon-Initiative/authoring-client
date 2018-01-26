@@ -4,18 +4,20 @@ export type FileNodeParams = {
   rev?: number,
   guid?: string,
   pathTo?: string,
+  fileName?: string;
   mimeType?: string,
   fileSize?: number,
 };
 
 export class FileNode extends Immutable.Record({
-  contentType: 'FileNode',rev:0, guid: '', pathTo: '', mimeType: '', fileSize: 0,
+  contentType: 'FileNode',rev:0, guid: '', pathTo: '', fileName: '', mimeType: '', fileSize: 0,
 }) {
 
   contentType: 'FileNode';
   rev: number;
   guid: string;
   pathTo: string;
+  fileName: string;
   mimeType: string;
   fileSize: number;
 
@@ -30,7 +32,8 @@ export class FileNode extends Immutable.Record({
   static fromPersistence(root: Object) : FileNode {
     const a = (root as any);
     return new FileNode({
-      rev: a.rev, guid: a.guid, pathTo: a.pathTo, mimeType: a.mimeType, fileSize: a.fileSize,
+      rev: a.rev, guid: a.guid, pathTo: a.pathTo, fileName: a.fileName,
+      mimeType: a.mimeType, fileSize: a.fileSize,
     });
   }
 
@@ -39,6 +42,7 @@ export class FileNode extends Immutable.Record({
       rev: this.rev,
       guid: this.guid,
       pathTo: this.pathTo,
+      fileName: this.fileName,
       mimeType: this.mimeType,
       fileSize: this.fileSize,
     };

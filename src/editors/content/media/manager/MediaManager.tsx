@@ -5,7 +5,6 @@ import { Button } from 'editors/content/common/Button';
 import { MediaIcon } from './MediaIcon';
 import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
-import { extractFileName } from '../utils';
 import { stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
@@ -341,11 +340,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   checked={this.isSelected(item.guid)}
                   onClick={() => this.onSelect(item.guid)} />
               <MediaIcon
-                  filename={extractFileName(item.pathTo)}
+                  filename={item.fileName}
                   mimeType={item.mimeType}
                   url={this.adjust(item.pathTo)} />
               <div className="name">
-                {stringFormat.ellipsize(extractFileName(item.pathTo), MAX_NAME_LENGTH, 5)}
+                {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
             </li>
           ))}
