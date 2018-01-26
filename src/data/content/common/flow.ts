@@ -1,8 +1,11 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 import { InlineElementType, SUPPORTED_ELEMENTS as INLINE_ELEMENTS } from './inline';
 import { parseContent } from './parse';
 import { augment, getChildren } from '../common';
 import { ContentType, ContentElement } from './interfaces';
+import { ContiguousText } from 'data/content/learning/contiguous';
+import createGuid from 'utils/guid';
 
 export type FlowElementType = InlineElementType;
 
@@ -57,11 +60,37 @@ export class FlowContent extends Immutable.Record(defaultContent)
     return SUPPORTED_ELEMENTS;
   }
 
+  tagInputRefsWithType(byId: Object) {
+    return this.with({
+      content: this.content.map((c) => {
+        if (c.contentType === 'ContiguousText') {
+          return (c as ContiguousText).tagInputRefsWithType(byId);
+        }
+        return c;
+      }).toOrderedMap(),
+    });
+  }
+
+  extractPlainText() : Maybe<string> {
+    const t = this.content.toArray().filter(c => c.contentType === 'ContiguousText');
+    if (t.length > 0) {
+      return (t[0] as ContiguousText).extractPlainText();
+    }
+    return Maybe.nothing();
+  }
+
   static fromPersistence(root: Object, guid: string) : FlowContent {
 
     const content = parseFlowContent(root);
     return new FlowContent({ guid, content });
   }
+
+  static fromText(text: string, guid: string) : FlowContent {
+    const t = ContiguousText.fromText(text, createGuid());
+    return new FlowContent({ guid,
+      content: Immutable.OrderedMap<string, FlowElement>().set(t.guid, t) });
+  }
+
 
   toPersistence() : Object {
     return this.content.toArray().map(e => e.toPersistence());

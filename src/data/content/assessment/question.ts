@@ -1,8 +1,7 @@
 import * as Immutable from 'immutable';
 
-import { ContentState } from 'draft-js';
 
-import { Html } from '../html';
+import { FlowContent } from '../common/flow';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
@@ -17,32 +16,30 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
-import { getEntities } from '../html/changes';
-import { EntityTypes } from '../html/common';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
-  body?: Html;
+  body?: FlowContent;
   concepts?: Immutable.List<string>;
   grading?: string;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
-  explanation?: Html;
+  explanation?: FlowContent;
   guid?: string;
 };
 
 const defaultQuestionParams = {
   contentType: 'Question',
   id: '',
-  body: new Html(),
+  body: new FlowContent(),
   concepts: Immutable.List<string>(),
   grading: 'automatic',
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
-  explanation: new Html(),
+  explanation: new FlowContent(),
   guid: '',
 };
 
@@ -64,20 +61,7 @@ function tagInputRefsWithType(model: Question) {
     },
     {});
 
-  const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
-    .reduce(
-      (contentState, info) => {
-        if (byId[info.entity.data['@input']] !== undefined) {
-          const type = byId[info.entity.data['@input']].contentType;
-          return contentState.mergeEntityData(info.entityKey, { $type: type });
-        }
-
-        return contentState;
-      },
-      model.body.contentState);
-
-  const body = model.body.with({ contentState });
-  return model.with({ body });
+  return model.with({ body: model.body.tagInputRefsWithType(byId) });
 }
 
 function ensureResponsesExist(model: Question) {
@@ -156,12 +140,14 @@ function migrateExplanationToFeedback(model: Question) : Question {
     const originalExplanation = partsArray[0].explanation;
     const originalReponses = partsArray[0].responses;
 
-    const migratedAlready = originalExplanation.contentState.getBlocksAsArray().length === 1
-      && originalExplanation.contentState.getBlocksAsArray()[0].text === 'migrated';
+    const migratedAlready = originalExplanation.extractPlainText().caseOf({
+      just: text => text === 'migrated',
+      nothing: () => false,
+    });
 
     if (!migratedAlready) {
       const explanation
-        = new Html().with({ contentState: ContentState.createFromText('migrated') });
+        = FlowContent.fromText('migrated', '');
 
       const f = new Feedback().with({ body: originalExplanation });
       const feedback = Immutable.OrderedMap<string, Feedback>()
@@ -187,12 +173,12 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
   id: string;
-  body: Html;
+  body: FlowContent;
   concepts: Immutable.List<string>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
-  explanation: Html;
+  explanation: FlowContent;
   guid: string;
 
   constructor(params?: QuestionParams) {
@@ -240,7 +226,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
 
         case 'body':
-          model = model.with({ body: Html.fromPersistence(item, id) });
+          model = model.with({ body: FlowContent.fromPersistence(item, id) });
           break;
         case 'part':
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
@@ -274,7 +260,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
           break;
         case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
+          model = model.with({ explanation:
+            FlowContent.fromPersistence((item as any).explanation, id) });
           break;
         default:
 

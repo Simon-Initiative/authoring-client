@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 
-import { Html } from '../html';
+import { FlowContent } from '../common/flow';
 import { augment } from '../common';
 
 export type ChoiceParams = {
   value?: string,
   color?: string,
-  body?: Html,
+  body?: FlowContent,
   guid?: string,
 };
 
@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Choice',
   value: '',
   color: '',
-  body: new Html(),
+  body: new FlowContent(),
   guid: '',
 };
 
@@ -44,7 +44,7 @@ export class Choice extends Immutable.Record(defaultContent) {
   contentType: 'Choice';
   value: string;
   color: string;
-  body: Html;
+  body: FlowContent;
   guid: string;
 
   constructor(params?: ChoiceParams) {
@@ -64,7 +64,7 @@ export class Choice extends Immutable.Record(defaultContent) {
       choice['#text'] = choice['@value'];
     }
 
-    const body = Html.fromPersistence(choice, '');
+    const body = FlowContent.fromPersistence(choice, '');
     model = model.with({ body });
 
     if (choice['@value'] !== undefined) {

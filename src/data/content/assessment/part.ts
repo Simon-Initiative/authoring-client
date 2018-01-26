@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { Html } from '../html';
+import { FlowContent } from '../common/flow';
 import { Title } from '../title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
@@ -21,7 +21,7 @@ export type PartParams = {
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
-  explanation?: Html;
+  explanation?: FlowContent;
   guid?: string;
 };
 
@@ -37,7 +37,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
-  explanation: new Html(),
+  explanation: new FlowContent(),
   guid: '',
 };
 
@@ -54,9 +54,9 @@ export class Part extends Immutable.Record(defaultPartParams) {
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
-  explanation: Html;
+  explanation: FlowContent;
   guid: string;
-  
+
   constructor(params?: PartParams) {
     super(defaultIdGuid(params));
   }
@@ -85,7 +85,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
     }
 
     getChildren(part).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -94,7 +94,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
-        
+
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
@@ -114,10 +114,11 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
           break;
         case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
+          model = model.with({ explanation:
+            FlowContent.fromPersistence((item as any).explanation, id) });
           break;
         default:
-          
+
       }
     });
 
@@ -129,7 +130,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
     const explanation = this.explanation.toPersistence();
 
     const children = [
-      
+
       this.title.toPersistence(),
 
       ...this.concepts

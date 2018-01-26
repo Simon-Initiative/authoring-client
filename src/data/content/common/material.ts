@@ -4,14 +4,14 @@ import { parseContent } from './parse';
 import { augment, getChildren } from '../common';
 import { ContentType, ContentElement } from './interfaces';
 
-export type MaterialElementType = InlineElementType;
+export type MaterialElementType = InlineElementType | 'WbInline';
 
 
 export interface MaterialElement extends ContentElement<MaterialElement> {
   contentType: MaterialElementType;
 }
 
-export const SUPPORTED_ELEMENTS = [...INLINE_ELEMENTS];
+export const SUPPORTED_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
 
 export function parseMaterialContent(obj: Object)
   : Immutable.OrderedMap<string, MaterialElement> {

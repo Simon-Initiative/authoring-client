@@ -10,7 +10,7 @@ import { Title } from '../title';
 import { Question } from './question';
 import { Selection } from './selection';
 import { Content } from './content';
-import { Html } from '../html';
+import { BodyContent } from '../common/body';
 import { Node } from './node';
 
 export type PageParams = {
@@ -87,7 +87,7 @@ export class Page extends Immutable.Record(defaultPageParams) {
     // If no nodes exist, serialize with an empty content
     // just so as to satisfy DTD constraints
     const nodes = this.nodes.size === 0
-      ? [new Content().with({ body: Html.fromText('Placeholder') }).toPersistence()]
+      ? [new Content().with({ body: new BodyContent() }).toPersistence()]
       : this.nodes
         .toArray()
         .map(item => item.toPersistence());

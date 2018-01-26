@@ -1,28 +1,28 @@
 import * as Immutable from 'immutable';
 
-import { Html } from '../html';
+import { FlowContent } from '../common/flow';
 import { augment } from '../common';
 
 export type FeedbackParams = {
   targets?: string,
-  body?: Html
+  body?: FlowContent
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Feedback',
   targets: '',
-  body: new Html(),
+  body: new FlowContent(),
   guid: '',
 };
 
 export class Feedback extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Feedback';
   targets: string;
-  body: Html;
+  body: FlowContent;
   guid: string;
-  
+
   constructor(params?: FeedbackParams) {
     super(augment(params));
   }
@@ -36,12 +36,12 @@ export class Feedback extends Immutable.Record(defaultContent) {
     const feedback = (root as any).feedback;
 
     let model = new Feedback({ guid });
-    model = model.with({ body: Html.fromPersistence(feedback, '') });
-    
+    model = model.with({ body: FlowContent.fromPersistence(feedback, '') });
+
     if (feedback['@targets'] !== undefined) {
       model = model.with({ targets: feedback['@targets'] });
     }
-    
+
     return model;
   }
 

@@ -1,16 +1,18 @@
 import * as Immutable from 'immutable';
-import { InlineElementType, SUPPORTED_ELEMENTS as INLINE_ELEMENTS } from './inline';
+import { MaterialElementType, SUPPORTED_ELEMENTS as MATERIAL_ELEMENTS } from './material';
 import { parseContent } from './parse';
 import { augment, getChildren } from '../common';
 import { ContentType, ContentElement } from './interfaces';
 
-export type BodyElementType = InlineElementType |
-  'Definition' | 'Example' | 'Pullout';
+export type BodyElementType = MaterialElementType |
+  'Definition' | 'Example' | 'Pullout' |
+  'Activity';
 
 
 const SEMANTIC_ELEMENTS = ['popout', 'example', 'definition'];
+const WB_EXTENSIONS = ['activity'];
 
-export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...INLINE_ELEMENTS];
+export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...WB_EXTENSIONS, ...MATERIAL_ELEMENTS];
 
 function parseBodyContent(obj: Object)
   : Immutable.OrderedMap<string, BodyElement> {

@@ -1,28 +1,28 @@
 import * as Immutable from 'immutable';
 
-import { Html } from '../html';
+import { BodyContent } from '../common/body';
 import { augment } from '../common';
 
 export type ContentParams = {
   availability?: string,
-  body?: Html,
+  body?: BodyContent,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Content',
   availability: 'always',
-  body: new Html(),
+  body: new BodyContent(),
   guid: '',
 };
 
 export class Content extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Content';
   availability: string;
-  body: Html;
+  body: BodyContent;
   guid: string;
-  
+
   constructor(params?: ContentParams) {
     super(augment(params));
   }
@@ -36,12 +36,12 @@ export class Content extends Immutable.Record(defaultContent) {
     const content = (root as any).content;
 
     let model = new Content({ guid });
-    model = model.with({ body: Html.fromPersistence(content, '') });
-    
+    model = model.with({ body: BodyContent.fromPersistence(content, '') });
+
     if (content['@availability'] !== undefined) {
       model = model.with({ availability: content['@availability'] });
     }
-    
+
     return model;
   }
 

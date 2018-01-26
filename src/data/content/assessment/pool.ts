@@ -5,7 +5,7 @@ import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
 
-import { ObjRef } from '../objref';
+import { ObjRef } from '../learning/objref';
 import { Title } from '../title';
 import { Content } from './content';
 import { Question } from './question';
@@ -41,7 +41,7 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
   sections: Immutable.OrderedMap<string, Unsupported>;
   questions: Immutable.OrderedMap<string, Question>;
   guid: string;
-  
+
   constructor(params?: PoolParams) {
     super(augment(params));
   }
@@ -59,9 +59,9 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
     if (s['@id'] !== undefined) {
       model = model.with({ id: s['@id'] });
     }
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -76,17 +76,17 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
           model = model.with({ content: Content.fromPersistence(item, id) });
           break;
         case 'question':
-          model = model.with({ 
-            questions: model.questions.set(id, Question.fromPersistence(item, id)), 
+          model = model.with({
+            questions: model.questions.set(id, Question.fromPersistence(item, id)),
           });
           break;
         case 'section':
-          model = model.with({ 
+          model = model.with({
             sections: model.sections.set(id, Unsupported.fromPersistence(item, id)),
           });
           break;
         default:
-          
+
       }
     });
 
