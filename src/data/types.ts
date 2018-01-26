@@ -19,3 +19,11 @@ export enum LegacyTypes {
 export interface HasGuid {
   guid: string;
 }
+
+export interface Cloneable<T> {
+  clone(): T;
+}
+
+export interface Persistable {
+  toPersistence(): Object;
+}

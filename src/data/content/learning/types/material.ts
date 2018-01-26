@@ -1,6 +1,25 @@
 import * as Immutable from 'immutable';
-import { MaterialElement, parseMaterialContent } from './parser';
-import { augment, getChildren } from '../common';
+import { InlineElementType, SUPPORTED_ELEMENTS as INLINE_ELEMENTS } from './inline';
+import { parseContent } from '../../common/parse';
+import { augment, getChildren } from '../../common';
+import { ContentType, ContentElement } from '../../common/interfaces';
+
+export type MaterialElementType = InlineElementType;
+
+
+export interface MaterialElement extends ContentElement<MaterialElement> {
+  contentType: MaterialElementType;
+}
+
+export const SUPPORTED_ELEMENTS = [...INLINE_ELEMENTS];
+
+export function parseMaterialContent(obj: Object)
+  : Immutable.OrderedMap<string, MaterialElement> {
+
+  return parseContent(
+    obj,
+    SUPPORTED_ELEMENTS) as Immutable.OrderedMap<string, MaterialElement>;
+}
 
 export type MaterialContentParams = {
   content?: Immutable.OrderedMap<string, MaterialElement>,
@@ -13,7 +32,8 @@ const defaultContent = {
   guid: '',
 };
 
-export class MaterialContent extends Immutable.Record(defaultContent) {
+export class MaterialContent extends Immutable.Record(defaultContent)
+  implements ContentType<MaterialContent> {
 
   contentType: 'MaterialContent';
   content: Immutable.OrderedMap<string, MaterialElement>;
@@ -31,6 +51,10 @@ export class MaterialContent extends Immutable.Record(defaultContent) {
     return this.with({
       content: this.content.map(e => e.clone()).toOrderedMap(),
     });
+  }
+
+  supportedElements() {
+    return SUPPORTED_ELEMENTS;
   }
 
   static fromPersistence(root: Object, guid: string) : MaterialContent {

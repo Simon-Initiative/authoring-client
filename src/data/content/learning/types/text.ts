@@ -1,10 +1,24 @@
 import * as Immutable from 'immutable';
 
-import * as common from '../html/common';
+import * as common from '../common';
 import guid from 'utils/guid';
-import { augment } from '../common';
-import { ContiguousText } from '../html/contiguous';
-import { parseTextContent } from './parser';
+import { augment } from '../../common';
+import { ContiguousText } from '../contiguous';
+import { parseContent } from '../../common/parse';
+import { ContentType } from '../../common/interfaces';
+
+export const SUPPORTED_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
+  'cite', 'term', 'var', 'link'];
+
+export function parseTextContent(obj: Object)
+  : ContiguousText {
+
+  const result = parseContent(
+    obj,
+    SUPPORTED_ELEMENTS) as Immutable.OrderedMap<string, ContiguousText>;
+
+  return result.first();
+}
 
 export type TextContentParams = {
   content?: ContiguousText,
@@ -17,7 +31,8 @@ const defaultContent = {
   guid: '',
 };
 
-export class TextContent extends Immutable.Record(defaultContent) {
+export class TextContent extends Immutable.Record(defaultContent)
+  implements ContentType<TextContent> {
 
   contentType: 'TextContent';
   content: ContiguousText;
@@ -25,6 +40,10 @@ export class TextContent extends Immutable.Record(defaultContent) {
 
   constructor(params?: TextContentParams) {
     super(augment(params));
+  }
+
+  supportedElements() {
+    return SUPPORTED_ELEMENTS;
   }
 
   with(values: TextContentParams) {
