@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { FlowContent } from '../types/flow';
+import { FlowContent } from '../common/flow';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 

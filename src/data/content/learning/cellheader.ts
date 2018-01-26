@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { InlineContent } from '../types/inline';
+import { InlineContent } from '../common/inline';
 
 export type CellHeaderParams = {
   align?: string,

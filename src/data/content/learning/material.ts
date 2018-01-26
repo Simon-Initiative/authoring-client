@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-import { MaterialContent } from '../types/material';
+import { MaterialContent } from '../common/material';
 
 export type MaterialParams = {
   content?: MaterialContent,

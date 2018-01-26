@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { LinkContent } from '../types/link';
+import { LinkContent } from '../common/link';
 
 
 export type XrefParams = {

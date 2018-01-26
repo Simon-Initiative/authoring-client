@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
-import { parseContent } from '../../common/parse';
-import { augment, getChildren } from '../../common';
-import { ContentType, ContentElement } from '../../common/interfaces';
+import { parseContent } from './parse';
+import { augment, getChildren } from '../common';
+import { ContentType, ContentElement } from './interfaces';
 
 export type InlineElementType =
   'Formula' | 'Code' | 'Image' | 'Quote' | 'Table' | 'CodeBlock' | 'Video' | 'Audio' | 'YouTube' |

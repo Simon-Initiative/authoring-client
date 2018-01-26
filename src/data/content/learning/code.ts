@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { InlineContent } from '../types/inline';
+import { InlineContent } from '../common/inline';
 
 export type CodeParams = {
   text?: InlineContent,

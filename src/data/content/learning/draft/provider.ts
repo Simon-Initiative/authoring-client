@@ -1,5 +1,5 @@
 import { ContentBlock, ContentState } from 'draft-js';
-import * as common from './common';
+import * as common from '../common';
 
 export type Block = {
   rawBlock: common.RawContentBlock,

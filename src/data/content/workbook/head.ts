@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { Title } from '../html/title';
+import { Title } from '../learning/title';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 import { getKey } from '../../common';

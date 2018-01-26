@@ -1,11 +1,10 @@
 import * as Immutable from 'immutable';
 
-import * as common from '../common';
 import guid from 'utils/guid';
-import { augment } from '../../common';
-import { ContiguousText } from '../contiguous';
-import { ContentType, ContentElement } from '../../common/interfaces';
-import { parseContent } from '../../common/parse';
+import { augment } from '../common';
+import { ContiguousText } from '../learning/contiguous';
+import { ContentType, ContentElement } from './interfaces';
+import { parseContent } from './parse';
 import { SUPPORTED_ELEMENTS as TEXT_ELEMENTS } from './text';
 
 export type LinkElementType = 'ContiguousText' | 'Image';

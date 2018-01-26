@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 import { InlineElementType, SUPPORTED_ELEMENTS as INLINE_ELEMENTS } from './inline';
-import { parseContent } from '../../common/parse';
-import { augment, getChildren } from '../../common';
-import { ContentType, ContentElement } from '../../common/interfaces';
+import { parseContent } from './parse';
+import { augment, getChildren } from '../common';
+import { ContentType, ContentElement } from './interfaces';
 
 export type FlowElementType = InlineElementType;
 

@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { InlineContent } from '../types/inline';
+import { InlineContent } from '../common/inline';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 

@@ -1,17 +1,9 @@
 import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from '../common';
-import { CodeBlock } from '../codeblock';
-import { WbInline } from '../wbinline';
-import { Table } from '../table';
-import { Audio } from '../audio';
 import { Image } from '../image';
-import { IFrame } from '../iframe';
-import { Video } from '../video';
-import { YouTube } from '../youtube';
 import { Link as HyperLink } from '../link';
-import { Xref } from '../xref';
+import { Xref } from '../../workbook/xref';
 import { ActivityLink } from '../activity_link';
-import { Activity } from '../activity';
 import { Cite } from '../cite';
 import guid from 'utils/guid';
 

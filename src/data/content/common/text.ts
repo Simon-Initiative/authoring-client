@@ -1,14 +1,13 @@
 import * as Immutable from 'immutable';
 
-import * as common from '../common';
 import guid from 'utils/guid';
-import { augment } from '../../common';
-import { ContiguousText } from '../contiguous';
-import { parseContent } from '../../common/parse';
-import { ContentType } from '../../common/interfaces';
+import { augment } from '../common';
+import { ContiguousText } from '../learning/contiguous';
+import { parseContent } from './parse';
+import { ContentType } from './interfaces';
 
 export const SUPPORTED_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
-  'cite', 'term', 'var', 'link'];
+  'cite', 'term', 'var', 'link', 'activity_link', 'xref', 'input_ref'];
 
 export function parseTextContent(obj: Object)
   : ContiguousText {

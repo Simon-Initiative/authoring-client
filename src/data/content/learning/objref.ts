@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment } from './common';
+import { augment } from '../common';
 
 export type ObjRefParams = {
   idref?: string;
@@ -17,7 +17,7 @@ export class ObjRef extends Immutable.Record(defaultObjRefParams) {
   contentType: 'ObjRef';
   idref: string;
   guid: string;
-  
+
   constructor(params?: ObjRefParams) {
     super(augment(params));
   }
@@ -35,7 +35,7 @@ export class ObjRef extends Immutable.Record(defaultObjRefParams) {
     if (s['@idref'] !== undefined) {
       model = model.with({ idref: s['@idref'] });
     }
-    
+
     return model;
   }
 

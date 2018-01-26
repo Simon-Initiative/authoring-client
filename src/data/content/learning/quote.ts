@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { TextContent } from '../types/text';
+import { TextContent } from '../common/text';
 
 export type QuoteParams = {
   text?: TextContent,
