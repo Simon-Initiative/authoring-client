@@ -27,7 +27,7 @@ export function createWebContent(courseId: string, file): Promise<string> {
  */
 export function fetchWebContent(
     courseId: string, offset?: number, limit?: number,
-    mimeFilter?: string, pathFilter?: string, orderBy?: string,
+    mimeFilter?: string, searchText?: string, orderBy?: string,
     order?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
@@ -38,7 +38,7 @@ export function fetchWebContent(
     offset ? { offset } : {},
     limit ? { limit } : {},
     mimeFilter ? { mimeFilter } : {},
-    pathFilter ? { pathFilter } : {},
+    searchText ? { searchText } : {},
     orderBy ? { orderBy } : {},
     order ? { order } : {},
   );

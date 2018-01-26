@@ -13,7 +13,7 @@ interface StateProps {
 
 interface DispatchProps {
   onLoadCourseMediaNextPage: (
-    mimeFilter: string, pathFilter: string,
+    mimeFilter: string, searchText: string,
     orderBy: string, order: string) => void;
   onResetMedia: () => void;
 }
@@ -36,9 +36,9 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onLoadCourseMediaNextPage: (mimeFilter, pathFilter, orderBy, order) => {
+    onLoadCourseMediaNextPage: (mimeFilter, searchText, orderBy, order) => {
       dispatch(fetchCourseMediaNextPage(
-        ownProps.context.courseId, mimeFilter, pathFilter, orderBy, order));
+        ownProps.context.courseId, mimeFilter, searchText, orderBy, order));
     },
     onResetMedia: () => {
       dispatch(resetMedia(ownProps.context.courseId));

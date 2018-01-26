@@ -44,12 +44,12 @@ const SORT_MAPPINGS = {
     icon: 'fa fa-calendar',
   },
   'Name A-Z': {
-    orderBy: 'pathTo',
+    orderBy: 'fileName',
     order: 'asc',
     icon: 'fa fa-sort-alpha-asc',
   },
   'Name Z-A': {
-    orderBy: 'pathTo',
+    orderBy: 'fileName',
     order: 'desc',
     icon: 'fa fa-sort-alpha-desc',
   },
@@ -58,7 +58,7 @@ const SORT_MAPPINGS = {
     order: 'asc',
     icon: 'fa fa-file-image-o',
   },
-  Size: {
+  'File Size': {
     orderBy: 'fileSize',
     order: 'asc',
     icon: 'fa fa-sort-numeric-asc',
@@ -80,7 +80,7 @@ export interface MediaManagerProps {
   selectionType: SELECTION_TYPES;
   onEdit: (updated: Media) => void;
   onLoadCourseMediaNextPage: (
-    mimeFilter: string, pathFilter: string,
+    mimeFilter: string, searchText: string,
     orderBy: string, order: string) => void;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
