@@ -79,7 +79,7 @@
     }
   }
 
-  .media-content {
+  .media-library {
     display: flex;
     flex-direction: row;
     height: 400px;
@@ -105,151 +105,16 @@
 
         &.active {
           color: initial;
-          background-color: $gray-lightest;
+          background-color: $gray-lighter;
         }
       }
     }
 
-    .media-items {
+    .media-content {
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: auto;
-
-      ol {
-        flex: 1;
-        display: block;
-        margin: 0 auto;
-        padding: 5px 10px;
-        min-width: 100%;
-
-        &.media-grid {
-          li.media-item {
-            position: relative;
-            float: left;
-            margin: 5px 5px 55px;
-            list-style: none;
-            border: 1px solid rgba(255,255,255,0);
-            width: 120px;
-            height: 60px;
-            border: 1px solid transparent;
-
-            .selection-check {
-              position: absolute;
-              top: 5px;
-              left: 5px;
-              display: none;
-            }
-
-            .media-icon {
-              width: 118px;
-              height: 58px;
-              text-align: center;
-              overflow: hidden;
-            }
-
-            .name {
-              position: absolute;
-              top: 60px;
-              left: 0;
-              margin: 0 auto;
-              padding: 5px 0;
-              width: 120px;
-              max-height: 45px;
-              white-space: pre-wrap;
-              word-wrap: break-word;
-              overflow: hidden;
-              text-align: center;
-              vertical-align: top;
-              line-height: 20px;
-            }
-
-            &.selectable {
-              cursor: pointer;
-
-              &:hover {
-                border: 1px solid $selection;
-
-                .selection-check {
-                  display: block;
-                }
-              }
-
-              &:active, &.selected {
-                background-color: rgba($selection, 0.3);
-                border: 1px solid $selection;
-
-                .selection-check {
-                  display: block;
-                }
-              }
-            }
-          }
-        }
-
-        &.media-list {
-          li.media-item {
-            display: flex;
-            flex-direction: row;
-            position: relative;
-            list-style: none;
-            border: 1px solid rgba(255,255,255,0);
-            // width: 120px;
-            height: 32px;
-            line-height: 32px;
-            vertical-align: middle;
-            border: 1px solid transparent;
-
-            &:nth-child(odd) {
-              background-color: lighten($gray-lightest, 5%);
-            }
-
-            .selection-check {
-              display: none;
-              visibility: hidden;
-              height: 32px;
-              margin: 0 10px;
-              line-height: 32px;
-              vertical-align: middle;
-              text-align: center;
-              cursor: pointer;
-            }
-
-            .name {
-              flex: 1;
-              padding: 0 5px;
-              vertical-align: baseline;
-              overflow: visible;
-              white-space: nowrap;
-            }
-
-            &.selectable {
-              cursor: pointer;
-
-              .selection-check {
-                display: block;
-              }
-
-              &:hover {
-                border: 1px solid $selection;
-
-                .selection-check {
-                  visibility: visible;
-                }
-              }
-
-              &:active, &.selected {
-                background-color: rgba($selection, 0.3);
-                border: 1px solid $selection;
-
-                .selection-check {
-                  visibility: visible;
-                }
-              }
-            }
-          }
-        }
-      }
+      overflow: hidden;
 
       .loading {
         padding: 20px 0;
@@ -261,6 +126,181 @@
           margin: 0 5px;
           animation-duration: 1s;
           -webkit-animation-duration: 1s;
+        }
+      }
+
+      .media-grid {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+
+        .scroll-content {}
+
+        .media-item {
+          $media-item-width: 117px;
+          position: relative;
+          float: left;
+          margin: 5px 5px 55px;
+          list-style: none;
+          border: 1px solid rgba(255,255,255,0);
+          width: $media-item-width;
+          height: 60px;
+          border: 1px solid transparent;
+
+          .selection-check {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            display: none;
+          }
+
+          .media-icon {
+            width: calc($media-item-width - 2px);
+            height: 58px;
+            text-align: center;
+            overflow: hidden;
+          }
+
+          .name {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            margin: 0 auto;
+            padding: 5px 0;
+            width: $media-item-width;
+            max-height: 45px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-align: center;
+            vertical-align: top;
+            line-height: 20px;
+          }
+
+          &.selectable {
+            cursor: pointer;
+
+            &:hover {
+              border: 1px solid $selection;
+
+              .selection-check {
+                display: block;
+              }
+            }
+
+            &:active, &.selected {
+              background-color: rgba($selection, 0.3);
+              border: 1px solid $selection;
+
+              .selection-check {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      .media-list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .list-header {
+          display: flex;
+          flex-direction: row;
+          background-color: $gray-lightest;
+        }
+
+        .list-body {
+          flex: 1;
+          overflow: auto;
+        }
+
+        .sel-col {
+          width: 32px;
+          overflow: hidden;
+        }
+
+        .name-col {
+          flex: 1;
+          overflow: hidden;
+
+          img {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .path-col {
+          width: 250px;
+          overflow: hidden;
+          word-break: break-all;
+        }
+
+        .date-col {
+          width: 130px;
+          overflow: hidden;
+        }
+
+        .size-col {
+          width: 80px;
+          overflow: hidden;
+        }
+
+        .media-item {
+          display: flex;
+          flex-direction: row;
+          position: relative;
+          border: 1px solid transparent;
+
+          &:nth-child(odd) {
+            background-color: lighten($gray-lightest, 5%);
+          }
+
+          .selection-check {
+            display: none;
+            visibility: hidden;
+            height: 32px;
+            margin: 0 10px;
+            line-height: 32px;
+            vertical-align: middle;
+            text-align: center;
+            cursor: pointer;
+          }
+
+          .name {
+            flex: 1;
+            padding: 0 5px;
+            vertical-align: baseline;
+            overflow: visible;
+            white-space: nowrap;
+          }
+
+          &.selectable {
+            cursor: pointer;
+
+            .selection-check {
+              display: block;
+            }
+
+            &:hover {
+              border: 1px solid $selection;
+
+              .selection-check {
+                visibility: visible;
+              }
+            }
+
+            &:active, &.selected {
+              background-color: rgba($selection, 0.3);
+              border: 1px solid $selection;
+
+              .selection-check {
+                visibility: visible;
+              }
+            }
+          }
         }
       }
     }

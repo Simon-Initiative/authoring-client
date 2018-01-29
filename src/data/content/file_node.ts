@@ -2,6 +2,8 @@ import * as Immutable from 'immutable';
 
 export type FileNodeParams = {
   rev?: number,
+  dateCreated?: string,
+  dateUpdated?: string,
   guid?: string,
   pathTo?: string,
   fileName?: string;
@@ -10,11 +12,14 @@ export type FileNodeParams = {
 };
 
 export class FileNode extends Immutable.Record({
-  contentType: 'FileNode',rev:0, guid: '', pathTo: '', fileName: '', mimeType: '', fileSize: 0,
+  contentType: 'FileNode', rev:0, dateCreated: '', dateUpdated: '', guid: '', pathTo: '',
+  fileName: '', mimeType: '', fileSize: 0,
 }) {
 
   contentType: 'FileNode';
   rev: number;
+  dateCreated: string;
+  dateUpdated: string;
   guid: string;
   pathTo: string;
   fileName: string;
@@ -32,14 +37,16 @@ export class FileNode extends Immutable.Record({
   static fromPersistence(root: Object) : FileNode {
     const a = (root as any);
     return new FileNode({
-      rev: a.rev, guid: a.guid, pathTo: a.pathTo, fileName: a.fileName,
-      mimeType: a.mimeType, fileSize: a.fileSize,
+      rev: a.rev, dateCreated: a.dateCreated, dateUpdated: a.dateUpdated, guid: a.guid,
+      pathTo: a.pathTo, fileName: a.fileName, mimeType: a.mimeType, fileSize: a.fileSize,
     });
   }
 
   toPersistence() : Object {
     return {
       rev: this.rev,
+      dateCreated: this.dateCreated,
+      dateUpdated: this.dateUpdated,
       guid: this.guid,
       pathTo: this.pathTo,
       fileName: this.fileName,

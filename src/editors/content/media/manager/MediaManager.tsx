@@ -42,12 +42,12 @@ const SORT_MAPPINGS = {
     order: 'asc',
     icon: 'fa fa-calendar',
   },
-  'Name A-Z': {
+  'A-Z': {
     orderBy: 'fileName',
     order: 'asc',
     icon: 'fa fa-sort-alpha-asc',
   },
-  'Name Z-A': {
+  'Z-A': {
     orderBy: 'fileName',
     order: 'desc',
     icon: 'fa fa-sort-alpha-desc',
@@ -99,7 +99,6 @@ export interface MediaManagerState {
 export class MediaManager extends React.PureComponent<MediaManagerProps, MediaManagerState> {
   scrollView: HTMLElement;
   scrollContent: HTMLElement;
-  scrollViewListener: EventListener;
 
   constructor(props) {
     super(props);
@@ -129,7 +128,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   componentWillUnmount() {
     const { onResetMedia } = this.props;
 
-    this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+    this.scrollView.removeEventListener('scroll', this.onScroll);
     onResetMedia();
   }
 
@@ -140,6 +139,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   setupScrollListener(scrollView: HTMLElement) {
     if (!scrollView) {
       return;
+    }
+
+    if (this.scrollView) {
+      this.scrollView.removeEventListener('scroll', this.onScroll);
     }
 
     this.scrollView = scrollView;
@@ -161,7 +164,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     });
 
     if (allItemsLoaded) {
-      this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+      this.scrollView.removeEventListener('scroll', this.onScroll);
       return;
     }
 
@@ -235,6 +238,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const mediaLibrary = media.valueOr(null);
     if (mediaLibrary) {
       onSelectionChange(updatedSelection.map(s => mediaLibrary.getItem(s)).toArray());
+
+      // print the path of the media item to the developer console
+      console.log('MEDIA MANAGER Selected Item URL: ' + mediaLibrary.getItem(guid).pathTo);
     }
   }
 
@@ -279,32 +285,51 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     });
 
     return (
-      <React.Fragment>
-        <ol className="media-list" ref={el => this.scrollContent = el}>
-          {mediaItems.map(item => (
-            <li key={item.guid}
-                className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
-                  + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
-                onClick={() => this.onSelect(item.guid)}>
-              <input
-                  type="checkbox"
-                  className="selection-check"
-                  checked={this.isSelected(item.guid)}
-                  onClick={() => this.onSelect(item.guid)} />
-              <div className="name">{item.pathTo}</div>
-            </li>
-          ))}
-        </ol>
-        {isLoadingMedia && !allItemsLoaded
-          ? (
-            <div className="loading">
-              <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-              Hang on while more items are loaded...
-            </div>
-          )
-          : null
-        }
-      </React.Fragment>
+      <div className="media-list">
+        <div className="list-header">
+          <div className="sel-col"/>
+          <div className="name-col">Name</div>
+          <div className="path-col">Path</div>
+          <div className="date-col">Date Modified</div>
+          <div className="size-col">Size</div>
+        </div>
+        <div className="list-body" ref={el => this.setupScrollListener(el)}>
+          <div ref={el => this.scrollContent = el}>
+            {mediaItems.map(item => (
+              <div key={item.guid}
+                  className={
+                    `media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                    + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
+                  onClick={() => this.onSelect(item.guid)}>
+                <div className="sel-col">
+                  <input
+                      type="checkbox"
+                      readOnly
+                      className="selection-check"
+                      checked={this.isSelected(item.guid)}
+                      onClick={() => this.onSelect(item.guid)} />
+                </div>
+                <div className="name-col">
+                  <img src={this.adjust(item.pathTo)} />
+                  {` ${item.fileName}`}
+                </div>
+                <div className="path-col">{item.pathTo}</div>
+                <div className="date-col">{item.dateUpdated}</div>
+                <div className="size-col">{item.fileSize}</div>
+              </div>
+            ))}
+            {isLoadingMedia && !allItemsLoaded
+              ? (
+                <div key="loading" className="loading">
+                  <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                  Hang on while more items are loaded...
+                </div>
+              )
+              : null
+            }
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -327,15 +352,16 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     });
 
     return (
-      <React.Fragment>
-        <ol className="media-grid" ref={el => this.scrollContent = el}>
+      <div className="media-grid" ref={el => this.setupScrollListener(el)}>
+        <div className="scroll-content" ref={el => this.scrollContent = el}>
           {mediaItems.map(item => (
-            <li key={item.guid}
+            <div key={item.guid}
                 className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
                   + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
                 onClick={() => this.onSelect(item.guid)}>
               <input
                   type="checkbox"
+                  readOnly
                   className="selection-check"
                   checked={this.isSelected(item.guid)}
                   onClick={() => this.onSelect(item.guid)} />
@@ -346,9 +372,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               <div className="name">
                 {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
-            </li>
+            </div>
           ))}
-        </ol>
+        </div>
         {isLoadingMedia && !allItemsLoaded
           ? (
             <div className="loading">
@@ -358,7 +384,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           )
           : null
         }
-      </React.Fragment>
+      </div>
     );
   }
 
@@ -411,8 +437,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   type="button"
                   className="dropdown-item"
                   onClick={() => this.onSortChange(sortKey)}>
-                  <i className={SORT_MAPPINGS[sortKey].icon} />
-                  {` ${sortKey}`}
+                  {sortKey}
                 </button>,
               )}
             </div>
@@ -431,13 +456,13 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             </div>
           </div>
         </div>
-        <div className="media-content">
+        <div className="media-library">
           <ol className="media-sidebar">
             <li className="active">All Media</li>
             {/* <li className="">Unit 1</li>
             <li className="">Unit 2</li> */}
           </ol>
-          <div className="media-items" ref={el => this.setupScrollListener(el)}>
+          <div className="media-content">
             {layout === LAYOUTS.GRID
               ? (this.renderMediaGrid())
               : (this.renderMediaList())
