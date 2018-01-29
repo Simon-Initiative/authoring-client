@@ -36,6 +36,46 @@ export const convert = {
     return result;
 
   },
+
+  /**
+   * Returns the string representation of bytes converted to the correct units.
+   * Inspired by Bytes utility https://github.com/visionmedia/bytes.js
+   * @param value value to convert to string
+   * @param decimalPlaces number of decimal places to include in result
+   */
+  toByteNotation: (value: number, decimalPlaces: number = 2) => {
+    if (!Number.isFinite(value)) {
+      return null;
+    }
+
+    const UNIT_MAP = {
+      b:  1,
+      kb: 1 << 10,
+      mb: 1 << 20,
+      gb: 1 << 30,
+      tb: ((1 << 30) * 1024),
+    };
+
+    const mag = Math.abs(value);
+    let unit;
+
+    if (mag >= UNIT_MAP.tb) {
+      unit = 'TB';
+    } else if (mag >= UNIT_MAP.gb) {
+      unit = 'GB';
+    } else if (mag >= UNIT_MAP.mb) {
+      unit = 'MB';
+    } else if (mag >= UNIT_MAP.kb) {
+      unit = 'KB';
+    } else {
+      unit = 'B';
+    }
+
+    const val = value / UNIT_MAP[unit.toLowerCase()];
+    const str = val.toFixed(decimalPlaces).replace(/^(.+)\.?[0]+$/, '$1').replace(/\.0$/, '');
+
+    return `${str} ${unit}`;
+  },
 };
 
 export const stringFormat = {

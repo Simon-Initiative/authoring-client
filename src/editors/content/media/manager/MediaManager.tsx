@@ -5,7 +5,7 @@ import { Button } from 'editors/content/common/Button';
 import { MediaIcon } from './MediaIcon';
 import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
-import { stringFormat } from 'utils/format';
+import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
@@ -315,7 +315,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 </div>
                 <div className="path-col">{item.pathTo}</div>
                 <div className="date-col">{item.dateUpdated}</div>
-                <div className="size-col">{item.fileSize}</div>
+                <div className="size-col">{convert.toByteNotation(item.fileSize)}</div>
               </div>
             ))}
             {isLoadingMedia && !allItemsLoaded
