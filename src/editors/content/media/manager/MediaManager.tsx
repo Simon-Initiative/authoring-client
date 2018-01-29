@@ -389,10 +389,15 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   render() {
-    const { className, mimeFilter } = this.props;
+    const { className, mimeFilter, media } = this.props;
     const { searchText, layout, orderBy, order } = this.state;
 
     const id = guid();
+
+    const mediaCount = media.caseOf({
+      just: ml => ({ numResults: ml.totalItemsLoaded, totalResults: ml.totalItems }),
+      nothing: () => null,
+    });
 
     return (
       <div className={`media-manager ${className || ''}`}>
@@ -468,6 +473,12 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               : (this.renderMediaList())
             }
           </div>
+        </div>
+        <div className="media-infobar">
+            <div className="flex-spacer"/>
+            {mediaCount && mediaCount.totalResults > -Infinity &&
+              <div>Showing {mediaCount.numResults} of {mediaCount.totalResults}</div>
+            }
         </div>
       </div>
     );

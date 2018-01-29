@@ -305,4 +305,12 @@
       }
     }
   }
+
+  .media-infobar {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+    color: $gray;
+    height: 24px;
+  }
 }
