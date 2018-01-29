@@ -39,7 +39,7 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : ActivityLink {
+  static fromPersistence(root: Object, guid: string) : ActivityLink {
 
     const t = (root as any).activity_link;
 

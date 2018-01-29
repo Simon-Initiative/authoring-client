@@ -40,7 +40,7 @@ export class Xref extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Xref {
+  static fromPersistence(root: Object, guid: string) : Xref {
 
     const t = (root as any).xref;
 

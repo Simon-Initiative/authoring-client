@@ -44,7 +44,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Alternatives {
+  static fromPersistence(root: Object, guid: string) : Alternatives {
     const t = (root as any).alternatives;
 
     let model = new Alternatives({ guid });

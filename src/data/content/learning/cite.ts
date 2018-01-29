@@ -46,7 +46,7 @@ export class Cite extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Cite {
+  static fromPersistence(root: Object, guid: string) : Cite {
 
     const t = (root as any).cite;
 

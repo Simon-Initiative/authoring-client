@@ -72,7 +72,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
   }
 
 
-  static fromPersistence(root: Object, guid: string, toDraft) : IFrame {
+  static fromPersistence(root: Object, guid: string) : IFrame {
 
     const t = (root as any).iframe;
 
@@ -117,7 +117,7 @@ export class IFrame extends Immutable.Record(defaultContent) {
           model = model.with({ caption: Caption.fromPersistence(item, id) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
+          model = model.with({ cite: Cite.fromPersistence(item, id) });
           break;
         default:
 

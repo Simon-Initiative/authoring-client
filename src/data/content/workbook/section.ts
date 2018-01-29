@@ -39,7 +39,7 @@ export class Section extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Section {
+  static fromPersistence(root: Object, guid: string) : Section {
     const t = (root as any).section;
 
     let model = new Section({ guid });

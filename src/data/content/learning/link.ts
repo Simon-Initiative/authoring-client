@@ -39,7 +39,7 @@ export class Link extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Link {
+  static fromPersistence(root: Object, guid: string) : Link {
     const t = (root as any).link;
 
     let model = new Link({ guid });
@@ -61,7 +61,7 @@ export class Link extends Immutable.Record(defaultContent) {
 
     if (children instanceof Array
       && children.length === 1 && (children[0] as any).image !== undefined) {
-      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '', toDraft)) });
+      model = model.with({ content: Maybe.just(Image.fromPersistence(children[0], '')) });
     }
 
     return model;

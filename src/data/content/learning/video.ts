@@ -93,7 +93,7 @@ export class Video extends Immutable.Record(defaultContent) {
   }
 
 
-  static fromPersistence(root: Object, guid: string, toDraft) : Video {
+  static fromPersistence(root: Object, guid: string) : Video {
 
     const t = (root as any).video;
 
@@ -156,7 +156,7 @@ export class Video extends Immutable.Record(defaultContent) {
           model = model.with({ caption: Caption.fromPersistence(item, id) });
           break;
         case 'cite':
-          model = model.with({ cite: Cite.fromPersistence(item, id, toDraft) });
+          model = model.with({ cite: Cite.fromPersistence(item, id) });
           break;
         default:
 
