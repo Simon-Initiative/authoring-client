@@ -60,6 +60,8 @@ export class FlowContent extends Immutable.Record(defaultContent)
     return SUPPORTED_ELEMENTS;
   }
 
+  // TODO: Generalize this functionality allowing visitation and
+  // update of any text or element entity, filtered based on type
   tagInputRefsWithType(byId: Object) {
     return this.with({
       content: this.content.map((c) => {

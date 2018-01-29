@@ -3,7 +3,7 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isArray } from 'util';
-import { ContentState } from 'draft-js';
+import { BodyContent } from 'data/content/workbook/types/body';
 import { LegacyTypes } from '../types';
 
 export type WorkbookPageModelParams = {
@@ -11,7 +11,7 @@ export type WorkbookPageModelParams = {
   guid?: string,
   type?: string;
   head?: contentTypes.Head,
-  body?: contentTypes.Html,
+  body?: BodyContent,
   lock?: contentTypes.Lock
 };
 
@@ -21,7 +21,7 @@ const defaultWorkbookPageModelParams = {
   guid: '',
   type: LegacyTypes.workbook_page,
   head: new contentTypes.Head(),
-  body: new contentTypes.Html(),
+  body: new BodyContent(),
   lock: new contentTypes.Lock(),
 };
 
@@ -49,7 +49,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
       head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
-      body: new contentTypes.Html({ contentState: ContentState.createFromText(body) }),
+      body: BodyContent.fromText(body, ''),
     });
   }
 
@@ -81,7 +81,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with({ head: contentTypes.Head.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({ body: contentTypes.Html.fromPersistence(item, id) });
+          model = model.with({ body: BodyContent.fromPersistence(item, id) });
           break;
         default:
       }
