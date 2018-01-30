@@ -8,7 +8,7 @@ import { MediaItem } from 'types/media';
 import * as messageActions from 'actions/messages';
 import * as Messages from 'types/messages';
 
-const MEDIA_PAGE_SIZE = 40;
+const MEDIA_PAGE_SIZE = 60;
 
 export type FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
 export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
