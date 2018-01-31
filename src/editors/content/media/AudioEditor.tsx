@@ -1,14 +1,17 @@
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 import { ContentState } from 'draft-js';
-
 import { Audio } from '../../../data/content/html/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-
 import { TabContainer } from '../common/TabContainer';
+import { MediaManager } from './manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
+import { MediaItem } from 'types/media';
+import { Source } from 'data/content/html/source';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
 
@@ -27,14 +30,15 @@ export class AudioEditor
   constructor(props) {
     super(props);
 
-    this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onSourcesEdit = this.onSourcesEdit.bind(this);
     this.onTracksEdit = this.onTracksEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.adjust = this.adjust.bind(this);
+    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
+    this.renderSources = this.renderSources.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -69,21 +73,11 @@ export class AudioEditor
     this.props.onEdit(this.props.model.with({ controls }));
   }
 
-  onSourcesEdit(sources) {
-    this.props.onEdit(this.props.model.with({ sources }));
-  }
-
   onTracksEdit(tracks) {
     this.props.onEdit(this.props.model.with({ tracks }));
   }
 
-  onSetClick() {
-    // TODO
-  }
-
-
   renderTracks() {
-
     const { tracks } = this.props.model;
 
     return (
@@ -162,23 +156,40 @@ export class AudioEditor
     );
   }
 
-  renderSources() {
+  adjust(path) {
+    const { context } = this.props;
 
-    const { sources } = this.props.model;
+    const dirCount = context.resourcePath.split('\/').length;
+    let updated = path;
+    for (let i = 0; i < dirCount; i += 1) {
+      updated = '../' + updated;
+    }
+    return updated;
+  }
+
+  onSourceSelectionChange(selections: MediaItem[]) {
+    const { model, onEdit } = this.props;
+
+    if (selections.length > 0) {
+      const source = new Source({ src: this.adjust(selections[0].pathTo) });
+
+      onEdit(model.with({
+        sources: OrderedMap<string, Source>().set(source.guid, source),
+      }));
+    }
+  }
+
+  renderSources() {
+    const { context, model, onEdit } = this.props;
+    // const { sources } = this.props.model;
 
     return (
-      <div style={ { marginTop: '5px' } }>
-
-        <Sources
-          {...this.props}
-          mediaType="audio"
-          accept="audio/*"
-          model={sources}
-          onEdit={this.onSourcesEdit}
-        />
-
-      </div>
+      <MediaManager context={context} model={model}
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.AUDIO}
+        selectionType={SELECTION_TYPES.SINGLE}
+        onSelectionChange={this.onSourceSelectionChange} />
     );
+
   }
 
 

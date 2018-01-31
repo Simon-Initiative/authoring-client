@@ -17,6 +17,8 @@ const MAX_NAME_LENGTH = 26;
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
+  AUDIO = 'audio',
+  VIDEO = 'video',
   ALL = '',
 }
 
