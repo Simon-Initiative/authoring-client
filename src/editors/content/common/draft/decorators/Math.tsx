@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { Math as MathRenderer } from '../../../../../utils/math/Math';
 import { ContentState } from 'draft-js';
 

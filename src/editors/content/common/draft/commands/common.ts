@@ -3,7 +3,7 @@ import {
     AtomicBlockUtils, CharacterMetadata, ContentBlock, ContentState, EditorState, Modifier,
     SelectionState,
 } from 'draft-js';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
+import { EntityTypes, generateRandomKey } from '../../../../../data/content/learning/common';
 
 // Append text to a content block
 export function appendText(contentBlock, contentState, text) {

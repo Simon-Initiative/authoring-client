@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { containerPrecondition, insertBlocksAfter, stateFromKey } from './common';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
+import { EntityTypes, generateRandomKey } from '../../../../../data/content/learning/common';
 import { AbstractCommand } from '../../command';
 import {
     CharacterMetadata, ContentBlock, ContentState, EditorState,
@@ -34,49 +34,10 @@ function buildEntityBlock(
 export class InsertDefinitionCommand extends AbstractCommand<EditorState> {
 
   precondition(editorState: EditorState) : boolean {
-    return containerPrecondition(
-      editorState.getSelection(), editorState.getCurrentContent(),
-      [EntityTypes.pullout_begin, EntityTypes.example_begin, EntityTypes.definition_begin],
-      [EntityTypes.pullout_end, EntityTypes.example_end, EntityTypes.definition_end],
-
-    );
+    return true;
   }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
 
-    const ss = editorState.getSelection();
-    let content = editorState.getCurrentContent();
-    const key = ss.getAnchorKey();
-    const contentKey = generateRandomKey();
-
-    const blocks = [];
-
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.definition_begin, { type: 'definition_begin', term: '' });
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.meaning_begin, { type: 'meaning_begin' });
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.material_begin, { type: 'material_begin' });
-
-    buildTextBlock(contentKey, blocks);
-
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.material_end, { type: 'material_end' });
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.meaning_end, { type: 'meaning_end' });
-    buildEntityBlock(
-      blocks, content,
-      EntityTypes.definition_end, { type: 'definition_end' });
-    buildTextBlock(generateRandomKey(), blocks);
-
-    content = insertBlocksAfter(content, key, blocks);
-
-    return Promise.resolve(EditorState.forceSelection(
-      EditorState.push(editorState, content, 'insert-fragment'), stateFromKey(contentKey)));
   }
 }

@@ -2,7 +2,7 @@ import {
   ContentBlock, ContentState, EditorState, Entity, Modifier, SelectionState,
 } from 'draft-js';
 import * as Immutable from 'immutable';
-import * as common from '../../../../../data/content/html/common';
+import * as common from '../../../../../data/content/learning/common';
 import { validateSchema } from '../paste';
 
 

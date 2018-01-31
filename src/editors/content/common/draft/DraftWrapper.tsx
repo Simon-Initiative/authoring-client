@@ -17,55 +17,35 @@ import {
 } from './utils';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
-import * as common from '../../../../data/content/html/common';
-import { Html } from '../../../../data/contentTypes';
-import { getRendererByName } from './renderers/registry';
+import * as common from 'data/content/learning/common';
+import { ContiguousText } from 'data/content/learning//contiguous';
 import { buildCompositeDecorator } from './decorators/composite';
-import handleBackspace from './keyhandlers/backspace';
-import { containerPrecondition, insertBlocksAfter } from './commands/common';
-import { validateSchema, wouldViolateSchema } from './paste';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { insertBlocksAfter } from './commands/common';
+
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 
-export type ChangePreviewer = (current: Html, next: Html) => Html;
 
 const SHIFT_KEY = 16;
 const ALT_KEY = 18;
 
 export interface DraftWrapperProps {
-  onEdit: (html : Html) => void;
+  onEdit: (text : ContiguousText) => void;
   onSelectionChange: (state: SelectionState) => void;
-  content: Html;
+  content: ContiguousText;
   undoRedoGuid: string;
   locked: boolean;
   context: AppContext;
   services: AppServices;
   inlineToolbar: any;
-  blockToolbar: any;
-  inlineInsertionToolbar: any;
   activeItemId: string;
   inlineOnlyMode: boolean;
   editorStyles?: Object;
-  changePreviewer?: ChangePreviewer;
 }
-
-type ExpanderPosition = {
-  x: number,
-  y: number,
-};
 
 interface DraftWrapperState {
   editorState: EditorState;
-  lockedByBlockRenderer: boolean;
-  show: boolean;
-  component: any;
-  blockToolbarShown: boolean;
-  expanderPosition: Maybe<ExpanderPosition>;
-  x: number;
-  y: number;
-  alignLeft: boolean;
 }
 
 const styles = {
@@ -124,9 +104,6 @@ const styleMap = {
   },
 };
 
-const UL_WRAP = <ul className="public-DraftStyleDefault-ul" />;
-const OL_WRAP = <ol className="public-DraftStyleDefault-ol" />;
-
 const blockRenderMap = Immutable.Map({
   'header-one': { element: 'h1' },
   'header-two': { element: 'h2' },
@@ -134,31 +111,9 @@ const blockRenderMap = Immutable.Map({
   'header-four': { element: 'h4' },
   'header-five': { element: 'h5' },
   'header-six': { element: 'h6' },
-  blockquote: { element: 'blockquote' },
-  code: { element: 'pre' },
-  atomic: { element: 'div' },
-  'unordered-list-item': { element: 'li', wrapper: UL_WRAP },
-  'ordered-list-item': { element: 'li', wrapper: OL_WRAP },
   unstyled: { element: 'div' },
-  formula: { element: 'div' },
 });
 
-// tslint:disable-next-line
-const BlockRendererFactory = (props) => {
-
-  const entity = props.contentState.getEntity(
-    props.block.getEntityAt(0),
-  );
-
-  const data = entity.getData();
-  const type = entity.getType();
-
-  const viewer = getRendererByName(type).viewer;
-
-  const childProps = Object.assign({}, props, { data });
-
-  return React.createElement((viewer as any), childProps);
-};
 
 function appendText(contentBlock, contentState, text) {
 
@@ -223,32 +178,18 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
 
 class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   implements CommandProcessor<EditorState> {
-  lastBlockY: number;
+
   onChange: any;
   focus: () => any;
   lastSelectionState: SelectionState;
   lastContent: ContentState;
   container: any;
-  mouseDown: boolean;
-  shiftPressed: boolean;
 
   constructor(props) {
     super(props);
 
-    this.lastBlockY = 0;
     this.focus = () => (this.refs as any).editor.focus();
-    this.handleKeyCommand = this.handleKeyCommand.bind(this);
     this.lastSelectionState = null;
-
-    this.dismissToolbar = this.dismissToolbar.bind(this);
-    this.mouseDown = false;
-    this.shiftPressed = false;
-
-    this.onKeyDown = this.onKeyDown.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-    this.onFocus = this.onFocus.bind(this);
-    this.onClickExpand = this.onClickExpand.bind(this);
 
     const contentState = props.content.contentState;
     this.lastContent = contentState;
@@ -258,14 +199,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.state = {
       editorState: newEditorState,
-      lockedByBlockRenderer: false,
-      show: false,
-      x: null,
-      y: null,
-      blockToolbarShown: false,
-      expanderPosition: Maybe.nothing(),
-      component: null,
-      alignLeft: true,
     };
 
     this.onChange = (currentEditorState : EditorState) => {
@@ -279,7 +212,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         const ss = editorState.getSelection();
         const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss;
-        this.handleSelectionChange(changeType, ss);
 
         let contentState = editorState.getCurrentContent();
         const contentChange = contentState !== this.lastContent;
@@ -300,7 +232,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           contentState = editorState.getCurrentContent();
 
           this.lastContent = contentState;
-          this.setState({ editorState }, () => this.props.onEdit(new Html({ contentState })));
+          this.setState(
+            { editorState },
+            () => this.props.onEdit(new ContiguousText({ content: contentState })));
         } else {
           this.setState({ editorState });
         }
@@ -319,7 +253,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     this.setState({ editorState }, () => {
 
-      this.props.onEdit(new Html({ contentState }));
+      this.props.onEdit(new ContiguousText({ content: contentState }));
       this.forceRender();
     });
   }
@@ -329,200 +263,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
     this.setState({ editorState }, () => {
-      this.props.onEdit(new Html({ contentState }));
+      this.props.onEdit(new ContiguousText({ content: contentState }));
       this.forceRender();
     });
-  }
-
-
-
-  onBlur(e) {
-    e.stopPropagation();
-    if (this.state.show || this.state.blockToolbarShown) {
-      setTimeout(
-        () => this.setState({
-          blockToolbarShown: false,
-          show: false, x: null, y: null }),
-        200);
-    }
-  }
-
-  setExpanderPosition() {
-    let topRect = getPosition();
-
-    if (topRect === null) {
-      const position = getCursorPosition();
-      if (position !== null) {
-        topRect = {
-          top: position.y,
-          left: position.x,
-          bottom: 0,
-          right: 0,
-          height: 0,
-          width: 0,
-        };
-      }
-    }
-
-    if (topRect !== null) {
-      const divRect = this.container.getBoundingClientRect();
-
-      let blockY = topRect.top + window.scrollY - (divRect.top + window.scrollY);
-      const blockX = -27;
-
-      if (blockY < 0) {
-        blockY = this.lastBlockY;
-      }
-
-      this.setState({ expanderPosition: Maybe.just({ x: blockX, y: blockY }) });
-      this.lastBlockY = blockY;
-    }
-
-  }
-
-  onFocus() {
-    this.setExpanderPosition();
-  }
-
-
-  handleSelectionChange(changeType, ss) {
-
-    if (changeType === SelectionChangeType.Selection) {
-
-      if (hasSelection(ss)) {
-        const selection = document.getSelection();
-        if (selection.rangeCount !== 0) {
-          let topRect = getPosition();
-
-          if (topRect === null) {
-            const position = getCursorPosition();
-            if (position !== null) {
-              topRect = {
-                top: position.y,
-                left: position.x,
-                bottom: 0,
-                right: 0,
-                height: 0,
-                width: 0,
-              };
-            }
-          }
-
-          if (topRect === null) {
-            this.setState({ show: false, x: null, y: null,
-              expanderPosition: Maybe.nothing<ExpanderPosition>() });
-            return;
-          }
-
-          const divRect = this.container.getBoundingClientRect();
-          const y = (topRect.top + window.scrollY - (divRect.top + window.scrollY)) - 25;
-
-          const alignLeft = topRect.left - divRect.left < divRect.width / 2;
-
-          const x = alignLeft
-            ? topRect.left - divRect.left
-            : (divRect.width - (topRect.left - divRect.left));
-
-          if (topRect !== null) {
-            const show = !this.shiftPressed;
-
-            this.setState({ show, x, y,
-              component: this.props.inlineToolbar, alignLeft,
-              expanderPosition: Maybe.nothing<ExpanderPosition>() });
-
-          } else {
-            this.setState({ show: false, x: null, y: null,
-              expanderPosition: Maybe.nothing<ExpanderPosition>() });
-          }
-        }
-      } else {
-        this.setState({ show: false, x: null, y: null,
-          expanderPosition: Maybe.nothing<ExpanderPosition>() });
-      }
-
-      this.setExpanderPosition();
-
-    } else if (changeType === SelectionChangeType.CursorPosition) {
-      this.setState({ show: false, x: null, y: null,
-        expanderPosition: Maybe.nothing<ExpanderPosition>() });
-      this.setExpanderPosition();
-    } else {
-      // this.setState({ blockToolbarShown: false, blockX: null, blockY: null });
-    }
-  }
-
-
-  dismissToolbar() {
-    this.setState({ show: false, blockToolbarShown: false, x: null,
-      y: null, expanderPosition: Maybe.nothing<ExpanderPosition>() });
-  }
-
-  onKeyDown(e) {
-    if (e.keyCode === SHIFT_KEY) {
-      this.shiftPressed = true;
-    } else if (e.keyCode === ALT_KEY) {
-      const point = getCursorPosition();
-      this.setState({
-        show: true,
-        x: point.x,
-        y: point.y,
-        component: this.props.blockToolbar,
-      });
-    }
-  }
-
-  onKeyUp(e) {
-
-    if (e.keyCode === SHIFT_KEY) {
-      this.shiftPressed = false;
-
-      if (this.state.x !== null) {
-        this.setState({ show: true });
-      }
-
-    } else if (e.keyCode === ALT_KEY) {
-      this.setState({ show: false, x: null, y: null });
-    }
-  }
-
-  getXOffset() {
-    const position = this.container.getBoundingClientRect();
-    return position.left;
-  }
-
-  processBlockEdit(block, data) {
-
-    const content = this.state.editorState.getCurrentContent();
-
-    const entityKey = block.getEntityAt(0);
-    const newContentState = content.mergeEntityData(entityKey, data);
-
-    this.forceContentChange(newContentState, 'apply-entity');
-
-  }
-
-  removeBlock(block) {
-
-    const contentState = this.state.editorState.getCurrentContent();
-    const blockMap = contentState.getBlockMap();
-    const toRemove = blockMap.get(block.key);
-
-    const blocksBefore = blockMap.toSeq().takeUntil(v => v === toRemove);
-    const blocksAfter = blockMap.toSeq().skipUntil(v => v === toRemove).rest();
-    const newBlocks = blocksBefore.concat(blocksAfter).toOrderedMap();
-
-    const updated = contentState.merge({ blockMap: newBlocks });
-
-    this.forceContentChange(updated, 'remove-range');
-
-    // Workaround to 'unfreeze' the editor
-    setTimeout(
-      () => {
-        this.setState(
-          { lockedByBlockRenderer: true },
-          () => this.setState({ lockedByBlockRenderer: false }));
-      },
-      100);
   }
 
   insertEmptyBlockAfter(key) {
@@ -555,87 +298,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       contentState, 'insert-fragment', selection);
   }
 
-  blockRenderer(block) {
-    if (block.getType() === 'atomic') {
-      return {
-        component: BlockRendererFactory,
-        editable: false,
-        props: {
-          onContentChange: (contentState: ContentState) => {
-            this.forceContentChange(contentState, 'apply-entity');
-          },
-          onLockChange: (locked) => {
-            this.setState({ lockedByBlockRenderer: locked });
-          },
-          onEditModeChange: (editMode) => {
-            // this.props.onEditModeChange(block.getKey(), editMode);
-          },
-          onEdit: (data) => {
-            this.processBlockEdit(block, data);
-
-            setTimeout(
-              () => {
-                this.setState(
-                  { lockedByBlockRenderer: true },
-                  () => this.setState({ lockedByBlockRenderer: false }));
-              },
-              100);
-          },
-          onInsertBlock: (key) => {
-            this.insertEmptyBlockAfter(key);
-          },
-          onRemove: () => {
-            this.removeBlock(block);
-          },
-          editMode: !this.props.locked,
-          services: this.props.services,
-          context: this.props.context,
-        },
-      };
-    }
-
-    return null;
-  }
-
-  handleKeyCommand(command) {
-
-    const editorState = this.state.editorState;
-
-    if (command === 'backspace') {
-      if (handleBackspace(editorState, this.onChange) === 'handled') {
-        return 'handled';
-      }
-
-      // Do not allow users to press enter and create a new block when
-      // their cursor is within titles, pronunciations, or translations
-    } else if (command === 'split-block' &&
-        !containerPrecondition(
-          editorState.getSelection(), editorState.getCurrentContent(),
-          [common.EntityTypes.title_begin,
-            common.EntityTypes.pronunciation_begin,
-            common.EntityTypes.translation_begin],
-          [common.EntityTypes.title_end,
-            common.EntityTypes.pronunciation_end,
-            common.EntityTypes.translation_end])) {
-
-      return 'handled';
-
-    // In 'inlineOnlyMode' we do not allow the user to create additional
-    // blocks
-    } else if (command === 'split-block' && this.props.inlineOnlyMode) {
-      return 'handled';
-    }
-
-    const newState = RichUtils.handleKeyCommand(editorState, command);
-    if (newState) {
-      this.onChange(newState);
-      return 'handled';
-    }
-
-    return 'not-handled';
-  }
-
-
 
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
@@ -643,16 +305,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (this.props.activeItemId !== nextProps.activeItemId) {
       setTimeout(() => this.forceRender(), 100);
 
-    } else if (this.props.content.contentState !== nextProps.content.contentState) {
+    } else if (this.props.content.content !== nextProps.content.content) {
 
       const current = this.state.editorState.getCurrentContent();
 
-      if (nextProps.content.contentState !== current
+      if (nextProps.content.content !== current
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
 
-        this.lastContent = nextProps.content.contentState;
+        this.lastContent = nextProps.content.content;
         const newEditorState = EditorState.push(
-          this.state.editorState, nextProps.content.contentState);
+          this.state.editorState, nextProps.content.content);
 
         this.setState({
           editorState: newEditorState,
@@ -660,69 +322,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       }
 
     }
-  }
-
-  renderPostProcess(components, blocks) {
-
-    const updated = [];
-    let children = [];
-    let current = updated;
-
-    const content =  this.state.editorState.getCurrentContent();
-    let currentWrapper : ContentWrapper = null;
-
-    for (let i = 0; i < components.length; i += 1) {
-
-      const comp = components[i];
-      const block = content.getBlockForKey(comp.key);
-
-      // Block will be undefined when what we have encountered is a Draft
-      // block level wrapper such as a ol or a ul that is wrapping a series
-      // of li blocks.
-      if (block === undefined) {
-        if (currentWrapper === null) {
-          updated.push(comp);
-        } else {
-          current.push(comp);
-        }
-
-        continue;
-      }
-
-      if (currentWrapper === null) {
-
-        const foundWrapperBegin = wrappers.find(w => w.isBeginBlock(block, content));
-        if (foundWrapperBegin !== undefined) {
-
-          currentWrapper = foundWrapperBegin;
-
-          children = [];
-          // tslint:disable-next-line
-          current = children;
-          children.push(components[i]);
-
-        } else {
-          current.push(components[i]);
-        }
-
-      } else if (currentWrapper.isEndBlock(block, content)) {
-
-        children.push(components[i]);
-        updated.push(
-          React.createElement(
-            currentWrapper.component,
-            { key: 'block-' + block.key }, children));
-        // tslint:disable-next-line
-        current = updated;
-        currentWrapper = null;
-
-      } else {
-        current.push(components[i]);
-      }
-
-    }
-
-    return updated;
   }
 
   process(command: Command<EditorState>) {
@@ -755,35 +354,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.setState({ editorState: newEditorState });
   }
 
-  renderToolbar() {
-
-    if (this.state.show) {
-
-      const additionalProps = {
-        editorState: this.state.editorState,
-        commandProcessor: this,
-        dismissToolbar: this.dismissToolbar,
-      };
-      const clonedToolbar = React.cloneElement(this.state.component, additionalProps);
-
-      const positionStyle = {
-        position: 'absolute',
-        top: this.state.y,
-      };
-
-      this.state.alignLeft
-        ? (positionStyle as any).left = this.state.x
-        : (positionStyle as any).right = this.state.x;
-
-      return <div style={positionStyle as any}>
-          {clonedToolbar}
-        </div>;
-
-    }
-
-    return null;
-  }
-
   isAtEmptyBlock() : boolean {
     const ss = this.state.editorState.getSelection();
 
@@ -798,53 +368,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return false;
   }
 
-  renderBlockToolbar() {
-
-    if (this.state.blockToolbarShown) {
-
-      const position = this.state.expanderPosition.caseOf({
-        just: position => position,
-        nothing: () => ({ x: 0, y: 0 }),
-      });
-
-      const additionalProps = {
-        editorState: this.state.editorState,
-        commandProcessor: this,
-        dismissToolbar: this.dismissToolbar,
-      };
-
-
-      const component = this.isAtEmptyBlock()
-        ? this.props.blockToolbar
-        : this.props.inlineInsertionToolbar;
-
-      const clonedToolbar = React.cloneElement(component, additionalProps);
-
-      const positionStyle = {
-        top: position.y,
-        position: 'absolute',
-        left: position.x + 75,
-      };
-
-      return <div style={positionStyle as any}>
-          {clonedToolbar}
-        </div>;
-
-    }
-
-    return null;
-  }
-
-  blockStyleFn(contentBlock: ContentBlock) {
-    const type = contentBlock.getType();
-    if (type === 'formula') {
-      return 'formulaDiv';
-    }
-    if (type === 'code') {
-      return 'codeDiv';
-    }
-  }
-
   handlePastedText(text, html) {
     // Disable pasting in inline mode
     if (this.props.inlineOnlyMode) {
@@ -852,12 +375,11 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
-
   // Do not allow pasting of fragments that would introduce
   // unbalanced block sentinels or that would violate content
   // model schema.
   handlePastedFragment(fragment, editorState) {
-    if (this.props.inlineOnlyMode || wouldViolateSchema(fragment, editorState)) {
+    if (this.props.inlineOnlyMode) {
       return true;
     }
   }
@@ -865,80 +387,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   // Prevent cut operations that would leave the document in
   // an invalid state.
   handleCutFragment(fragment, editorState, previewEditorState) {
-    if (!validateSchema(previewEditorState.getCurrentContent())) {
-      return true;
-    }
-  }
-
-  onClickExpand() {
-    this.setState({ blockToolbarShown: !this.state.blockToolbarShown });
-  }
-
-  shouldShowExpander() {
-
-    if (this.isAtEmptyBlock()) {
-      if (!this.props.inlineOnlyMode && containerPrecondition(
-        this.state.editorState.getSelection(), this.state.editorState.getCurrentContent(),
-        [common.EntityTypes.title_begin,
-          common.EntityTypes.pronunciation_begin,
-          common.EntityTypes.translation_begin],
-        [common.EntityTypes.title_end,
-          common.EntityTypes.pronunciation_end,
-          common.EntityTypes.translation_end])) {
-
-        return true;
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
-  renderExpander() {
-
-    const expander = this.state.expanderPosition.caseOf({
-      just: (position) => {
-        if (this.shouldShowExpander()) {
-
-          const iconClasses = this.state.blockToolbarShown
-            ? 'fa fa-minus'
-            : 'fa fa-plus';
-
-          const style = {
-            color: 'black',
-          };
-          const buttonStyle = {
-            backgroundColor: 'white',
-            top: position.y,
-            position: 'absolute',
-            color: '#cccccc',
-            left: position.x + 25,
-          };
-
-          return (
-            <button
-              onClick={this.onClickExpand}
-              type="button"
-              className="btn"
-              style={buttonStyle as any}>
-              <i style={style} className={iconClasses}></i>
-            </button>
-          );
-
-        }
-
-        return null;
-      },
-      nothing: () => null,
-    });
-
-    return (
-      <ReactCSSTransitionGroup transitionName="expander"
-        transitionEnterTimeout={700} transitionLeave={false}>
-        {expander}
-      </ReactCSSTransitionGroup>
-    );
+    return false;
   }
 
   render() {
@@ -956,18 +405,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         <div
           className="draft-wrapper"
           ref={(container => this.container = container)}
-          onBlur={this.onBlur}
-          onFocus={this.onFocus}
-          onKeyUp={this.onKeyUp}
-          onKeyDown={this.onKeyDown}
           style={editorStyle}
           onClick={this.focus}>
-
-          {this.renderExpander()}
-
-          {this.renderToolbar()}
-
-          {this.renderBlockToolbar()}
 
           <Editor ref="editor"
             spellCheck={true}
@@ -975,14 +414,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             handleCutFragment={this.handleCutFragment.bind(this)}
             handlePastedText={this.handlePastedText.bind(this)}
             handlePastedFragment={this.handlePastedFragment.bind(this)}
-            renderPostProcess={this.renderPostProcess.bind(this)}
             customStyleMap={styleMap}
-            handleKeyCommand={this.handleKeyCommand}
             blockRenderMap={blockRenderMap}
-            blockRendererFn={this.blockRenderer.bind(this)}
-            blockStyleFn={this.blockStyleFn.bind(this)}
             editorState={this.state.editorState}
-            readOnly={this.state.lockedByBlockRenderer || this.props.locked}
+            readOnly={this.props.locked}
             onChange={this.onChange} />
 
       </div>

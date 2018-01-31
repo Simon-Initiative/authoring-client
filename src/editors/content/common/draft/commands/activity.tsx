@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { EntityTypes } from 'data/content/html/common';
-import { Activity } from 'data/content/html/activity';
+import { EntityTypes } from 'data/content/learning/common';
+import { Activity } from 'data/content/workbook/activity';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
