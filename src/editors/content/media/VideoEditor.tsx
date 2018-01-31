@@ -222,7 +222,6 @@ export class VideoEditor
 
   renderSources() {
     const { context, model, onEdit } = this.props;
-    // const { sources } = this.props.model;
 
     return (
       <MediaManager context={context} model={model}
