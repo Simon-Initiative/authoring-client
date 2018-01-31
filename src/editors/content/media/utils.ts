@@ -6,3 +6,13 @@ export function extractFileName(src: string) {
 
   return src;
 }
+
+
+export function adjustPath(path, resourcePath) {
+  const dirCount = resourcePath.split('\/').length;
+  let updated = path;
+  for (let i = 0; i < dirCount; i += 1) {
+    updated = '../' + updated;
+  }
+  return updated;
+}
