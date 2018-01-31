@@ -27,7 +27,7 @@ export const MediaIcon: React.StatelessComponent<MediaIconProps> = ({
   mimeType,
   url,
 }) => {
-  const extensionMatches = filename.match(/\.[^.]+/);
+  const extensionMatches = filename.match(/\.[^.]+$/);
   const extension = extensionMatches ? extensionMatches[0].substr(1, 3).toLowerCase() : '';
 
   const Icon = getMediaIconRenderer(mimeType);
