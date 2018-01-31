@@ -16,6 +16,7 @@ export type ExampleParams = {
 };
 
 const defaultContent = {
+  contentType: 'Example',
   id: Maybe.nothing(),
   title: new Title(),
   purpose: Maybe.nothing(),

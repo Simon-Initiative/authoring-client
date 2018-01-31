@@ -38,6 +38,7 @@ export type PulloutParams = {
 };
 
 const defaultContent = {
+  contentType: 'Pullout',
   id: Maybe.nothing(),
   title: new Title(),
   purpose: Maybe.nothing(),
@@ -90,6 +91,8 @@ export class Pullout extends Immutable.Record(defaultContent) {
         default:
       }
     });
+
+    debugger;
 
     model = model.with({ content: BoxContent.fromPersistence(getChildren(t), '') });
 

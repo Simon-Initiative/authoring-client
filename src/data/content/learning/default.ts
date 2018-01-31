@@ -10,6 +10,7 @@ export type DefaultParams = {
 };
 
 const defaultContent = {
+  contentType: 'Default',
   content: '',
   guid: '',
 };

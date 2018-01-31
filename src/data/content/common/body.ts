@@ -5,14 +5,12 @@ import { augment, getChildren } from '../common';
 import { ContentType, ContentElement } from './interfaces';
 
 export type BodyElementType = MaterialElementType |
-  'Definition' | 'Example' | 'Pullout' |
-  'Activity';
+  'Definition' | 'Example' | 'Pullout' | 'Activity';
 
 
 const SEMANTIC_ELEMENTS = ['popout', 'example', 'definition'];
-const WB_EXTENSIONS = ['activity'];
 
-export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...WB_EXTENSIONS, ...MATERIAL_ELEMENTS];
+export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...MATERIAL_ELEMENTS];
 
 function parseBodyContent(obj: Object)
   : Immutable.OrderedMap<string, BodyElement> {

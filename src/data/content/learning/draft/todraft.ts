@@ -1,10 +1,6 @@
 import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from '../common';
-import { Image } from '../image';
-import { Link as HyperLink } from '../link';
-import { Xref } from '../../workbook/xref';
-import { ActivityLink } from '../activity_link';
-import { Cite } from '../cite';
+import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 
 
@@ -61,16 +57,16 @@ const inlineHandlers = {
   input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
   activity_link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE',
-    common.EntityTypes.activity_link, 'activity_link', ActivityLink.fromPersistence),
+    common.EntityTypes.activity_link, 'activity_link', registeredTypes['activity_link']),
   xref: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE',
-    common.EntityTypes.xref, 'xref', Xref.fromPersistence),
+    common.EntityTypes.xref, 'xref', registeredTypes['xref']),
   link: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE',
-    common.EntityTypes.link, 'link', HyperLink.fromPersistence),
+    common.EntityTypes.link, 'link', registeredTypes['link']),
   cite: insertDataDrivenEntity.bind(
     undefined, 'MUTABLE',
-    common.EntityTypes.cite, 'cite', Cite.fromPersistence),
+    common.EntityTypes.cite, 'cite', registeredTypes['cite']),
   em,
   foreign: applyStyle.bind(undefined, 'UNDERLINE'),
   ipa: applyStyle.bind(undefined, 'UNDERLINE'),
@@ -148,7 +144,7 @@ function insertDataDrivenEntity(
   workingBlock.entities.push({ offset, length, key });
 
   const data = {};
-  data[label] = fromPersistence(item, '', toDraft);
+  data[label] = registeredTypes[type](item);
 
   context.draft.entityMap[key] = {
     type,
@@ -203,7 +199,7 @@ function imageInline(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const image = Image.fromPersistence(item, '', toDraft);
+  const image = registeredTypes['image'](item, '');
 
   context.draft.entityMap[key] = {
     type: common.EntityTypes.image,

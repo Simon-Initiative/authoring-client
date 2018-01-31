@@ -4,6 +4,7 @@ import { Unsupported } from '../unsupported';
 import guid from 'utils/guid';
 import { HasGuid } from 'data/types';
 import { ContiguousText } from '../learning/contiguous';
+import * as logger from 'utils/logger';
 
 export const ARRAY = '#array';
 export const TITLE = '@title';
@@ -16,10 +17,10 @@ export const CONTIGUOUS_TEXT_ELEMENTS = [
   'sup', 'ipa', 'foreign',
   'cite', 'term', 'var', 'link', 'input_ref', 'm:math', 'activity_link', 'xref'];
 
-const registeredTypes = {};
+export const registeredTypes = {};
 
 
-export function registerType(elementName: string, factoryFn: (obj) => HasGuid) {
+export function registerType(elementName: string, factoryFn: (obj, guid) => HasGuid) {
   if (registeredTypes[elementName] === undefined) {
     registeredTypes[elementName] = factoryFn;
   } else {
@@ -70,11 +71,16 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
   // Buffer for contiguous text elements
   let textBuffer = [];
 
+  logger.log(
+    'begin parsing element groups', logger.LogLevel.Debug,
+    logger.Tags.Serialization);
+
   elements.forEach((e) => {
     const maybeKey = getKey(e);
 
     maybeKey.caseOf({
       just: (key) => {
+
         // If this isn't a text element
         if (textElements[key] === undefined) {
 
@@ -84,6 +90,11 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
           }
 
           const parse = factories[key];
+
+          logger.log(
+            'factory = ' + (parse === undefined ? 'undefined' : 'defined'),
+            logger.LogLevel.Debug, logger.Tags.Serialization);
+
           if (parse !== undefined) {
             parsedObjects.push(parse(e, guid()));
           } else {
@@ -99,8 +110,7 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
           parsedObjects.push(ContiguousText.fromPersistence(textBuffer, guid()));
           textBuffer = [];
         }
-        console.log('Encountered content with no key:');
-        console.log(e);
+
       },
     });
 

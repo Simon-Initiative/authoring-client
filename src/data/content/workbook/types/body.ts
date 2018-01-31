@@ -9,11 +9,11 @@ import createGuid from 'utils/guid';
 
 export type BodyElementType = MaterialElementType |
   'Definition' | 'Example' | 'Pullout' |
-  'Section' | 'Activity';
+  'Section' | 'Activity' | 'WbInline';
 
 
-const SEMANTIC_ELEMENTS = ['popout', 'example', 'definition'];
-const WB_EXTENSIONS = ['activity', 'section'];
+const SEMANTIC_ELEMENTS = ['pullout', 'example', 'definition'];
+const WB_EXTENSIONS = ['activity', 'section', 'wb:inline'];
 
 export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...WB_EXTENSIONS, ...MATERIAL_ELEMENTS];
 

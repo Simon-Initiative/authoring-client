@@ -1,0 +1,190 @@
+{
+  "rev": 1,
+  "guid": "2c9b80865c1b77b4015c1b79bc2c0003",
+  "id": "workbook",
+  "type": "x-oli-workbook_page",
+  "title": "This is the title",
+  "shortTitle": null,
+  "doc": {
+    "workbook_page": {
+      "@id": "workbook",
+      "#array": [
+        {
+          "head": {
+            "#array": [
+              {
+                "title": {
+                  "#text": "This is the title"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "body": {
+            "section": {
+              "#array": [
+                {
+                  "title": {
+                    "#text": "Section title"
+                  }
+                },
+                {
+                  "body": {
+                    "#array": [
+                      {
+                        "pullout": {
+                          "@type": "note",
+                          "p": {
+                            "#array": [
+                              {
+                                "#text": "This is an inline formula using MathML, click to edit it: "
+                              },
+                              {
+                                "math": {
+                                  "#cdata": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\">\n<munderover><mo>&sum;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>&infin;</mi></munderover><mfrac><mn>1</mn><mi>n</mi></mfrac></math>"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "p": {
+                          "#array": [
+                            {
+                              "#text": "As we "
+                            },
+                            {
+                              "link": {
+                                "#text": "text hyperlink ",
+                                "@target": "new",
+                                "@href": "http://www.google.com"
+                              }
+                            },
+                            {
+                              "link": {
+                                "#array": [
+                                  {
+                                    "em": {
+                                      "@style": "bold",
+                                      "#text": "a bold link "
+                                    }
+                                  }
+                                ],
+                                "@target": "new",
+                                "@href": "http://www.google.com"
+                              }
+                            },
+                            {
+                              "cite": {
+                                "#text": "cite ",
+                                "@entry": "A citation"
+                              }
+                            },
+                            {
+                              "term": {
+                                "#text": "term "
+                              }
+                            },
+                            {
+                              "sub": {
+                                "#text": "subscript "
+                              }
+                            },
+                            {
+                              "bdo": {
+                                "#text": "this is bdo "
+                              }
+                            },
+                            {
+                              "sup": {
+                                "#text": "superscript "
+                              }
+                            },
+                            {
+                              "var": {
+                                "#text": "and use code "
+                              }
+                            },
+                            {
+                              "em": {
+                                "@style": "bold",
+                                "#text": "have seen bold "
+                              }
+                            },
+                            {
+                              "em": {
+                                "@style": "bold",
+                                "em": {
+                                  "@style": "italic",
+                                  "#text": "both bold and italic "
+                                }
+                              }
+                            },
+                            {
+                              "em": {
+                                "@style": "italic",
+                                "#text": "italics"
+                              }
+                            },
+                            {
+                              "#text": ", for example a pair of equal and ."
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "p": {
+                          "#text": "Within this Character Data block"
+                        }
+                      },
+                      {
+                        "ul": {
+                          "#array": [
+                            {
+                              "li": {
+                                "#text": "Unordered List item 1"
+                              }
+                            },
+                            {
+                              "li": {
+                                "#text": "Unordered List item 2"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "ol": {
+                          "#array": [
+                            {
+                              "li": {
+                                "#text": "Ordered List item 1"
+                              }
+                            },
+                            {
+                              "li": {
+                                "#text": "Ordered List item 2"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "wb:inline": {
+                          "@idref": "prose_light_side",
+                          "@purpose": "learnbydoing"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

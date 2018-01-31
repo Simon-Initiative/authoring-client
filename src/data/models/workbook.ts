@@ -4,7 +4,10 @@ import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isArray } from 'util';
 import { BodyContent } from 'data/content/workbook/types/body';
+import { TextContent } from 'data/content/common/text';
+
 import { LegacyTypes } from '../types';
+
 
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
@@ -32,7 +35,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   guid: string;
   type: string;
   head: contentTypes.Head;
-  body: contentTypes.Html;
+  body: BodyContent;
   lock: contentTypes.Lock;
 
   constructor(params?: WorkbookPageModelParams) {
@@ -46,7 +49,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   static createNew(id: string, title: string, body: string) {
 
     return new WorkbookPageModel({
-      head: new contentTypes.Head({ title: new contentTypes.Title({ text: title }) }),
+      head: new contentTypes.Head({ title:
+        new contentTypes.Title({ text: TextContent.fromText(title, '') }) }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
       body: BodyContent.fromText(body, ''),
@@ -81,7 +85,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with({ head: contentTypes.Head.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({ body: BodyContent.fromPersistence(item, id) });
+          model = model.with({ body: BodyContent.fromPersistence(item.body, id) });
           break;
         default:
       }

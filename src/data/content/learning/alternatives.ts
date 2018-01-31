@@ -19,6 +19,7 @@ export type AlternativesParams = {
 };
 
 const defaultContent = {
+  contentType: 'Alternatives',
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   group: Maybe.nothing(),

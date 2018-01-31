@@ -16,6 +16,7 @@ import { loadCourse } from 'actions/course';
 import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
+import { registerContentTypes } from 'data/registrar';
 
 import { ApplicationRoot } from './ApplicationRoot';
 // import application styles
@@ -80,6 +81,7 @@ function main() {
   // Application specific initialization
   initRegistry();
   initEditorRegistry();
+  registerContentTypes();
 
   let userInfo = null;
 

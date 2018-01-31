@@ -60,6 +60,12 @@ export class TextContent extends Immutable.Record(defaultContent)
     return new TextContent({ guid, content: parseTextContent(root) });
   }
 
+
+  static fromText(text: string, guid: string) : TextContent {
+    const content = ContiguousText.fromText(text, '');
+    return new TextContent({ guid, content });
+  }
+
   toPersistence() : Object {
     return this.content.toPersistence();
   }

@@ -21,6 +21,7 @@ const defaultContent = {
   purpose: Maybe.nothing(),
   body: new BodyContent(),
   guid: '',
+  contentType: 'Section',
 };
 
 export class Section extends Immutable.Record(defaultContent) {
@@ -61,7 +62,7 @@ export class Section extends Immutable.Record(defaultContent) {
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({ body: BodyContent.fromPersistence(item, id) });
+          model = model.with({ body: BodyContent.fromPersistence(item['body'], id) });
           break;
         default:
       }

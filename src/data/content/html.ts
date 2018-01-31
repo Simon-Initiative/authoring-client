@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { ContentState } from 'draft-js';
-import { toPersistence } from './html/topersistence';
-import { toDraft } from './html/todraft';
+import { fromDraft as toPersistence } from './learning/draft/topersistence';
+import { toDraft } from './learning/draft/todraft';
 import { augment } from './common';
 import { cloneContent } from './common/clone';
 

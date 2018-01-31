@@ -15,6 +15,7 @@ export type AlternativeParams = {
 };
 
 const defaultContent = {
+  contentType: 'Alternative',
   title: new Title(),
   value: '',
   content: new MaterialContent(),
