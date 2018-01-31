@@ -9,7 +9,7 @@ import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
-import { adjustPath } from '../utils';
+import { webContentsPath } from '../utils';
 
 import './MediaManager.scss';
 
@@ -322,7 +322,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   <MediaIcon
                       filename={item.fileName}
                       mimeType={item.mimeType}
-                      url={adjustPath(item.pathTo, context.resourcePath)} />
+                      url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
                   {` ${item.fileName}`}
                 </div>
                 <div className="path-col">{item.pathTo}</div>
@@ -380,7 +380,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               <MediaIcon
                   filename={item.fileName}
                   mimeType={item.mimeType}
-                  url={adjustPath(item.pathTo, context.resourcePath)} />
+                  url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
               <div className="name">
                 {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
