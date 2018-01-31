@@ -41,7 +41,6 @@ export class VideoEditor
     this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
-    this.adjust = this.adjust.bind(this);
     this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
     this.renderSources = this.renderSources.bind(this);
   }
