@@ -16,32 +16,32 @@ export interface LinkElement extends ContentElement<LinkElement> {
 }
 
 export function parseLinkContent(obj: Object)
-  : LinkElement {
+  : Immutable.OrderedMap<string, LinkElement> {
 
   const result = parseContent(
     obj,
     SUPPORTED_ELEMENTS) as Immutable.OrderedMap<string, LinkElement>;
 
-  return result.first();
+  return result;
 }
 
 
 export type LinkContentParams = {
-  content?: LinkElement,
+  content?: Immutable.OrderedMap<string, LinkElement>,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'LinkContent',
-  content: new ContiguousText(),
+  content: Immutable.OrderedMap<string, LinkElement>(),
   guid: '',
 };
 
 export class LinkContent extends Immutable.Record(defaultContent)
-  implements ContentType<LinkContent> {
+  implements ContentType<LinkContent, LinkElement> {
 
   contentType: 'LinkContent';
-  content: LinkElement;
+  content: Immutable.OrderedMap<string, LinkElement>;
   guid: string;
 
   constructor(params?: LinkContentParams) {
@@ -58,7 +58,7 @@ export class LinkContent extends Immutable.Record(defaultContent)
 
   clone() : LinkContent {
     return this.with({
-      content: this.content.clone(),
+      content: this.content.map(c => c.clone()).toOrderedMap(),
     });
   }
 
@@ -67,7 +67,7 @@ export class LinkContent extends Immutable.Record(defaultContent)
   }
 
   toPersistence() : Object {
-    return this.content.toPersistence();
+    return this.content.first().toPersistence();
   }
 }
 

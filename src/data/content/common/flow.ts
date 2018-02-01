@@ -36,7 +36,7 @@ const defaultContent = {
 };
 
 export class FlowContent extends Immutable.Record(defaultContent)
-  implements ContentType<FlowContent> {
+  implements ContentType<FlowContent, FlowElement> {
 
   contentType: 'FlowContent';
   content: Immutable.OrderedMap<string, FlowElement>;

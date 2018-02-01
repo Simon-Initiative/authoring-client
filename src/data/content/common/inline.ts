@@ -40,7 +40,7 @@ const defaultContent = {
 };
 
 export class InlineContent extends Immutable.Record(defaultContent)
-  implements ContentType<InlineContent> {
+  implements ContentType<InlineContent, InlineElement> {
 
   contentType: 'InlineContent';
   content: Immutable.OrderedMap<string, InlineElement>;

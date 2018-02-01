@@ -33,7 +33,7 @@ const defaultContent = {
 };
 
 export class MaterialContent extends Immutable.Record(defaultContent)
-  implements ContentType<MaterialContent> {
+  implements ContentType<MaterialContent, MaterialElement> {
 
   contentType: 'MaterialContent';
   content: Immutable.OrderedMap<string, MaterialElement>;

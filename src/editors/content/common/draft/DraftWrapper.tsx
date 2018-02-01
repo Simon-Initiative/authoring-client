@@ -9,8 +9,6 @@ import {
 } from 'draft-js';
 import { Command, CommandProcessor } from '../command';
 
-import { wrappers } from './wrappers/wrappers';
-import { ContentWrapper } from './wrappers/common';
 import {
     cloneDuplicatedEntities, determineChangeType, getCursorPosition, getPosition, hasSelection,
     SelectionChangeType,
@@ -38,9 +36,7 @@ export interface DraftWrapperProps {
   locked: boolean;
   context: AppContext;
   services: AppServices;
-  inlineToolbar: any;
   activeItemId: string;
-  inlineOnlyMode: boolean;
   editorStyles?: Object;
 }
 
@@ -369,23 +365,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   handlePastedText(text, html) {
-    // Disable pasting in inline mode
-    if (this.props.inlineOnlyMode) {
-      return true;
-    }
+
+    return false;
   }
 
-  // Do not allow pasting of fragments that would introduce
-  // unbalanced block sentinels or that would violate content
-  // model schema.
   handlePastedFragment(fragment, editorState) {
-    if (this.props.inlineOnlyMode) {
-      return true;
-    }
+    return false;
   }
 
-  // Prevent cut operations that would leave the document in
-  // an invalid state.
   handleCutFragment(fragment, editorState, previewEditorState) {
     return false;
   }

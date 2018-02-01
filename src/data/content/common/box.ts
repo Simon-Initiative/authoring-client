@@ -33,7 +33,7 @@ const defaultContent = {
 };
 
 export class BoxContent extends Immutable.Record(defaultContent)
-  implements ContentType<BoxContent> {
+  implements ContentType<BoxContent, BoxElement> {
 
   contentType: 'BoxContent';
   content: Immutable.OrderedMap<string, BoxElement>;
