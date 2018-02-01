@@ -94,6 +94,7 @@ export interface MediaManagerState {
   orderBy: string;
   order: string;
   layout: LAYOUTS;
+  showDetails: boolean;
 }
 
 /**
@@ -112,6 +113,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       orderBy: SORT_MAPPINGS.Newest.orderBy,
       order: SORT_MAPPINGS.Newest.order,
       layout: LAYOUTS.GRID,
+      showDetails: true,
     };
 
     this.onScroll = this.onScroll.bind(this);
@@ -400,6 +402,72 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     );
   }
 
+  renderMediaSelectionDetails() {
+    const { media, selectionType, context } = this.props;
+    const { selection, showDetails } = this.state;
+
+    const selectedMediaItems: MediaItem[] = media.caseOf({
+      just: ml => ml.getItems().filter(item => selection.contains(item.guid)),
+      nothing: () => [],
+    });
+
+    if (selectedMediaItems.length > 1) {
+      return (
+        <div className="media-selection-details">
+          Multiple Items Selected
+        </div>
+      );
+    }
+
+    const selectedItem = selectedMediaItems[0];
+    if (selectedMediaItems.length > 0) {
+      return (
+        <div className="media-selection-details">
+          <div className="details-title">
+            <i className="fa fa-check-square-o" />
+            <a
+              href={webContentsPath(
+                selectedItem.pathTo, context.resourcePath, context.courseId)}
+              target="_blank"  >
+              {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
+            <div className="flex-spacer" />
+            <Button type="link" className="btn btn-remove" editMode onClick={() =>
+                this.setState({ selection: Immutable.List<string>() })}>
+              Deselect
+            </Button>
+            <Button type="link" editMode onClick={() =>
+                this.setState({ showDetails: !showDetails })}>
+              {showDetails ? 'Hide' : 'Details'}
+            </Button>
+          </div>
+          {showDetails &&
+            <div className="details-content">
+              <MediaIcon
+                filename={selectedItem.fileName}
+                mimeType={selectedItem.mimeType}
+                url={webContentsPath(
+                  selectedItem.pathTo, context.resourcePath, context.courseId)} />
+              <div className="details-info">
+                <div className="detail-row date-created">
+                  <b>Created:</b> {selectedItem.dateCreated}
+                </div>
+                <div className="detail-row date-updated">
+                  <b>Updated:</b> {selectedItem.dateUpdated}
+                </div>
+                <div className="detail-row file-size">
+                  <b>Size:</b> {convert.toByteNotation(selectedItem.fileSize)}
+                </div>
+              </div>
+              <div className="details-page-refs">
+                <div><b>References:</b></div>
+              </div>
+            </div>
+          }
+        </div>
+      );
+    }
+  }
+
   render() {
     const { className, mimeFilter, media } = this.props;
     const { searchText, layout, orderBy, order } = this.state;
@@ -486,6 +554,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               ? (this.renderMediaGrid())
               : (this.renderMediaList())
             }
+            {this.renderMediaSelectionDetails()}
           </div>
         </div>
         <div className="media-infobar">
