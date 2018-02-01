@@ -6,10 +6,13 @@ import {
   ResetMediaAction,
   RECEIVE_MEDIA_PAGE,
   ReceiveMediaPageAction,
+  SIDELOAD_DATA,
+  SideloadDataAction,
 } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 
-export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction;
+export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction
+  | SideloadDataAction;
 
 export type MediaState = Map<string, OrderedMediaLibrary>;
 
@@ -49,13 +52,20 @@ export const media = (
 
       return state.set(
         courseId,
-        mediaLibrary.with({
-          items: mediaLibrary.items
-            .merge(items.reduce((acc, i) => acc.set(i.guid, i), OrderedMap())),
-          totalItems,
-          totalItemsLoaded: mediaLibrary.totalItemsLoaded + items.size,
+        mediaLibrary.load(items, totalItems).with({
           isLoading: false,
         }),
+      );
+    }
+    case SIDELOAD_DATA: {
+      const { courseId, data } = action;
+
+      // get existing media library or initialize a new one
+      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+
+      return state.set(
+        courseId,
+        mediaLibrary.sideloadData(data),
       );
     }
     default:

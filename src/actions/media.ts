@@ -1,4 +1,4 @@
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { FileNode } from 'data/content/file_node';
@@ -46,12 +46,28 @@ export type ReceiveMediaPageAction = {
   totalItems: number,
 };
 
-export const ReceiveMediaPageAction = (
+export const receiveMediaPage = (
   courseId: string, items: List<MediaItem>, totalItems: number): ReceiveMediaPageAction => ({
     type: RECEIVE_MEDIA_PAGE,
     courseId,
     items,
     totalItems,
+  });
+
+export type SIDELOAD_DATA = 'media/SIDELOAD_DATA';
+export const SIDELOAD_DATA: SIDELOAD_DATA = 'media/SIDELOAD_DATA';
+
+export type SideloadDataAction = {
+  type: SIDELOAD_DATA,
+  courseId: string,
+  data: Map<string, MediaItem>,
+};
+
+export const sideloadData = (
+  courseId: string, data: Map<string, MediaItem>): SideloadDataAction => ({
+    type: SIDELOAD_DATA,
+    courseId,
+    data,
   });
 
 export const fetchCourseMedia = (
@@ -61,12 +77,12 @@ export const fetchCourseMedia = (
     dispatch(fetchMediaPage(courseId));
 
     return persistence.fetchWebContent(
-        courseId, offset, limit, mimeFilter, searchText, orderBy, order)
+        courseId, offset, limit, mimeFilter, null, searchText, orderBy, order)
       .then((response) => {
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
 
-        dispatch(ReceiveMediaPageAction(courseId, items, response.totalResults));
+        dispatch(receiveMediaPage(courseId, items, response.totalResults));
 
         return Maybe.just(items);
       })
@@ -101,5 +117,22 @@ export const fetchCourseMediaNextPage = (
       : 0;
     return dispatch(fetchCourseMedia(
       courseId, offset, limit, mimeFilter, searchText, orderBy, order));
+  }
+);
+
+export const fetchMediaItemByPath = (courseId: string, path: string) => (
+  (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<MediaItem>> => {
+    const limit = 1;
+    const offset = 0;
+
+    return persistence.fetchWebContent(courseId, offset, limit, null, path)
+    .then((response) => {
+      const data = Map<string, MediaItem>(
+        response.results.map(item => [item.fileNode.guid, new FileNode(item.fileNode)]));
+
+      dispatch(sideloadData(courseId, data));
+
+      return Maybe.maybe(data.first());
+    });
   }
 );

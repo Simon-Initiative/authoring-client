@@ -174,6 +174,7 @@ export class AudioEditor
       <MediaManager context={context} model={model}
         onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.AUDIO}
         selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
         onSelectionChange={this.onSourceSelectionChange} />
     );
 

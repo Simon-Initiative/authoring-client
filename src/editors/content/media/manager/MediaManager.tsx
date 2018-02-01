@@ -15,6 +15,7 @@ import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
+const PAGE_LOADING_MESSAGE = 'Hang on while more items are loaded...';
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
@@ -28,6 +29,8 @@ export enum SELECTION_TYPES {
   SINGLE,
   NONE,
 }
+
+const test = SELECTION_TYPES.SINGLE | SELECTION_TYPES.NONE;
 
 export enum LAYOUTS {
   GRID,
@@ -80,12 +83,14 @@ export interface MediaManagerProps {
   media: Maybe<OrderedMediaLibrary>;
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
+  initialSelectionPaths: string[];
   onEdit: (updated: Media) => void;
   onLoadCourseMediaNextPage: (
     mimeFilter: string, searchText: string,
     orderBy: string, order: string) => void;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
+  onLoadMediaItemByPath: (path: string) => Promise<Maybe<MediaItem>>;
 }
 
 export interface MediaManagerState {
@@ -124,10 +129,29 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   componentDidMount() {
-    const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
-    const { searchText, orderBy, order } = this.state;
+    const { mimeFilter, initialSelectionPaths,
+      onLoadCourseMediaNextPage, onLoadMediaItemByPath } = this.props;
+    const { searchText, orderBy, order, selection } = this.state;
 
     onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
+
+    // load initial selection data
+    if (initialSelectionPaths) {
+      Promise.all(initialSelectionPaths.filter(path => path).map(path =>
+        onLoadMediaItemByPath(path.replace(/^\.+\//, ''))),
+      ).then((mediaItems) => {
+        this.setState({
+          selection: Immutable.List(
+            mediaItems.map(mi =>
+              mi.caseOf({
+                just: item => item.guid,
+                nothing: () => undefined,
+              }),
+            ).filter(i => i),
+          ),
+        });
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -249,9 +273,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const mediaLibrary = media.valueOr(null);
     if (mediaLibrary) {
       onSelectionChange(updatedSelection.map(s => mediaLibrary.getItem(s)).toArray());
-
-      // print the path of the media item to the developer console
-      console.log('MEDIA MANAGER Selected Item URL: ' + mediaLibrary.getItem(guid).pathTo);
     }
   }
 
@@ -336,7 +357,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               ? (
                 <div key="loading" className="loading">
                   <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-                  Hang on while more items are loaded...
+                  {PAGE_LOADING_MESSAGE}
                 </div>
               )
               : null
@@ -393,7 +414,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           ? (
             <div className="loading">
               <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-              Hang on while more items are loaded...
+              {PAGE_LOADING_MESSAGE}
             </div>
           )
           : null
@@ -407,34 +428,30 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const { selection, showDetails } = this.state;
 
     const selectedMediaItems: MediaItem[] = media.caseOf({
-      just: ml => ml.getItems().filter(item => selection.contains(item.guid)),
+      just: ml => selection.map(guid => ml.data.get(guid)).toArray(),
       nothing: () => [],
     });
 
     if (selectedMediaItems.length > 1) {
       return (
         <div className="media-selection-details">
-          Multiple Items Selected
+          <div className="details-title">
+            Multiple Items Selected
+          </div>
         </div>
       );
     }
-
     const selectedItem = selectedMediaItems[0];
     if (selectedMediaItems.length > 0) {
       return (
         <div className="media-selection-details">
           <div className="details-title">
-            <i className="fa fa-check-square-o" />
             <a
               href={webContentsPath(
                 selectedItem.pathTo, context.resourcePath, context.courseId)}
               target="_blank"  >
               {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
             <div className="flex-spacer" />
-            <Button type="link" className="btn btn-remove" editMode onClick={() =>
-                this.setState({ selection: Immutable.List<string>() })}>
-              Deselect
-            </Button>
             <Button type="link" editMode onClick={() =>
                 this.setState({ showDetails: !showDetails })}>
               {showDetails ? 'Hide' : 'Details'}

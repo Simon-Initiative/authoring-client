@@ -135,6 +135,7 @@ export class ImageEditor
       <MediaManager context={context} model={model}
         onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE}
         selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={[model.src]}
         onSelectionChange={this.onSourceSelectionChange} />
     );
   }
