@@ -5,7 +5,7 @@ import { Button } from 'editors/content/common/Button';
 import { MediaIcon } from './MediaIcon';
 import { Media, MediaItem } from 'types/media';
 import guid from 'utils/guid';
-import { extractFileName } from '../utils';
+import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
@@ -13,6 +13,7 @@ import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
+const MAX_NAME_LENGTH = 26;
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
@@ -25,6 +26,50 @@ export enum SELECTION_TYPES {
   NONE,
 }
 
+export enum LAYOUTS {
+  GRID,
+  LIST,
+}
+
+const SORT_MAPPINGS = {
+  Newest: {
+    orderBy: 'dateCreated',
+    order: 'desc',
+    icon: 'fa fa-calendar',
+  },
+  Oldest: {
+    orderBy: 'dateCreated',
+    order: 'asc',
+    icon: 'fa fa-calendar',
+  },
+  'A-Z': {
+    orderBy: 'fileName',
+    order: 'asc',
+    icon: 'fa fa-sort-alpha-asc',
+  },
+  'Z-A': {
+    orderBy: 'fileName',
+    order: 'desc',
+    icon: 'fa fa-sort-alpha-desc',
+  },
+  Type: {
+    orderBy: 'mimeType',
+    order: 'asc',
+    icon: 'fa fa-file-image-o',
+  },
+  'File Size': {
+    orderBy: 'fileSize',
+    order: 'asc',
+    icon: 'fa fa-sort-numeric-asc',
+  },
+};
+
+const getSortMappingKey = (orderBy: string, order?: string) => {
+  return Object.keys(SORT_MAPPINGS).find(key =>
+    orderBy === SORT_MAPPINGS[key].orderBy
+    && (order === undefined || order === SORT_MAPPINGS[key].order));
+};
+
 export interface MediaManagerProps {
   className?: string;
   model: Media;
@@ -33,14 +78,19 @@ export interface MediaManagerProps {
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
   onEdit: (updated: Media) => void;
-  onLoadCourseMediaNextPage: (mimeFilter: string, pathFilter) => void;
+  onLoadCourseMediaNextPage: (
+    mimeFilter: string, searchText: string,
+    orderBy: string, order: string) => void;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
 }
 
 export interface MediaManagerState {
   selection: Immutable.List<string>;
-  searchText: '';
+  searchText: string;
+  orderBy: string;
+  order: string;
+  layout: LAYOUTS;
 }
 
 /**
@@ -49,7 +99,6 @@ export interface MediaManagerState {
 export class MediaManager extends React.PureComponent<MediaManagerProps, MediaManagerState> {
   scrollView: HTMLElement;
   scrollContent: HTMLElement;
-  scrollViewListener: EventListener;
 
   constructor(props) {
     super(props);
@@ -57,25 +106,29 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     this.state = {
       selection: Immutable.List<string>(),
       searchText: undefined,
+      orderBy: SORT_MAPPINGS.Newest.orderBy,
+      order: SORT_MAPPINGS.Newest.order,
+      layout: LAYOUTS.GRID,
     };
 
     this.onScroll = this.onScroll.bind(this);
     this.isSelected = this.isSelected.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onSearch = this.onSearch.bind(this);
+    this.onChangeLayout = this.onChangeLayout.bind(this);
   }
 
   componentDidMount() {
     const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
-    onLoadCourseMediaNextPage(mimeFilter, searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
   }
 
   componentWillUnmount() {
     const { onResetMedia } = this.props;
 
-    this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+    this.scrollView.removeEventListener('scroll', this.onScroll);
     onResetMedia();
   }
 
@@ -88,13 +141,17 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       return;
     }
 
+    if (this.scrollView) {
+      this.scrollView.removeEventListener('scroll', this.onScroll);
+    }
+
     this.scrollView = scrollView;
     this.scrollView.addEventListener('scroll', this.onScroll);
   }
 
   onScroll() {
     const { media, mimeFilter, onLoadCourseMediaNextPage } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -107,13 +164,13 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     });
 
     if (allItemsLoaded) {
-      this.scrollView.removeEventListener('scroll', this.scrollViewListener);
+      this.scrollView.removeEventListener('scroll', this.onScroll);
       return;
     }
 
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
         > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
-      onLoadCourseMediaNextPage(mimeFilter, searchText);
+      onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
     }
   }
 
@@ -132,13 +189,19 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   onFileUpload(file) {
     const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
-    const { searchText } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
     persistence.createWebContent(courseId, file)
       .then((result) => {
         onResetMedia();
-        onLoadCourseMediaNextPage(mimeFilter, searchText);
+        onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
       });
+  }
+
+  onChangeLayout(newLayout: LAYOUTS) {
+    this.setState({
+      layout: newLayout,
+    });
   }
 
   isSelected(guid) {
@@ -175,17 +238,35 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const mediaLibrary = media.valueOr(null);
     if (mediaLibrary) {
       onSelectionChange(updatedSelection.map(s => mediaLibrary.getItem(s)).toArray());
+
+      // print the path of the media item to the developer console
+      console.log('MEDIA MANAGER Selected Item URL: ' + mediaLibrary.getItem(guid).pathTo);
     }
   }
 
   onSearch(searchText: string) {
     const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { orderBy, order } = this.state;
 
     onResetMedia();
-    onLoadCourseMediaNextPage(mimeFilter, searchText);
+    onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
   }
 
-  renderMediaGrid () {
+  onSortChange(sortKey: string) {
+    const { mimeFilter, onLoadCourseMediaNextPage, onResetMedia } = this.props;
+    const { searchText } = this.state;
+
+    this.setState({
+      orderBy: SORT_MAPPINGS[sortKey].orderBy,
+      order: SORT_MAPPINGS[sortKey].order,
+    });
+
+    onResetMedia();
+    onLoadCourseMediaNextPage(
+      mimeFilter, searchText, SORT_MAPPINGS[sortKey].orderBy, SORT_MAPPINGS[sortKey].order);
+  }
+
+  renderMediaList() {
     const { media, selectionType } = this.props;
 
     const isLoadingMedia = media.caseOf({
@@ -204,26 +285,99 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     });
 
     return (
-      <React.Fragment>
-        <ol ref={el => this.scrollContent = el}>
+      <div className="media-list">
+        <div className="list-header">
+          <div className="sel-col"/>
+          <div className="name-col">Name</div>
+          <div className="path-col">Path</div>
+          <div className="date-col">Date Modified</div>
+          <div className="size-col">Size</div>
+        </div>
+        <div className="list-body" ref={el => this.setupScrollListener(el)}>
+          <div ref={el => this.scrollContent = el}>
+            {mediaItems.map(item => (
+              <div key={item.guid}
+                  className={
+                    `media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                    + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
+                  onClick={() => this.onSelect(item.guid)}>
+                <div className="sel-col">
+                  <input
+                      type="checkbox"
+                      readOnly
+                      className="selection-check"
+                      checked={this.isSelected(item.guid)}
+                      onClick={() => this.onSelect(item.guid)} />
+                </div>
+                <div className="name-col">
+                  <MediaIcon
+                      filename={item.fileName}
+                      mimeType={item.mimeType}
+                      url={this.adjust(item.pathTo)} />
+                  {` ${item.fileName}`}
+                </div>
+                <div className="path-col">{item.pathTo}</div>
+                <div className="date-col">{item.dateUpdated}</div>
+                <div className="size-col">{convert.toByteNotation(item.fileSize)}</div>
+              </div>
+            ))}
+            {isLoadingMedia && !allItemsLoaded
+              ? (
+                <div key="loading" className="loading">
+                  <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                  Hang on while more items are loaded...
+                </div>
+              )
+              : null
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderMediaGrid() {
+    const { media, selectionType } = this.props;
+
+    const isLoadingMedia = media.caseOf({
+      just: ml => ml.isLoading,
+      nothing: () => false,
+    });
+
+    const allItemsLoaded = media.caseOf({
+      just: ml => ml.allItemsLoaded(),
+      nothing: () => false,
+    });
+
+    const mediaItems: MediaItem[] = media.caseOf({
+      just: ml => ml.getItems(),
+      nothing: () => [],
+    });
+
+    return (
+      <div className="media-grid" ref={el => this.setupScrollListener(el)}>
+        <div className="scroll-content" ref={el => this.scrollContent = el}>
           {mediaItems.map(item => (
-            <li key={item.guid}
+            <div key={item.guid}
                 className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
                   + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
                 onClick={() => this.onSelect(item.guid)}>
               <input
                   type="checkbox"
+                  readOnly
                   className="selection-check"
                   checked={this.isSelected(item.guid)}
                   onClick={() => this.onSelect(item.guid)} />
               <MediaIcon
-                  filename={extractFileName(item.pathTo)}
+                  filename={item.fileName}
                   mimeType={item.mimeType}
                   url={this.adjust(item.pathTo)} />
-              <div className="name">{extractFileName(item.pathTo)}</div>
-            </li>
+              <div className="name">
+                {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
         {isLoadingMedia && !allItemsLoaded
           ? (
             <div className="loading">
@@ -233,15 +387,20 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           )
           : null
         }
-      </React.Fragment>
+      </div>
     );
   }
 
   render() {
-    const { className, mimeFilter } = this.props;
-    const { searchText } = this.state;
+    const { className, mimeFilter, media } = this.props;
+    const { searchText, layout, orderBy, order } = this.state;
 
     const id = guid();
+
+    const mediaCount = media.caseOf({
+      just: ml => ({ numResults: ml.totalItemsLoaded, totalResults: ml.totalItems }),
+      nothing: () => null,
+    });
 
     return (
       <div className={`media-manager ${className || ''}`}>
@@ -258,33 +417,72 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               onClick={() => this.onUploadClick(id)}>
             <i className="fa fa-upload" /> Upload
           </Button>
+          <div className="media-toolbar-item layout-control">
+            <button
+              className={`btn btn-outline-primary ${layout === LAYOUTS.GRID ? 'selected' : ''}`}
+              onClick={() => this.onChangeLayout(LAYOUTS.GRID)}>
+              <i className="fa fa-th" />
+            </button>
+            <button
+              className={`btn btn-outline-primary ${layout === LAYOUTS.LIST ? 'selected' : ''}`}
+              onClick={() => this.onChangeLayout(LAYOUTS.LIST)}>
+              <i className="fa fa-th-list" />
+            </button>
+          </div>
           <div className="media-toolbar-item flex-spacer"/>
-          <div className="media-toolbar-item sort-control">
-            Sort: Newest <i className="fa fa-angle-down" />
+          <div className="media-toolbar-item sort-control dropdown">
+            Sort By:
+            <button
+                className="btn btn-secondary dropdown-toggle sort-btn"
+                type="button" id="dropdownMenu2"
+                data-toggle="dropdown">
+              <i className={SORT_MAPPINGS[getSortMappingKey(orderBy, order)].icon} />
+              {` ${getSortMappingKey(orderBy, order)}`}
+            </button>
+            <div className="dropdown-menu">
+              {Object.keys(SORT_MAPPINGS).map(sortKey =>
+                <button
+                  key={sortKey}
+                  type="button"
+                  className="dropdown-item"
+                  onClick={() => this.onSortChange(sortKey)}>
+                  {sortKey}
+                </button>,
+              )}
+            </div>
           </div>
           <div className="media-toolbar-item search">
-          <div className="input-group">
-            <span className="input-group-addon">
-              <i className="fa fa-search" />
-            </span>
-            <input
-                type="text"
-                className="form-control"
-                placeholder="Search"
-                value={searchText}
-                onChange={({ target: { value } }) => this.onSearch(value)} />
-          </div>
+            <div className="input-group">
+              <span className="input-group-addon">
+                <i className="fa fa-search" />
+              </span>
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search"
+                  value={searchText}
+                  onChange={({ target: { value } }) => this.onSearch(value)} />
+            </div>
           </div>
         </div>
-        <div className="media-content">
+        <div className="media-library">
           <ol className="media-sidebar">
             <li className="active">All Media</li>
             {/* <li className="">Unit 1</li>
             <li className="">Unit 2</li> */}
           </ol>
-          <div className="media-grid" ref={el => this.setupScrollListener(el)}>
-            {this.renderMediaGrid()}
+          <div className="media-content">
+            {layout === LAYOUTS.GRID
+              ? (this.renderMediaGrid())
+              : (this.renderMediaList())
+            }
           </div>
+        </div>
+        <div className="media-infobar">
+            <div className="flex-spacer"/>
+            {mediaCount && mediaCount.totalResults > -Infinity &&
+              <div>Showing {mediaCount.numResults} of {mediaCount.totalResults}</div>
+            }
         </div>
       </div>
     );

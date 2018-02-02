@@ -27,17 +27,20 @@ export function createWebContent(courseId: string, file): Promise<string> {
  */
 export function fetchWebContent(
     courseId: string, offset?: number, limit?: number,
-    mimeFilter?: string, pathFilter?: string): Promise<PaginatedResponse<WebContent>> {
+    mimeFilter?: string, searchText?: string, orderBy?: string,
+    order?: string): Promise<PaginatedResponse<WebContent>> {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${courseId}/webcontents`;
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},
-    offset !== undefined ? { offset } : {},
-    limit !== undefined ? { limit } : {},
-    mimeFilter !== undefined ? { mimeFilter } : {},
-    pathFilter !== undefined ? { pathFilter } : {},
+    offset ? { offset } : {},
+    limit ? { limit } : {},
+    mimeFilter ? { mimeFilter } : {},
+    searchText ? { searchText } : {},
+    orderBy ? { orderBy } : {},
+    order ? { order } : {},
   );
 
   return authenticatedFetch({ method, url, headers, query }).then(res =>
