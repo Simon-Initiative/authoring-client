@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
-import { Xref } from '../../../data/content/html/xref';
+import { Xref } from '../../../data/content/workbook/xref';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';

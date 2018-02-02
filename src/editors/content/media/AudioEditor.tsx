@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ContentState } from 'draft-js';
 
-import { Audio } from '../../../data/content/html/audio';
+import { Audio } from '../../../data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
@@ -122,16 +122,16 @@ export class AudioEditor
 
           {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+            model={titleContent.text.content.first()}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
           <br/>
 
           {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
-          model={caption.content}
+          model={caption.content.content.first()}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
           />)}

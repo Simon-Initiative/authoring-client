@@ -7,8 +7,8 @@ import { ContentType, ContentElement } from './interfaces';
 export type BoxElementType = MaterialElementType | 'Materials' | 'Alternatives';
 
 
-export interface BoxElement extends ContentElement<BoxElement> {
-  contentType: BoxElementType;
+export interface BoxElement extends ContentElement<BoxElementType> {
+
 }
 
 export const SUPPORTED_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
@@ -33,7 +33,7 @@ const defaultContent = {
 };
 
 export class BoxContent extends Immutable.Record(defaultContent)
-  implements ContentType<BoxContent, BoxElement> {
+  implements ContentType<BoxElement> {
 
   contentType: 'BoxContent';
   content: Immutable.OrderedMap<string, BoxElement>;

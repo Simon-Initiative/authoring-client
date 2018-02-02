@@ -7,8 +7,8 @@ import { ContentType, ContentElement } from './interfaces';
 export type MaterialElementType = InlineElementType | 'WbInline';
 
 
-export interface MaterialElement extends ContentElement<MaterialElement> {
-  contentType: MaterialElementType;
+export interface MaterialElement extends ContentElement<MaterialElementType> {
+
 }
 
 export const SUPPORTED_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
@@ -33,7 +33,7 @@ const defaultContent = {
 };
 
 export class MaterialContent extends Immutable.Record(defaultContent)
-  implements ContentType<MaterialContent, MaterialElement> {
+  implements ContentType<MaterialElement> {
 
   contentType: 'MaterialContent';
   content: Immutable.OrderedMap<string, MaterialElement>;

@@ -11,8 +11,8 @@ export type LinkElementType = 'ContiguousText' | 'Image';
 
 export const SUPPORTED_ELEMENTS = [...TEXT_ELEMENTS, 'image'];
 
-export interface LinkElement extends ContentElement<LinkElement> {
-  contentType: LinkElementType;
+export interface LinkElement extends ContentElement<LinkElementType> {
+
 }
 
 export function parseLinkContent(obj: Object)
@@ -38,7 +38,7 @@ const defaultContent = {
 };
 
 export class LinkContent extends Immutable.Record(defaultContent)
-  implements ContentType<LinkContent, LinkElement> {
+  implements ContentType<LinkElement> {
 
   contentType: 'LinkContent';
   content: Immutable.OrderedMap<string, LinkElement>;

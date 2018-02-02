@@ -9,8 +9,8 @@ import createGuid from 'utils/guid';
 
 export type FlowElementType = InlineElementType;
 
-export interface FlowElement extends ContentElement<FlowElement> {
-  contentType: FlowElementType;
+export interface FlowElement extends ContentElement<FlowElementType> {
+
 }
 
 export const SUPPORTED_ELEMENTS = [...INLINE_ELEMENTS];
@@ -36,7 +36,7 @@ const defaultContent = {
 };
 
 export class FlowContent extends Immutable.Record(defaultContent)
-  implements ContentType<FlowContent, FlowElement> {
+  implements ContentType<FlowElement> {
 
   contentType: 'FlowContent';
   content: Immutable.OrderedMap<string, FlowElement>;

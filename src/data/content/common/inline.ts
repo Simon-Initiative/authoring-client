@@ -7,8 +7,8 @@ export type InlineElementType =
   'Formula' | 'Code' | 'Image' | 'Quote' | 'Table' | 'CodeBlock' | 'Video' | 'Audio' | 'YouTube' |
   'IFrame' | 'Ol' | 'Ul' | 'Dl' | 'ContiguousText';
 
-export interface InlineElement extends ContentElement<InlineElement> {
-  contentType: InlineElementType;
+export interface InlineElement extends ContentElement<InlineElementType> {
+
 }
 
 const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
@@ -40,7 +40,7 @@ const defaultContent = {
 };
 
 export class InlineContent extends Immutable.Record(defaultContent)
-  implements ContentType<InlineContent, InlineElement> {
+  implements ContentType<InlineElement> {
 
   contentType: 'InlineContent';
   content: Immutable.OrderedMap<string, InlineElement>;

@@ -106,7 +106,7 @@ export function flowBlock() {
     <Button key="codeblock"
       command={
         insertBlock(
-          EntityTypes.codeblock, 'IMMUTABLE',
+          EntityTypes.image, 'IMMUTABLE',
           { codeblock: new CodeBlock({ source: 'Your code here...' }).with({ id: guid() }) })}
       tooltip="Code block" icon="code"/>,
     <Button key="quoteblock"
@@ -117,7 +117,7 @@ export function flowBlock() {
       tooltip="Insert block formula" icon="plus"/>,
     <Button key="table"
       command={insertBlock(
-        EntityTypes.table, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { table: new Table().with({ id: guid() }) })}
       tooltip="Insert table" icon="table"/>,
     <Button key="image"
@@ -127,22 +127,22 @@ export function flowBlock() {
       tooltip="Insert image" icon="picture-o"/>,
     <Button key="audio"
       command={insertBlock(
-        EntityTypes.audio, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { audio: new Audio().with({ id: guid() }) })}
       tooltip="Insert audio clip" icon="music"/>,
     <Button key="video"
       command={insertBlock(
-        EntityTypes.video, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { video: new Video().with({ id: guid() }) })}
       tooltip="Insert video clip" icon="video-camera"/>,
     <Button key="youtube"
       command={insertBlock(
-        EntityTypes.youtube, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { youtube: new YouTube().with({ id: guid() }) })}
       tooltip="Insert YouTube Video" icon="youtube"/>,
     <Button key="iframe"
       command={insertBlock(
-        EntityTypes.iframe, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { iframe: new IFrame().with({ id: guid() }) })}
       tooltip="Insert page in iframe" icon="html5"/>,
   ];

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Title } from '../../../data/content/html/title';
-import { Caption } from '../../../data/content/html/caption';
-import { Cite } from '../../../data/content/html/cite';
+import { Title } from '../../../data/content/learning/title';
+import { Caption } from '../../../data/content/learning/caption';
+import { Cite } from '../../../data/content/learning/cite';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 
@@ -42,7 +42,7 @@ export class LabeledEditor
 
   onTitleEdit(content) {
     this.props.onEdit({
-      titleContent: this.props.model.titleContent.with({ content }),
+      titleContent: this.props.model.titleContent.with({ text: content }),
       caption: this.props.model.caption,
       cite: this.props.model.cite,
     });
@@ -75,7 +75,7 @@ export class LabeledEditor
           {...this.props}
           onEdit={this.onTitleEdit}
           inline={true}
-          model={titleContent.content}
+          model={titleContent.text}
         />
         <RichTextEditor
           label="Caption"

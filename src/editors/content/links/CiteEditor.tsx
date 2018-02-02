@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Cite } from '../../../data/content/html/cite';
+import { Cite } from '../../../data/content/learning/cite';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { InputLabel } from '../common/InputLabel';
 import { TextInput } from '../common/TextInput';

@@ -21,8 +21,8 @@ function parseBodyContent(obj: Object)
 }
 
 
-export interface BodyElement extends ContentElement<BodyElement> {
-  contentType: BodyElementType;
+export interface BodyElement extends ContentElement<BodyElementType> {
+
 }
 
 
@@ -38,7 +38,7 @@ const defaultContent = {
 };
 
 export class BodyContent extends Immutable.Record(defaultContent)
-  implements ContentType<BodyContent, BodyElement> {
+  implements ContentType<BodyElement> {
 
   contentType: 'BodyContent';
   content: Immutable.OrderedMap<string, BodyElement>;

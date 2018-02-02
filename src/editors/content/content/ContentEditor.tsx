@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import { ContentContainer } from '../container/ContentContainer';
 import guid from '../../../utils/guid';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
@@ -91,15 +91,11 @@ export class ContentEditor
 
     return (
       <div className="content-body">
-        <HtmlContentEditor
-          editorStyles={bodyStyle}
-          inlineToolbar={<InlineToolbar/>}
-          blockToolbar={<BlockToolbar/>}
-          inlineInsertionToolbar={<InlineInsertionToolbar/>}
+        <ContentContainer
           {...this.props}
           model={this.props.model.body}
           onEdit={this.onBodyEdit}
-          />
+        />
       </div>
     );
   }

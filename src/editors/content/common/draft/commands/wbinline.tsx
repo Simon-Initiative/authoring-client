@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { EntityTypes } from 'data/content/html/common';
-import { WbInline } from 'data/content/html/wbinline';
+import { EntityTypes } from 'data/content/learning/common';
+import { WbInline } from 'data/content/workbook/wbinline';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';

@@ -20,21 +20,21 @@ export function parseTextContent(obj: Object)
 }
 
 export type TextContentParams = {
-  content?: ContiguousText,
+  content?: Immutable.OrderedMap<string, ContiguousText>,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'TextContent',
-  content: new ContiguousText(),
+  content: Immutable.OrderedMap<string, ContiguousText>(),
   guid: '',
 };
 
 export class TextContent extends Immutable.Record(defaultContent)
-  implements ContentType<TextContent> {
+  implements ContentType<ContiguousText> {
 
   contentType: 'TextContent';
-  content: ContiguousText;
+  content: Immutable.OrderedMap<string, ContiguousText>;
   guid: string;
 
   constructor(params?: TextContentParams) {
@@ -52,12 +52,14 @@ export class TextContent extends Immutable.Record(defaultContent)
 
   clone() : TextContent {
     return this.with({
-      content: this.content.clone(),
+      content: this.content.map(c => c.clone()).toOrderedMap(),
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : TextContent {
-    return new TextContent({ guid, content: parseTextContent(root) });
+  static fromPersistence(root: Object, g: string) : TextContent {
+    const text = parseTextContent(root).with({ guid: guid() });
+    return new TextContent({ guid: g, content:
+      Immutable.OrderedMap<string, ContiguousText>([[text.guid, text]]) });
   }
 
 
@@ -67,7 +69,7 @@ export class TextContent extends Immutable.Record(defaultContent)
   }
 
   toPersistence() : Object {
-    return this.content.toPersistence();
+    return this.content.first().toPersistence();
   }
 }
 

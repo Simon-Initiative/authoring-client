@@ -2,13 +2,14 @@ import * as React from 'react';
 import { ContentState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import InlineToolbar from '../html/InlineToolbar';
 import BlockToolbar from '../html/BlockToolbar';
 import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
-export interface RichTextEditorProps extends AbstractContentEditorProps<ContentState> {
+export interface RichTextEditorProps
+  extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   label: string;
   showLabel?: boolean;
   inline?: boolean;
@@ -37,8 +38,8 @@ export class RichTextEditor
     return false;
   }
 
-  onEdit(html: contentTypes.Html) {
-    this.props.onEdit(html.contentState);
+  onEdit(html: contentTypes.ContiguousText) {
+    this.props.onEdit(html);
   }
 
   render() : JSX.Element {
@@ -54,16 +55,11 @@ export class RichTextEditor
       borderColor: '#AAAAAA',
     };
 
-    const editor = <HtmlContentEditor
-            inline={this.props.inline}
+    const editor = <ContiguousTextEditor
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            inlineInsertionToolbar={insertionToolbar}
-            blockToolbar={blockToolbar}
-            model={new contentTypes.Html({ contentState: this.props.model })}
+            model={this.props.model}
             onEdit={this.onEdit}
             />;
 

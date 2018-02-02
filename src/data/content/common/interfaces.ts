@@ -6,11 +6,14 @@ export interface HasContent<V> {
   content: Immutable.OrderedMap<string, V>;
 }
 
-export interface ContentElement<T> extends HasGuid, Persistable, Cloneable<T> {
-  contentType: string;
+export interface ContentElement<T> extends HasGuid, Persistable {
+  clone: () => ContentElement<T>;
+  contentType: T;
 }
 
-export interface ContentType<T, V> extends Persistable, Cloneable<T>, HasContent<V> {
+export interface ContentType<V>
+  extends Persistable, HasContent<V> {
   supportedElements() : string[];
-  with(args: HasContent<V>) : ContentType<T, V>;
+  with(args: HasContent<V>) : ContentType<V>;
+  clone: () => ContentType<V>;
 }
