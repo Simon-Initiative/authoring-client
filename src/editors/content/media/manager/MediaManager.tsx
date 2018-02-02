@@ -186,12 +186,30 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     return updated;
   }
 
-  onFileUpload(file) {
+  onFileUpload(files: FileList) {
     const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
     const { searchText, orderBy, order } = this.state;
 
-    persistence.createWebContent(courseId, file)
+    // get a list of the files to upload
+    const fileList = [];
+    for (let i = 0; i < files.length; i = i + 1) {
+      fileList.push(files[i]);
+    }
+
+    // the server creates a lock on upload, so we must upload files one at a
+    // time. This factory function returns a new promise to upload a file
+    // recursively until fileList is empty
+    const createWebContentPromiseFactory = (courseId, file) =>
+      persistence.createWebContent(courseId, file)
+        .then((result) => {
+          if (fileList.length > 0) {
+            return createWebContentPromiseFactory(courseId, fileList.pop());
+          }
+        });
+
+    // sequentially upload files one at a time, then reload the media page
+    createWebContentPromiseFactory(courseId, fileList.pop())
       .then((result) => {
         onResetMedia();
         onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
@@ -408,8 +426,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             <input
               id={id}
               style={ { display: 'none' } }
-              accept={`${mimeFilter}/*`}
-              onChange={({ target: { files } }) => this.onFileUpload(files[0])}
+              accept={mimeFilter && `${mimeFilter}/*`}
+              multiple={true}
+              onChange={({ target: { files } }) => this.onFileUpload(files)}
               type="file" />
           <Button
               className="media-toolbar-item upload"
