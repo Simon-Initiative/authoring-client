@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Button } from 'editors/content/common/Button';
 import { MediaIcon } from './MediaIcon';
-import { Media, MediaItem } from 'types/media';
+import { Media, MediaItem, MediaRef } from 'types/media';
 import guid from 'utils/guid';
 import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
@@ -316,7 +316,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     const mediaItemRefs = media.caseOf({
       just: ml => ml.references,
-      nothing: () => Immutable.Map<string, number>(),
+      nothing: () => Immutable.Map<string, Immutable.List<MediaRef>>(),
     });
 
     return (
@@ -351,7 +351,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                       url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
                   {` ${item.fileName}`}
                 </div>
-                <div className="refs-col">{mediaItemRefs.get(item.guid)}</div>
+                <div className="refs-col">
+                  {mediaItemRefs.get(item.guid) && mediaItemRefs.get(item.guid).size}
+                </div>
                 <div className="date-col">{item.dateUpdated}</div>
                 <div className="size-col">{convert.toByteNotation(item.fileSize)}</div>
               </div>
@@ -437,7 +439,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
 
     const mediaItemRefs = media.caseOf({
       just: ml => ml.references,
-      nothing: () => Immutable.Map<string, number>(),
+      nothing: () => Immutable.Map<string, Immutable.List<MediaRef>>(),
     });
 
     if (selectedMediaItems.length > 1) {
@@ -484,7 +486,23 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 </div>
               </div>
               <div className="details-page-refs">
-                <div><b>References:</b> {mediaItemRefs.get(selectedItem.guid)}</div>
+                <div><b>References:</b> {
+                  mediaItemRefs.get(selectedItem.guid) && mediaItemRefs.get(selectedItem.guid).size
+                }</div>
+                <div>
+                  {mediaItemRefs.get(selectedItem.guid) &&
+                    mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
+                      <span key={ref.guid}>
+                        <a href={`./#${ref.guid}-${context.courseId}`}
+                            target="_blank">
+                            {stringFormat.ellipsize(
+                              context.courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
+                        </a>
+                        {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
+                      </span>
+                    ),
+                  )}
+                </div>
               </div>
             </div>
           }

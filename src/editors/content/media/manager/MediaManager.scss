@@ -186,10 +186,15 @@
           .details-info {
             display: flex;
             flex-direction: column;
+            min-width: 250px;
           }
 
           .details-page-refs {
-
+            display: flex;
+            flex-direction: column;
+            max-height: 62px;
+            overflow: auto;
+            word-break: break-all;
           }
         }
       }

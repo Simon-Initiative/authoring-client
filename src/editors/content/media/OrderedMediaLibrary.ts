@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
-import { MediaItem } from 'types/media';
+import { MediaItem, MediaRef } from 'types/media';
 
 type OrderedMediaLibraryParams = {
   data?: Immutable.Map<string, MediaItem>;
   items?: Immutable.List<string>;
-  references?: Immutable.Map<string, number>;
+  references?: Immutable.Map<string, Immutable.List<MediaRef>>;
   totalItems?: number;
   totalItemsLoaded?: number;
   isLoading?: boolean;
@@ -13,7 +13,7 @@ type OrderedMediaLibraryParams = {
 const defaultContent = {
   data: Immutable.Map<string, MediaItem>(),
   items: Immutable.List<string>(),
-  references: Immutable.Map<string, number>(),
+  references: Immutable.Map<string, Immutable.List<MediaRef>>(),
   totalItems: -Infinity,
   totalItemsLoaded: 0,
   isLoading: false,
@@ -22,7 +22,7 @@ const defaultContent = {
 export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
   data: Immutable.Map<string, MediaItem>;
   items: Immutable.List<string>;
-  references: Immutable.Map<string, number>;
+  references: Immutable.Map<string, Immutable.List<MediaRef>>;
   totalItems: number;
   totalItemsLoaded: number;
   isLoading: boolean;
@@ -37,10 +37,6 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
 
   getItem(guid: string) {
     return this.data.get(guid);
-  }
-
-  getReferences(guid: string) {
-    return this.references.get(guid);
   }
 
   getItems(offset: number = 0, count: number = this.items.size) {
@@ -65,7 +61,11 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
     return this.with({ data: this.data.merge(data) });
   }
 
-  loadReferences(references: Immutable.Map<string, number>) {
+  getReferences(guid: string) {
+    return this.references.get(guid);
+  }
+
+  loadReferences(references: Immutable.Map<string, Immutable.List<MediaRef>>) {
     return this.with({ references: this.references.merge(references) });
   }
 }

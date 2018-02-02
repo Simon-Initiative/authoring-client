@@ -4,7 +4,7 @@ import { State } from 'reducers';
 import { FileNode } from 'data/content/file_node';
 import * as persistence from 'data/persistence';
 import { Maybe } from 'tsmonad';
-import { MediaItem } from 'types/media';
+import { MediaItem, MediaRef } from 'types/media';
 import * as messageActions from 'actions/messages';
 import * as Messages from 'types/messages';
 
@@ -76,35 +76,41 @@ export const LOAD_MEDIA_REFS: LOAD_MEDIA_REFS = 'media/LOAD_MEDIA_REFS';
 export type LoadMediaReferencesAction = {
   type: LOAD_MEDIA_REFS,
   courseId: string,
-  references: Map<string, number>,
+  references: Map<string, List<MediaRef>>,
 };
 
 export const loadMediaReferences = (
-  courseId: string, references: Map<string, number>): LoadMediaReferencesAction => ({
+  courseId: string, references: Map<string, List<MediaRef>>): LoadMediaReferencesAction => ({
     type: LOAD_MEDIA_REFS,
     courseId,
     references,
   });
 
 export const fetchMediaReferences = (courseId: string) => (
-  (dispatch: Dispatch<State>, getState: () => State): Promise<Map<string, number>> => {
+  (dispatch: Dispatch<State>, getState: () => State): Promise<Map<string, List<MediaRef>>> => {
     return persistence.fetchWebContentReferences(courseId, {
       destinationType: 'x-oli-webcontent',
     })
     .then((edges) => {
-      const webcontentPathToCountMap = edges.reduce(
+      const webcontentPathToSourceMap = edges.reduce(
         (acc, edge) => {
           const edgePathTo = edge.destinationId.replace(/^.*content\//, 'webcontent/');
-          return acc.set(edgePathTo, (acc.get(edgePathTo) || 0) + 1);
+          return acc.set(
+            edgePathTo,
+            (acc.get(edgePathTo) || List<MediaRef>()).concat({
+              resourceId: edge.sourceId.replace(/^.*:/, ''),
+              guid: edge.metadata.jsonObject.sourceGuid,
+            }) as List<MediaRef>,
+          );
         },
-        Map<string, number>());
+        Map<string, List<MediaRef>>());
 
       const references = getState().media.get(courseId).getItems()
         .reduce(
           (acc, i) => (
-            acc.set(i.guid, webcontentPathToCountMap.get(i.pathTo) || 0)
+            acc.set(i.guid, webcontentPathToSourceMap.get(i.pathTo) || List<MediaRef>())
           ),
-          Map<string, number>());
+          Map<string, List<MediaRef>>());
 
       dispatch(loadMediaReferences(courseId, references));
 
