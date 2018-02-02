@@ -10,6 +10,7 @@ import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
+import { adjustPath } from './utils';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -74,20 +75,11 @@ export class ImageEditor
     return false;
   }
 
-  adjust(path) {
-    const dirCount = this.props.context.resourcePath.split('\/').length;
-    let updated = path;
-    for (let i = 0; i < dirCount; i += 1) {
-      updated = '../' + updated;
-    }
-    return updated;
-  }
-
   onSourceSelectionChange(selection: MediaItem[]) {
-    const { onEdit } = this.props;
+    const { context, onEdit } = this.props;
 
     if (selection[0]) {
-      onEdit(this.props.model.with({ src: this.adjust(selection[0].pathTo) }));
+      onEdit(this.props.model.with({ src: adjustPath(selection[0].pathTo, context.resourcePath) }));
     }
   }
 

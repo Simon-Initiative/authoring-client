@@ -9,6 +9,7 @@ import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
+import { webContentsPath } from '../utils';
 
 import './MediaManager.scss';
 
@@ -17,6 +18,8 @@ const MAX_NAME_LENGTH = 26;
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
+  AUDIO = 'audio',
+  VIDEO = 'video',
   ALL = '',
 }
 
@@ -174,18 +177,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     }
   }
 
-  adjust(path) {
-    const { context } = this.props;
-
-    const dirCount = context.resourcePath.split('\/').length;
-    let updated = 'webcontents/' + context.courseId + '/' + path;
-    for (let i = 0; i < dirCount; i += 1) {
-      updated = '../' + updated;
-    }
-
-    return updated;
-  }
-
   onFileUpload(files: FileList) {
     const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
@@ -285,7 +276,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaList() {
-    const { media, selectionType } = this.props;
+    const { media, selectionType, context } = this.props;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -331,7 +322,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   <MediaIcon
                       filename={item.fileName}
                       mimeType={item.mimeType}
-                      url={this.adjust(item.pathTo)} />
+                      url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
                   {` ${item.fileName}`}
                 </div>
                 <div className="path-col">{item.pathTo}</div>
@@ -355,7 +346,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaGrid() {
-    const { media, selectionType } = this.props;
+    const { media, selectionType, context } = this.props;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -389,7 +380,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               <MediaIcon
                   filename={item.fileName}
                   mimeType={item.mimeType}
-                  url={this.adjust(item.pathTo)} />
+                  url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
               <div className="name">
                 {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
