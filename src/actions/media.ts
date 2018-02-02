@@ -70,6 +70,49 @@ export const sideloadData = (
     data,
   });
 
+export type LOAD_MEDIA_REFS = 'media/LOAD_MEDIA_REFS';
+export const LOAD_MEDIA_REFS: LOAD_MEDIA_REFS = 'media/LOAD_MEDIA_REFS';
+
+export type LoadMediaReferencesAction = {
+  type: LOAD_MEDIA_REFS,
+  courseId: string,
+  references: Map<string, number>,
+};
+
+export const loadMediaReferences = (
+  courseId: string, references: Map<string, number>): LoadMediaReferencesAction => ({
+    type: LOAD_MEDIA_REFS,
+    courseId,
+    references,
+  });
+
+export const fetchMediaReferences = (courseId: string) => (
+  (dispatch: Dispatch<State>, getState: () => State): Promise<Map<string, number>> => {
+    return persistence.fetchWebContentReferences(courseId, {
+      destinationType: 'x-oli-webcontent',
+    })
+    .then((edges) => {
+      const webcontentPathToCountMap = edges.reduce(
+        (acc, edge) => {
+          const edgePathTo = edge.destinationId.replace(/^.*content\//, 'webcontent/');
+          return acc.set(edgePathTo, (acc.get(edgePathTo) || 0) + 1);
+        },
+        Map<string, number>());
+
+      const references = getState().media.get(courseId).getItems()
+        .reduce(
+          (acc, i) => (
+            acc.set(i.guid, webcontentPathToCountMap.get(i.pathTo) || 0)
+          ),
+          Map<string, number>());
+
+      dispatch(loadMediaReferences(courseId, references));
+
+      return references;
+    });
+  }
+);
+
 export const fetchCourseMedia = (
     courseId: string, offset?: number, limit?: number, mimeFilter?: string,
     searchText?: string, orderBy?: string, order?: string) => (
@@ -83,6 +126,7 @@ export const fetchCourseMedia = (
           response.results.map(item => new FileNode(item.fileNode)));
 
         dispatch(receiveMediaPage(courseId, items, response.totalResults));
+        dispatch(fetchMediaReferences(courseId));
 
         return Maybe.just(items);
       })

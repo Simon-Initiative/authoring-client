@@ -2,6 +2,7 @@ import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 import { PaginatedResponse } from 'data/types';
+import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
 
 /**
@@ -46,4 +47,47 @@ export function fetchWebContent(
 
   return authenticatedFetch({ method, url, headers, query }).then(res =>
     (res as PaginatedResponse<WebContent>));
+}
+
+/**
+ * Fetches all webcontent references for the course, returns a Promise to resolve to
+ * a list of edges
+ */
+export function fetchWebContentReferences(packageId: string, queryParams?: {
+  relationship?: string,
+  purpose?: string,
+  sourceId?: string,
+  sourceType?: string,
+  destinationId?: string,
+  destinationType?: string,
+  referenceType?: string,
+  status?: string,
+}): Promise<Edge[]> {
+  const {
+    relationship,
+    purpose,
+    sourceId,
+    sourceType,
+    destinationId,
+    destinationType,
+    referenceType,
+    status,
+  } = queryParams;
+
+  const method = 'GET';
+  const url = `${configuration.baseUrl}/${packageId}/edges`;
+  const headers = getFormHeaders(credentials);
+  const query = Object.assign(
+    {},
+    relationship ? { relationship } : {},
+    purpose ? { purpose } : {},
+    sourceId ? { sourceId } : {},
+    sourceType ? { sourceType } : {},
+    destinationId ? { destinationId } : {},
+    destinationType ? { destinationType } : {},
+    referenceType ? { referenceType } : {},
+    status ? { relationship } : {},
+  );
+
+  return authenticatedFetch({ method, url, headers, query }).then(res => (res as Edge[]));
 }

@@ -8,11 +8,13 @@ import {
   ReceiveMediaPageAction,
   SIDELOAD_DATA,
   SideloadDataAction,
+  LOAD_MEDIA_REFS,
+  LoadMediaReferencesAction,
 } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 
 export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction
-  | SideloadDataAction;
+  | SideloadDataAction | LoadMediaReferencesAction;
 
 export type MediaState = Map<string, OrderedMediaLibrary>;
 
@@ -66,6 +68,17 @@ export const media = (
       return state.set(
         courseId,
         mediaLibrary.sideloadData(data),
+      );
+    }
+    case LOAD_MEDIA_REFS: {
+      const { courseId, references } = action;
+
+      // get existing media library or initialize a new one
+      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+
+      return state.set(
+        courseId,
+        mediaLibrary.loadReferences(references),
       );
     }
     default:

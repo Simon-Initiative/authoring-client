@@ -274,7 +274,7 @@
           flex-direction: row;
           background-color: $gray-lightest;
 
-          .sel-col, .name-col, .path-col, .date-col, .size-col {
+          .sel-col, .name-col, .refs-col, .date-col, .size-col {
             padding: 0;
           }
         }
@@ -314,8 +314,8 @@
           }
         }
 
-        .path-col {
-          width: 250px;
+        .refs-col {
+          width: 110px;
           overflow: hidden;
           padding: 5px 5px 5px 0;
           word-break: break-all;

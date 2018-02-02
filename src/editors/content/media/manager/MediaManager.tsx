@@ -316,12 +316,17 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       nothing: () => [],
     });
 
+    const mediaItemRefs = media.caseOf({
+      just: ml => ml.references,
+      nothing: () => Immutable.Map<string, number>(),
+    });
+
     return (
       <div className="media-list">
         <div className="list-header">
           <div className="sel-col"/>
           <div className="name-col">Name</div>
-          <div className="path-col">Path</div>
+          <div className="refs-col">References</div>
           <div className="date-col">Date Modified</div>
           <div className="size-col">Size</div>
         </div>
@@ -348,7 +353,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                       url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
                   {` ${item.fileName}`}
                 </div>
-                <div className="path-col">{item.pathTo}</div>
+                <div className="refs-col">{mediaItemRefs.get(item.guid)}</div>
                 <div className="date-col">{item.dateUpdated}</div>
                 <div className="size-col">{convert.toByteNotation(item.fileSize)}</div>
               </div>
@@ -432,6 +437,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       nothing: () => [],
     });
 
+    const mediaItemRefs = media.caseOf({
+      just: ml => ml.references,
+      nothing: () => Immutable.Map<string, number>(),
+    });
+
     if (selectedMediaItems.length > 1) {
       return (
         <div className="media-selection-details">
@@ -476,7 +486,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 </div>
               </div>
               <div className="details-page-refs">
-                <div><b>References:</b></div>
+                <div><b>References:</b> {mediaItemRefs.get(selectedItem.guid)}</div>
               </div>
             </div>
           }
