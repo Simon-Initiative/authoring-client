@@ -1,4 +1,4 @@
-import { Map, OrderedMap } from 'immutable';
+import { Map } from 'immutable';
 import {
   FETCH_MEDIA_PAGE,
   FetchMediaPageAction,

@@ -30,8 +30,6 @@ export enum SELECTION_TYPES {
   NONE,
 }
 
-const test = SELECTION_TYPES.SINGLE | SELECTION_TYPES.NONE;
-
 export enum LAYOUTS {
   GRID,
   LIST,
@@ -131,7 +129,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   componentDidMount() {
     const { mimeFilter, initialSelectionPaths,
       onLoadCourseMediaNextPage, onLoadMediaItemByPath } = this.props;
-    const { searchText, orderBy, order, selection } = this.state;
+    const { searchText, orderBy, order } = this.state;
 
     onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
 
@@ -429,7 +427,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaSelectionDetails() {
-    const { media, selectionType, context } = this.props;
+    const { media, context } = this.props;
     const { selection, showDetails } = this.state;
 
     const selectedMediaItems: MediaItem[] = media.caseOf({
