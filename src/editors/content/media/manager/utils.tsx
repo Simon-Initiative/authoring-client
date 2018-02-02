@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { stringToColor } from 'utils/color';
 
 export const isImage = (mimeType) => {
   return mimeType.match(/^image\//);
@@ -19,7 +20,7 @@ export const getFileExtensionColor = (extension) => {
     txt: '#009CF2',
     xls: '#00A51C',
     zip: '#515151',
-  }[extension] || '#515151';
+  }[extension] || stringToColor.hex(extension);
 };
 
 export const getFileExtensionGlyph = (extension) => {

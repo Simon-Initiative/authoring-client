@@ -328,7 +328,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                       onClick={() => this.onSelect(item.guid)} />
                 </div>
                 <div className="name-col">
-                  <img src={this.adjust(item.pathTo)} />
+                  <MediaIcon
+                      filename={item.fileName}
+                      mimeType={item.mimeType}
+                      url={this.adjust(item.pathTo)} />
                   {` ${item.fileName}`}
                 </div>
                 <div className="path-col">{item.pathTo}</div>
@@ -458,6 +461,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             <div className="dropdown-menu">
               {Object.keys(SORT_MAPPINGS).map(sortKey =>
                 <button
+                  key={sortKey}
                   type="button"
                   className="dropdown-item"
                   onClick={() => this.onSortChange(sortKey)}>
