@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Button } from 'editors/content/common/Button';
 import { MediaIcon } from './MediaIcon';
-import { Media, MediaItem } from 'types/media';
+import { Media, MediaItem, MediaRef } from 'types/media';
 import guid from 'utils/guid';
 import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
@@ -15,6 +15,7 @@ import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
+const PAGE_LOADING_MESSAGE = 'Hang on while more items are loaded...';
 
 export enum MIMETYPE_FILTERS {
   IMAGE = 'image',
@@ -80,12 +81,14 @@ export interface MediaManagerProps {
   media: Maybe<OrderedMediaLibrary>;
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
+  initialSelectionPaths: string[];
   onEdit: (updated: Media) => void;
   onLoadCourseMediaNextPage: (
     mimeFilter: string, searchText: string,
     orderBy: string, order: string) => void;
   onResetMedia: () => void;
   onSelectionChange: (selection: MediaItem[]) => void;
+  onLoadMediaItemByPath: (path: string) => Promise<Maybe<MediaItem>>;
 }
 
 export interface MediaManagerState {
@@ -94,6 +97,7 @@ export interface MediaManagerState {
   orderBy: string;
   order: string;
   layout: LAYOUTS;
+  showDetails: boolean;
 }
 
 /**
@@ -112,6 +116,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       orderBy: SORT_MAPPINGS.Newest.orderBy,
       order: SORT_MAPPINGS.Newest.order,
       layout: LAYOUTS.GRID,
+      showDetails: true,
     };
 
     this.onScroll = this.onScroll.bind(this);
@@ -122,10 +127,29 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   componentDidMount() {
-    const { mimeFilter, onLoadCourseMediaNextPage } = this.props;
+    const { mimeFilter, initialSelectionPaths,
+      onLoadCourseMediaNextPage, onLoadMediaItemByPath } = this.props;
     const { searchText, orderBy, order } = this.state;
 
     onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
+
+    // load initial selection data
+    if (initialSelectionPaths) {
+      Promise.all(initialSelectionPaths.filter(path => path).map(path =>
+        onLoadMediaItemByPath(path.replace(/^[./]+/, ''))),
+      ).then((mediaItems) => {
+        this.setState({
+          selection: Immutable.List(
+            mediaItems.map(mi =>
+              mi.caseOf({
+                just: item => item.guid,
+                nothing: () => undefined,
+              }),
+            ).filter(i => i),
+          ),
+        });
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -247,9 +271,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const mediaLibrary = media.valueOr(null);
     if (mediaLibrary) {
       onSelectionChange(updatedSelection.map(s => mediaLibrary.getItem(s)).toArray());
-
-      // print the path of the media item to the developer console
-      console.log('MEDIA MANAGER Selected Item URL: ' + mediaLibrary.getItem(guid).pathTo);
     }
   }
 
@@ -293,12 +314,17 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       nothing: () => [],
     });
 
+    const mediaItemRefs = media.caseOf({
+      just: ml => ml.references,
+      nothing: () => Immutable.Map<string, Immutable.List<MediaRef>>(),
+    });
+
     return (
       <div className="media-list">
         <div className="list-header">
           <div className="sel-col"/>
           <div className="name-col">Name</div>
-          <div className="path-col">Path</div>
+          <div className="refs-col">References</div>
           <div className="date-col">Date Modified</div>
           <div className="size-col">Size</div>
         </div>
@@ -325,7 +351,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                       url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
                   {` ${item.fileName}`}
                 </div>
-                <div className="path-col">{item.pathTo}</div>
+                <div className="refs-col">
+                  {mediaItemRefs.get(item.guid) && mediaItemRefs.get(item.guid).size}
+                </div>
                 <div className="date-col">{item.dateUpdated}</div>
                 <div className="size-col">{convert.toByteNotation(item.fileSize)}</div>
               </div>
@@ -334,7 +362,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               ? (
                 <div key="loading" className="loading">
                   <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-                  Hang on while more items are loaded...
+                  {PAGE_LOADING_MESSAGE}
                 </div>
               )
               : null
@@ -391,13 +419,104 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           ? (
             <div className="loading">
               <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-              Hang on while more items are loaded...
+              {PAGE_LOADING_MESSAGE}
             </div>
           )
           : null
         }
       </div>
     );
+  }
+
+  renderMediaSelectionDetails() {
+    const { media, context } = this.props;
+    const { selection, showDetails } = this.state;
+
+    const selectedMediaItems: MediaItem[] = media.caseOf({
+      just: ml => selection.map(guid => ml.data.get(guid)).toArray(),
+      nothing: () => [],
+    });
+
+    const mediaItemRefs = media.caseOf({
+      just: ml => ml.references,
+      nothing: () => Immutable.Map<string, Immutable.List<MediaRef>>(),
+    });
+
+    if (selectedMediaItems.length > 1) {
+      return (
+        <div className="media-selection-details">
+          <div className="details-title">
+            Multiple Items Selected
+          </div>
+        </div>
+      );
+    }
+    const selectedItem = selectedMediaItems[0];
+    if (selectedMediaItems.length > 0) {
+      return (
+        <div className="media-selection-details">
+          <div className="details-title">
+            <a
+              href={webContentsPath(
+                selectedItem.pathTo, context.resourcePath, context.courseId)}
+              target="_blank"  >
+              {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
+            <div className="flex-spacer" />
+            <Button type="link" editMode onClick={() =>
+                this.setState({ showDetails: !showDetails })}>
+              {showDetails ? 'Hide' : 'Details'}
+            </Button>
+          </div>
+          {showDetails &&
+            <div className="details-content">
+              <MediaIcon
+                filename={selectedItem.fileName}
+                mimeType={selectedItem.mimeType}
+                url={webContentsPath(
+                  selectedItem.pathTo, context.resourcePath, context.courseId)} />
+              <div className="details-info">
+                <div className="detail-row date-created">
+                  <b>Created:</b> {selectedItem.dateCreated}
+                </div>
+                <div className="detail-row date-updated">
+                  <b>Updated:</b> {selectedItem.dateUpdated}
+                </div>
+                <div className="detail-row file-size">
+                  <b>Size:</b> {convert.toByteNotation(selectedItem.fileSize)}
+                </div>
+              </div>
+              <div className="details-page-refs">
+                <div>
+                  <b>References:</b> {
+                    mediaItemRefs.get(selectedItem.guid)
+                    ? (
+                      mediaItemRefs.get(selectedItem.guid).size
+                    )
+                    : (
+                      <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                    )
+                  }
+                </div>
+                <div>
+                  {mediaItemRefs.get(selectedItem.guid)
+                    && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
+                      <span key={ref.guid}>
+                        <a href={`./#${ref.guid}-${context.courseId}`}
+                            target="_blank">
+                            {stringFormat.ellipsize(
+                              context.courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
+                        </a>
+                        {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
+                      </span>
+                    ))
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      );
+    }
   }
 
   render() {
@@ -486,6 +605,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               ? (this.renderMediaGrid())
               : (this.renderMediaList())
             }
+            {this.renderMediaSelectionDetails()}
           </div>
         </div>
         <div className="media-infobar">

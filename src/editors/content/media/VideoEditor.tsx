@@ -227,6 +227,7 @@ export class VideoEditor
       <MediaManager context={context} model={model}
         onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.VIDEO}
         selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
         onSelectionChange={this.onSourceSelectionChange} />
     );
   }
