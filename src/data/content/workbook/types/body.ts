@@ -1,21 +1,18 @@
 import * as Immutable from 'immutable';
-import { MaterialElementType, SUPPORTED_ELEMENTS as MATERIAL_ELEMENTS }
-  from '../../common/material';
+import { BodyElementType as LearningBodyElementType, SUPPORTED_ELEMENTS as BODY_ELEMENTS }
+  from '../../common/body';
 import { parseContent } from '../../common/parse';
 import { ContiguousText } from '../../learning/contiguous';
 import { augment, getChildren } from '../../common';
 import { ContentType, ContentElement } from '../../common/interfaces';
 import createGuid from 'utils/guid';
 
-export type BodyElementType = MaterialElementType |
-  'Definition' | 'Example' | 'Pullout' |
+export type BodyElementType = LearningBodyElementType |
   'Section' | 'Activity' | 'WbInline';
 
-
-const SEMANTIC_ELEMENTS = ['pullout', 'example', 'definition'];
 const WB_EXTENSIONS = ['activity', 'section', 'wb:inline'];
 
-export const SUPPORTED_ELEMENTS = [...SEMANTIC_ELEMENTS, ...WB_EXTENSIONS, ...MATERIAL_ELEMENTS];
+export const SUPPORTED_ELEMENTS = [...WB_EXTENSIONS, ...BODY_ELEMENTS];
 
 function parseBodyContent(obj: Object)
   : Immutable.OrderedMap<string, BodyElement> {
@@ -26,8 +23,8 @@ function parseBodyContent(obj: Object)
 }
 
 
-export interface BodyElement extends ContentElement<BodyElement> {
-  contentType: BodyElementType;
+export interface BodyElement extends ContentElement<BodyElementType> {
+
 }
 
 
@@ -43,7 +40,7 @@ const defaultContent = {
 };
 
 export class BodyContent extends Immutable.Record(defaultContent)
-  implements ContentType<BodyContent> {
+  implements ContentType<BodyElement> {
 
   contentType: 'BodyContent';
   content: Immutable.OrderedMap<string, BodyElement>;

@@ -2,13 +2,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { TextContent } from 'data/content/common/text';
 import { InlineContent } from 'data/content/common/inline';
+import { ContentContainer } from '../container/ContentContainer';
 import { Audio } from '../../../data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { ContentContainer } from '../container/ContentContainer';
+
 import { TabContainer } from '../common/TabContainer';
 import { ContiguousText } from 'data/content/learning/contiguous';
 

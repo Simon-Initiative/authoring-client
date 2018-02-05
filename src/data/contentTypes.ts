@@ -1,3 +1,10 @@
+export { BodyContent } from './content/common/body';
+export { MaterialContent } from './content/common/material';
+export { BoxContent } from './content/common/box';
+export { FlowContent } from './content/common/flow';
+export { InlineContent } from './content/common/inline';
+export { TextContent } from './content/common/text';
+
 
 // Learning
 export { ActivityLink } from './content/learning/activity_link';
