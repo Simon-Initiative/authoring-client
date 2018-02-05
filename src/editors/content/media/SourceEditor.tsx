@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
 
-import { Source } from '../../../data/content/html/source';
+import { Source } from '../../../data/content/learning/source';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';

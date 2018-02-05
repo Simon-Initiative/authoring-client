@@ -133,9 +133,9 @@ export class AudioEditor
 
           <br/>
 
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
-          model={titleContent.text.content.first()}
+          model={caption.content}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
           />)}

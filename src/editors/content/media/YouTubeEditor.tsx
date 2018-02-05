@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
 
-import { YouTube } from '../../../data/content/html/youtube';
+import { YouTube } from '../../../data/content/learning/youtube';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { TextContent } from 'data/content/common/text';
+import { InlineContent } from 'data/content/common/inline';
 import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-
+import { ContentContainer } from '../container/ContentContainer';
 import { Collapse } from '../common/Collapse';
 
 export interface YouTubeEditorProps extends AbstractContentEditorProps<YouTube> {
@@ -58,12 +58,12 @@ export class YouTubeEditor
     this.props.onEdit(updated);
   }
 
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentState) {
+  onAlternateEdit(content: TextContent) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
@@ -83,12 +83,12 @@ export class YouTubeEditor
   }
 
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: TextContent) {
+    const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: InlineContent) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
@@ -146,21 +146,19 @@ export class YouTubeEditor
               onEdit={this.onPopoutEdit}
             />)}
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
-
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
           />)}
-
         </Collapse>
 
       </div>);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Source } from '../../../data/content/html/source';
+import { Source } from '../../../data/content/learning/source';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { SourceEditor } from './SourceEditor';
 

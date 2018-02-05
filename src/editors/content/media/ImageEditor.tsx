@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
 import * as persistence from '../../../data/persistence';
-import { Image } from '../../../data/content/html/image';
+import { Image } from '../../../data/content/learning/image';
+import { TextContent } from 'data/content/common/text';
+import { InlineContent } from 'data/content/common/inline';
+import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName } from './utils';
@@ -110,22 +112,22 @@ export class ImageEditor
     this.props.onEdit(updated);
   }
 
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentState) {
+  onAlternateEdit(content: TextContent) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: TextContent) {
+    const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: InlineContent) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
@@ -274,15 +276,14 @@ export class ImageEditor
               onEdit={this.onPopoutEdit}
             />)}
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
-
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}

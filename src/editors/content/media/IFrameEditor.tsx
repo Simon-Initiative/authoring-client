@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
+import { TextContent } from 'data/content/common/text';
+import { InlineContent } from 'data/content/common/inline';
 
-import { IFrame } from '../../../data/content/html/iframe';
+import { IFrame } from '../../../data/content/learning/iframe';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
+import { ContentContainer } from '../container/ContentContainer';
 
 import { TabContainer } from '../common/TabContainer';
 
@@ -46,12 +48,12 @@ export class IFrameEditor
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: TextContent) {
+    const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: InlineContent) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
@@ -144,16 +146,17 @@ export class IFrameEditor
     return (
       <div style={ { marginTop: '30px' } }>
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
           <br/>
 
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
