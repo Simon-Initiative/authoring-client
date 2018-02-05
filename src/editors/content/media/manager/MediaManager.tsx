@@ -500,7 +500,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 <div>
                   {mediaItemRefs.get(selectedItem.guid)
                     && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
-                      <span key={`${ref.guid}`}>
+                      <span key={ref.guid}>
                         <a href={`./#${ref.guid}-${context.courseId}`}
                             target="_blank">
                             {stringFormat.ellipsize(
