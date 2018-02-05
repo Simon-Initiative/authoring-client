@@ -1,7 +1,7 @@
 import { connect, Dispatch } from 'react-redux';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
-import { fetchCourseMediaNextPage, resetMedia } from 'actions/media';
+import { fetchCourseMediaNextPage, resetMedia, fetchMediaItemByPath } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
 import { AppContext } from 'editors/common/AppContext';
@@ -16,6 +16,7 @@ interface DispatchProps {
     mimeFilter: string, searchText: string,
     orderBy: string, order: string) => void;
   onResetMedia: () => void;
+  onLoadMediaItemByPath: (path: string) => Promise<Maybe<MediaItem>>;
 }
 
 interface OwnProps {
@@ -24,6 +25,7 @@ interface OwnProps {
   context: AppContext;
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
+  initialSelectionPaths?: string[];
   onEdit: (updated: Media) => void;
   onSelectionChange: (selection: MediaItem[]) => void;
 }
@@ -43,6 +45,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onResetMedia: () => {
       dispatch(resetMedia(ownProps.context.courseId));
     },
+    onLoadMediaItemByPath: (path: string) => (
+      dispatch(fetchMediaItemByPath(ownProps.context.courseId, path))
+    ),
   };
 };
 
