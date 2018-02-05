@@ -136,7 +136,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     // load initial selection data
     if (initialSelectionPaths) {
       Promise.all(initialSelectionPaths.filter(path => path).map(path =>
-        onLoadMediaItemByPath(path.replace(/^\.+\//, ''))),
+        onLoadMediaItemByPath(path.replace(/^[./]+/, ''))),
       ).then((mediaItems) => {
         this.setState({
           selection: Immutable.List(
@@ -486,13 +486,21 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 </div>
               </div>
               <div className="details-page-refs">
-                <div><b>References:</b> {
-                  mediaItemRefs.get(selectedItem.guid) && mediaItemRefs.get(selectedItem.guid).size
-                }</div>
                 <div>
-                  {mediaItemRefs.get(selectedItem.guid) &&
-                    mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
-                      <span key={ref.guid}>
+                  <b>References:</b> {
+                    mediaItemRefs.get(selectedItem.guid)
+                    ? (
+                      mediaItemRefs.get(selectedItem.guid).size
+                    )
+                    : (
+                      <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                    )
+                  }
+                </div>
+                <div>
+                  {mediaItemRefs.get(selectedItem.guid)
+                    && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
+                      <span key={console.log(ref) || `${ref.guid}-${i}`}>
                         <a href={`./#${ref.guid}-${context.courseId}`}
                             target="_blank">
                             {stringFormat.ellipsize(
@@ -500,8 +508,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                         </a>
                         {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
                       </span>
-                    ),
-                  )}
+                    ))
+                  }
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { FileNode } from 'data/content/file_node';
 import * as persistence from 'data/persistence';
+import { LegacyTypes } from 'data/types';
 import { Maybe } from 'tsmonad';
 import { MediaItem, MediaRef } from 'types/media';
 import * as messageActions from 'actions/messages';
@@ -89,7 +90,7 @@ export const loadMediaReferences = (
 export const fetchMediaReferences = (courseId: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Map<string, List<MediaRef>>> => {
     return persistence.fetchWebContentReferences(courseId, {
-      destinationType: 'x-oli-webcontent',
+      destinationType: LegacyTypes.webcontent,
     })
     .then((edges) => {
       const webcontentPathToSourceMap = edges.reduce(
@@ -105,7 +106,7 @@ export const fetchMediaReferences = (courseId: string) => (
         },
         Map<string, List<MediaRef>>());
 
-      const references = getState().media.get(courseId).getItems()
+      const references = getState().media.get(courseId).data.toArray()
         .reduce(
           (acc, i) => (
             acc.set(i.guid, webcontentPathToSourceMap.get(i.pathTo) || List<MediaRef>())
@@ -181,6 +182,7 @@ export const fetchMediaItemByPath = (courseId: string, path: string) => (
         response.results.map(item => [item.fileNode.guid, new FileNode(item.fileNode)]));
 
       dispatch(sideloadData(courseId, data));
+      dispatch(fetchMediaReferences(courseId));
 
       return Maybe.maybe(data.first());
     });
