@@ -4,7 +4,20 @@ import guid from 'utils/guid';
 import { augment } from '../common';
 import { ContiguousText } from '../learning/contiguous';
 import { parseContent } from './parse';
-import { ContentType } from './interfaces';
+import { ContentType, ContentElement } from './interfaces';
+
+
+
+export type TextElementType = 'ContiguousText';
+
+export interface TextElement extends ContentElement<TextElementType> {
+
+}
+
+
+
+
+
 
 export const SUPPORTED_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'cite', 'term', 'var', 'link', 'activity_link', 'xref', 'input_ref'];

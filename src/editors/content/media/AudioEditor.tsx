@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
-
+import * as Immutable from 'immutable';
+import { TextContent } from 'data/content/common/text';
+import { InlineContent } from 'data/content/common/inline';
 import { Audio } from '../../../data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Sources } from './Sources';
 import { Tracks } from './Tracks';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-
+import { ContentContainer } from '../container/ContentContainer';
 import { TabContainer } from '../common/TabContainer';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
 
@@ -44,22 +46,24 @@ export class AudioEditor
     return false;
   }
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: TextContent) {
+    const titleContent = this.props.model.titleContent.with({
+      text,
+    });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: InlineContent) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
 
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentState) {
+  onAlternateEdit(content: TextContent) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
@@ -120,9 +124,9 @@ export class AudioEditor
           <br/>
 
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-            model={titleContent.text.content.first()}
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit}
           />)}
@@ -131,7 +135,7 @@ export class AudioEditor
 
           {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
           {...this.props}
-          model={caption.content.content.first()}
+          model={titleContent.text.content.first()}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
           />)}

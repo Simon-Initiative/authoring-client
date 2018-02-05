@@ -23,7 +23,8 @@ export interface RichTextEditorState {
  * The content editor for HtmlContent.
  */
 export class RichTextEditor
-  extends AbstractContentEditor<ContentState, RichTextEditorProps, RichTextEditorState> {
+  extends AbstractContentEditor<contentTypes.ContiguousText,
+  RichTextEditorProps, RichTextEditorState> {
 
   constructor(props) {
     super(props);
