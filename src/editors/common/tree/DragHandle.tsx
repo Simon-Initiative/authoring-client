@@ -21,7 +21,7 @@ export class DragHandle
     return this.props.connectDragSource(
       <div className="dragHandleGrab">
         <span>
-          <i className="icon icon-reorder"></i>
+          <i className="fa fa-bars"></i>
         </span>
       </div>,
     );

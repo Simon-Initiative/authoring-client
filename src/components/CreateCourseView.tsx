@@ -7,6 +7,8 @@ import { isNullOrUndefined } from 'util';
 
 import './CreateCourseView.scss';
 
+const BOOK_IMAGE = require('../../assets/book.svg');
+
 export interface CreateCourseViewProps {
   dispatch: any;
 }
@@ -90,8 +92,12 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       </div>
     );
 
+    const imageViaStyle = {
+      backgroundImage: 'url(' + BOOK_IMAGE + ')',
+    };
+
     return (
-      <div className="create-course-view full container-fluid">
+      <div style={imageViaStyle} className="create-course-view full container-fluid">
         <div className="row">
           <div className="col-md-12">
             <h1>Create a new course content package</h1>

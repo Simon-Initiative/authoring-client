@@ -13,7 +13,7 @@ export const Remove = (props) => {
         onClick={() => props.processCommand(new RemoveCommand())}
         type="button"
         className="btn btn-sm">
-        <i className="icon icon-remove"></i>
+        <i className="fa fa-close"></i>
       </button>
     </span>
   );

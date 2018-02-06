@@ -13,7 +13,6 @@ import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Hints } from '../part/Hints';
-import { ExplanationEditor } from '../part/ExplanationEditor';
 import ConceptsEditor from '../concepts/ConceptsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
@@ -93,8 +92,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   abstract getClassName(): string;
 
   onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    const { onEdit } = this.props;
-
     const hint = new contentTypes.Hint();
     this.onHintsEdit(part.hints.set(hint.guid, hint), item, part);
   }

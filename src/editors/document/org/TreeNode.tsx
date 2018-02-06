@@ -102,12 +102,12 @@ export class TreeNode
 
     const hasHiddenChildren =
       <span>
-        <i className="icon icon-caret-right"></i>
+        <i className="fa fa-caret-right"></i>
       </span>;
 
     const hasShownChildren =
       <span>
-        <i className="icon icon-caret-down"></i>
+        <i className="fa fa-caret-down"></i>
       </span>;
 
     const icon = isExpanded ? hasShownChildren : hasHiddenChildren;
