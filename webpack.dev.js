@@ -1,29 +1,52 @@
 var path = require('path');
 var webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: [
-        'webpack-dev-server/client?http://dev.local:3000',
-        'webpack/hot/only-dev-server',
-        'react-hot-loader/patch',
-        './src/app.tsx'
-    ],
+    entry: {
+        app: ['react-hot-loader/patch', './src/app.tsx'],
+        vendor: [
+            'draft-js',
+            'history',
+            'immutable',
+            'json-beautify',
+            'keycloak-js',
+            'react',
+            'react-addons-css-transition-group',
+            'react-addons-shallow-compare',
+            'react-bootstrap-typeahead',
+            'react-dnd',
+            'react-dnd-html5-backend',
+            'react-dom',
+            'react-redux',
+            'redux',
+            'redux-logger',
+            'redux-thunk',
+            'tsmonad',
+            'whatwg-fetch'
+        ]
+    },
     output: {
-        path: __dirname + '/dev',
-        filename: "bundle.js",
-        publicPath: '/',
-        sourcePrefix: ''
+        path: path.resolve(__dirname, 'dev'),
+        filename: '[name].[hash].js'
     },
     externals: {
     },
     devtool: 'source-map',
     devServer: {
-        contentBase: path.join(__dirname, "dev"),
-        historyApiFallback: true
+        contentBase: __dirname,
+        historyApiFallback: true,
+        hot: true,
+        disableHostCheck: true,
+        port: 9000,
+        host: '0.0.0.0',
+        stats: {
+            colors: true
+        }
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: ['.ts', '.tsx', '.js'],
         // Add webpack aliases for top level imports
         alias: {
             actions: path.resolve(__dirname, 'src/actions'),
@@ -39,13 +62,14 @@ module.exports = {
     module: {
         unknownContextCritical: false,
         rules: [
+            { test: /\.html$/, loader: 'underscore-template-loader' },
             { test: /\.css$/, use: ['style-loader', 'css-loader'] },
             {
               test: /\.scss$/,
               use: [
-                  { loader: "style-loader"},
-                  { loader: "css-loader"},
-                  { loader: "sass-loader",
+                  { loader: 'style-loader'},
+                  { loader: 'css-loader'},
+                  { loader: 'sass-loader',
                     options: {
                         includePaths: [
                             path.join(__dirname, 'src/stylesheets'),
@@ -75,6 +99,18 @@ module.exports = {
 
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+            template: '!!underscore-template-loader!./index.html',
+            inject: false
+        }),
+        new webpack.HashedModuleIdsPlugin(),
+        new webpack.NamedModulesPlugin(),
+        new webpack.optimize.CommonsChunkPlugin({
+          name: 'vendor'
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+          name: 'manifest'
+        })
     ]
 };

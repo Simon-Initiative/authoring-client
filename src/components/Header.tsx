@@ -5,6 +5,8 @@ import { UserState } from 'reducers/user';
 
 import './Header.scss';
 
+const OLI_ICON = require('../../assets/oli-icon.png');
+
 export interface HeaderProps {
   course: CourseModel;
   user: UserState;
@@ -103,7 +105,7 @@ class Header extends React.PureComponent<HeaderProps, {}> {
       <div className="header">
         <div className="header-logo">
           <Link action={this.props.viewActions.viewAllCourses}>
-            <img src="assets/oli-icon.png" width="30" height="30"
+            <img src={OLI_ICON} width="30" height="30"
                 className="d-inline-block align-top" alt=""/>
           </Link>
         </div>
@@ -111,9 +113,7 @@ class Header extends React.PureComponent<HeaderProps, {}> {
           {this.props.course ? this.renderPackageActions() : this.renderApplicationLabel()}
         </div>
         <div className="header-logout">
-          <Link action={() => window.open(this.props.user.logoutUrl)}>
-            Logout
-          </Link>
+          <a className="header-link" href={this.props.user.logoutUrl}>Logout</a>
         </div>
       </div>
     );

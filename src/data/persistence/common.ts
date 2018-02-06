@@ -19,6 +19,7 @@ export type HttpRequestParams = {
   url: string,
   body?: any,
   headers?: Object,
+  query?: Object,
   hasTextResult?: boolean,
 };
 
@@ -28,7 +29,15 @@ export function authenticatedFetch(params: HttpRequestParams) {
   const headers = params.headers ? params.headers : getHeaders(credentials);
   const hasTextResult = params.hasTextResult ? params.hasTextResult : false;
 
-  const { body, url } = params;
+  const { body, url, query } = params;
+
+  let queryString = '';
+  if (query && Object.keys(query).length > 0) {
+    // convert query params to encoded url string
+    queryString = '?' + Object.keys(query)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(query[k]))
+      .join('&');
+  }
 
   return new Promise((resolve, reject) => {
 
@@ -40,7 +49,7 @@ export function authenticatedFetch(params: HttpRequestParams) {
         return;
       }
 
-      return fetch(url, {
+      return fetch(url + queryString, {
         method,
         headers,
         body,

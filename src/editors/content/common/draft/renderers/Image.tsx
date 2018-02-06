@@ -10,6 +10,8 @@ import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
+const IMAGE = require('../../../../../../assets/400x300.png');
+
 type Data = {
   image: ImageType;
 };
@@ -73,7 +75,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
     if (src === '') {
       imageComponent = <img onClick={this.onClick}
-        src="assets/400x300.png" width="400" height="300"/>;
+        src={IMAGE} width="400" height="300"/>;
 
     } else {
 

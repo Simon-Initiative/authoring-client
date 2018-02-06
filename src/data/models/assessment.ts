@@ -147,9 +147,12 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 
   toPersistence(): Object {
+    const shortTitle = this.title.text.length > 30
+      ? this.title.text.substr(0, 30) : this.title.text;
+
     const children = [
       this.title.toPersistence(),
-      { short_title: { '#text': this.title.text } },
+      { short_title: { '#text': shortTitle } },
       ...this.pages.toArray().map(page => page.toPersistence()),
     ];
     let resource = this.resource.toPersistence();

@@ -5,6 +5,7 @@ import * as persistence from 'data/persistence';
 import * as Messages from 'types/messages';
 
 export interface PreviewProps {
+  email: string;
   documentId?: string;
   courseId?: string;
   previewUrl: Maybe<string>;
@@ -17,17 +18,35 @@ interface PreviewState {
   previewUrl: Maybe<string>;
 }
 
-function buildMessage() {
+function buildPreviewMessage() {
   const content = new Messages.TitledContent().with({
     title: 'Refresh in progress.',
     message: 'A newer version of this page is loading, please wait.',
   });
   return new Messages.Message().with({
     content,
-    guid: 'PreviewMessage',
+    guid: 'PreviewInProgressMessage',
+    scope: Messages.Scope.Resource,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: Immutable.List([]),
+  });
+}
+
+function buildAccountMessage(email: string) {
+  const content = new Messages.TitledContent().with({
+    title: 'Preview',
+    message: 'To preview your content, sign in to your Preview (dev-01.oli.cmu.edu) '
+      + 'account. If you have never signed in to your Preview '
+      + 'account, please check your ' + email
+      + ' email for instructions.',
+  });
+  return new Messages.Message().with({
+    content,
+    guid: 'PreviewAccountMessage',
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Information,
-    canUserDismiss: false,
+    canUserDismiss: true,
     actions: Immutable.List([]),
   });
 }
@@ -56,7 +75,7 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
       .then((result) => {
         if (result.type === 'PreviewSuccess') {
           if (result.message === '') {
-            this.props.dismissMessage(buildMessage());
+            this.props.dismissMessage(buildPreviewMessage());
             this.setState({ previewUrl: Maybe.just(result.activityUrl || result.sectionUrl) });
           } else {
             this.timerId = Maybe.just(window.setTimeout(() => this.checkOnProgress(), 10000));
@@ -75,8 +94,10 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
       just: url => this.props.shouldRefresh,
     });
 
+    this.props.showMessage(buildAccountMessage(this.props.email));
+
     if (needsRefresh) {
-      this.props.showMessage(buildMessage());
+      this.props.showMessage(buildPreviewMessage());
       this.checkOnProgress();
     }
   }

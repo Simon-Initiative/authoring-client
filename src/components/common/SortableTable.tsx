@@ -16,8 +16,8 @@ export type DataRow = {
   data: Object;
 };
 
-export interface SortableTable {  
-  
+export interface SortableTable {
+
 }
 
 export interface SortableTableProps {
@@ -33,7 +33,7 @@ export interface SortableTableState {
   sortedModel: DataRow[];
 }
 
-export class SortableTable 
+export class SortableTable
   extends React.Component<SortableTableProps, SortableTableState> {
 
   constructor(props) {
@@ -43,15 +43,15 @@ export class SortableTable
       sortDirection: SortDirection.Ascending,
       sortColumnIndex: 0,
       sortedModel: this.sort(
-        this.props.model, 
+        this.props.model,
         0, SortDirection.Ascending),
     };
 
   }
 
-  
+
   sort(model: DataRow[], columnIndex: number, sortDirection: SortDirection) : DataRow[] {
-    
+
     const i = columnIndex;
     return model.sort((a: DataRow, b: DataRow) => {
       return this.props.columnComparators[i](
@@ -72,11 +72,11 @@ export class SortableTable
 
     if (sortColumnIndex === this.state.sortColumnIndex) {
 
-      const sortDirection = this.state.sortDirection === SortDirection.Ascending 
+      const sortDirection = this.state.sortDirection === SortDirection.Ascending
           ? SortDirection.Descending : SortDirection.Ascending;
 
       this.setState({
-        sortDirection,  
+        sortDirection,
         sortedModel: this.sort(this.props.model, this.state.sortColumnIndex, sortDirection),
       });
     } else {
@@ -90,7 +90,7 @@ export class SortableTable
 
   renderSortIndicator() {
 
-    const classes = 'icon icon-sort-' 
+    const classes = 'fa fa-sort-'
       + (this.state.sortDirection === SortDirection.Ascending ? 'up' : 'down');
 
     return (
@@ -143,6 +143,6 @@ export class SortableTable
       </table>
     );
   }
-  
+
 }
 

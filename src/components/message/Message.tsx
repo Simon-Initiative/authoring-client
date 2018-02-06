@@ -65,7 +65,7 @@ export class Message
       <button
         onClick={this.onDismiss.bind(this)}
         className="btn btn-sm">
-        <i className="icon icon-remove"></i>
+        <i className="fa fa-close"></i>
       </button>
     );
   }
