@@ -1,18 +1,18 @@
 import * as Immutable from 'immutable';
 
-import { FlowContent } from '../common/flow';
+import { AlternativeFlowContent } from './types/flow';
 import { augment } from '../common';
 
 export type HintParams = {
   targets?: string,
-  body?: FlowContent
+  body?: AlternativeFlowContent
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Hint',
   targets: '',
-  body: new FlowContent(),
+  body: new AlternativeFlowContent(),
   guid: '',
 };
 
@@ -20,7 +20,7 @@ export class Hint extends Immutable.Record(defaultContent) {
 
   contentType: 'Hint';
   targets: string;
-  body: FlowContent;
+  body: AlternativeFlowContent;
   guid: string;
 
   constructor(params?: HintParams) {
@@ -36,7 +36,7 @@ export class Hint extends Immutable.Record(defaultContent) {
     const hint = (root as any).hint;
 
     let model = new Hint({ guid });
-    model = model.with({ body: FlowContent.fromPersistence(hint, '') });
+    model = model.with({ body: AlternativeFlowContent.fromPersistence(hint, '') });
 
     if (hint['@targets'] !== undefined) {
       model = model.with({ targets: hint['@targets'] });

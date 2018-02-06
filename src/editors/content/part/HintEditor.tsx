@@ -1,13 +1,10 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
 import { InputLabel } from '../common/InputLabel';
-
+import { ContentContainer } from 'editors/content/container//ContentContainer';
 
 type IdTypes = {
   targets: string,
@@ -62,27 +59,12 @@ export class HintEditor
 
   render() : JSX.Element {
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="itemWrapper">
 
       <InputLabel editMode={this.props.editMode}
         label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
-          <HtmlContentEditor
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            inlineInsertionToolbar={insertionToolbar}
+          <ContentContainer
             {...this.props}
             model={this.props.model.body}
             onEdit={this.onBodyEdit}

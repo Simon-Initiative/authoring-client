@@ -60,19 +60,6 @@ export class FlowContent extends Immutable.Record(defaultContent)
     return SUPPORTED_ELEMENTS;
   }
 
-  // TODO: Generalize this functionality allowing visitation and
-  // update of any text or element entity, filtered based on type
-  tagInputRefsWithType(byId: Object) {
-    return this.with({
-      content: this.content.map((c) => {
-        if (c.contentType === 'ContiguousText') {
-          return (c as ContiguousText).tagInputRefsWithType(byId);
-        }
-        return c;
-      }).toOrderedMap(),
-    });
-  }
-
   extractPlainText() : Maybe<string> {
     const t = this.content.toArray().filter(c => c.contentType === 'ContiguousText');
     if (t.length > 0) {

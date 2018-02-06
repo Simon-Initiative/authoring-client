@@ -1,13 +1,11 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import BlockToolbar from '../html/BlockToolbar';
+import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
-export interface ExplanationEditorProps extends AbstractContentEditorProps<contentTypes.Html> {
-  onEdit: (model: contentTypes.Html) => void;
+export interface ExplanationEditorProps extends AbstractContentEditorProps<AlternativeFlowContent> {
+  onEdit: (model: AlternativeFlowContent) => void;
 }
 
 export interface ExplanationEditorState {
@@ -17,7 +15,8 @@ export interface ExplanationEditorState {
  * The content editor for HtmlContent.
  */
 export class ExplanationEditor
-  extends AbstractContentEditor<contentTypes.Html, ExplanationEditorProps, ExplanationEditorState> {
+  extends AbstractContentEditor<AlternativeFlowContent,
+  ExplanationEditorProps, ExplanationEditorState> {
 
   constructor(props) {
     super(props);
@@ -40,11 +39,7 @@ export class ExplanationEditor
 
     return (
       <div className="explanation-editor">
-        <HtmlContentEditor
-          editorStyles={bodyStyle}
-          inlineToolbar={<InlineToolbar/>}
-          blockToolbar={<BlockToolbar/>}
-          inlineInsertionToolbar={<InlineInsertionToolbar/>}
+        <ContentContainer
           {...this.props}
           model={this.props.model}
           onEdit={this.props.onEdit} />

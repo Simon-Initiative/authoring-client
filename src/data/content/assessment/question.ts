@@ -1,7 +1,8 @@
 import * as Immutable from 'immutable';
 
 
-import { FlowContent } from '../common/flow';
+import { AlternativeFlowContent } from './types/flow';
+import { QuestionBodyContent } from './types/body';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
@@ -22,24 +23,24 @@ export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
 
 export type QuestionParams = {
   id?: string;
-  body?: FlowContent;
+  body?: QuestionBodyContent;
   concepts?: Immutable.List<string>;
   grading?: string;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
-  explanation?: FlowContent;
+  explanation?: AlternativeFlowContent;
   guid?: string;
 };
 
 const defaultQuestionParams = {
   contentType: 'Question',
   id: '',
-  body: new FlowContent(),
+  body: new QuestionBodyContent(),
   concepts: Immutable.List<string>(),
   grading: 'automatic',
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
-  explanation: new FlowContent(),
+  explanation: new AlternativeFlowContent(),
   guid: '',
 };
 
@@ -147,7 +148,7 @@ function migrateExplanationToFeedback(model: Question) : Question {
 
     if (!migratedAlready) {
       const explanation
-        = FlowContent.fromText('migrated', '');
+        = AlternativeFlowContent.fromText('migrated', '');
 
       const f = new Feedback().with({ body: originalExplanation });
       const feedback = Immutable.OrderedMap<string, Feedback>()
@@ -173,12 +174,12 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
   id: string;
-  body: FlowContent;
+  body: QuestionBodyContent;
   concepts: Immutable.List<string>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
-  explanation: FlowContent;
+  explanation: AlternativeFlowContent;
   guid: string;
 
   constructor(params?: QuestionParams) {
@@ -226,7 +227,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
 
         case 'body':
-          model = model.with({ body: FlowContent.fromPersistence(item, id) });
+          model = model.with({ body: QuestionBodyContent.fromPersistence(item, id) });
           break;
         case 'part':
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
@@ -261,7 +262,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
         case 'explanation':
           model = model.with({ explanation:
-            FlowContent.fromPersistence((item as any).explanation, id) });
+            AlternativeFlowContent.fromPersistence((item as any).explanation, id) });
           break;
         default:
 

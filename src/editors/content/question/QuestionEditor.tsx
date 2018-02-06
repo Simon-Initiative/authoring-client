@@ -3,15 +3,16 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
+import { QuestionBodyContent } from 'data/content/assessment/types/body';
 import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
-import { EntityTypes } from '../../../data/content/html/common';
+import { EntityTypes } from '../../../data/content/learning/common';
 import { Skill } from 'types/course';
-import { changes, removeInputRef } from '../../../data/content/html/changes';
+import { changes, removeInputRef } from '../../../data/content/learning/changes';
 import { InsertInputRefCommand } from './commands';
 
 import './QuestionEditor.scss';
@@ -31,7 +32,7 @@ export interface QuestionEditorState {
  */
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
-  lastBody: contentTypes.Html;
+  lastBody: QuestionBodyContent;
   itemToAdd: any;
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;

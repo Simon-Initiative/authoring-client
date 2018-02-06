@@ -1,10 +1,5 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { HtmlToolbarButton } from '../html/TypedToolbar';
 import { InsertInputRefCommand } from '../question/commands';
 import {
   Question, QuestionProps, QuestionState,
@@ -13,6 +8,7 @@ import { TabContainer } from 'editors/content/common/TabContainer';
 import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';
+import { ContentContainer } from 'editors/content/container//ContentContainer';
 
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
@@ -90,41 +86,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       onBodyEdit,
     } = this.props;
 
-    const bodyStyle = {
-      minHeight: '50px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
-    const multipartButtons = [];
-    if (canInsertAnotherPart('FillInTheBlank')) {
-      multipartButtons.push(<HtmlToolbarButton
-        tooltip="Insert Dropdown"
-        key="server"
-        icon="server"
-        command={fillInTheBlankCommand}/>);
-    }
-    if (canInsertAnotherPart('Numeric')) {
-      multipartButtons.push(<HtmlToolbarButton
-        tooltip="Insert Numeric Input"
-        key="info"
-        icon="info"
-        command={numericCommand}/>);
-    }
-    if (canInsertAnotherPart('Text')) {
-      multipartButtons.push(<HtmlToolbarButton
-        tooltip="Insert Text Input"
-        key="i-cursor"
-        icon="i-cursor"
-        command={textCommand}/>);
-    }
-
-    const insertionToolbar =
-      <InlineInsertionToolbar>
-        {multipartButtons}
-      </InlineInsertionToolbar>;
-
     return (
       <div className="question-body" key="question">
         <div className="control insert-item">
@@ -147,15 +108,10 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             </button>
 
         </div>
-        <HtmlContentEditor
-          ref={c => this.htmlEditor = c}
+        <ContentContainer
           editMode={editMode}
           services={services}
           context={context}
-          editorStyles={bodyStyle}
-          inlineToolbar={<InlineToolbar/>}
-          inlineInsertionToolbar={insertionToolbar}
-          blockToolbar={<BlockToolbar/>}
           model={body}
           onEdit={onBodyEdit} />
       </div>

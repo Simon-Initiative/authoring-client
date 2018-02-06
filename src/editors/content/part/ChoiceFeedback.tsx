@@ -4,7 +4,7 @@ import * as contentTypes from '../../../data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { convert } from 'utils/format';
-
+import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
@@ -104,7 +104,7 @@ export abstract class ChoiceFeedback
     this.onResponseEdit(updatedResponse);
   }
 
-  onDefaultFeedbackEdit(body: contentTypes.FlowContent, score: string) {
+  onDefaultFeedbackEdit(body: AlternativeFlowContent, score: string) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
     const updatedModel = modelWithDefaultFeedback(
