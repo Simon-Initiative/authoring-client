@@ -8,6 +8,7 @@ import { Maybe } from 'tsmonad';
 import { MediaItem, MediaRef } from 'types/media';
 import * as messageActions from 'actions/messages';
 import * as Messages from 'types/messages';
+import guid from 'utils/guid';
 
 const MEDIA_PAGE_SIZE = 60;
 
@@ -17,11 +18,13 @@ export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
 export type FetchMediaPageAction = {
   type: FETCH_MEDIA_PAGE,
   courseId: string,
+  reqId: string,
 };
 
-export const fetchMediaPage = (courseId: string): FetchMediaPageAction => ({
+export const fetchMediaPage = (courseId: string, reqId: string): FetchMediaPageAction => ({
   type: FETCH_MEDIA_PAGE,
   courseId,
+  reqId,
 });
 
 export type RESET_MEDIA = 'media/RESET_MEDIA';
@@ -124,7 +127,8 @@ export const fetchCourseMedia = (
     courseId: string, offset?: number, limit?: number, mimeFilter?: string,
     searchText?: string, orderBy?: string, order?: string) => (
   (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<List<MediaItem>>> => {
-    dispatch(fetchMediaPage(courseId));
+    const reqId = guid();
+    dispatch(fetchMediaPage(courseId, reqId));
 
     return persistence.fetchWebContent(
         courseId, offset, limit, mimeFilter, null, searchText, orderBy, order)
@@ -132,8 +136,12 @@ export const fetchCourseMedia = (
         const items = List<MediaItem>(
           response.results.map(item => new FileNode(item.fileNode)));
 
-        dispatch(receiveMediaPage(courseId, items, response.totalResults));
-        dispatch(fetchMediaReferences(courseId));
+        // check if the response if for the latest request
+        if (getState().media.get(courseId).lastReqId === reqId) {
+          // request is latest, update state
+          dispatch(receiveMediaPage(courseId, items, response.totalResults));
+          dispatch(fetchMediaReferences(courseId));
+        }
 
         return Maybe.just(items);
       })
