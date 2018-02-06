@@ -17,7 +17,6 @@ import { Objectives } from './Objectives';
 import { TabContainer } from '../../content/common/TabContainer';
 import { Details } from './Details';
 import { Actions } from './Actions';
-import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './WorkbookPageEditor.scss';
 
@@ -59,26 +58,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       props.model.body.contentState, props.context.courseModel)) {
       props.services.refreshCourse(props.context.courseId);
     }
-  }
-
-  componentDidMount() {
-    const { model } = this.props;
-
-    logger.group(
-      LogLevel.INFO,
-      LogTag.DEFAULT,
-      'Workbook Page Details',
-      (logger) => {
-        logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `Title: ${model.resource.title}`)
-          .info(LogTag.DEFAULT, `Created: ${model.resource.dateCreated}`)
-          .info(LogTag.DEFAULT, `Updated: ${model.resource.dateUpdated}`)
-          .info(LogTag.DEFAULT, `Path: ${model.resource.fileNode.pathTo}`);
-      },
-      LogStyle.HEADER + LogStyle.BLUE,
-    );
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
