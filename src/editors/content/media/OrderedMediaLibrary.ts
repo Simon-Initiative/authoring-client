@@ -70,8 +70,14 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
   }
 
   clearItems() {
+    // reset media library but keep data and reference cache
     return this.with({
+      data: this.data,
       items: Immutable.List<string>(),
+      references: this.references,
+      totalItems: -Infinity,
+      totalItemsLoaded: 0,
+      isLoading: false,
     });
   }
 }
