@@ -25,7 +25,6 @@ import 'stylesheets/index.scss';
 // attach global variables to window
 (window as any).React = React;
 
-
 const loggerMiddleware = (createLogger as any)();
 
 function initStoreWithState(state) {

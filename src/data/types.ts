@@ -27,3 +27,13 @@ export interface Cloneable<T> {
 export interface Persistable {
   toPersistence(): Object;
 }
+
+export type PaginatedResponse<T> = {
+  offset: number;
+  limit: number;
+  order: string;
+  orderBy: string;
+  numResults: number;
+  totalResults: number;
+  results: T[];
+};

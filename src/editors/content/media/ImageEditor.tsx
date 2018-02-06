@@ -5,14 +5,15 @@ import { TextContent } from 'data/content/common/text';
 import { InlineContent } from 'data/content/common/inline';
 import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
 import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
+import { MediaManager } from './manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
+import { MediaItem } from 'types/media';
+import { adjustPath } from './utils';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -41,7 +42,7 @@ export class ImageEditor
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onAltEdit = this.onAltEdit.bind(this);
     this.onValignEdit = this.onValignEdit.bind(this);
-    this.onFileChange = this.onFileChange.bind(this);
+    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
 
@@ -77,31 +78,12 @@ export class ImageEditor
     return false;
   }
 
-  adjust(path) {
-    const dirCount = this.props.context.resourcePath.split('\/').length;
-    let updated = path;
-    for (let i = 0; i < dirCount; i += 1) {
-      updated = '../' + updated;
+  onSourceSelectionChange(selection: MediaItem[]) {
+    const { context, onEdit } = this.props;
+
+    if (selection[0]) {
+      onEdit(this.props.model.with({ src: adjustPath(selection[0].pathTo, context.resourcePath) }));
     }
-    return updated;
-  }
-
-  onFileChange(e) {
-    const file = e.target.files[0];
-
-    persistence.createWebContent(this.props.context.courseId, file)
-    .then((result) => {
-      this.setState(
-        { failure: false },
-        () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
-    })
-    .catch((err) => {
-      this.setState({ failure: true });
-    });
-  }
-
-  openFileDialog(id) {
-    (window as any).$('#' + id).trigger('click');
   }
 
   onLabeledEdit(model: LabeledType) {
@@ -150,44 +132,14 @@ export class ImageEditor
   }
 
   renderSource() {
-    const { src } = this.props.model;
-    let srcDisplay;
-    if (!this.state.failure) {
-      const contents = (src === '' || src.indexOf('via.placeholder.com') !== -1)
-        ? '' : extractFileName(src);
-      srcDisplay = <input type="text" id="disabledTextInput"
-        className="form-control" placeholder={contents} readOnly/>;
-    } else {
-      srcDisplay =
-        <div className="alert alert-danger" role="alert">
-          <strong>Failed</strong> Rename the file and try again
-        </div>;
-    }
-    const id : string = guid();
+    const { context, model, onEdit } = this.props;
 
     return (
-      <div style={ { marginTop: '70px' } }>
-
-        {this.row('Image', '6', <div className="input-group">
-          <input
-            id={id}
-            style={ { display: 'none' } }
-            accept="image/*"
-            onChange={this.onFileChange}
-            type="file"
-          />
-          {srcDisplay}
-          <span className="input-group-btn">
-            <Button editMode={this.props.editMode}
-          onClick={this.openFileDialog.bind(this, id)}>Browse...</Button>
-          </span>
-        </div>)}
-
-        {this.row('', '6', <span className="form-text text-muted">
-          Browse to and select an image file from your computer to upload
-        </span>)}
-
-      </div>
+      <MediaManager context={context} model={model}
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+        selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={[model.src]}
+        onSelectionChange={this.onSourceSelectionChange} />
     );
   }
 

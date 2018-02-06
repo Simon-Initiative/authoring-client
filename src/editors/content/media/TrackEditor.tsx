@@ -4,8 +4,7 @@ import * as persistence from '../../../data/persistence';
 import { Track } from '../../../data/content/learning/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import { extractFileName } from './utils';
-
+import { extractFileName, adjustPath } from './utils';
 import { TextInput } from '../common/TextInput';
 import { Button } from '../common/Button';
 
@@ -65,16 +64,6 @@ export class TrackEditor
     this.props.onEdit(this.props.model.with({ default: def }));
   }
 
-
-  adjust(path) {
-    const dirCount = this.props.context.resourcePath.split('\/').length;
-    let updated = path;
-    for (let i = 0; i < dirCount; i += 1) {
-      updated = '../' + updated;
-    }
-    return updated;
-  }
-
   onFileChange(e) {
     const file = e.target.files[0];
 
@@ -82,7 +71,8 @@ export class TrackEditor
     .then((result) => {
       this.setState(
         { failure: false },
-        () => this.props.onEdit(this.props.model.with({ src: this.adjust(result) })));
+        () => this.props.onEdit(this.props.model.with({
+          src: adjustPath(result, this.props.context.resourcePath) })));
     })
     .catch((err) => {
       this.setState({ failure: true });

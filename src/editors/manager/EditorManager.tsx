@@ -21,6 +21,8 @@ import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
 import { LearningObjective, Skill } from 'data//contentTypes';
+import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
+
 import './EditorManager.scss';
 
 export interface EditorManagerProps {
@@ -159,6 +161,26 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     });
   }
 
+  logResourceDetails(resource: Resource) {
+
+    logger.group(
+      LogLevel.INFO,
+      LogTag.DEFAULT,
+      'Resource Details',
+      (logger) => {
+        logger
+          .setVisibility(LogAttribute.TAG, false)
+          .setVisibility(LogAttribute.DATE, false)
+          .info(LogTag.DEFAULT, `Type: ${resource.type}`)
+          .info(LogTag.DEFAULT, `Title: ${resource.title}`)
+          .info(LogTag.DEFAULT, `Created: ${resource.dateCreated}`)
+          .info(LogTag.DEFAULT, `Updated: ${resource.dateUpdated}`)
+          .info(LogTag.DEFAULT, `Path: ${resource.fileNode.pathTo}`);
+      },
+      LogStyle.HEADER + LogStyle.BLUE,
+    );
+  }
+
   fetchDocument(courseId: string, documentId: string) {
     const { onCourseChanged } = this.props;
 
@@ -179,6 +201,8 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         if (document.model.modelType === models.ModelTypes.CourseModel) {
           onCourseChanged(document.model);
         }
+
+        this.logResourceDetails((document.model as any).resource);
 
         // Tear down previous persistence strategy
         if (this.persistenceStrategy !== null) {

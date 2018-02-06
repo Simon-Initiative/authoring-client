@@ -5,13 +5,17 @@ import { InlineContent } from 'data/content/common/inline';
 import { ContentContainer } from '../container/ContentContainer';
 import { Audio } from '../../../data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Sources } from './Sources';
 import { Tracks } from './Tracks';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-
 import { TabContainer } from '../common/TabContainer';
 import { ContiguousText } from 'data/content/learning/contiguous';
+
+import { MediaManager } from './manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
+import { MediaItem } from 'types/media';
+import { Source } from 'data/content/learning/source';
+import { adjustPath } from './utils';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
 
@@ -30,14 +34,14 @@ export class AudioEditor
   constructor(props) {
     super(props);
 
-    this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onSourcesEdit = this.onSourcesEdit.bind(this);
     this.onTracksEdit = this.onTracksEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
+    this.renderSources = this.renderSources.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -74,21 +78,11 @@ export class AudioEditor
     this.props.onEdit(this.props.model.with({ controls }));
   }
 
-  onSourcesEdit(sources) {
-    this.props.onEdit(this.props.model.with({ sources }));
-  }
-
   onTracksEdit(tracks) {
     this.props.onEdit(this.props.model.with({ tracks }));
   }
 
-  onSetClick() {
-    // TODO
-  }
-
-
   renderTracks() {
-
     const { tracks } = this.props.model;
 
     return (
@@ -167,23 +161,29 @@ export class AudioEditor
     );
   }
 
-  renderSources() {
+  onSourceSelectionChange(selections: MediaItem[]) {
+    const { model, context, onEdit } = this.props;
 
-    const { sources } = this.props.model;
+    if (selections.length > 0) {
+      const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
+
+      onEdit(model.with({
+        sources: Immutable.OrderedMap<string, Source>().set(source.guid, source),
+      }));
+    }
+  }
+
+  renderSources() {
+    const { context, model, onEdit } = this.props;
 
     return (
-      <div style={ { marginTop: '5px' } }>
-
-        <Sources
-          {...this.props}
-          mediaType="audio"
-          accept="audio/*"
-          model={sources}
-          onEdit={this.onSourcesEdit}
-        />
-
-      </div>
+      <MediaManager context={context} model={model}
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.AUDIO}
+        selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
+        onSelectionChange={this.onSourceSelectionChange} />
     );
+
   }
 
 

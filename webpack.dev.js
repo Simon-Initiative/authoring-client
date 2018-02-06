@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        app: './src/app.tsx',
+        app: ['react-hot-loader/patch', './src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
@@ -39,7 +39,10 @@ module.exports = {
         hot: true,
         disableHostCheck: true,
         port: 9000,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        stats: {
+            colors: true
+        }
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
@@ -98,7 +101,12 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
+<<<<<<< HEAD
             template: '!!underscore-template-loader!./index.html'
+=======
+            template: '!!underscore-template-loader!./index.html',
+            inject: false
+>>>>>>> master
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.NamedModulesPlugin(),
