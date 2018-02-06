@@ -10,7 +10,11 @@ export {
   importPackage,
 } from './persistence/package';
 
-export { createWebContent, fetchWebContent } from './persistence/webcontent';
+export {
+  createWebContent,
+  fetchWebContent,
+  fetchWebContentReferences,
+} from './persistence/webcontent';
 
 export { developerRegistration } from './persistence/developer';
 

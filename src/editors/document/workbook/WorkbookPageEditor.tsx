@@ -123,7 +123,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const insertionToolbar = <InlineInsertionToolbar />;
 
     return (
-      <div className="html-editor-well">
+      <div key="content-tab" className="html-editor-well">
         <HtmlContentEditor
           inlineToolbar={inlineToolbar}
           inlineInsertionToolbar={insertionToolbar}
@@ -138,19 +138,31 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   renderDetailsTab() {
-    return <Details
-      model={this.props.model}
-      editMode={this.props.editMode}
-      onEdit={this.onModelEdit}/>;
+    return (
+      <div key="details-tab">
+        <Details
+          model={this.props.model}
+          editMode={this.props.editMode}
+          onEdit={this.onModelEdit}/>
+      </div>
+    );
   }
 
   renderObjectivesTab() {
-    return this.renderObjectives();
+    return (
+      <div key="objectives-tab">
+        {this.renderObjectives()}
+      </div>
+    );
   }
 
   renderActionsTab() {
-    return <Actions onPreview={() =>
-      this.props.preview(this.props.context.courseId, this.props.model.resource)}/>;
+    return (
+      <div key="actions-tab">
+        <Actions onPreview={() =>
+          this.props.preview(this.props.context.courseId, this.props.model.resource)}/>
+      </div>
+    );
   }
 
   render() {

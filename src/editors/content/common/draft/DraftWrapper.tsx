@@ -662,6 +662,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     }
   }
 
+
+
   renderPostProcess(components, blocks) {
 
     const updated = [];

@@ -1,15 +1,17 @@
 import * as React from 'react';
-
+import { OrderedMap } from 'immutable';
 import { ContentState } from 'draft-js';
-
 import { Video } from '../../../data/content/html/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Sources } from './Sources';
 import { Tracks } from './Tracks';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
-
 import { TabContainer } from '../common/TabContainer';
+import { MediaManager } from './manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
+import { MediaItem } from 'types/media';
+import { Source } from 'data/content/html/source';
+import { adjustPath } from './utils';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
 
@@ -39,6 +41,8 @@ export class VideoEditor
     this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
+    this.renderSources = this.renderSources.bind(this);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -125,7 +129,7 @@ export class VideoEditor
 
           {this.row('', '8', <label className="form-check-label">
             &nbsp;&nbsp;&nbsp;
-            <input type="checkbox"
+            <input type="checkbox" readOnly
               onClick={this.onControlEdit}
               className="form-check-input"
               checked={this.props.model.controls}
@@ -204,22 +208,27 @@ export class VideoEditor
     );
   }
 
-  renderSources() {
+  onSourceSelectionChange(selections: MediaItem[]) {
+    const { model, context, onEdit } = this.props;
 
-    const { sources } = this.props.model;
+    if (selections.length > 0) {
+      const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
+
+      onEdit(model.with({
+        sources: OrderedMap<string, Source>().set(source.guid, source),
+      }));
+    }
+  }
+
+  renderSources() {
+    const { context, model, onEdit } = this.props;
 
     return (
-      <div style={ { marginTop: '5px' } }>
-
-        <Sources
-          {...this.props}
-          mediaType="video"
-          accept="video/*"
-          model={sources}
-          onEdit={this.onSourcesEdit}
-        />
-
-      </div>
+      <MediaManager context={context} model={model}
+        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.VIDEO}
+        selectionType={SELECTION_TYPES.SINGLE}
+        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
+        onSelectionChange={this.onSourceSelectionChange} />
     );
   }
 
