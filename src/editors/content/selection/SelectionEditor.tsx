@@ -154,15 +154,14 @@ export class SelectionEditor
     let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
       titleEditor =
-        <Collapse caption="Title" details={this.props.model.source.title.text}>
             <PoolTitleEditor
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
               model={this.props.model.source.title}
               onEdit={this.onTitleEdit}
-            />
-        </Collapse>;
+            />;
+
     }
 
     return (

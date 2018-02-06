@@ -6,7 +6,7 @@ import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
 
 import { ObjRef } from '../learning/objref';
-import { Title } from '../title';
+import { Title } from '../learning/title';
 import { Content } from './content';
 import { Question } from './question';
 

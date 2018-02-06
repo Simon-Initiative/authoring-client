@@ -23,7 +23,7 @@ export const SUPPORTED_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign'
   'cite', 'term', 'var', 'link', 'activity_link', 'xref', 'input_ref'];
 
 export function parseTextContent(obj: Object)
-  : ContiguousText {
+  : Immutable.OrderedMap<string, TextElement> {
 
   const result = parseContent(
     obj,
@@ -70,9 +70,8 @@ export class TextContent extends Immutable.Record(defaultContent)
   }
 
   static fromPersistence(root: Object, g: string) : TextContent {
-    const text = parseTextContent(root).with({ guid: guid() });
-    return new TextContent({ guid: g, content:
-      Immutable.OrderedMap<string, TextElement>([[text.guid, text]]) });
+    const text = parseTextContent(root);
+    return new TextContent({ guid: g, content: text });
   }
 
 

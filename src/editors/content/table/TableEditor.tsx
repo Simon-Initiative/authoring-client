@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Cell, Row } from '../../../data/content/html/row';
-import { CellData } from '../../../data/content/html/celldata';
-import { CellHeader } from '../../../data/content/html/cellheader';
+import { Cell, Row } from '../../../data/content/learning/row';
+import { CellData } from '../../../data/content/learning/celldata';
+import { CellHeader } from '../../../data/content/learning/cellheader';
 import { Html } from '../../../data/content/html';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { HtmlContentEditor } from '../html/HtmlContentEditor';

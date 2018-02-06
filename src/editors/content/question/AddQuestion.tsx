@@ -145,7 +145,7 @@ export class AddQuestion
   onAddMultipart() {
     const q = new contentTypes.Question()
       .with({
-        body: new contentTypes.Html().with({ contentState:  defaultInputBody }),
+        body: defaultInputBody,
       });
     this.props.onQuestionAdd(q);
   }
