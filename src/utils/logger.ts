@@ -4,6 +4,7 @@ const DEFAULT_MAX_HISTORY = Infinity;
 
 export enum LogTag {
   DEFAULT = 'DEFAULT',
+  EDITOR = 'EDITOR',
 }
 
 export type Log = {

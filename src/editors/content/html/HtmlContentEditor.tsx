@@ -4,7 +4,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { Command, CommandProcessor } from '../common/command';
 import DraftWrapper from '../../content/common/draft/DraftWrapper';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { logger, LogTag } from 'utils/logger';
 
 export type ChangePreviewer = (
   current: contentTypes.Html,
@@ -84,7 +84,7 @@ export class HtmlContentEditor
   componentDidCatch(error, info) {
     // Display fallback UI
     this.setState({ hasError: true });
-    console.log(error);
+    logger.error(LogTag.EDITOR, error);
   }
 
   checkPrecondition(command: Command<EditorState>) {
