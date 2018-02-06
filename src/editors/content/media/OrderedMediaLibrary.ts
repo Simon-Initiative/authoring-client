@@ -68,4 +68,10 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
   loadReferences(references: Immutable.Map<string, Immutable.List<MediaRef>>) {
     return this.with({ references: this.references.merge(references) });
   }
+
+  clearItems() {
+    return this.with({
+      items: Immutable.List<string>(),
+    });
+  }
 }
