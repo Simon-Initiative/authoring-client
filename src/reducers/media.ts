@@ -26,7 +26,7 @@ export const media = (
 ): MediaState => {
   switch (action.type) {
     case FETCH_MEDIA_PAGE: {
-      const { courseId } = action;
+      const { courseId, reqId } = action;
 
       // get existing media library or initialize a new one
       const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
@@ -35,15 +35,19 @@ export const media = (
         courseId,
         mediaLibrary.with({
           isLoading: true,
+          lastReqId: reqId,
         }),
       );
     }
     case RESET_MEDIA: {
       const { courseId } = action;
 
+      // get existing media library or initialize a new one
+      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+
       return state.set(
         courseId,
-        new OrderedMediaLibrary(),
+        mediaLibrary.clearItems(),
       );
     }
     case RECEIVE_MEDIA_PAGE: {

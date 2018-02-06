@@ -8,6 +8,7 @@ type OrderedMediaLibraryParams = {
   totalItems?: number;
   totalItemsLoaded?: number;
   isLoading?: boolean;
+  lastReqId?: string;
 };
 
 const defaultContent = {
@@ -17,6 +18,7 @@ const defaultContent = {
   totalItems: -Infinity,
   totalItemsLoaded: 0,
   isLoading: false,
+  lastReqId: null,
 };
 
 export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
@@ -26,6 +28,7 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
   totalItems: number;
   totalItemsLoaded: number;
   isLoading: boolean;
+  lastReqId: string;
 
   constructor(params?: OrderedMediaLibraryParams) {
     super(params);
@@ -67,5 +70,17 @@ export class OrderedMediaLibrary extends Immutable.Record(defaultContent) {
 
   loadReferences(references: Immutable.Map<string, Immutable.List<MediaRef>>) {
     return this.with({ references: this.references.merge(references) });
+  }
+
+  clearItems() {
+    // reset media library but keep data and reference cache
+    return this.with({
+      data: this.data,
+      items: Immutable.List<string>(),
+      references: this.references,
+      totalItems: -Infinity,
+      totalItemsLoaded: 0,
+      isLoading: false,
+    });
   }
 }
