@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import * as Immutable from 'immutable';
 import { TextContent } from 'data/content/common/text';
 import { InlineContent } from 'data/content/common/inline';
 import { ContentContainer } from '../container/ContentContainer';
@@ -217,7 +217,7 @@ export class VideoEditor
       const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
 
       onEdit(model.with({
-        sources: OrderedMap<string, Source>().set(source.guid, source),
+        sources: Immutable.OrderedMap<string, Source>().set(source.guid, source),
       }));
     }
   }

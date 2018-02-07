@@ -1,8 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-
+import { TextContent } from 'data/content/common/text';
 import { TextInput } from '../../content/common/TextInput';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
+
 
 export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;
@@ -11,6 +15,8 @@ export interface PageSelectionProps {
   editMode: boolean;
   pages: Immutable.OrderedMap<string, contentTypes.Page>;
   current: contentTypes.Page;
+  context: AppContext;
+  services: AppServices;
 }
 
 export interface PageSelection {
@@ -28,7 +34,8 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
   }
 
   onTitleEdit(page: contentTypes.Page, text: string) {
-    this.props.onEdit(page.with({ title: new contentTypes.Title({ text }) }));
+    this.props.onEdit(page.with({ title: new contentTypes.Title({
+      text: TextContent.fromText(text, '') }) }));
   }
 
   renderPage(page: contentTypes.Page, pageNumber: number) {
@@ -55,14 +62,12 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
         <td style={ { width: '100%' } } key="title">
 
-          <TextInput
+          <ContentContainer
+            {...this.props}
+            model={page.title.text}
             editMode={this.props.editMode}
-            value={page.title.text}
             onEdit={this.onTitleEdit.bind(this, page)}
-            type="text"
-            width="100%"
-            label=""
-            />
+          />
 
         </td>
 

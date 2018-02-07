@@ -6,7 +6,7 @@ import { ContiguousText } from '../learning/contiguous';
 import { parseContent } from './parse';
 import { ContentType, ContentElement } from './interfaces';
 
-
+import { Maybe } from 'tsmonad';
 
 export type TextElementType = 'ContiguousText';
 
@@ -62,6 +62,13 @@ export class TextContent extends Immutable.Record(defaultContent)
     return this.merge(values) as this;
   }
 
+  extractPlainText() : Maybe<string> {
+    const t = this.content.toArray().filter(c => c.contentType === 'ContiguousText');
+    if (t.length > 0) {
+      return (t[0] as ContiguousText).extractPlainText();
+    }
+    return Maybe.nothing();
+  }
 
   clone() : TextContent {
     return this.with({
@@ -73,6 +80,7 @@ export class TextContent extends Immutable.Record(defaultContent)
     const text = parseTextContent(root);
     return new TextContent({ guid: g, content: text });
   }
+
 
 
   static fromText(text: string, guid: string) : TextContent {

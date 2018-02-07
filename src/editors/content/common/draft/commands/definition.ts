@@ -38,6 +38,6 @@ export class InsertDefinitionCommand extends AbstractCommand<EditorState> {
   }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
-
+    return Promise.resolve(editorState);
   }
 }

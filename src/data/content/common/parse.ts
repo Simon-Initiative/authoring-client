@@ -71,10 +71,6 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
   // Buffer for contiguous text elements
   let textBuffer = [];
 
-  logger.log(
-    'begin parsing element groups', logger.LogLevel.Debug,
-    logger.Tags.Serialization);
-
   elements.forEach((e) => {
     const maybeKey = getKey(e);
 
@@ -90,10 +86,6 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
           }
 
           const parse = factories[key];
-
-          logger.log(
-            'factory = ' + (parse === undefined ? 'undefined' : 'defined'),
-            logger.LogLevel.Debug, logger.Tags.Serialization);
 
           if (parse !== undefined) {
             parsedObjects.push(parse(e, guid()));

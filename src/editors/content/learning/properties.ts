@@ -1,6 +1,6 @@
 import { ContentState } from 'draft-js';
-import { AppContext } from '../../../../common/AppContext';
-import { AppServices } from '../../../../common/AppServices';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
 
 export type BlockProps = {
 
@@ -9,11 +9,11 @@ export type BlockProps = {
   onContentChange: (contentState: ContentState) => void;
 
   // Callback to indicate the block renderer has set
-  // full edit mode 
+  // full edit mode
   onEditModeChange: (editMode: boolean) => void;
 
   // Callback to indicate the block renderer has set
-  // lock mode 
+  // lock mode
   onLockChange: (locked: boolean) => void;
 
   onEdit: (data: any) => void;

@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { CodeBlock as CodeBlockType } from '../../../../../data/content/html/codeblock';
+import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
 import PreformattedText from './PreformattedText';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import { Checkbox, Select, TextInput } from '../../controls';
+import { Checkbox, Select, TextInput } from '../common/controls';
 
 import './markers.scss';
 

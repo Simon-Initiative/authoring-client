@@ -4,9 +4,10 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
-
+import { TextContent } from 'data/content/common/text';
 import { ObjRef } from '../learning/objref';
 import { Title } from '../learning/title';
+
 import { Content } from './content';
 import { Question } from './question';
 
@@ -24,7 +25,7 @@ const defaultPoolParams = {
   contentType: 'Pool',
   id: '',
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
-  title: new Title({ text: 'Pool Title' }),
+  title: new Title({ text: TextContent.fromText('Pool Title', '') }),
   content: new Content(),
   sections: Immutable.OrderedMap<string, Unsupported>(),
   questions: Immutable.OrderedMap<string, Question>(),

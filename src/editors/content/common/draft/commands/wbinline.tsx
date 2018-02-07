@@ -17,7 +17,7 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
 
     const data = { wbinline: new WbInline({ idRef: assessment.resource.id }) };
 
-    const delegate = new InsertBlockEntityCommand(EntityTypes.wb_inline, 'IMMUTABLE', data);
+    const delegate = new InsertBlockEntityCommand(EntityTypes.image, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)
       .then(newState => resolve(newState))
       .catch(err => reject(err));

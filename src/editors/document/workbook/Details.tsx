@@ -1,6 +1,10 @@
 import * as React from 'react';
 import * as models from '../../../data/models';
 import { TextInput } from '../../content/common/TextInput';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { TextContent } from 'data/content/common/text';
 
 export interface Details {
 
@@ -10,6 +14,8 @@ export interface DetailsProps {
   model: models.WorkbookPageModel;
   editMode: boolean;
   onEdit: (model: models.WorkbookPageModel) => void;
+  context: AppContext;
+  services: AppServices;
 }
 
 export interface DetailsState {
@@ -25,8 +31,11 @@ export class Details
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  onTitleEdit(text) {
-    const resource = this.props.model.resource.with({ title: text });
+  onTitleEdit(text: TextContent) {
+
+    const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+
+    const resource = this.props.model.resource.with({ title: t });
     const title = this.props.model.head.title.with({ text });
     const head = this.props.model.head.with({ title });
 
@@ -40,9 +49,11 @@ export class Details
         <div className="form-group row">
           <label className="col-1 col-form-label">Title</label>
           <div className="col-11">
-            <TextInput editMode={this.props.editMode}
-              width="100%" label="" value={this.props.model.head.title.text}
-              onEdit={this.onTitleEdit} type="text"/>
+            <ContentContainer
+              {...this.props}
+              editMode={this.props.editMode}
+              model={this.props.model.head.title.text}
+              onEdit={this.onTitleEdit} />
           </div>
         </div>
       </div>

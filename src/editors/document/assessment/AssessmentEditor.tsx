@@ -100,7 +100,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    const resource = this.props.model.resource.with({ title: content.text });
+    const resource = this.props.model.resource.with({ title: content.text
+      .extractPlainText().caseOf({ just: s => s, nothing: () => '' }) });
     this.handleEdit(this.props.model.with({ title: content, resource }));
   }
 
@@ -213,7 +214,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddPage() {
     const text = 'Page ' + (this.props.model.pages.size + 1);
     const page = new contentTypes.Page()
-      .with({ title: new contentTypes.Title().with({ text }) });
+      .with({ title: contentTypes.Title.fromText(text) });
 
     this.handleEdit(this.props.model.with(
       { pages: this.props.model.pages.set(page.guid, page) }));
@@ -302,6 +303,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <div style={ { marginLeft: '25px' } }>
 
           <PageSelection
+            {...this.props}
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}

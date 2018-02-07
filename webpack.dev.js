@@ -101,12 +101,8 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-<<<<<<< HEAD
-            template: '!!underscore-template-loader!./index.html'
-=======
             template: '!!underscore-template-loader!./index.html',
             inject: false
->>>>>>> master
         }),
         new webpack.HashedModuleIdsPlugin(),
         new webpack.NamedModulesPlugin(),

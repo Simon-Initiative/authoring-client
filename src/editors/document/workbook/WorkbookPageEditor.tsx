@@ -2,17 +2,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { HtmlContentEditor } from '../../content/html/HtmlContentEditor';
-import InlineToolbar from './InlineToolbar';
-import BlockToolbar from './BlockToolbar';
-import InlineInsertionToolbar from './InlineInsertionToolbar';
 import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { Resource } from 'data/content/resource';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { ContentState } from 'draft-js';
-import { getEntities } from 'data/content/html/changes';
-import { EntityTypes } from 'data/content/html/common';
+import { getEntities } from 'data/content/learning/changes';
+import { EntityTypes } from 'data/content/learning/common';
 import { Objectives } from './Objectives';
 import { TabContainer } from '../../content/common/TabContainer';
 import { Details } from './Details';
@@ -27,18 +24,9 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
 
-function hasMissingResource(
-  contentState: ContentState, course: models.CourseModel) : boolean {
-
-  const missingActivity = getEntities(EntityTypes.activity, contentState)
-    .some(e => !course.resourcesById.has(e.entity.data.activity.idRef));
-
-  getEntities(EntityTypes.wb_inline, contentState)
-    .forEach(e => console.log(e));
-
-  return missingActivity ||
-    getEntities(EntityTypes.wb_inline, contentState)
-      .some(e => !course.resourcesById.has(e.entity.data.wbinline.idRef));
+function hasMissingResource() : boolean {
+  // TODO restore post wb fix
+  return false;
 }
 
 
@@ -54,8 +42,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       props.model.head.objrefs, props.context.objectives)) {
       props.services.refreshObjectives(props.context.courseId);
     }
-    if (hasMissingResource(
-      props.model.body.contentState, props.context.courseModel)) {
+    if (hasMissingResource()) {
       props.services.refreshCourse(props.context.courseId);
     }
   }
@@ -118,16 +105,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   renderContentTab() {
-    const inlineToolbar = <InlineToolbar />;
-    const blockToolbar = <BlockToolbar />;
-    const insertionToolbar = <InlineInsertionToolbar />;
-
     return (
       <div key="content-tab" className="html-editor-well">
-        <HtmlContentEditor
-          inlineToolbar={inlineToolbar}
-          inlineInsertionToolbar={insertionToolbar}
-          blockToolbar={blockToolbar}
+        <ContentContainer
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
@@ -141,6 +121,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div key="details-tab">
         <Details
+          {...this.props}
           model={this.props.model}
           editMode={this.props.editMode}
           onEdit={this.onModelEdit}/>

@@ -3,10 +3,7 @@ import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
 import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
@@ -15,6 +12,7 @@ import {
 import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 const HTML_CONTENT_EDITOR_STYLE = {
   minHeight: '20px',
@@ -114,18 +112,16 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
 
-      feedbackEditor = (
-        <HtmlContentEditor
-          editorStyles={HTML_CONTENT_EDITOR_STYLE}
-          inlineToolbar={<InlineToolbar/>}
-          blockToolbar={<BlockToolbar/>}
-          inlineInsertionToolbar={<InlineInsertionToolbar/>}
+      feedbackEditor =
+        <ContentContainer
           model={feedback.body}
           editMode={editMode}
           context={context}
           services={services}
-          onEdit={body => onEditFeedback(response, feedback.with({ body }))} />
-      );
+          onEdit={body => onEditFeedback(
+            response,
+            feedback.with({ body: (body as AlternativeFlowContent) }))} />;
+
 
       scoreEditor = (
         <div className="input-group">

@@ -17,7 +17,7 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
 
     const data = { activity: new Activity({ idref: assessment.resource.id }) };
 
-    const delegate = new InsertBlockEntityCommand(EntityTypes.activity, 'IMMUTABLE', data);
+    const delegate = new InsertBlockEntityCommand(EntityTypes.image, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)
       .then(newState => resolve(newState))
       .catch(err => reject(err));

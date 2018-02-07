@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { FlowContent } from '../common/flow';
 import { AlternativeFlowContent } from './types/flow';
-import { Title } from '../title';
+import { Title } from '../learning/title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';

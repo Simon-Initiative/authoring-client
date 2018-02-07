@@ -114,7 +114,7 @@ const Label = (props) => {
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
   return (
-    <Tab {...props} tooltip={preview(q.body)}>
+    <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">
         <div>
           <DragHandle connectDragSource={props.connectDragSource}/>
@@ -130,7 +130,7 @@ const QuestionTab = (props: TabProps) => {
 const ContentTab = (props: TabProps) => {
   const c = props.node as Content;
   return (
-    <Tab {...props} tooltip={preview(c.body)}>
+    <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">
         <div>
           <DragHandle connectDragSource={props.connectDragSource}/>
@@ -189,7 +189,7 @@ interface TabProperties {
   node: AssessmentNode;
   nodeState: Tree.NodeState<AssessmentNode>;
   handlers: Tree.Handlers;
-  tooltip: string;
+  tooltip?: string;
 }
 
 class Tab extends React.PureComponent<TabProperties, {}> {

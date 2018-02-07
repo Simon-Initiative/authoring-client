@@ -5,8 +5,8 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
-
-import { Title } from '../title';
+import { TextContent } from 'data/content/common/text';
+import { Title } from '../learning/title';
 import { Question } from './question';
 import { Selection } from './selection';
 import { Content } from './content';
@@ -23,7 +23,7 @@ export type PageParams = {
 const defaultPageParams = {
   contentType: 'Page',
   id: '',
-  title: new Title({ text: 'Assessment Page Title' }),
+  title: new Title({ text: TextContent.fromText('Assessment Page Title', '') }),
   nodes: Immutable.OrderedMap<string, Node>(),
   guid: '',
 };

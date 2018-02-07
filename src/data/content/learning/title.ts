@@ -33,6 +33,10 @@ export class Title extends Immutable.Record(defaultContent) {
     });
   }
 
+  static fromText(str: string) : Title {
+    const text = TextContent.fromText(str, '');
+    return new Title({ text });
+  }
 
   static fromPersistence(root: Object, guid: string) : Title {
 

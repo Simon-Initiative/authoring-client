@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { getCaretPosition, setCaretPosition } from '../utils';
+import { getCaretPosition, setCaretPosition } from '../common/draft/utils';
 
 require('./PreformattedText.scss');
 
