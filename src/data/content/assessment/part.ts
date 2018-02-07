@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import { FlowContent } from '../common/flow';
+import { AlternativeFlowContent } from './types/flow';
 import { Title } from '../title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
@@ -21,7 +22,7 @@ export type PartParams = {
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
-  explanation?: FlowContent;
+  explanation?: AlternativeFlowContent;
   guid?: string;
 };
 
@@ -37,7 +38,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
-  explanation: new FlowContent(),
+  explanation: new AlternativeFlowContent(),
   guid: '',
 };
 
@@ -54,7 +55,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
-  explanation: FlowContent;
+  explanation: AlternativeFlowContent;
   guid: string;
 
   constructor(params?: PartParams) {
@@ -115,7 +116,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           break;
         case 'explanation':
           model = model.with({ explanation:
-            FlowContent.fromPersistence((item as any).explanation, id) });
+            AlternativeFlowContent.fromPersistence((item as any).explanation, id) });
           break;
         default:
 

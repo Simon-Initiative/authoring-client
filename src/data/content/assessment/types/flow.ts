@@ -5,6 +5,7 @@ import { augment, getChildren } from '../../common';
 import { ContentType, ContentElement } from '../../common/interfaces';
 import { ContiguousText } from '../../learning/contiguous';
 import createGuid from 'utils/guid';
+import { Maybe } from 'tsmonad';
 
 export type AlternativeFlowElementType = FlowElementType | 'Alternatives';
 
@@ -59,6 +60,13 @@ export class AlternativeFlowContent extends Immutable.Record(defaultContent)
     return SUPPORTED_ELEMENTS;
   }
 
+  extractPlainText() : Maybe<string> {
+    const t = this.content.toArray().filter(c => c.contentType === 'ContiguousText');
+    if (t.length > 0) {
+      return (t[0] as ContiguousText).extractPlainText();
+    }
+    return Maybe.nothing();
+  }
 
   static fromText(text: string, guid: string) : AlternativeFlowContent {
     const t = ContiguousText.fromText(text, createGuid());

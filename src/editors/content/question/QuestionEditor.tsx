@@ -12,7 +12,6 @@ import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
 import { EntityTypes } from '../../../data/content/learning/common';
 import { Skill } from 'types/course';
-import { changes, removeInputRef } from '../../../data/content/learning/changes';
 import { InsertInputRefCommand } from './commands';
 
 import './QuestionEditor.scss';
@@ -103,13 +102,12 @@ export class QuestionEditor
       || question.items.first().contentType === contentTypeToAdd;
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body: QuestionBodyContent) {
 
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
-      const delta
-        = changes(EntityTypes.input_ref, '@input', this.lastBody.contentState, body.contentState);
+      const delta = body.detectInputRefChanges(this.lastBody);
 
       // For any deletions of input_refs, we need to make sure that we remove
       // the corresponding item and part from the question model
@@ -180,16 +178,16 @@ export class QuestionEditor
 
     const items = this.props.model.items.delete(itemModel.guid);
     const parts = this.props.model.parts.delete(partModel.guid);
-    let body = this.props.model.body;
+    let model = this.props.model;
 
     switch (itemModel.contentType) {
       case 'Numeric':
       case 'Text':
       case 'FillInTheBlank':
-        body = removeInputRef(body, itemModel.id);
+        model = model.removeInputRef(itemModel.id);
     }
 
-    const model = this.props.model.with({ items, parts, body });
+    model = model.with({ items, parts });
     this.props.onEdit(model);
   }
 

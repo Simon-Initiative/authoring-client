@@ -17,6 +17,7 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;
@@ -64,6 +65,7 @@ function tagInputRefsWithType(model: Question) {
 
   return model.with({ body: model.body.tagInputRefsWithType(byId) });
 }
+
 
 function ensureResponsesExist(model: Question) {
   const itemsArray = model.items.toArray();
@@ -188,6 +190,21 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   with(values: QuestionParams) {
     return this.merge(values) as this;
+  }
+
+  removeInputRef(itemModelId: string)
+    : Question {
+
+    const content = this.body.content.map((c) => {
+      if (c.contentType === 'ContiguousText') {
+        return (c as ContiguousText).removeInputRef(itemModelId);
+      }
+      return c;
+    }).toOrderedMap();
+
+    const body = this.body.with({ content });
+
+    return this.with({ body });
   }
 
   static fromPersistence(json: any, guid: string) {

@@ -1,7 +1,6 @@
 import { ContentBlock, ContentState, Entity, Modifier, SelectionState } from 'draft-js';
 import * as Immutable from 'immutable';
-import { EntityTypes } from './common';
-import { Html } from '../html';
+import { EntityTypes } from '../common';
 
 export type Changes = {
   additions: Immutable.List<Entity>;
@@ -20,9 +19,10 @@ export type EntityInfo = {
   entity: Entity,
 };
 
-export function removeInputRef(html: Html, itemModelId: string) : Html {
+export function removeInputRef(contentState: ContentState, itemModelId: string) : ContentState {
+
     // Find the range that represents the entity
-  const range = findEntityRangeByInput(itemModelId, html.contentState);
+  const range = findEntityRangeByInput(itemModelId, contentState);
 
     // Remove that entity via its range
   if (range !== null) {
@@ -32,12 +32,11 @@ export function removeInputRef(html: Html, itemModelId: string) : Html {
       anchorOffset: range.start,
       focusOffset: range.end,
     });
-    return new Html({
-      contentState: Modifier.applyEntity(html.contentState, selectionState, null),
-    });
+    return Modifier.applyEntity(contentState, selectionState, null);
+
   }
 
-  return html;
+  return contentState;
 }
 
 function findEntityRangeByInput(inputId: string, contentState: ContentState) : EntityRange {
@@ -147,7 +146,7 @@ function keyedByInput(entities : EntityInfo[], uniqueIdentifier: string) : Objec
 
 // For a given entity type, determine any that have been
 // added or deleted between versions of ContentState
-export function changes(
+export function detectChanges(
   type: EntityTypes, uniqueIdentifier: string,
   prev: ContentState, current: ContentState) : Changes {
 

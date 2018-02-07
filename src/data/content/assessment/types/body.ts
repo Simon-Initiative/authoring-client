@@ -6,6 +6,7 @@ import { ContentType, ContentElement } from '../../common/interfaces';
 import { Maybe } from 'tsmonad';
 import { ContiguousText } from '../../learning/contiguous';
 import createGuid from 'utils/guid';
+import { Changes } from 'data/content/learning/draft/changes';
 
 export type QuestionBodyElementType = FlowElementType | 'Alternatives' | 'Custom';
 
@@ -62,6 +63,30 @@ export class QuestionBodyContent extends Immutable.Record(defaultContent)
         return c;
       }).toOrderedMap(),
     });
+  }
+
+  detectInputRefChanges(previous: QuestionBodyContent) : Changes {
+
+    const initial : Changes = {
+      additions: Immutable.List(),
+      deletions: Immutable.List(),
+    };
+
+    return this.content.toArray()
+      .filter(c => c.contentType === 'ContiguousText')
+      .reduce(
+        (delta, c) => {
+          const p = previous.content.get(c.guid);
+          if (p !== undefined) {
+            const changes = (c as ContiguousText).detectInputRefChanges(p as ContiguousText);
+            return {
+              additions: delta.additions.concat(changes.additions).toList(),
+              deletions: delta.deletions.concat(changes.deletions).toList(),
+            };
+          }
+          return delta;
+        },
+        initial);
   }
 
   extractPlainText() : Maybe<string> {

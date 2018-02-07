@@ -7,7 +7,8 @@ import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 
-import { getEntities } from '../learning/changes';
+import { getEntities, removeInputRef as removeInputRefDraft,
+  Changes, detectChanges } from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
 
@@ -36,6 +37,16 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   with(values: ContiguousTextParams) {
     return this.merge(values) as this;
+  }
+
+  removeInputRef(id: string) {
+    return this.with({
+      content: removeInputRefDraft(this.content, id),
+    });
+  }
+
+  detectInputRefChanges(previous: ContiguousText) : Changes {
+    return detectChanges(EntityTypes.input_ref, '@input', previous.content, this.content);
   }
 
   tagInputRefsWithType(byId: Object) {
