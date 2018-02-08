@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 
-import { MaterialContent } from '../common/material';
+import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common//elements';
 import { augment } from '../common';
 
 export type GradingCriteriaParams = {
   score?: string,
   name?: string,
-  body?: MaterialContent,
+  body?: ContentElements,
   guid?: string,
 };
 
@@ -14,7 +14,7 @@ const defaultGradingCriteria = {
   contentType: 'GradingCriteria',
   score: '0',
   name: '',
-  body: new MaterialContent(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
   guid: '',
 };
 
@@ -23,7 +23,7 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
   contentType: 'GradingCriteria';
   score: string;
   name: string;
-  body: MaterialContent;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: GradingCriteriaParams) {
@@ -39,7 +39,7 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
     const c = (root as any).grading_criteria;
 
     let model = new GradingCriteria({ guid });
-    model = model.with({ body: MaterialContent.fromPersistence(c, '') });
+    model = model.with({ body: ContentElements.fromPersistence(c, '', MATERIAL_ELEMENTS) });
 
     if (c['@score'] !== undefined) {
       model = model.with({ score: c['@score'] });

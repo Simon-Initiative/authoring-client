@@ -2,13 +2,13 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { TextContent } from '../common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type CiteParams = {
   title?: string,
   id?: string,
   entry?: string,
-  content?: TextContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -17,7 +17,7 @@ const defaultContent = {
   title: '',
   id: '',
   entry: '',
-  content: new TextContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
 
@@ -27,7 +27,7 @@ export class Cite extends Immutable.Record(defaultContent) {
   title: string;
   id: string;
   entry: string;
-  content: TextContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: CiteParams) {
@@ -63,13 +63,14 @@ export class Cite extends Immutable.Record(defaultContent) {
     }
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {
-      model = model.with({ content: TextContent.fromPersistence(getChildren(t), '') });
+      model = model.with({ content: ContentElements
+        .fromPersistence(getChildren(t), '', TEXT_ELEMENTS) });
     }
 
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence() : Object {
     const o = {
       cite: {
         '@title': this.title,

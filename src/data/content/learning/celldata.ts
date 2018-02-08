@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { InlineContent } from '../common/inline';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 
@@ -7,7 +7,7 @@ export type CellDataParams = {
   align?: string,
   colspan?: string,
   rowspan?: string,
-  content?: InlineContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -16,7 +16,7 @@ const defaultContent = {
   align: 'left',
   colspan: '1',
   rowspan: '1',
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
 
@@ -26,7 +26,7 @@ export class CellData extends Immutable.Record(defaultContent) {
   align: string;
   colspan: string;
   rowspan: string;
-  content: InlineContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: CellDataParams) {
@@ -59,7 +59,8 @@ export class CellData extends Immutable.Record(defaultContent) {
       model = model.with({ align: t['@align'] });
     }
 
-    model = model.with({ content: InlineContent.fromPersistence(t, createGuid()) });
+    model = model.with({ content: ContentElements
+      .fromPersistence(t, createGuid(), INLINE_ELEMENTS) });
 
     return model;
   }

@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Audio as AudioType } from '../../../../../data/content/html/audio';
+import { Audio as AudioType } from 'data/content/learning/audio';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { AudioEditor } from '../../../media/AudioEditor';
-import { buildUrl } from '../../../../../utils/path';
+import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
+import { AudioEditor } from 'editors/content/media/AudioEditor';
+import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';

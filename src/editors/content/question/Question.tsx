@@ -3,10 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
 import {
@@ -19,6 +15,7 @@ import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 
 import './Question.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
@@ -196,15 +193,10 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     return (
       <div className="question-body" key="question">
-          <HtmlContentEditor
-            ref={c => this.htmlEditor = c}
+          <ContentContainer
             editMode={editMode}
             services={services}
             context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={<InlineInsertionToolbar/>}
-            blockToolbar={<BlockToolbar/>}
             model={body}
             onEdit={onBodyEdit} />
       </div>

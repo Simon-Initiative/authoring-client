@@ -1,10 +1,11 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-import { InlineContent } from '../common/inline';
+
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type TranslationParams = {
-  content?: InlineContent,
+  content?: ContentElements,
   id?: Maybe<string>,
   title?: Maybe<string>,
   guid?: string,
@@ -12,7 +13,7 @@ export type TranslationParams = {
 
 const defaultContent = {
   contentType: 'Translation',
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   guid: '',
@@ -21,7 +22,7 @@ const defaultContent = {
 export class Translation extends Immutable.Record(defaultContent) {
 
   contentType: 'Translation';
-  content: InlineContent;
+  content: ContentElements;
   id: Maybe<string>;
   title: Maybe<string>;
   guid: string;
@@ -54,7 +55,7 @@ export class Translation extends Immutable.Record(defaultContent) {
 
     return new Translation({
       guid,
-      content: InlineContent.fromPersistence(t, ''),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
       id,
       title,
     });

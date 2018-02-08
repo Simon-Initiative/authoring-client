@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { TextContent } from 'data/content/common/text';
-import { InlineContent } from 'data/content/common/inline';
+import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { Video } from '../../../data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -60,17 +59,17 @@ export class VideoEditor
   }
 
 
-  onTitleEdit(text: TextContent) {
+  onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: InlineContent) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
 
-  onAlternateEdit(content: TextContent) {
+  onAlternateEdit(content: ContentElements) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }

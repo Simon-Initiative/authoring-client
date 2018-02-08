@@ -1,19 +1,20 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { FlowContent } from '../common/flow';
+
+import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 
 export type LiParams = {
   title?: Maybe<string>,
-  content?: FlowContent,
+  content?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Li',
   title: Maybe.nothing(),
-  content: new FlowContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -21,7 +22,7 @@ export class Li extends Immutable.Record(defaultContent) {
 
   contentType: 'Li';
   title: Maybe<string>;
-  content: FlowContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: LiParams) {
@@ -48,7 +49,8 @@ export class Li extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: FlowContent.fromPersistence(t, createGuid()) });
+    model = model.with({ content: ContentElements
+      .fromPersistence(t, createGuid(), FLOW_ELEMENTS) });
 
     return model;
   }

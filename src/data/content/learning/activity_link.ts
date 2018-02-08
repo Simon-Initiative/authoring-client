@@ -1,13 +1,13 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { LinkContent } from '../common/link';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type ActivityLinkParams = {
   target?: string,
   idref?: string,
   purpose?: string,
   title?: string,
-  content?: LinkContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -17,14 +17,14 @@ const defaultContent = {
   idref: '',
   purpose: 'checkpoint',
   title: '',
-  content: new LinkContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
 
 export class ActivityLink extends Immutable.Record(defaultContent) {
 
   contentType: 'ActivityLink';
-  content: LinkContent;
+  content: ContentElements;
   target: string;
   idref: string;
   purpose: string;
@@ -33,6 +33,13 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
 
   constructor(params?: ActivityLinkParams) {
     super(augment(params));
+  }
+
+
+  clone() : ActivityLink {
+    return this.with({
+      content: this.content.clone(),
+    });
   }
 
   with(values: ActivityLinkParams) {
@@ -58,12 +65,12 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
       model = model.with({ purpose: t['@purpose'] });
     }
 
-    model = model.with({ content: LinkContent.fromPersistence(t, '') });
+    model = model.with({ content: ContentElements.fromPersistence(t, '', TEXT_ELEMENTS) });
 
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence() : Object {
     return {
       activity_link: {
         '@title': this.title,

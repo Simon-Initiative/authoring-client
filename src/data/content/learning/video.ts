@@ -166,7 +166,7 @@ export class Video extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence() : Object {
 
     let sources = this.sources.toArray();
     if (sources.length === 0

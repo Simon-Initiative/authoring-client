@@ -35,6 +35,13 @@ export class Activity extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Activity {
+    return this.with({
+      image: this.image.caseOf(
+        { just: i => Maybe.just(i.clone()), nothing: () => Maybe.nothing<Image>() }),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Activity {
     const t = (root as any).activity;
 

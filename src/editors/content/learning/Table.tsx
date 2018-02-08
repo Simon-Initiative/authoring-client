@@ -1,13 +1,12 @@
 import * as React from 'react';
 
-import * as contentTypes from '../../../../../data/contentTypes';
-import { Table as TableType } from '../../../../../data/content/html/table';
-import { CellHeader } from '../../../../../data/content/html/cellheader';
+import * as contentTypes from 'data/contentTypes';
+import { Table as TableType } from 'data/content/learning/table';
+import { CellHeader } from 'data/content/learning/cellheader';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalTableEditor from '../../../table/ModalTableEditor';
-import { Html } from '../../../../../data/content/html';
+import ModalTableEditor from 'editors/content/table/ModalTableEditor';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 type Data = {
@@ -24,21 +23,6 @@ export interface TableState extends InteractiveRendererState {
 
 export interface TableProps {
 
-}
-
-export function getHtmlDetails(html : contentTypes.Html) : JSX.Element {
-
-  const blocks = html.contentState.getBlocksAsArray();
-
-  const filtered = html.contentState.getBlocksAsArray()
-    .filter(b => b.getType !== 'atomic'
-      && b.getCharacterList().toArray().every(e => e.getEntity() === null));
-
-  if (filtered.length !== blocks.length) {
-    return <i>Click &apos;Edit&apos; to see cell content</i>;
-  }
-
-  return blocks.map(b => <p key={b.getKey()}>{b.getText()}</p>);
 }
 
 
@@ -90,11 +74,13 @@ export class Table extends InteractiveRenderer<TableProps, TableState> {
       if (cell instanceof CellHeader) {
 
         return <th colSpan={colspan} key={cell.guid}>
-          {getHtmlDetails(new Html({ contentState: cell.content }))}</th>;
+          {cell.content.extractPlainText()
+            .caseOf({ just: s => s, nothing: () => '' })}</th>;
       }
 
       return <td colSpan={colspan} key={cell.guid}>
-        {getHtmlDetails(new Html({ contentState: cell.content }))}</td>;
+        {cell.content.extractPlainText()
+            .caseOf({ just: s => s, nothing: () => '' })}</td>;
     };
 
     if (rows.length > 0) {

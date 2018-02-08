@@ -1,22 +1,23 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-import { MaterialContent } from '../common/material';
+
+import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 
 export type MaterialParams = {
-  content?: MaterialContent,
+  content?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Material',
-  content: new MaterialContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
   guid: '',
 };
 
 export class Material extends Immutable.Record(defaultContent) {
 
   contentType: 'Material';
-  content: MaterialContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: MaterialParams) {
@@ -37,7 +38,8 @@ export class Material extends Immutable.Record(defaultContent) {
 
     const cb = (root as any).material;
 
-    return new Material({ guid, content: MaterialContent.fromPersistence(cb, '') });
+    return new Material({ guid, content: ContentElements
+      .fromPersistence(cb, '', MATERIAL_ELEMENTS) });
   }
 
   toPersistence() : Object {

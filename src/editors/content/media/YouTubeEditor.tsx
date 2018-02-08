@@ -2,9 +2,7 @@ import * as React from 'react';
 
 import { YouTube } from '../../../data/content/learning/youtube';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextContent } from 'data/content/common/text';
-import { InlineContent } from 'data/content/common/inline';
-import { LabeledType } from '../labeled/LabeledEditor';
+import { ContentElements } from 'data/content/common/elements';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { ContentContainer } from '../container/ContentContainer';
@@ -27,7 +25,6 @@ export class YouTubeEditor
   constructor(props) {
     super(props);
 
-    this.onLabeledEdit = this.onLabeledEdit.bind(this);
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onWidthEdit = this.onWidthEdit.bind(this);
@@ -50,20 +47,13 @@ export class YouTubeEditor
 
 
 
-  onLabeledEdit(model: LabeledType) {
-
-    const { titleContent, cite, caption } = model;
-    const updated = this.props.model.with({ titleContent, cite, caption });
-
-    this.props.onEdit(updated);
-  }
 
   onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: TextContent) {
+  onAlternateEdit(content: ContentElements) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
@@ -83,12 +73,12 @@ export class YouTubeEditor
   }
 
 
-  onTitleEdit(text: TextContent) {
+  onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: InlineContent) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }

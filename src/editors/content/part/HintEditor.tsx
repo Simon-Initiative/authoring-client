@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import { InputLabel } from '../common/InputLabel';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
 

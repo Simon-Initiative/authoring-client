@@ -3,6 +3,7 @@ import * as common from '../common';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
 
+let inlineHandlers = null;
 
 export function toDraft(toParse: Object[]) : ContentState {
 
@@ -53,34 +54,38 @@ type InlineHandler = (
   workingBlock: WorkingBlock,
   blockBeforeChildren: WorkingBlock) => void;
 
-const inlineHandlers = {
-  input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
-  activity_link: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE',
-    common.EntityTypes.activity_link, 'activity_link', registeredTypes['activity_link']),
-  xref: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE',
-    common.EntityTypes.xref, 'xref', registeredTypes['xref']),
-  link: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE',
-    common.EntityTypes.link, 'link', registeredTypes['link']),
-  cite: insertDataDrivenEntity.bind(
-    undefined, 'MUTABLE',
-    common.EntityTypes.cite, 'cite', registeredTypes['cite']),
-  em,
-  foreign: applyStyle.bind(undefined, 'UNDERLINE'),
-  ipa: applyStyle.bind(undefined, 'UNDERLINE'),
-  sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
-  sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
-  term: applyStyle.bind(undefined, 'BOLD'),
-  var: applyStyle.bind(undefined, 'ITALIC'),
-  image: imageInline,
-  formula: formulaInline,
-  '#math': hashMath,
-  'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
-  quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
-  code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
-};
+
+function getInlineHandlers() {
+  const inlineHandlers = {
+    input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
+    activity_link: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.activity_link, 'activity_link', registeredTypes['activity_link']),
+    xref: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.xref, 'xref', registeredTypes['xref']),
+    link: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.link, 'link', registeredTypes['link']),
+    cite: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.cite, 'cite', registeredTypes['cite']),
+    em,
+    foreign: applyStyle.bind(undefined, 'UNDERLINE'),
+    ipa: applyStyle.bind(undefined, 'UNDERLINE'),
+    sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
+    sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
+    term: applyStyle.bind(undefined, 'BOLD'),
+    var: applyStyle.bind(undefined, 'ITALIC'),
+    image: imageInline,
+    formula: formulaInline,
+    '#math': hashMath,
+    'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
+    quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
+    code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
+  };
+  return inlineHandlers;
+}
 
 function activityLinkBlock(item: Object, context: ParsingContext) {
   const blockContext = {
@@ -243,6 +248,13 @@ function formulaInline(
 
 
 function getInlineHandler(key: string) : InlineHandler {
+
+  // Lazily initialize the handlers to avoid a webpack
+  // module import problem
+  if (inlineHandlers === null) {
+    inlineHandlers = getInlineHandlers();
+  }
+
   if (inlineHandlers[key] !== undefined) {
     return inlineHandlers[key];
   }

@@ -4,7 +4,6 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
-import { MaterialContent } from '../common/material';
 import { Maybe } from 'tsmonad';
 import { Default } from './default';
 import { Alternative } from './alternative';
@@ -43,6 +42,14 @@ export class Alternatives extends Immutable.Record(defaultContent) {
 
   with(values: AlternativesParams) {
     return this.merge(values) as this;
+  }
+
+
+
+  clone() : Alternatives {
+    return this.with({
+      content: this.content.map(c => c.clone()).toOrderedMap(),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Alternatives {

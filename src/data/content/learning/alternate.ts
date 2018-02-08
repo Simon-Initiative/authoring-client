@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { TextContent } from '../common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 
 export type AlternateParams = {
   title?: string,
   idref?: string,
-  content?: TextContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -14,7 +14,7 @@ const defaultContent = {
   contentType: 'Alternate',
   title: '',
   idref: '',
-  content: new TextContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
 
@@ -23,7 +23,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
   contentType: 'Alternate';
   title: string;
   idref: string;
-  content: TextContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: AlternateParams) {
@@ -54,7 +54,8 @@ export class Alternate extends Immutable.Record(defaultContent) {
       model = model.with({ idref: t['@idref'] });
     }
 
-    model = model.with({ content: TextContent.fromPersistence(getChildren(t), '') });
+    model = model.with({ content: ContentElements
+      .fromPersistence(getChildren(t), '', TEXT_ELEMENTS) });
 
     return model;
   }

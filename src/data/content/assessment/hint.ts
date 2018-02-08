@@ -1,18 +1,19 @@
 import * as Immutable from 'immutable';
 
-import { AlternativeFlowContent } from './types/flow';
+import { ContentElements } from 'data/content/common//elements';
+import { ALT_FLOW_ELEMENTS } from './types';
 import { augment } from '../common';
 
 export type HintParams = {
   targets?: string,
-  body?: AlternativeFlowContent
+  body?: ContentElements
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Hint',
   targets: '',
-  body: new AlternativeFlowContent(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -20,7 +21,7 @@ export class Hint extends Immutable.Record(defaultContent) {
 
   contentType: 'Hint';
   targets: string;
-  body: AlternativeFlowContent;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: HintParams) {
@@ -36,7 +37,7 @@ export class Hint extends Immutable.Record(defaultContent) {
     const hint = (root as any).hint;
 
     let model = new Hint({ guid });
-    model = model.with({ body: AlternativeFlowContent.fromPersistence(hint, '') });
+    model = model.with({ body: ContentElements.fromPersistence(hint, '', ALT_FLOW_ELEMENTS) });
 
     if (hint['@targets'] !== undefined) {
       model = model.with({ targets: hint['@targets'] });

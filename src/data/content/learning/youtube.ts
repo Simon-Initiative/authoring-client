@@ -127,11 +127,11 @@ export class YouTube extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence() : Object {
 
     const children = [
       this.titleContent.toPersistence(),
-      this.cite.toPersistence(toPersistence),
+      this.cite.toPersistence(),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
       this.alternate.toPersistence(),

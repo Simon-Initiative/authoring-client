@@ -1,10 +1,11 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
-import { InlineContent } from '../common/inline';
+
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type PronunciationParams = {
-  content?: InlineContent,
+  content?: ContentElements,
   id?: Maybe<string>,
   title?: Maybe<string>,
   src?: Maybe<string>,
@@ -14,7 +15,7 @@ export type PronunciationParams = {
 
 const defaultContent = {
   contentType: 'Pronunciation',
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   src: Maybe.nothing(),
@@ -25,7 +26,7 @@ const defaultContent = {
 export class Pronunciation extends Immutable.Record(defaultContent) {
 
   contentType: 'Pronunciation';
-  content: InlineContent;
+  content: ContentElements;
   id: Maybe<string>;
   title: Maybe<string>;
   src: Maybe<string>;
@@ -68,7 +69,7 @@ export class Pronunciation extends Immutable.Record(defaultContent) {
 
     return new Pronunciation({
       guid,
-      content: InlineContent.fromPersistence(t, ''),
+      content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS),
       id,
       title,
       src,

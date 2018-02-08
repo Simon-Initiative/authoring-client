@@ -1,7 +1,9 @@
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import { CombinationsMap } from 'types/combinations';
+import { Alternatives } from 'data/content/learning/alternatives';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 // This sets the limit for the number of choices to use the autogenerate
 // feedback combinations feature. When exceeded, the editor will switch to
@@ -45,7 +47,7 @@ const getFeedbackCombinations = (userResponses, choices, allCombinations: Combin
  *                      be a single feedback item with match set to the match-all 'glob'
  */
 export const modelWithDefaultFeedback =
-  (model, choices, body: AlternativeFlowContent, score: string, maxGenChoices: number,
+  (model, choices, body: ContentElements, score: string, maxGenChoices: number,
    onUpdateChoiceCombinations: (numChoices: number) => CombinationsMap) => {
     // remove all existing default responses
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
@@ -107,7 +109,7 @@ export const getGeneratedResponseBody = (partModel) => {
   const defaultResponseItem = getGeneratedResponseItem(partModel);
 
   return defaultResponseItem ? defaultResponseItem.feedback.first().body
-    : new AlternativeFlowContent();
+    : ContentElements.fromPersistence('', '', ALT_FLOW_ELEMENTS);
 };
 
 export const getGeneratedResponseScore = (partModel) => {

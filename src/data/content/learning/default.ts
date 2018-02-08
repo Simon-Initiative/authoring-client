@@ -28,6 +28,11 @@ export class Default extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Default {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : Default {
     const t = (root as any).default;
 

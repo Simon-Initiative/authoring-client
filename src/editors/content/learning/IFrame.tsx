@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { IFrame as IFrameType } from '../../../../../data/content/html/iframe';
+import { IFrame as IFrameType } from 'data/content/learning/iframe';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { IFrameEditor } from '../../../media/IFrameEditor';
-import { buildUrl } from '../../../../../utils/path';
+import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
+import { IFrameEditor } from 'editors/content/media/IFrameEditor';
+import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';

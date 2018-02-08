@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { CharacterMetadata, ContentBlock, ContentState, Entity } from 'draft-js';
-import { insertBlocksAfter, shouldInsertBlock } from '../commands/common';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
+import { insertBlocksAfter, shouldInsertBlock } from '../common/draft/commands/common';
+import { EntityTypes, generateRandomKey } from 'data/content/learning/common';
 
 export function handleInsertion(props : any) {
   if (shouldInsertBlock(props.selection, props.contentState, props.block.key)) {
@@ -36,19 +36,19 @@ export function findKeyOfLast(
       if (block.type === 'atomic') {
 
         const entity = contentState.getEntity(block.getEntityAt(0));
-        
+
         if (stopTypes.indexOf(entity.data.type) !== -1) {
           return key;
         }
-        
+
         if (endTypes.indexOf(entity.data.type) !== -1) {
           key = block.key;
         }
       }
-      
+
     }
   }
-  return key; 
+  return key;
 }
 
 export function within(
@@ -78,7 +78,7 @@ export function within(
 }
 
 export function insertNoSpace(
-  key: string, contentState: ContentState, 
+  key: string, contentState: ContentState,
   beginType: EntityTypes, endType: EntityTypes,
   beginData: Object, endData: Object, includePad = true) : ContentState {
 
@@ -89,12 +89,12 @@ export function insertNoSpace(
   let content = contentState;
 
   content = content.createEntity(
-    beginType, 
+    beginType,
     'IMMUTABLE', beginData);
   const beginKey = content.getLastCreatedEntityKey();
 
   content = content.createEntity(
-    endType, 
+    endType,
     'IMMUTABLE', endData);
   const endKey = content.getLastCreatedEntityKey();
 
@@ -103,24 +103,24 @@ export function insertNoSpace(
   const endCharList = Immutable.List().push(new CharacterMetadata({ entity: endKey }));
 
   const blocks = [
-    new ContentBlock({ type: 'atomic', key: beginBlockKey, 
+    new ContentBlock({ type: 'atomic', key: beginBlockKey,
       text: ' ', characterList: beginCharList }),
     new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
-    
+
   ];
 
   if (includePad) {
-    blocks.push(new ContentBlock({ type: 'unstyled', 
+    blocks.push(new ContentBlock({ type: 'unstyled',
       key: contentKey, text: ' ', characterList: emptyCharList }));
   }
-  
+
 
   return insertBlocksAfter(content, key, blocks);
 
 }
 
 export function insert(
-  key: string, contentState: ContentState, 
+  key: string, contentState: ContentState,
   beginType: EntityTypes, endType: EntityTypes,
   beginData: Object, endData: Object, includePad = true) : ContentState {
 
@@ -131,12 +131,12 @@ export function insert(
   let content = contentState;
 
   content = content.createEntity(
-    beginType, 
+    beginType,
     'IMMUTABLE', beginData);
   const beginKey = content.getLastCreatedEntityKey();
 
   content = content.createEntity(
-    endType, 
+    endType,
     'IMMUTABLE', endData);
   const endKey = content.getLastCreatedEntityKey();
 
@@ -145,19 +145,19 @@ export function insert(
   const endCharList = Immutable.List().push(new CharacterMetadata({ entity: endKey }));
 
   const blocks = [
-    new ContentBlock({ type: 'atomic', key: beginBlockKey, 
+    new ContentBlock({ type: 'atomic', key: beginBlockKey,
       text: ' ', characterList: beginCharList }),
-    new ContentBlock({ type: 'unstyled', key: contentKey, 
+    new ContentBlock({ type: 'unstyled', key: contentKey,
       text: ' ', characterList: emptyCharList }),
     new ContentBlock({ type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }),
-    
+
   ];
 
   if (includePad) {
-    blocks.push(new ContentBlock({ type: 'unstyled', 
+    blocks.push(new ContentBlock({ type: 'unstyled',
       key: contentKey, text: ' ', characterList: emptyCharList }));
   }
-  
+
 
   return insertBlocksAfter(content, key, blocks);
 

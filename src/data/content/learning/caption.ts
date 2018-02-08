@@ -1,22 +1,22 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { InlineContent } from '../common/inline';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export type CaptionParams = {
-  content?: InlineContent,
+  content?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Caption',
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
 
 export class Caption extends Immutable.Record(defaultContent) {
 
   contentType: 'Caption';
-  content: InlineContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: CaptionParams) {
@@ -38,7 +38,8 @@ export class Caption extends Immutable.Record(defaultContent) {
     const t = (root as any).caption;
 
     let model = new Caption({ guid });
-    model = model.with({ content: InlineContent.fromPersistence(getChildren(t), '') });
+    model = model.with({ content: ContentElements
+      .fromPersistence(getChildren(t), '', INLINE_ELEMENTS) });
 
     return model;
   }

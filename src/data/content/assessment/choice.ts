@@ -1,12 +1,13 @@
 import * as Immutable from 'immutable';
 
-import { AlternativeFlowContent } from '../assessment/types/flow';
+import { ContentElements, FLOW_ELEMENTS } from 'data/content/common//elements';
+
 import { augment } from '../common';
 
 export type ChoiceParams = {
   value?: string,
   color?: string,
-  body?: AlternativeFlowContent,
+  body?: ContentElements,
   guid?: string,
 };
 
@@ -14,7 +15,7 @@ const defaultContent = {
   contentType: 'Choice',
   value: '',
   color: '',
-  body: new AlternativeFlowContent(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -44,7 +45,7 @@ export class Choice extends Immutable.Record(defaultContent) {
   contentType: 'Choice';
   value: string;
   color: string;
-  body: AlternativeFlowContent;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: ChoiceParams) {
@@ -64,7 +65,7 @@ export class Choice extends Immutable.Record(defaultContent) {
       choice['#text'] = choice['@value'];
     }
 
-    const body = AlternativeFlowContent.fromPersistence(choice, '');
+    const body = ContentElements.fromPersistence(choice, '', FLOW_ELEMENTS);
     model = model.with({ body });
 
     if (choice['@value'] !== undefined) {

@@ -26,6 +26,11 @@ export class ObjRef extends Immutable.Record(defaultObjRefParams) {
     return this.merge(values) as this;
   }
 
+
+  clone() : ObjRef {
+    return this;
+  }
+
   static fromPersistence(json: any, guid: string) {
 
     let model = new ObjRef({ guid });

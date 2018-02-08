@@ -5,12 +5,11 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
-import { TextContent } from 'data/content/common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common//elements';
 import { Title } from '../learning/title';
 import { Question } from './question';
 import { Selection } from './selection';
 import { Content } from './content';
-import { BodyContent } from '../common/body';
 import { Node } from './node';
 
 export type PageParams = {
@@ -23,7 +22,7 @@ export type PageParams = {
 const defaultPageParams = {
   contentType: 'Page',
   id: '',
-  title: new Title({ text: TextContent.fromText('Assessment Page Title', '') }),
+  title: new Title({ text: ContentElements.fromText('Assessment Page Title', '', TEXT_ELEMENTS) }),
   nodes: Immutable.OrderedMap<string, Node>(),
   guid: '',
 };
@@ -87,7 +86,7 @@ export class Page extends Immutable.Record(defaultPageParams) {
     // If no nodes exist, serialize with an empty content
     // just so as to satisfy DTD constraints
     const nodes = this.nodes.size === 0
-      ? [new Content().with({ body: new BodyContent() }).toPersistence()]
+      ? [new Content().with({ body: ContentElements.fromText('', '', []) }).toPersistence()]
       : this.nodes
         .toArray()
         .map(item => item.toPersistence());

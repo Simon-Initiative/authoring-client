@@ -2,17 +2,18 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { TextContent } from '../common/text';
+
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type QuoteParams = {
-  text?: TextContent,
+  text?: ContentElements,
   entry?: Maybe<string>,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Quote',
-  text: new TextContent(),
+  text: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   entry: Maybe.nothing(),
   guid: '',
 };
@@ -20,7 +21,7 @@ const defaultContent = {
 export class Quote extends Immutable.Record(defaultContent) {
 
   contentType: 'Quote';
-  text: TextContent;
+  text: ContentElements;
   entry: Maybe<string>;
   guid: string;
 
@@ -42,7 +43,7 @@ export class Quote extends Immutable.Record(defaultContent) {
 
     const t = (root as any).quote;
 
-    const text = TextContent.fromPersistence(getChildren(t), '');
+    const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS);
     const entry = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);

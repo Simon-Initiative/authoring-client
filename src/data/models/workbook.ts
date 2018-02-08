@@ -3,10 +3,10 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isArray } from 'util';
-import { BodyContent } from 'data/content/workbook/types/body';
-import { TextContent } from 'data/content/common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 import { LegacyTypes } from '../types';
+import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
 
 export type WorkbookPageModelParams = {
@@ -14,7 +14,7 @@ export type WorkbookPageModelParams = {
   guid?: string,
   type?: string;
   head?: contentTypes.Head,
-  body?: BodyContent,
+  body?: ContentElements,
   lock?: contentTypes.Lock
 };
 
@@ -24,7 +24,7 @@ const defaultWorkbookPageModelParams = {
   guid: '',
   type: LegacyTypes.workbook_page,
   head: new contentTypes.Head(),
-  body: new BodyContent(),
+  body: new ContentElements(),
   lock: new contentTypes.Lock(),
 };
 
@@ -35,7 +35,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   guid: string;
   type: string;
   head: contentTypes.Head;
-  body: BodyContent;
+  body: ContentElements;
   lock: contentTypes.Lock;
 
   constructor(params?: WorkbookPageModelParams) {
@@ -50,10 +50,10 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
     return new WorkbookPageModel({
       head: new contentTypes.Head({ title:
-        new contentTypes.Title({ text: TextContent.fromText(title, '') }) }),
+        new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }) }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
-      body: BodyContent.fromText(body, ''),
+      body: ContentElements.fromText(body, '', WB_BODY_EXTENSIONS),
     });
   }
 
@@ -85,7 +85,8 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with({ head: contentTypes.Head.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({ body: BodyContent.fromPersistence(item.body, id) });
+          model = model.with({ body: ContentElements
+            .fromPersistence(item.body, id, WB_BODY_EXTENSIONS) });
           break;
         default:
       }

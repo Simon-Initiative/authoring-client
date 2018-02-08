@@ -25,12 +25,12 @@ const defaultContent = {
 };
 
 export class Param extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Param';
   name: string;
   content: Immutable.OrderedMap<string, ParamContent>;
   guid: string;
-  
+
   constructor(params?: ParamParams) {
     super(augment(params));
   }
@@ -39,42 +39,48 @@ export class Param extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Param {
+    return this.with({
+      content: this.content.map(c => c.clone()).toOrderedMap(),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Param {
 
     const param = (root as any).param;
 
     let model = new Param({ guid });
-    
+
     if (param['@name'] !== undefined) {
       model = model.with({ name: param['@name'] });
     }
-    
+
     getChildren(param).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
       switch (key) {
         case '#text':
-          model = model.with({ 
+          model = model.with({
             content: model.content.set(id, ParamText.fromPersistence(item, id)),
           });
           break;
         case 'pref:label':
-          model = model.with({ 
+          model = model.with({
             content: model.content.set(id, PrefLabel.fromPersistence(item, id)),
           });
           break;
         case 'pref:value':
-          model = model.with({ 
+          model = model.with({
             content: model.content.set(id, PrefValue.fromPersistence(item, id)),
           });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 

@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { LinkContent } from '../common/link';
+
+import { ContentElements, LINK_ELEMENTS } from 'data/content/common/elements';
 
 
 export type XrefParams = {
@@ -8,7 +9,7 @@ export type XrefParams = {
   idref?: string,
   page?: string,
   title?: string,
-  content?: LinkContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -18,14 +19,14 @@ const defaultContent = {
   idref: '',
   page: '',
   title: '',
-  content: LinkContent,
+  content: new ContentElements().with({ supportedElements: Immutable.List(LINK_ELEMENTS) }),
   guid: '',
 };
 
 export class Xref extends Immutable.Record(defaultContent) {
 
   contentType: 'Xref';
-  content: LinkContent;
+  content: ContentElements;
   target: string;
   idref: string;
   page: string;
@@ -38,6 +39,12 @@ export class Xref extends Immutable.Record(defaultContent) {
 
   with(values: XrefParams) {
     return this.merge(values) as this;
+  }
+
+  clone() : Xref {
+    return this.with({
+      content: this.content.clone(),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Xref {
@@ -59,12 +66,13 @@ export class Xref extends Immutable.Record(defaultContent) {
       model = model.with({ page: t['@page'] });
     }
 
-    model = model.with({ content: LinkContent.fromPersistence(getChildren(t), '') });
+    model = model.with({ content: ContentElements
+      .fromPersistence(getChildren(t), '', LINK_ELEMENTS) });
 
     return model;
   }
 
-  toPersistence(toPersistence) : Object {
+  toPersistence() : Object {
     return {
       xref: {
         '@title': this.title,

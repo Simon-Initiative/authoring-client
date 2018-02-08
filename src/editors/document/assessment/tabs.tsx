@@ -4,7 +4,6 @@ import * as Tree from 'editors/common/tree';
 import {
   Content, Node as AssessmentNode, Question, Selection,
 } from 'data/contentTypes';
-import { getHtmlDetails } from '../../content/common/details';
 import { DragHandle } from './DragHandle';
 
 import './tabs.scss';
@@ -45,8 +44,6 @@ export function renderTab(
 
 const countSkills = (q: Question) : number =>
   q.concepts.size + q.parts.toArray().reduce((total, p) => total + p.concepts.size, 0);
-
-const preview = (html) : string => getHtmlDetails(html, 20);
 
 const strategy = (s : string) : string => {
   switch (s) {

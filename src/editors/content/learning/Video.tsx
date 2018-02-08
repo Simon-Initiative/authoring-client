@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Video as VideoType } from '../../../../../data/content/html/video';
+import { Video as VideoType } from 'data/content/learning/video';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { VideoEditor } from '../../../media/VideoEditor';
-import { buildUrl } from '../../../../../utils/path';
+import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
+import { VideoEditor } from 'editors/content/media/VideoEditor';
+import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';

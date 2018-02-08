@@ -13,11 +13,11 @@ const defaultContent = {
 };
 
 export class PrefValue extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'PrefValue';
   preference: string;
   guid: string;
-  
+
   constructor(params?: PrefValueParams) {
     super(augment(params));
   }
@@ -26,16 +26,20 @@ export class PrefValue extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : PrefValue {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : PrefValue {
 
     const p = (root as any)['pref:value'];
 
     let model = new PrefValue({ guid });
-    
+
     if (p['@preference'] !== undefined) {
       model = model.with({ preference: p['@preference'] });
     }
-    
+
     return model;
   }
 

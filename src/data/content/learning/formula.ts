@@ -2,23 +2,23 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { TextContent } from '../common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type FormulaParams = {
-  text?: TextContent,
+  text?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Formula',
-  text: new TextContent(),
+  text: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
 
 export class Formula extends Immutable.Record(defaultContent) {
 
   contentType: 'Formula';
-  text: TextContent;
+  text: ContentElements;
   guid: string;
 
   constructor(params?: FormulaParams) {
@@ -39,7 +39,7 @@ export class Formula extends Immutable.Record(defaultContent) {
 
     const t = (root as any).formula;
 
-    const text = TextContent.fromPersistence(t, '');
+    const text = ContentElements.fromPersistence(t, '', TEXT_ELEMENTS);
     return new Formula({ guid, text });
 
   }

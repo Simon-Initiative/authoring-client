@@ -45,6 +45,10 @@ export class WbInline extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : WbInline {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : WbInline {
 
     const wb = (root as any)['wb:inline'];

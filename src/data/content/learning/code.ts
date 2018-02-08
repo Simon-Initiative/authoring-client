@@ -2,23 +2,23 @@ import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
-import { InlineContent } from '../common/inline';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export type CodeParams = {
-  text?: InlineContent,
+  text?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Code',
-  text: new InlineContent(),
+  text: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
 
 export class Code extends Immutable.Record(defaultContent) {
 
   contentType: 'Code';
-  text: InlineContent;
+  text: ContentElements;
   guid: string;
 
   constructor(params?: CodeParams) {
@@ -39,7 +39,7 @@ export class Code extends Immutable.Record(defaultContent) {
 
     const t = (root as any).code;
 
-    const text = InlineContent.fromPersistence(getChildren(t), '');
+    const text = ContentElements.fromPersistence(getChildren(t), '', INLINE_ELEMENTS);
     return new Code({ guid, text });
 
   }

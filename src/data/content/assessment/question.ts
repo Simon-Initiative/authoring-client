@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 
 
-import { AlternativeFlowContent } from './types/flow';
-import { QuestionBodyContent } from './types/body';
+import { ContentElements } from 'data/content/common/elements';
+import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
@@ -18,30 +18,31 @@ import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import { Changes } from 'data/content/learning/draft/changes';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
-  body?: QuestionBodyContent;
+  body?: ContentElements;
   concepts?: Immutable.List<string>;
   grading?: string;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
-  explanation?: AlternativeFlowContent;
+  explanation?: ContentElements;
   guid?: string;
 };
 
 const defaultQuestionParams = {
   contentType: 'Question',
   id: '',
-  body: new QuestionBodyContent(),
+  body: new ContentElements(),
   concepts: Immutable.List<string>(),
   grading: 'automatic',
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
-  explanation: new AlternativeFlowContent(),
+  explanation: new ContentElements(),
   guid: '',
 };
 
@@ -50,7 +51,7 @@ const defaultPart = new Part().toPersistence();
 
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
-function tagInputRefsWithType(model: Question) {
+export function tagInputRefsWithType(model: Question) {
 
   const byId = model.items.toArray().reduce(
     (p, c) => {
@@ -63,9 +64,41 @@ function tagInputRefsWithType(model: Question) {
     },
     {});
 
-  return model.with({ body: model.body.tagInputRefsWithType(byId) });
+  const body = model.body.with({ content: model.body.content.map((c) => {
+    if (c.contentType === 'ContiguousText') {
+      return (c as ContiguousText).tagInputRefsWithType(byId);
+    }
+    return c;
+  }).toOrderedMap() });
+
+  return model.with({ body });
+
 }
 
+export function detectInputRefChanges(
+  current: ContentElements, previous: ContentElements) : Changes {
+
+  const initial : Changes = {
+    additions: Immutable.List(),
+    deletions: Immutable.List(),
+  };
+
+  return this.content.toArray()
+    .filter(c => c.contentType === 'ContiguousText')
+    .reduce(
+      (delta, c) => {
+        const p = previous.content.get(c.guid);
+        if (p !== undefined) {
+          const changes = (c as ContiguousText).detectInputRefChanges(p as ContiguousText);
+          return {
+            additions: delta.additions.concat(changes.additions).toList(),
+            deletions: delta.deletions.concat(changes.deletions).toList(),
+          };
+        }
+        return delta;
+      },
+      initial);
+}
 
 function ensureResponsesExist(model: Question) {
   const itemsArray = model.items.toArray();
@@ -150,7 +183,7 @@ function migrateExplanationToFeedback(model: Question) : Question {
 
     if (!migratedAlready) {
       const explanation
-        = AlternativeFlowContent.fromText('migrated', '');
+        = ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS);
 
       const f = new Feedback().with({ body: originalExplanation });
       const feedback = Immutable.OrderedMap<string, Feedback>()
@@ -176,12 +209,12 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
   id: string;
-  body: QuestionBodyContent;
+  body: ContentElements;
   concepts: Immutable.List<string>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
-  explanation: AlternativeFlowContent;
+  explanation: ContentElements;
   guid: string;
 
   constructor(params?: QuestionParams) {
@@ -244,7 +277,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
 
         case 'body':
-          model = model.with({ body: QuestionBodyContent.fromPersistence(item, id) });
+          model = model.with({ body: ContentElements.fromPersistence(
+            item, id, QUESTION_BODY_ELEMENTS) });
           break;
         case 'part':
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
@@ -279,7 +313,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
         case 'explanation':
           model = model.with({ explanation:
-            AlternativeFlowContent.fromPersistence((item as any).explanation, id) });
+            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
           break;
         default:
 

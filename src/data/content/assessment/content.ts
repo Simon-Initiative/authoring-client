@@ -1,18 +1,18 @@
 import * as Immutable from 'immutable';
 
-import { BodyContent } from '../common/body';
+import { ContentElements, BODY_ELEMENTS, BOX_ELEMENTS } from 'data/content/common//elements';
 import { augment } from '../common';
 
 export type ContentParams = {
   availability?: string,
-  body?: BodyContent,
+  body?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Content',
   availability: 'always',
-  body: new BodyContent(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
   guid: '',
 };
 
@@ -20,7 +20,7 @@ export class Content extends Immutable.Record(defaultContent) {
 
   contentType: 'Content';
   availability: string;
-  body: BodyContent;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: ContentParams) {
@@ -36,7 +36,7 @@ export class Content extends Immutable.Record(defaultContent) {
     const content = (root as any).content;
 
     let model = new Content({ guid });
-    model = model.with({ body: BodyContent.fromPersistence(content, '') });
+    model = model.with({ body: ContentElements.fromPersistence(content, '', BODY_ELEMENTS) });
 
     if (content['@availability'] !== undefined) {
       model = model.with({ availability: content['@availability'] });

@@ -3,7 +3,7 @@ import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
@@ -120,7 +120,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
           services={services}
           onEdit={body => onEditFeedback(
             response,
-            feedback.with({ body: (body as AlternativeFlowContent) }))} />;
+            feedback.with({ body: (body as ContentElements) }))} />;
 
 
       scoreEditor = (

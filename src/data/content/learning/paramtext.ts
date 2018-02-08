@@ -13,11 +13,11 @@ const defaultContent = {
 };
 
 export class ParamText extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'ParamText';
   text: string;
   guid: string;
-  
+
   constructor(params?: ParamTextParams) {
     super(augment(params));
   }
@@ -26,16 +26,22 @@ export class ParamText extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+
+  clone() : ParamText {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : ParamText {
 
     const p = (root as any);
 
     let model = new ParamText({ guid });
-    
+
     if (p['#text'] !== undefined) {
       model = model.with({ text: p['#text'] });
     }
-    
+
     return model;
   }
 

@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 
-export interface ExplanationEditorProps extends AbstractContentEditorProps<AlternativeFlowContent> {
-  onEdit: (model: AlternativeFlowContent) => void;
+export interface ExplanationEditorProps extends AbstractContentEditorProps<ContentElements> {
+  onEdit: (model: ContentElements) => void;
 }
 
 export interface ExplanationEditorState {
@@ -15,7 +15,7 @@ export interface ExplanationEditorState {
  * The content editor for HtmlContent.
  */
 export class ExplanationEditor
-  extends AbstractContentEditor<AlternativeFlowContent,
+  extends AbstractContentEditor<ContentElements,
   ExplanationEditorProps, ExplanationEditorState> {
 
   constructor(props) {

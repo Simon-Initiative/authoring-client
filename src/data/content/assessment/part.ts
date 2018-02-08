@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
-import { FlowContent } from '../common/flow';
-import { AlternativeFlowContent } from './types/flow';
+import { ContentElements } from 'data/content/common//elements';
+import { ALT_FLOW_ELEMENTS } from './types';
 import { Title } from '../learning/title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
@@ -22,7 +22,7 @@ export type PartParams = {
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
-  explanation?: AlternativeFlowContent;
+  explanation?: ContentElements;
   guid?: string;
 };
 
@@ -38,7 +38,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
-  explanation: new AlternativeFlowContent(),
+  explanation: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -55,7 +55,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
-  explanation: AlternativeFlowContent;
+  explanation: ContentElements;
   guid: string;
 
   constructor(params?: PartParams) {
@@ -116,7 +116,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           break;
         case 'explanation':
           model = model.with({ explanation:
-            AlternativeFlowContent.fromPersistence((item as any).explanation, id) });
+            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
           break;
         default:
 

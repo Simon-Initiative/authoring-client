@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { TextContent } from 'data/content/common/text';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { TextInput } from '../../content/common/TextInput';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
@@ -35,7 +35,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
   onTitleEdit(page: contentTypes.Page, text: string) {
     this.props.onEdit(page.with({ title: new contentTypes.Title({
-      text: TextContent.fromText(text, '') }) }));
+      text: ContentElements.fromText(text, '', TEXT_ELEMENTS) }) }));
   }
 
   renderPage(page: contentTypes.Page, pageNumber: number) {

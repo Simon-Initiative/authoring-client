@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 import { augment, getChildren } from '../common';
-import { InlineContent } from '../common/inline';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
 export type CellHeaderParams = {
   align?: string,
   colspan?: string,
   rowspan?: string,
-  content?: InlineContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -15,7 +15,7 @@ const defaultContent = {
   align: 'left',
   colspan: '1',
   rowspan: '1',
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
 
@@ -25,7 +25,7 @@ export class CellHeader extends Immutable.Record(defaultContent) {
   align: string;
   colspan: string;
   rowspan: string;
-  content: InlineContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: CellHeaderParams) {
@@ -60,9 +60,10 @@ export class CellHeader extends Immutable.Record(defaultContent) {
     }
 
     if (t['#text'] !== undefined) {
-      model = model.with({ content: InlineContent.fromPersistence(t, '') });
+      model = model.with({ content: ContentElements.fromPersistence(t, '', INLINE_ELEMENTS) });
     } else {
-      model = model.with({ content: InlineContent.fromPersistence(getChildren(t), '') });
+      model = model.with({ content: ContentElements
+        .fromPersistence(getChildren(t), '', INLINE_ELEMENTS) });
     }
 
     return model;

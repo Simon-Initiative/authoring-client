@@ -13,11 +13,11 @@ const defaultContent = {
 };
 
 export class PrefLabel extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'PrefLabel';
   preference: string;
   guid: string;
-  
+
   constructor(params?: PrefLabelParams) {
     super(augment(params));
   }
@@ -26,16 +26,20 @@ export class PrefLabel extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : PrefLabel {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : PrefLabel {
 
     const p = (root as any)['pref:label'];
 
     let model = new PrefLabel({ guid });
-    
+
     if (p['@preference'] !== undefined) {
       model = model.with({ preference: p['@preference'] });
     }
-    
+
     return model;
   }
 

@@ -4,7 +4,7 @@ import { TextInput } from '../../content/common/TextInput';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { TextContent } from 'data/content/common/text';
+import { ContentElements } from 'data/content/common/elements';
 
 export interface Details {
 
@@ -31,7 +31,7 @@ export class Details
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  onTitleEdit(text: TextContent) {
+  onTitleEdit(text: ContentElements) {
 
     const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
 

@@ -4,8 +4,9 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import './Feedback.scss';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
 
@@ -114,7 +115,7 @@ export abstract class Feedback
             services={services}
             editMode={editMode}
             body={response.feedback.first() ? response.feedback.first().body
-              : new AlternativeFlowContent()}
+              : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS)}
             onEdit={body => this.onBodyEdit(body, response)}
             onRemove={isDefault ? undefined : () => this.onResponseRemove(response)}
             options={

@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { TextContent } from 'data/content/common/text';
-import { InlineContent } from 'data/content/common/inline';
-
+import { ContentElements } from 'data/content/common/elements';
 import { IFrame } from '../../../data/content/learning/iframe';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
@@ -48,12 +46,12 @@ export class IFrameEditor
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onTitleEdit(text: TextContent) {
+  onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: InlineContent) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }

@@ -4,7 +4,8 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
-import { BoxContent } from '../common/box';
+
+import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export enum PulloutType {
@@ -32,7 +33,7 @@ export type PulloutParams = {
   id?: Maybe<string>,
   title?: Title,
   purpose?: Maybe<string>,
-  content?: BoxContent,
+  content?: ContentElements,
   pulloutType?: Maybe<PulloutType>,
   guid?: string,
 };
@@ -43,7 +44,7 @@ const defaultContent = {
   title: new Title(),
   purpose: Maybe.nothing(),
   pulloutType: Maybe.nothing(),
-  content: new BoxContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
   guid: '',
 };
 
@@ -52,7 +53,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
   id: Maybe<string>;
   title: Title;
   purpose: Maybe<string>;
-  content: BoxContent;
+  content: ContentElements;
   pulloutType: Maybe<PulloutType>;
   guid: string;
 
@@ -62,6 +63,13 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
   with(values: PulloutParams) {
     return this.merge(values) as this;
+  }
+
+  clone() : Pullout {
+    return this.with({
+      content: this.content.clone(),
+      title: this.title.clone(),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Pullout {
@@ -94,7 +102,8 @@ export class Pullout extends Immutable.Record(defaultContent) {
 
     debugger;
 
-    model = model.with({ content: BoxContent.fromPersistence(getChildren(t), '') });
+    model = model.with({ content: ContentElements
+      .fromPersistence(getChildren(t), '', BOX_ELEMENTS) });
 
     return model;
   }

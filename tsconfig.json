@@ -8,7 +8,6 @@
         "experimentalDecorators": true,
         "noImplicitAny": false,
         "removeComments": false,
-        "inlineSourceMap": true,
         "inlineSources": true,
         "sourceMap": true,
         "noEmitHelpers": false,

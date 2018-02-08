@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { YouTube as YouTubeType } from '../../../../../data/content/html/youtube';
+import { YouTube as YouTubeType } from 'data/content/learning/youtube';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { YouTubeEditor } from '../../../media/YouTubeEditor';
+import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
+import { YouTubeEditor } from 'editors/content/media/YouTubeEditor';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';

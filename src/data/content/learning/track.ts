@@ -21,7 +21,7 @@ const defaultContent = {
 };
 
 export class Track extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Track';
   src: string;
   kind: string;
@@ -29,7 +29,7 @@ export class Track extends Immutable.Record(defaultContent) {
   srclang: string;
   default: string;
   guid: string;
-  
+
   constructor(params?: TrackParams) {
     super(augment(params));
   }
@@ -38,12 +38,16 @@ export class Track extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Track {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : Track {
 
     const t = (root as any).track;
 
     let model = new Track({ guid });
-    
+
     if (t['@src'] !== undefined) {
       model = model.with({ src: t['@src'] });
     }
@@ -59,7 +63,7 @@ export class Track extends Immutable.Record(defaultContent) {
     if (t['@default'] !== undefined) {
       model = model.with({ default: t['@default'] });
     }
-    
+
     return model;
   }
 

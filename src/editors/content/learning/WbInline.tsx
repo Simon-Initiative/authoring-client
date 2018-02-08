@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { WbInline as WbInlineType } from '../../../../../data/content/html/wbinline';
+import { WbInline as WbInlineType } from 'data/content/workbook/wbinline';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import * as persistence from '../../../../../data/persistence';
-import { Select } from '../../Select';
-import { Button } from '../../Button';
-import { PurposeTypes } from '../../../../../data/content/html/common';
+import * as persistence from 'data/persistence';
+import { Select } from '../common/Select';
+import { Button } from '../common/Button';
+import { PurposeTypes } from 'data/content/learning/common';
 import { handleInsertion } from './common';
-import { LegacyTypes } from '../../../../../data/types';
+import { LegacyTypes } from 'data/types';
 
-import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
+import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './wbinline.scss';
 

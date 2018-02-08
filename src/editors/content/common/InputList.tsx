@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { AlternativeFlowContent } from 'data/content/assessment/types/flow';
+import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { DragHandle } from 'components/common/DragHandle.tsx';
 import { Remove } from 'components/common/Remove';
@@ -39,11 +39,11 @@ export interface InputListItemProps {
   contentTitle?: string;
   context: AppContext;
   services: AppServices;
-  body: AlternativeFlowContent;
+  body: ContentElements;
   options?: any;
   controls?: any;
   editMode: boolean;
-  onEdit: (body: AlternativeFlowContent) => void;
+  onEdit: (body: ContentElements) => void;
   onRemove?: (id: string) => void;
 
   // required props if draggable

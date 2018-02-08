@@ -1,11 +1,9 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
 import { Image } from '../../../data/content/learning/image';
-import { TextContent } from 'data/content/common/text';
-import { InlineContent } from 'data/content/common/inline';
+import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { LabeledType } from '../labeled/LabeledEditor';
 import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { Select } from '../common/Select';
@@ -14,6 +12,7 @@ import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
 import { adjustPath } from './utils';
+import { ContentEditor } from 'editors/content/content/ContentEditor';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 
@@ -34,7 +33,6 @@ export class ImageEditor
   constructor(props) {
     super(props);
 
-    this.onLabeledEdit = this.onLabeledEdit.bind(this);
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
@@ -86,30 +84,22 @@ export class ImageEditor
     }
   }
 
-  onLabeledEdit(model: LabeledType) {
-
-    const { titleContent, cite, caption } = model;
-    const updated = this.props.model.with({ titleContent, cite, caption });
-
-    this.props.onEdit(updated);
-  }
-
   onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: TextContent) {
+  onAlternateEdit(content: ContentElements) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onTitleEdit(text: TextContent) {
+  onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: InlineContent) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }

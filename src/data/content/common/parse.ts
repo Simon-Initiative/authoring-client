@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { Unsupported } from '../unsupported';
 import guid from 'utils/guid';
-import { HasGuid } from 'data/types';
+import { ContentElement } from './interfaces';
 import { ContiguousText } from '../learning/contiguous';
 import * as logger from 'utils/logger';
 
@@ -20,7 +20,7 @@ export const CONTIGUOUS_TEXT_ELEMENTS = [
 export const registeredTypes = {};
 
 
-export function registerType(elementName: string, factoryFn: (obj, guid) => HasGuid) {
+export function registerType(elementName: string, factoryFn: (obj, guid) => ContentElement) {
   if (registeredTypes[elementName] === undefined) {
     registeredTypes[elementName] = factoryFn;
   } else {
@@ -64,9 +64,9 @@ export function getKey(item) : Maybe<string> {
   return Maybe.just(keys[0]);
 }
 
-function parseElements(elements: Object[], factories, textElements) : HasGuid[] {
+function parseElements(elements: Object[], factories, textElements) : ContentElement[] {
 
-  const parsedObjects : HasGuid[] = [];
+  const parsedObjects : ContentElement[] = [];
 
   // Buffer for contiguous text elements
   let textBuffer = [];
@@ -116,7 +116,7 @@ function parseElements(elements: Object[], factories, textElements) : HasGuid[] 
 }
 
 export function parseContent(obj: Object, supportedElementKeys: string[])
-  : Immutable.OrderedMap<string, HasGuid> {
+  : Immutable.OrderedMap<string, ContentElement> {
 
   // Create a lookup table for the registered factory deserialization
   // functions based on the supported element keys
@@ -134,9 +134,9 @@ export function parseContent(obj: Object, supportedElementKeys: string[])
   const inputAsArray = normalizeInput(obj, textElements);
 
   // Parse the elements and collect the deserialized content here
-  const parsedObjects : HasGuid[] = parseElements(inputAsArray, factories, textElements);
+  const parsedObjects : ContentElement[] = parseElements(inputAsArray, factories, textElements);
 
   // Convert to the Immutable representation and return
   const keyValuePairs = parsedObjects.map(h => [h.guid, h]);
-  return Immutable.OrderedMap<string, HasGuid>(keyValuePairs);
+  return Immutable.OrderedMap<string, ContentElement>(keyValuePairs);
 }

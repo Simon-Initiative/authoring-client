@@ -4,14 +4,14 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
-import { BoxContent } from '../common/box';
+import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
 export type ExampleParams = {
   id?: Maybe<string>,
   title?: Title,
   purpose?: Maybe<string>,
-  content?: BoxContent,
+  content?: ContentElements,
   guid?: string,
 };
 
@@ -20,7 +20,7 @@ const defaultContent = {
   id: Maybe.nothing(),
   title: new Title(),
   purpose: Maybe.nothing(),
-  content: new BoxContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
   guid: '',
 };
 
@@ -29,7 +29,7 @@ export class Example extends Immutable.Record(defaultContent) {
   id: Maybe<string>;
   title: Title;
   purpose: Maybe<string>;
-  content: BoxContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: ExampleParams) {
@@ -38,6 +38,12 @@ export class Example extends Immutable.Record(defaultContent) {
 
   with(values: ExampleParams) {
     return this.merge(values) as this;
+  }
+
+  clone() : Example {
+    return this.with({
+      content: this.content.clone(),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Example {
@@ -65,7 +71,8 @@ export class Example extends Immutable.Record(defaultContent) {
       }
     });
 
-    model = model.with({ content: BoxContent.fromPersistence(getChildren(t), '') });
+    model = model.with({ content: ContentElements
+      .fromPersistence(getChildren(t), '', BOX_ELEMENTS) });
 
     return model;
   }

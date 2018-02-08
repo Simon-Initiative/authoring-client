@@ -9,11 +9,11 @@ export type UnsupportedParams = {
 
 export class Unsupported extends Immutable.Record(
   { contentType: 'Unsupported', guid: '', data: {} }) {
-  
+
   contentType: 'Unsupported';
   data: Object;
   guid: string;
-  
+
   constructor(params?: UnsupportedParams) {
     super(augment(params));
   }
@@ -22,9 +22,13 @@ export class Unsupported extends Immutable.Record(
     return this.merge(values) as this;
   }
 
+  clone() {
+    return this;
+  }
+
   toPersistence() : Object {
     return this.data;
-  } 
+  }
 
   static fromPersistence(data: Object, guid: string) : Unsupported {
     return new Unsupported().with({ data, guid });

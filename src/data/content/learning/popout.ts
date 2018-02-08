@@ -15,12 +15,12 @@ const defaultContent = {
 };
 
 export class Popout extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Popout';
   enable: boolean;
   content: string;
   guid: string;
-  
+
   constructor(params?: PopoutParams) {
     super(augment(params));
   }
@@ -29,19 +29,23 @@ export class Popout extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Popout {
+    return this;
+  }
+
   static fromPersistence(root: Object, guid: string) : Popout {
 
     const cb = (root as any).popout;
 
     let model = new Popout({ guid });
-    
+
     if (cb['@enable'] !== undefined) {
       model = model.with({ enable: cb['@enable'] === 'true' });
     }
     if (cb['#text'] !== undefined) {
       model = model.with({ content: cb['#text'] });
     }
-    
+
     return model;
   }
 

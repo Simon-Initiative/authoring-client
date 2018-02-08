@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { getEditorByContentType } from './registry';
-import { ContentType, ContentElement } from 'data/content/common/interfaces';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ContentElements } from 'data/content/common/elements';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
-export interface ContentContainerProps<T>
-  extends AbstractContentEditorProps<ContentType<ContentElement<any>>> {
+export interface ContentContainerProps
+  extends AbstractContentEditorProps<ContentElements> {
 
 }
 
@@ -17,9 +18,9 @@ export interface ContentContainerState {
 /**
  * The content container editor.
  */
-export class ContentContainer<T>
-  extends AbstractContentEditor<ContentType<ContentElement<T>>,
-    ContentContainerProps<ContentElement<T>>, ContentContainerState> {
+export class ContentContainer
+  extends AbstractContentEditor<ContentElements,
+    ContentContainerProps, ContentContainerState> {
 
 
   constructor(props) {

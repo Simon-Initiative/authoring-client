@@ -1,19 +1,19 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { InlineContent } from '../common/inline';
+import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 import { augment, getChildren } from '../common';
 import createGuid from 'utils/guid';
 
 export type DdParams = {
   title?: Maybe<string>,
-  content?: InlineContent,
+  content?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Dd',
   title: Maybe.nothing(),
-  content: new InlineContent(),
+  content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
 
@@ -21,7 +21,7 @@ export class Dd extends Immutable.Record(defaultContent) {
 
   contentType: 'Dd';
   title: Maybe<string>;
-  content: InlineContent;
+  content: ContentElements;
   guid: string;
 
   constructor(params?: DdParams) {
@@ -48,7 +48,8 @@ export class Dd extends Immutable.Record(defaultContent) {
       model = model.with({ title: Maybe.just(t['@title']) });
     }
 
-    model = model.with({ content: InlineContent.fromPersistence(t, createGuid()) });
+    model = model.with({ content: ContentElements
+      .fromPersistence(t, createGuid(), INLINE_ELEMENTS) });
 
     return model;
   }

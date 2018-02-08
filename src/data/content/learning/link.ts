@@ -39,6 +39,14 @@ export class Link extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Link {
+    return this.with({
+      content: this.content.caseOf(
+        { just: i => Maybe.just(i.clone()), nothing: () => Maybe.nothing<Image>() }),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Link {
     const t = (root as any).link;
 
@@ -67,7 +75,7 @@ export class Link extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence(toPersistence, text) : Object {
+  toPersistence() : Object {
     const link = {
       link: {
         '@title': this.title,
@@ -78,7 +86,7 @@ export class Link extends Immutable.Record(defaultContent) {
     };
 
     const imageContent: Image = this.content.caseOf({
-      just: c => [c.toPersistence(toPersistence)],
+      just: c => [c.toPersistence()],
       nothing: () => undefined,
     });
 

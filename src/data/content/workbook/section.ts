@@ -4,14 +4,16 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
-import { BodyContent } from './types/body';
+
+import { ContentElements } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
+import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
 export type SectionParams = {
   id?: Maybe<string>,
   title?: Title,
   purpose?: Maybe<string>,
-  body?: BodyContent,
+  body?: ContentElements,
   guid?: string,
 };
 
@@ -19,7 +21,7 @@ const defaultContent = {
   id: Maybe.nothing(),
   title: new Title(),
   purpose: Maybe.nothing(),
-  body: new BodyContent(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(WB_BODY_EXTENSIONS) }),
   guid: '',
   contentType: 'Section',
 };
@@ -29,7 +31,7 @@ export class Section extends Immutable.Record(defaultContent) {
   id: Maybe<string>;
   title: Title;
   purpose: Maybe<string>;
-  body: BodyContent;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: SectionParams) {
@@ -38,6 +40,13 @@ export class Section extends Immutable.Record(defaultContent) {
 
   with(values: SectionParams) {
     return this.merge(values) as this;
+  }
+
+  clone() : Section {
+    return this.with({
+      title: this.title.clone(),
+      body: this.body.clone(),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Section {
@@ -62,7 +71,8 @@ export class Section extends Immutable.Record(defaultContent) {
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
         case 'body':
-          model = model.with({ body: BodyContent.fromPersistence(item['body'], id) });
+          model = model.with({ body: ContentElements
+            .fromPersistence(item['body'], id, WB_BODY_EXTENSIONS) });
           break;
         default:
       }

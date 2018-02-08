@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import { QuestionBodyContent } from 'data/content/assessment/types/body';
+import { ContentElements } from 'data/content/common/elements';
 import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
@@ -13,6 +13,7 @@ import { MultipartInput } from './MultipartInput';
 import { EntityTypes } from '../../../data/content/learning/common';
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from './commands';
+import { detectInputRefChanges } from 'data/content/assessment/question';
 
 import './QuestionEditor.scss';
 
@@ -31,7 +32,7 @@ export interface QuestionEditorState {
  */
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
-  lastBody: QuestionBodyContent;
+  lastBody: ContentElements;
   itemToAdd: any;
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
@@ -102,12 +103,12 @@ export class QuestionEditor
       || question.items.first().contentType === contentTypeToAdd;
   }
 
-  onBodyEdit(body: QuestionBodyContent) {
+  onBodyEdit(body: ContentElements) {
 
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
-      const delta = body.detectInputRefChanges(this.lastBody);
+      const delta = detectInputRefChanges(this.lastBody, body);
 
       // For any deletions of input_refs, we need to make sure that we remove
       // the corresponding item and part from the question model

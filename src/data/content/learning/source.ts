@@ -15,12 +15,12 @@ const defaultContent = {
 };
 
 export class Source extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Source';
   src: string;
   type: string;
   guid: string;
-  
+
   constructor(params?: SourceParams) {
     super(augment(params));
   }
@@ -29,19 +29,22 @@ export class Source extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Source {
+    return this;
+  }
   static fromPersistence(root: Object, guid: string) : Source {
 
     const t = (root as any).source;
 
     let model = new Source({ guid });
-    
+
     if (t['@src'] !== undefined) {
       model = model.with({ src: t['@src'] });
     }
     if (t['@type'] !== undefined) {
       model = model.with({ type: t['@type'] });
     }
-    
+
     return model;
   }
 
