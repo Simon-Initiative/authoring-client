@@ -278,7 +278,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
         case 'body':
           model = model.with({ body: ContentElements.fromPersistence(
-            item, id, QUESTION_BODY_ELEMENTS) });
+            item['body'], id, QUESTION_BODY_ELEMENTS) });
           break;
         case 'part':
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });

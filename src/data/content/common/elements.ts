@@ -15,7 +15,7 @@ const ELEMENTS_SEMANTIC = ['popout', 'example', 'definition'];
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'cite', 'term', 'var', 'link', 'activity_link', 'xref', 'input_ref'];
 export const INLINE_ELEMENTS = [...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST];
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS];

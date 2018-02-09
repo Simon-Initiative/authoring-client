@@ -384,7 +384,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       ? Object.assign({}, this.props.editorStyles)
       : Object.assign({}, styles.editor);
 
-    editorStyle.paddingLeft = '50px';
     editorStyle.position = 'relative';
     editorStyle.top = '0px';
     editorStyle.left = '0px';

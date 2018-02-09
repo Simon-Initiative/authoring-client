@@ -6,6 +6,8 @@ import { ContentElements } from 'data/content/common/elements';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
+import './ContentContainer.scss';
+
 export interface ContentContainerProps
   extends AbstractContentEditorProps<ContentElements> {
 
