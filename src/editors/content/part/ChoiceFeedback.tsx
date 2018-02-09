@@ -197,7 +197,7 @@ export abstract class ChoiceFeedback
           id={response.guid}
           label={response.isDefault || simpleFeedback ? '' : `${i + 1}`}
           contentTitle={
-            response.isDefault ? 'Other Feedback' : ''
+            response.isDefault ? 'Other' : ''
             || simpleFeedback ? 'Correct' : ''
           }
           context={context}

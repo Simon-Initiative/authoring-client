@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { process } from './process';
 
-const MathJax : any = (window as any).MathJax;
-
 export interface Math {
   node: any;
   script: any;
@@ -17,13 +15,20 @@ export interface MathProps {
  * @type {ReactClass}
  */
 export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }> {
+  MathJax : any;
 
   constructor(props) {
     super(props);
 
+    this.MathJax = (window as any).MathJax;
+
     this.state = {
-      isMathJaxReady: MathJax.isReady,
+      isMathJaxReady: this.MathJax.isReady,
     };
+
+    this.clear = this.clear.bind(this);
+    this.typeset = this.typeset.bind(this);
+    this.setScriptText = this.setScriptText.bind(this);
   }
 
   componentDidMount() {
@@ -31,13 +36,13 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
     if (this.state.isMathJaxReady) {
       this.typeset(false);
     } else {
-      MathJax.Hub.Register.StartupHook(
+      this.MathJax.Hub.Register.StartupHook(
         'End',
         () => this.setState({ isMathJaxReady: true }),
       );
     }
 
-  } 
+  }
 
     /**
      * Update the jax, force update if the display mode changed
@@ -72,11 +77,11 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
    * Clear the jax
    */
   clear() {
-    if (!this.script || !MathJax) {
+    if (!this.script || !this.MathJax) {
       return;
     }
 
-    const jax = MathJax.Hub.getJaxFor(this.script);
+    const jax = this.MathJax.Hub.getJaxFor(this.script);
     if (jax) {
       jax.Remove();
     }
@@ -89,7 +94,7 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
   typeset(forceUpdate) {
     const { children } = this.props;
 
-    if (!MathJax) {
+    if (!this.MathJax) {
       return;
     }
 
@@ -100,21 +105,21 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
     }
 
     if (!forceUpdate && this.script) {
-      MathJax.Hub.Queue(() => {
-        const jax = MathJax.Hub.getJaxFor(this.script);
+      this.MathJax.Hub.Queue(() => {
+        const jax = this.MathJax.Hub.getJaxFor(this.script);
 
         if (jax) {
           jax.Text(text, () => {});
         } else {
           const script = this.setScriptText(text);
-          process(MathJax, script, () => {});
+          process(this.MathJax, script, () => {});
         }
       });
 
 
     } else {
       const script = this.setScriptText(text);
-      process(MathJax, script, () => {});
+      process(this.MathJax, script, () => {});
     }
   }
 
@@ -128,14 +133,14 @@ export class Math extends React.Component<MathProps, { isMathJaxReady: boolean }
 
     if (!this.script) {
       this.script = document.createElement('script');
-      
+
       const tex = 'math/tex; ';
       const mml = 'math/mml; ';
       let type = tex;
       if (text.startsWith('<')) {
         type = mml;
       }
-      
+
       this.script.type = type + (inline ? '' : 'mode=display');
       (this.node as any).appendChild(this.script);
     }
