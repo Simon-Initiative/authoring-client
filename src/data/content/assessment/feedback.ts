@@ -49,7 +49,7 @@ export class Feedback extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const body = this.body.toPersistence();
-    const feedback = { feedback: (body as any) };
+    const feedback = { feedback: { '#array': (body as any) } };
 
     feedback.feedback['@targets'] = this.targets;
 

@@ -113,7 +113,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
       pullout: {
         '#array': [
           this.title.toPersistence(),
-          this.content.toPersistence(),
+          ...this.content.toPersistence(),
         ],
       },
     };

@@ -86,7 +86,7 @@ export class Section extends Immutable.Record(defaultContent) {
       section: {
         '#array': [
           this.title.toPersistence(),
-          this.body.toPersistence(),
+          ...this.body.toPersistence(),
         ],
       },
     };

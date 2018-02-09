@@ -102,7 +102,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         '@id': this.resource.id,
         '#array': [
           this.head.toPersistence(),
-          { body: this.body.toPersistence() },
+          { body: { '#array': this.body.toPersistence() } },
         ],
       },
     }];

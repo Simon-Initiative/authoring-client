@@ -10,7 +10,7 @@ export type TitleParams = {
 
 const defaultContent = {
   contentType: 'Title',
-  text: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
+  text: ContentElements.fromText('', '', TEXT_ELEMENTS),
   guid: '',
 };
 
@@ -52,7 +52,10 @@ export class Title extends Immutable.Record(defaultContent) {
 
     return {
       title: {
-        '#array': this.text.toPersistence(),
+        '#text': this.text.extractPlainText().caseOf({
+          just: s => s,
+          nothing: () => '',
+        }),
       },
     };
   }

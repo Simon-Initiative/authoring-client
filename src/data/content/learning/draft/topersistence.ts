@@ -105,7 +105,7 @@ function translate(content: common.RawDraft, state: ContentState, inlineText: bo
     }
 
   } else {
-    return root.body;
+    return root.body['#array'];
   }
 
 }

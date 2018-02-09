@@ -5,6 +5,7 @@ import { getKey } from '../common';
 
 import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
@@ -92,7 +93,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
     model = model.with({ type: a.type });
-    model = model.with({ title: new contentTypes.Title({ guid: guid(), text: a.title }) });
+    model = model.with({ title: new contentTypes.Title({ guid: guid(),
+      text: ContentElements.fromText(a.title, '', TEXT_ELEMENTS) }) });
 
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });

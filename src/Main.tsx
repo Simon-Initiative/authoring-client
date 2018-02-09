@@ -80,7 +80,7 @@ const resources = {
         resource => resource.type === LegacyTypes.inline,
         (courseId, title, type) => new models.AssessmentModel({
           type,
-          title: new contentTypes.Title({ text: title }),
+          title: contentTypes.Title.fromText(title),
         })),
   summativeassessments: res(
     'Summative Assessments',
@@ -88,7 +88,7 @@ const resources = {
     resource => resource.type === LegacyTypes.assessment2,
     (courseId, title, type) => new models.AssessmentModel({
       type,
-      title: new contentTypes.Title({ text: title }),
+      title: contentTypes.Title.fromText(title),
     })),
   pages: res(
         'Workbook Pages',
@@ -108,7 +108,7 @@ const resources = {
           return new models.PoolModel({
             type,
             pool: new contentTypes.Pool({ questions, id: guid(),
-              title: new contentTypes.Title({ text: title }) }),
+              title: contentTypes.Title.fromText(title) }),
           });
         }),
 };

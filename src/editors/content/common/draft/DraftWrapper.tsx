@@ -187,7 +187,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     this.focus = () => (this.refs as any).editor.focus();
     this.lastSelectionState = null;
 
-    const contentState = props.content.contentState;
+    const contentState = props.content.content;
     this.lastContent = contentState;
 
     const es = EditorState.createWithContent(contentState, this.getCompositeDecorator());
@@ -230,7 +230,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           this.lastContent = contentState;
           this.setState(
             { editorState },
-            () => this.props.onEdit(new ContiguousText({ content: contentState })));
+            () => this.props.onEdit(new ContiguousText({ content: contentState,
+              guid: this.props.content.guid })));
         } else {
           this.setState({ editorState });
         }

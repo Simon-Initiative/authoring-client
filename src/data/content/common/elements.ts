@@ -80,7 +80,19 @@ export class ContentElements extends Immutable.Record(defaultContent) {
       content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t) });
   }
 
-  toPersistence() : Object {
-    return this.content.toArray().map(e => e.toPersistence());
+  toPersistence() : Object[] {
+    const initial : Object[] = [];
+    return (this.content.toArray()
+      .map(e => e.toPersistence())
+      .reduce(
+        (p: Object[], c) => {
+          if (c instanceof Array) {
+            c.forEach(i => p.push(i));
+            return p;
+          }
+          p.push(c);
+          return p;
+        },
+        initial) as Object[]);
   }
 }

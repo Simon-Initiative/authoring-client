@@ -49,7 +49,7 @@ export class Hint extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const body = this.body.toPersistence();
-    const hint = { hint: (body as any) };
+    const hint = { hint: { '#array': (body as any) } };
 
     hint.hint['@targets'] = this.targets;
 

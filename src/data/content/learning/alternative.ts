@@ -80,7 +80,7 @@ export class Alternative extends Immutable.Record(defaultContent) {
         '@value': this.value,
         '#array': [
           this.title.toPersistence(),
-          this.content.toPersistence(),
+          ...this.content.toPersistence(),
         ],
       },
     };

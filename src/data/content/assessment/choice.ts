@@ -21,18 +21,22 @@ const defaultContent = {
 
 function simplifyBody(body: Object) : Object {
 
+  let arr = null;
   if (body['#array'] !== undefined) {
-    const arr = body['#array'];
-    if (arr.length === 1) {
-      if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
-        return { '#text': arr[0].p['#text'] };
-      }
-      if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
-        const c = arr[0].p;
-        delete c['@id'];
-        delete c['@title'];
-        return c;
-      }
+    arr = body['#array'];
+  } else if (body instanceof Array) {
+    arr = body;
+  }
+
+  if (arr !== null && arr.length === 1) {
+    if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
+      return { '#text': arr[0].p['#text'] };
+    }
+    if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+      const c = arr[0].p;
+      delete c['@id'];
+      delete c['@title'];
+      return c;
     }
   }
 

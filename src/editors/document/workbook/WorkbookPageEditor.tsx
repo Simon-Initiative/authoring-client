@@ -156,10 +156,15 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       this.renderActionsTab(),
     ];
 
+    const text = this.props.model.head.title.text.extractPlainText().caseOf({
+      just: s => s,
+      nothing: () => '',
+    });
+
     return (
       <div className="workbookpage-editor">
           <div className="title-row">
-            <h3>Page: {this.props.model.head.title.text}</h3>
+            <h3>Page: {text}</h3>
             <div className="flex-spacer"/>
             <UndoRedoToolbar
               undoEnabled={this.state.undoStackSize > 0}

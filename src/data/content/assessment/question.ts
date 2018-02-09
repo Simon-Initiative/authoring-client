@@ -338,7 +338,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
     const children = [
 
-      { body: this.body.toPersistence() },
+      { body: { '#array': this.body.toPersistence() } },
 
       ...this.concepts
         .toArray()
@@ -346,7 +346,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
       ...itemsAndParts,
 
-      { explanation: this.explanation.toPersistence() },
+      { explanation: { '#array': this.explanation.toPersistence() } },
     ];
 
     return {

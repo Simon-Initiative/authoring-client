@@ -5,16 +5,21 @@ import CodeBlock from '../learning/CodeBlock';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 
-export const registry = {};
+let registry = null;
 
 export function getEditorByContentType(contentType: string) {
-  const component = registry[name];
+
+  if (registry === null) {
+    init();
+  }
+
+  const component = registry[contentType];
 
   return component !== undefined ? component : Unsupported;
 }
 
-
-export default function init() {
+function init() {
+  registry = {};
   registry['ContiguousText'] = ContiguousTextEditor;
   registry['CodeBlock'] = CodeBlock;
 }

@@ -48,7 +48,7 @@ export class Content extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const body = this.body.toPersistence();
-    const content = { content: (body as any) };
+    const content = { content: { '#array': (body as any) } };
 
     content.content['@availability'] = this.availability;
 
