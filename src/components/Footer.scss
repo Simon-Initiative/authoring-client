@@ -1,21 +1,59 @@
 @import 'oli/typography';
 
 .footer {
+  display: flex;
+  flex-direction: row;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 50px;
 
   background-color: #f2f2f2;
   border-top: 1px solid #e8e8e8;
-  padding-top: 1rem;
-  padding-bottom: 2rem;
-  line-height: 1.2em;
   font-family: $serif-font;
   font-size: 14px;
 
-  .ccLicense {
-    float: left;
-    margin-right: 2.5rem;
-    color: #0067cb;
+  .footer-section {
+    display: flex;
+    flex-direction: row;
+
+    &.center {
+      flex: 1;
+      text-align: center;
+      vertical-align: middle;
+      margin: 0 10px;
+
+      .ccLicense {
+        margin-right: 15px;
+
+        img {
+          width: 88px;
+          height: 50px;
+          padding: 10px 0;
+        }
+      }
+
+      .license {
+        max-width: 500px;
+        padding: 5px 0;
+      }
+    }
+
+    &.left, &.right {
+      width: 20%;
+      margin: 0 10px;
+      line-height: 50px;
+    }
+  }
+
+  .quick-links {
+    a {
+      margin: 0 5px;
+    }
+  }
+
+  .centered {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
   }
 }

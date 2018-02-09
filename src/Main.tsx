@@ -5,6 +5,11 @@ import { setServerTimeSkew } from './actions/server';
 import { modalActions } from './actions/modal';
 import * as viewActions from './actions/view';
 import { loadCourse } from 'actions/course';
+import { UserState } from 'reducers/user';
+import { ModalState } from 'reducers/modal';
+import { CourseState } from 'reducers/course';
+import { ExpandedState } from 'reducers/expanded';
+import { ServerState } from 'reducers/server';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
@@ -115,11 +120,11 @@ const resources = {
 
 interface MainProps {
   location: any;
-  user: any;
-  modal: any;
-  course: models.CourseModel;
-  expanded: any;
-  server: any;
+  user: UserState;
+  modal: ModalState;
+  course: CourseState;
+  expanded: ExpandedState;
+  server: ServerState;
   onDispatch: (...args: any[]) => any;
 }
 
@@ -292,7 +297,7 @@ export default class Main extends React.Component<MainProps, MainState> {
             {currentView}
           </div>
           <div className="main-footer">
-            <Footer/>
+            <Footer name={user.profile.username} email={user.profile.email} />
           </div>
           {modalDisplay}
         </div>

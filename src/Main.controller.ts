@@ -1,13 +1,17 @@
 import { connect } from 'react-redux';
-import { CourseModel } from 'data/models';
+import { UserState } from 'reducers/user';
+import { ModalState } from 'reducers/modal';
+import { CourseState } from 'reducers/course';
+import { ExpandedState } from 'reducers/expanded';
+import { ServerState } from 'reducers/server';
 import Main from './Main';
 
 interface StateProps {
-  user: any;
-  modal: any;
-  course: CourseModel;
-  expanded: any;
-  server: any;
+  user: UserState;
+  modal: ModalState;
+  course: CourseState;
+  expanded: ExpandedState;
+  server: ServerState;
 }
 
 interface DispatchProps {
