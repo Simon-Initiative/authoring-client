@@ -2,32 +2,46 @@ import { List, Map } from 'immutable';
 import { Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { Maybe } from 'tsmonad';
+import { Document } from 'data/persistence';
+import { ContentModel } from 'data/models';
 import { EditedDocument } from 'types/document';
 
-export type FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
-export const FETCH_MEDIA_PAGE: FETCH_MEDIA_PAGE = 'media/FETCH_MEDIA_PAGE';
+export type DOCUMENT_LOADED = 'document/DOCUMENT_LOADED';
+export const DOCUMENT_LOADED: DOCUMENT_LOADED = 'document/DOCUMENT_LOADED';
 
-export type FetchMediaPageAction = {
-  type: FETCH_MEDIA_PAGE,
-  courseId: string,
+export type DocumentLoadedAction = {
+  type: DOCUMENT_LOADED,
+  document: Document,
 };
 
-export const fetchMediaPage = (courseId: string): FetchMediaPageAction => ({
-  type: FETCH_MEDIA_PAGE,
-  courseId,
+export const documentLoaded = (document: Document): DocumentLoadedAction => ({
+  type: DOCUMENT_LOADED,
+  document,
 });
 
-export type RESET_MEDIA = 'media/RESET_MEDIA';
-export const RESET_MEDIA: RESET_MEDIA = 'media/RESET_MEDIA';
 
-export type ResetMediaAction = {
-  type: RESET_MEDIA,
-  courseId: string,
-};
 
-export const resetMedia = (courseId: string): ResetMediaAction => ({
-  type: RESET_MEDIA,
-  courseId,
-});
+export function save(documentId: string, model: ContentModel) {
+  return function (dispatch, getState) {
+
+
+  };
+}
+
+export function undo(documentId: string) {
+  return function (dispatch, getState) {
+
+
+  };
+}
+
+
+export function redo(documentId: string) {
+  return function (dispatch, getState) {
+
+
+  };
+}
+
 
 

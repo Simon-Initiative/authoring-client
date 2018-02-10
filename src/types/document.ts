@@ -5,7 +5,7 @@ import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStra
 import { Maybe } from 'tsmonad';
 
 export type EditedDocument = {
-  document: Document;
+  document: Maybe<Document>;
   persistence: PersistenceStrategy;
   activeContentGuid: Maybe<string>;
   undoStack: Immutable.Stack<ContentModel>;
