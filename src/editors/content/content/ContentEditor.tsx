@@ -69,6 +69,9 @@ export class ContentEditor
 
     return (
       <div className="content-options">
+        {
+        /** availability options disabled. To re-enable, uncomment this block */
+        /**
         <Select onChange={this.onAvailability} label="Availability"
           editMode={editMode}
           value={model.availability}>
@@ -77,6 +80,7 @@ export class ContentEditor
           <option value="feedback_only">Feedback Only</option>
           <option value="never">Never</option>
         </Select>
+        */}
       </div>
     );
   }
@@ -109,7 +113,6 @@ export class ContentEditor
     return (
       <div className="content-editor">
         {this.renderTitle()}
-        {this.renderOptions()}
         {this.renderBody()}
       </div>
     );
