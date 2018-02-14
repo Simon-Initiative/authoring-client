@@ -94,9 +94,7 @@ export class AddQuestion
 
     const item = new contentTypes.ShortAnswer();
 
-    const body = new contentTypes.Html()
-      .with({ contentState: ContentState.createFromText('Enter feedback here') });
-    const feedback = new contentTypes.Feedback().with({ body });
+    const feedback = new contentTypes.Feedback();
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
       .set(feedback.guid, feedback);
 
