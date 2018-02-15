@@ -34,6 +34,7 @@ export class DuplicateListingInput
       duplicates: Immutable.List<string>(),
     };
 
+    this.onSubmit = this.onSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -46,6 +47,13 @@ export class DuplicateListingInput
 
     const duplicates = this.props.existing.filter(v => v.indexOf(value) !== -1).toList();
     this.setState({ value, duplicates });
+  }
+
+  onSubmit(e) {
+    // When enter is pressed, the onClick handler for the 'Create' button
+    // should be called instead of submitting the form
+    e.preventDefault();
+    this.props.onClick(this.state.value);
   }
 
   renderDuplicates() {
@@ -90,7 +98,9 @@ export class DuplicateListingInput
 
     return (
       <div style={outerDiv}>
-        <form className="form-inline">
+        <form 
+          className="form-inline"
+          onSubmit={this.onSubmit}>
           <input
             disabled={!this.props.editMode}
             style={ { width: this.props.width } }
