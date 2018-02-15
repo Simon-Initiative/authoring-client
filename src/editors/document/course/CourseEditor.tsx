@@ -170,7 +170,7 @@ class CourseEditor
                     <HelpPopover
                       title="Optional title"
                       content="Hey! Looks like you could use some help."
-                      placement={Direction.Top}
+                      placement={('right' as Direction)}
                       // placement={'down'}
                     />
                   </span>

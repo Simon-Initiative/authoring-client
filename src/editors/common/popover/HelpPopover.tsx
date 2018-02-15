@@ -14,8 +14,6 @@ export enum Direction {
   Down = 'down',
 }
 
-// export type Direction = 'top' | 'left' | 'right' | 'down';
-
 export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
   buttonRef: any;
 
