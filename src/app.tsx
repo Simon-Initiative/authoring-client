@@ -16,10 +16,11 @@ import { loadCourse } from 'actions/course';
 import { AppContainer } from 'react-hot-loader';
 import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
-
 import { ApplicationRoot } from './ApplicationRoot';
+
 // import application styles
 import 'stylesheets/index.scss';
+import 'react-tippy/dist/tippy.css';
 
 // attach global variables to window
 (window as any).React = React;
