@@ -1,11 +1,6 @@
 import { connect } from 'react-redux';
-import * as Immutable from 'immutable';
-import { MultipleChoice } from './MultipleChoice';
 import * as contentTypes from 'data/contentTypes';
 import { QuestionProps } from './Question';
-import { Skill } from 'types/course';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
 import { CheckAllThatApply } from './CheckAllThatApply';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
