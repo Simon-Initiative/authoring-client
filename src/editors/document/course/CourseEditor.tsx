@@ -7,6 +7,7 @@ import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import * as viewActions from 'actions/view';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
+import { Direction, HelpPopover } from 'editors/common/popover/HelpPopover';
 
 import './CourseEditor.scss';
 
@@ -163,8 +164,20 @@ class CourseEditor
                 <div className="col-9">{model.id}</div>
               </div>
               <div className="row">
-                <div className="col-3">Team members</div>
-                <div className="col-9">{this.renderDevelopers()}</div>
+                <div className="col-3">
+                  Team members
+                  <span className="float-right">
+                    <HelpPopover
+                      title="Optional title"
+                      content="Hey! Looks like you could use some help."
+                      placement={Direction.Top}
+                      // placement={'down'}
+                    />
+                  </span>
+                </div>
+                <div className="col-9">
+                  {this.renderDevelopers()}
+                </div>
               </div>
               <div className="row">
                 <div className="col-3">Version</div>
