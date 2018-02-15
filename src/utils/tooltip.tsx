@@ -14,6 +14,7 @@ const mergeWithDefaultProps = props =>
   Object.assign({}, DEFAULT_TOOLTIP_PROPS, props);
 
 interface TooltipProps {
+  title: string;
   disabled?: boolean;
   open?: boolean;
   useContext?: boolean;
@@ -45,7 +46,6 @@ interface TooltipProps {
   sticky?: boolean;
   stickyDuration?: number;
   touchHold?: number;
-  title?: string;
   onShow?: () => void;
   onShown?: () => void;
   onHide?: () => void;

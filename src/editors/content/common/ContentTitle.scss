@@ -45,6 +45,16 @@
           color: darken($remove, 15%);
         }
       }
+
+      &.disabled {
+        cursor: default;
+
+        &, &:hover, &:active {
+          i {
+            color: $gray;
+          }
+        }
+      }
     }
   }
 }

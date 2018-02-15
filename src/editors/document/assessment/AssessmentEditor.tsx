@@ -152,6 +152,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.setState({ currentNode });
   }
 
+  canRemoveNode() {
+    const page = this.props.model.pages.get(this.state.currentPage);
+
+    return page.nodes.filter(n => n.contentType === 'Question').size > 1;
+  }
+
   onNodeRemove(guid: string) {
 
     let page = this.props.model.pages.get(this.state.currentPage);
@@ -400,7 +406,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, rendererProps, this.onEdit, this.onNodeRemove)}
+                this.state.currentNode, rendererProps, this.onEdit,
+                this.onNodeRemove, this.canRemoveNode())}
             </div>
           </div>
         </div>
