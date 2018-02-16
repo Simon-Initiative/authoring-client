@@ -99,7 +99,7 @@ export class SelectionEditor
       ? 'Pool' : 'Shared Pool';
 
     return (
-      <ContentTitle title={title} onRemove={() => onRemove(model.guid)} />
+      <ContentTitle title={title} onRemove={() => onRemove(model.guid)} canRemove={true} />
     );
   }
 
