@@ -7,7 +7,7 @@ import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import * as viewActions from 'actions/view';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { Direction, HelpPopover } from 'editors/common/popover/HelpPopover';
+import { Position, HelpPopover } from 'editors/common/popover/HelpPopover';
 
 import './CourseEditor.scss';
 
@@ -168,11 +168,13 @@ class CourseEditor
                   Team members
                   <span className="float-right">
                     <HelpPopover
-                      title="Optional title"
-                      content="Hey! Looks like you could use some help."
-                      placement={('right' as Direction)}
-                      // placement={'down'}
-                    />
+                      position={('top' as Position)}>
+                      <div>
+                        <p>Looks like you could use some help.</p>
+                        <p>You can click <a href="#" target="_blank">here</a>&nbsp;
+                        to get some more information.</p>
+                      </div>
+                    </HelpPopover>
                   </span>
                 </div>
                 <div className="col-9">
