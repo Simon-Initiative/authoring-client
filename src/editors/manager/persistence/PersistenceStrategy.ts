@@ -1,6 +1,5 @@
 import * as persistence from '../../../data/persistence';
 import { LockDetails } from '../../../utils/lock';
-import { RegisterLocks, UnregisterLocks } from 'types/locks';
 
 export type onSaveCompletedCallback = (lastSavedDocument: persistence.Document) => void;
 
@@ -18,8 +17,6 @@ export interface PersistenceStrategy {
                userName: string,
                onSuccess: onSaveCompletedCallback,
                onFailure: onFailureCallback,
-               registerLocks: RegisterLocks,
-               unregisterLocks: UnregisterLocks,
               ) => Promise<boolean>;
 
   /**

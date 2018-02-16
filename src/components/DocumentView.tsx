@@ -5,7 +5,8 @@ import EditorManager from 'editors/manager/EditorManager.controller';
 import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
-  dispatch: any;
+  onLoad: (documentId: string) => void;
+  onRelease: (documentId: string) => void;
   documentId: string;
   profile: UserProfile;
   userId: string;
@@ -17,13 +18,28 @@ export interface DocumentViewState {}
 
 export default class DocumentView
   extends React.PureComponent<DocumentViewProps, DocumentViewState> {
-  viewActions: Object;
 
   constructor(props) {
     super(props);
-    const { dispatch } = this.props;
+  }
 
-    this.viewActions = bindActionCreators((viewActions as any), dispatch);
+  componentDidMount() {
+    const { onRelease, onLoad, documentId } = this.props;
+    onLoad(documentId);
+  }
+
+  componentWillUnmount() {
+    const { onRelease, documentId } = this.props;
+    onRelease(documentId);
+  }
+
+  componentWillReceiveProps(nextProps: DocumentViewProps) {
+    if (nextProps.documentId !== this.props.documentId) {
+      const { onLoad, onRelease, documentId } = nextProps;
+
+      onRelease(this.props.documentId);
+      onLoad(documentId);
+    }
   }
 
   render() {

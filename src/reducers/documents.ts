@@ -1,88 +1,114 @@
 import * as Immutable from 'immutable';
+import * as documentActions from 'actions/document';
+import { EditedDocument } from 'types/document';
+import createGuid from 'utils/guid';
 
-import {
-  FETCH_MEDIA_PAGE,
-  FetchMediaPageAction,
-  RESET_MEDIA,
-  ResetMediaAction,
-  RECEIVE_MEDIA_PAGE,
-  ReceiveMediaPageAction,
-  SIDELOAD_DATA,
-  SideloadDataAction,
-  LOAD_MEDIA_REFS,
-  LoadMediaReferencesAction,
-} from 'actions/media';
+export type ActionTypes =
+  documentActions.ChangeRedoneAction |
+  documentActions.ChangeUndoneAction |
+  documentActions.DocumentReleasedAction |
+  documentActions.DocumentFailedAction |
+  documentActions.DocumentLoadedAction |
+  documentActions.DocumentRequestedAction |
+  documentActions.ModelUpdatedAction;
 
-import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 
-export type ActionTypes = FetchMediaPageAction | ResetMediaAction | ReceiveMediaPageAction
-  | SideloadDataAction | LoadMediaReferencesAction;
+export type DocumentsState = Immutable.Map<string, EditedDocument>;
 
-export type MediaState = Map<string, OrderedMediaLibrary>;
+const initialState = Immutable.Map<string, EditedDocument>();
 
-const initialState = Map<string, OrderedMediaLibrary>();
+function processUndo(
+  state: DocumentsState, action: documentActions.ChangeUndoneAction) : DocumentsState {
 
-export const media = (
-  state: MediaState = initialState,
+  const ed = state.get(action.documentId);
+
+  if (ed.document.type === 'Loaded') {
+
+    const currentModel = ed.undoStack.peek();
+
+    const undoStack = ed.undoStack.pop();
+
+    const model = undoStack.peek();
+    const document = ed.document.document.with({ model });
+
+    return state.set(action.documentId, ed.with({
+      undoRedoGuid: createGuid(),
+      redoStack: ed.redoStack.push(currentModel),
+      undoStack: ed.undoStack.pop(),
+      document: { type: 'Loaded', document },
+    }));
+  }
+
+}
+
+function processRedo(
+  state: DocumentsState, action: documentActions.ChangeRedoneAction) : DocumentsState {
+
+  const ed = state.get(action.documentId);
+
+  if (ed.document.type === 'Loaded') {
+
+    const model = ed.redoStack.peek();
+    const undoStack = ed.undoStack.push(model);
+    const redoStack = ed.redoStack.pop();
+
+    const document = ed.document.document.with({ model });
+
+    return state.set(action.documentId, ed.with({
+      undoRedoGuid: createGuid(),
+      redoStack,
+      undoStack,
+      document: { type: 'Loaded', document },
+    }));
+  }
+}
+
+export const documents = (
+  state: DocumentsState = initialState,
   action: ActionTypes,
-): MediaState => {
+): DocumentsState => {
+
   switch (action.type) {
-    case FETCH_MEDIA_PAGE: {
-      const { courseId } = action;
+    case documentActions.DOCUMENT_REQUESTED:
+      // Newly requested documents simply get a new record in the map
 
-      // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+      return state.set(action.documentId, new EditedDocument()
+        .with({ documentId: action.documentId }));
 
-      return state.set(
-        courseId,
-        mediaLibrary.with({
-          isLoading: true,
-        }),
-      );
-    }
-    case RESET_MEDIA: {
-      const { courseId } = action;
+    case documentActions.DOCUMENT_LOADED:
 
-      return state.set(
-        courseId,
-        new OrderedMediaLibrary(),
-      );
-    }
-    case RECEIVE_MEDIA_PAGE: {
-      const { courseId, items, totalItems } = action;
+      // Successfully loaded documents have to have their doc set and
+      // their persistence strategies initialized
+      return state.set(action.documentId, state.get(action.documentId).with({
+        document: { type: 'Loaded', document: action.document },
+        persistence: action.persistence,
+        editingAllowed: action.editingAllowed,
+      }));
 
-      // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+    case documentActions.DOCUMENT_FAILED:
 
-      return state.set(
-        courseId,
-        mediaLibrary.load(items, totalItems).with({
-          isLoading: false,
-        }),
-      );
-    }
-    case SIDELOAD_DATA: {
-      const { courseId, data } = action;
+      return state.set(action.documentId, state.get(action.documentId).with({
+        document: { type: 'Failed', error: action.error },
+      }));
 
-      // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+    case documentActions.DOCUMENT_RELEASED:
+      return state.delete(action.documentId);
 
-      return state.set(
-        courseId,
-        mediaLibrary.sideloadData(data),
-      );
-    }
-    case LOAD_MEDIA_REFS: {
-      const { courseId, references } = action;
+    case documentActions.CHANGE_REDONE:
+      return processRedo(state, action);
 
-      // get existing media library or initialize a new one
-      const mediaLibrary = state.get(courseId) || new OrderedMediaLibrary();
+    case documentActions.CHANGE_UNDONE:
+      return processUndo(state, action);
 
-      return state.set(
-        courseId,
-        mediaLibrary.loadReferences(references),
-      );
-    }
+    case documentActions.MODEL_UPDATED:
+      const ed = state.get(action.documentId);
+      if (ed.document.type === 'Loaded') {
+        const document = ed.document.document.with({ model: action.model });
+        return state.set(action.documentId, ed.with({
+          document: { type: 'Loaded', document },
+        }));
+      }
+
     default:
       return state;
   }

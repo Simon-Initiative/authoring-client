@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
 import { modalActions } from './actions/modal';
 import * as viewActions from './actions/view';
+import { load, release } from 'actions/document';
 import { loadCourse } from 'actions/course';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
@@ -249,10 +250,15 @@ export default class Main extends React.Component<MainProps, MainState> {
       if (resources[documentId] !== undefined) {
         return this.renderResource(resources[documentId]);
       }
+
+      const onRelease = (documentId: string) => onDispatch(release(documentId));
+      const onLoad = (documentId: string) => onDispatch(load(course.guid, documentId));
+
       return (
           <DocumentView
+            onLoad={onLoad}
+            onRelease={onRelease}
             profile={user.profile}
-            dispatch={onDispatch}
             course={course}
             userId={user.userId}
             userName={user.user}

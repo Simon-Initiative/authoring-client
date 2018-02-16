@@ -19,9 +19,6 @@ export interface AbstractEditorProps<ModelType> {
   // Handles edits to the model
   onEdit: (model: ModelType) => void;
 
-  // Handles edits to the model driven by undo/redo
-  onUndoRedoEdit: (model: ModelType) => void;
-
   services: AppServices;
 
   context: AppContext;
@@ -82,20 +79,7 @@ export abstract class AbstractEditor<ModelType,
   }
 
   undo() {
-    const currentModel = this.undoStack.peek();
-    this.redoStack = this.redoStack.push(currentModel);
 
-    this.undoStack = this.undoStack.pop();
-
-    const model = this.undoStack.peek();
-
-    this.setState(
-      {
-        undoStackSize: this.undoStack.size - 1,
-        redoStackSize: this.redoStack.size,
-      },
-      () => this.props.onUndoRedoEdit(model),
-    );
 
   }
 
@@ -113,17 +97,7 @@ export abstract class AbstractEditor<ModelType,
   }
 
   redo() {
-    const model = this.redoStack.peek();
-    this.undoStack = this.undoStack.push(model);
-    this.redoStack = this.redoStack.pop();
 
-    this.setState(
-      {
-        undoStackSize: this.undoStack.size - 1,
-        redoStackSize: this.redoStack.size,
-      },
-      () => this.props.onUndoRedoEdit(model),
-    );
   }
 
 
