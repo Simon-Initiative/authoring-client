@@ -56,7 +56,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   hints: Immutable.OrderedMap<string, Hint>;
   explanation: Html;
   guid: string;
-  
+
   constructor(params?: PartParams) {
     super(defaultIdGuid(params));
   }
@@ -85,7 +85,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
     }
 
     getChildren(part).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -94,7 +94,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
-        
+
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
@@ -117,7 +117,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         default:
-          
+
       }
     });
 
@@ -129,7 +129,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
     const explanation = this.explanation.toPersistence();
 
     const children = [
-      
+
       this.title.toPersistence(),
 
       ...this.concepts
@@ -137,6 +137,8 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
 
       ...this.responses
+        // filter out responses with empty matches
+        .filter(r => r.match !== '')
         .toArray()
         .map(response => response.toPersistence()),
 

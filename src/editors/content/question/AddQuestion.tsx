@@ -54,7 +54,7 @@ export class AddQuestion
 
     const choice = new contentTypes.Choice({ value, guid: guid() });
     const feedback = new contentTypes.Feedback();
-    let response = new contentTypes.Response({ match });
+    let response = new contentTypes.Response({ match, score: '1' });
     response = response.with({ guid: guid(),
       feedback: response.feedback.set(feedback.guid, feedback) });
 
