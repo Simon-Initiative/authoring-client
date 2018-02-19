@@ -13,7 +13,7 @@ import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import { findNodeByGuid, locateNextOfKin } from './utils';
 import { Collapse } from '../../content/common/Collapse';
-import { AddQuestion } from '../../content/question/AddQuestion';
+import { AddQuestion, createMultipleChoiceQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
@@ -218,8 +218,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onAddPage() {
     const text = 'Page ' + (this.props.model.pages.size + 1);
-    const page = new contentTypes.Page()
+    let page = new contentTypes.Page()
       .with({ title: new contentTypes.Title().with({ text }) });
+
+    let content = new contentTypes.Content();
+    content = content.with({ guid: guid() });
+
+    const question = createMultipleChoiceQuestion('single');
+
+    page = page.with({
+      nodes: page.nodes.set(content.guid, content)
+        .set(question.guid, question),
+    });
 
     this.handleEdit(this.props.model.with(
       { pages: this.props.model.pages.set(page.guid, page) }));
@@ -312,7 +322,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             editMode={this.props.editMode}
             pages={this.props.model.pages}
             current={this.props.model.pages.get(this.state.currentPage)}
-            onChangeCurrent={currentPage => this.setState({ currentPage })}
+            onChangeCurrent={(currentPage) => {
+              const page = this.props.model.pages.get(currentPage);
+              const currentNode = page.nodes.first();
+              this.setState({ currentPage, currentNode });
+            }}
             onEdit={this.onPageEdit}/>
 
         </div>
