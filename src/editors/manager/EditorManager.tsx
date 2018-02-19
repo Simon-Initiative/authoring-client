@@ -139,8 +139,6 @@ export default class EditorManager
 
     const { document, hasFailed } = this.props;
 
-
-
     let component = null;
 
     if (hasFailed) {

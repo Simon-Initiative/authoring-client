@@ -62,7 +62,6 @@ export abstract class AbstractPersistenceStrategy implements PersistenceStrategy
           this.writeLockedDocumentId = doc._id;
           this.courseId = doc._courseId;
 
-          onSuccess(doc);
           resolve(true);
 
         } else {

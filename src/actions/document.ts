@@ -228,8 +228,6 @@ export function save(documentId: string, model: models.ContentModel) {
 
     const editedDocument : EditedDocument = getState().documents.get(documentId);
 
-    const model = editedDocument.document.model;
-
     if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
       const resource = model.resource.with({ dateUpdated: new Date() });
       const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
