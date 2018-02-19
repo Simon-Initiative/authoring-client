@@ -49,6 +49,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddPoolRef = this.onAddPoolRef.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
 
+    this.getCurrentPage = this.getCurrentPage.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
@@ -79,7 +80,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
-    const currentPage = nextProps.model.pages.get(this.state.currentPage);
+    const currentPage = this.getCurrentPage(nextProps);
 
     // Handle the case that the current node has changed externally,
     // for instance, from an undo/redo
@@ -125,9 +126,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
+  getCurrentPage(props) {
+    return props.model.pages.get(this.state.currentPage)
+    || props.model.pages.first();
+  }
+
   onEdit(guid : string, node : models.Node) {
 
-    const nodes = this.props.model.pages.get(this.state.currentPage).nodes;
+    const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
@@ -136,7 +142,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
 
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
     page = page.with({ nodes });
 
     const pages = this.props.model.pages.set(page.guid, page);
@@ -153,14 +159,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   canRemoveNode() {
-    const page = this.props.model.pages.get(this.state.currentPage);
+    const page = this.getCurrentPage(this.props);
 
     return page.nodes.filter(n => n.contentType === 'Question').size > 1;
   }
 
   onNodeRemove(guid: string) {
 
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
 
     const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
 
@@ -208,7 +214,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
     const pages = this.props.model.pages.set(page.guid, page);
@@ -328,7 +334,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}
-            current={this.props.model.pages.get(this.state.currentPage)}
+            current={this.getCurrentPage(this.props)}
             onChangeCurrent={(currentPage) => {
               const page = this.props.model.pages.get(currentPage);
               const currentNode = page.nodes.first();
@@ -376,7 +382,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const titleEditor = this.renderTitle();
-    const page = this.props.model.pages.get(this.state.currentPage);
+    const page = this.getCurrentPage(this.props);
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
