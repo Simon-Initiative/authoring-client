@@ -164,12 +164,8 @@ class CourseEditor
                 <div className="col-9">{model.id}</div>
               </div>
               <div className="row">
-                <div className="col-3">
-                  Team members
-                </div>
-                <div className="col-9">
-                  {this.renderDevelopers()}
-                </div>
+                <div className="col-3">Team members</div>
+                <div className="col-9">{this.renderDevelopers()}</div>
               </div>
               <div className="row">
                 <div className="col-3">Version</div>
