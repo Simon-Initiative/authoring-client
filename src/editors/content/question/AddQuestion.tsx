@@ -27,6 +27,36 @@ export interface AddQuestionState {
 
 }
 
+
+export function createMultipleChoiceQuestion(select: string) {
+  let model = new contentTypes.Question();
+  let item = new contentTypes.MultipleChoice();
+
+  const value = select === 'multiple' ? 'A' : guid().replace('-', '');
+  const match = select === 'multiple' ? 'A' : value;
+
+  const choice = new contentTypes.Choice({ value, guid: guid() });
+  const feedback = new contentTypes.Feedback();
+  let response = new contentTypes.Response({ match });
+  response = response.with({ guid: guid(),
+    feedback: response.feedback.set(feedback.guid, feedback) });
+
+  const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
+  const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+    .set(response.guid, response);
+
+  item = item.with({ guid: guid(), select, choices });
+
+  model = model.with({ items: model.items.set(item.guid, item) });
+
+  let part = new contentTypes.Part();
+  part = part.with({ guid: guid(), responses });
+  model = model.with({ parts: model.parts.set(part.guid, part) });
+
+  return model;
+}
+
+
 /**
  * Reusable component for adding new questions to a question
  * container (pool, assessment, etc)
@@ -45,32 +75,7 @@ export class AddQuestion
   }
 
   onAddMultipleChoice(select: string) {
-
-    let model = new contentTypes.Question();
-    let item = new contentTypes.MultipleChoice();
-
-    const value = select === 'multiple' ? 'A' : guid().replace('-', '');
-    const match = select === 'multiple' ? 'A' : value;
-
-    const choice = new contentTypes.Choice({ value, guid: guid() });
-    const feedback = new contentTypes.Feedback();
-    let response = new contentTypes.Response({ match, score: '1' });
-    response = response.with({ guid: guid(),
-      feedback: response.feedback.set(feedback.guid, feedback) });
-
-    const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
-    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
-      .set(response.guid, response);
-
-    item = item.with({ guid: guid(), select, choices });
-
-    model = model.with({ items: model.items.set(item.guid, item) });
-
-    let part = new contentTypes.Part();
-    part = part.with({ guid: guid(), responses });
-    model = model.with({ parts: model.parts.set(part.guid, part) });
-
-    this.props.onQuestionAdd(model);
+    this.props.onQuestionAdd(createMultipleChoiceQuestion(select));
   }
 
   onAddOrdering() {
