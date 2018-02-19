@@ -166,16 +166,17 @@ class CourseEditor
               <div className="row">
                 <div className="col-3">
                   Team members
-                  <span className="float-right">
-                    <HelpPopover>
+                  {// Leaving commented as example of HelpPopover usage
+                    /* <span className="float-right">
+                    {<HelpPopover>
                       <div>
                         <p>Looks like you could use some help.</p>
                         <br />
                         <p>You can click <a href="#" target="_blank">here</a> to 
                         get some more information.</p>
                       </div>
-                    </HelpPopover>
-                  </span>
+                    </HelpPopover>}
+                  </span> */}
                 </div>
                 <div className="col-9">
                   {this.renderDevelopers()}
