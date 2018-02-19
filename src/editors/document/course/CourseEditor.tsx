@@ -167,12 +167,12 @@ class CourseEditor
                 <div className="col-3">
                   Team members
                   <span className="float-right">
-                    <HelpPopover
-                      position={('top' as Position)}>
+                    <HelpPopover>
                       <div>
                         <p>Looks like you could use some help.</p>
-                        <p>You can click <a href="#" target="_blank">here</a>&nbsp;
-                        to get some more information.</p>
+                        <br />
+                        <p>You can click <a href="#" target="_blank">here</a> to 
+                        get some more information.</p>
                       </div>
                     </HelpPopover>
                   </span>

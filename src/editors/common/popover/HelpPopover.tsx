@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Tooltip } from 'utils/tooltip';
+import './HelpPopover.scss';
 
-// How do we make either title or content required?
 export type HelpPopoverProps = {
   title?: string,
   position?: Position,
@@ -15,17 +15,12 @@ export enum Position {
 }
 
 const DEFAULT_TOOLTIP_PROPS = {
-  theme: 'dark',
+  theme: 'light',
   animation: 'shift',
   interactive: true,
   arrow: true,
   position: Position.Top,
-  // Figure out how to get this to work. It targets the wrong div
-  style: {
-    padding: '15px',
-    maxWidth: '250px',
-    textAlign: 'left',
-  },
+  className: 'help-popover-trigger',
 };
 
 const mergeWithDefaultProps = props =>
@@ -45,7 +40,10 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
       this.props.children
         ? <Tooltip
             {...props}
-            html={this.props.children}>
+            html={
+              <div className="help-popover-container">
+                {this.props.children}
+              </div>}>
             {icon}
           </Tooltip>
         : <Tooltip 
@@ -56,30 +54,3 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
     );
   }
 }
-
-// buttonRef: any;
-// this.onClick = this.onClick.bind(this);
-// Fixes issue with href attribute being required on <a> tag for popover to work
-// onClick(e) {
-//   e.preventDefault();
-// }
-
-// componentDidMount() {
-//   (window as any).$(() => (window as any).$(this.buttonRef).popover());
-// }
-
-// <a
-//   ref={a => this.buttonRef = a}
-//   onClick={this.onClick}
-//   title={this.props.title || ''}
-//   data-content={this.props.content}
-//   data-placement={this.props.placement || Direction.Top}
-//   href="#"
-//   tab-index="0" 
-//   className="btn" 
-//   role="button" 
-//   data-toggle="popover" 
-//   data-trigger="focus" 
-// >
-//   <i style={iconStyle} className={iconClasses}></i>
-// </a>
