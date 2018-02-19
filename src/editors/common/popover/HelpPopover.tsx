@@ -54,3 +54,16 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
     );
   }
 }
+
+/* Example of HelpPopover usage. Leaving in code until we use this in production.
+<span className="float-right">
+  {<HelpPopover>
+    <div>
+      <p>Looks like you could use some help.</p>
+      <br />
+      <p>You can click <a href="#" target="_blank">here</a> to 
+      get some more information.</p>
+    </div>
+  </HelpPopover>}
+</span> 
+*/
