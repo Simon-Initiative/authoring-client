@@ -14,7 +14,7 @@ const mergeWithDefaultProps = props =>
   Object.assign({}, DEFAULT_TOOLTIP_PROPS, props);
 
 interface TooltipProps {
-  title: string;
+  title?: string;
   disabled?: boolean;
   open?: boolean;
   useContext?: boolean;
@@ -39,7 +39,7 @@ interface TooltipProps {
   inertia?: boolean;
   transitionFlip?: boolean;
   popperOptions?: object;
-  html?: JSX.Element;
+  html?: React.ReactNode;
   // rawTemplate?: string | DOMElement;
   unmountHTMLWhenHide?: boolean;
   size?: string;
