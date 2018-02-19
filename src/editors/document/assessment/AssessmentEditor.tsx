@@ -231,12 +231,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         .set(question.guid, question),
     });
 
-    this.handleEdit(this.props.model.with(
-      { pages: this.props.model.pages.set(page.guid, page) }));
+    this.handleEdit(
+      this.props.model.with({
+        pages: this.props.model.pages.set(page.guid, page) }),
+      () => this.setState({
+        currentPage: page.guid,
+        currentNode: page.nodes.get(content.guid) }),
+    );
   }
 
   onRemovePage(page: contentTypes.Page) {
-
     if (this.props.model.pages.size > 1) {
 
       const guid = page.guid;
@@ -244,12 +248,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       if (guid === this.state.currentPage) {
         this.setState(
-          { currentPage: removed.last().guid },
-          () => this.handleEdit(removed));
+          {
+            currentPage: removed.pages.first().guid,
+            currentNode: removed.pages.first().nodes.first(),
+          },
+          () => this.handleEdit(removed),
+        );
       } else {
         this.handleEdit(removed);
       }
-
     }
   }
 
