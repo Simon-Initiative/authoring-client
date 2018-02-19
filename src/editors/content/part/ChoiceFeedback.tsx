@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -22,7 +23,7 @@ export interface ChoiceFeedbackProps extends AbstractContentEditorProps<contentT
 }
 
 export interface ChoiceFeedbackState {
-
+  invalidFeedback: Immutable.Map<string, boolean>;
 }
 
 /**
@@ -33,6 +34,10 @@ export abstract class ChoiceFeedback
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      invalidFeedback: Immutable.Map<string, boolean>(),
+    };
 
     this.onResponseEdit = this.onResponseEdit.bind(this);
     this.onResponseRemove = this.onResponseRemove.bind(this);
@@ -142,18 +147,18 @@ export abstract class ChoiceFeedback
 
   renderMaxChoicesMessage() {
     return (
-      <div className="message flex-spacer">
-        <div className="alert alert-warning">
-          <strong>NOTE</strong>&nbsp;&nbsp;Providing more than {AUTOGEN_MAX_CHOICES} choices
-          (Choice {convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will prevent
-          you from determining exact selections for All Other Choices.
-        </div>
+      <div className="message alert alert-warning">
+        <i className="fa fa-info-circle"/>
+        {` Providing more than ${AUTOGEN_MAX_CHOICES} choices \
+        (Choice ${convert.toAlphaNotation(AUTOGEN_MAX_CHOICES - 1)}) for this question will \
+        prevent you from determining exact selections for other choices.`}
       </div>
     );
   }
 
   renderResponses() {
     const { choices, model, context, services, editMode, simpleFeedback } = this.props;
+    const { invalidFeedback } = this.state;
 
     // get default feedback details
     const defaultFeedbackBody = getGeneratedResponseBody(model);
@@ -209,48 +214,71 @@ export abstract class ChoiceFeedback
             ? null
             : () => this.onResponseRemove(response.item)
           }
-          options={
-          <ItemOptions>
-            {!response.isDefault && !simpleFeedback
-              ? (
-                <ItemOption className="matches" label="Matching Choices" flex>
-                  <Typeahead
-                    multiple
-                    bsSize="small"
-                    onChange={selected =>
-                      this.onEditMatchSelections(response.guid, choices, selected)}
-                    options={choices.map(c => c.guid)}
-                    labelKey={id => choices.find(c => c.guid === id).value}
-                    selected={this.getSelectedMatches(response.item, choices)} />
-                </ItemOption>
-              ) : (
-                choices.length > AUTOGEN_MAX_CHOICES
+          options={[
+            <ItemOptions key="feedback-options">
+              {!response.isDefault && !simpleFeedback
                 ? (
-                  this.renderMaxChoicesMessage()
+                  <ItemOption className="matches" label="Matching Choices" flex>
+                    <Typeahead
+                      multiple
+                      bsSize="small"
+                      onChange={(selected) => {
+                        if (selected.length > 0) {
+                          this.onEditMatchSelections(response.guid, choices, selected);
+
+                          this.setState({
+                            invalidFeedback: invalidFeedback.set(response.guid, false),
+                          });
+                        } else {
+                          this.setState({
+                            invalidFeedback: invalidFeedback.set(response.guid, true),
+                          });
+                        }
+                      }}
+                      options={choices.map(c => c.guid)}
+                      labelKey={id => choices.find(c => c.guid === id).value}
+                      selected={this.getSelectedMatches(response.item, choices)} />
+                  </ItemOption>
                 ) : (
-                  <ItemOptionFlex />
+                  response.isDefault && choices.length > AUTOGEN_MAX_CHOICES
+                  ? (
+                    this.renderMaxChoicesMessage()
+                  ) : (
+                    <ItemOptionFlex />
+                  )
                 )
-              )
-            }
-            {!simpleFeedback
-              ? (
-                <ItemOption className="score" label="Score">
-                  <div className="input-group">
-                    <input
-                      type="number"
-                      className="form-control input-sm form-control-sm"
-                      disabled={!this.props.editMode}
-                      value={response.score}
-                      onChange={({ target: { value } }) =>
-                        response.onScoreEdit(response.item, value)}
-                      />
+              }
+              {!simpleFeedback
+                ? (
+                  <ItemOption className="score" label="Score">
+                    <div className="input-group">
+                      <input
+                        type="number"
+                        className="form-control input-sm form-control-sm"
+                        disabled={!this.props.editMode}
+                        value={response.score}
+                        onChange={({ target: { value } }) =>
+                          response.onScoreEdit(response.item, value)}
+                        />
+                    </div>
+                  </ItemOption>
+                )
+                : (null)
+              }
+            </ItemOptions>,
+            <ItemOptions key="feedback-message">
+              {invalidFeedback.get(response.guid) && !response.isDefault && !simpleFeedback
+                ? (
+                  <div className="message alert alert-warning">
+                    <i className="fa fa-exclamation-circle"/>
+                    {' Matching choices not updated. \
+                      Feedback must contain at least one matching choice'}
                   </div>
-                </ItemOption>
-              )
-              : (null)
-            }
-          </ItemOptions>
-          } />
+                )
+                : null
+              }
+            </ItemOptions>,
+          ]} />
       ));
   }
 
