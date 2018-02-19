@@ -168,9 +168,9 @@ function logResourceDetails(resource: Resource) {
 }
 
 export function load(courseId: string, documentId: string) {
-  return function (dispatch, getState) {
+  return function (dispatch, getState) : Promise<boolean> {
 
-    const userName = getState().user.profile.userName;
+    const userName = getState().user.profile.username;
 
     dispatch(documentRequested(documentId));
 
@@ -207,7 +207,10 @@ export function load(courseId: string, documentId: string) {
           dispatch(documentLoaded(documentId, document, strategy, editingAllowed));
 
         });
-      });
+      })
+      .catch(error => console.log('load-error:' + error));
+
+    return Promise.resolve(true);
   };
 }
 
@@ -225,21 +228,19 @@ export function save(documentId: string, model: models.ContentModel) {
 
     const editedDocument : EditedDocument = getState().documents.get(documentId);
 
-    if (editedDocument.document.type === 'Loaded') {
+    const model = editedDocument.document.model;
 
-      const model = editedDocument.document.document.model;
-
-      if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
-        const resource = model.resource.with({ dateUpdated: new Date() });
-        const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
-        dispatch(updateCourseResources(resources));
-      }
-
-      const doc = editedDocument.document.document.with({ model });
-      editedDocument.persistence.save(doc);
+    if (model.modelType !== 'CourseModel' && model.modelType !== 'MediaModel') {
+      const resource = model.resource.with({ dateUpdated: new Date() });
+      const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
+      dispatch(updateCourseResources(resources));
     }
 
+    const doc = editedDocument.document.with({ model });
+    editedDocument.persistence.save(doc);
+
   };
+
 }
 
 export function undo(documentId: string) {

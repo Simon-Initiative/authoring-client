@@ -13,8 +13,10 @@ import { server, ServerState } from './server';
 import { skills, SkillsState } from './skills';
 import { user, UserState } from './user';
 import { questionEditor, QuestionEditorState } from './questionEditor';
+import { documents, DocumentsState } from './documents';
 
 export interface State {
+  documents: DocumentsState;
   choices: ChoicesState;
   course: CourseState;
   expanded: ExpandedState;
@@ -31,6 +33,7 @@ export interface State {
 }
 
 const reducers = combineReducers({
+  documents,      // The current state and models of documents under edit
   choices,        // Supporting data for choices
   course,         // Information about current course
   expanded,       // preserves expaned state of tree UIs

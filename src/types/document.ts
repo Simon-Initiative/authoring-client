@@ -5,26 +5,12 @@ import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStra
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-export type RemoteDocument = Loading | Failed | Loaded;
-
-export interface Loading {
-  type: 'Loading';
-}
-
-export interface Failed {
-  type: 'Failed';
-  error: string;
-}
-
-export interface Loaded {
-  type: 'Loaded';
-  document: Document;
-}
-
 
 export type EditedDocumentParams = {
   documentId? : string,
-  document?: RemoteDocument;
+  document?: Document;
+  hasFailed?: boolean;
+  error?: string;
   persistence?: PersistenceStrategy;
   activeContentGuid?: Maybe<string>;
   undoStack?: Immutable.Stack<ContentModel>;
@@ -35,8 +21,10 @@ export type EditedDocumentParams = {
 
 const defaultContent = {
   documentId: '',
-  document: { type: 'Loading' },
+  document: null,
+  hasFailed: false,
   persistence: null,
+  error: null,
   activeContentGuid: Maybe.nothing(),
   undoStack: Immutable.Stack<ContentModel>(),
   redoStack: Immutable.Stack<ContentModel>(),
@@ -47,7 +35,9 @@ const defaultContent = {
 export class EditedDocument extends Immutable.Record(defaultContent) {
 
   documentId: string;
-  document: RemoteDocument;
+  document: Document;
+  hasFailed: boolean;
+  error: string;
   persistence: PersistenceStrategy;
   activeContentGuid: Maybe<string>;
   undoStack: Immutable.Stack<ContentModel>;

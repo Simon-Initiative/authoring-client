@@ -8,16 +8,17 @@ import { CourseModel, ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
-import { EditedDocument, Loaded, RemoteDocument } from 'types/document';
+import { EditedDocument } from 'types/document';
 import { save } from 'actions/document';
 
 interface StateProps {
   expanded: any;
   skills: Map<string, Skill>;
   objectives: Map<string, LearningObjective>;
-  remoteDocument: RemoteDocument;
+  document: Document;
   undoRedoGuid: string;
   editingAllowed: boolean;
+  hasFailed: boolean;
 }
 
 interface DispatchProps {
@@ -37,15 +38,28 @@ interface OwnProps {
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
   const { expanded, skills, objectives, documents } = state;
-  const { document, undoRedoGuid, editingAllowed } = documents.get(ownProps.documentId);
+  const ed = documents.get(ownProps.documentId);
+
+  let document = null;
+  let undoRedoGuid = 'Loading';
+  let editingAllowed = false;
+  let hasFailed = false;
+
+  if (ed !== undefined) {
+    document = ed.document;
+    undoRedoGuid = ed.undoRedoGuid;
+    editingAllowed = ed.editingAllowed;
+    hasFailed = ed.hasFailed;
+  }
 
   return {
     expanded,
     skills,
     objectives,
-    remoteDocument: document,
+    document,
     undoRedoGuid,
     editingAllowed,
+    hasFailed,
   };
 };
 

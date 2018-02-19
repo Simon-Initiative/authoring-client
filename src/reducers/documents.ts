@@ -21,23 +21,20 @@ function processUndo(
   state: DocumentsState, action: documentActions.ChangeUndoneAction) : DocumentsState {
 
   const ed = state.get(action.documentId);
+  const currentModel = ed.undoStack.peek();
 
-  if (ed.document.type === 'Loaded') {
+  const undoStack = ed.undoStack.pop();
 
-    const currentModel = ed.undoStack.peek();
+  const model = undoStack.peek();
+  const document = ed.document.with({ model });
 
-    const undoStack = ed.undoStack.pop();
+  return state.set(action.documentId, ed.with({
+    undoRedoGuid: createGuid(),
+    redoStack: ed.redoStack.push(currentModel),
+    undoStack: ed.undoStack.pop(),
+    document,
+  }));
 
-    const model = undoStack.peek();
-    const document = ed.document.document.with({ model });
-
-    return state.set(action.documentId, ed.with({
-      undoRedoGuid: createGuid(),
-      redoStack: ed.redoStack.push(currentModel),
-      undoStack: ed.undoStack.pop(),
-      document: { type: 'Loaded', document },
-    }));
-  }
 
 }
 
@@ -46,21 +43,19 @@ function processRedo(
 
   const ed = state.get(action.documentId);
 
-  if (ed.document.type === 'Loaded') {
+  const model = ed.redoStack.peek();
+  const undoStack = ed.undoStack.push(model);
+  const redoStack = ed.redoStack.pop();
 
-    const model = ed.redoStack.peek();
-    const undoStack = ed.undoStack.push(model);
-    const redoStack = ed.redoStack.pop();
+  const document = ed.document.with({ model });
 
-    const document = ed.document.document.with({ model });
+  return state.set(action.documentId, ed.with({
+    undoRedoGuid: createGuid(),
+    redoStack,
+    undoStack,
+    document,
+  }));
 
-    return state.set(action.documentId, ed.with({
-      undoRedoGuid: createGuid(),
-      redoStack,
-      undoStack,
-      document: { type: 'Loaded', document },
-    }));
-  }
 }
 
 export const documents = (
@@ -80,7 +75,7 @@ export const documents = (
       // Successfully loaded documents have to have their doc set and
       // their persistence strategies initialized
       return state.set(action.documentId, state.get(action.documentId).with({
-        document: { type: 'Loaded', document: action.document },
+        document: action.document,
         persistence: action.persistence,
         editingAllowed: action.editingAllowed,
       }));
@@ -88,7 +83,8 @@ export const documents = (
     case documentActions.DOCUMENT_FAILED:
 
       return state.set(action.documentId, state.get(action.documentId).with({
-        document: { type: 'Failed', error: action.error },
+        error: action.error,
+        hasFailed: true,
       }));
 
     case documentActions.DOCUMENT_RELEASED:
@@ -102,12 +98,11 @@ export const documents = (
 
     case documentActions.MODEL_UPDATED:
       const ed = state.get(action.documentId);
-      if (ed.document.type === 'Loaded') {
-        const document = ed.document.document.with({ model: action.model });
-        return state.set(action.documentId, ed.with({
-          document: { type: 'Loaded', document },
-        }));
-      }
+
+      const document = ed.document.with({ model: action.model });
+      return state.set(action.documentId, ed.with({
+        document,
+      }));
 
     default:
       return state;

@@ -30,6 +30,7 @@ import * as messageActions from 'actions//messages';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
+import CourseEditor from 'editors/document/course//CourseEditor.controller';
 
 type ResourceList = {
   title: string,
@@ -244,15 +245,23 @@ export default class Main extends React.Component<MainProps, MainState> {
           expanded={expanded}
           userName={user.user}/>;
     }
-    if (course) {
-      const documentId = url.substr(1, url.indexOf('-') - 1);
 
+    if (course) {
+
+      const documentId : string = url.substr(1, url.indexOf('-') - 1);
+
+      if (documentId === course.guid) {
+        return <CourseEditor
+          model={course}
+          editMode={true}
+        />;
+      }
       if (resources[documentId] !== undefined) {
         return this.renderResource(resources[documentId]);
       }
 
-      const onRelease = (documentId: string) => onDispatch(release(documentId));
-      const onLoad = (documentId: string) => onDispatch(load(course.guid, documentId));
+      const onRelease = (docId: string) => onDispatch(release(docId));
+      const onLoad = (docId: string) => onDispatch(load(course.guid, docId));
 
       return (
           <DocumentView

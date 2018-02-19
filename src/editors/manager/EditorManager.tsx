@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { UserProfile } from 'types/user';
-import { RemoteDocument } from 'types/document';
 import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { configuration } from 'actions/utils/config';
@@ -15,7 +14,8 @@ import { LearningObjective, Skill } from 'data//contentTypes';
 import './EditorManager.scss';
 
 export interface EditorManagerProps {
-  remoteDocument: RemoteDocument;
+  document: persistence.Document;
+  hasFailed: boolean;
   documentId: string;
   userId: string;
   userName: string;
@@ -137,16 +137,18 @@ export default class EditorManager
 
   render(): JSX.Element {
 
-    const { remoteDocument } = this.props;
+    const { document, hasFailed } = this.props;
+
+
 
     let component = null;
 
-    if (remoteDocument.type === 'Loading' && this.state.waitBufferElapsed) {
-      component = this.renderLoading();
-    } else if (remoteDocument.type === 'Failed') {
+    if (hasFailed) {
       component = this.renderFailed();
-    } else if (remoteDocument.type === 'Loaded') {
-      component = this.renderLoaded(remoteDocument.document);
+    } else if (document === null && this.state.waitBufferElapsed) {
+      component = this.renderLoading();
+    } else if (document !== null) {
+      component = this.renderLoaded(document);
     } else {
       component = <span/>;
     }
