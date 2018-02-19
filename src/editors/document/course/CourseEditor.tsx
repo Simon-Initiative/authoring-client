@@ -7,7 +7,6 @@ import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import * as viewActions from 'actions/view';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { Position, HelpPopover } from 'editors/common/popover/HelpPopover';
 
 import './CourseEditor.scss';
 
