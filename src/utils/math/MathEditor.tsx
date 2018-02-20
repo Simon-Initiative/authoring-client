@@ -52,7 +52,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
             id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
         </div>
         <div className="form-group mathPreview">
-          <label className="preview" htmlFor={this.ids.preview}>Preview</label>
+          <label className="labelPreview" htmlFor={this.ids.preview}>Preview</label>
           <Math inline>{this.state.content}</Math>
         </div>
 
