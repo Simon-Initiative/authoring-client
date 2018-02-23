@@ -126,19 +126,26 @@ export class Tree<NodeType extends Types.HasGuid>
     // node using the tree renderer.  We interleave the drop targets between
     // the rendered nodes, as well.
     const treeNodes = renderedNodes
-      .map((r) => {
+      .map((r, i) => {
         const parentId = r.parent.caseOf({
           just: m => Maybe.just(m.guid),
           nothing: () => Maybe.nothing<string>(),
         });
 
-        const target = treeRenderer.renderDropTarget(
-          r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false, editMode);
+        const dropTargets = [];
+        if (i === renderedNodes.length - 1) {
+          dropTargets.push(treeRenderer.renderDropTarget(
+            r.indexWithinParent + 1, this.onDrop, canHandleDrop, 
+            r.parent, parentId, true, editMode));
+        }
+
+        dropTargets.push(treeRenderer.renderDropTarget(
+          r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false, editMode));
 
         return treeRenderer.renderNode(
             r.nodeId, r.node,
             { depth: r.depth, parentNode: r.parent, isSelected: selected === r.nodeId },
-            r.component, target, r.indexWithinParent, editMode);
+            r.component, dropTargets, r.indexWithinParent, editMode);
 
       });
 
