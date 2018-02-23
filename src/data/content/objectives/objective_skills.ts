@@ -6,14 +6,14 @@ import { getKey } from '../../common';
 export type ObjectiveSkillsParams = {
   idref?: string,
   guid?: string,
-  skills?: Immutable.List<string>,
+  skills?: Immutable.Set<string>,
 };
 
 const defaultContent = {
   contentType: 'ObjectiveSkills',
   idref: '',
   guid: '',
-  skills: Immutable.List<string>(),
+  skills: Immutable.Set<string>(),
 };
 
 export class ObjectiveSkills extends Immutable.Record(defaultContent) {
@@ -22,7 +22,7 @@ export class ObjectiveSkills extends Immutable.Record(defaultContent) {
   idref: string;
   guid: string;
   title: string;
-  skills: Immutable.List<string>;
+  skills: Immutable.Set<string>;
 
   constructor(params?: ObjectiveSkillsParams) {
     super(augment(params));
@@ -47,7 +47,7 @@ export class ObjectiveSkills extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'skillref':
-          model = model.with({ skills: model.skills.push(item['skillref']['@idref']) });
+          model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
           break;
         default:
 

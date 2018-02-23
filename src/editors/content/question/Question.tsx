@@ -236,8 +236,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              model={part.concepts}
-              onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
+              model={part.skills}
+              onEdit={skills => this.onConceptsEdit(skills, item, part)} />
           </TabSectionContent>
         </TabSection>
       </Tab>

@@ -27,6 +27,7 @@ export type QuestionParams = {
   id?: string;
   body?: Html;
   concepts?: Immutable.List<string>;
+  skills?: Immutable.Set<string>;
   grading?: string;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
@@ -39,6 +40,7 @@ const defaultQuestionParams = {
   id: '',
   body: new Html(),
   concepts: Immutable.List<string>(),
+  skills: Immutable.Set<string>(),
   grading: 'automatic',
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
@@ -116,21 +118,27 @@ function ensureResponsesExist(model: Question) {
 }
 
 // If skills are found only at the question level, duplicate them
-// at the part level
+// at the part level.
+// Originally, this migrated from concepts to concepts. After
+// adding a new 'skillref' attribute to the DTD, the skills now
+// are added to the skills set. This function looks to see if 
+// the concepts list has any skills present and adds them to the new
+// skills set.
 function migrateSkillsToParts(model: Question) : Question {
 
   const partsArray = model.parts.toArray();
   let updated = model;
 
-  const noSkillsAtParts : boolean = partsArray.every(p => p.concepts.size === 0);
+  const noSkillsAtParts : boolean = partsArray.every(p => p.skills.size === 0);
   const skillsAtQuestion : boolean = model.concepts.size > 0;
 
   if (skillsAtQuestion && noSkillsAtParts) {
 
-    const { concepts } = model;
+    const { skills } = model;
 
     updated = model.with({
-      parts: model.parts.map(p => p.with({ concepts })).toOrderedMap(),
+      parts: model.parts.map(p => p.with({ skills })).toOrderedMap(),
+      skills: Immutable.Set<string>(),
     });
   }
 
@@ -145,7 +153,6 @@ function migrateExplanationToFeedback(model: Question) : Question {
 
   const itemsArray = model.items.toArray();
   const partsArray = model.parts.toArray();
-
 
   let updated = model;
 
@@ -189,6 +196,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
   id: string;
   body: Html;
   concepts: Immutable.List<string>;
+  skills: Immutable.Set<string>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
@@ -222,59 +230,58 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const id = createGuid();
 
       switch (key) {
-        case 'responses':
-          // read weird legacy format where individual response elements are under a
-          // 'responses' element instead of a 'part'
-          const copy = Object.assign({}, item);
-          copy['part'] = copy['responses'];
-
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
-
-          break;
-        case 'concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
+        case 'body':
+          model = model.with({ body: Html.fromPersistence(item, id) });
           break;
         case 'cmd:concept':
           model = model.with(
             { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
           break;
-
-        case 'body':
-          model = model.with({ body: Html.fromPersistence(item, id) });
+        case 'concept':
+          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
           break;
-        case 'part':
-          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
+        case 'essay':
+          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
           break;
-        case 'multiple_choice':
-          model = model.with(
-            { items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
+        case 'explanation':
+          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         case 'fill_in_the_blank':
           model = model.with(
             { items: model.items.set(id, FillInTheBlank.fromPersistence(item, id)) });
           break;
-        case 'numeric':
-          model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
-          break;
-        case 'text':
-          model = model.with({ items: model.items.set(id, Text.fromPersistence(item, id)) });
-          break;
-        case 'short_answer':
-          model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
-          break;
-        case 'ordering':
-          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
-          break;
-        case 'essay':
-          model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
-          break;
-
         // We do not yet support image_hotspot:
         case 'image_hotspot':
           model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
           break;
-        case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
+        case 'multiple_choice':
+          model = model.with(
+            { items: model.items.set(id, MultipleChoice.fromPersistence(item, id)) });
+          break;
+        case 'numeric':
+          model = model.with({ items: model.items.set(id, Numeric.fromPersistence(item, id)) });
+          break;
+        case 'ordering':
+          model = model.with({ items: model.items.set(id, Ordering.fromPersistence(item, id)) });
+          break;
+        case 'part':
+          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(item, id)) });
+          break;
+        case 'responses':
+          // read weird legacy format where individual response elements are under a
+          // 'responses' element instead of a 'part'
+          const copy = Object.assign({}, item);
+          copy['part'] = copy['responses'];
+          model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
+          break;
+        case 'skillref':
+          model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
+          break;
+        case 'short_answer':
+          model = model.with({ items: model.items.set(id, ShortAnswer.fromPersistence(item, id)) });
+          break;
+        case 'text':
+          model = model.with({ items: model.items.set(id, Text.fromPersistence(item, id)) });
           break;
         default:
 
@@ -291,8 +298,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     const itemsAndParts = this.items.size === 0
       ? [defaultItem, defaultPart]
       : [...this.items
-        .toArray()
-        .map(item => item.toPersistence()),
+          .toArray()
+          .map(item => item.toPersistence()),
         ...this.parts
           .toArray()
           .map(part => part.toPersistence())];
@@ -304,6 +311,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       ...this.concepts
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
+
+      ...this.skills
+        .toArray()
+        .map(skill => ({ skillref: { '@idref': skill } })),
 
       ...itemsAndParts,
 

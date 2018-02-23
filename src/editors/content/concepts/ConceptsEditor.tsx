@@ -9,7 +9,7 @@ import {
 
 import './ConceptsEditor.scss';
 
-export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
+export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.Set<string>> {
 
 }
 
@@ -18,7 +18,7 @@ export interface ConceptstEditorState {
 }
 
 function toSkillArray(
-  ids: Immutable.List<string>,
+  ids: Immutable.Set<string>,
   allSkills: Immutable.OrderedMap<string, contentTypes.Skill>) : Skill[] {
 
   return ids
@@ -30,7 +30,7 @@ function toSkillArray(
  * Concepts editor
  */
 export default class ConceptsEditor
-  extends AbstractContentEditor<Immutable.List<string>, ConceptsEditorProps, ConceptstEditorState> {
+  extends AbstractContentEditor<Immutable.Set<string>, ConceptsEditorProps, ConceptstEditorState> {
 
   constructor(props: ConceptsEditorProps) {
     super(props);
@@ -41,7 +41,8 @@ export default class ConceptsEditor
   }
 
   componentWillReceiveProps(nextProps: ConceptsEditorProps) {
-    if (nextProps.model !== this.props.model) {
+    if (nextProps.model !== this.props.model || 
+        this.props.context.skills !== nextProps.context.skills) {
       this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
 
@@ -70,8 +71,7 @@ export default class ConceptsEditor
         <Typeahead
           multiple
           onChange={(selected: Skill[]) => {
-
-            const model = Immutable.List(selected.map(s => s.id));
+            const model = Immutable.Set(selected.map(s => s.id));
             this.setState({ selected }, () => this.props.onEdit(model));
           }}
           options={options}

@@ -124,7 +124,7 @@ export class LearningObjectivesModel
 
         if (o.skills.size > 0) {
           objectiveSkills.push(
-            (new contentTypes.ObjectiveSkills().with({ idref: o.id, skills: o.skills }))
+            (new contentTypes.ObjectiveSkills().with({ idref: o.id, skills: o.skills.toSet() }))
               .toPersistence());
         }
       });
