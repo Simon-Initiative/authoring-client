@@ -138,6 +138,10 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       this.title.toPersistence(),
 
+      ...this.skills
+        .toArray()
+        .map(skill => ({ skillref: { '@idref': skill } })),
+
       ...this.concepts
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
@@ -146,23 +150,19 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(item => item.toPersistence()),
 
-      ...this.hints
-        .toArray()
-        .map(hint => hint.toPersistence()),
-
       ...this.responses
         // filter out responses with empty matches
         .filter(r => r.match !== '')
         .toArray()
         .map(response => response.toPersistence()),
-
+      
       ...this.responseMult
         .toArray()
         .map(response => response.toPersistence()),
 
-      ...this.skills
+      ...this.hints
         .toArray()
-        .map(skill => ({ skillref: { '@idref': skill } })),
+        .map(hint => hint.toPersistence()),
 
       { explanation },
     ];
