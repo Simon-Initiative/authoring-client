@@ -18,6 +18,8 @@ import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
 import { hasUnknownSkill } from 'utils/skills';
+import * as persistence from 'data/persistence';
+import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './AssessmentEditor.scss';
 
@@ -46,7 +48,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
     this.onAddPool = this.onAddPool.bind(this);
-    this.onAddPoolRef = this.onAddPoolRef.bind(this);
+    this.onSelectPool = this.onSelectPool.bind(this);
+    this.onCancelSelectPool = this.onCancelSelectPool.bind(this);
+    this.onInsertPool = this.onInsertPool.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
 
     this.getCurrentPage = this.getCurrentPage.bind(this);
@@ -273,9 +277,38 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(model);
   }
 
-  onAddPoolRef() {
-    const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef() });
-    this.addNode(pool);
+  onSelectPool() {
+
+    const predicate =
+      (res: persistence.CourseResource) : boolean => {
+        return res.type === LegacyTypes.assessment2_pool;
+      };
+
+    this.props.services.displayModal(
+        <ResourceSelection
+          filterPredicate={predicate}
+          courseId={this.props.context.courseId}
+          onInsert={this.onInsertPool}
+          onCancel={this.onCancelSelectPool}/>);
+  }
+
+  onCancelSelectPool() {
+    this.props.services.dismissModal();
+  }
+
+  onInsertPool(resource) {
+    this.props.services.dismissModal();
+
+    // Handle case where Insert is clicked after no pool selection is made
+    if (!resource || resource.id === '') {
+      return;
+    }
+
+    this.props.services.fetchIdByGuid(resource.id)
+    .then((idref) => {
+      const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
+      this.addNode(pool);
+    });
   }
 
   renderSettings() {
@@ -373,7 +406,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <button
           disabled={!this.props.editMode || isInline}
           type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPoolRef}>Question Pool</button>
+          onClick={this.onSelectPool}>Question Pool</button>
 
       </div>
     );
