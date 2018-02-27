@@ -44,7 +44,7 @@ export function renderTab(
 }
 
 const countSkills = (q: Question) : number =>
-  q.concepts.size + q.parts.toArray().reduce((total, p) => total + p.concepts.size, 0);
+  q.skills.size + q.parts.toArray().reduce((total, p) => total + p.skills.size, 0);
 
 const preview = (html) : string => getHtmlDetails(html, 20);
 
