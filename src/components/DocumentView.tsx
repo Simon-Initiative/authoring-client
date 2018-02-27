@@ -2,6 +2,7 @@ import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { UserProfile } from 'types/user';
 import EditorManager from 'editors/manager/EditorManager.controller';
+import ContextAwareToolbar from './toolbar/ContextAwareToolbar.controller';
 import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
@@ -48,7 +49,7 @@ export default class DocumentView
     return (
       <div className="document-view container-fluid">
         <div className="row">
-            <div className="col-sm-12 col-md-12 document">
+            <div className="col-sm-11 col-md-11 document">
               <div className="editor">
                 <EditorManager
                   course={course}
@@ -57,6 +58,9 @@ export default class DocumentView
                   userName={userName}
                   documentId={documentId} />
               </div>
+            </div>
+            <div className="col-sm-1 col-md-1">
+              <ContextAwareToolbar />
             </div>
         </div>
       </div>

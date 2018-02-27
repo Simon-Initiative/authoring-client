@@ -14,8 +14,10 @@ import { skills, SkillsState } from './skills';
 import { user, UserState } from './user';
 import { questionEditor, QuestionEditorState } from './questionEditor';
 import { documents, DocumentsState } from './documents';
+import { activeContext, ActiveContextState } from './active';
 
 export interface State {
+  activeContext: ActiveContextState;
   documents: DocumentsState;
   choices: ChoicesState;
   course: CourseState;
@@ -33,6 +35,7 @@ export interface State {
 }
 
 const reducers = combineReducers({
+  activeContext,  // The active editing context - aka: what is being edited
   documents,      // The current state and models of documents under edit
   choices,        // Supporting data for choices
   course,         // Information about current course
