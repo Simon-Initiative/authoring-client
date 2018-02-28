@@ -231,9 +231,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           this.setState(
             { editorState },
             () => this.props.onEdit(new ContiguousText({ content: contentState,
+              selection: ss,
               guid: this.props.content.guid })));
         } else {
-          this.setState({ editorState });
+
+          if (changeType === SelectionChangeType.Selection) {
+            this.setState(
+              { editorState },
+              () => this.props.onEdit(new ContiguousText({
+                selection: ss,
+                guid: this.props.content.guid })));
+          } else {
+            this.setState({ editorState });
+          }
+
         }
 
 
@@ -310,14 +321,23 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         && nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
 
         this.lastContent = nextProps.content.content;
-        const newEditorState = EditorState.push(
+        let newEditorState = EditorState.push(
           this.state.editorState, nextProps.content.content);
+
+        if (this.props.content.selection !== nextProps.content.selection) {
+          newEditorState = EditorState.forceSelection(newEditorState, nextProps.content.selection);
+        }
 
         this.setState({
           editorState: newEditorState,
         });
       }
 
+    } else if (this.props.content.selection !== nextProps.content.selection) {
+
+      const editorState = EditorState.forceSelection(
+        this.state.editorState, nextProps.content.selection);
+      this.setState({ editorState });
     }
   }
 

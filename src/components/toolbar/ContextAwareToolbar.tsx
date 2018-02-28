@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton } from './ToolbarButton';
 
 export interface ToolbarProps {
@@ -41,9 +42,15 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
         },
         {});
 
+
     const iff = el => elementMap[el];
 
+    const isText = content instanceof contentTypes.ContiguousText;
+
     const buttons = [
+      btn(
+        () => edit((content as contentTypes.ContiguousText).toggleStyle(InlineStyles.Bold)),
+        'bold', 'Bold the selected text', isText),
       btn(
         () => insert(new contentTypes.CodeBlock()),
         'code', 'Add a block of source code', iff('code-block')),
