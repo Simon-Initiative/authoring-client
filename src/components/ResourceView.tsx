@@ -47,7 +47,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
           .setVisibility(LogAttribute.DATE, false)
           .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
           .groupCollapsed(
-            LogLevel.INFO, 
+            LogLevel.INFO,
             LogTag.DEFAULT,
             'Details',
             (logger) => {
