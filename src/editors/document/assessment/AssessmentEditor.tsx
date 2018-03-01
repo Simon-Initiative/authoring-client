@@ -36,6 +36,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   pendingCurrentNode: Maybe<contentTypes.Node>;
+  supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
     super(props, ({
@@ -53,7 +54,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onNodeRemove = this.onNodeRemove.bind(this);
-    this.onEdit = this.onEdit.bind(this);
+    this.onEditNode = this.onEditNode.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
 
@@ -126,7 +127,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  onEdit(guid : string, node : models.Node) {
+  onEditNode(guid : string, node : models.Node) {
 
     const nodes = this.props.model.pages.get(this.state.currentPage).nodes;
 
@@ -175,6 +176,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   renderTitle() {
     return <TitleContentEditor
+            parent={null}
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
@@ -348,6 +350,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     );
   }
 
+  onAddNew(content: Object) {
+
+  }
+  onEdit(content: Object) {
+
+  }
+
   render() {
 
     const titleEditor = this.renderTitle();
@@ -402,7 +411,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, rendererProps, this.onEdit, this.onNodeRemove)}
+                this.state.currentNode, rendererProps, this.onEditNode, this.onNodeRemove, this)}
             </div>
           </div>
         </div>

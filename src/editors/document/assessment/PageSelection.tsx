@@ -64,6 +64,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
           <ContentContainer
             {...this.props}
+            parent={null}
             model={page.title.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit.bind(this, page)}

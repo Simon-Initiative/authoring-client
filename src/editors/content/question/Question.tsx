@@ -254,6 +254,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                parent={null}
                 key={c.guid}
                 onRemove={this.onCriteriaRemove}
                 model={c}

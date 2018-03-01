@@ -20,14 +20,14 @@ interface OwnProps {
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const activeContext : ActiveContextState = state.activeContext;
 
-  if (activeContext.container === null) {
-    return {
-      supportedElements: Immutable.List<string>(),
-      content: activeContext.activeChild,
-    };
-  }
+
+  const supportedElements = activeContext.container.caseOf({
+    just: c => c.supportedElements,
+    nothing: () => Immutable.List<string>(),
+  });
+
   return {
-    supportedElements: activeContext.container.supportedElements,
+    supportedElements,
     content: activeContext.activeChild,
   };
 

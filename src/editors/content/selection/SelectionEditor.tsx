@@ -155,6 +155,7 @@ export class SelectionEditor
     if (this.props.model.source.contentType === 'Pool') {
       titleEditor =
             <PoolTitleEditor
+              {...this.props}
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}

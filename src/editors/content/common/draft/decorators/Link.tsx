@@ -26,6 +26,7 @@ class Link extends React.PureComponent<any, any> {
     if (data.link.content instanceof Image) {
       model = { link: data.link, image: data.link.content };
       child = <ImageLinkEditor
+          parent={null}
           model={model}
           context={b.context}
           services={b.services}
@@ -34,6 +35,7 @@ class Link extends React.PureComponent<any, any> {
     } else {
       model = data.link;
       child = <LinkEditor
+          parent={null}
           model={model}
           context={b.context}
           services={b.services}

@@ -1,13 +1,18 @@
 import * as React from 'react';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
+import { ParentContainer } from 'types/active';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
   S extends AbstractContentEditorState> {}
 
+
+
 export interface AbstractContentEditorProps<ModelType> {
   model: ModelType;
-  onEdit: (updated: ModelType) => void;
+  parent?: ParentContainer;
+  onEdit: (updated: ModelType, source?: Object) => void;
+  onFocus?: (model: any, parent) => void;
   context: AppContext;
   services: AppServices;
   editMode: boolean;

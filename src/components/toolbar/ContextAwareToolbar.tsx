@@ -3,10 +3,11 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton } from './ToolbarButton';
+import { Maybe } from 'tsmonad';
 
 export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
-  content: Object;
+  content: Maybe<Object>;
   insert: (content: Object) => void;
   edit: (content: Object) => void;
 }
@@ -45,11 +46,15 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
 
     const iff = el => elementMap[el];
 
-    const isText = content instanceof contentTypes.ContiguousText;
+    const isText = content.caseOf({
+      just: c => c instanceof contentTypes.ContiguousText,
+      nothing: () => false,
+    });
 
     const buttons = [
       btn(
-        () => edit((content as contentTypes.ContiguousText).toggleStyle(InlineStyles.Bold)),
+        () => edit(content.lift(t => (t as contentTypes.ContiguousText)
+          .toggleStyle(InlineStyles.Bold))),
         'bold', 'Bold the selected text', isText),
       btn(
         () => insert(new contentTypes.CodeBlock()),
