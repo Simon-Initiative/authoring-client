@@ -8,6 +8,7 @@ import { Resource } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
 import { SortableTable, SortDirection } from './common/SortableTable';
 import { isNullOrUndefined } from 'util';
+import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './ResourceView.scss';
 
@@ -32,6 +33,37 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   constructor(props) {
     super(props);
+  }
+
+  logResourceDetails(resources: Resource[]) {
+    logger.group(
+      LogLevel.INFO,
+      LogTag.DEFAULT,
+      `Resource Details:`,
+      (logger) => {
+        resources.forEach((resource) => {
+          logger
+          .setVisibility(LogAttribute.TAG, false)
+          .setVisibility(LogAttribute.DATE, false)
+          .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
+          .groupCollapsed(
+            LogLevel.INFO, 
+            LogTag.DEFAULT,
+            'Details',
+            (logger) => {
+              logger
+                .setVisibility(LogAttribute.TAG, false)
+                .setVisibility(LogAttribute.DATE, false)
+                .info(LogTag.DEFAULT, `Type: ${resource.type}`)
+                .info(LogTag.DEFAULT, `FilePath: ${resource
+                  .fileNode
+                  .pathTo
+                  .replace(/\.json/, '.xml')}`);
+            });
+        });
+      },
+      LogStyle.HEADER + LogStyle.BLUE,
+    );
   }
 
   clickResource(id) {
@@ -77,6 +109,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         key: r.guid,
         data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
       }));
+    
+    const resources = rows.map(row => row.data as Resource);
+    this.logResourceDetails(resources);
 
     const labels = [
       'Title',

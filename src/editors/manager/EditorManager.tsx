@@ -161,44 +161,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
     });
   }
 
-  logCourseResources(course: models.CourseModel) {
-    const resources = course
-      .resources
-      .toArray()
-      .map(resource => ({ 
-        id: resource.id, 
-        title: resource.title, 
-        type: resource.type, 
-        filePath: resource.fileNode.pathTo.replace(/\.json/, '.xml'),
-      }));
-
-    logger.group(
-      LogLevel.INFO,
-      LogTag.DEFAULT,
-      `This Course Has ${resources.length} Resources:`,
-      (logger) => {
-        resources.forEach((resource) => {
-          logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `${resource.title} (${resource.id})`)
-          .groupCollapsed(
-            LogLevel.INFO, 
-            LogTag.DEFAULT,
-            'Details',
-            (logger) => {
-              logger
-                .setVisibility(LogAttribute.TAG, false)
-                .setVisibility(LogAttribute.DATE, false)
-                .info(LogTag.DEFAULT, `Type: ${resource.type}`)
-                .info(LogTag.DEFAULT, `FilePath: ${resource.filePath}`);
-            });
-        });
-      },
-      LogStyle.HEADER + LogStyle.BLUE,
-    );
-  }
-
   logResourceDetails(resource: Resource) {
 
     logger.group(
@@ -332,7 +294,6 @@ export default class EditorManager extends React.Component<EditorManagerProps, E
         this.initPersistence(document);
       }
       this.setState({ document });
-      this.logCourseResources(course);
     } else if (course) {
       this.fetchDocument(course.guid, documentId);
     }
