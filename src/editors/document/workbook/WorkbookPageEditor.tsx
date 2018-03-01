@@ -15,12 +15,17 @@ import { TabContainer } from '../../content/common/TabContainer';
 import { Details } from './Details';
 import { Actions } from './Actions';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { ActiveContext, ParentContainer } from 'types/active';
 
 import './WorkbookPageEditor.scss';
 
 export interface WorkbookPageEditorProps extends AbstractEditorProps<models.WorkbookPageModel> {
   fetchObjectives: (courseId: string) => void;
   preview: (courseId: string, resource: Resource) => Promise<any>;
+  activeContext: ActiveContext;
+  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContentSelection: (
+    documentId: string, content: Object, container: ParentContainer) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -88,6 +93,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   renderObjectives() {
     return <Objectives
+      parent={null}
       {...this.props}
       model={this.props.model.head.objrefs}
       onEdit={this.onObjectivesEdit}
@@ -105,11 +111,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
+  onFocus(model, parent) {
+    console.log('focus gained');
+    this.props.onUpdateContentSelection(this.props.context.documentId, model, parent);
+  }
+
   renderContentTab() {
     return (
       <div key="content-tab" className="html-editor-well">
         <div className="flex-spacer">
         <ContentContainer
+          parent={null}
+          onFocus={this.onFocus.bind(this)}
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}

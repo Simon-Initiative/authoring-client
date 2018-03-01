@@ -12,21 +12,31 @@ export const styles = {
       border: `1px solid ${colors.grayLighter}`,
     },
 
+    '&[disabled]': {
+      color: colors.gray,
+
+      '&:hover': {
+        cursor: 'default',
+        color: colors.gray,
+        border: '1px solid transparent',
+      },
+    },
+
     '& i': {
       fontSize: 16,
     },
 
     '&.small': {
       width: 36,
-      height: 32,
+      minHeight: 32,
     },
     '&.large': {
       width: 72,
-      height: 64,
+      minHeight: 64,
     },
     '&.wide': {
       width: 72,
-      height: 32,
+      minHeight: 32,
     },
   },
 };

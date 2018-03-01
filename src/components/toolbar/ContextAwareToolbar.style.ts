@@ -14,7 +14,7 @@ export const styles = {
     backgroundColor: colors.white,
     borderRadius: 10,
   },
-  textBlock: {
+  unicodeIcon: {
     font: {
       style: 'normal',
       family: 'serif',

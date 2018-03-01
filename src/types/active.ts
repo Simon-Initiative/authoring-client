@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import { Maybe } from 'tsmonad';
 
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;
@@ -7,27 +8,27 @@ export interface ParentContainer {
 }
 
 export type ActiveContextParams = {
-  documentId? : string,
-  container?: ParentContainer,
-  activeChild?: Object,
+  documentId? : Maybe<string>,
+  container?: Maybe<ParentContainer>,
+  activeChild?: Maybe<Object>,
 };
 
 const defaultContent = {
-  documentId: '',
-  container: null,
-  activeChild: null,
+  documentId: Maybe.nothing(),
+  container: Maybe.nothing(),
+  activeChild: Maybe.nothing(),
 };
 
 export class ActiveContext extends Immutable.Record(defaultContent) {
 
   // The id of the parent document
-  documentId: string;
+  documentId: Maybe<string>;
 
   // The parent container
-  container: ParentContainer;
+  container: Maybe<ParentContainer>;
 
   // The current active child component of the parent container
-  activeChild: Object;
+  activeChild: Maybe<Object>;
 
 
   constructor(params?: ActiveContextParams) {

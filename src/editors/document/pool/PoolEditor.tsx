@@ -150,6 +150,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               redoEnabled={this.state.redoStackSize > 0}
               onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
           <TitleContentEditor
+              parent={null}
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
@@ -175,7 +176,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit, this.onRemove)}
+                this.state.currentNode, this.props, this.onEdit, this.onRemove, null)}
             </div>
           </div>
         </div>

@@ -36,6 +36,7 @@ class Xref extends React.PureComponent<any, any> {
         }
       }>
         <XrefEditor
+          parent={null}
           model={data.xref}
           context={b.context}
           services={b.services}

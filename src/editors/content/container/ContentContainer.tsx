@@ -3,13 +3,14 @@ import * as Immutable from 'immutable';
 import { getEditorByContentType } from './registry';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
-
+import { ParentContainer } from 'types/active';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 import './ContentContainer.scss';
 
 export interface ContentContainerProps
   extends AbstractContentEditorProps<ContentElements> {
+
 
 }
 
@@ -24,16 +25,28 @@ export class ContentContainer
   extends AbstractContentEditor<ContentElements,
     ContentContainerProps, ContentContainerState> {
 
+  supportedElements: Immutable.List<string>;
 
   constructor(props) {
     super(props);
 
     this.onChildEdit = this.onChildEdit.bind(this);
+
+    this.supportedElements = this.props.model.supportedElements;
   }
 
-  onChildEdit(childModel) {
+  onEdit(childModel) {
+    this.onChildEdit(childModel, childModel);
+  }
+
+  onAddNew(toAdd) {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }));
+    onEdit(model.with({ content: model.content.set(toAdd.guid, toAdd) }), toAdd);
+  }
+
+  onChildEdit(childModel, sourceObject) {
+    const { onEdit, model } = this.props;
+    onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), sourceObject);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -51,7 +64,11 @@ export class ContentContainer
     const editors = this.props.model.content
       .toArray()
       .map((model) => {
-        const props = { ...this.props, model, onEdit: this.onChildEdit };
+        const props = {
+          ...this.props, model,
+          onEdit: this.onChildEdit,
+          parent: this,
+        };
         return React.createElement(getEditorByContentType((model as any).contentType), props);
       });
 
