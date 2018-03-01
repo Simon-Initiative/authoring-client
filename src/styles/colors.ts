@@ -1,0 +1,36 @@
+import chroma from 'chroma-js';
+import flatui from 'styles/palettes/flatui';
+
+// Base Colors
+export default {
+  black: 'black',
+  white: 'white',
+  offwhite: '#f0f4fa',
+  blue: '#0067cb',
+  blueLight: '#a3b8cc',
+
+  grayBase: '#999',
+  get grayDarkest() { return chroma(this.grayBase).darken(2).hex(); },
+  get grayDarker() { return chroma(this.grayBase).darken(1.5).hex(); },
+  get grayDark() { return chroma(this.grayBase).darken().hex(); },
+  get gray() { return chroma(this.grayBase).hex(); },
+  get grayLight() { return chroma(this.grayBase).brighten().hex(); },
+  get grayLighter() { return chroma(this.grayBase).brighten(1.5).hex(); },
+  get grayLightest() { return chroma(this.grayBase).brighten(2).hex(); },
+
+  // Indication Colors
+  primary: '#2780E3',
+  secondary: '#a3b8cc',
+  success: '#3FB618',
+  info: '#9954BB',
+  warning: '#FF7518',
+  danger: '#da3232',
+
+  // Action Colors
+  get remove() { return this.danger; },
+  get add() { return chroma(this.primary).darken().hex(); },
+
+  selection: flatui.peterRiver,
+  get hover() { return chroma(this.selection).darken().hex(); },
+  get active() { return chroma(this.selection).darken(2).hex(); },
+};

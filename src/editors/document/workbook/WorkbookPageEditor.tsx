@@ -14,6 +14,7 @@ import { Objectives } from './Objectives';
 import { TabContainer } from '../../content/common/TabContainer';
 import { Details } from './Details';
 import { Actions } from './Actions';
+import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 
 import './WorkbookPageEditor.scss';
 
@@ -107,12 +108,17 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   renderContentTab() {
     return (
       <div key="content-tab" className="html-editor-well">
+        <div className="flex-spacer">
         <ContentContainer
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           model={this.props.model.body}
           onEdit={c => this.onBodyEdit(c)} />
+        </div>
+        <div>
+          <ContextAwareToolbar />
+        </div>
       </div>
     );
   }

@@ -1,48 +1,38 @@
 import * as React from 'react';
+import { injectSheet, JSSProps, classNames } from 'styles/jss';
 
+import { styles } from './ToolbarButton.style';
 
-export type ToolbarButtonProps = {
-  command: () => void,
-  icon: string,
-  tooltip: string,
-  enabled: boolean,
-};
+export enum ToolbarButtonSize {
+  Large = 'large',
+  Small = 'small',
+  Wide = 'wide',
+}
 
-export class ToolbarButton extends React.PureComponent<ToolbarButtonProps, {}> {
+export interface ToolbarButtonProps {
+  size?: ToolbarButtonSize;
+  onClick: () => void;
+  disabled?: boolean;
+  tooltip?: string;
+}
 
-  buttonRef: any;
-
+@injectSheet(styles)
+export class ToolbarButton extends React.Component<ToolbarButtonProps & JSSProps, {}> {
   constructor(props) {
     super(props);
-
-    this.onClick = this.onClick.bind(this);
-  }
-
-  onClick() {
-    this.props.command();
   }
 
   render() {
-    const { icon } = this.props;
-    const iconClasses = 'fa fa-' + icon;
-    const style = {
-      color: 'white',
-    };
-    const buttonStyle = {
-      backgroundColor: 'black',
-    };
+    const { classes, disabled, size = ToolbarButtonSize.Small, onClick } = this.props;
 
     return (
       <button
-        ref={a => this.buttonRef = a}
-        onClick={this.onClick}
-        disabled={!this.props.enabled}
         type="button"
-        className="btn"
-        style={buttonStyle}>
-        <i style={style} className={iconClasses}></i>
+        className={classNames([classes.toolbarButton, size])}
+        onClick={onClick}
+        disabled={disabled}>
+        {this.props.children}
       </button>
     );
   }
 }
-

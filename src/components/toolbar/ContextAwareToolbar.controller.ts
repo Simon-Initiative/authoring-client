@@ -42,5 +42,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   };
 };
 
-export default connect<StateProps, DispatchProps, OwnProps>
-  (mapStateToProps, mapDispatchToProps)(ContextAwareToolbar);
+export const controller = connect<StateProps, DispatchProps, OwnProps>
+(mapStateToProps, mapDispatchToProps)(ContextAwareToolbar);
+
+export { controller as ContextAwareToolbar };
