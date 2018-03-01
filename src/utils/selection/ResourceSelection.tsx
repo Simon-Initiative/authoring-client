@@ -74,8 +74,11 @@ class ResourceSelection
 
   render() {
     return (
-      <ModalSelection title="Select Resource" 
-        onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.state.selected)}>
+      <ModalSelection 
+        title="Select Resource" 
+        onCancel={this.props.onCancel} 
+        onInsert={() => this.props.onInsert(this.state.selected)}
+        disableInsert={this.state.selected.id === ''}>
         <table className="table table-hover table-sm">
           <thead>
               <tr>
