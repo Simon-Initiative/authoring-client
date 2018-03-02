@@ -8,6 +8,7 @@ import * as persistence from 'data/persistence';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 import createGuid from 'utils/guid';
 import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
 import { insertNode } from '../../utils';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
@@ -37,7 +38,8 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
   execute(
     org: models.OrganizationModel, 
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
-    context: AppContext, services) : Promise<models.OrganizationModel> {
+    context: AppContext, 
+    services: AppServices) : Promise<models.OrganizationModel> {
 
     if (parent.contentType === 'Unit' || 
       parent.contentType === 'Section' || 
