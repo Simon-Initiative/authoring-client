@@ -1,6 +1,6 @@
 import colors from 'styles/colors';
 
-export const styles = {
+export default {
   toolbarLabel: {
     color: colors.white,
     background: colors.grayLight,

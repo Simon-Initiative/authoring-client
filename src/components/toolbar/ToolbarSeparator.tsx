@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { injectSheet, JSSProps } from 'styles/jss';
 
-import { styles } from './ToolbarSeparator.style';
+import styles from './ToolbarSeparator.style';
 
 export interface ToolbarSeparatorProps {
 

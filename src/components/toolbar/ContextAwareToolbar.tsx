@@ -6,9 +6,9 @@ import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { ToolbarSeparator } from './ToolbarSeparator';
 import { ToolbarLabel } from './ToolbarLabel';
-
-import { styles } from './ContextAwareToolbar.style';
 import { Maybe } from 'tsmonad';
+
+import styles from './ContextAwareToolbar.style';
 
 export interface ToolbarProps {
   supportedElements: Immutable.List<string>;

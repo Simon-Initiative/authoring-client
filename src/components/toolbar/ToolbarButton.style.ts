@@ -1,6 +1,6 @@
 import colors from 'styles/colors';
 
-export const styles = {
+export default {
   toolbarButton: {
     background: 'transparent',
     fontSize: 12,

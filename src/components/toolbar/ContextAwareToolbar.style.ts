@@ -2,7 +2,7 @@ import chroma from 'chroma-js';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
-export const styles = {
+export default {
   toolbar: {
     extend: [disableSelect],
     margin: [0, 10],

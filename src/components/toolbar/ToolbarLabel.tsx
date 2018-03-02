@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { injectSheet, JSSProps } from 'styles/jss';
-import { styles } from './ToolbarLabel.style';
+
+import styles from './ToolbarLabel.style';
 
 export interface ToolbarLabelProps {
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { injectSheet, JSSProps, classNames } from 'styles/jss';
 
-import { styles } from './ToolbarButton.style';
+import styles from './ToolbarButton.style';
 
 export enum ToolbarButtonSize {
   Large = 'large',
