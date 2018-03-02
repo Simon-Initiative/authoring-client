@@ -1,14 +1,13 @@
 import * as Immutable from 'immutable';
 
 import { AbstractCommand } from '../command';
-import * as models from '../../../../../data/models';
-import * as t from '../../../../../data/contentTypes';
-import { LegacyTypes } from '../../../../../data/types';
-import * as persistence from '../../../../../data/persistence';
-import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
-import createGuid from '../../../../../utils/guid';
+import * as models from 'data/models';
+import * as t from 'data/contentTypes';
+import { LegacyTypes } from 'data/types';
+import * as persistence from 'data/persistence';
+import ResourceSelection from 'utils/selection/ResourceSelection';
+import createGuid from 'utils/guid';
 import { AppContext } from 'editors/common/AppContext';
-
 import { insertNode } from '../../utils';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
