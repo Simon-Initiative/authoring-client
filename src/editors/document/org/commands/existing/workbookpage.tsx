@@ -52,8 +52,8 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
                                           .courseModel
                                           .resourcesById
                                           .get((child as t.Item)
-                                            .resourceref
-                                            .idref)
+                                                .resourceref
+                                                .idref)
                                           .guid),
                 Immutable.Set<String>());
 
