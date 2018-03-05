@@ -28,7 +28,7 @@ const defaultContent = {
 };
 
 export class Response extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Response';
   feedback : Immutable.OrderedMap<string, Feedback>;
   concepts : Immutable.List<string>;
@@ -37,7 +37,7 @@ export class Response extends Immutable.Record(defaultContent) {
   score : string;
   name : string;
   guid: string;
-  
+
   constructor(params?: ResponseParams) {
     super(augment(params));
   }
@@ -47,7 +47,7 @@ export class Response extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : Response {
-    
+
     const r = (json as any).response;
     let model = new Response({ guid });
 
@@ -65,7 +65,7 @@ export class Response extends Immutable.Record(defaultContent) {
     }
 
     getChildren(r).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -100,11 +100,11 @@ export class Response extends Immutable.Record(defaultContent) {
     const concepts = this.concepts
         .toArray()
         .map(concept => ({ concept: { '#text': concept } }));
-   
+
     const feedback = this.feedback
         .toArray()
         .map(f => f.toPersistence());
-    
+
     const o = {
       response: {
         '@match': this.match,

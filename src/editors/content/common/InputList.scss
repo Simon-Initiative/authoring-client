@@ -14,26 +14,28 @@
       display: flex;
       flex-direction: row;
       margin-right: 10px;
-      padding-top: 8px;
+
+      & > * {
+        height: 36px;
+        margin-right: 10px;
+
+        &:last-child {
+          margin-right: 0px;
+        }
+      }
 
       .label-text {
         min-width: 16px;
+        padding-top: 8px;
       }
 
       .item-drag-handle {
-        margin-top: 4px;
-        margin-left: 10px;
+        padding-top: 6px;
       }
 
       .input-list-item-controls {
         display: flex;
         flex-direction: row;
-        margin: 0 5px;
-
-        .input-list-item-control {
-          margin-top: 4px;
-          margin-left: 10px;
-        }
       }
 
     }
@@ -89,8 +91,20 @@
     }
 
     .remove-btn {
-      padding-top: 10px;
+      padding-top: 5px;
       width: 26px;
+
+      button {
+        &:hover {
+          color: lighten($remove, 10%);
+        }
+      }
+
+      button {
+        &:active {
+          color: darken($remove, 10%);
+        }
+      }
     }
 
     .content-title-btn-offset {

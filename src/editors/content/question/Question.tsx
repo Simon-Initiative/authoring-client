@@ -17,6 +17,10 @@ import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 import './Question.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 
+const REMOVE_QUESTION_DISABLED_MSG =
+  'An assessment must contain at least one question. '
+  + 'Please add another question before removing';
+
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
@@ -26,6 +30,7 @@ export interface QuestionProps<ModelType>
   hideGradingCriteria: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   model: contentTypes.Question;
+  canRemoveQuestion: boolean;
   onRemoveQuestion: () => void;
 }
 
@@ -122,11 +127,13 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   renderQuestionTitle(): JSX.Element {
-    const { model, onRemoveQuestion } = this.props;
+    const { model, canRemoveQuestion, onRemoveQuestion } = this.props;
 
     return (
       <ContentTitle
           title={getLabelForQuestion(model)}
+          canRemove={canRemoveQuestion}
+          removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
           onRemove={onRemoveQuestion} />
     );
   }

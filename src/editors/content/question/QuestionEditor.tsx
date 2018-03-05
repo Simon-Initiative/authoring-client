@@ -21,6 +21,7 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   onRemove: (guid: string) => void;
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
+  canRemove: boolean;
 }
 
 export interface QuestionEditorState {
@@ -198,6 +199,8 @@ export class QuestionEditor
   }
 
   renderQuestionBody(): JSX.Element {
+    const { canRemove } = this.props;
+
     const item = this.props.model.items.first();
     const part = this.props.model.parts.first();
 
@@ -230,6 +233,7 @@ export class QuestionEditor
           textCommand={this.textCommand}
           canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -253,6 +257,7 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -276,6 +281,7 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -299,6 +305,7 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -322,6 +329,7 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );
@@ -345,6 +353,7 @@ export class QuestionEditor
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
           model={this.props.model}
+          canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
           onEdit={(c, p) => this.onItemPartEdit(c, p)} />
       );

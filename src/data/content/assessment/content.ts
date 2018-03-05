@@ -38,8 +38,8 @@ export class Content extends Immutable.Record(defaultContent) {
     let model = new Content({ guid });
     model = model.with({ body: ContentElements.fromPersistence(content, '', BODY_ELEMENTS) });
 
-    if (content['@availability'] !== undefined) {
-      model = model.with({ availability: content['@availability'] });
+    if (content['@available'] !== undefined) {
+      model = model.with({ availability: content['@available'] });
     }
 
     return model;
@@ -50,7 +50,7 @@ export class Content extends Immutable.Record(defaultContent) {
     const body = this.body.toPersistence();
     const content = { content: { '#array': (body as any) } };
 
-    content.content['@availability'] = this.availability;
+    content.content['@available'] = this.availability;
 
     return content;
   }
