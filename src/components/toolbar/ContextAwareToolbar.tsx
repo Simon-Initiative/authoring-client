@@ -297,13 +297,11 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
           <ToolbarLayoutGrid>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Undo"
                 size={ToolbarButtonSize.Wide}>
               <i className={'fa fa-undo'}/> Undo
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Redo"
                 size={ToolbarButtonSize.Wide}>
               <i className={'fa fa-repeat'}/> Redo
             </ToolbarButton>
@@ -311,20 +309,23 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
           <ToolbarLayoutInline>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Edit Page Details" size={ToolbarButtonSize.Large}>
+                tooltip="View and Edit Page Details"
+                size={ToolbarButtonSize.Large}>
               <div><i className="fa fa-info-circle"/></div>
               <div>Details</div>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Delete this Page" size={ToolbarButtonSize.Large}
+                size={ToolbarButtonSize.Large}
+                tooltip="Delete this Page"
                 disabled>
               <div><i className="fa fa-trash-o"/></div>
               <div>Delete</div>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Preview" size={ToolbarButtonSize.Large}>
+                tooltip="Preview this Page"
+                size={ToolbarButtonSize.Large}>
               <div><i className="fa fa-eye"/></div>
               <div>Preview</div>
             </ToolbarButton>
