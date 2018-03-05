@@ -31,6 +31,7 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
   }
 
   renderButtons() {
+
     const { insert, edit, content, supportedElements } = this.props;
     const btn = this.btn;
 
@@ -43,7 +44,6 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
         },
         {});
 
-
     const iff = el => elementMap[el];
 
     const isText = content.caseOf({
@@ -53,8 +53,12 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
 
     const buttons = [
       btn(
-        () => edit(content.lift(t => (t as contentTypes.ContiguousText)
-          .toggleStyle(InlineStyles.Bold))),
+        () => {
+          this.props.content.lift((t) => {
+            const text = t as contentTypes.ContiguousText;
+            edit(text.toggleStyle(InlineStyles.Bold));
+          });
+        },
         'bold', 'Bold the selected text', isText),
       btn(
         () => insert(new contentTypes.CodeBlock()),

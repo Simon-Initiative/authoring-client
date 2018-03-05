@@ -46,6 +46,13 @@ export class ContentContainer
 
   onChildEdit(childModel, sourceObject) {
     const { onEdit, model } = this.props;
+    console.log('content container onChildEdit');
+
+    const text = sourceObject as any;
+    console.log('content container view of content:');
+    console.log(text.content.getFirstBlock().getText());
+
+
     onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), sourceObject);
   }
 

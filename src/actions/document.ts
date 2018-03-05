@@ -133,12 +133,11 @@ export const changeRedone = (documentId: string): ChangeRedoneAction => ({
 function saveCompleted(dispatch, getState, documentId, document) {
   dispatch(
     dismissSpecificMessage(new Messages.Message().with({ guid: documentId + '_PERSISTENCE' })));
-  dispatch(modelUpdated(documentId, document.model));
 }
 
 function saveFailed(dispatch, getState, courseId, documentId, error) {
 
-  const message = error === 'Forbedden'
+  const message = error === 'Forbidden'
     ? buildLockExpiredMessage({
       label: 'Reload',
       execute: () => dispatch(load(courseId, documentId)) })
@@ -233,6 +232,8 @@ export function save(documentId: string, model: models.ContentModel) {
       const resources = Immutable.OrderedMap<string, Resource>([[resource.guid, resource]]);
       dispatch(updateCourseResources(resources));
     }
+
+    dispatch(modelUpdated(documentId, model));
 
     const doc = editedDocument.document.with({ model });
     editedDocument.persistence.save(doc);

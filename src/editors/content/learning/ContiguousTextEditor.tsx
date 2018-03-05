@@ -55,7 +55,7 @@ export default class ContiguousTextEditor
             content={this.props.model}
             undoRedoGuid={this.props.context.undoRedoGuid}
             locked={!this.props.editMode}
-            onEdit={this.props.onEdit} />
+            onEdit={c => this.props.onEdit(c, c)} />
 
       </div>);
   }

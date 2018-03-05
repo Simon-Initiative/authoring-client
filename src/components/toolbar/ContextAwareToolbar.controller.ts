@@ -37,7 +37,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch): DispatchProps => {
 
   return {
-    edit: content => dispatch(edit(content)),
+    edit: content =>  dispatch(edit(content)),
     insert: content => dispatch(insert(content)),
   };
 };

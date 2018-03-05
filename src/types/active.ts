@@ -4,7 +4,7 @@ import { Maybe } from 'tsmonad';
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;
   onAddNew: (content: Object) => void;
-  onEdit: (content: Object) => void;
+  onEdit: (content: Object, source: Object) => void;
 }
 
 export type ActiveContextParams = {
