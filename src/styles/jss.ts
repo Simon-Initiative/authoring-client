@@ -9,5 +9,5 @@ export const classNames = (names: string | string[]) => {
     return names.trim();
   }
 
-  return names.join(' ');
+  return names.filter(n => n).join(' ');
 };

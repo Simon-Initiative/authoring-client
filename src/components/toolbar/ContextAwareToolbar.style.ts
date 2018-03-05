@@ -22,8 +22,13 @@ export default {
     },
   },
   toolbarGroup: {
+    width: 300,
+  },
+  toolbarGroupContainer: {
+    overflowX: 'hidden',
+    height: 86,
     flexShrink: 0,
-    maxWidth: 300,
+    maxWidth: 600,
     marginRight: 5,
     paddingRight: 5,
     borderRight: '1px solid #ddd',
@@ -33,6 +38,13 @@ export default {
       paddingRight: 0,
       borderRight: 'none',
     },
+
+    '&.hide': {
+      maxWidth: 0,
+      opacity: 0,
+    },
+
+    transition: 'max-width .25s ease-in, opacity .25s ease-in',
   },
   toolbarLayoutInline: {
     display: 'inline-block',
@@ -53,19 +65,19 @@ export default {
     display: props => props.hideLabels ? 'none' : 'block',
     textAlign: 'center',
     textTransform: 'uppercase',
-    color: colors.gray,
+    color: colors.grayDark,
     borderBottom: props => `4px solid ${props.highlightColor || 'transparent'}`,
   },
   toolbarInsertGroup: {
 
   },
   toolbarFormatGroup: {
-    maxWidth: 150,
+    width: 150,
   },
   toolbarContextGroup: {
 
   },
   toolbarActionsGroup: {
-    maxWidth: 'initial',
+    width: 'initial',
   },
 };

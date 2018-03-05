@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps, classNames } from 'styles/jss';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
@@ -14,14 +14,17 @@ interface ToolbarGroupProps extends JSSProps {
   children: any;
   label: string;
   highlightColor?: string;
+  hide?: boolean;
 }
 
 export const ToolbarGroup = injectSheet(styles)
-  (({ className, classes, label, children }: ToolbarGroupProps) => {
+  (({ className, classes, label, hide, children }: ToolbarGroupProps) => {
     return (
-      <div className={`${classes.toolbarGroup} ${className}`}>
-        <div className={classes.tbGroupItems}>{children}</div>
-        <div className={classes.tbGroupLabel}>{label}</div>
+      <div className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
+        <div className={classNames([classes.toolbarGroup, className])}>
+            <div className={classes.tbGroupItems}>{children}</div>
+            <div className={classes.tbGroupLabel}>{label}</div>
+        </div>
       </div>
     );
   });
@@ -234,7 +237,7 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarContextGroup} label="Text Block"
-            highlightColor={distinctColors.distinctGreen}>
+            highlightColor={distinctColors.distinctGreen} hide={!isText}>
           <ToolbarLayoutInline>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
