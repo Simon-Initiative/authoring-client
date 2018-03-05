@@ -13,7 +13,7 @@ import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
 import { findNodeByGuid, locateNextOfKin } from './utils';
 import { Collapse } from '../../content/common/Collapse';
-import { AddQuestion } from '../../content/question/AddQuestion';
+import { AddQuestion, createMultipleChoiceQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
@@ -50,6 +50,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onAddPoolRef = this.onAddPoolRef.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
 
+    this.getCurrentPage = this.getCurrentPage.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
@@ -80,7 +81,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
-    const currentPage = nextProps.model.pages.get(this.state.currentPage);
+    const currentPage = this.getCurrentPage(nextProps);
 
     // Handle the case that the current node has changed externally,
     // for instance, from an undo/redo
@@ -93,6 +94,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
         this.setState({ currentNode });
       });
+  }
+
+  getCurrentPage(props) {
+    return props.model.pages.get(this.state.currentPage)
+    || props.model.pages.first();
   }
 
   onPageEdit(page: contentTypes.Page) {
@@ -129,7 +135,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNode(guid : string, node : models.Node) {
 
-    const nodes = this.props.model.pages.get(this.state.currentPage).nodes;
+    const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
@@ -138,7 +144,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
 
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
     page = page.with({ nodes });
 
     const pages = this.props.model.pages.set(page.guid, page);
@@ -154,9 +160,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.setState({ currentNode });
   }
 
+  canRemoveNode() {
+    const page = this.getCurrentPage(this.props);
+
+    return page.nodes.filter(n => n.contentType === 'Question').size > 1;
+  }
+
   onNodeRemove(guid: string) {
 
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
 
     const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
 
@@ -205,7 +217,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   addNode(node) {
-    let page = this.props.model.pages.get(this.state.currentPage);
+    let page = this.getCurrentPage(this.props);
     page = page.with({ nodes: page.nodes.set(node.guid, node) });
 
     const pages = this.props.model.pages.set(page.guid, page);
@@ -215,15 +227,29 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onAddPage() {
     const text = 'Page ' + (this.props.model.pages.size + 1);
-    const page = new contentTypes.Page()
+    let page = new contentTypes.Page()
       .with({ title: contentTypes.Title.fromText(text) });
 
-    this.handleEdit(this.props.model.with(
-      { pages: this.props.model.pages.set(page.guid, page) }));
+    let content = new contentTypes.Content();
+    content = content.with({ guid: guid() });
+
+    const question = createMultipleChoiceQuestion('single');
+
+    page = page.with({
+      nodes: page.nodes.set(content.guid, content)
+        .set(question.guid, question),
+    });
+
+    this.handleEdit(
+      this.props.model.with({
+        pages: this.props.model.pages.set(page.guid, page) }),
+      () => this.setState({
+        currentPage: page.guid,
+        currentNode: page.nodes.get(content.guid) }),
+    );
   }
 
   onRemovePage(page: contentTypes.Page) {
-
     if (this.props.model.pages.size > 1) {
 
       const guid = page.guid;
@@ -231,12 +257,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       if (guid === this.state.currentPage) {
         this.setState(
-          { currentPage: removed.last().guid },
-          () => this.handleEdit(removed));
+          {
+            currentPage: removed.pages.first().guid,
+            currentNode: removed.pages.first().nodes.first(),
+          },
+          () => this.handleEdit(removed),
+        );
       } else {
         this.handleEdit(removed);
       }
-
     }
   }
 
@@ -309,8 +338,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}
-            current={this.props.model.pages.get(this.state.currentPage)}
-            onChangeCurrent={currentPage => this.setState({ currentPage })}
+            current={this.getCurrentPage(this.props)}
+            onChangeCurrent={(currentPage) => {
+              const page = this.props.model.pages.get(currentPage);
+              const currentNode = page.nodes.first();
+              this.setState({ currentPage, currentNode });
+            }}
             onEdit={this.onPageEdit}/>
 
         </div>
@@ -360,7 +393,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   render() {
 
     const titleEditor = this.renderTitle();
-    const page = this.props.model.pages.get(this.state.currentPage);
+    const page = this.getCurrentPage(this.props);
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
@@ -411,7 +444,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, rendererProps, this.onEditNode, this.onNodeRemove, this)}
+                this.state.currentNode, rendererProps, this.onEdit,
+                this.onNodeRemove, this.canRemoveNode(), this)}
             </div>
           </div>
         </div>

@@ -176,7 +176,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit, this.onRemove, null)}
+                this.state.currentNode, this.props, this.onEdit, this.onRemove, true, null)}
             </div>
           </div>
         </div>

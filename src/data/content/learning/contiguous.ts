@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, convertFromRaw, SelectionState,
+import { ContentState, convertFromRaw, convertToRaw, SelectionState,
   EditorState, RichUtils, Modifier } from 'draft-js';
 import * as common from './common';
 import guid from '../../../utils/guid';
@@ -88,6 +88,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+    console.log('contig');
     return fromDraft(this.content);
   }
 
@@ -102,17 +103,21 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   toggleStyle(style: InlineStyles) : ContiguousText {
 
-    const editorState = EditorState
-      .createWithContent(this.content);
-    const withSelection = EditorState.forceSelection(editorState, this.selection);
+    // Determine whether we need to apply or remove the style based
+    // on the presence of the style at the first character of the
+    // selection
+    const anchorKey = this.selection.getAnchorKey();
+    const currentContentBlock = this.content.getBlockForKey(anchorKey);
+    const start = this.selection.getStartOffset();
 
-    const updateStyle = RichUtils.toggleInlineStyle(editorState, style);
+    const currentStyles = currentContentBlock.getInlineStyleAt(start);
 
-    const key : string = this.selection.getAnchorKey();
+    const content = currentStyles.has(style)
+      ? Modifier.removeInlineStyle(this.content, this.selection, style)
+      : Modifier.applyInlineStyle(this.content, this.selection, style);
 
     return this.with({
-      content: updateStyle.getCurrentContent(),
-      selection: SelectionState.createEmpty(key),
+      content,
     });
 
   }
@@ -168,7 +173,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     return this.with({
       content: contentStateWithLink,
-      selection: SelectionState.createEmpty(selectionState.anchorKey),
     });
   }
 

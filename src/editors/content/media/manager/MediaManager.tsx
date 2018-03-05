@@ -432,9 +432,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     const { media, context } = this.props;
     const { selection, showDetails } = this.state;
 
-    const selectedMediaItems: MediaItem[] = media.caseOf({
-      just: ml => selection.map(guid => ml.data.get(guid)).toArray(),
-      nothing: () => [],
+    const selectedMediaItems: Immutable.List<MediaItem> = media.caseOf({
+      just: ml => selection.map(guid => ml.data.get(guid)) as Immutable.List<MediaItem>,
+      nothing: () => Immutable.List<MediaItem>([]),
     });
 
     const mediaItemRefs = media.caseOf({
@@ -442,7 +442,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
       nothing: () => Immutable.Map<string, Immutable.List<MediaRef>>(),
     });
 
-    if (selectedMediaItems.length > 1) {
+    if (selectedMediaItems.size > 1) {
       return (
         <div className="media-selection-details">
           <div className="details-title">
@@ -451,8 +451,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
         </div>
       );
     }
-    const selectedItem = selectedMediaItems[0];
-    if (selectedMediaItems.length > 0) {
+
+    if (selectedMediaItems.size > 0) {
+      const selectedItem = selectedMediaItems.first();
+
       return (
         <div className="media-selection-details">
           <div className="details-title">

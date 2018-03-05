@@ -3,11 +3,12 @@ import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isArray } from 'util';
-import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
+import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
 
 import { LegacyTypes } from '../types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
+const WB_ELEMENTS = [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS];
 
 export type WorkbookPageModelParams = {
   resource?: contentTypes.Resource,
@@ -53,7 +54,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
         new contentTypes.Title({ text: ContentElements.fromText(title, '', TEXT_ELEMENTS) }) }),
       resource: new contentTypes.Resource({ id, title }),
       guid: id,
-      body: ContentElements.fromText(body, '', WB_BODY_EXTENSIONS),
+      body: ContentElements.fromText(body, '', WB_ELEMENTS),
     });
   }
 
@@ -86,7 +87,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           break;
         case 'body':
           model = model.with({ body: ContentElements
-            .fromPersistence(item.body, id, WB_BODY_EXTENSIONS) });
+            .fromPersistence(item.body, id, WB_ELEMENTS) });
           break;
         default:
       }

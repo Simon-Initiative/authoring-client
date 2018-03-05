@@ -11,6 +11,7 @@ export interface AbstractContentEditor<ModelType, P extends AbstractContentEdito
 export interface AbstractContentEditorProps<ModelType> {
   model: ModelType;
   parent?: ParentContainer;
+  activeContentGuid?: string;
   onEdit: (updated: ModelType, source?: Object) => void;
   onFocus?: (model: any, parent) => void;
   context: AppContext;

@@ -1,9 +1,6 @@
 import { connect } from 'react-redux';
-import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Skill } from 'types/course';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
+import { QuestionProps } from './Question';
 import { CheckAllThatApply } from './CheckAllThatApply';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
@@ -20,24 +17,8 @@ interface DispatchProps {
   onToggleAdvancedScoring: (id: string, value?: boolean) => void;
 }
 
-interface OwnProps {
-  onBodyEdit: (...args: any[]) => any;
-  body: any;
-  grading: any;
-  onGradingChange: (value) => void;
-  hideGradingCriteria: boolean;
-  allSkills: Immutable.OrderedMap<string, Skill>;
-  model: contentTypes.Question;
-  onRemoveQuestion: () => void;
-  itemModel: contentTypes.MultipleChoice;
-  partModel: contentTypes.Part;
-  onEdit: (item: contentTypes.MultipleChoice, part: contentTypes.Part) => void;
-  context: AppContext;
-  services: AppServices;
-  editMode: boolean;
-  onFocus: (itemId: string) => void;
-  onBlur: (itemId: string) => void;
-  onRemove: (item: contentTypes.MultipleChoice, part: contentTypes.Part) => void;
+interface OwnProps extends QuestionProps<contentTypes.MultipleChoice> {
+
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

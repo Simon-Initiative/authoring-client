@@ -26,7 +26,7 @@ export type RemoveHandler = (guid: string) => void;
 
 export function renderAssessmentNode(
   n : models.Node, props: Props, onEdit: EditHandler,
-  onRemove: RemoveHandler, parent: ParentContainer) {
+  onRemove: RemoveHandler, canRemove: boolean, parent: ParentContainer) {
 
   const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
 
@@ -41,6 +41,7 @@ export function renderAssessmentNode(
             context={props.context}
             model={n}
             onEdit={c => onEdit(n.guid, c)}
+            canRemove={canRemove}
             onRemove={() => onRemove(n.guid)}
             />;
 

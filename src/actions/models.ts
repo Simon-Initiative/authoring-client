@@ -96,7 +96,7 @@ export function duplicateOrganization(
             [[doc.model.resource.guid, doc.model.resource]]);
           dispatch(updateCourseResources(resources));
 
-          viewOrganizations(courseId);
+          dispatch(viewOrganizations(courseId));
         }
 
 

@@ -82,7 +82,8 @@ export class ContentElements extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object[] {
     const initial : Object[] = [];
-    return (this.content.toArray()
+
+    const items = (this.content.toArray()
       .map(e => e.toPersistence())
       .reduce(
         (p: Object[], c) => {
@@ -94,5 +95,7 @@ export class ContentElements extends Immutable.Record(defaultContent) {
           return p;
         },
         initial) as Object[]);
+
+    return items;
   }
 }

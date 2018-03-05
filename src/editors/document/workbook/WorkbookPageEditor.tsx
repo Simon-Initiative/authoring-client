@@ -56,6 +56,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
+    if (this.props.activeContext !== nextProps.activeContext) {
+      return true;
+    }
     if (this.props.model !== nextProps.model) {
       return true;
     }
@@ -73,8 +76,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onBodyEdit(content : any) {
+  onBodyEdit(content : any, source: Object) {
     const model = this.props.model.with({ body: content });
+
+    console.dir(model.toPersistence());
+    console.dir(source);
+
+    this.props.onUpdateContent(this.props.context.documentId, source);
     this.handleEdit(model);
   }
 
@@ -125,22 +133,28 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onFocus(model, parent) {
-    console.log('focus gained');
     this.props.onUpdateContentSelection(this.props.context.documentId, model, parent);
   }
 
   renderContentTab() {
+
+    const activeGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
     return (
       <div key="content-tab" className="html-editor-well">
         <div className="flex-spacer">
         <ContentContainer
           parent={null}
+          activeContentGuid={activeGuid}
           onFocus={this.onFocus.bind(this)}
           editMode={this.props.editMode}
           services={this.props.services}
           context={this.props.context}
           model={this.props.model.body}
-          onEdit={c => this.onBodyEdit(c)} />
+          onEdit={(c, s) => this.onBodyEdit(c, s)} />
         </div>
       </div>
     );

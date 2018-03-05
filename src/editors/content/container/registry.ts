@@ -1,7 +1,7 @@
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor } from '../common/AbstractContentEditor';
 
-import CodeBlock from '../learning/CodeBlock';
+import { CodeBlock } from '../learning/CodeBlock';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 
