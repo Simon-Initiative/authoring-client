@@ -53,6 +53,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
+    if (this.props.activeContext !== nextProps.activeContext) {
+      return true;
+    }
     if (this.props.model !== nextProps.model) {
       return true;
     }
@@ -120,10 +123,17 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   renderContentTab() {
+
+    const activeGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
     return (
       <div key="content-tab" className="html-editor-well">
         <ContentContainer
           parent={null}
+          activeContentGuid={activeGuid}
           onFocus={this.onFocus.bind(this)}
           editMode={this.props.editMode}
           services={this.props.services}

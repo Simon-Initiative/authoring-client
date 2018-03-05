@@ -46,6 +46,8 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
 
     const iff = el => elementMap[el];
 
+    console.dir(elementMap);
+
     const isText = content.caseOf({
       just: c => c instanceof contentTypes.ContiguousText,
       nothing: () => false,
@@ -62,10 +64,10 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
         'bold', 'Bold the selected text', isText),
       btn(
         () => insert(new contentTypes.CodeBlock()),
-        'code', 'Add a block of source code', iff('code-block')),
+        'code', 'Add a block of source code', iff('codeblock')),
       btn(
         () => insert(new contentTypes.Example()),
-        'chart-bar', 'Add an example', iff('example')),
+        'bar-chart', 'Add an example', iff('example')),
     ];
 
     return buttons;

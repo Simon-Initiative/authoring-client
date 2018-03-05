@@ -5,6 +5,7 @@ import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
 import { ParentContainer } from 'types/active';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { ContentDecorator } from './ContentDecorator';
 
 import './ContentContainer.scss';
 
@@ -46,17 +47,18 @@ export class ContentContainer
 
   onChildEdit(childModel, sourceObject) {
     const { onEdit, model } = this.props;
-    console.log('content container onChildEdit');
-
-    const text = sourceObject as any;
-    console.log('content container view of content:');
-    console.log(text.content.getFirstBlock().getText());
-
-
     onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), sourceObject);
   }
 
+  onRemove(childModel) {
+    const { onEdit, model } = this.props;
+    onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
       return true;
     }
@@ -67,6 +69,7 @@ export class ContentContainer
   }
 
   render() : JSX.Element {
+    console.log('render container: ' + this.props.activeContentGuid);
 
     const editors = this.props.model.content
       .toArray()
@@ -76,7 +79,19 @@ export class ContentContainer
           onEdit: this.onChildEdit,
           parent: this,
         };
-        return React.createElement(getEditorByContentType((model as any).contentType), props);
+        const childRenderer = React.createElement(
+          getEditorByContentType((model as any).contentType), props);
+
+        return (
+          <ContentDecorator
+            isActiveContent={model.guid === this.props.activeContentGuid}
+            onRemove={this.onRemove.bind(this, model)}
+            onFocus={this.props.onFocus.bind(undefined, model, this)}>
+
+            {childRenderer}
+
+          </ContentDecorator>
+        );
       });
 
     return (

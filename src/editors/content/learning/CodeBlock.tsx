@@ -1,34 +1,32 @@
 import * as React from 'react';
 import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
 import PreformattedText from './PreformattedText';
-import {
-  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
-} from './InteractiveRenderer';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+
 import { Checkbox, Select, TextInput } from '../common/controls';
 
 import './markers.scss';
 
-type Data = {
-  codeblock: CodeBlockType;
-};
 
-export interface CodeBlockProps extends InteractiveRendererProps {
-  data: Data;
-}
-
-export interface CodeBlockState extends InteractiveRendererState {
+export interface CodeBlockProps
+  extends AbstractContentEditorProps<CodeBlockType> {
 
 }
 
-export interface CodeBlockProps {
+export interface CodeBlockState {
 
 }
 
+/**
+ * The content editor for contiguous text.
+ */
+export class CodeBlock
+  extends AbstractContentEditor<CodeBlockType,
+  CodeBlockProps, CodeBlockState> {
 
-class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
 
   constructor(props) {
-    super(props, {});
+    super(props);
 
     this.onSourceEdit = this.onSourceEdit.bind(this);
     this.onSyntaxChange = this.onSyntaxChange.bind(this);
@@ -37,34 +35,43 @@ class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
     this.onHighlightEdit = this.onHighlightEdit.bind(this);
   }
 
+  shouldComponentUpdate(nextProps) {
+    return this.props.model !== nextProps.model;
+  }
+
   onSourceEdit(source) {
-    this.props.blockProps.onEdit({ codeblock: this.props.data.codeblock.with({ source }) });
+    const model = this.props.model.with({ source });
+    this.props.onEdit(model, model);
   }
 
   onSyntaxChange(syntax) {
-    this.props.blockProps.onEdit({ codeblock: this.props.data.codeblock.with({ syntax }) });
+    const model = this.props.model.with({ syntax });
+    this.props.onEdit(model, model);
   }
 
   onNumberEdit(number) {
-    this.props.blockProps.onEdit({ codeblock: this.props.data.codeblock.with({ number }) });
+    const model = this.props.model.with({ number });
+    this.props.onEdit(model, model);
   }
 
   onHighlightEdit(highlight) {
-    this.props.blockProps.onEdit({ codeblock: this.props.data.codeblock.with({ highlight }) });
+    const model = this.props.model.with({ highlight });
+    this.props.onEdit(model, model);
   }
 
   onStartEdit(start) {
-    this.props.blockProps.onEdit({ codeblock: this.props.data.codeblock.with({ start }) });
+    const model = this.props.model.with({ start });
+    this.props.onEdit(model, model);
   }
 
   render() : JSX.Element {
 
-    const syntax = this.props.data.codeblock.syntax;
+    const syntax = this.props.model.syntax;
 
     return (
-      <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
+      <div>
         <form className="form-inline">
-          <Select editMode={this.props.blockProps.editMode}
+          <Select editMode={this.props.editMode}
             label="Syntax" value={syntax} onChange={this.onSyntaxChange}>
             <option value="actionscript3">ActionScript</option>
             <option value="bash">Bash</option>
@@ -77,38 +84,36 @@ class CodeBlock extends InteractiveRenderer<CodeBlockProps, CodeBlockState> {
             <option value="xml">XML</option>
           </Select>
           <Checkbox
-            editMode={this.props.blockProps.editMode}
+            editMode={this.props.editMode}
             label="Show line numbers"
-            value={this.props.data.codeblock.number}
+            value={this.props.model.number}
             onEdit={this.onNumberEdit}
           />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           Start number
           &nbsp;
           <TextInput
-            editMode={this.props.blockProps.editMode}
+            editMode={this.props.editMode}
             width="50"
             type="number"
             label=""
-            value={this.props.data.codeblock.start}
+            value={this.props.model.start}
             onEdit={this.onStartEdit}
           />
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           Highlight
           &nbsp;
           <TextInput
-            editMode={this.props.blockProps.editMode}
+            editMode={this.props.editMode}
             width="70"
             type="text"
             label=""
-            value={this.props.data.codeblock.highlight}
+            value={this.props.model.highlight}
             onEdit={this.onHighlightEdit}
           />
         </form>
         <PreformattedText onEdit={this.onSourceEdit}
-          src={this.props.data.codeblock.source} editMode={this.props.blockProps.editMode} />
+          src={this.props.model.source} editMode={this.props.editMode} />
       </div>);
   }
 }
-
-export default CodeBlock;

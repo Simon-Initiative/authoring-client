@@ -35,16 +35,12 @@ export default class ContiguousTextEditor
     return false;
   }
 
-  onFocus() {
-    this.props.onFocus(this.props.model, this.props.parent);
-  }
-
   render() : JSX.Element {
 
     const ignoreSelection = () => {};
 
     return (
-      <div className="contiguous-text" onFocus={this.onFocus.bind(this)}>
+      <div className="contiguous-text">
 
           <DraftWrapper
             activeItemId=""
