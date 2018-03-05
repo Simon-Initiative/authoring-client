@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import * as contentTypes from 'data/contentTypes';
 import { Table as TableType } from 'data/content/learning/table';
 import { CellHeader } from 'data/content/learning/cellheader';
 import {

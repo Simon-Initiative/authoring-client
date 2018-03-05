@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
+import { augment } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type ActivityLinkParams = {

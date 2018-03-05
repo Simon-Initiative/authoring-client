@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { parseContent } from './parse';
-import { augment, getChildren } from '../common';
+import { augment } from '../common';
 import { ContentElement } from './interfaces';
 import { ContiguousText } from '../learning/contiguous';
 import { Maybe } from 'tsmonad';

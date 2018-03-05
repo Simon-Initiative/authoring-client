@@ -5,7 +5,6 @@ import { ContentContainer } from '../container/ContentContainer';
 import { Video } from '../../../data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Tracks } from './Tracks';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';

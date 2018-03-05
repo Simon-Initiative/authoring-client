@@ -1,10 +1,8 @@
 import * as React from 'react';
-import * as persistence from '../../../data/persistence';
 import { Image } from '../../../data/content/learning/image';
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
@@ -12,7 +10,6 @@ import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
 import { adjustPath } from './utils';
-import { ContentEditor } from 'editors/content/content/ContentEditor';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
 

@@ -1,8 +1,6 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
+import { augment } from '../common';
 
 export type DefaultParams = {
   content?: string,

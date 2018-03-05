@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
 
-import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 

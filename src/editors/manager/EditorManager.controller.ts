@@ -2,13 +2,9 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { Document } from 'data/persistence';
 import EditorManager from './EditorManager';
-import { courseChanged } from 'actions/course';
-import * as lockActions from 'actions/locks';
-import { CourseModel, ContentModel } from 'data/models';
+import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
-import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
-import { EditedDocument } from 'types/document';
 import { save } from 'actions/document';
 
 interface StateProps {

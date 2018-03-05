@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { bindActionCreators } from 'redux';
 import { UserProfile } from 'types/user';
 import EditorManager from 'editors/manager/EditorManager.controller';
-import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
   onLoad: (documentId: string) => void;

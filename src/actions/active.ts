@@ -1,7 +1,3 @@
-import * as Immutable from 'immutable';
-import * as persistence from 'data/persistence';
-import { Dispatch } from 'react-redux';
-import { State } from 'reducers';
 import { ParentContainer } from 'types/active';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';

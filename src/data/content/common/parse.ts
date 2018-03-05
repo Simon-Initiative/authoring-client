@@ -4,7 +4,6 @@ import { Unsupported } from '../unsupported';
 import guid from 'utils/guid';
 import { ContentElement } from './interfaces';
 import { ContiguousText } from '../learning/contiguous';
-import * as logger from 'utils/logger';
 
 export const ARRAY = '#array';
 export const TITLE = '@title';

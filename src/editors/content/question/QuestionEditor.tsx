@@ -10,7 +10,6 @@ import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
-import { EntityTypes } from '../../../data/content/learning/common';
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from './commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';

@@ -2,7 +2,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ContentElements } from 'data/content/common/elements';
 import { CombinationsMap } from 'types/combinations';
-import { Alternatives } from 'data/content/learning/alternatives';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 // This sets the limit for the number of choices to use the autogenerate

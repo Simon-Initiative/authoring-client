@@ -1,9 +1,8 @@
-import * as Immutable from 'immutable';
 import {
-    AtomicBlockUtils, CharacterMetadata, ContentBlock, ContentState, EditorState, Modifier,
+    AtomicBlockUtils, ContentBlock, ContentState, EditorState, Modifier,
     SelectionState,
 } from 'draft-js';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/learning/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 
 // Append text to a content block
 export function appendText(contentBlock, contentState, text) {

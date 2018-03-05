@@ -1,9 +1,6 @@
-import * as Immutable from 'immutable';
-import { containerPrecondition, insertBlocksAfter, stateFromKey } from './common';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/learning/common';
 import { AbstractCommand } from '../../command';
 import {
-  CharacterMetadata, ContentBlock, EditorState,
+  EditorState,
 } from 'draft-js';
 
 

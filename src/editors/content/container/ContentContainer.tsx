@@ -1,9 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { getEditorByContentType } from './registry';
-import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
-import { ParentContainer } from 'types/active';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ContentDecorator } from './ContentDecorator';
 

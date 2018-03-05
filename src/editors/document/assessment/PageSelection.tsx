@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
-import { TextInput } from '../../content/common/TextInput';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';

@@ -5,8 +5,6 @@ import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
-import { Maybe } from 'tsmonad';
-import { Alternate } from 'data/content/learning/alternate';
 
 export type AlternativeParams = {
   title?: Title,

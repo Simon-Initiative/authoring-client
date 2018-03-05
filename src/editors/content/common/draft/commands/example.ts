@@ -1,11 +1,9 @@
-import * as Immutable from 'immutable';
-import { containerPrecondition, insertBlocksAfter, stateFromKey } from './common';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/learning/common';
+import { containerPrecondition } from './common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { AbstractCommand } from '../../command';
 import {
-  CharacterMetadata, ContentBlock, EditorState,
+  EditorState,
 } from 'draft-js';
-import { EDOM } from 'constants';
 
 
 export class InsertExampleCommand extends AbstractCommand<EditorState> {

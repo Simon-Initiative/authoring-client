@@ -3,9 +3,6 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ContentContainer } from '../container/ContentContainer';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 
 import './ContentEditor.scss';

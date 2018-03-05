@@ -1,6 +1,5 @@
-import * as Immutable from 'immutable';
 
-import { HasGuid, Persistable, Cloneable } from 'data/types';
+import { HasGuid, Persistable } from 'data/types';
 
 
 export interface ContentElement extends HasGuid, Persistable {

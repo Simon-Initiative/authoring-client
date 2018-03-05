@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';

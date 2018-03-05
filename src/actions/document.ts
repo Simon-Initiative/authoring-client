@@ -1,8 +1,5 @@
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
-import { Dispatch } from 'react-redux';
-import { State } from 'reducers';
-import { Maybe } from 'tsmonad';
 import { EditedDocument } from 'types/document';
 import { courseChanged, updateCourseResources } from './course';
 import { Resource } from 'data/content/resource';
@@ -10,7 +7,7 @@ import * as models from 'data/models';
 import * as Messages from 'types/messages';
 import { showMessage, dismissScopedMessages, dismissSpecificMessage } from './messages';
 import { lookUpByName } from 'editors/manager/registry';
-import { buildPersistenceFailureMessage, buildReportProblemAction } from 'utils/error';
+import { buildPersistenceFailureMessage } from 'utils/error';
 import { buildLockExpiredMessage, buildReadOnlyMessage } from 'utils/lock';
 
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';

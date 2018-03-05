@@ -3,7 +3,6 @@ import * as React from 'react';
 import { YouTube } from '../../../data/content/learning/youtube';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ContentElements } from 'data/content/common/elements';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { ContentContainer } from '../container/ContentContainer';
 import { Collapse } from '../common/Collapse';

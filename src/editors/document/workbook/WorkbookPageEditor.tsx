@@ -2,21 +2,15 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { ContentState } from 'draft-js';
-import { getEntities } from 'data/content/learning/changes';
-import { EntityTypes } from 'data/content/learning/common';
 import { Objectives } from './Objectives';
-import { TabContainer } from '../../content/common/TabContainer';
 import { Details } from './Details';
 import { Actions } from './Actions';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ActiveContext, ParentContainer } from 'types/active';
-import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { ContentElements } from 'data/content/common/elements';
 
 import './WorkbookPageEditor.scss';

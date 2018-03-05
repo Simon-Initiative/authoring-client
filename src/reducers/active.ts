@@ -1,10 +1,7 @@
-import * as Immutable from 'immutable';
 import * as actions from 'actions/active';
 import * as documentActions from 'actions/document';
 import { ActiveContext } from 'types/active';
-import { EditedDocument } from 'types/document';
 import { Maybe } from 'tsmonad';
-import createGuid from 'utils/guid';
 
 export type ActionTypes =
   documentActions.DocumentReleasedAction |

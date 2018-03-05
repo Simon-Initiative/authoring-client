@@ -5,10 +5,8 @@ import { ContentContainer } from '../container/ContentContainer';
 import { Audio } from '../../../data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Tracks } from './Tracks';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { TabContainer } from '../common/TabContainer';
-import { ContiguousText } from 'data/content/learning/contiguous';
 
 import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';

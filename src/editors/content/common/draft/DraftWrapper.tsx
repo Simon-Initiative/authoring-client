@@ -1,16 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Maybe } from 'tsmonad';
 
 import {
   CharacterMetadata, ContentBlock, ContentState, Editor,
-  EditorState, Modifier, RichUtils, SelectionState,
+  EditorState, Modifier, SelectionState,
 } from 'draft-js';
 import { Command, CommandProcessor } from '../command';
 
 import {
-    cloneDuplicatedEntities, determineChangeType, getCursorPosition, getPosition, hasSelection,
+    cloneDuplicatedEntities, determineChangeType,
     SelectionChangeType,
 } from './utils';
 import { AppServices } from '../../../common/AppServices';

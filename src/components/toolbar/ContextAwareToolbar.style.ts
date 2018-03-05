@@ -1,4 +1,3 @@
-import chroma from 'chroma-js';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 

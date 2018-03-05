@@ -1,9 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, convertFromRaw, convertToRaw, SelectionState,
-  EditorState, RichUtils, Modifier } from 'draft-js';
-import * as common from './common';
-import guid from '../../../utils/guid';
+import { ContentState, SelectionState, Modifier } from 'draft-js';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';

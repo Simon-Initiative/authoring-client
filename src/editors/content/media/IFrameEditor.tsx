@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ContentElements } from 'data/content/common/elements';
 import { IFrame } from '../../../data/content/learning/iframe';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { ContentContainer } from '../container/ContentContainer';
 

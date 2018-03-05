@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as models from '../../../data/models';
-import { TextInput } from '../../content/common/TextInput';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
