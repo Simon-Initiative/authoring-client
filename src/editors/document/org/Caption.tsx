@@ -42,7 +42,7 @@ export class Caption
 
     this.state = { mouseOver: false };
 
-    this.onViewEdit = this.onViewEdit.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   getLabel(contentType: string) {
@@ -54,7 +54,8 @@ export class Caption
     return this.props.labels[contentType.toLowerCase()];
   }
 
-  onViewEdit() {
+  onClick(model) {
+    this.props.toggleExpanded(getExpandId(model));
     this.props.onViewEdit();
   }
 
@@ -64,13 +65,6 @@ export class Caption
 
     const buttons = this.props.isHoveredOver
         ? [(
-          <button
-            onClick={this.onViewEdit}
-            type="button"
-            className="btn btn-link btn-sm">
-            Edit
-          </button>
-        ), (
           <span className="flex-spacer"/>
         ), (
           <Remove editMode={this.props.editMode} processCommand={this.props.processCommand}/>
@@ -80,7 +74,7 @@ export class Caption
       <div className="caption">
         <button
           className="caption-btn btn btn-link"
-          onClick={() => this.props.toggleExpanded(getExpandId(model))}
+          onClick={() => this.onClick(model)}
           type="button">{this.props.children}
         </button>
 
