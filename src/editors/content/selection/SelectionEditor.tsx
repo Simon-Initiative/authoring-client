@@ -103,7 +103,14 @@ export class SelectionEditor
     );
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     const controls = (
       <div className="controls">
         {

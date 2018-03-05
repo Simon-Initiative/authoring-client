@@ -36,7 +36,14 @@ export class CiteEditor
     this.props.onEdit(this.props.model.with({ entry }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { entry } = this.props.model;
 

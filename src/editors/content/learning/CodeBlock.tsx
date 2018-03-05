@@ -64,7 +64,14 @@ export class CodeBlock
     this.props.onEdit(model, model);
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const syntax = this.props.model.syntax;
 

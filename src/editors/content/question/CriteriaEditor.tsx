@@ -53,7 +53,14 @@ export class CriteriaEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const controls = (
       <form className="form-inline">

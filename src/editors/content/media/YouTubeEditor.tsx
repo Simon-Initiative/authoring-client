@@ -95,7 +95,15 @@ export class YouTubeEditor
     );
   }
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { titleContent, caption, popout, height, width } = this.props.model;
 

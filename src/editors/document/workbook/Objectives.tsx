@@ -62,7 +62,14 @@ export class Objectives
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const options = this.props.context.objectives
       .toArray()

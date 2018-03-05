@@ -46,7 +46,14 @@ export class ImageLinkEditor
     this.props.onEdit({ link, image: this.props.model.image });
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { link, image } = this.props.model;
 

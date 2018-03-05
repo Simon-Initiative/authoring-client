@@ -360,7 +360,14 @@ export class QuestionEditor
     }
   }
 
-  render() {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
     return (
       <div className="question-editor">
         {this.renderQuestionBody()}

@@ -29,7 +29,14 @@ class Unsupported extends React.Component<UnsupportedProps, UnsupportedState> {
 
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     return (
       <PreformattedText
         editMode={false}

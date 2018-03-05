@@ -35,7 +35,14 @@ export default class ContiguousTextEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const ignoreSelection = () => {};
 

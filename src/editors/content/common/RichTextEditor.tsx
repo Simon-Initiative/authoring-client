@@ -43,7 +43,15 @@ export class RichTextEditor
     this.props.onEdit(html);
   }
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const inlineToolbar = <InlineToolbar/>;
     const blockToolbar = <BlockToolbar/>;

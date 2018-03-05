@@ -164,7 +164,15 @@ export class TableEditor
     );
   }
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const table = this.props.model;
     const rows = table.rows.toArray();

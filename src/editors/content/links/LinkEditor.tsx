@@ -40,7 +40,14 @@ export class LinkEditor
     this.props.onEdit(this.props.model.with({ href }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { href, target } = this.props.model;
 

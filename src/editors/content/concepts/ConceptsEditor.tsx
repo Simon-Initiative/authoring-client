@@ -60,7 +60,14 @@ export default class ConceptsEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     const options = this.props.context.skills
       .toArray()
       .map(s => ({ id: s.id, title: s.title }));

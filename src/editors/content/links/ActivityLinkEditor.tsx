@@ -76,7 +76,14 @@ export class ActivityLinkEditor
     this.props.onEdit(this.props.model.with({ purpose }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { purpose, target } = this.props.model;
 

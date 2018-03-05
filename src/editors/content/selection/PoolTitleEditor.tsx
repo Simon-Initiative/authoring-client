@@ -56,7 +56,14 @@ export class PoolTitleEditor
       </h5>;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     if (this.props.editMode) {
       return this.renderEdit();
     }
