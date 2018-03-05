@@ -5,6 +5,7 @@ import { injectSheet, JSSProps } from 'styles/jss';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
+import distinctColors from 'styles/palettes/distinct';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -12,6 +13,7 @@ interface ToolbarGroupProps extends JSSProps {
   className: string;
   children: any;
   label: string;
+  highlightColor?: string;
 }
 
 export const ToolbarGroup = injectSheet(styles)
@@ -217,7 +219,8 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
           </ToolbarLayoutInline>
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarContextGroup} label="Text Block">
+        <ToolbarGroup className={classes.toolbarContextGroup} label="Text Block"
+            highlightColor={distinctColors.distinctGreen}>
           <ToolbarLayoutInline>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}

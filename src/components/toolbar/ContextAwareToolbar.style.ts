@@ -55,6 +55,7 @@ export default {
     textAlign: 'center',
     textTransform: 'uppercase',
     color: colors.gray,
+    borderBottom: props => `4px solid ${props.highlightColor || 'transparent'}`,
   },
   toolbarInsertGroup: {
 
