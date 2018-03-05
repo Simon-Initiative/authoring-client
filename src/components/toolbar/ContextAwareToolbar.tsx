@@ -102,8 +102,8 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => insert(new contentTypes.CodeBlock())}
-                tooltip="Code Block">
-                disabled={!iff('codeblock')}
+                tooltip="Code Block"
+                disabled={!iff('codeblock')}>
               <i className={'fa fa-code'}/>
             </ToolbarButton>
             <ToolbarButton
@@ -143,8 +143,8 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => insert(new contentTypes.Example())}
-                tooltip="Example">
-                disabled={!iff('example')}
+                tooltip="Example"
+                disabled={!iff('example')}>
               <i className={'fa fa-bar-chart'}/>
             </ToolbarButton>
             <ToolbarButton
