@@ -16,6 +16,8 @@ import { Details } from './Details';
 import { Actions } from './Actions';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ActiveContext, ParentContainer } from 'types/active';
+import { TitleContentEditor } from '../../content/title/TitleContentEditor';
+import { ContentElements } from 'data/content/common/elements';
 
 import './WorkbookPageEditor.scss';
 
@@ -76,6 +78,17 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
+  onTitleEdit(text: ContentElements) {
+
+    const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+
+    const resource = this.props.model.resource.with({ title: t });
+    const title = this.props.model.head.title.with({ text });
+    const head = this.props.model.head.with({ title });
+
+    this.props.onEdit(this.props.model.with({ head, resource }));
+  }
+
   onObjectivesEdit(objrefs: Immutable.List<string>) {
 
     const head = this.props.model.head.with({ objrefs });
@@ -129,9 +142,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
           model={this.props.model.body}
           onEdit={c => this.onBodyEdit(c)} />
         </div>
-        <div>
-          <ContextAwareToolbar />
-        </div>
       </div>
     );
   }
@@ -166,15 +176,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   render() {
-
-    const labels = ['Content', 'Details', 'Objectives', 'Actions'];
-    const tabs = [
-      this.renderContentTab(),
-      this.renderDetailsTab(),
-      this.renderObjectivesTab(),
-      this.renderActionsTab(),
-    ];
-
     const text = this.props.model.head.title.text.extractPlainText().caseOf({
       just: s => s,
       nothing: () => '',
@@ -182,18 +183,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     return (
       <div className="workbookpage-editor">
-          <div className="title-row">
-            <h3>Page: {text}</h3>
-            <div className="flex-spacer"/>
-            <UndoRedoToolbar
-              undoEnabled={this.state.undoStackSize > 0}
-              redoEnabled={this.state.redoStackSize > 0}
-              onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)} />
-          </div>
-
-          <TabContainer labels={labels}>
-            {tabs}
-          </TabContainer>
+        <h2 className="title-row">{text}</h2>
+        <ContextAwareToolbar />
+        {this.renderContentTab()}
       </div>
     );
   }

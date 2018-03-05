@@ -10,9 +10,11 @@ export enum ToolbarButtonSize {
 }
 
 export interface ToolbarButtonProps {
+  className?: string;
   size?: ToolbarButtonSize;
   onClick: () => void;
   disabled?: boolean;
+  selected?: boolean;
   tooltip?: string;
 }
 
@@ -23,12 +25,14 @@ export class ToolbarButton extends React.Component<ToolbarButtonProps & JSSProps
   }
 
   render() {
-    const { classes, disabled, size = ToolbarButtonSize.Small, onClick } = this.props;
+    const {
+      className, classes, disabled, selected, size = ToolbarButtonSize.Small, onClick,
+    } = this.props;
 
     return (
       <button
         type="button"
-        className={classNames([classes.toolbarButton, size])}
+        className={classNames([classes.toolbarButton, size, className, selected ? 'selected' : ''])}
         onClick={onClick}
         disabled={disabled}>
         {this.props.children}
