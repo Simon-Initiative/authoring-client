@@ -84,22 +84,26 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
           <ToolbarLayoutInline>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Text Block">
+                tooltip="Text Block"
+                disabled>
               <i className={classes.unicodeIcon}>T</i>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Section">
+                tooltip="Section"
+                disabled>
               <i className={'fa fa-list-alt'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Quote Block">
+                tooltip="Quote Block"
+                disabled>
               <i className={'fa fa-quote-right'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Table">
+                tooltip="Table"
+                disabled>
               <i className={'fa fa-table'}/>
             </ToolbarButton>
             <ToolbarButton
@@ -110,37 +114,44 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Formula Block">
+                tooltip="Formula Block"
+                disabled>
               <i className={classes.unicodeIcon}>&#8721;</i>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Image">
+                tooltip="Image"
+                disabled>
               <i className={'fa fa-image'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Audio Clip">
+                tooltip="Audio Clip"
+                disabled>
               <i className={'fa fa-volume-up'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Video Clip">
+                tooltip="Video Clip"
+                disabled>
               <i className={'fa fa-film'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="YouTube Video">
+                tooltip="YouTube Video"
+                disabled>
               <i className={'fa fa-youtube'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="iFrame">
+                tooltip="iFrame"
+                disabled>
               <i className={'fa fa-html5'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Pullout">
+                tooltip="Pullout"
+                disabled>
               <i className={'fa fa-external-link-square'}/>
             </ToolbarButton>
             <ToolbarButton
@@ -151,17 +162,20 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Definition">
+                tooltip="Definition"
+                disabled>
               <i className={'fa fa-book'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Inline Assessment">
+                tooltip="Inline Assessment"
+                disabled>
               <i className={'fa fa-flask'}/>
             </ToolbarButton>
             <ToolbarButton
                 onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Activity">
+                tooltip="Activity"
+                disabled>
               <i className={'fa fa-check'}/>
             </ToolbarButton>
           </ToolbarLayoutInline>
