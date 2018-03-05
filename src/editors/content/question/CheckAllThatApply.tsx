@@ -197,6 +197,13 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       });
     }
 
+    // verify the new reponses don't result in an invalid state
+    // i.e. at least one choice is selected for any of the responses
+    if (!updatedPartModel.responses.reduce((acc, val) => acc || val.match !== '', false)) {
+      // choice selection is invalid, abort the update
+      return;
+    }
+
     // because we changed response match values, we must update choice refs
     const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
@@ -215,7 +222,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     const response = new contentTypes.Response({
       score: '0',
-      match: '',
+      // copy the response matches from the last existing response as default
+      match: partModel.responses.filter(autogenResponseFilter).last().match,
       feedback: feedbacks.set(feedback.guid, feedback),
     });
 

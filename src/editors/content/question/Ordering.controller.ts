@@ -1,9 +1,6 @@
 import { connect } from 'react-redux';
-import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Skill } from 'types/course';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
+import { QuestionProps } from './Question';
 import { Ordering } from './Ordering';
 import { CombinationsMap } from 'types/combinations';
 import { computeCombinations } from 'actions/choices';
@@ -16,24 +13,8 @@ interface DispatchProps {
   onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
 }
 
-interface OwnProps {
-  onBodyEdit: (...args: any[]) => any;
-  body: any;
-  grading: any;
-  onGradingChange: (value) => void;
-  hideGradingCriteria: boolean;
-  allSkills: Immutable.OrderedMap<string, Skill>;
-  model: contentTypes.Question;
-  onRemoveQuestion: () => void;
-  itemModel: contentTypes.Ordering;
-  partModel: contentTypes.Part;
-  onEdit: (item: contentTypes.Ordering, part: contentTypes.Part) => void;
-  context: AppContext;
-  services: AppServices;
-  editMode: boolean;
-  onFocus: (itemId: string) => void;
-  onBlur: (itemId: string) => void;
-  onRemove: (item: contentTypes.Ordering, part: contentTypes.Part) => void;
+interface OwnProps extends QuestionProps<contentTypes.Ordering> {
+
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

@@ -110,6 +110,7 @@ export class PoolEditor
              {...this.props}
              model={question}
              onEdit={this.onEditQuestion}
+             canRemove={true}
              onRemove={this.onRemoveQuestion}
            />;
   }

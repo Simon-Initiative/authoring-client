@@ -99,7 +99,7 @@ export abstract class AbstractEditor<ModelType,
 
   }
 
-  handleEdit(model: ModelType) {
+  handleEdit(model: ModelType, callback?: () => void) {
     this.undoStack = this.undoStack.push(model);
     this.redoStack = Immutable.Stack<ModelType>();
 
@@ -108,7 +108,10 @@ export abstract class AbstractEditor<ModelType,
         undoStackSize: this.undoStack.size - 1,
         redoStackSize: this.redoStack.size,
       },
-      () => this.props.onEdit(model),
+      () => {
+        this.props.onEdit(model);
+        callback && callback();
+      },
     );
   }
 

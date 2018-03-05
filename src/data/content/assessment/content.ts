@@ -17,12 +17,12 @@ const defaultContent = {
 };
 
 export class Content extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Content';
   availability: string;
   body: Html;
   guid: string;
-  
+
   constructor(params?: ContentParams) {
     super(augment(params));
   }
@@ -37,11 +37,11 @@ export class Content extends Immutable.Record(defaultContent) {
 
     let model = new Content({ guid });
     model = model.with({ body: Html.fromPersistence(content, '') });
-    
-    if (content['@availability'] !== undefined) {
-      model = model.with({ availability: content['@availability'] });
+
+    if (content['@available'] !== undefined) {
+      model = model.with({ availability: content['@available'] });
     }
-    
+
     return model;
   }
 
@@ -50,7 +50,7 @@ export class Content extends Immutable.Record(defaultContent) {
     const body = this.body.toPersistence();
     const content = { content: (body as any) };
 
-    content.content['@availability'] = this.availability;
+    content.content['@available'] = this.availability;
 
     return content;
   }

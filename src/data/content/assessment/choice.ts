@@ -88,6 +88,10 @@ export class Choice extends Immutable.Record(defaultContent) {
 
     const root = { choice: simplifiedBody };
 
+    if (root.choice['#text'] === '') {
+      root.choice['#text'] = 'Placeholder';
+    }
+
     root.choice['@value'] = this.value;
     root.choice['@color'] = this.color;
 
