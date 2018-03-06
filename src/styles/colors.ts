@@ -33,4 +33,6 @@ export default {
   selection: flatui.peterRiver,
   get hover() { return chroma(this.selection).darken().hex(); },
   get active() { return chroma(this.selection).darken(2).hex(); },
+
+  contentSelection: '#eca037',
 };

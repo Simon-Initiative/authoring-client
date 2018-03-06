@@ -10,7 +10,7 @@ export enum ToolbarButtonSize {
   Wide = 'wide',
 }
 
-export interface ToolbarButtonProps {
+export interface ToolbarButtonProps extends JSSProps {
   className?: string;
   size?: ToolbarButtonSize;
   onClick: () => void;
@@ -20,7 +20,7 @@ export interface ToolbarButtonProps {
 }
 
 @injectSheet(styles)
-export class ToolbarButton extends React.Component<ToolbarButtonProps & JSSProps, {}> {
+export class ToolbarButton extends React.Component<ToolbarButtonProps, {}> {
   constructor(props) {
     super(props);
   }
@@ -44,7 +44,8 @@ export class ToolbarButton extends React.Component<ToolbarButtonProps & JSSProps
 
     return tooltip ?
       (
-        <Tooltip title={tooltip} position="top-start" delay={1000} size="small" arrowSize="small">
+        <Tooltip title={tooltip} delay={1000}
+            size="small" arrowSize="small">
           {button}
         </Tooltip>
       )
