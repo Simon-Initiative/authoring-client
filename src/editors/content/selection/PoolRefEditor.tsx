@@ -98,7 +98,14 @@ export class PoolRefEditor
           onCancel={this.onCancel}/>);
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     let details;
     if (this.props.model.idref === '') {

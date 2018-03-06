@@ -65,7 +65,14 @@ export class XrefEditor
     this.props.onEdit(this.props.model.with({ idref }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { target } = this.props.model;
 

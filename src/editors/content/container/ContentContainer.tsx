@@ -66,7 +66,15 @@ export class ContentContainer
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const editors = this.props.model.content
       .toArray()

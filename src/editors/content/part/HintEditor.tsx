@@ -56,7 +56,14 @@ export class HintEditor
       this.props.onEdit(this.props.model.with({ targets })));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="itemWrapper">

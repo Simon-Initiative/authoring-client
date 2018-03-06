@@ -83,7 +83,14 @@ export class TrackEditor
     (window as any).$('#' + id).trigger('click');
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { src, kind, label, srclang } = this.props.model;
     let srcDisplay;

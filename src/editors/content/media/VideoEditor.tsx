@@ -233,7 +233,14 @@ export class VideoEditor
   }
 
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="itemWrapper">

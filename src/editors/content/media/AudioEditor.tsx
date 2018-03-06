@@ -184,7 +184,14 @@ export class AudioEditor
   }
 
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="itemWrapper">

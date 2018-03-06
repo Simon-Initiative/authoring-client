@@ -11,7 +11,15 @@ export interface UnsupportedEditorProps
 export class UnsupportedEditor
   extends AbstractContentEditor<contentTypes.Unsupported, UnsupportedEditorProps, {}> {
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     return <div className="unsupported-editor">{JSON.stringify(this.props.model.data)}</div>;
   }
 

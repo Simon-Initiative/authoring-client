@@ -4,6 +4,7 @@ import PreformattedText from './PreformattedText';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 import { Checkbox, Select, TextInput } from '../common/controls';
+import { Label, VerticalSpacer } from '../common/Sidebar';
 
 import './markers.scss';
 
@@ -64,56 +65,59 @@ export class CodeBlock
     this.props.onEdit(model, model);
   }
 
-  render() : JSX.Element {
-
+  renderSidebar() {
     const syntax = this.props.model.syntax;
 
     return (
       <div>
-        <form className="form-inline">
-          <Select editMode={this.props.editMode}
-            label="Syntax" value={syntax} onChange={this.onSyntaxChange}>
-            <option value="actionscript3">ActionScript</option>
-            <option value="bash">Bash</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="html">HTML</option>
-            <option value="java">Java</option>
-            <option value="python">Python</option>
-            <option value="text">Text</option>
-            <option value="xml">XML</option>
-          </Select>
-          <Checkbox
-            editMode={this.props.editMode}
-            label="Show line numbers"
-            value={this.props.model.number}
-            onEdit={this.onNumberEdit}
-          />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          Start number
-          &nbsp;
-          <TextInput
-            editMode={this.props.editMode}
-            width="50"
-            type="number"
-            label=""
-            value={this.props.model.start}
-            onEdit={this.onStartEdit}
-          />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          Highlight
-          &nbsp;
-          <TextInput
-            editMode={this.props.editMode}
-            width="70"
-            type="text"
-            label=""
-            value={this.props.model.highlight}
-            onEdit={this.onHighlightEdit}
-          />
-        </form>
-        <PreformattedText onEdit={this.onSourceEdit}
-          src={this.props.model.source} editMode={this.props.editMode} />
+        <Label>Language / Syntax</Label>
+        <Select editMode={this.props.editMode}
+          value={syntax} onChange={this.onSyntaxChange}>
+          <option value="actionscript3">ActionScript</option>
+          <option value="bash">Bash</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="html">HTML</option>
+          <option value="java">Java</option>
+          <option value="python">Python</option>
+          <option value="text">Text</option>
+          <option value="xml">XML</option>
+        </Select>
+        <Checkbox
+          editMode={this.props.editMode}
+          label="Show line numbers"
+          value={this.props.model.number}
+          onEdit={this.onNumberEdit}
+        />
+        <Label>First line number</Label>
+        <TextInput
+          editMode={this.props.editMode}
+          width="100%"
+          type="number"
+          label=""
+          value={this.props.model.start}
+          onEdit={this.onStartEdit}
+        />
+        <Label>Highlighting</Label>
+        <TextInput
+          editMode={this.props.editMode}
+          width="100%"
+          type="text"
+          label=""
+          value={this.props.model.highlight}
+          onEdit={this.onHighlightEdit}
+        />
       </div>);
+  }
+
+  renderToolbar() {
+    return <span>Code block</span>;
+  }
+
+  renderMain() : JSX.Element {
+    return (
+      <PreformattedText onEdit={this.onSourceEdit}
+        src={this.props.model.source} editMode={this.props.editMode} />
+    );
   }
 }

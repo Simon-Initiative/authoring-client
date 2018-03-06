@@ -29,7 +29,14 @@ export class TitleContentEditor
 
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     return <ContentContainer
       {...this.props}
       model={this.props.model.text}

@@ -70,8 +70,8 @@ export class ShortAnswer
   }
 
   renderDetails() {
-    const { 
-      partModel, 
+    const {
+      partModel,
       editMode,
     } = this.props;
 

@@ -28,7 +28,14 @@ export class ExplanationEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     const bodyStyle = {
       minHeight: '20px',
       borderStyle: 'none',
