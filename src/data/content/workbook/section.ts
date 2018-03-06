@@ -5,7 +5,7 @@ import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 
-import { ContentElements } from 'data/content/common/elements';
+import { ContentElements, BODY_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
@@ -72,7 +72,7 @@ export class Section extends Immutable.Record(defaultContent) {
           break;
         case 'body':
           model = model.with({ body: ContentElements
-            .fromPersistence(item['body'], id, WB_BODY_EXTENSIONS) });
+            .fromPersistence(item['body'], id, [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS]) });
           break;
         default:
       }
