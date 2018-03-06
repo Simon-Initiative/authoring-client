@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps, classNames } from 'styles/jss';
+import { injectSheet, injectSheetSFC, JSSProps, classNames } from 'styles/jss';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
@@ -9,16 +9,15 @@ import colors from 'styles/colors';
 
 import styles from './ContextAwareToolbar.style';
 
-interface ToolbarGroupProps extends JSSProps {
+interface ToolbarGroupProps {
   className?: string;
-  children: any;
   label: string;
   highlightColor?: string;
   hide?: boolean;
 }
 
-export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps> = injectSheet(styles)
-  (({ className, classes, label, hide, children }: ToolbarGroupProps) => {
+export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
+  (({ className, classes, label, hide, children }) => {
     return (
       <div className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
         <div className={classNames([classes.toolbarGroup, className])}>
@@ -29,12 +28,11 @@ export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps> = injectS
     );
   });
 
-interface ToolbarLayoutInlineProps extends JSSProps {
+interface ToolbarLayoutInlineProps {
   className?: string;
 }
 
-export const ToolbarLayoutInline: React.StatelessComponent<ToolbarLayoutInlineProps> =
-  injectSheet(styles)
+export const ToolbarLayoutInline = injectSheetSFC<ToolbarLayoutInlineProps>(styles)
   (({ className, classes, children }) => {
     return (
       <div className={`${classes.toolbarLayoutInline} ${className}`}>
@@ -43,12 +41,11 @@ export const ToolbarLayoutInline: React.StatelessComponent<ToolbarLayoutInlinePr
     );
   });
 
-interface ToolbarLayoutGridProps extends JSSProps {
+interface ToolbarLayoutGridProps {
   className?: string;
 }
 
-export const ToolbarLayoutGrid: React.StatelessComponent<ToolbarLayoutGridProps> =
-  injectSheet(styles)
+export const ToolbarLayoutGrid = injectSheetSFC<ToolbarLayoutGridProps>(styles)
   (({ className, classes, children }) => {
     return (
       <div className={`${classes.toolbarLayoutGrid} ${className}`}>
@@ -57,7 +54,7 @@ export const ToolbarLayoutGrid: React.StatelessComponent<ToolbarLayoutGridProps>
     );
   });
 
-export interface ToolbarProps extends JSSProps {
+export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   insert: (content: Object) => void;
@@ -65,8 +62,8 @@ export interface ToolbarProps extends JSSProps {
   hideLabels?: boolean;
 }
 
-@injectSheet(styles)
-export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
+@injectSheet<ToolbarProps>(styles)
+export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSProps> {
 
   constructor(props) {
     super(props);

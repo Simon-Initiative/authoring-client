@@ -1,4 +1,4 @@
-export { default as injectSheet } from 'react-jss';
+import injectSheetJSS from 'react-jss';
 
 export interface JSSProps {
   classes?: any;
@@ -11,3 +11,14 @@ export const classNames = (names: string | string[]) => {
 
   return names.filter(n => n).join(' ');
 };
+
+export const injectSheet = injectSheetJSS;
+
+export function injectSheetSFC<P>(style: any):
+    (component:
+      (props: P & React.Attributes & React.ClassAttributes<P> & JSSProps
+        & Readonly<{ children?: React.ReactNode }>)
+       => JSX.Element)
+    => React.StatelessComponent<P> {
+  return injectSheetJSS(style);
+}

@@ -10,7 +10,7 @@ export enum ToolbarButtonSize {
   Wide = 'wide',
 }
 
-export interface ToolbarButtonProps extends JSSProps {
+export interface ToolbarButtonProps {
   className?: string;
   size?: ToolbarButtonSize;
   onClick: () => void;
@@ -20,7 +20,7 @@ export interface ToolbarButtonProps extends JSSProps {
 }
 
 @injectSheet(styles)
-export class ToolbarButton extends React.Component<ToolbarButtonProps, {}> {
+export class ToolbarButton extends React.PureComponent<ToolbarButtonProps & JSSProps> {
   constructor(props) {
     super(props);
   }
