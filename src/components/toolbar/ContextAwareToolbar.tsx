@@ -5,19 +5,19 @@ import { injectSheet, JSSProps, classNames } from 'styles/jss';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
-import distinctColors from 'styles/palettes/distinct';
+import colors from 'styles/colors';
 
 import styles from './ContextAwareToolbar.style';
 
 interface ToolbarGroupProps extends JSSProps {
-  className: string;
+  className?: string;
   children: any;
   label: string;
   highlightColor?: string;
   hide?: boolean;
 }
 
-export const ToolbarGroup = injectSheet(styles)
+export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps> = injectSheet(styles)
   (({ className, classes, label, hide, children }: ToolbarGroupProps) => {
     return (
       <div className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
@@ -29,7 +29,12 @@ export const ToolbarGroup = injectSheet(styles)
     );
   });
 
-export const ToolbarLayoutInline = injectSheet(styles)
+interface ToolbarLayoutInlineProps extends JSSProps {
+  className?: string;
+}
+
+export const ToolbarLayoutInline: React.StatelessComponent<ToolbarLayoutInlineProps> =
+  injectSheet(styles)
   (({ className, classes, children }) => {
     return (
       <div className={`${classes.toolbarLayoutInline} ${className}`}>
@@ -38,7 +43,12 @@ export const ToolbarLayoutInline = injectSheet(styles)
     );
   });
 
-export const ToolbarLayoutGrid = injectSheet(styles)
+interface ToolbarLayoutGridProps extends JSSProps {
+  className?: string;
+}
+
+export const ToolbarLayoutGrid: React.StatelessComponent<ToolbarLayoutGridProps> =
+  injectSheet(styles)
   (({ className, classes, children }) => {
     return (
       <div className={`${classes.toolbarLayoutGrid} ${className}`}>
@@ -47,7 +57,7 @@ export const ToolbarLayoutGrid = injectSheet(styles)
     );
   });
 
-export interface ToolbarProps {
+export interface ToolbarProps extends JSSProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   insert: (content: Object) => void;
@@ -56,7 +66,7 @@ export interface ToolbarProps {
 }
 
 @injectSheet(styles)
-export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSProps, {}> {
+export class ContextAwareToolbar extends React.PureComponent<ToolbarProps, {}> {
 
   constructor(props) {
     super(props);
@@ -267,7 +277,7 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarContextGroup} label="Text Block"
-            highlightColor={distinctColors.distinctGreen} hide={!isText}>
+            highlightColor={colors.contentSelection} hide={!isText}>
           <ToolbarLayoutInline>
             <ToolbarButton
                 onClick={
