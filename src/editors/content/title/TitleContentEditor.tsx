@@ -5,6 +5,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import {
   getCaretPosition, getSelectionRange, setCaretPosition,
 } from '../../content/common/draft/utils';
+import './TitleContentEditor.scss';
 
 const BACKSPACE = 8;
 
@@ -101,6 +102,7 @@ export class TitleContentEditor
 
     return (
       <h2
+        className="titleContentEditor"
         style={this.props.styles}
         ref="text"
         onInput={this.onChange}

@@ -67,7 +67,6 @@ class ResourceSelection
     return this.state.resources.map((r) => {
       const active = r.id === this.state.selected.id ? 'table-active' : '';
       return <tr key={r.id} className={active}>
-        <td>{r.type}</td>
         <td>{link(r)}</td>
       </tr>;
     });
@@ -83,7 +82,6 @@ class ResourceSelection
         <table className="table table-hover table-sm">
           <thead>
               <tr>
-                  <th>Type</th>
                   <th>Title</th>
               </tr>
           </thead>
