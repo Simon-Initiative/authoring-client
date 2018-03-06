@@ -7,18 +7,18 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 
-import './ConceptsEditor.scss';
+import './SkillsEditor.scss';
 
-export interface ConceptsEditorProps extends AbstractContentEditorProps<Immutable.List<string>> {
+export interface SkillsEditorProps extends AbstractContentEditorProps<Immutable.Set<string>> {
 
 }
 
-export interface ConceptstEditorState {
+export interface SkillsEditorState {
   selected: any;
 }
 
 function toSkillArray(
-  ids: Immutable.List<string>,
+  ids: Immutable.Set<string>,
   allSkills: Immutable.OrderedMap<string, contentTypes.Skill>) : Skill[] {
 
   return ids
@@ -27,12 +27,12 @@ function toSkillArray(
 }
 
 /**
- * Concepts editor
+ * Skills editor
  */
-export default class ConceptsEditor
-  extends AbstractContentEditor<Immutable.List<string>, ConceptsEditorProps, ConceptstEditorState> {
+export default class SkillsEditor
+  extends AbstractContentEditor<Immutable.Set<string>, SkillsEditorProps, SkillsEditorState> {
 
-  constructor(props: ConceptsEditorProps) {
+  constructor(props: SkillsEditorProps) {
     super(props);
 
     this.state = {
@@ -40,8 +40,9 @@ export default class ConceptsEditor
     };
   }
 
-  componentWillReceiveProps(nextProps: ConceptsEditorProps) {
-    if (nextProps.model !== this.props.model) {
+  componentWillReceiveProps(nextProps: SkillsEditorProps) {
+    if (nextProps.model !== this.props.model || 
+        this.props.context.skills !== nextProps.context.skills) {
       this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
 
@@ -73,12 +74,11 @@ export default class ConceptsEditor
       .map(s => ({ id: s.id, title: s.title }));
 
     return (
-      <div className="concepts-editor">
+      <div className="skills-editor">
         <Typeahead
           multiple
           onChange={(selected: Skill[]) => {
-
-            const model = Immutable.List(selected.map(s => s.id));
+            const model = Immutable.Set(selected.map(s => s.id));
             this.setState({ selected }, () => this.props.onEdit(model));
           }}
           options={options}
@@ -90,6 +90,4 @@ export default class ConceptsEditor
 
   }
 
-
 }
-

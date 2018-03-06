@@ -18,6 +18,7 @@ export type PartParams = {
   targets?: string;
   title?: Title;
   concepts?: Immutable.List<string>;
+  skills?: Immutable.Set<string>;
   responses?: Immutable.OrderedMap<string, Response>;
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
@@ -34,6 +35,7 @@ const defaultPartParams = {
   targets: '',
   title: new Title(),
   concepts: Immutable.List<string>(),
+  skills: Immutable.Set<string>(),
   criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
@@ -51,6 +53,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   targets: string;
   title: Title;
   concepts: Immutable.List<string>;
+  skills: Immutable.Set<string>;
   criteria: Immutable.OrderedMap<string, GradingCriteria>;
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
@@ -91,17 +94,16 @@ export class Part extends Immutable.Record(defaultPartParams) {
       const id = createGuid();
 
       switch (key) {
+        case 'cmd:concept':
+          model = model.with({ concepts: model.concepts.push((item as any)
+            ['cmd:concept']['#text']) });
+          break;
         case 'grading_criteria':
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
-
-        case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
-          break;
-        case 'cmd:concept':
-          model = model.with({ concepts: model.concepts.push((item as any)
-            ['cmd:concept']['#text']) });
+        case 'hint':
+          model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
           break;
         case 'response':
           model = model.with(
@@ -111,12 +113,15 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with(
             { responseMult: model.responseMult.set(id, ResponseMult.fromPersistence(item, id)) });
           break;
-        case 'hint':
-          model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
+        case 'skillref':
+          model = model.with({ skills: model.skills.add((item as any)
+            ['skillref']['@idref']) });
           break;
         case 'explanation':
           model = model.with({ explanation:
             ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
+        case 'title':
+          model = model.with({ title: Title.fromPersistence(item, id) });
           break;
         default:
 
@@ -134,19 +139,23 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
       this.title.toPersistence(),
 
+      ...this.skills
+        .toArray()
+        .map(skill => ({ skillref: { '@idref': skill } })),
+
       ...this.concepts
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
+
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
 
       ...this.responses
         // filter out responses with empty matches
         .filter(r => r.match !== '')
         .toArray()
         .map(response => response.toPersistence()),
-
-      ...this.criteria
-        .toArray()
-        .map(item => item.toPersistence()),
 
       ...this.responseMult
         .toArray()

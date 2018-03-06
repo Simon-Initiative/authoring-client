@@ -9,7 +9,7 @@ import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Hints } from '../part/Hints';
-import ConceptsEditor from '../concepts/ConceptsEditor';
+import SkillsEditor from '../skills/SkillsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
@@ -86,7 +86,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onSkillsEdit = this.onSkillsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
   }
 
@@ -115,10 +115,10 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
   }
 
-  onConceptsEdit(concepts, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onSkillsEdit(skills, item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ concepts }));
+    onEdit(item, part.with({ skills }));
   }
 
   onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part) {
@@ -226,13 +226,13 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         <TabSection className="skills">
           <TabSectionHeader title="Attached Skills"/>
           <TabSectionContent>
-            <ConceptsEditor
-              onFocus={() => this.props.onItemFocus(part.concepts, this)}
+            <SkillsEditor
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              model={part.concepts}
-              onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
+              onFocus={() => this.props.onItemFocus(part.concepts, this)}
+              model={part.skills}
+              onEdit={skills => this.onSkillsEdit(skills, item, part)} />
           </TabSectionContent>
         </TabSection>
       </Tab>
