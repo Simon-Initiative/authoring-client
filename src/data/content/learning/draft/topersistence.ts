@@ -158,20 +158,6 @@ function translateUnsupported(
   top(context).push(entityMap[rawBlock.entityRanges[0].key].data);
 }
 
-function translatePureInline(
-  rawBlock : common.RawContentBlock,
-  block: ContentBlock, entityMap : common.RawEntityMap, container: Object[]) {
-
-  if (rawBlock.inlineStyleRanges.length === 0
-    && rawBlock.entityRanges.length === 0) {
-    container.push({ '#text': rawBlock.text });
-  } else {
-    translateTextBlock(rawBlock, block, entityMap, container);
-
-  }
-
-}
-
 function translateParagraph(
   rawBlock : common.RawContentBlock,
   block: ContentBlock, entityMap : common.RawEntityMap, context: Stack) {

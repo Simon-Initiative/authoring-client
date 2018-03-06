@@ -125,7 +125,6 @@ const QuestionTab = (props: TabProps) => {
 };
 
 const ContentTab = (props: TabProps) => {
-  const c = props.node as Content;
   return (
     <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">

@@ -118,12 +118,7 @@ export class TableEditor
 
     const width = ((1 / totalCells) * 100) + '%';
     const verticalAlign = 'top';
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
+
     const editor = <ContentContainer
       {...this.props}
       model={cell.content}

@@ -52,17 +52,6 @@ export class RichTextEditor
 
   renderMain() : JSX.Element {
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
     const editor = <ContiguousTextEditor
             onFocus={this.props.onFocus}
             context={this.props.context}

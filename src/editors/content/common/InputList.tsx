@@ -10,13 +10,6 @@ import { DragTypes } from 'utils/drag';
 
 import './InputList.scss';
 
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
-
 export interface InputListProps {
   className?: string;
 }

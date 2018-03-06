@@ -80,13 +80,6 @@ export class ContentEditor
   }
 
   renderBody() {
-    const bodyStyle = {
-      minHeight: '30px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="content-body">
         <ContentContainer

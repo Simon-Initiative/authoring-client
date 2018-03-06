@@ -4,7 +4,7 @@ import PreformattedText from './PreformattedText';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 
 import { Checkbox, Select, TextInput } from '../common/controls';
-import { Label, VerticalSpacer } from '../common/Sidebar';
+import { Label } from '../common/Sidebar';
 
 import './markers.scss';
 

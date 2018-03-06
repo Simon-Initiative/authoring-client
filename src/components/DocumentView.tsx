@@ -22,7 +22,7 @@ export default class DocumentView
   }
 
   componentDidMount() {
-    const { onRelease, onLoad, documentId } = this.props;
+    const { onLoad, documentId } = this.props;
     onLoad(documentId);
   }
 
