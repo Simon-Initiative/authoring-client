@@ -1,11 +1,14 @@
-import { AbstractCommand } from '../command';
-import * as models from '../../../../../data/models';
-import * as t from '../../../../../data/contentTypes';
-import { LegacyTypes } from '../../../../../data/types';
-import * as persistence from '../../../../../data/persistence';
-import ResourceSelection from '../../../../../utils/selection/ResourceSelection';
-import createGuid from '../../../../../utils/guid';
+import * as Immutable from 'immutable';
 
+import { AbstractCommand } from '../command';
+import * as models from 'data/models';
+import * as t from 'data/contentTypes';
+import { LegacyTypes } from 'data/types';
+import * as persistence from 'data/persistence';
+import ResourceSelection from 'utils/selection/ResourceSelection';
+import createGuid from 'utils/guid';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
 import { insertNode } from '../../utils';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
@@ -35,18 +38,37 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
   execute(
     org: models.OrganizationModel, 
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
-    context, services) : Promise<models.OrganizationModel> {
+    context: AppContext, 
+    services: AppServices) : Promise<models.OrganizationModel> {
 
-    const predicate = (res: persistence.CourseResource) : boolean => 
-      res.type === LegacyTypes.workbook_page;
+    if (parent.contentType === 'Unit' || 
+      parent.contentType === 'Section' || 
+      parent.contentType === 'Module') {
+      
+      type children = t.Module | t.Section | t.Item;
+      const resourcesAlreadyInOrg: Immutable.Set<String> = Immutable.Set<String>(
+        (parent.children.toArray() as children[])
+          .filter(child => child.contentType === 'Item')
+          .map(child => context
+                          .courseModel
+                          .resourcesById
+                          .get((child as t.Item).resourceref.idref)
+                          .guid));
+
+      const predicate = (res: persistence.CourseResource) : boolean => 
+        res.type === LegacyTypes.workbook_page &&
+        !resourcesAlreadyInOrg.has(res._id);
+
+      return new Promise((resolve, reject) => {
+        services.displayModal(
+          <ResourceSelection
+            filterPredicate={predicate}
+            courseId={context.courseId}
+            onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)} 
+            onCancel={this.onCancel.bind(this, services)}/>);
+      });
+    }
     
-    return new Promise((resolve, reject) => {
-      services.displayModal(
-        <ResourceSelection
-          filterPredicate={predicate}
-          courseId={context.courseId}
-          onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)} 
-          onCancel={this.onCancel.bind(this, services)}/>);
-    });
+    return Promise.resolve(org);
   }
 }
