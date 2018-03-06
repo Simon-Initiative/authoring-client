@@ -10,7 +10,7 @@ const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe'];
 const ELEMENTS_BLOCK = ['table', 'codeblock'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
-const ELEMENTS_SEMANTIC = ['popout', 'example', 'definition'];
+const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition'];
 
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'cite', 'term', 'var', 'link', 'activity_link', 'xref', 'input_ref'];

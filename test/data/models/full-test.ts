@@ -34,7 +34,7 @@ it('Single, top-level section', () => {
     expect(pullout.content.content.toArray().length).toBe(1);
     expect(pullout.content.content.first() instanceof ContiguousText).toBe(true);
   } else {
-    fail('Should have been a pullout element');
+    fail('Should have been a pullout element, was: ' + p.contentType);
   }
 
 
