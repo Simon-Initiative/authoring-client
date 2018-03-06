@@ -46,16 +46,14 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
       parent.contentType === 'Module') {
       
       type children = t.Module | t.Section | t.Item;
-      const resourcesAlreadyInOrg: Immutable.Set<String> = (parent.children.toArray() as children[])
+      const resourcesAlreadyInOrg: Immutable.Set<String> = Immutable.Set<String>(
+        (parent.children.toArray() as children[])
         .filter(child => child.contentType === 'Item')
-        .reduce((set, child) => set.add(context
-                                          .courseModel
-                                          .resourcesById
-                                          .get((child as t.Item)
-                                                .resourceref
-                                                .idref)
-                                          .guid),
-                Immutable.Set<String>());
+        .map(child => context
+                        .courseModel
+                        .resourcesById
+                        .get((child as t.Item).resourceref.idref)
+                        .guid));
 
       const predicate = (res: persistence.CourseResource) : boolean => 
         res.type === LegacyTypes.workbook_page &&
