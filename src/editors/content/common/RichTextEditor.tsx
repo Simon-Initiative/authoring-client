@@ -56,6 +56,7 @@ export class RichTextEditor
     };
 
     const editor = <ContiguousTextEditor
+            onFocus={this.props.onFocus}
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}

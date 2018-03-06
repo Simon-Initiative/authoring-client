@@ -43,6 +43,7 @@ export interface InputListItemProps {
   options?: any;
   controls?: any;
   editMode: boolean;
+  onFocus: (child, parent) => void;
   onEdit: (body: ContentElements) => void;
   onRemove?: (id: string) => void;
 
@@ -145,6 +146,7 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
                 : (null)
               }
               <ContentContainer
+                onFocus={this.props.onFocus}
                 context={context}
                 services={services}
                 editMode={editMode}

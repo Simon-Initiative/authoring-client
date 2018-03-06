@@ -109,6 +109,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   renderObjectives() {
     return <Objectives
       parent={null}
+      onFocus={this.onFocus.bind(this, this.props.model.head.objrefs, this)}
       {...this.props}
       model={this.props.model.head.objrefs}
       onEdit={this.onObjectivesEdit}
@@ -158,6 +159,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div key="details-tab">
         <Details
+          onFocus={this.onFocus.bind(this, this.props.model, this)}
           {...this.props}
           model={this.props.model}
           editMode={this.props.editMode}

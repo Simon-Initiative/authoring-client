@@ -212,6 +212,7 @@ export class QuestionEditor
       const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -240,6 +241,7 @@ export class QuestionEditor
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
         <MultipleChoice
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -264,6 +266,7 @@ export class QuestionEditor
     if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
         <CheckAllThatApply
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -288,6 +291,7 @@ export class QuestionEditor
     if (item.contentType === 'ShortAnswer') {
       return (
         <ShortAnswer
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -312,6 +316,7 @@ export class QuestionEditor
     if (item.contentType === 'Ordering') {
       return (
         <Ordering
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -336,6 +341,7 @@ export class QuestionEditor
     if (item.contentType === 'Essay') {
       return (
         <Essay
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}

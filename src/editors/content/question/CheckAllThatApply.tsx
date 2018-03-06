@@ -349,6 +349,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       .map((choice, index) => {
         return (
           <Choice
+            onFocus={this.props.onFocus}
             key={choice.guid}
             index={index}
             choice={choice}

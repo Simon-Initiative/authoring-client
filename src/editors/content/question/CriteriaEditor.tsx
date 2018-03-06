@@ -78,6 +78,7 @@ export class CriteriaEditor
         {controls}
 
         <ContentContainer
+          onFocus={this.props.onFocus}
           services={this.props.services}
           context={this.props.context}
           editMode={this.props.editMode}

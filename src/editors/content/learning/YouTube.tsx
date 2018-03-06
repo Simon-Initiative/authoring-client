@@ -51,6 +51,7 @@ class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
         }
       }>
         <YouTubeEditor
+          onFocus={null}
           model={this.props.data.youtube}
           context={b.context}
           services={b.services}

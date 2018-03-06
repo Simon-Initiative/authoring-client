@@ -44,6 +44,7 @@ class ActivityLink extends React.PureComponent<any, any> {
         }
       }>
         <ActivityLinkEditor
+          onFocus={null}
           model={data.activity_link}
           context={this.props.context}
           services={this.props.services}

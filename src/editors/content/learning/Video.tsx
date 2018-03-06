@@ -52,6 +52,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         }
       }>
         <VideoEditor
+          onFocus={null}
           model={this.props.data.video}
           context={b.context}
           services={b.services}

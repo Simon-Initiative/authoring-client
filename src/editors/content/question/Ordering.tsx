@@ -153,6 +153,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       .map((choice, index) => {
         return (
           <Choice
+            onFocus={this.props.onFocus}
             key={choice.guid}
             index={index}
             choice={choice}

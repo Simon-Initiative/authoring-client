@@ -12,6 +12,7 @@ export interface Details {
 export interface DetailsProps {
   model: models.WorkbookPageModel;
   editMode: boolean;
+  onFocus: (child, parent) => void;
   onEdit: (model: models.WorkbookPageModel) => void;
   context: AppContext;
   services: AppServices;

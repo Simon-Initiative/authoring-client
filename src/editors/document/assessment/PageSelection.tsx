@@ -11,6 +11,7 @@ export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;
   onEdit: (page: contentTypes.Page) => void;
   onRemove: (page: contentTypes.Page) => void;
+  onFocus: (child, parent) => void;
   editMode: boolean;
   pages: Immutable.OrderedMap<string, contentTypes.Page>;
   current: contentTypes.Page;
@@ -64,6 +65,7 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
           <ContentContainer
             {...this.props}
             parent={null}
+            onFocus={this.props.onFocus}
             model={page.title.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit.bind(this, page)}

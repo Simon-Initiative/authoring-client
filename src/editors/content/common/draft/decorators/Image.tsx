@@ -43,6 +43,7 @@ class Image extends React.PureComponent<any, any> {
         }
       }>
         <ImageEditor
+          onFocus={null}
           parent={null}
           model={data.image}
           context={b.context}

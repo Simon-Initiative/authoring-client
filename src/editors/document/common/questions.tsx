@@ -24,9 +24,12 @@ export type EditHandler = (guid: string, node: contentTypes.Node) => void;
 
 export type RemoveHandler = (guid: string) => void;
 
+export type FocusHandler = (child: Object, parent: any) => void;
+
 export function renderAssessmentNode(
   n : models.Node, props: Props, onEdit: EditHandler,
-  onRemove: RemoveHandler, canRemove: boolean, parent: ParentContainer) {
+  onRemove: RemoveHandler, onFocus: FocusHandler,
+  canRemove: boolean, parent: ParentContainer) {
 
   const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
 
@@ -34,6 +37,7 @@ export function renderAssessmentNode(
     return <QuestionEditor
             key={n.guid}
             parent={parent}
+            onFocus={onFocus}
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}
@@ -50,6 +54,7 @@ export function renderAssessmentNode(
     return <ContentEditor
             parent={parent}
             key={n.guid}
+            onFocus={onFocus}
             editMode={props.editMode}
             services={props.services}
             context={props.context}
@@ -62,6 +67,7 @@ export function renderAssessmentNode(
     return <SelectionEditor
             parent={parent}
             key={n.guid}
+            onFocus={onFocus}
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}

@@ -109,6 +109,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
         </div>
         <ContentContainer
+          onFocus={this.props.onFocus}
           editMode={editMode}
           services={services}
           context={context}

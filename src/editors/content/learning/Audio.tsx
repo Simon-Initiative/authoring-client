@@ -52,6 +52,7 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
         }
       }>
         <AudioEditor
+          onFocus={null}
           model={this.props.data.audio}
           context={b.context}
           services={b.services}

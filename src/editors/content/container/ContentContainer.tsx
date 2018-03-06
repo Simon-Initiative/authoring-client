@@ -67,7 +67,6 @@ export class ContentContainer
   }
 
   render() : JSX.Element {
-    console.log('render container: ' + this.props.activeContentGuid);
 
     const editors = this.props.model.content
       .toArray()

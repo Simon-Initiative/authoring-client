@@ -189,6 +189,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderTitle() {
     return <TitleContentEditor
             parent={null}
+            onFocus={this.onFocus.bind(this, this.props.model.title, this)}
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
@@ -335,6 +336,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           <PageSelection
             {...this.props}
+            onFocus={() => this.onFocus.call(this, this.getCurrentPage(this.props), this)}
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}
@@ -387,6 +389,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
   onEdit(content: Object) {
+
+  }
+
+  onFocus(child, parent) {
 
   }
 
@@ -445,7 +451,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             <div className="nodeContainer">
               {renderAssessmentNode(
                 this.state.currentNode, rendererProps, this.onEdit,
-                this.onNodeRemove, this.canRemoveNode(), this)}
+                this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
             </div>
           </div>
         </div>

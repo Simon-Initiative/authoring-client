@@ -45,6 +45,7 @@ class Cite extends React.PureComponent<any, any> {
       }>
         <CiteEditor
           model={data.cite}
+          onFocus={null}
           context={this.props.context}
           services={this.props.services}
           editMode={true}

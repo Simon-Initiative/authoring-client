@@ -80,6 +80,7 @@ export interface ChoiceProps  {
     selected?: boolean;
   };
   onReorderChoice?: (originalIndex: number, newIndex: number) => void;
+  onFocus: (child, parent) => void;
   onEditChoice: (choice: contentTypes.Choice) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
@@ -114,6 +115,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
       feedbackEditor =
         <ContentContainer
+          onFocus={this.props.onFocus}
           model={feedback.body}
           editMode={editMode}
           context={context}
@@ -139,6 +141,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
       <InputListItem
         className="choice"
         id={choice.guid}
+        onFocus={this.props.onFocus}
         label={convert.toAlphaNotation(index)}
         context={context}
         services={services}

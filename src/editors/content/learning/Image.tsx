@@ -58,6 +58,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
         }
       }>
         <ImageEditor
+          onFocus={null}
           model={this.props.data.image}
           context={b.context}
           services={b.services}

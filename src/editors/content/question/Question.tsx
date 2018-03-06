@@ -24,6 +24,7 @@ const REMOVE_QUESTION_DISABLED_MSG =
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
+  onItemFocus: (child, model) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -201,6 +202,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <div className="question-body" key="question">
           <ContentContainer
+            onFocus={this.props.onFocus}
             editMode={editMode}
             services={services}
             context={context}
@@ -225,6 +227,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           <TabSectionHeader title="Attached Skills"/>
           <TabSectionContent>
             <ConceptsEditor
+              onFocus={() => this.props.onItemFocus(part.concepts, this)}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -261,6 +264,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                onFocus={this.props.onItemFocus.bind(this, c, this)}
                 parent={null}
                 key={c.guid}
                 onRemove={this.onCriteriaRemove}
@@ -292,6 +296,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           </TabSectionHeader>
           <TabSectionContent>
             <Hints
+              onFocus={this.props.onFocus}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}

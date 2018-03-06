@@ -7,7 +7,7 @@ import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
 
 interface ModalTableEditor {
-  
+
 }
 
 export interface ModalTableEditorProps {
@@ -42,19 +42,20 @@ class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalT
   render() {
 
     return (
-      <ModalSelection title="Edit Table" 
+      <ModalSelection title="Edit Table"
         okLabel="Done" cancelLabel="Cancel"
-        onCancel={this.props.onCancel} 
+        onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.model)}>
-        
+
         <TableEditor
+          onFocus={null}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           model={this.state.model}
           onEdit={this.onEdit}
         />
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
 

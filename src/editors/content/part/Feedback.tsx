@@ -106,6 +106,7 @@ export abstract class Feedback
 
         return (
           <InputListItem
+            onFocus={this.props.onFocus}
             key={response.guid}
             className="response"
             id={response.guid}
