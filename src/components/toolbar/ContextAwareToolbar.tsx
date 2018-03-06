@@ -198,37 +198,67 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
               <i className={'fa fa-bold'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Italic));
+                  })
+                }
                 tooltip="Italic"
                 disabled={!isText}>
               <i className={'fa fa-italic'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Strikethrough));
+                  })
+                }
                 tooltip="Strikethrough"
                 disabled={!isText}>
               <i className={'fa fa-strikethrough'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Highlight));
+                  })
+                }
                 tooltip="Highlight"
                 disabled={!isText}>
               <i className={'fa fa-pencil'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Superscript));
+                  })
+                }
                 tooltip="Superscript"
                 disabled={!isText}>
               <i className={'fa fa-superscript'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Subscript));
+                  })
+                }
                 tooltip="Subscript"
                 disabled={!isText}>
               <i className={'fa fa-subscript'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Code));
+                  })
+                }
                 tooltip="Code"
                 disabled={!isText}>
               <i className={'fa fa-code'}/>
@@ -240,12 +270,22 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
             highlightColor={distinctColors.distinctGreen} hide={!isText}>
           <ToolbarLayoutInline>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Term));
+                  })
+                }
                 tooltip="Term">
               <i className={'fa fa-book'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.toggleStyle(InlineStyles.Foreign));
+                  })
+                }
                 tooltip="Foreign">
               <i className={'fa fa-globe'}/>
             </ToolbarButton>
@@ -283,12 +323,6 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
                 onClick={() => console.log('NOT IMPLEMENTED')}
                 tooltip="Unordered List">
               <i className={'fa fa-list-ul'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Unordered List"
-                size={ToolbarButtonSize.Wide}>
-              Hyperlink Details...
             </ToolbarButton>
           </ToolbarLayoutInline>
         </ToolbarGroup>
