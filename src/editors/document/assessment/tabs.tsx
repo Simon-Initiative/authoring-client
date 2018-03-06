@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Content, Node as AssessmentNode, Question, Selection,
+  Node as AssessmentNode, Question, Selection,
 } from 'data/contentTypes';
 import { DragHandle } from './DragHandle';
 

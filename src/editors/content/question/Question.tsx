@@ -192,13 +192,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onBodyEdit,
     } = this.props;
 
-    const bodyStyle = {
-      minHeight: '50px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="question-body" key="question">
           <ContentContainer

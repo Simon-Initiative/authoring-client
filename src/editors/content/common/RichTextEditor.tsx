@@ -2,9 +2,6 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { InputLabel } from '../common/InputLabel';
 
 export interface RichTextEditorProps

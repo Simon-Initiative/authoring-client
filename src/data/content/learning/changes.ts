@@ -19,25 +19,6 @@ export type EntityInfo = {
   entity: Entity,
 };
 
-function findEntityRangeForBlock(
-  contentBlock: ContentBlock,
-  contentState: ContentState, isMatch: (key: string) => boolean) : EntityRange[] {
-
-  const ranges = [];
-
-  contentBlock.findEntityRanges(
-    (character) => {
-      const entityKey = character.getEntity();
-      return isMatch(entityKey);
-    },
-    (start: number, end: number) => {
-      ranges.push({ start, end, contentBlock });
-    },
-  );
-
-  return ranges;
-}
-
 function getEntitiesForBlock(
   contentBlock: ContentBlock,
   contentState: ContentState, isMatch: (key: string) => boolean) : EntityInfo[] {
