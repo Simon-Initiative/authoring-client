@@ -87,23 +87,6 @@ function getInlineHandlers() {
   return inlineHandlers;
 }
 
-function activityLinkBlock(item: Object, context: ParsingContext) {
-  const blockContext = {
-    fullText: '',
-    markups : [],
-    entities : [],
-  };
-
-  processInline(item, context, blockContext);
-
-  addNewBlock(context.draft, {
-    text: blockContext.fullText,
-    inlineStyleRanges: blockContext.markups,
-    entityRanges: blockContext.entities,
-    type: 'unstyled',
-  });
-}
-
 function applyStyle(
   style: string, offset: number, length: number, item: Object,
   context: ParsingContext, workingBlock: WorkingBlock) {

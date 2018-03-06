@@ -3,12 +3,8 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import {
-  getCaretPosition, getSelectionRange, setCaretPosition,
-} from '../../content/common/draft/utils';
-import './TitleContentEditor.scss';
 
-const BACKSPACE = 8;
+import './TitleContentEditor.scss';
 
 export interface TitleContentEditorProps extends AbstractContentEditorProps<contentTypes.Title> {
   styles?: Object;

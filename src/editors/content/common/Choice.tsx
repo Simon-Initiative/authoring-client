@@ -14,13 +14,6 @@ import { Button } from 'editors/content/common/Button';
 import './Choice.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
-
 export const ChoiceList = InputList;
 
 export const updateChoiceValuesAndRefs =

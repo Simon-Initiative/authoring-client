@@ -36,13 +36,6 @@ export class ExplanationEditor
   }
 
   renderMain() : JSX.Element {
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="explanation-editor">
         <ContentContainer

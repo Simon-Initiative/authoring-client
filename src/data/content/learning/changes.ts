@@ -18,42 +18,6 @@ export type EntityInfo = {
   entityKey: string,
   entity: Entity,
 };
-function findEntityRangeByInput(inputId: string, contentState: ContentState) : EntityRange {
-
-  const matchPredicate = (key: string) => {
-    return key !== null &&
-      contentState.getEntity(key).getData()['@input'] === inputId;
-  };
-
-  const result = contentState.getBlocksAsArray()
-    .map(block => findEntityRangeForBlock(block, contentState, matchPredicate))
-    .reduce((p, c) => p.concat(c), []);
-
-  if (result.length > 0) {
-    return result[0];
-  }
-
-  return null;
-}
-
-function findEntityRangeForBlock(
-  contentBlock: ContentBlock,
-  contentState: ContentState, isMatch: (key: string) => boolean) : EntityRange[] {
-
-  const ranges = [];
-
-  contentBlock.findEntityRanges(
-    (character) => {
-      const entityKey = character.getEntity();
-      return isMatch(entityKey);
-    },
-    (start: number, end: number) => {
-      ranges.push({ start, end, contentBlock });
-    },
-  );
-
-  return ranges;
-}
 
 function getEntitiesForBlock(
   contentBlock: ContentBlock,

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Content, Node as AssessmentNode, Question, Selection,
+  Node as AssessmentNode, Question, Selection,
 } from 'data/contentTypes';
 import { DragHandle } from './DragHandle';
 
@@ -125,7 +125,6 @@ const QuestionTab = (props: TabProps) => {
 };
 
 const ContentTab = (props: TabProps) => {
-  const c = props.node as Content;
   return (
     <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">

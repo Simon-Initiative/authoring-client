@@ -23,10 +23,6 @@ import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 
-
-const SHIFT_KEY = 16;
-const ALT_KEY = 18;
-
 export interface DraftWrapperProps {
   onEdit: (text : ContiguousText) => void;
   onSelectionChange: (state: SelectionState) => void;
