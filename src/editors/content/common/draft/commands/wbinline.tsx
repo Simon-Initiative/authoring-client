@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { EntityTypes } from 'data/content/html/common';
-import { WbInline } from 'data/content/html/wbinline';
+import { EntityTypes } from 'data/content/learning/common';
+import { WbInline } from 'data/content/workbook/wbinline';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
@@ -17,7 +17,7 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
 
     const data = { wbinline: new WbInline({ idRef: assessment.resource.id }) };
 
-    const delegate = new InsertBlockEntityCommand(EntityTypes.wb_inline, 'IMMUTABLE', data);
+    const delegate = new InsertBlockEntityCommand(EntityTypes.image, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)
       .then(newState => resolve(newState))
       .catch(err => reject(err));

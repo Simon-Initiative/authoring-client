@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
-import { Html } from '../html';
-import { Title } from '../title';
+import { ContentElements } from 'data/content/common//elements';
+import { ALT_FLOW_ELEMENTS } from './types';
+import { Title } from '../learning/title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
@@ -22,7 +23,7 @@ export type PartParams = {
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
-  explanation?: Html;
+  explanation?: ContentElements;
   guid?: string;
 };
 
@@ -39,7 +40,7 @@ const defaultPartParams = {
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
-  explanation: new Html(),
+  explanation: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -57,7 +58,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
-  explanation: Html;
+  explanation: ContentElements;
   guid: string;
 
   constructor(params?: PartParams) {
@@ -97,9 +98,6 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ concepts: model.concepts.push((item as any)
             ['cmd:concept']['#text']) });
           break;
-        case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
-          break;
         case 'grading_criteria':
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
@@ -119,6 +117,9 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with({ skills: model.skills.add((item as any)
             ['skillref']['@idref']) });
           break;
+        case 'explanation':
+          model = model.with({ explanation:
+            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
         case 'title':
           model = model.with({ title: Title.fromPersistence(item, id) });
           break;
@@ -155,7 +156,7 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .filter(r => r.match !== '')
         .toArray()
         .map(response => response.toPersistence()),
-      
+
       ...this.responseMult
         .toArray()
         .map(response => response.toPersistence()),

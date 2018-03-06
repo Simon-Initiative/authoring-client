@@ -7,6 +7,7 @@ import { HintEditor } from './HintEditor';
 
 export interface HintsProps {
   model: contentTypes.Part;
+  onFocus: (child, parent) => void;
   onEdit: (hints: Immutable.Map<string, contentTypes.Hint>) => void;
   context: AppContext;
   editMode: boolean;
@@ -46,6 +47,7 @@ export abstract class Hints
     return this.props.model.hints.toArray().map((i) => {
       return (
         <HintEditor
+          onFocus={this.props.onFocus}
           key={i.guid}
           {...this.props}
           model={i}

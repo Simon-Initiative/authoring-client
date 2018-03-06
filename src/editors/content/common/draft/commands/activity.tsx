@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { EntityTypes } from 'data/content/html/common';
-import { Activity } from 'data/content/html/activity';
+import { EntityTypes } from 'data/content/learning/common';
+import { Activity } from 'data/content/workbook/activity';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
@@ -17,7 +17,7 @@ export class InsertActivityCommand extends AbstractCommand<EditorState> {
 
     const data = { activity: new Activity({ idref: assessment.resource.id }) };
 
-    const delegate = new InsertBlockEntityCommand(EntityTypes.activity, 'IMMUTABLE', data);
+    const delegate = new InsertBlockEntityCommand(EntityTypes.image, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)
       .then(newState => resolve(newState))
       .catch(err => reject(err));

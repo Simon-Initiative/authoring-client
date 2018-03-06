@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { LinkEditor } from '../../../links/LinkEditor';
 import { ImageLinkEditor } from '../../../links/ImageLinkEditor';
 
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { Image } from '../../../../../data/content/html/image';
+import { Image } from '../../../../../data/content/learning/image';
 
 class Link extends React.PureComponent<any, any> {
 
@@ -25,7 +25,9 @@ class Link extends React.PureComponent<any, any> {
     let model;
     if (data.link.content instanceof Image) {
       model = { link: data.link, image: data.link.content };
-      child = <ImageLinkEditor 
+      child = <ImageLinkEditor
+          onFocus={null}
+          parent={null}
           model={model}
           context={b.context}
           services={b.services}
@@ -33,7 +35,9 @@ class Link extends React.PureComponent<any, any> {
           onEdit={c => true}/>;
     } else {
       model = data.link;
-      child = <LinkEditor 
+      child = <LinkEditor
+          onFocus={null}
+          parent={null}
           model={model}
           context={b.context}
           services={b.services}
@@ -41,15 +45,15 @@ class Link extends React.PureComponent<any, any> {
           onEdit={c => true}/>;
     }
 
-    
-    
+
+
     this.props.services.displayModal(
       <ModalMediaEditor
         editMode={true}
         context={b.context}
         services={b.services}
         model={model}
-        onCancel={() => this.props.services.dismissModal()} 
+        onCancel={() => this.props.services.dismissModal()}
         onInsert={(model) => {
           this.props.services.dismissModal();
 
@@ -59,7 +63,7 @@ class Link extends React.PureComponent<any, any> {
           } else {
             data.link = model;
           }
-          
+
           const contentState = this.props.contentState.replaceEntityData(key, data);
 
           this.props.onEdit(contentState);
@@ -72,37 +76,37 @@ class Link extends React.PureComponent<any, any> {
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    
+
     let children;
     if (data.link.content instanceof Image) {
 
       const src = data.link.content.src;
       let fullSrc;
       if (src.startsWith('..')) {
-        fullSrc = this.props.context.baseUrl 
+        fullSrc = this.props.context.baseUrl
           + '/' + this.props.context.courseId
-          + '/' 
-          + this.props.context.resourcePath 
+          + '/'
+          + this.props.context.resourcePath
           + '/' + src;
       } else {
         fullSrc = src;
       }
 
-      children = 
-        <img 
+      children =
+        <img
           onClick={this.onClick}
           src={fullSrc}
           height={data.link.content.height}
           width={data.link.content.width}/>;
-    
+
     } else {
       children = this.props.children;
     }
-      
-    
+
+
     return (
-      <a className="editor-link" 
-        data-offset-key={this.props.offsetKey} 
+      <a className="editor-link"
+        data-offset-key={this.props.offsetKey}
         ref={a => this.a = a} onClick={this.onClick}>
         {children}
       </a>

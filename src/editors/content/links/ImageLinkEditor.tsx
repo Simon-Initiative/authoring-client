@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Link } from '../../../data/content/html/link';
-import { Image } from '../../../data/content/html/image';
+import { Link } from '../../../data/content/learning/link';
+import { Image } from '../../../data/content/learning/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkEditor } from './LinkEditor';
 import { ImageEditor } from '../media/ImageEditor';
@@ -46,7 +46,14 @@ export class ImageLinkEditor
     this.props.onEdit({ link, image: this.props.model.image });
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { link, image } = this.props.model;
 

@@ -1,15 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Cell, Row } from '../../../data/content/html/row';
-import { CellData } from '../../../data/content/html/celldata';
-import { CellHeader } from '../../../data/content/html/cellheader';
-import { Html } from '../../../data/content/html';
+import { Cell, Row } from '../../../data/content/learning/row';
+import { CellData } from '../../../data/content/learning/celldata';
+import { CellHeader } from '../../../data/content/learning/cellheader';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+
 
 export interface TableEditorProps extends AbstractContentEditorProps<contentTypes.Table> {
 
@@ -116,28 +113,15 @@ export class TableEditor
   renderCell(
     rowGuid: string,
     cell: Cell,
-    inlineToolbar: any,
-    blockToolbar: any,
-    insertionToolbar: any,
     totalCells: number,
   ) {
 
     const width = ((1 / totalCells) * 100) + '%';
     const verticalAlign = 'top';
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-    const editor = <HtmlContentEditor
-      showBorder={false}
-      editorStyles={bodyStyle}
-      inlineToolbar={inlineToolbar}
-      blockToolbar={blockToolbar}
-      inlineInsertionToolbar={insertionToolbar}
+
+    const editor = <ContentContainer
       {...this.props}
-      model={new Html({ contentState: cell.content })}
+      model={cell.content}
       onEdit={this.onCellEdit.bind(this, rowGuid, cell.guid)}
       />;
     if (cell.contentType === 'CellData') {
@@ -163,27 +147,30 @@ export class TableEditor
     return null;
   }
 
-  renderRow(row: Row, inlineToolbar: any, blockToolbar: any, insertionToolbar: any) {
+  renderRow(row: Row) {
     return (
       <tr key={row.guid}>
         {row.cells.toArray().map(
           c => this.renderCell(
-            row.guid, c, inlineToolbar,
-            blockToolbar, insertionToolbar, row.cells.size))}
+            row.guid, c, row.cells.size))}
         <td><span className="closebtn input-group-addon"
           onClick={this.onRowRemove.bind(this, row.guid)}>&times;</span> </td>
       </tr>
     );
   }
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const table = this.props.model;
     const rows = table.rows.toArray();
-
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
 
     return (
       <div className="itemWrapper">
@@ -198,7 +185,7 @@ export class TableEditor
         <table className="table table-bordered" style={ { width: '100%' } }>
           <tbody>
           {this.renderDeleteColumn()}
-          {rows.map(row => this.renderRow(row, inlineToolbar, blockToolbar, insertionToolbar))}
+          {rows.map(row => this.renderRow(row))}
           </tbody>
         </table>
       </div>);

@@ -3,10 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
 import {
@@ -19,6 +15,7 @@ import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 
 import './Question.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question. '
@@ -27,6 +24,7 @@ const REMOVE_QUESTION_DISABLED_MSG =
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
+  onItemFocus: (child, model) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -194,24 +192,13 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onBodyEdit,
     } = this.props;
 
-    const bodyStyle = {
-      minHeight: '50px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="question-body" key="question">
-          <HtmlContentEditor
-            ref={c => this.htmlEditor = c}
+          <ContentContainer
+            onFocus={this.props.onFocus}
             editMode={editMode}
             services={services}
             context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={<InlineInsertionToolbar/>}
-            blockToolbar={<BlockToolbar/>}
             model={body}
             onEdit={onBodyEdit} />
       </div>
@@ -236,6 +223,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
+              onFocus={() => this.props.onItemFocus(part.concepts, this)}
               model={part.skills}
               onEdit={skills => this.onSkillsEdit(skills, item, part)} />
           </TabSectionContent>
@@ -269,6 +257,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                onFocus={this.props.onItemFocus.bind(this, c, this)}
+                parent={null}
                 key={c.guid}
                 onRemove={this.onCriteriaRemove}
                 model={c}
@@ -299,6 +289,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           </TabSectionHeader>
           <TabSectionContent>
             <Hints
+              onFocus={this.props.onFocus}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}

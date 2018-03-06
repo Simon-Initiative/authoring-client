@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Track } from '../../../data/content/html/track';
+import { Track } from '../../../data/content/learning/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TrackEditor } from './TrackEditor';
 
@@ -58,7 +58,13 @@ export class Tracks
       />);
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+  renderMain() : JSX.Element {
 
     return (
       <div>

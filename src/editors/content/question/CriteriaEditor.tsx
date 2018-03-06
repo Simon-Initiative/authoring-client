@@ -1,11 +1,8 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { TextInput } from '../common/controls';
 import { RemovableContent } from '../common/RemovableContent';
 
@@ -56,18 +53,14 @@ export class CriteriaEditor
     return false;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '30px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
+  renderMain() : JSX.Element {
 
     const controls = (
       <form className="form-inline">
@@ -91,11 +84,8 @@ export class CriteriaEditor
 
         {controls}
 
-        <HtmlContentEditor
-          editorStyles={bodyStyle}
-          inlineToolbar={inlineToolbar}
-          inlineInsertionToolbar={insertionToolbar}
-          blockToolbar={blockToolbar}
+        <ContentContainer
+          onFocus={this.props.onFocus}
           services={this.props.services}
           context={this.props.context}
           editMode={this.props.editMode}

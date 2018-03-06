@@ -4,8 +4,7 @@
 .workbookpage-editor {
 
   .title-row {
-    display: flex;
-    flex-direction: row;
+    margin: 10px;
   }
 
   .wb-tab {
@@ -15,6 +14,8 @@
   }
 
   .html-editor-well {
+    display: flex;
+    flex-direction: row;
     padding: 12px;
   }
 

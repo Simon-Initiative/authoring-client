@@ -1,9 +1,9 @@
-import { EntityTypes } from '../data/content/html/common';
+import { EntityTypes } from '../data/content/learning/common';
 
-export type AuthoringActions = 
+export type AuthoringActions =
   toggleInlineStyleAction |
   insertAtomicBlockAction |
-  toggleBlockTypeAction | 
+  toggleBlockTypeAction |
   insertInlineEntityAction;
 
 export interface AuthoringActionsHandler {
@@ -55,7 +55,7 @@ export function insertAtomicBlock(entityType: EntityTypes, data: Object) : inser
 }
 
 export function insertInlineEntity(
-  entityType: string, mutability: string, 
+  entityType: string, mutability: string,
   data: Object) : insertInlineEntityAction {
   return {
     type: INSERT_INLINE_ENTITY,

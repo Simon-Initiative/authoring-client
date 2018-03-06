@@ -1,12 +1,13 @@
 import * as Immutable from 'immutable';
 
-import { Html } from '../html';
+import { ContentElements, FLOW_ELEMENTS } from 'data/content/common//elements';
+
 import { augment } from '../common';
 
 export type ChoiceParams = {
   value?: string,
   color?: string,
-  body?: Html,
+  body?: ContentElements,
   guid?: string,
 };
 
@@ -14,24 +15,28 @@ const defaultContent = {
   contentType: 'Choice',
   value: '',
   color: '',
-  body: new Html(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
   guid: '',
 };
 
 function simplifyBody(body: Object) : Object {
 
+  let arr = null;
   if (body['#array'] !== undefined) {
-    const arr = body['#array'];
-    if (arr.length === 1) {
-      if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
-        return { '#text': arr[0].p['#text'] };
-      }
-      if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
-        const c = arr[0].p;
-        delete c['@id'];
-        delete c['@title'];
-        return c;
-      }
+    arr = body['#array'];
+  } else if (body instanceof Array) {
+    arr = body;
+  }
+
+  if (arr !== null && arr.length === 1) {
+    if (arr[0].p !== undefined && arr[0].p['#text'] !== undefined) {
+      return { '#text': arr[0].p['#text'] };
+    }
+    if (arr[0].p !== undefined && arr[0].p['#array'] !== undefined) {
+      const c = arr[0].p;
+      delete c['@id'];
+      delete c['@title'];
+      return c;
     }
   }
 
@@ -44,7 +49,7 @@ export class Choice extends Immutable.Record(defaultContent) {
   contentType: 'Choice';
   value: string;
   color: string;
-  body: Html;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: ChoiceParams) {
@@ -64,7 +69,7 @@ export class Choice extends Immutable.Record(defaultContent) {
       choice['#text'] = choice['@value'];
     }
 
-    const body = Html.fromPersistence(choice, '');
+    const body = ContentElements.fromPersistence(choice, '', FLOW_ELEMENTS);
     model = model.with({ body });
 
     if (choice['@value'] !== undefined) {

@@ -247,6 +247,7 @@ export class MultipleChoice
       const response = responses[i];
       return (
         <Choice
+          onFocus={this.props.onFocus}
           key={choice.guid}
           index={i}
           choice={choice}

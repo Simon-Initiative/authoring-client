@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { CiteEditor } from '../../../links/CiteEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 
@@ -24,7 +24,7 @@ class Cite extends React.PureComponent<any, any> {
   onClick() {
     const key = this.props.entityKey;
     const data = this.props.contentState.getEntity(key).getData();
-    
+
     this.props.services.displayModal(
       <ModalMediaEditor
         editMode={true}
@@ -32,7 +32,7 @@ class Cite extends React.PureComponent<any, any> {
         services={this.props.services}
 
         model={data.cite}
-        onCancel={() => this.props.services.dismissModal()} 
+        onCancel={() => this.props.services.dismissModal()}
         onInsert={(cite) => {
           this.props.services.dismissModal();
           const data = {
@@ -43,8 +43,9 @@ class Cite extends React.PureComponent<any, any> {
           this.props.onEdit(contentState);
         }
       }>
-        <CiteEditor 
+        <CiteEditor
           model={data.cite}
+          onFocus={null}
           context={this.props.context}
           services={this.props.services}
           editMode={true}
@@ -58,9 +59,9 @@ class Cite extends React.PureComponent<any, any> {
     const entry = data['@entry'];
     return (
       <a
-        className="editor-link" 
-        data-offset-key={this.props.offsetKey} 
-        ref={a => this.a = a} data-toggle="tooltip" 
+        className="editor-link"
+        data-offset-key={this.props.offsetKey}
+        ref={a => this.a = a} data-toggle="tooltip"
         data-placement="top" title={entry} onClick={this.onClick}>
         {this.props.children}
       </a>

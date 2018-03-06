@@ -335,9 +335,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
     return (
       <div className="org-tab">
         <LabelsEditor {...this.props}
+        parent={null}
+        onFocus={this.onFocus.bind(this)}
         onEdit={this.onLabelsEdit} model={this.props.model.labels} />
       </div>
     );
+  }
+
+  onFocus(child, parent) {
+
   }
 
   renderConstraints() {

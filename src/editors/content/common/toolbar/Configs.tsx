@@ -3,19 +3,19 @@ import { Maybe } from 'tsmonad';
 
 import { HtmlToolbarButton as Button } from '../../html/TypedToolbar';
 import { Separator } from './Separator';
-import { EntityTypes } from '../../../../data/content/html/common';
-import { CodeBlock } from '../../../../data/content/html/codeblock';
-import { Table } from '../../../../data/content/html/table';
-import { YouTube } from '../../../../data/content/html/youtube';
-import { Audio } from '../../../../data/content/html/audio';
-import { Image as ImageData } from '../../../../data/content/html/image';
-import { Video } from '../../../../data/content/html/video';
-import { IFrame } from '../../../../data/content/html/iframe';
-import { Link } from '../../../../data/content/html/link';
+import { EntityTypes } from '../../../../data/content/learning/common';
+import { CodeBlock } from '../../../../data/content/learning/codeblock';
+import { Table } from '../../../../data/content/learning/table';
+import { YouTube } from '../../../../data/content/learning/youtube';
+import { Audio } from '../../../../data/content/learning/audio';
+import { Image as ImageData } from '../../../../data/content/learning/image';
+import { Video } from '../../../../data/content/learning/video';
+import { IFrame } from '../../../../data/content/learning/iframe';
+import { Link } from '../../../../data/content/learning/link';
 
-import { ActivityLink } from '../../../../data/content/html/activity_link';
-import { Xref } from '../../../../data/content/html/xref';
-import { Cite } from '../../../../data/content/html/cite';
+import { ActivityLink } from '../../../../data/content/learning/activity_link';
+import { Xref } from '../../../../data/content/workbook/xref';
+import { Cite } from '../../../../data/content/learning/cite';
 
 import guid from '../../../../utils/guid';
 
@@ -106,7 +106,7 @@ export function flowBlock() {
     <Button key="codeblock"
       command={
         insertBlock(
-          EntityTypes.codeblock, 'IMMUTABLE',
+          EntityTypes.image, 'IMMUTABLE',
           { codeblock: new CodeBlock({ source: 'Your code here...' }).with({ id: guid() }) })}
       tooltip="Code block" icon="code"/>,
     <Button key="quoteblock"
@@ -117,7 +117,7 @@ export function flowBlock() {
       tooltip="Insert block formula" icon="plus"/>,
     <Button key="table"
       command={insertBlock(
-        EntityTypes.table, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { table: new Table().with({ id: guid() }) })}
       tooltip="Insert table" icon="table"/>,
     <Button key="image"
@@ -127,22 +127,22 @@ export function flowBlock() {
       tooltip="Insert image" icon="picture-o"/>,
     <Button key="audio"
       command={insertBlock(
-        EntityTypes.audio, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { audio: new Audio().with({ id: guid() }) })}
       tooltip="Insert audio clip" icon="music"/>,
     <Button key="video"
       command={insertBlock(
-        EntityTypes.video, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { video: new Video().with({ id: guid() }) })}
       tooltip="Insert video clip" icon="video-camera"/>,
     <Button key="youtube"
       command={insertBlock(
-        EntityTypes.youtube, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { youtube: new YouTube().with({ id: guid() }) })}
       tooltip="Insert YouTube Video" icon="youtube"/>,
     <Button key="iframe"
       command={insertBlock(
-        EntityTypes.iframe, 'IMMUTABLE',
+        EntityTypes.image, 'IMMUTABLE',
         { iframe: new IFrame().with({ id: guid() }) })}
       tooltip="Insert page in iframe" icon="html5"/>,
   ];

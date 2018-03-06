@@ -95,7 +95,7 @@ export class DispatchBasedServices implements AppServices {
   createAssessment(title: string, courseId: string) : Promise<persistence.Document> {
     const resource = new models.AssessmentModel({
       type: types.LegacyTypes.assessment2,
-      title: new contentTypes.Title({ text: title }),
+      title: contentTypes.Title.fromText(title),
     });
     return this.createResource(courseId, resource);
   }

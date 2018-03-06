@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { bindActionCreators } from 'redux';
 import { UserProfile } from 'types/user';
 import EditorManager from 'editors/manager/EditorManager.controller';
-import * as viewActions from 'actions/view';
 
 export interface DocumentViewProps {
-  dispatch: any;
+  onLoad: (documentId: string) => void;
+  onRelease: (documentId: string) => void;
   documentId: string;
   profile: UserProfile;
   userId: string;
@@ -17,13 +16,28 @@ export interface DocumentViewState {}
 
 export default class DocumentView
   extends React.PureComponent<DocumentViewProps, DocumentViewState> {
-  viewActions: Object;
 
   constructor(props) {
     super(props);
-    const { dispatch } = this.props;
+  }
 
-    this.viewActions = bindActionCreators((viewActions as any), dispatch);
+  componentDidMount() {
+    const { onLoad, documentId } = this.props;
+    onLoad(documentId);
+  }
+
+  componentWillUnmount() {
+    const { onRelease, documentId } = this.props;
+    onRelease(documentId);
+  }
+
+  componentWillReceiveProps(nextProps: DocumentViewProps) {
+    if (nextProps.documentId !== this.props.documentId) {
+      const { onLoad, onRelease, documentId } = nextProps;
+
+      onRelease(this.props.documentId);
+      onLoad(documentId);
+    }
   }
 
   render() {
@@ -32,7 +46,7 @@ export default class DocumentView
     return (
       <div className="document-view container-fluid">
         <div className="row">
-            <div className="col-sm-12 col-md-12 document">
+            <div className="col-sm-11 col-md-11 document">
               <div className="editor">
                 <EditorManager
                   course={course}

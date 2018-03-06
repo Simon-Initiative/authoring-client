@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
-import { Image } from '../../../data/content/html/image';
+import { Image } from '../../../data/content/learning/image';
+import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { LabeledType } from '../labeled/LabeledEditor';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { Select } from '../common/Select';
 import { TabContainer } from '../common/TabContainer';
@@ -31,7 +30,6 @@ export class ImageEditor
   constructor(props) {
     super(props);
 
-    this.onLabeledEdit = this.onLabeledEdit.bind(this);
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
@@ -83,30 +81,22 @@ export class ImageEditor
     }
   }
 
-  onLabeledEdit(model: LabeledType) {
-
-    const { titleContent, cite, caption } = model;
-    const updated = this.props.model.with({ titleContent, cite, caption });
-
-    this.props.onEdit(updated);
-  }
-
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentState) {
+  onAlternateEdit(content: ContentElements) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: ContentElements) {
+    const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
@@ -225,15 +215,14 @@ export class ImageEditor
               onEdit={this.onPopoutEdit}
             />)}
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
-
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
@@ -244,7 +233,15 @@ export class ImageEditor
     );
   }
 
-  render() : JSX.Element {
+
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="itemWrapper">

@@ -3,16 +3,16 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
+import { ContentElements } from 'data/content/common/elements';
 import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
 import { MultipartInput } from './MultipartInput';
-import { EntityTypes } from '../../../data/content/html/common';
 import { Skill } from 'types/course';
-import { changes, removeInputRef } from '../../../data/content/html/changes';
 import { InsertInputRefCommand } from './commands';
+import { detectInputRefChanges } from 'data/content/assessment/question';
 
 import './QuestionEditor.scss';
 
@@ -32,7 +32,7 @@ export interface QuestionEditorState {
  */
 export class QuestionEditor
   extends AbstractContentEditor<contentTypes.Question, QuestionEditorProps, QuestionEditorState> {
-  lastBody: contentTypes.Html;
+  lastBody: ContentElements;
   itemToAdd: any;
   fillInTheBlankCommand: InsertInputRefCommand;
   numericCommand: InsertInputRefCommand;
@@ -103,13 +103,12 @@ export class QuestionEditor
       || question.items.first().contentType === contentTypeToAdd;
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body: ContentElements) {
 
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
-      const delta
-        = changes(EntityTypes.input_ref, '@input', this.lastBody.contentState, body.contentState);
+      const delta = detectInputRefChanges(this.lastBody, body);
 
       // For any deletions of input_refs, we need to make sure that we remove
       // the corresponding item and part from the question model
@@ -180,16 +179,16 @@ export class QuestionEditor
 
     const items = this.props.model.items.delete(itemModel.guid);
     const parts = this.props.model.parts.delete(partModel.guid);
-    let body = this.props.model.body;
+    let model = this.props.model;
 
     switch (itemModel.contentType) {
       case 'Numeric':
       case 'Text':
       case 'FillInTheBlank':
-        body = removeInputRef(body, itemModel.id);
+        model = model.removeInputRef(itemModel.id);
     }
 
-    const model = this.props.model.with({ items, parts, body });
+    model = model.with({ items, parts });
     this.props.onEdit(model);
   }
 
@@ -213,6 +212,7 @@ export class QuestionEditor
       const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -241,6 +241,7 @@ export class QuestionEditor
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
         <MultipleChoice
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -265,6 +266,7 @@ export class QuestionEditor
     if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
         <CheckAllThatApply
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -289,6 +291,7 @@ export class QuestionEditor
     if (item.contentType === 'ShortAnswer') {
       return (
         <ShortAnswer
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -313,6 +316,7 @@ export class QuestionEditor
     if (item.contentType === 'Ordering') {
       return (
         <Ordering
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -337,6 +341,7 @@ export class QuestionEditor
     if (item.contentType === 'Essay') {
       return (
         <Essay
+          onItemFocus={this.props.onFocus}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
@@ -360,7 +365,14 @@ export class QuestionEditor
     }
   }
 
-  render() {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() {
     return (
       <div className="question-editor">
         {this.renderQuestionBody()}

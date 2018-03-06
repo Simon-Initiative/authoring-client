@@ -16,6 +16,18 @@ export enum LegacyTypes {
   assessment2_pool = 'x-oli-assessment2-pool',
 }
 
+export interface HasGuid {
+  guid: string;
+}
+
+export interface Cloneable<T> {
+  clone(): T;
+}
+
+export interface Persistable {
+  toPersistence(): Object;
+}
+
 export type PaginatedResponse<T> = {
   offset: number;
   limit: number;

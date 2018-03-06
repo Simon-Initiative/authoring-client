@@ -1,14 +1,11 @@
 import * as React from 'react';
-import { ContentState } from 'draft-js';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import { InputLabel } from '../common/InputLabel';
 
-export interface RichTextEditorProps extends AbstractContentEditorProps<ContentState> {
+export interface RichTextEditorProps
+  extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   label: string;
   showLabel?: boolean;
   inline?: boolean;
@@ -22,7 +19,8 @@ export interface RichTextEditorState {
  * The content editor for HtmlContent.
  */
 export class RichTextEditor
-  extends AbstractContentEditor<ContentState, RichTextEditorProps, RichTextEditorState> {
+  extends AbstractContentEditor<contentTypes.ContiguousText,
+  RichTextEditorProps, RichTextEditorState> {
 
   constructor(props) {
     super(props);
@@ -37,33 +35,26 @@ export class RichTextEditor
     return false;
   }
 
-  onEdit(html: contentTypes.Html) {
-    this.props.onEdit(html.contentState);
+  onEdit(html: contentTypes.ContiguousText) {
+    this.props.onEdit(html);
   }
 
-  render() : JSX.Element {
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
 
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
+  renderMain() : JSX.Element {
 
-    const editor = <HtmlContentEditor
-            inline={this.props.inline}
+    const editor = <ContiguousTextEditor
+            onFocus={this.props.onFocus}
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            inlineInsertionToolbar={insertionToolbar}
-            blockToolbar={blockToolbar}
-            model={new contentTypes.Html({ contentState: this.props.model })}
+            model={this.props.model}
             onEdit={this.onEdit}
             />;
 

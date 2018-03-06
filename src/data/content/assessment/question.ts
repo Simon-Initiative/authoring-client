@@ -1,8 +1,8 @@
 import * as Immutable from 'immutable';
 
-import { ContentState } from 'draft-js';
 
-import { Html } from '../html';
+import { ContentElements } from 'data/content/common/elements';
+import { ALT_FLOW_ELEMENTS, QUESTION_BODY_ELEMENTS } from './types';
 import { Part } from './part';
 import { MultipleChoice } from './multiple_choice';
 import { FillInTheBlank } from './fill_in_the_blank';
@@ -17,34 +17,34 @@ import { Unsupported } from '../unsupported';
 import createGuid from '../../../utils/guid';
 import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
-import { getEntities } from '../html/changes';
-import { EntityTypes } from '../html/common';
+import { ContiguousText } from 'data/content/learning/contiguous';
+import { Changes } from 'data/content/learning/draft/changes';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
   | ShortAnswer | Numeric | Text | Unsupported;
 
 export type QuestionParams = {
   id?: string;
-  body?: Html;
+  body?: ContentElements;
   concepts?: Immutable.List<string>;
   skills?: Immutable.Set<string>;
   grading?: string;
   items?: Immutable.OrderedMap<string, Item>;
   parts?: Immutable.OrderedMap<string, Part>;
-  explanation?: Html;
+  explanation?: ContentElements;
   guid?: string;
 };
 
 const defaultQuestionParams = {
   contentType: 'Question',
   id: '',
-  body: new Html(),
+  body: new ContentElements(),
   concepts: Immutable.List<string>(),
   skills: Immutable.Set<string>(),
   grading: 'automatic',
   items: Immutable.OrderedMap<string, Item>(),
   parts: Immutable.OrderedMap<string, Part>(),
-  explanation: new Html(),
+  explanation: new ContentElements(),
   guid: '',
 };
 
@@ -53,7 +53,7 @@ const defaultPart = new Part().toPersistence();
 
 // Find all input ref tags and add a '$type' attribute to its data
 // to indicate the type of the item
-function tagInputRefsWithType(model: Question) {
+export function tagInputRefsWithType(model: Question) {
 
   const byId = model.items.toArray().reduce(
     (p, c) => {
@@ -66,20 +66,40 @@ function tagInputRefsWithType(model: Question) {
     },
     {});
 
-  const contentState = getEntities(EntityTypes.input_ref, model.body.contentState)
-    .reduce(
-      (contentState, info) => {
-        if (byId[info.entity.data['@input']] !== undefined) {
-          const type = byId[info.entity.data['@input']].contentType;
-          return contentState.mergeEntityData(info.entityKey, { $type: type });
-        }
+  const body = model.body.with({ content: model.body.content.map((c) => {
+    if (c.contentType === 'ContiguousText') {
+      return (c as ContiguousText).tagInputRefsWithType(byId);
+    }
+    return c;
+  }).toOrderedMap() });
 
-        return contentState;
-      },
-      model.body.contentState);
-
-  const body = model.body.with({ contentState });
   return model.with({ body });
+
+}
+
+export function detectInputRefChanges(
+  current: ContentElements, previous: ContentElements) : Changes {
+
+  const initial : Changes = {
+    additions: Immutable.List(),
+    deletions: Immutable.List(),
+  };
+
+  return this.content.toArray()
+    .filter(c => c.contentType === 'ContiguousText')
+    .reduce(
+      (delta, c) => {
+        const p = previous.content.get(c.guid);
+        if (p !== undefined) {
+          const changes = (c as ContiguousText).detectInputRefChanges(p as ContiguousText);
+          return {
+            additions: delta.additions.concat(changes.additions).toList(),
+            deletions: delta.deletions.concat(changes.deletions).toList(),
+          };
+        }
+        return delta;
+      },
+      initial);
 }
 
 function ensureResponsesExist(model: Question) {
@@ -121,7 +141,7 @@ function ensureResponsesExist(model: Question) {
 // at the part level.
 // Originally, this migrated from concepts to concepts. After
 // adding a new 'skillref' attribute to the DTD, the skills now
-// are added to the skills set. This function looks to see if 
+// are added to the skills set. This function looks to see if
 // the concepts list has any skills present and adds them to the new
 // skills set.
 function migrateSkillsToParts(model: Question) : Question {
@@ -163,12 +183,14 @@ function migrateExplanationToFeedback(model: Question) : Question {
     const originalExplanation = partsArray[0].explanation;
     const originalReponses = partsArray[0].responses;
 
-    const migratedAlready = originalExplanation.contentState.getBlocksAsArray().length === 1
-      && originalExplanation.contentState.getBlocksAsArray()[0].text === 'migrated';
+    const migratedAlready = originalExplanation.extractPlainText().caseOf({
+      just: text => text === 'migrated',
+      nothing: () => false,
+    });
 
     if (!migratedAlready) {
       const explanation
-        = new Html().with({ contentState: ContentState.createFromText('migrated') });
+        = ContentElements.fromText('migrated', '', ALT_FLOW_ELEMENTS);
 
       const f = new Feedback().with({ body: originalExplanation });
       const feedback = Immutable.OrderedMap<string, Feedback>()
@@ -194,13 +216,13 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
   id: string;
-  body: Html;
+  body: ContentElements;
   concepts: Immutable.List<string>;
   skills: Immutable.Set<string>;
   grading: string;
   items: Immutable.OrderedMap<string, Item>;
   parts: Immutable.OrderedMap<string, Part>;
-  explanation: Html;
+  explanation: ContentElements;
   guid: string;
 
   constructor(params?: QuestionParams) {
@@ -209,6 +231,21 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   with(values: QuestionParams) {
     return this.merge(values) as this;
+  }
+
+  removeInputRef(itemModelId: string)
+    : Question {
+
+    const content = this.body.content.map((c) => {
+      if (c.contentType === 'ContiguousText') {
+        return (c as ContiguousText).removeInputRef(itemModelId);
+      }
+      return c;
+    }).toOrderedMap();
+
+    const body = this.body.with({ content });
+
+    return this.with({ body });
   }
 
   static fromPersistence(json: any, guid: string) {
@@ -230,21 +267,16 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       const id = createGuid();
 
       switch (key) {
-        case 'body':
-          model = model.with({ body: Html.fromPersistence(item, id) });
-          break;
         case 'cmd:concept':
           model = model.with(
             { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
           break;
-        case 'concept':
-          model = model.with({ concepts: model.concepts.push((item as any).concept['#text']) });
+        case 'body':
+          model = model.with({ body: ContentElements.fromPersistence(
+            item['body'], id, QUESTION_BODY_ELEMENTS) });
           break;
         case 'essay':
           model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
-          break;
-        case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
           break;
         case 'fill_in_the_blank':
           model = model.with(
@@ -274,6 +306,9 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           copy['part'] = copy['responses'];
           model = model.with({ parts: model.parts.set(id, Part.fromPersistence(copy, id)) });
           break;
+        case 'explanation':
+          model = model.with({ explanation:
+            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
         case 'skillref':
           model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
           break;
@@ -306,7 +341,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
     const children = [
 
-      { body: this.body.toPersistence() },
+      { body: { '#array': this.body.toPersistence() } },
 
       ...this.concepts
         .toArray()
@@ -318,7 +353,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
       ...itemsAndParts,
 
-      { explanation: this.explanation.toPersistence() },
+      { explanation: { '#array': this.explanation.toPersistence() } },
     ];
 
     return {

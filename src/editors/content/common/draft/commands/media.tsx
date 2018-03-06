@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 
 import { AppServices } from '../../../../common/AppServices';
 import { AppContext } from '../../../../common/AppContext';

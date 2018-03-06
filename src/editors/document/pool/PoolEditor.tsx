@@ -104,6 +104,10 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.setState({ currentNode });
   }
 
+  onFocus(child, parent) {
+
+  }
+
   onRemove(guid: string) {
 
     const { model } = this.props;
@@ -150,6 +154,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               redoEnabled={this.state.redoStackSize > 0}
               onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
           <TitleContentEditor
+              parent={null}
+              onFocus={this.onFocus.bind(this, this.props.model.pool.title, this)}
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
@@ -175,7 +181,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             </div>
             <div className="nodeContainer">
               {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit, this.onRemove, true)}
+                this.state.currentNode, this.props, this.onEdit,
+                this.onRemove, this.onFocus,
+                true, null)}
             </div>
           </div>
         </div>

@@ -3,10 +3,7 @@ import { OrderedMap, Map } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
+import { ContentElements } from 'data/content/common/elements';
 import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
@@ -15,13 +12,7 @@ import {
 import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
-
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 export const ChoiceList = InputList;
 
@@ -82,6 +73,7 @@ export interface ChoiceProps  {
     selected?: boolean;
   };
   onReorderChoice?: (originalIndex: number, newIndex: number) => void;
+  onFocus: (child, parent) => void;
   onEditChoice: (choice: contentTypes.Choice) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
@@ -114,18 +106,17 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     if (response && response.feedback.size > 0) {
       const feedback = response.feedback.first();
 
-      feedbackEditor = (
-        <HtmlContentEditor
-          editorStyles={HTML_CONTENT_EDITOR_STYLE}
-          inlineToolbar={<InlineToolbar/>}
-          blockToolbar={<BlockToolbar/>}
-          inlineInsertionToolbar={<InlineInsertionToolbar/>}
+      feedbackEditor =
+        <ContentContainer
+          onFocus={this.props.onFocus}
           model={feedback.body}
           editMode={editMode}
           context={context}
           services={services}
-          onEdit={body => onEditFeedback(response, feedback.with({ body }))} />
-      );
+          onEdit={body => onEditFeedback(
+            response,
+            feedback.with({ body: (body as ContentElements) }))} />;
+
 
       scoreEditor = (
         <div className="input-group">
@@ -143,6 +134,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
       <InputListItem
         className="choice"
         id={choice.guid}
+        onFocus={this.props.onFocus}
         label={convert.toAlphaNotation(index)}
         context={context}
         services={services}

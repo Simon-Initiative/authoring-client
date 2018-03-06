@@ -1,9 +1,8 @@
-import * as Immutable from 'immutable';
 import {
-    AtomicBlockUtils, CharacterMetadata, ContentBlock, ContentState, EditorState, Modifier,
+    AtomicBlockUtils, ContentBlock, ContentState, EditorState, Modifier,
     SelectionState,
 } from 'draft-js';
-import { EntityTypes, generateRandomKey } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 
 // Append text to a content block
 export function appendText(contentBlock, contentState, text) {
@@ -117,8 +116,8 @@ export function shouldInsertBlock(
       return isAtomic(nextBlock)
           && containerPrecondition(
             selection, contentState,
-            [EntityTypes.definition_begin],
-            [EntityTypes.definition_end]);
+            [],
+            []);
 
 
     }
@@ -129,41 +128,6 @@ export function shouldInsertBlock(
   return false;
 }
 
-// Create draft representation of a title, populating the blocks array
-export function createTitle(currentContent, blocks) {
-
-  const beginBlockKey = generateRandomKey();
-  const contentKey = generateRandomKey();
-  const endBlockKey = generateRandomKey();
-
-  let content = currentContent;
-
-  content = content.createEntity(
-    EntityTypes.title_begin, 'IMMUTABLE', { type: 'title_begin' });
-  const beginKey = content.getLastCreatedEntityKey();
-
-  content = content.createEntity(
-    EntityTypes.title_end, 'IMMUTABLE', { type: 'title_end' });
-  const endKey = content.getLastCreatedEntityKey();
-
-  const beginCharList = Immutable.List().push(
-    new CharacterMetadata({ entity: beginKey }));
-  const emptyCharList = Immutable.List().push(new CharacterMetadata());
-  const endCharList = Immutable.List().push(
-    new CharacterMetadata({ entity: endKey }));
-
-  blocks.push(
-    new ContentBlock(
-      { type: 'atomic', key: beginBlockKey, text: ' ', characterList: beginCharList }));
-  blocks.push(
-    new ContentBlock(
-      { type: 'unstyled', key: contentKey, text: ' ', characterList: emptyCharList }));
-  blocks.push(
-    new ContentBlock(
-      { type: 'atomic', key: endBlockKey, text: ' ', characterList: endCharList }));
-
-  return content;
-}
 
 // Insert an array of blocks after a particular block referenced by blockKey
 export function insertBlocksAfter(

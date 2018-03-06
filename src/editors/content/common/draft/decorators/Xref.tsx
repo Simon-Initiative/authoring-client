@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { XrefEditor } from '../../../links/XrefEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 
@@ -36,6 +36,8 @@ class Xref extends React.PureComponent<any, any> {
         }
       }>
         <XrefEditor
+          onFocus={null}
+          parent={null}
           model={data.xref}
           context={b.context}
           services={b.services}

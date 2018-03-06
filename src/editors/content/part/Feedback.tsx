@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Html } from 'data/content/html.ts';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
-
+import { ContentElements } from 'data/content/common/elements';
 import './Feedback.scss';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
 
@@ -106,6 +106,7 @@ export abstract class Feedback
 
         return (
           <InputListItem
+            onFocus={this.props.onFocus}
             key={response.guid}
             className="response"
             id={response.guid}
@@ -114,7 +115,8 @@ export abstract class Feedback
             context={context}
             services={services}
             editMode={editMode}
-            body={response.feedback.first() ? response.feedback.first().body : new Html()}
+            body={response.feedback.first() ? response.feedback.first().body
+              : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS)}
             onEdit={body => this.onBodyEdit(body, response)}
             onRemove={isDefault ? undefined : () => this.onResponseRemove(response)}
             options={

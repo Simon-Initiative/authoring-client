@@ -5,6 +5,7 @@ const DEFAULT_MAX_HISTORY = Infinity;
 export enum LogTag {
   DEFAULT = 'DEFAULT',
   EDITOR = 'EDITOR',
+  RAW_HTTP = 'RAW_HTTP',
 }
 
 export type Log = {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
-import { ActivityLink } from '../../../data/content/html/activity_link';
-import { PurposeTypes } from '../../../data/content/html/common';
+import { ActivityLink } from '../../../data/content/learning/activity_link';
+import { PurposeTypes } from '../../../data/content/learning/common';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
@@ -76,7 +76,14 @@ export class ActivityLinkEditor
     this.props.onEdit(this.props.model.with({ purpose }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { purpose, target } = this.props.model;
 

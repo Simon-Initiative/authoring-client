@@ -2,9 +2,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
+
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { convert } from 'utils/format';
-import { Html } from 'data/content/html.ts';
+import { ContentElements } from 'data/content/common/elements';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList.tsx';
@@ -108,7 +109,7 @@ export abstract class ChoiceFeedback
     this.onResponseEdit(updatedResponse);
   }
 
-  onDefaultFeedbackEdit(body: Html, score: string) {
+  onDefaultFeedbackEdit(body: ContentElements, score: string) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
     const updatedModel = modelWithDefaultFeedback(
@@ -197,6 +198,7 @@ export abstract class ChoiceFeedback
       // finally, render all response elements and the psudo-feedback element for all other choices
       .map((response, i) => (
         <InputListItem
+          onFocus={this.props.onFocus}
           key={response.guid}
           className="response"
           id={response.guid}

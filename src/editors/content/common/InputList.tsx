@@ -2,23 +2,13 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { Html } from 'data/content/html.ts';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
+import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from '../container/ContentContainer';
 import { DragHandle } from 'components/common/DragHandle.tsx';
 import { Remove } from 'components/common/Remove';
 import { DragTypes } from 'utils/drag';
 
 import './InputList.scss';
-
-const HTML_CONTENT_EDITOR_STYLE = {
-  minHeight: '20px',
-  borderStyle: 'none',
-  borderWith: 1,
-  borderColor: '#AAAAAA',
-};
 
 export interface InputListProps {
   className?: string;
@@ -42,11 +32,12 @@ export interface InputListItemProps {
   contentTitle?: string;
   context: AppContext;
   services: AppServices;
-  body: Html;
+  body: ContentElements;
   options?: any;
   controls?: any;
   editMode: boolean;
-  onEdit: (body: Html) => void;
+  onFocus: (child, parent) => void;
+  onEdit: (body: ContentElements) => void;
   onRemove?: (id: string) => void;
 
   // required props if draggable
@@ -147,11 +138,8 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
                 ? (<div className="input-list-item-content-title">{contentTitle}</div>)
                 : (null)
               }
-              <HtmlContentEditor
-                editorStyles={HTML_CONTENT_EDITOR_STYLE}
-                inlineToolbar={<InlineToolbar/>}
-                blockToolbar={<BlockToolbar/>}
-                inlineInsertionToolbar={<InlineInsertionToolbar/>}
+              <ContentContainer
+                onFocus={this.props.onFocus}
                 context={context}
                 services={services}
                 editMode={editMode}

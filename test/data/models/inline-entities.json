@@ -1,0 +1,68 @@
+{
+  "rev": 1,
+  "guid": "2c9b80865c1b77b4015c1b79bc2c0003",
+  "id": "workbook",
+  "type": "x-oli-workbook_page",
+  "title": "This is the title",
+  "shortTitle": null,
+  "doc": {
+    "workbook_page": {
+      "@id": "workbook",
+      "#array": [
+        {
+          "head": {
+            "#array": [
+              {
+                "title": {
+                  "#text": "This is the title"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "body": {
+            "#array": [
+              {
+                "p": {
+                  "#array": [
+                    { "#text": "Here is "},
+                    {
+                      "link": {
+                        "#array": [
+                          {
+                            "em": {
+                              "@style": "bold",
+                              "#text": "a bold link"
+                            }
+                          }
+                        ],
+                        "@target": "new",
+                        "@href": "http://www.google.com"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "p": {
+                  "#text": "Two"
+                }
+              },
+              {
+                "p": {
+                  "#text": "Three"
+                }
+              },
+              {
+                "p": {
+                  "#text": "Four"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

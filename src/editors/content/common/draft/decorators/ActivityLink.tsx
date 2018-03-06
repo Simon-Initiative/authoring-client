@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { ActivityLinkEditor } from '../../../links/ActivityLinkEditor';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 
@@ -44,6 +44,7 @@ class ActivityLink extends React.PureComponent<any, any> {
         }
       }>
         <ActivityLinkEditor
+          onFocus={null}
           model={data.activity_link}
           context={this.props.context}
           services={this.props.services}

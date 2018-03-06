@@ -1,6 +1,6 @@
 import { EditorState } from 'draft-js';
 import { AbstractCommand } from '../common/command';
-import { EntityTypes } from '../../../data/content/html/common';
+import { EntityTypes } from '../../../data/content/learning/common';
 import { InsertInlineEntityCommand } from '../common/draft/commands/insert';
 import guid from '../../../utils/guid';
 

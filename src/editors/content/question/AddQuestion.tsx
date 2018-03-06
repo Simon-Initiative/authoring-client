@@ -2,9 +2,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
-import { ContentState } from 'draft-js';
+import { ContentElements } from 'data/content/common/elements';
+import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
-const defaultInputBody = ContentState.createFromText('Add numeric, text, or dropdown components');
+const defaultInputBody = ContentElements.fromText
+  ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
 
 export interface AddQuestion {
 
@@ -99,7 +101,8 @@ export class AddQuestion
 
     const item = new contentTypes.ShortAnswer();
 
-    const feedback = new contentTypes.Feedback();
+    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
+    const feedback = new contentTypes.Feedback().with({ body });
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
       .set(feedback.guid, feedback);
 
@@ -147,7 +150,7 @@ export class AddQuestion
   onAddMultipart() {
     const q = new contentTypes.Question()
       .with({
-        body: new contentTypes.Html().with({ contentState:  defaultInputBody }),
+        body: defaultInputBody,
       });
     this.props.onQuestionAdd(q);
   }

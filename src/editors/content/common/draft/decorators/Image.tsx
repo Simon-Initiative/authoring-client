@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import ModalMediaEditor from '../../../media/ModalMediaEditor';
 import { ImageEditor } from '../../../media/ImageEditor';
 import { buildUrl } from '../../../../../utils/path';
@@ -43,6 +43,8 @@ class Image extends React.PureComponent<any, any> {
         }
       }>
         <ImageEditor
+          onFocus={null}
+          parent={null}
           model={data.image}
           context={b.context}
           services={b.services}

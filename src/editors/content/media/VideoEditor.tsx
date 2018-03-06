@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { OrderedMap } from 'immutable';
-import { ContentState } from 'draft-js';
-import { Video } from '../../../data/content/html/video';
+import * as Immutable from 'immutable';
+import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from '../container/ContentContainer';
+import { Video } from '../../../data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Tracks } from './Tracks';
-import { RichTextEditor } from '../common/RichTextEditor';
 import { TextInput } from '../common/TextInput';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
-import { Source } from 'data/content/html/source';
+import { Source } from 'data/content/learning/source';
 import { adjustPath } from './utils';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
@@ -52,23 +52,23 @@ export class VideoEditor
     return false;
   }
 
-  onPopoutEdit(content: ContentState) {
+  onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
 
-  onTitleEdit(content: ContentState) {
-    const titleContent = this.props.model.titleContent.with({ content });
+  onTitleEdit(text: ContentElements) {
+    const titleContent = this.props.model.titleContent.with({ text });
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentState) {
+  onCaptionEdit(content: ContentElements) {
     const caption = this.props.model.caption.with({ content });
     this.props.onEdit(this.props.model.with({ caption }));
   }
 
-  onAlternateEdit(content: ContentState) {
+  onAlternateEdit(content: ContentElements) {
     const alternate = this.props.model.alternate.with({ content });
     this.props.onEdit(this.props.model.with({ alternate }));
   }
@@ -140,16 +140,16 @@ export class VideoEditor
           <br/>
 
 
-          {this.row('Title', '8', <RichTextEditor showLabel={false} label=""
-          {...this.props}
-          model={titleContent.content}
-          editMode={this.props.editMode}
-          onEdit={this.onTitleEdit}
+          {this.row('Title', '8', <ContentContainer
+            {...this.props}
+            model={titleContent.text}
+            editMode={this.props.editMode}
+            onEdit={this.onTitleEdit}
           />)}
 
           <br/>
 
-          {this.row('Caption', '8', <RichTextEditor showLabel={false} label=""
+          {this.row('Caption', '8', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
@@ -215,7 +215,7 @@ export class VideoEditor
       const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
 
       onEdit(model.with({
-        sources: OrderedMap<string, Source>().set(source.guid, source),
+        sources: Immutable.OrderedMap<string, Source>().set(source.guid, source),
       }));
     }
   }
@@ -233,7 +233,14 @@ export class VideoEditor
   }
 
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="itemWrapper">

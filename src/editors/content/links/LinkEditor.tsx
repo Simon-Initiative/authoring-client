@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from '../../../data/content/html/link';
+import { Link } from '../../../data/content/learning/link';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
 import { InputLabel } from '../common/InputLabel';
@@ -40,7 +40,14 @@ export class LinkEditor
     this.props.onEdit(this.props.model.with({ href }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { href, target } = this.props.model;
 

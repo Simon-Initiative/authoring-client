@@ -1,11 +1,8 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
+import { ContentContainer } from '../container/ContentContainer';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
 import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
 
 import './ContentEditor.scss';
@@ -83,29 +80,25 @@ export class ContentEditor
   }
 
   renderBody() {
-    const bodyStyle = {
-      minHeight: '30px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="content-body">
-        <HtmlContentEditor
-          editorStyles={bodyStyle}
-          inlineToolbar={<InlineToolbar/>}
-          blockToolbar={<BlockToolbar/>}
-          inlineInsertionToolbar={<InlineInsertionToolbar/>}
+        <ContentContainer
           {...this.props}
           model={this.props.model.body}
           onEdit={this.onBodyEdit}
-          />
+        />
       </div>
     );
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div className="content-editor">

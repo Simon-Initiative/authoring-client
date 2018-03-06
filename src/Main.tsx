@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { setServerTimeSkew } from './actions/server';
 import { modalActions } from './actions/modal';
 import * as viewActions from './actions/view';
+import { load, release } from 'actions/document';
 import { loadCourse } from 'actions/course';
 import { UserState } from 'reducers/user';
 import { ModalState } from 'reducers/modal';
@@ -34,6 +35,7 @@ import * as messageActions from 'actions//messages';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
+import CourseEditor from 'editors/document/course//CourseEditor.controller';
 
 type ResourceList = {
   title: string,
@@ -85,7 +87,7 @@ const resources = {
         resource => resource.type === LegacyTypes.inline,
         (courseId, title, type) => new models.AssessmentModel({
           type,
-          title: new contentTypes.Title({ text: title }),
+          title: contentTypes.Title.fromText(title),
         })),
   summativeassessments: res(
     'Summative Assessments',
@@ -93,7 +95,7 @@ const resources = {
     resource => resource.type === LegacyTypes.assessment2,
     (courseId, title, type) => new models.AssessmentModel({
       type,
-      title: new contentTypes.Title({ text: title }),
+      title: contentTypes.Title.fromText(title),
     })),
   pages: res(
         'Workbook Pages',
@@ -113,7 +115,7 @@ const resources = {
           return new models.PoolModel({
             type,
             pool: new contentTypes.Pool({ questions, id: guid(),
-              title: new contentTypes.Title({ text: title }) }),
+              title: contentTypes.Title.fromText(title) }),
           });
         }),
 };
@@ -248,16 +250,29 @@ export default class Main extends React.Component<MainProps, MainState> {
           expanded={expanded}
           userName={user.user}/>;
     }
-    if (course) {
-      const documentId = url.substr(1, url.indexOf('-') - 1);
 
+    if (course) {
+
+      const documentId : string = url.substr(1, url.indexOf('-') - 1);
+
+      if (documentId === course.guid) {
+        return <CourseEditor
+          model={course}
+          editMode={true}
+        />;
+      }
       if (resources[documentId] !== undefined) {
         return this.renderResource(resources[documentId]);
       }
+
+      const onRelease = (docId: string) => onDispatch(release(docId));
+      const onLoad = (docId: string) => onDispatch(load(course.guid, docId));
+
       return (
           <DocumentView
+            onLoad={onLoad}
+            onRelease={onRelease}
             profile={user.profile}
-            dispatch={onDispatch}
             course={course}
             userId={user.userId}
             userName={user.user}

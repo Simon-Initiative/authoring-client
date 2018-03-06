@@ -39,7 +39,7 @@ module.exports = {
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ['.ts', '.tsx', '.js'],
+        extensions: ['.ts', '.tsx', '.js', '.jss'],
 
         // Add webpack aliases for top level imports
         alias: {
@@ -48,6 +48,7 @@ module.exports = {
             data: path.resolve(__dirname, 'src/data'),
             editors: path.resolve(__dirname, 'src/editors'),
             reducers: path.resolve(__dirname, 'src/reducers'),
+            styles: path.resolve(__dirname, 'src/styles'),
             stylesheets: path.resolve(__dirname, 'src/stylesheets'),
             types: path.resolve(__dirname, 'src/types'),
             utils: path.resolve(__dirname, 'src/utils'),

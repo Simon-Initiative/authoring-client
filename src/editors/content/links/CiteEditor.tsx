@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Cite } from '../../../data/content/html/cite';
+import { Cite } from '../../../data/content/learning/cite';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { InputLabel } from '../common/InputLabel';
 import { TextInput } from '../common/TextInput';
@@ -36,7 +36,14 @@ export class CiteEditor
     this.props.onEdit(this.props.model.with({ entry }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { entry } = this.props.model;
 

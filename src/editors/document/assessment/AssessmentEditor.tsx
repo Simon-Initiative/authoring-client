@@ -38,6 +38,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorState>  {
 
   pendingCurrentNode: Maybe<contentTypes.Node>;
+  supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
     super(props, ({
@@ -58,7 +59,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onNodeRemove = this.onNodeRemove.bind(this);
-    this.onEdit = this.onEdit.bind(this);
+    this.onEditNode = this.onEditNode.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
 
@@ -99,13 +100,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       });
   }
 
+  getCurrentPage(props) {
+    return props.model.pages.get(this.state.currentPage)
+    || props.model.pages.first();
+  }
+
   onPageEdit(page: contentTypes.Page) {
     const pages = this.props.model.pages.set(page.guid, page);
     this.handleEdit(this.props.model.with({ pages }));
   }
 
   onTitleEdit(content: contentTypes.Title) {
-    const resource = this.props.model.resource.with({ title: content.text });
+    const resource = this.props.model.resource.with({ title: content.text
+      .extractPlainText().caseOf({ just: s => s, nothing: () => '' }) });
     this.handleEdit(this.props.model.with({ title: content, resource }));
   }
 
@@ -130,12 +137,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  getCurrentPage(props) {
-    return props.model.pages.get(this.state.currentPage)
-    || props.model.pages.first();
-  }
-
-  onEdit(guid : string, node : models.Node) {
+  onEditNode(guid : string, node : models.Node) {
 
     const nodes = this.getCurrentPage(this.props).nodes;
 
@@ -190,6 +192,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   renderTitle() {
     return <TitleContentEditor
+            parent={null}
+            onFocus={this.onFocus.bind(this, this.props.model.title, this)}
             services={this.props.services}
             context={this.props.context}
             editMode={this.props.editMode}
@@ -229,7 +233,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddPage() {
     const text = 'Page ' + (this.props.model.pages.size + 1);
     let page = new contentTypes.Page()
-      .with({ title: new contentTypes.Title().with({ text }) });
+      .with({ title: contentTypes.Title.fromText(text) });
 
     let content = new contentTypes.Content();
     content = content.with({ guid: guid() });
@@ -364,6 +368,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <div style={ { marginLeft: '25px' } }>
 
           <PageSelection
+            {...this.props}
+            onFocus={() => this.onFocus.call(this, this.getCurrentPage(this.props), this)}
             onRemove={this.onRemovePage}
             editMode={this.props.editMode}
             pages={this.props.model.pages}
@@ -410,6 +416,17 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       </div>
     );
+  }
+
+  onAddNew(content: Object) {
+
+  }
+  onEdit(content: Object) {
+
+  }
+
+  onFocus(child, parent) {
+
   }
 
   render() {
@@ -467,7 +484,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             <div className="nodeContainer">
               {renderAssessmentNode(
                 this.state.currentNode, rendererProps, this.onEdit,
-                this.onNodeRemove, this.canRemoveNode())}
+                this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
             </div>
           </div>
         </div>

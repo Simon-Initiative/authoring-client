@@ -5,30 +5,31 @@ import * as models from 'data/models';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
-import * as viewActions from 'actions/view';
-import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
+
 
 import './CourseEditor.scss';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
-export interface CourseEditorProps extends AbstractEditorProps<models.CourseModel> {
-  courseChanged: (model: models.CourseModel) => void;
+export interface CourseEditorProps {
+  model: models.CourseModel;
+  courseChanged: (m: models.CourseModel) => any;
+  viewAllCourses: () => any;
+  editMode: boolean;
 }
 
 
-interface CourseEditorState extends AbstractEditorState {
+interface CourseEditorState {
   selectedDevelopers: UserInfo[];
 }
 
-class CourseEditor
-  extends AbstractEditor<models.CourseModel, CourseEditorProps, CourseEditorState> {
+class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
   constructor(props: CourseEditorProps) {
-    super(
-      props,
-      {
-        selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
-      });
+    super(props);
+
+    this.state = {
+      selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
+    };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
     this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
@@ -49,7 +50,7 @@ class CourseEditor
       return;
     }
 
-    const courseId = this.props.context.courseId;
+    const courseId = this.props.model.guid;
 
     const action = developers.length > this.state.selectedDevelopers.length
       ? 'add' : 'remove';
@@ -121,7 +122,7 @@ class CourseEditor
   removePackage() {
     persistence.deleteCoursePackage(this.props.model.guid)
     .then((document) => {
-      this.props.dispatch(viewActions.viewAllCourses());
+      this.props.viewAllCourses();
     })
     .catch(err => console.log(err));
   }

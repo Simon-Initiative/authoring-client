@@ -6,54 +6,6 @@
     background-color: #999;
   }
 
-  .exampleBlock {
-    border-left-color: #0000DD;
-    border-left-style: solid;
-    border-left-width: 2;
-    padding-left: 20;
-  }
-
-  .pulloutBlock {
-    border-left-width: 2;
-  }
-
-  .public-DraftStyleDefault-unorderedListItem {
-    .public-DraftStyleDefault-block {
-      display: inline;
-    }
-  }
-
-  .public-DraftStyleDefault-orderedListItem {
-    .public-DraftStyleDefault-block {
-      display: inline;
-    }
-  }
-
-  .gutter {
-    width: 50px;
-  }
-
-  .expander-enter {
-    opacity: 0;
-  }
-
-  .expander-enter.editRemove-enter-active {
-    opacity: 1;
-    transition: opacity 700ms ease-in;
-  }
-
-  .public-DraftStyleDefault-block {
-    &.public-DraftStyleDefault-ltr {
-      margin-top: 0rem;
-      margin-bottom: 0;
-    }
-  }
-
-  .public-DraftStyleDefault-ul, .public-DraftStyleDefault-ol {
-    margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  }
-
   h1 {
     .public-DraftStyleDefault-block {
       &.public-DraftStyleDefault-ltr {
