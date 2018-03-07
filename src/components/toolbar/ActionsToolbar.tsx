@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ComponentProps } from 'types//component';
+import { ComponentProps } from 'types/component';
 import { ToolbarLayoutInline, ToolbarLayoutGrid } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 
