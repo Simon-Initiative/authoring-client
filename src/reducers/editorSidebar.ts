@@ -12,7 +12,7 @@ interface EditorSidebarStateParams {
 }
 
 const initialState = {
-  show: true,
+  show: false,
 };
 
 export class EditorSidebarState extends Record(initialState) {

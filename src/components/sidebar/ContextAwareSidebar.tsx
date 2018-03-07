@@ -69,9 +69,7 @@ export class ContextAwareSidebar
 
   render() {
     const {
-      classes, className, content, container, supportedElements, show, children,
-      onHide, onEdit } = this.props;
-
+      classes, className, content, container, show, onEdit } = this.props;
 
     const contentModel = content.caseOf({
       just: c => c,
@@ -101,17 +99,6 @@ export class ContextAwareSidebar
         getEditorByContentType((contentModel as any).contentType), props);
 
     }
-
-    const elementMap = supportedElements
-      .toArray()
-      .reduce(
-        (m, c) => {
-          m[c] = true;
-          return m;
-        },
-        {});
-
-    const iff = el => elementMap[el];
 
     return (
       <ReactCSSTransitionGroup

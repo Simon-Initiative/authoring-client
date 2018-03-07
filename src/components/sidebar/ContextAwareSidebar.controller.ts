@@ -1,6 +1,5 @@
 import { connect, Dispatch } from 'react-redux';
 import * as Immutable from 'immutable';
-import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
 import { ContextAwareSidebar } from './ContextAwareSidebar';

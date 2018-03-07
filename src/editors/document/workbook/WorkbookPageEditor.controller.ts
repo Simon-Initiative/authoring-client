@@ -25,7 +25,7 @@ interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { activeContext, editorSidebar } = state;
+  const { activeContext } = state;
 
   return {
     activeContext,

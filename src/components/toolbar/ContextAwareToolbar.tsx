@@ -2,10 +2,14 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheet, injectSheetSFC, JSSProps, classNames } from 'styles/jss';
-import { InlineStyles } from 'data/content/learning/contiguous';
-import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
+import { RenderContext } from 'editors/content/common/AbstractContentEditor';
+import { ParentContainer } from 'types/active.ts';
+import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
+import { InsertToolbar } from './InsertToolbar';
+import { FormatToolbar } from './FormatToolbar';
+import { ActionsToolbar } from './ActionsToolbar';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -57,14 +61,15 @@ export const ToolbarLayoutGrid = injectSheetSFC<ToolbarLayoutGridProps>(styles)
 export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
-  insert: (content: Object) => void;
-  edit: (content: Object) => void;
+  container: Maybe<ParentContainer>;
+  onInsert: (content: Object) => void;
+  onEdit: (content: Object) => void;
   hideLabels?: boolean;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
 }
 
-@injectSheet<ToolbarProps>(styles)
+@injectSheet(styles)
 export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSProps> {
 
   constructor(props) {
@@ -72,10 +77,46 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
   }
 
   render() {
-    const { insert, edit, content, supportedElements, classes, onShowPageDetails } = this.props;
+    const {
+      onInsert, onEdit, content, container, supportedElements, classes, onShowPageDetails,
+    } = this.props;
 
     const isText = content.caseOf({
       just: c => c instanceof contentTypes.ContiguousText,
+      nothing: () => false,
+    });
+
+    const contentModel = content.caseOf({
+      just: c => c,
+      nothing: () => undefined,
+    });
+
+    const contentParent = container.caseOf({
+      just: c => c,
+      nothing: () => undefined,
+    });
+
+    let contentRenderer;
+    if (contentParent) {
+      const props = {
+        renderContext: RenderContext.Toolbar,
+        model: contentModel,
+        onEdit,
+        parent: contentParent,
+        activeContentGuid: contentParent.activeContentGuid,
+        onFocus: () => {},
+        context: contentParent.context,
+        services: contentParent.services,
+        editMode: contentParent.editMode,
+      };
+
+      contentRenderer = React.createElement(
+        getEditorByContentType((contentModel as any).contentType), props);
+
+    }
+
+    const contentType = content.caseOf({
+      just: c => (c as any).contentType,
       nothing: () => false,
     });
 
@@ -88,291 +129,32 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
         },
         {});
 
-    const iff = el => elementMap[el];
+    const parentSupportsElementType = el => !!elementMap[el];
 
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
-          <ToolbarLayoutInline>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Text Block"
-                disabled>
-              <i className={classes.unicodeIcon}>T</i>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Section"
-                disabled>
-              <i className={'fa fa-list-alt'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Quote Block"
-                disabled>
-              <i className={'fa fa-quote-right'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Table"
-                disabled>
-              <i className={'fa fa-table'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => insert(new contentTypes.CodeBlock())}
-                tooltip="Insert Code Block"
-                disabled={!iff('codeblock')}>
-              <i className={'fa fa-code'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Formula Block"
-                disabled>
-              <i className={classes.unicodeIcon}>&#8721;</i>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Image"
-                disabled>
-              <i className={'fa fa-image'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Audio Clip"
-                disabled>
-              <i className={'fa fa-volume-up'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Video Clip"
-                disabled>
-              <i className={'fa fa-film'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert YouTube Video"
-                disabled>
-              <i className={'fa fa-youtube'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert iFrame"
-                disabled>
-              <i className={'fa fa-html5'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Pullout"
-                disabled>
-              <i className={'fa fa-external-link-square'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => insert(new contentTypes.Example())}
-                tooltip="Insert Example"
-                disabled={!iff('example')}>
-              <i className={'fa fa-bar-chart'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Definition"
-                disabled>
-              <i className={'fa fa-book'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Inline Assessment"
-                disabled>
-              <i className={'fa fa-flask'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Insert Activity"
-                disabled>
-              <i className={'fa fa-check'}/>
-            </ToolbarButton>
-          </ToolbarLayoutInline>
+          <InsertToolbar
+            onInsert={onInsert}
+            parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarFormatGroup} label="Format">
-          <ToolbarLayoutInline>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Bold));
-                  })
-                }
-                tooltip="Bold"
-                disabled={!isText}>
-              <i className={'fa fa-bold'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Italic));
-                  })
-                }
-                tooltip="Italic"
-                disabled={!isText}>
-              <i className={'fa fa-italic'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Strikethrough));
-                  })
-                }
-                tooltip="Strikethrough"
-                disabled={!isText}>
-              <i className={'fa fa-strikethrough'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Highlight));
-                  })
-                }
-                tooltip="Highlight"
-                disabled={!isText}>
-              <i className={'fa fa-pencil'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Superscript));
-                  })
-                }
-                tooltip="Superscript"
-                disabled={!isText}>
-              <i className={'fa fa-superscript'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Subscript));
-                  })
-                }
-                tooltip="Subscript"
-                disabled={!isText}>
-              <i className={'fa fa-subscript'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Code));
-                  })
-                }
-                tooltip="Code"
-                disabled={!isText}>
-              <i className={'fa fa-code'}/>
-            </ToolbarButton>
-          </ToolbarLayoutInline>
+          <FormatToolbar
+            content={content}
+            onEdit={onEdit}
+            isText={isText}
+            />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarContextGroup} label="Text Block"
-            highlightColor={colors.contentSelection} hide={!isText}>
-          <ToolbarLayoutInline>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Term));
-                  })
-                }
-                tooltip="Term">
-              <i className={'fa fa-book'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={
-                  () => content.lift((t) => {
-                    const text = t as contentTypes.ContiguousText;
-                    edit(text.toggleStyle(InlineStyles.Foreign));
-                  })
-                }
-                tooltip="Foreign">
-              <i className={'fa fa-globe'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Quotation">
-              <i className={'fa fa-quote-right'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Citation">
-              <i className={'fa fa-asterisk'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="External Hyperlink">
-              <i className={'fa fa-external-link'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="High Stakes Assessment Link">
-              <i className={'fa fa-check'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Cross Reference Link">
-              <i className={'fa fa-map-signs'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Ordered List">
-              <i className={'fa fa-list-ol'}/>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Unordered List">
-              <i className={'fa fa-list-ul'}/>
-            </ToolbarButton>
-          </ToolbarLayoutInline>
+        <ToolbarGroup
+            label={contentType} highlightColor={contentModel && colors.contentSelection}
+            hide={!contentModel}>
+          {contentRenderer}
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ToolbarLayoutGrid>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                size={ToolbarButtonSize.Wide}>
-              <i className={'fa fa-undo'}/> Undo
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                size={ToolbarButtonSize.Wide}>
-              <i className={'fa fa-repeat'}/> Redo
-            </ToolbarButton>
-          </ToolbarLayoutGrid>
-          <ToolbarLayoutInline>
-            <ToolbarButton
-                onClick={() => onShowPageDetails()}
-                tooltip="View and Edit Page Details"
-                size={ToolbarButtonSize.Large}>
-              <div><i className="fa fa-info-circle"/></div>
-              <div>Details</div>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                size={ToolbarButtonSize.Large}
-                tooltip="Delete this Page"
-                disabled>
-              <div><i className="fa fa-trash-o"/></div>
-              <div>Delete</div>
-            </ToolbarButton>
-            <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
-                tooltip="Preview this Page"
-                size={ToolbarButtonSize.Large}>
-              <div><i className="fa fa-eye"/></div>
-              <div>Preview</div>
-            </ToolbarButton>
-          </ToolbarLayoutInline>
+          <ActionsToolbar onShowPageDetails={onShowPageDetails} />
         </ToolbarGroup>
       </div>
     );
