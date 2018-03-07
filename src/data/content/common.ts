@@ -1,4 +1,5 @@
 import createGuid from '../../utils/guid';
+import { getKey } from 'data/common.ts';
 
 export function getChildren(item) : Object[] {
 
@@ -6,6 +7,10 @@ export function getChildren(item) : Object[] {
     return item['#array'];
   }
   return [item];
+}
+
+export function except(array, ...elements): Object[] {
+  return array.filter(x => elements.indexOf(getKey(x)) === -1);
 }
 
 export function augment(params) {

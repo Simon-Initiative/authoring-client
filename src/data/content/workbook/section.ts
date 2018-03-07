@@ -8,20 +8,21 @@ import { Title } from '../learning/title';
 import { ContentElements, BODY_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
+import { PurposeType } from 'data/content/learning/common';
 
 export type SectionParams = {
   id?: Maybe<string>,
   title?: Title,
-  purpose?: Maybe<string>,
+  purpose?: Maybe<PurposeType>,
   body?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   id: Maybe.nothing(),
-  title: new Title(),
+  title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
-  body: new ContentElements().with({ supportedElements: Immutable.List(WB_BODY_EXTENSIONS) }),
+  body: ContentElements.fromText('Content', '', WB_BODY_EXTENSIONS),
   guid: '',
   contentType: 'Section',
 };
@@ -42,7 +43,7 @@ export class Section extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : Section {
+  clone(): Section {
     return this.with({
       title: this.title.clone(),
       body: this.body.clone(),
@@ -86,7 +87,11 @@ export class Section extends Immutable.Record(defaultContent) {
       section: {
         '#array': [
           this.title.toPersistence(),
-          ...this.body.toPersistence(),
+          { 
+            body: {
+              '#array': this.body.toPersistence(),
+            },
+          },
         ],
       },
     };

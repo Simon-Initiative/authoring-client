@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, except } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
@@ -67,7 +67,7 @@ export class Alternative extends Immutable.Record(defaultContent) {
     });
 
     model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', MATERIAL_ELEMENTS) });
+      .fromPersistence(except(getChildren(t), 'title'), '', MATERIAL_ELEMENTS) });
 
     return model;
   }

@@ -6,7 +6,6 @@ import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
-import { supportedElements as supportedExampleElements } from 'data/content/learning/example.ts';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -100,9 +99,9 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
               <i className={classes.unicodeIcon}>T</i>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={() => insert(new contentTypes.WorkbookSection())}
                 tooltip="Insert Section"
-                disabled>
+                disabled={!iff('section')}>
               <i className={'fa fa-list-alt'}/>
             </ToolbarButton>
             <ToolbarButton
@@ -160,9 +159,9 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
               <i className={'fa fa-html5'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={() => insert(new contentTypes.Pullout())}
                 tooltip="Insert Pullout"
-                disabled>
+                disabled={!iff('pullout')}>
               <i className={'fa fa-external-link-square'}/>
             </ToolbarButton>
             <ToolbarButton

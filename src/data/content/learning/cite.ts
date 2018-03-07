@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, except } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type CiteParams = {
@@ -64,7 +64,7 @@ export class Cite extends Immutable.Record(defaultContent) {
 
     if (!Object.keys(t).every(k => k.startsWith('@'))) {
       model = model.with({ content: ContentElements
-        .fromPersistence(getChildren(t), '', TEXT_ELEMENTS) });
+        .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS) });
     }
 
     return model;
