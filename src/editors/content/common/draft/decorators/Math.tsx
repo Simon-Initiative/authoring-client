@@ -6,7 +6,6 @@ import { ContentState } from 'draft-js';
 
 import { AppServices } from '../../../../common/AppServices';
 
-import { ModalMathEditor } from '../../../../../utils/math/ModalMathEditor';
 
 interface Math {
   _onClick: any;
@@ -27,32 +26,6 @@ class Math extends React.PureComponent<MathProps, any> {
 
   constructor(props) {
     super(props);
-
-    this._onClick = this.onClick.bind(this);
-  }
-
-  onClick() {
-
-    const entity = this.props.contentState.getEntity(this.props.entityKey);
-    const { data } = entity;
-    const math = data[this.attribute];
-
-    const editor = <ModalMathEditor content={math}
-      onCancel={() => this.props.services.dismissModal()}
-      onInsert={(content) => {
-
-        this.props.services.dismissModal();
-
-        const toMerge = {};
-        toMerge[this.attribute] = content;
-
-        const contentState = this.props.contentState
-          .replaceEntityData(this.props.entityKey, toMerge);
-
-        this.props.onEdit(contentState);
-      }}/>;
-
-    this.props.services.displayModal(editor);
   }
 
   render() : JSX.Element {
@@ -68,7 +41,7 @@ class Math extends React.PureComponent<MathProps, any> {
     }
 
     return (
-      <span onClick={this._onClick} data-offset-key={this.props.offsetKey}>
+      <span data-offset-key={this.props.offsetKey}>
         <MathRenderer inline>{math}</MathRenderer>
       </span>
     );

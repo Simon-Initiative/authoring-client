@@ -16,14 +16,12 @@ const decorators = [
   unsupported,
   link,
   cite,
-  math, 
+  math,
   inputRef,
   activityLink,
   xref,
   quote,
   image,
-  formulaBegin,
-  formulaEnd,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

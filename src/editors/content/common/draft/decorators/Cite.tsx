@@ -1,36 +1,28 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
-import { CiteEditor } from '../../../links/CiteEditor';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
+import { Cite as CiteData } from 'data/content/learning/cite';
+import { StyledInlineEntity } from './StyledInlineEntity';
+
+import './styles.scss';
 
 class Cite extends React.PureComponent<any, any> {
-
-  a: any;
 
   constructor(props) {
     super(props);
   }
 
-  componentDidMount() {
-    (window as any).$(this.a).tooltip();
-  }
-
-  componentWillUnmount() {
-    (window as any).$(this.a).tooltip('hide');
-  }
-
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const entry = data['@entry'];
+    const tooltip = (data as CiteData).entry === '' ? 'Citation' : (data as CiteData).entry;
+
     return (
-      <a
-        className="editor-link"
-        data-offset-key={this.props.offsetKey}
-        ref={a => this.a = a} data-toggle="tooltip"
-        data-placement="top" title={entry}>
+      <StyledInlineEntity
+        offsetKey={this.props.offsetKey}
+        className="entity-hyperlink"
+        tooltip={tooltip}>
         {this.props.children}
-      </a>
+      </StyledInlineEntity>
     );
   }
 }
