@@ -60,6 +60,8 @@ export interface ToolbarProps {
   insert: (content: Object) => void;
   edit: (content: Object) => void;
   hideLabels?: boolean;
+  onShowPageDetails: () => void;
+  onShowSidebar: () => void;
 }
 
 @injectSheet<ToolbarProps>(styles)
@@ -70,7 +72,7 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
   }
 
   render() {
-    const { insert, edit, content, supportedElements, classes } = this.props;
+    const { insert, edit, content, supportedElements, classes, onShowPageDetails } = this.props;
 
     const isText = content.caseOf({
       just: c => c instanceof contentTypes.ContiguousText,
@@ -349,7 +351,7 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
           </ToolbarLayoutGrid>
           <ToolbarLayoutInline>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={() => onShowPageDetails()}
                 tooltip="View and Edit Page Details"
                 size={ToolbarButtonSize.Large}>
               <div><i className="fa fa-info-circle"/></div>

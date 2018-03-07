@@ -2,7 +2,8 @@ import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
-import { insert, edit } from 'actions/active';
+import { insert, edit, resetActive } from 'actions/active';
+import { showSidebar } from 'actions/editorSidebar';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -12,6 +13,8 @@ interface StateProps {
 interface DispatchProps {
   insert: (content: Object) => void;
   edit: (content: Object) => void;
+  onShowPageDetails: () => void;
+  onShowSidebar: () => void;
 }
 
 interface OwnProps {
@@ -19,7 +22,6 @@ interface OwnProps {
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const activeContext : ActiveContextState = state.activeContext;
-
 
   const supportedElements = activeContext.container.caseOf({
     just: c => c.supportedElements,
@@ -39,6 +41,11 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     edit: content =>  dispatch(edit(content)),
     insert: content => dispatch(insert(content)),
+    onShowPageDetails: () => {
+      dispatch(resetActive());
+      dispatch(showSidebar(true));
+    },
+    onShowSidebar: () => dispatch(showSidebar(true)),
   };
 };
 

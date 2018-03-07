@@ -13,11 +13,15 @@
     margin-right: 40px;
   }
 
-  .html-editor-well {
+  .wb-content {
     display: flex;
     flex-direction: row;
-    padding: 12px;
+
+    .html-editor-well {
+      flex: 1;
+    }
   }
+
 
   blockquote {
     background: #f9f9f9;

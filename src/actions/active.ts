@@ -35,6 +35,17 @@ export const updateContext = (
     container,
   });
 
+export type RESET_ACTIVE = 'active/RESET_ACTIVE';
+export const RESET_ACTIVE: RESET_ACTIVE = 'active/RESET_ACTIVE';
+
+export type ResetActiveAction = {
+  type: RESET_ACTIVE,
+};
+
+export const resetActive = (): ResetActiveAction => ({
+  type: RESET_ACTIVE,
+});
+
 
 export function insert(content: Object) {
   return function (dispatch, getState) {

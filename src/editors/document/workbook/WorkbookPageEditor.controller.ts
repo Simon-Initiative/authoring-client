@@ -1,5 +1,5 @@
-import { connect } from 'react-redux';
-
+import { connect, Dispatch } from 'react-redux';
+import { State } from 'reducers';
 import WorkbookPageEditor from './WorkbookPageEditor';
 import { fetchObjectives } from 'actions/objectives';
 import { AbstractEditorProps } from '../common/AbstractEditor';
@@ -10,7 +10,7 @@ import { ParentContainer } from 'types/active';
 import * as activeActions from 'actions/active';
 
 interface StateProps {
-
+  activeContext: any;
 }
 
 interface DispatchProps {
@@ -23,16 +23,16 @@ interface DispatchProps {
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
 
-const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { activeContext } = state;
+  const { activeContext, editorSidebar } = state;
 
   return {
     activeContext,
   };
 };
 
-const mapDispatchToProps = (dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     fetchObjectives: (courseId: string) => {
       return dispatch(fetchObjectives(courseId));
