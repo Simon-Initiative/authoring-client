@@ -15,12 +15,14 @@ export type ExampleParams = {
   guid?: string,
 };
 
+export const supportedElements = BOX_ELEMENTS;
+
 const defaultContent = {
   contentType: 'Example',
   id: Maybe.nothing(),
-  title: new Title(),
+  title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
+  content: ContentElements.fromText('Content', '', supportedElements),
   guid: '',
 };
 

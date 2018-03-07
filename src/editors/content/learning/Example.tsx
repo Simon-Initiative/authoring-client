@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Example as ExampleType } from 'data/content/learning/example'; 
-import { ContentEditor } from 'editors/content/content/ContentEditor';
+import { ContentContainer } from 'editors/content/container/ContentContainer.tsx';
 import { Label } from '../common/Sidebar';
 import { TextInput } from '../common/controls';
+import { TitleContentEditor } from 'editors/content/title/TitleContentEditor.tsx';
 
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {
 
@@ -18,6 +19,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onContentEdit = this.onContentEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -38,12 +40,9 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     return (
       <div>
         <Label>Title</Label>
-        <TextInput
-          editMode={this.props.editMode]}
-          width="100%"
-          type="text"
-          label=""
-          value={this.props.model.title}
+        <TitleContentEditor
+          {...this.props}
+          model={this.props.model.title}
           onEdit={this.onTitleEdit}
         />
       </div>
@@ -55,17 +54,19 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
   }
 
   renderMain(): JSX.Element {
-    
     return (
-      <ContentEditor
-        model={this.props.model}
-        onEdit={this.onContentEdit}
-        onFocus={this.onFocus}
-        onRemove={}
-        context={this.props.context}
-        services={this.props.services}
-        editMode
-      />
+      <div className="exampleEditor">
+        <TitleContentEditor
+          {...this.props}
+          model={this.props.model.title}
+          onEdit={this.onTitleEdit}
+        />
+        <ContentContainer
+          {...this.props}
+          model={this.props.model.content}
+          onEdit={this.onContentEdit}
+        />
+      </div>
     );
   }
 }

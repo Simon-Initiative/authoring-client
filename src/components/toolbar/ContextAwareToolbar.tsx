@@ -6,6 +6,7 @@ import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
 import colors from 'styles/colors';
+import { supportedElements as supportedExampleElements } from 'data/content/learning/example.ts';
 
 import styles from './ContextAwareToolbar.style';
 
