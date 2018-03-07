@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Example as ExampleType } from 'data/content/learning/example'; 
-import { ContentContainer } from 'editors/content/container/ContentContainer.tsx';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Label } from '../common/Sidebar';
 import { TextInput } from '../common/controls';
-import { TitleContentEditor } from 'editors/content/title/TitleContentEditor.tsx';
+import { TitleContentEditor } from 'editors/content/title/TitleContentEditor';
 
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {
 
@@ -36,7 +36,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     this.props.onEdit(model, model);
   }
 
-  renderSidebar() {
+  renderSidebar(): JSX.Element {
     return (
       <div>
         <Label>Title</Label>
@@ -49,7 +49,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     );
   }
 
-  renderToolbar() {
+  renderToolbar(): JSX.Element {
     return <span>Example</span>;
   }
 
