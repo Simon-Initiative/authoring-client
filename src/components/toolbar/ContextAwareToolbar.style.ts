@@ -8,7 +8,7 @@ export default {
     flexDirection: 'row',
     overflowX: 'auto',
     overflowY: 'hidden',
-    margin: [10, 10],
+    margin: [10, 0],
     padding: 5,
     height: props => props.hideLabels ? 74 : 92,
     fontSize: 12,
