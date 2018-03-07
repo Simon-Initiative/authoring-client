@@ -131,8 +131,7 @@ function insertDataDrivenEntity(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const data = {};
-  data[label] = registeredTypes[type](item);
+  const data = registeredTypes[type](item);
 
   context.draft.entityMap[key] = {
     type,

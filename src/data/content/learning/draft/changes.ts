@@ -39,6 +39,50 @@ export function removeInputRef(contentState: ContentState, itemModelId: string) 
   return contentState;
 }
 
+
+export function removeEntity(
+  contentState: ContentState,
+  isEntity: (key: string, entity: Object) => boolean) : ContentState {
+
+  // Find the range that represents the entity
+  const range = findEntity(isEntity, contentState);
+
+    // Remove that entity via its range
+  if (range !== null) {
+    const selectionState = new SelectionState({
+      anchorKey: range.contentBlock.key,
+      focusKey: range.contentBlock.key,
+      anchorOffset: range.start,
+      focusOffset: range.end,
+    });
+    return Modifier.applyEntity(contentState, selectionState, null);
+
+  }
+
+  return contentState;
+}
+
+
+function findEntity(
+  isEntity: (key: string, entity) => boolean, contentState: ContentState) : EntityRange {
+
+  const matchPredicate = (key: string) => {
+    return key !== null &&
+      isEntity(key, contentState.getEntity(key));
+  };
+
+  const result = contentState.getBlocksAsArray()
+    .map(block => findEntityRangeForBlock(block, contentState, matchPredicate))
+    .reduce((p, c) => p.concat(c), []);
+
+  if (result.length > 0) {
+    return result[0];
+  }
+
+  return null;
+}
+
+
 function findEntityRangeByInput(inputId: string, contentState: ContentState) : EntityRange {
 
   const matchPredicate = (key: string) => {

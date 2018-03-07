@@ -5,6 +5,7 @@ import { injectSheet, injectSheetSFC, JSSProps, classNames } from 'styles/jss';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
+import { EntityTypes } from 'data/content/learning/common';
 import colors from 'styles/colors';
 
 import styles from './ContextAwareToolbar.style';
@@ -307,7 +308,12 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
               <i className={'fa fa-asterisk'}/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={
+                  () => content.lift((t) => {
+                    const text = t as contentTypes.ContiguousText;
+                    edit(text.addEntity(EntityTypes.link, true, new contentTypes.Link()));
+                  })
+                }
                 tooltip="External Hyperlink">
               <i className={'fa fa-external-link'}/>
             </ToolbarButton>

@@ -23,7 +23,7 @@ class Xref extends React.PureComponent<any, any> {
         context={b.context}
         services={b.services}
 
-        model={data.xref}
+        model={data}
         onCancel={() => this.props.services.dismissModal()}
         onInsert={(xref) => {
           this.props.services.dismissModal();
@@ -38,7 +38,7 @@ class Xref extends React.PureComponent<any, any> {
         <XrefEditor
           onFocus={null}
           parent={null}
-          model={data.xref}
+          model={data}
           context={b.context}
           services={b.services}
           editMode={true}

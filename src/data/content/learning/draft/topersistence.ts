@@ -579,7 +579,7 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
   const { data } = entityMap[s.key];
-  return data.link.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function formula_begin(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -594,14 +594,14 @@ function inlineImage(s : common.RawEntityRange, text : string, entityMap : commo
 
   const { data } = entityMap[s.key];
 
-  return data.image.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
 
-  return data.activity_link.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 
 }
 
@@ -610,7 +610,7 @@ function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.cite.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 
 }
 
@@ -618,7 +618,7 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.xref.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {

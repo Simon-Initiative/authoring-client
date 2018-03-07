@@ -21,37 +21,7 @@ class Image extends React.PureComponent<any, any> {
   onClick() {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
 
-    const b = this.props;
-    this.props.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={b.context}
-        services={b.services}
 
-        model={data.image}
-        onCancel={() => this.props.services.dismissModal()}
-        onInsert={(image) => {
-          this.props.services.dismissModal();
-
-          const updatedData = {
-            image,
-          };
-          const contentState = this.props.contentState.replaceEntityData(
-            this.props.entityKey, updatedData);
-
-          this.props.onEdit(contentState);
-        }
-      }>
-        <ImageEditor
-          onFocus={null}
-          parent={null}
-          model={data.image}
-          context={b.context}
-          services={b.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
   }
 
   render() : JSX.Element {

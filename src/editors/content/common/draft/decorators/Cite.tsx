@@ -10,7 +10,6 @@ class Cite extends React.PureComponent<any, any> {
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
   }
 
   componentDidMount() {
@@ -21,39 +20,6 @@ class Cite extends React.PureComponent<any, any> {
     (window as any).$(this.a).tooltip('hide');
   }
 
-  onClick() {
-    const key = this.props.entityKey;
-    const data = this.props.contentState.getEntity(key).getData();
-
-    this.props.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={this.props.context}
-        services={this.props.services}
-
-        model={data.cite}
-        onCancel={() => this.props.services.dismissModal()}
-        onInsert={(cite) => {
-          this.props.services.dismissModal();
-          const data = {
-            cite,
-          };
-          const contentState = this.props.contentState.replaceEntityData(key, data);
-
-          this.props.onEdit(contentState);
-        }
-      }>
-        <CiteEditor
-          model={data.cite}
-          onFocus={null}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
-  }
-
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
     const entry = data['@entry'];
@@ -62,7 +28,7 @@ class Cite extends React.PureComponent<any, any> {
         className="editor-link"
         data-offset-key={this.props.offsetKey}
         ref={a => this.a = a} data-toggle="tooltip"
-        data-placement="top" title={entry} onClick={this.onClick}>
+        data-placement="top" title={entry}>
         {this.props.children}
       </a>
     );
