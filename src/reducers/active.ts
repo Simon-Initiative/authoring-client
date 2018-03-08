@@ -7,7 +7,8 @@ export type ActionTypes =
   documentActions.DocumentReleasedAction |
   documentActions.DocumentLoadedAction |
   actions.UpdateContentAction |
-  actions.UpdateContextAction;
+  actions.UpdateContextAction |
+  actions.ResetActiveAction;
 
 export type ActiveContextState = ActiveContext;
 
@@ -42,6 +43,8 @@ export const activeContext = (
         container: Maybe.nothing(),
         documentId: Maybe.just(action.documentId),
       });
+    case actions.RESET_ACTIVE:
+      return new ActiveContext();
 
     default:
       return state;

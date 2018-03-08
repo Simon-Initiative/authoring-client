@@ -1,4 +1,7 @@
-
+export enum LinkTarget {
+  New = 'new',
+  Self = 'self',
+}
 
 export type PurposeType = {
   value: string,

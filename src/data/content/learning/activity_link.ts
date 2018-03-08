@@ -1,9 +1,10 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
+import { LinkTarget } from './common';
 
 export type ActivityLinkParams = {
-  target?: string,
+  target?: LinkTarget,
   idref?: string,
   purpose?: string,
   title?: string,
@@ -13,7 +14,7 @@ export type ActivityLinkParams = {
 
 const defaultContent = {
   contentType: 'ActivityLink',
-  target: 'self',
+  target: LinkTarget.New,
   idref: '',
   purpose: 'checkpoint',
   title: '',
@@ -25,7 +26,7 @@ export class ActivityLink extends Immutable.Record(defaultContent) {
 
   contentType: 'ActivityLink';
   content: ContentElements;
-  target: string;
+  target: LinkTarget;
   idref: string;
   purpose: string;
   title: string;

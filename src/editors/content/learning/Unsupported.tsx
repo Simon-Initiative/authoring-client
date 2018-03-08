@@ -1,22 +1,23 @@
 import * as React from 'react';
 
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import PreformattedText from './PreformattedText';
 import './Unsupported.scss';
 
 const beautify = require('json-beautify');
 
-export interface UnsupportedProps {
-  data: Object;
+export interface UnsupportedProps extends AbstractContentEditorProps<{}> {
+
 }
 
 export interface UnsupportedState {
 
 }
 
-class Unsupported extends React.Component<UnsupportedProps, UnsupportedState> {
+class Unsupported extends AbstractContentEditor<{}, UnsupportedProps, UnsupportedState> {
 
   constructor(props) {
-    super(props, {});
+    super(props);
 
     this.onEdit = this.onEdit.bind(this);
   }
@@ -26,11 +27,11 @@ class Unsupported extends React.Component<UnsupportedProps, UnsupportedState> {
   }
 
   onEdit(data) {
-
+    // Editing is disabled
   }
 
   renderSidebar() {
-    return null;
+    return <div>This is an unsupported element</div>;
   }
   renderToolbar() {
     return null;
@@ -41,11 +42,12 @@ class Unsupported extends React.Component<UnsupportedProps, UnsupportedState> {
       <PreformattedText
         editMode={false}
         onEdit={this.onEdit}
-        src={beautify(this.props.data, null, 2, 100)}
+        src={beautify(this.props.model, null, 2, 100)}
         styleName="Unsupported-style"/>
 
     );
   }
+
 }
 
 export default Unsupported;

@@ -14,13 +14,6 @@ export default {
     fontSize: 12,
     borderBottom: [1, 'solid', colors.grayLight],
   },
-  unicodeIcon: {
-    font: {
-      style: 'normal',
-      family: 'serif',
-      weight: 700,
-    },
-  },
   toolbarGroup: {
     width: 300,
   },
@@ -73,9 +66,6 @@ export default {
   },
   toolbarFormatGroup: {
     width: 150,
-  },
-  toolbarContextGroup: {
-
   },
   toolbarActionsGroup: {
     width: 'initial',

@@ -101,8 +101,31 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return true;
   }
 
+  selectionOverlapsEntity() : boolean {
+    return this.content.getBlocksAsArray()
+      .reduce(
+        (acc, block) => {
+          if (acc) {
+            return true;
+          }
+          let overlaps = false;
+          block.findEntityRanges(
+            c => c.getEntity() !== null,
+            (start: number, end: number) => {
+              overlaps = overlaps || this.selection.hasEdgeWithin(block.key, start, end);
+            },
+          );
+          return overlaps;
+        },
+        false);
+  }
+
   getEntityAtCursor() : Maybe<InlineEntity> {
-    const block = this.content.getBlocksForKey(this.selection.focusKey);
+    const block = this.content.getBlockForKey(this.selection.focusKey);
+
+    if (block === undefined) {
+      return Maybe.nothing();
+    }
     const key = block.getEntityAt(this.selection.focusOffset);
 
     if (key === null) {
@@ -132,6 +155,10 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       content,
     });
 
+  }
+
+  updateEntity(key: string, data: Object) {
+    return this.content.replaceEntityData(key, data);
   }
 
   removeEntity(key: string) : ContiguousText {

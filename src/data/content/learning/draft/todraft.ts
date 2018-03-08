@@ -80,8 +80,12 @@ function getInlineHandlers() {
     image: imageInline,
     formula: formulaInline,
     '#math': hashMath,
-    'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
-    quote: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.quote),
+    'm:math': insertDataDrivenEntity.bind(
+      undefined, 'IMMUTABLE',
+      common.EntityTypes.math, 'math', registeredTypes['math']),
+    quote: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.quote, 'quote', registeredTypes['quote']),
     code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
   };
   return inlineHandlers;
@@ -168,8 +172,7 @@ function hashMath(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const data = {};
-  data['#math'] = item['#math'];
+  const data = registeredTypes['math'](item, '');
 
   context.draft.entityMap[key] = {
     type: common.EntityTypes.math,
