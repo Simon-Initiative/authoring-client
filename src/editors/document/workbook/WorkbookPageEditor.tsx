@@ -6,10 +6,8 @@ import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
-import { Objectives } from './Objectives';
-import { Details } from './Details';
-import { Actions } from './Actions';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
 
@@ -38,7 +36,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     super(props, {});
 
     this.onModelEdit = this.onModelEdit.bind(this);
-    this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -91,12 +88,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.props.onEdit(this.props.model.with({ head, resource }));
   }
 
-  onObjectivesEdit(objrefs: Immutable.List<string>) {
-
-    const head = this.props.model.head.with({ objrefs });
-    this.handleEdit(this.props.model.with({ head }));
-  }
-
   hasMissingObjective(
     objrefs: Immutable.List<string>,
     objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>) {
@@ -104,16 +95,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return objrefs
       .toArray()
       .some(id => !objectives.has(id));
-  }
-
-  renderObjectives() {
-    return <Objectives
-      parent={null}
-      onFocus={this.onFocus.bind(this, this.props.model.head.objrefs, this)}
-      {...this.props}
-      model={this.props.model.head.objrefs}
-      onEdit={this.onObjectivesEdit}
-      />;
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
@@ -131,7 +112,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.props.onUpdateContentSelection(this.props.context.documentId, model, parent);
   }
 
-  renderContentTab() {
+  render() {
+    const text = this.props.model.head.title.text.extractPlainText().caseOf({
+      just: s => s,
+      nothing: () => '',
+    });
 
     const activeGuid = this.props.activeContext.activeChild.caseOf({
       just: c => (c as any).guid,
@@ -139,63 +124,23 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     });
 
     return (
-      <div key="content-tab" className="html-editor-well">
-        <div className="flex-spacer">
-        <ContentContainer
-          parent={null}
-          activeContentGuid={activeGuid}
-          onFocus={this.onFocus.bind(this)}
-          editMode={this.props.editMode}
-          services={this.props.services}
-          context={this.props.context}
-          model={this.props.model.body}
-          onEdit={(c, s) => this.onBodyEdit(c, s)} />
-        </div>
-      </div>
-    );
-  }
-
-  renderDetailsTab() {
-    return (
-      <div key="details-tab">
-        <Details
-          onFocus={this.onFocus.bind(this, this.props.model, this)}
-          {...this.props}
-          model={this.props.model}
-          editMode={this.props.editMode}
-          onEdit={this.onModelEdit}/>
-      </div>
-    );
-  }
-
-  renderObjectivesTab() {
-    return (
-      <div key="objectives-tab">
-        {this.renderObjectives()}
-      </div>
-    );
-  }
-
-  renderActionsTab() {
-    return (
-      <div key="actions-tab">
-        <Actions onPreview={() =>
-          this.props.preview(this.props.context.courseId, this.props.model.resource)}/>
-      </div>
-    );
-  }
-
-  render() {
-    const text = this.props.model.head.title.text.extractPlainText().caseOf({
-      just: s => s,
-      nothing: () => '',
-    });
-
-    return (
       <div className="workbookpage-editor">
         <h2 className="title-row">{text}</h2>
         <ContextAwareToolbar />
-        {this.renderContentTab()}
+        <div className="wb-content">
+          <div className="html-editor-well">
+            <ContentContainer
+              parent={null}
+              activeContentGuid={activeGuid}
+              onFocus={this.onFocus.bind(this)}
+              editMode={this.props.editMode}
+              services={this.props.services}
+              context={this.props.context}
+              model={this.props.model.body}
+              onEdit={(c, s) => this.onBodyEdit(c, s)} />
+          </div>
+          <ContextAwareSidebar />
+        </div>
       </div>
     );
   }

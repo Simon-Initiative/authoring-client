@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 
 import { choices, ChoicesState } from './choices';
 import { course, CourseState } from './course';
+import { editorSidebar, EditorSidebarState } from './editorSidebar';
 import { expanded, ExpandedState } from './expanded';
 import { locks, LocksState } from './locks';
 import { media, MediaState } from './media';
@@ -21,6 +22,7 @@ export interface State {
   documents: DocumentsState;
   choices: ChoicesState;
   course: CourseState;
+  editorSidebar: EditorSidebarState;
   expanded: ExpandedState;
   locks: LocksState;
   media: MediaState;
@@ -39,6 +41,7 @@ const reducers = combineReducers({
   documents,      // The current state and models of documents under edit
   choices,        // Supporting data for choices
   course,         // Information about current course
+  editorSidebar,  // Editor sidebar state
   expanded,       // preserves expaned state of tree UIs
   locks,          // The current, registered document locks
   media,          // Course media state
