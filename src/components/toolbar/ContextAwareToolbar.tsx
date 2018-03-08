@@ -1,5 +1,4 @@
 import * as React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
@@ -8,12 +7,11 @@ import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
-import colors from 'styles/colors';
 import { InsertToolbar } from './InsertToolbar';
 import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
 
-import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
+import styles from './ContextAwareToolbar.style';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -116,11 +114,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         getEditorByContentType((contentModel as any).contentType), props);
 
     }
-
-    const contentType = content.caseOf({
-      just: c => (c as any).contentType,
-      nothing: () => false,
-    });
 
     const elementMap = supportedElements
       .toArray()
