@@ -5,10 +5,11 @@ import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { ToolbarLayoutInline } from 'components/toolbar/ContextAwareToolbar.tsx';
+import { ToolbarGroup, ToolbarLayoutInline } from 'components/toolbar/ContextAwareToolbar.tsx';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
+import colors from 'styles/colors';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -82,7 +83,8 @@ export default class ContiguousTextEditor
       : model.selectionOverlapsEntity();
 
     return (
-      <React.Fragment>
+      <ToolbarGroup
+        label="Text Block" highlightColor={colors.contentSelection}>
         <ToolbarLayoutInline>
           <ToolbarButton
               onClick={() => {
@@ -161,7 +163,7 @@ export default class ContiguousTextEditor
           </ToolbarButton>
 
         </ToolbarLayoutInline>
-      </React.Fragment>
+      </ToolbarGroup>
     );
   }
 

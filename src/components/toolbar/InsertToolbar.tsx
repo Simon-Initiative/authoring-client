@@ -38,9 +38,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-list-ul'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.WorkbookSection())}
             tooltip="Insert Section"
-            disabled>
+            disabled={!parentSupportsElementType('section')}>
           <i className={'fa fa-list-alt'}/>
         </ToolbarButton>
         <ToolbarButton
@@ -98,9 +98,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-html5'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.Pullout())}
             tooltip="Insert Pullout"
-            disabled>
+            disabled={!parentSupportsElementType('pullout')}>
           <i className={'fa fa-external-link-square'}/>
         </ToolbarButton>
         <ToolbarButton

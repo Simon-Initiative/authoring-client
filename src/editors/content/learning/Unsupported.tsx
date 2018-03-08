@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar.tsx';
 import PreformattedText from './PreformattedText';
 import './Unsupported.scss';
 
@@ -34,7 +35,9 @@ class Unsupported extends AbstractContentEditor<{}, UnsupportedProps, Unsupporte
     return <div>This is an unsupported element</div>;
   }
   renderToolbar() {
-    return null;
+    return (
+      <ToolbarGroup label="Unsupported" hide />
+    );
   }
 
   renderMain() : JSX.Element {

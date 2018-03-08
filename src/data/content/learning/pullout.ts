@@ -1,10 +1,10 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, except } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
-
+import { Orientation } from 'data/content/learning/common';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
 import { Maybe } from 'tsmonad';
 
@@ -32,7 +32,7 @@ function fromStr(value: string) : Maybe<PulloutType> {
 export type PulloutParams = {
   id?: Maybe<string>,
   title?: Title,
-  purpose?: Maybe<string>,
+  orient?: Orientation,
   content?: ContentElements,
   pulloutType?: Maybe<PulloutType>,
   guid?: string,
@@ -41,10 +41,10 @@ export type PulloutParams = {
 const defaultContent = {
   contentType: 'Pullout',
   id: Maybe.nothing(),
-  title: new Title(),
-  purpose: Maybe.nothing(),
+  title: Title.fromText('Title'),
+  orient: Orientation.Horizontal,
   pulloutType: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
+  content: ContentElements.fromText('Content', '', BOX_ELEMENTS),
   guid: '',
 };
 
@@ -52,7 +52,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
   contentType: 'Pullout';
   id: Maybe<string>;
   title: Title;
-  purpose: Maybe<string>;
+  orient: Orientation;
   content: ContentElements;
   pulloutType: Maybe<PulloutType>;
   guid: string;
@@ -80,8 +80,12 @@ export class Pullout extends Immutable.Record(defaultContent) {
     if (t['@id'] !== undefined) {
       model = model.with({ id: Maybe.just(t['@id']) });
     }
-    if (t['@purpose'] !== undefined) {
-      model = model.with({ purpose: Maybe.just(t['@purpose']) });
+    if (t['@orient'] !== undefined) {
+      model = model.with({ 
+        orient: t['@orient'] === 'vertical' 
+          ? Orientation.Vertical 
+          : Orientation.Horizontal,
+      });
     }
     if (t['@type'] !== undefined) {
       model = model.with({ pulloutType: fromStr(t['@type']) });
@@ -100,10 +104,8 @@ export class Pullout extends Immutable.Record(defaultContent) {
       }
     });
 
-    debugger;
-
     model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', BOX_ELEMENTS) });
+      .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS) });
 
     return model;
   }
@@ -111,6 +113,7 @@ export class Pullout extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     const s = {
       pullout: {
+        '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),
           ...this.content.toPersistence(),
@@ -119,7 +122,6 @@ export class Pullout extends Immutable.Record(defaultContent) {
     };
 
     this.id.lift(p => s.pullout['@id'] = p);
-    this.purpose.lift(p => s.pullout['@purpose'] = p);
     this.pulloutType.lift(p => s.pullout['@type'] = p);
 
     return s;

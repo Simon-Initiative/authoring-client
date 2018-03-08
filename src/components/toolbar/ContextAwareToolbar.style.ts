@@ -1,6 +1,10 @@
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
+export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 250;
+
+const TOOLBAR_HIDE_ANIMATION_DURATION_S = TOOLBAR_HIDE_ANIMATION_DURATION_MS / 1000;
+
 export default {
   toolbar: {
     extend: [disableSelect],
@@ -37,7 +41,8 @@ export default {
       opacity: 0,
     },
 
-    transition: 'max-width .25s ease-in, opacity .25s ease-in',
+    transition: `max-width ${TOOLBAR_HIDE_ANIMATION_DURATION_S}s ease-in, \
+      opacity ${TOOLBAR_HIDE_ANIMATION_DURATION_S}s ease-in`,
   },
   toolbarLayoutInline: {
     display: 'inline-block',

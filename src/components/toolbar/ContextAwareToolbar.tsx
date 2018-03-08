@@ -25,7 +25,7 @@ interface ToolbarGroupProps {
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
   (({ className, classes, label, hide, children }) => {
     return (
-      <div className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
+      <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
         <div className={classNames([classes.toolbarGroup, className])}>
             <div className={classes.tbGroupItems}>{children}</div>
             <div className={classes.tbGroupLabel}>{label}</div>
@@ -117,11 +117,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     }
 
-    const contentType = content.caseOf({
-      just: c => (c as any).contentType,
-      nothing: () => false,
-    });
-
     const elementMap = supportedElements
       .toArray()
       .reduce(
@@ -149,11 +144,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             />
         </ToolbarGroup>
 
-        <ToolbarGroup
-            label={contentType} highlightColor={contentModel && colors.contentSelection}
-            hide={!contentModel}>
-          {contentRenderer}
-        </ToolbarGroup>
+        {contentRenderer}
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
           <ActionsToolbar onShowPageDetails={onShowPageDetails} />
