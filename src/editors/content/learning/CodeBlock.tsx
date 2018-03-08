@@ -2,6 +2,7 @@ import * as React from 'react';
 import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
 import PreformattedText from './PreformattedText';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar.tsx';
 
 import { Checkbox, Select, TextInput } from '../common/controls';
 import { Label } from '../common/Sidebar';
@@ -71,8 +72,11 @@ export class CodeBlock
     return (
       <div>
         <Label>Language / Syntax</Label>
-        <Select editMode={this.props.editMode}
-          value={syntax} onChange={this.onSyntaxChange}>
+        <Select
+          editMode={this.props.editMode}
+          label=""
+          value={syntax}
+          onChange={this.onSyntaxChange}>
           <option value="actionscript3">ActionScript</option>
           <option value="bash">Bash</option>
           <option value="c">C</option>
@@ -111,7 +115,9 @@ export class CodeBlock
   }
 
   renderToolbar() {
-    return <span>Code block</span>;
+    return (
+      <ToolbarGroup label="Code Block" hide />
+    );
   }
 
   renderMain() : JSX.Element {

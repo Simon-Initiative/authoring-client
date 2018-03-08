@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar.tsx';
 import PreformattedText from './PreformattedText';
 import './Unsupported.scss';
 
@@ -33,7 +33,9 @@ class Unsupported extends React.Component<UnsupportedProps, UnsupportedState> {
     return null;
   }
   renderToolbar() {
-    return null;
+    return (
+      <ToolbarGroup label="Unsupported" hide />
+    );
   }
 
   renderMain() : JSX.Element {
