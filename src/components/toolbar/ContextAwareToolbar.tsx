@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, injectSheetSFC, JSSProps, classNames } from 'styles/jss';
+import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
