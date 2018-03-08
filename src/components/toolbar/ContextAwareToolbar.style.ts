@@ -67,7 +67,7 @@ export default {
     borderBottom: props => `4px solid ${props.highlightColor || 'transparent'}`,
   },
   toolbarInsertGroup: {
-
+    width: 336,
   },
   toolbarFormatGroup: {
     width: 150,
