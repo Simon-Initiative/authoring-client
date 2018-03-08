@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, except } from '../common';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { ContentElements, BOX_ELEMENTS } from 'data/content/common/elements';
@@ -18,9 +18,9 @@ export type ExampleParams = {
 const defaultContent = {
   contentType: 'Example',
   id: Maybe.nothing(),
-  title: new Title(),
+  title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
-  content: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
+  content: ContentElements.fromText('Content', '', BOX_ELEMENTS),
   guid: '',
 };
 
@@ -72,7 +72,7 @@ export class Example extends Immutable.Record(defaultContent) {
     });
 
     model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', BOX_ELEMENTS) });
+      .fromPersistence(except(getChildren(t), 'title'), '', BOX_ELEMENTS) });
 
     return model;
   }
