@@ -4,11 +4,7 @@ import { Material } from './material';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
-
-export enum Orientation {
-  Horizontal = 'horizontal',
-  Vertical = 'vertical',
-}
+import { Orientation } from 'data/content/learning/common';
 
 export type MaterialsParams = {
   content?: Immutable.OrderedMap<string, Material>,

@@ -1,4 +1,7 @@
-
+export enum Orientation {
+  Horizontal = 'horizontal',
+  Vertical = 'vertical',
+}
 
 export type PurposeType = {
   value: string,

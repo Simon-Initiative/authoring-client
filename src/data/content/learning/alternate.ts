@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
+import { augment, getChildren, except } from '../common';
 import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 
@@ -55,7 +55,7 @@ export class Alternate extends Immutable.Record(defaultContent) {
     }
 
     model = model.with({ content: ContentElements
-      .fromPersistence(getChildren(t), '', TEXT_ELEMENTS) });
+      .fromPersistence(except(getChildren(t), 'title'), '', TEXT_ELEMENTS) });
 
     return model;
   }
