@@ -50,7 +50,7 @@ export class MathEditor
         <Label>Math Editor</Label>
         <SourceBasedMathEditor
           content={model.data}
-          onChange={data => onEdit(model.with({ data }))}
+          onChange={data => onEdit(model.with({ data })) }
           />
       </div>
     );

@@ -158,7 +158,9 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   updateEntity(key: string, data: Object) {
-    return this.content.replaceEntityData(key, data);
+    return this.with({
+      content: this.content.replaceEntityData(key, data),
+    });
   }
 
   removeEntity(key: string) : ContiguousText {

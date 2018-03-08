@@ -82,8 +82,8 @@ export class XrefEditor
           value={model.target}
           onChange={v =>
             onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
-          <option value="self">Open in this window</option>
-          <option value="self">Open in new window</option>
+          <option value={LinkTarget.Self}>Open in this window</option>
+          <option value={LinkTarget.New}>Open in new window</option>
         </Select>
       </div>
     );

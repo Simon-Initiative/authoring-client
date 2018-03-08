@@ -6,7 +6,7 @@ import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
 import { Checkbox, Select, TextInput } from '../common/controls';
-import { Label, VerticalSpacer } from '../common/Sidebar';
+import { Label, VerticalSpacer, Header } from '../common/Sidebar';
 
 import styles from './Entity.style';
 
@@ -47,6 +47,8 @@ export class LinkEditor
     return (
       <div className={classNames([classes.entityRenderer, className])}>
 
+        <Header>External Link</Header>
+
         <Label>URL</Label>
         <TextInput
           editMode={editMode}
@@ -65,8 +67,8 @@ export class LinkEditor
           value={model.target}
           onChange={v =>
             onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
-          <option value="self">Open in this window</option>
-          <option value="self">Open in new window</option>
+          <option value={LinkTarget.Self}>Open in this window</option>
+          <option value={LinkTarget.New}>Open in new window</option>
         </Select>
       </div>
     );

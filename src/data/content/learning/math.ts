@@ -8,8 +8,8 @@ export type MathParams = {
 
 const defaultContent = {
   contentType: 'Math',
-  data: '<math><mi>c</mi><mo>=</mo><msqrt><msup><mi>a</mi><mn>2</mn>'
-    + '</msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup></msqrt></math>',
+  data: '<m:math><m:mi>c</m:mi><m:mo>=</m:mo><m:msqrt><m:msup><m:mi>a</m:mi><m:mn>2</m:mn>'
+    + '</m:msup><m:mo>+</m:mo><m:msup><m:mi>b</m:mi><m:mn>2</m:mn></m:msup></m:msqrt></m:math>',
   guid: '',
 };
 
@@ -47,9 +47,7 @@ export class Math extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
     return {
-      'm:math': {
-        '#cdata': this.data,
-      },
+      '#math': this.data,
     };
   }
 }

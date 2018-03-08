@@ -101,6 +101,16 @@ export default class ContiguousTextEditor
           <ToolbarButton
               onClick={
                 () => {
+                  onEdit(model.addEntity(EntityTypes.math, true, new contentTypes.Math()));
+                }
+              }
+              disabled={entitiesDisabled}
+              tooltip="MathML or Latex formula">
+            <i className={'fa fa-etsy'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={
+                () => {
                   onEdit(model.addEntity(EntityTypes.quote, true, new contentTypes.Quote()));
                 }
               }

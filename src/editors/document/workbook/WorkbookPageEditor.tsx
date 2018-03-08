@@ -68,10 +68,22 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   onBodyEdit(content : any, source: Object) {
+
     const model = this.props.model.with({ body: content });
 
+    const onlySelectionChange = (source instanceof contentTypes.ContiguousText
+      && this.props.activeContext.activeChild
+      .caseOf({
+        just: n => (n as any).guid === source.guid
+          ? (n as contentTypes.ContiguousText).content === source.content : false,
+        nothing: () => false }));
+
     this.props.onUpdateContent(this.props.context.documentId, source);
-    this.handleEdit(model);
+
+    if (!onlySelectionChange) {
+      this.handleEdit(model);
+    }
+
   }
 
   onTitleEdit(text: ContentElements) {
