@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { TextInput, Select } from '../common/controls';
+import { Select } from '../common/controls';
 import { Label } from '../common/Sidebar';
 import { TitleContentEditor } from 'editors/content/title//TitleContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';

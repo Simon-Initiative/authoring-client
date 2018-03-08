@@ -3,7 +3,6 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { Example as ExampleType } from 'data/content/learning/example'; 
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Label } from '../common/Sidebar';
-import { TextInput } from '../common/controls';
 import { TitleContentEditor } from 'editors/content/title/TitleContentEditor';
 
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {

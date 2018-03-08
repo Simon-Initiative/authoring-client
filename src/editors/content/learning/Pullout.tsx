@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Pullout as PulloutType } from 'data/content/learning/pullout';
-import { Select, TextInput, Checkbox } from '../common/controls';
+import { Select, Checkbox } from '../common/controls';
 import { Label } from '../common/Sidebar';
 import { TitleContentEditor } from 'editors/content/title//TitleContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
