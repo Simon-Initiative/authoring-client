@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
@@ -12,7 +13,7 @@ import { InsertToolbar } from './InsertToolbar';
 import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
 
-import styles from './ContextAwareToolbar.style';
+import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -24,7 +25,7 @@ interface ToolbarGroupProps {
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
   (({ className, classes, label, hide, children }) => {
     return (
-      <div className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
+      <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
         <div className={classNames([classes.toolbarGroup, className])}>
             <div className={classes.tbGroupItems}>{children}</div>
             <div className={classes.tbGroupLabel}>{label}</div>
@@ -148,11 +149,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             />
         </ToolbarGroup>
 
-        <ToolbarGroup
-            label={contentType} highlightColor={contentModel && colors.contentSelection}
-            hide={!contentModel}>
-          {contentRenderer}
-        </ToolbarGroup>
+        {contentRenderer}
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
           <ActionsToolbar onShowPageDetails={onShowPageDetails} />
