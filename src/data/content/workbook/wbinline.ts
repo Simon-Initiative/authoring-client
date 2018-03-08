@@ -85,7 +85,6 @@ export class WbInline extends Immutable.Record(defaultContent) {
       }
     });
 
-
     return model;
   }
 

@@ -3,6 +3,8 @@ import { CodeBlock } from '../learning/CodeBlock';
 import { Example } from '../learning/Example';
 import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
+import { WbInline } from '../learning/WbInline';
+import { Activity } from '../learning/Activity';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 
@@ -26,4 +28,6 @@ function init() {
   registry['Example'] = Example;
   registry['Pullout'] = Pullout;
   registry['Section'] = Section;
+  registry['WbInline'] = WbInline;
+  registry['Activity'] = Activity;
 }

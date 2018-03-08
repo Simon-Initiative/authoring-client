@@ -106,15 +106,15 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.WbInline())}
             tooltip="Insert Inline Assessment"
-            disabled>
+            disabled={!parentSupportsElementType('wb:inline')}>
           <i className={'fa fa-flask'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.Activity())}
             tooltip="Insert Activity"
-            disabled>
+            disabled={!parentSupportsElementType('activity')}>
           <i className={'fa fa-check'}/>
         </ToolbarButton>
       </ToolbarLayoutInline>
