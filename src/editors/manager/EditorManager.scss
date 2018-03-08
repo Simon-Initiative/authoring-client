@@ -5,6 +5,10 @@
 }
 
 .editor-manager {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   .itemWrapper {
     margin: 1;

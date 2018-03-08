@@ -2,6 +2,8 @@ import * as React from 'react';
 import { UserProfile } from 'types/user';
 import EditorManager from 'editors/manager/EditorManager.controller';
 
+import './DocumentView.scss';
+
 export interface DocumentViewProps {
   onLoad: (documentId: string) => void;
   onRelease: (documentId: string) => void;
@@ -45,18 +47,12 @@ export default class DocumentView
 
     return (
       <div className="document-view container-fluid">
-        <div className="row">
-            <div className="col-sm-11 col-md-11 document">
-              <div className="editor">
-                <EditorManager
-                  course={course}
-                  profile={profile}
-                  userId={userId}
-                  userName={userName}
-                  documentId={documentId} />
-              </div>
-            </div>
-        </div>
+        <EditorManager
+          course={course}
+          profile={profile}
+          userId={userId}
+          userName={userName}
+          documentId={documentId} />
       </div>
     );
   }

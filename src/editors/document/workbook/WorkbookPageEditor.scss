@@ -2,6 +2,10 @@
 @import 'oli/typography';
 
 .workbookpage-editor {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   .title-row {
     margin: 10px;
@@ -16,9 +20,13 @@
   .wb-content {
     display: flex;
     flex-direction: row;
+    overflow: hidden;
+    flex: 1;
 
     .html-editor-well {
       flex: 1;
+      overflow: auto;
+      padding: 0 10px 20px 10px;
     }
   }
 

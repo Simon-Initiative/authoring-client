@@ -59,15 +59,9 @@ export function insert(content: Object) {
 
 export function edit(content: Object) {
   return function (dispatch, getState) {
-
-    const text = content as any;
-    console.log('edit view of content:');
-    console.log(text.content.getFirstBlock().getText());
-
     const { activeContext } = getState();
     activeContext.container.lift((parent : ParentContainer) => {
       parent.onEdit(content, content);
     });
   };
 }
-

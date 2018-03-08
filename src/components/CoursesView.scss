@@ -1,4 +1,7 @@
 .courses-view {
+  flex: 1;
+  overflow: auto;
+
   .my-course-packages {
     margin: 2rem;
   }

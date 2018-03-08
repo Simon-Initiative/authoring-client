@@ -1,6 +1,9 @@
 @import 'oli/layout';
 
 .resource-view {
+  flex: 1;
+  overflow: auto;
+
   .table-toolbar {
     display: flex;
     flex-direction: row;
