@@ -6,6 +6,7 @@ import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
+import { AbstractContentEditorProps } from 'editors/content/common/AbstractContentEditor.tsx';
 
 import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
 
@@ -83,16 +84,16 @@ export class ContextAwareSidebar
 
     let contentRenderer;
     if (contentParent) {
-      const props = {
+      const props: AbstractContentEditorProps<any> = {
         renderContext: RenderContext.Sidebar,
         model: contentModel,
         onEdit,
         parent: contentParent,
-        activeContentGuid: contentParent.activeContentGuid,
+        activeContentGuid: contentParent.props.activeContentGuid,
         onFocus: () => {},
-        context: contentParent.context,
-        services: contentParent.services,
-        editMode: contentParent.editMode,
+        context: contentParent.props.context,
+        services: contentParent.props.services,
+        editMode: contentParent.props.editMode,
       };
 
       contentRenderer = React.createElement(

@@ -2,6 +2,9 @@
 @import 'oli/layout';
 
 .objective-skill-view {
+  flex: 1;
+  overflow: auto;
+
   .document {
     padding-top: 30px;
   }
