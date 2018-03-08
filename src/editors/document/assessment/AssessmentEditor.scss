@@ -1,6 +1,16 @@
 @import 'oli/typography';
 
 .assessment-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+	.docHead {
+    flex: 1;
+    overflow: auto;
+  }
+
   .slash {
     color: #606060;
   }
