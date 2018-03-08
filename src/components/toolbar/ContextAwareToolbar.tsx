@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, JSSProps, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
@@ -70,7 +71,7 @@ export interface ToolbarProps {
 }
 
 @injectSheet(styles)
-export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSProps> {
+export class ContextAwareToolbar extends React.PureComponent<StyledComponentProps<ToolbarProps>> {
 
   constructor(props) {
     super(props);
@@ -103,11 +104,11 @@ export class ContextAwareToolbar extends React.PureComponent<ToolbarProps & JSSP
         model: contentModel,
         onEdit,
         parent: contentParent,
-        activeContentGuid: contentParent.activeContentGuid,
+        activeContentGuid: contentParent.props.activeContentGuid,
         onFocus: () => {},
-        context: contentParent.context,
-        services: contentParent.services,
-        editMode: contentParent.editMode,
+        context: contentParent.props.context,
+        services: contentParent.props.services,
+        editMode: contentParent.props.editMode,
       };
 
       contentRenderer = React.createElement(
