@@ -63,7 +63,7 @@ export default class ContiguousTextEditor
   }
 
   renderSidebar() {
-    const { model, onEdit, editMode } = this.props;
+    const { model } = this.props;
 
     const entity = model.selection.isCollapsed()
       ? model.getEntityAtCursor().caseOf({ just: n => n, nothing: () => null })
@@ -78,7 +78,7 @@ export default class ContiguousTextEditor
   renderToolbar() {
     const { model, onEdit, editMode } = this.props;
 
-    const entitiesDisabled = model.selection.isCollapsed()
+    const entitiesDisabled = !editMode || model.selection.isCollapsed()
       ? model.getEntityAtCursor().caseOf({ just: n => true, nothing: () => false })
       : model.selectionOverlapsEntity();
 

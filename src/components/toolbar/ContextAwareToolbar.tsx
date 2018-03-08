@@ -7,8 +7,6 @@ import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
-import { EntityTypes } from 'data/content/learning/common';
-import colors from 'styles/colors';
 import { InsertToolbar } from './InsertToolbar';
 import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';

@@ -1,11 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { LinkTarget, PurposeTypes } from 'data/content/learning/common';
-import { Checkbox, Select, TextInput } from '../common/controls';
+import { LinkTarget } from 'data/content/learning/common';
+import { Select, TextInput } from '../common/controls';
 import { Label, VerticalSpacer } from '../common/Sidebar';
 
 import styles from './Entity.style';
@@ -44,7 +43,7 @@ export class XrefEditor
   }
 
   renderSidebar() {
-    const { className, classes, children, editMode, model, onEdit, context } = this.props;
+    const { className, classes, editMode, model, onEdit, context } = this.props;
 
     const pages = context.courseModel.resources
       .toArray()
@@ -90,7 +89,7 @@ export class XrefEditor
   }
 
   renderToolbar() {
-    const { className, classes, children } = this.props;
+    const { className, classes } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>

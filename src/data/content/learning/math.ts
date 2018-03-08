@@ -1,5 +1,5 @@
 import * as Immutable from 'immutable';
-import { augment, getChildren } from '../common';
+import { augment } from '../common';
 
 export type MathParams = {
   data?: string,

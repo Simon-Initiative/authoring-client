@@ -1,11 +1,10 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkTarget, PurposeTypes } from 'data/content/learning/common';
-import { Checkbox, Select, TextInput } from '../common/controls';
+import { Select } from '../common/controls';
 import { Label, VerticalSpacer, Header } from '../common/Sidebar';
 
 import styles from './Entity.style';
@@ -44,7 +43,7 @@ export class ActivityLinkEditor
   }
 
   renderSidebar() {
-    const { className, classes, children, editMode, model, onEdit, context } = this.props;
+    const { className, classes, editMode, model, onEdit, context } = this.props;
 
     const highStakesOptions = context.courseModel.resources
       .toArray()
@@ -92,7 +91,7 @@ export class ActivityLinkEditor
   }
 
   renderToolbar() {
-    const { className, classes, children } = this.props;
+    const { className, classes } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>

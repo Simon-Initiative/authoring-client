@@ -1,8 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-import { Maybe } from 'tsmonad';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/controls';
 import { Label } from '../common/Sidebar';
@@ -42,7 +40,7 @@ export class CiteEditor
   }
 
   renderSidebar() {
-    const { className, classes, children, editMode, model, onEdit, context } = this.props;
+    const { className, classes, editMode, model, onEdit } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>
@@ -61,7 +59,7 @@ export class CiteEditor
   }
 
   renderToolbar() {
-    const { className, classes, children } = this.props;
+    const { className, classes } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>

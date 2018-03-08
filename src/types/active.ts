@@ -1,6 +1,5 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Context } from 'vm';
 
 export interface ParentContainer {
   supportedElements: Immutable.List<string>;

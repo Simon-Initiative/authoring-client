@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
@@ -42,7 +41,7 @@ export class MathEditor
   }
 
   renderSidebar() {
-    const { className, classes, children, editMode, model, onEdit, context } = this.props;
+    const { className, classes, model, onEdit } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>
@@ -57,7 +56,7 @@ export class MathEditor
   }
 
   renderToolbar() {
-    const { className, classes, children } = this.props;
+    const { className, classes } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>
