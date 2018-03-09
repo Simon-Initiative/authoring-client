@@ -1,12 +1,12 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, SelectionState, Modifier } from 'draft-js';
+import { ContentState, SelectionState, Modifier, Entity } from 'draft-js';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 
 import { getEntities, removeInputRef as removeInputRefDraft,
-  Changes, detectChanges } from './draft/changes';
+  Changes, detectChanges, removeEntity as internalRemoveEntity} from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
 
@@ -37,6 +37,10 @@ export enum InlineStyles {
   Superscript = 'SUPERSCRIPT',
 }
 
+export type InlineEntity = {
+  key: string,
+  data: Object,
+};
 
 function appendText(contentBlock, contentState, text) {
 
@@ -85,7 +89,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    console.log('contig');
     return fromDraft(this.content);
   }
 
@@ -96,6 +99,41 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       return false;
     }
     return true;
+  }
+
+  selectionOverlapsEntity() : boolean {
+    return this.content.getBlocksAsArray()
+      .reduce(
+        (acc, block) => {
+          if (acc) {
+            return true;
+          }
+          let overlaps = false;
+          block.findEntityRanges(
+            c => c.getEntity() !== null,
+            (start: number, end: number) => {
+              overlaps = overlaps || this.selection.hasEdgeWithin(block.key, start, end);
+            },
+          );
+          return overlaps;
+        },
+        false);
+  }
+
+  getEntityAtCursor() : Maybe<InlineEntity> {
+    const block = this.content.getBlockForKey(this.selection.focusKey);
+
+    if (block === undefined) {
+      return Maybe.nothing();
+    }
+    const key = block.getEntityAt(this.selection.focusOffset);
+
+    if (key === null) {
+      return Maybe.nothing();
+    }
+
+    const entity = Entity.get(key);
+    return Maybe.just({ key, data: entity.getData() });
   }
 
   toggleStyle(style: InlineStyles) : ContiguousText {
@@ -119,7 +157,19 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   }
 
-  insertEntity(type: string, isMutable: boolean, data: Object) {
+  updateEntity(key: string, data: Object) {
+    return this.with({
+      content: this.content.replaceEntityData(key, data),
+    });
+  }
+
+  removeEntity(key: string) : ContiguousText {
+    return this.with({
+      content: internalRemoveEntity((k, e) => k === key, this.content),
+    });
+  }
+
+  addEntity(type: string, isMutable: boolean, data: Object) : ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
     let selectionState = this.selection;

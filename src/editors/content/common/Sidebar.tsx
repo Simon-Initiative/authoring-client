@@ -13,4 +13,12 @@ export const Label = (props: LabelProps) => {
   );
 };
 
-export const VerticalSpacer = () => <div className="sidebar-spacer"/>;
+export const Header = (props: LabelProps) => {
+  return (
+    <div className="sidebar-header">
+      {props.children}
+    </div>
+  );
+};
+
+export const VerticalSpacer = () => <div className="sidebar-vertical-spacer"/>;

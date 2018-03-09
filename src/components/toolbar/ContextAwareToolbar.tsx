@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
@@ -8,7 +7,6 @@ import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { InsertToolbar } from './InsertToolbar';
-import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
 
 import styles from './ContextAwareToolbar.style';
@@ -81,11 +79,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       onInsert, onEdit, content, container, supportedElements, classes, onShowPageDetails,
     } = this.props;
 
-    const isText = content.caseOf({
-      just: c => c instanceof contentTypes.ContiguousText,
-      nothing: () => false,
-    });
-
     const contentModel = content.caseOf({
       just: c => c,
       nothing: () => undefined,
@@ -132,14 +125,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
           <InsertToolbar
             onInsert={onInsert}
             parentSupportsElementType={parentSupportsElementType} />
-        </ToolbarGroup>
-
-        <ToolbarGroup className={classes.toolbarFormatGroup} label="Format">
-          <FormatToolbar
-            content={content}
-            onEdit={onEdit}
-            isText={isText}
-            />
         </ToolbarGroup>
 
         {contentRenderer}

@@ -3,10 +3,9 @@ import { byType, Decorator } from './common';
 import { EntityTypes } from '../../../../../data/content/learning/common';
 import { Math as MathRenderer } from '../../../../../utils/math/Math';
 import { ContentState } from 'draft-js';
-
+import { Math as MathData } from 'data/content/learning/math';
 import { AppServices } from '../../../../common/AppServices';
 
-import { ModalMathEditor } from '../../../../../utils/math/ModalMathEditor';
 
 interface Math {
   _onClick: any;
@@ -23,53 +22,17 @@ interface MathProps {
 
 class Math extends React.PureComponent<MathProps, any> {
 
-  attribute: string;
-
   constructor(props) {
     super(props);
-
-    this._onClick = this.onClick.bind(this);
-  }
-
-  onClick() {
-
-    const entity = this.props.contentState.getEntity(this.props.entityKey);
-    const { data } = entity;
-    const math = data[this.attribute];
-
-    const editor = <ModalMathEditor content={math}
-      onCancel={() => this.props.services.dismissModal()}
-      onInsert={(content) => {
-
-        this.props.services.dismissModal();
-
-        const toMerge = {};
-        toMerge[this.attribute] = content;
-
-        const contentState = this.props.contentState
-          .replaceEntityData(this.props.entityKey, toMerge);
-
-        this.props.onEdit(contentState);
-      }}/>;
-
-    this.props.services.displayModal(editor);
   }
 
   render() : JSX.Element {
-    const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-
-    let math;
-    if (data['#cdata'] !== undefined) {
-      math = data['#cdata'];
-      this.attribute = '#cdata';
-    } else {
-      math = data['#math'];
-      this.attribute = '#math';
-    }
+    const data : MathData
+      = this.props.contentState.getEntity(this.props.entityKey).getData();
 
     return (
-      <span onClick={this._onClick} data-offset-key={this.props.offsetKey}>
-        <MathRenderer inline>{math}</MathRenderer>
+      <span data-offset-key={this.props.offsetKey}>
+        <MathRenderer inline>{data.data}</MathRenderer>
       </span>
     );
   }

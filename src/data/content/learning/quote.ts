@@ -54,9 +54,7 @@ export class Quote extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const q = {
-      quote: {
-        '#array': this.text.toPersistence(),
-      },
+      quote: {},
     };
 
     this.entry.lift(e => q.quote['@entry'] = e);
