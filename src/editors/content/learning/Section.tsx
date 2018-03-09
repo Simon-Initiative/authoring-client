@@ -28,15 +28,15 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
   shouldComponentUpdate(nextProps) {
     return this.props.model !== nextProps.model;
   }
-  
-  onTitleEdit(title) {
+
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body, sourceObject) {
     const model = this.props.model.with({ body });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   onPurposeChange(purpose) {
@@ -77,7 +77,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
             {''}
           </option>
           {PurposeTypes.map(p =>
-            <option 
+            <option
               key={p.value}
               value={p.value}>
               {p.label}

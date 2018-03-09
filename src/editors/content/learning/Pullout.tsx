@@ -30,20 +30,20 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onContentEdit(content) {
+  onContentEdit(content, sourceObject) {
     const model = this.props.model.with({ content });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   onPulloutTypeChange(pulloutType) {
-    const model = this.props.model.with({ 
-      pulloutType: pulloutType === '' 
-        ? Maybe.nothing() 
+    const model = this.props.model.with({
+      pulloutType: pulloutType === ''
+        ? Maybe.nothing()
         : Maybe.just(pulloutType),
     });
     this.props.onEdit(model, model);
@@ -51,8 +51,8 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
 
   onEditOrient(isVertical) {
     const model = this.props.model.with({
-      orient: isVertical 
-        ? Orientation.Vertical 
+      orient: isVertical
+        ? Orientation.Vertical
         : Orientation.Horizontal,
     });
     this.props.onEdit(model, model);
@@ -82,7 +82,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
           value={this.props.model.pulloutType.caseOf({
             nothing: () => '',
             just: t => t,
-          })} 
+          })}
           onChange={this.onPulloutTypeChange}>
           <option value="">Pullout Type</option>
           <option value="note">Note</option>

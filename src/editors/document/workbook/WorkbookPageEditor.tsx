@@ -117,7 +117,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
-  onFocus(model, parent) {
+  onFocus(model, parent, e) {
+    e.stopPropagation();
     this.props.onUpdateContentSelection(this.props.context.documentId, model, parent);
   }
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Example as ExampleType } from 'data/content/learning/example'; 
+import { Example as ExampleType } from 'data/content/learning/example';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Label } from '../common/Sidebar';
 import { TitleContentEditor } from 'editors/content/title/TitleContentEditor';
@@ -25,14 +25,14 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onContentEdit(content) {
+  onContentEdit(content, sourceObject) {
     const model = this.props.model.with({ content });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   renderSidebar(): JSX.Element {
