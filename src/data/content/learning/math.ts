@@ -1,6 +1,8 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
 
+import { logger, LogTag } from 'utils/logger';
+
 export type MathParams = {
   data?: string,
   guid?: string,
@@ -40,7 +42,7 @@ export class Math extends Immutable.Record(defaultContent) {
       return new Math({ guid, data: (root as any)['#math'] });
     }
 
-    console.log('UNKNOWN MATH FORMAT ENCOUNTERED');
+    logger.log(LogTag.DEFAULT, 'Unexpected math format encountered');
 
     return new Math({ guid });
   }

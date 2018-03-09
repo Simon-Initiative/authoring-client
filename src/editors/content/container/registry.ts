@@ -21,11 +21,7 @@ export function getEditorByContentType(contentType: string) {
     init();
   }
 
-  console.log(contentType);
-
-
   const component = registry[contentType];
-
   return component !== undefined ? component : Unsupported;
 }
 
