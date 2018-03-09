@@ -4,19 +4,26 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayoutInline } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
+import { AppContext } from 'editors/common/AppContext';
+import ResourceSelection from 'utils/selection/ResourceSelection';
+import { LegacyTypes } from 'data/types';
+import * as persistence from 'data/persistence';
 
 import styles from './InsertToolbar.style';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
   parentSupportsElementType: (type: string) => boolean;
+  context: AppContext;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
 }
 
 /**
  * InsertToolbar React Stateless Component
  */
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
-  classes, onInsert, parentSupportsElementType,
+  classes, onInsert, parentSupportsElementType, context, displayModal, dismissModal,
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
@@ -106,7 +113,25 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.WbInline())}
+            onClick={() => 
+            displayModal(
+              <ResourceSelection 
+                filterPredicate={(
+                  res: persistence.CourseResource): boolean => 
+                    res.type === LegacyTypes.inline}
+                courseId={context.courseId}
+                onInsert={(resource) => {
+                  dismissModal();
+                  const resources = context.courseModel.resources.toArray();
+                  const found = resources.find(r => r.guid === resource.id);
+                  if (found !== undefined) {
+                    onInsert(new contentTypes.WbInline().with({ idRef: found.id }));
+                  }
+                }}
+                onCancel={dismissModal}
+              />)
+            // )
+            }
             tooltip="Insert Inline Assessment"
             disabled={!parentSupportsElementType('wb:inline')}>
           <i className={'fa fa-flask'}/>

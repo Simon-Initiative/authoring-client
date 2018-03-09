@@ -11,6 +11,7 @@ import colors from 'styles/colors';
 import { InsertToolbar } from './InsertToolbar';
 import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
+import { AppContext } from 'editors/common/AppContext';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -68,6 +69,9 @@ export interface ToolbarProps {
   hideLabels?: boolean;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
+  context: AppContext;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
 }
 
 @injectSheet(styles)
@@ -80,6 +84,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
   render() {
     const {
       onInsert, onEdit, content, container, supportedElements, classes, onShowPageDetails,
+      displayModal, dismissModal,
     } = this.props;
 
     const isText = content.caseOf({
@@ -137,7 +142,10 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
             onInsert={onInsert}
-            parentSupportsElementType={parentSupportsElementType} />
+            parentSupportsElementType={parentSupportsElementType}
+            context={this.props.context}
+            displayModal={displayModal}
+            dismissModal={dismissModal} />
         </ToolbarGroup>
 
         <ToolbarGroup className={classes.toolbarFormatGroup} label="Format">

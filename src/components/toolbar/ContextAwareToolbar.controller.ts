@@ -6,6 +6,8 @@ import { insert, edit, resetActive } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer } from 'types/active.ts';
 import { Maybe } from 'tsmonad';
+import { modalActions } from 'actions/modal';
+import { AppContext } from 'editors/common/AppContext';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -18,9 +20,12 @@ interface DispatchProps {
   onEdit: (content: Object) => void;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
 }
 
 interface OwnProps {
+  context: AppContext;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
@@ -37,7 +42,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     container: activeContext.container,
   };
 
-
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
@@ -45,6 +49,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onEdit: content =>  dispatch(edit(content)),
     onInsert: content => dispatch(insert(content)),
+    displayModal: component => dispatch(modalActions.display(component)),
+    dismissModal: () => dispatch(modalActions.dismiss()),
     onShowPageDetails: () => {
       dispatch(resetActive());
       dispatch(showSidebar(true));
