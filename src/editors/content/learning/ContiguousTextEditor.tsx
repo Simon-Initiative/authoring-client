@@ -78,9 +78,16 @@ export default class ContiguousTextEditor
   renderToolbar() {
     const { model, onEdit, editMode } = this.props;
 
-    const entitiesDisabled = !editMode || model.selection.isCollapsed()
+    const bareTextSelected = model.selection.isCollapsed()
+      ? false
+      : !model.selectionOverlapsEntity();
+
+    const cursorInEntity = model.selection.isCollapsed()
       ? model.getEntityAtCursor().caseOf({ just: n => true, nothing: () => false })
-      : model.selectionOverlapsEntity();
+      : false;
+
+    const rangeEntitiesEnabled = editMode && bareTextSelected;
+    const pointEntitiesEnabled = editMode && !cursorInEntity;
 
     return (
       <ToolbarGroup
@@ -106,7 +113,7 @@ export default class ContiguousTextEditor
                   onEdit(model.addEntity(EntityTypes.math, true, new contentTypes.Math()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!pointEntitiesEnabled}
               tooltip="MathML or Latex formula">
             <i className={'fa fa-etsy'}/>
           </ToolbarButton>
@@ -116,7 +123,7 @@ export default class ContiguousTextEditor
                   onEdit(model.addEntity(EntityTypes.quote, true, new contentTypes.Quote()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!rangeEntitiesEnabled}
               tooltip="Quotation">
             <i className={'fa fa-quote-right'}/>
           </ToolbarButton>
@@ -126,7 +133,7 @@ export default class ContiguousTextEditor
                   onEdit(model.addEntity(EntityTypes.cite, true, new contentTypes.Cite()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!rangeEntitiesEnabled}
               tooltip="Citation">
             <i className={'fa fa-asterisk'}/>
           </ToolbarButton>
@@ -136,7 +143,7 @@ export default class ContiguousTextEditor
                   onEdit(model.addEntity(EntityTypes.link, true, new contentTypes.Link()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!rangeEntitiesEnabled}
               tooltip="External Hyperlink">
             <i className={'fa fa-external-link'}/>
           </ToolbarButton>
@@ -147,7 +154,7 @@ export default class ContiguousTextEditor
                     EntityTypes.activity_link, true, new contentTypes.ActivityLink()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!rangeEntitiesEnabled}
               tooltip="High Stakes Assessment Link">
             <i className={'fa fa-check'}/>
           </ToolbarButton>
@@ -157,7 +164,7 @@ export default class ContiguousTextEditor
                   onEdit(model.addEntity(EntityTypes.xref, true, new contentTypes.Xref()));
                 }
               }
-              disabled={entitiesDisabled}
+              disabled={!rangeEntitiesEnabled}
               tooltip="Cross Reference Link">
             <i className={'fa fa-map-signs'}/>
           </ToolbarButton>
