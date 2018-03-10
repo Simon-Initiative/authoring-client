@@ -4,7 +4,7 @@ import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
-import { DragHandle } from 'components/common/DragHandle.tsx';
+import { DragHandle } from 'components/common/DragHandle';
 import { Remove } from 'components/common/Remove';
 import { DragTypes } from 'utils/drag';
 

@@ -2,17 +2,19 @@ import * as React from 'react';
 import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
 import PreformattedText from './PreformattedText';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar.tsx';
-
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { Checkbox, Select, TextInput } from '../common/controls';
-import { Label } from '../common/Sidebar';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import colors from 'styles/colors';
 
 import './markers.scss';
 
 
 export interface CodeBlockProps
   extends AbstractContentEditorProps<CodeBlockType> {
-
+  onShowSidebar: () => void;
 }
 
 export interface CodeBlockState {
@@ -70,53 +72,70 @@ export class CodeBlock
     const syntax = this.props.model.syntax;
 
     return (
-      <div>
-        <Label>Language / Syntax</Label>
-        <Select
-          editMode={this.props.editMode}
-          label=""
-          value={syntax}
-          onChange={this.onSyntaxChange}>
-          <option value="actionscript3">ActionScript</option>
-          <option value="bash">Bash</option>
-          <option value="c">C</option>
-          <option value="cpp">C++</option>
-          <option value="html">HTML</option>
-          <option value="java">Java</option>
-          <option value="python">Python</option>
-          <option value="text">Text</option>
-          <option value="xml">XML</option>
-        </Select>
-        <Checkbox
-          editMode={this.props.editMode}
-          label="Show line numbers"
-          value={this.props.model.number}
-          onEdit={this.onNumberEdit}
-        />
-        <Label>First line number</Label>
-        <TextInput
-          editMode={this.props.editMode}
-          width="100%"
-          type="number"
-          label=""
-          value={this.props.model.start}
-          onEdit={this.onStartEdit}
-        />
-        <Label>Highlighting</Label>
-        <TextInput
-          editMode={this.props.editMode}
-          width="100%"
-          type="text"
-          label=""
-          value={this.props.model.highlight}
-          onEdit={this.onHighlightEdit}
-        />
-      </div>);
+      <SidebarContent title="Code Block">
+        <SidebarGroup label="Language / Syntax">
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={syntax}
+            onChange={this.onSyntaxChange}>
+            <option value="actionscript3">ActionScript</option>
+            <option value="bash">Bash</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="html">HTML</option>
+            <option value="java">Java</option>
+            <option value="python">Python</option>
+            <option value="text">Text</option>
+            <option value="xml">XML</option>
+          </Select>
+          <Checkbox
+            editMode={this.props.editMode}
+            label="Show line numbers"
+            value={this.props.model.number}
+            onEdit={this.onNumberEdit} />
+        </SidebarGroup>
+        <SidebarGroup label="First line number">
+          <TextInput
+            editMode={this.props.editMode}
+            width="100%"
+            type="number"
+            label=""
+            value={this.props.model.start}
+            onEdit={this.onStartEdit} />
+        </SidebarGroup>
+        <SidebarGroup label="Highlighting">
+          <TextInput
+            editMode={this.props.editMode}
+            width="100%"
+            type="text"
+            label=""
+            value={this.props.model.highlight}
+            onEdit={this.onHighlightEdit} />
+        </SidebarGroup>
+      </SidebarContent>
+    );
   }
 
   renderToolbar() {
+    const { onShowSidebar } = this.props;
+
     return (
-      <ToolbarGroup label="Code Block" hide />
+      <ToolbarGroup label="Code Block" highlightColor={colors.contentSelection}>
+        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+          <div><i className="fa fa-file-code-o"/></div>
+          <div>Language</div>
+        </ToolbarButton>
+
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-sort-numeric-asc"/> Line Numbers
+          </ToolbarButton>
+          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-eraser"/> Highlighting
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
     );
   }
 

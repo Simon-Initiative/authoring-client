@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, SelectionState, Modifier } from 'draft-js';
+import { ContentState, SelectionState, Modifier, Entity } from 'draft-js';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
@@ -37,6 +37,10 @@ export enum InlineStyles {
   Superscript = 'SUPERSCRIPT',
 }
 
+export type InlineEntity = {
+  key: string,
+  data: Object,
+};
 
 function appendText(contentBlock, contentState, text) {
 
@@ -96,6 +100,41 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       return false;
     }
     return true;
+  }
+
+  selectionOverlapsEntity() : boolean {
+    return this.content.getBlocksAsArray()
+      .reduce(
+        (acc, block) => {
+          if (acc) {
+            return true;
+          }
+          let overlaps = false;
+          block.findEntityRanges(
+            c => c.getEntity() !== null,
+            (start: number, end: number) => {
+              overlaps = overlaps || this.selection.hasEdgeWithin(block.key, start, end);
+            },
+          );
+          return overlaps;
+        },
+        false);
+  }
+
+  getEntityAtCursor() : Maybe<InlineEntity> {
+    const block = this.content.getBlockForKey(this.selection.focusKey);
+
+    if (block === undefined) {
+      return Maybe.nothing();
+    }
+    const key = block.getEntityAt(this.selection.focusOffset);
+
+    if (key === null) {
+      return Maybe.nothing();
+    }
+
+    const entity = Entity.get(key);
+    return Maybe.just({ key, data: entity.getData() });
   }
 
   toggleStyle(style: InlineStyles) : ContiguousText {

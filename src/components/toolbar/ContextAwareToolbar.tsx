@@ -21,7 +21,7 @@ interface ToolbarGroupProps {
 }
 
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
-  (({ className, classes, label, hide, children }) => {
+  (({ className, classes, label, hide, children }: StyledComponentProps<ToolbarGroupProps>) => {
     return (
       <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
         <div className={classNames([classes.toolbarGroup, className])}>
@@ -32,31 +32,51 @@ export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
     );
   });
 
-interface ToolbarLayoutInlineProps {
+interface ToolbarLayoutProps {
   className?: string;
 }
 
-export const ToolbarLayoutInline = injectSheetSFC<ToolbarLayoutInlineProps>(styles)
-  (({ className, classes, children }) => {
+export const ToolbarLayout = {
+  Inline: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
     return (
-      <div className={`${classes.toolbarLayoutInline} ${className}`}>
+      <div className={classNames([classes.toolbarLayoutInline, className])}>
         {children}
       </div>
     );
-  });
+  }),
 
-interface ToolbarLayoutGridProps {
-  className?: string;
-}
-
-export const ToolbarLayoutGrid = injectSheetSFC<ToolbarLayoutGridProps>(styles)
-  (({ className, classes, children }) => {
+  Grid: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
     return (
-      <div className={`${classes.toolbarLayoutGrid} ${className}`}>
+      <div className={classNames([classes.toolbarLayoutInline, className])}>
         {children}
       </div>
     );
-  });
+  }),
+
+  Row: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
+    return (
+      <div className={classNames([classes.toolbarLayoutRow, className])}>
+        {children}
+      </div>
+    );
+  }),
+
+  Column: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
+    return (
+      <div className={classNames([classes.toolbarLayoutColumn, className])}>
+        {children}
+      </div>
+    );
+  }),
+};
 
 export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
@@ -64,7 +84,6 @@ export interface ToolbarProps {
   container: Maybe<ParentContainer>;
   onInsert: (content: Object) => void;
   onEdit: (content: Object) => void;
-  hideLabels?: boolean;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
 }
@@ -143,6 +162,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         </ToolbarGroup>
 
         {contentRenderer}
+
+        <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
           <ActionsToolbar onShowPageDetails={onShowPageDetails} />

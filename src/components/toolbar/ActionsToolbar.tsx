@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ComponentProps } from 'types/component';
-import { ToolbarLayoutInline, ToolbarLayoutGrid } from './ContextAwareToolbar';
+import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 
 export interface ActionsToolbarProps {
@@ -13,7 +13,7 @@ export interface ActionsToolbarProps {
 export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
-      <ToolbarLayoutGrid>
+      <ToolbarLayout.Column>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
             size={ToolbarButtonSize.Wide}>
@@ -24,8 +24,8 @@ export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToo
             size={ToolbarButtonSize.Wide}>
           <i className={'fa fa-repeat'}/> Redo
         </ToolbarButton>
-      </ToolbarLayoutGrid>
-      <ToolbarLayoutInline>
+      </ToolbarLayout.Column>
+      <ToolbarLayout.Inline>
         <ToolbarButton
             onClick={() => onShowPageDetails()}
             tooltip="View and Edit Page Details"
@@ -48,7 +48,7 @@ export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToo
           <div><i className="fa fa-eye"/></div>
           <div>Preview</div>
         </ToolbarButton>
-      </ToolbarLayoutInline>
+      </ToolbarLayout.Inline>
     </React.Fragment>
   );
 });

@@ -5,6 +5,7 @@ import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
+import { connectSidebarActions } from './connectSidebarActions';
 
 let registry = null;
 
@@ -22,8 +23,8 @@ export function getEditorByContentType(contentType: string) {
 function init() {
   registry = {};
   registry['ContiguousText'] = ContiguousTextEditor;
-  registry['CodeBlock'] = CodeBlock;
-  registry['Example'] = Example;
-  registry['Pullout'] = Pullout;
-  registry['Section'] = Section;
+  registry['CodeBlock'] = connectSidebarActions()(CodeBlock);
+  registry['Example'] = connectSidebarActions()(Example);
+  registry['Pullout'] = connectSidebarActions()(Pullout);
+  registry['Section'] = connectSidebarActions()(Section);
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar.tsx';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import PreformattedText from './PreformattedText';
 import './Unsupported.scss';
 

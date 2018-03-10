@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ComponentProps } from 'types/component';
 import * as contentTypes from 'data/contentTypes';
 import { InlineStyles } from 'data/content/learning/contiguous';
-import { ToolbarLayoutInline } from './ContextAwareToolbar';
+import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 import { Maybe } from 'tsmonad';
 
@@ -20,7 +20,7 @@ export const FormatToolbar = (({
 }: ComponentProps<FormatToolbarProps>) => {
   return (
     <React.Fragment>
-      <ToolbarLayoutInline>
+      <ToolbarLayout.Inline>
         <ToolbarButton
             onClick={
               () => content.lift((t) => {
@@ -98,7 +98,7 @@ export const FormatToolbar = (({
             disabled={!isText}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
-      </ToolbarLayoutInline>
+      </ToolbarLayout.Inline>
     </React.Fragment>
   );
 });
