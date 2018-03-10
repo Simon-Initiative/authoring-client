@@ -80,8 +80,12 @@ function getInlineHandlers() {
     image: imageInline,
     formula: formulaInline,
     '#math': hashMath,
-    'm:math': insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.math),
-    quote: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.quote),
+    'm:math': insertDataDrivenEntity.bind(
+      undefined, 'IMMUTABLE',
+      common.EntityTypes.math, 'math', registeredTypes['math']),
+    quote: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.quote, 'quote', registeredTypes['quote']),
     code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
   };
   return inlineHandlers;
@@ -131,8 +135,7 @@ function insertDataDrivenEntity(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const data = {};
-  data[label] = registeredTypes[type](item);
+  const data = registeredTypes[type](item);
 
   context.draft.entityMap[key] = {
     type,
@@ -169,8 +172,7 @@ function hashMath(
 
   workingBlock.entities.push({ offset, length, key });
 
-  const data = {};
-  data['#math'] = item['#math'];
+  const data = registeredTypes['math'](item, '');
 
   context.draft.entityMap[key] = {
     type: common.EntityTypes.math,
@@ -201,32 +203,8 @@ function formulaInline(
   context: ParsingContext, workingBlock: WorkingBlock,
   blockBeforeChildren: WorkingBlock) {
 
-  // Adjust the full text to account for our insertion of
-  // the formula sentinels
-  workingBlock.fullText = workingBlock.fullText.substr(0, offset)
-    + ' ' + workingBlock.fullText.substr(offset) + ' ';
+  // NoOp - we do nothing with inline formulas
 
-  // Adjust markup and entities that were added by children
-  const markupsStart = workingBlock.markups.length
-    - (workingBlock.markups.length - blockBeforeChildren.markups.length);
-  const entitiesStart = workingBlock.entities.length
-    - (workingBlock.entities.length - blockBeforeChildren.entities.length);
-
-  for (let i = markupsStart; i < workingBlock.markups.length; i += 1) {
-    workingBlock.markups[i].offset += 1;
-  }
-  for (let i = entitiesStart; i < workingBlock.entities.length; i += 1) {
-    workingBlock.entities[i].offset += 1;
-  }
-
-  // Now add the sentinels
-  insertEntity(
-    'IMMUTABLE', common.EntityTypes.formula_begin,
-    offset, 1, item, context, workingBlock);
-
-  insertEntity(
-    'IMMUTABLE', common.EntityTypes.formula_end,
-    offset + length + 1, 1, item, context, workingBlock);
 }
 
 

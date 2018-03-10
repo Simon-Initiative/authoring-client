@@ -230,7 +230,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
               guid: this.props.content.guid })));
         } else {
 
-          if (changeType === SelectionChangeType.Selection) {
+          if (changeType === SelectionChangeType.Selection
+            || changeType === SelectionChangeType.CursorPosition) {
             this.setState(
               { editorState },
               () => this.props.onEdit(this.props.content.with({

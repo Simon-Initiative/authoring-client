@@ -23,6 +23,7 @@ export { IFrame } from './content/learning/iframe';
 export { Image } from './content/learning/image';
 export { Li } from './content/learning/li';
 export { Link } from './content/learning/link';
+export { Math } from './content/learning/math';
 export { Material } from './content/learning/material';
 export { Materials } from './content/learning/materials';
 export { Meaning } from './content/learning/meaning';

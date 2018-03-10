@@ -1,3 +1,8 @@
+export enum LinkTarget {
+  New = 'new',
+  Self = 'self',
+}
+
 export enum Orientation {
   Horizontal = 'horizontal',
   Vertical = 'vertical',

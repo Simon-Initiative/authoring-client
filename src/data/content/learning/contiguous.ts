@@ -6,7 +6,7 @@ import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 
 import { getEntities, removeInputRef as removeInputRefDraft,
-  Changes, detectChanges } from './draft/changes';
+  Changes, detectChanges, removeEntity as internalRemoveEntity} from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
 
@@ -89,7 +89,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    console.log('contig');
     return fromDraft(this.content);
   }
 
@@ -158,7 +157,19 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   }
 
-  insertEntity(type: string, isMutable: boolean, data: Object) {
+  updateEntity(key: string, data: Object) {
+    return this.with({
+      content: this.content.replaceEntityData(key, data),
+    });
+  }
+
+  removeEntity(key: string) : ContiguousText {
+    return this.with({
+      content: internalRemoveEntity((k, e) => k === key, this.content),
+    });
+  }
+
+  addEntity(type: string, isMutable: boolean, data: Object) : ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
     let selectionState = this.selection;

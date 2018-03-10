@@ -35,14 +35,14 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onContentEdit(content) {
+  onContentEdit(content, sourceObject) {
     const model = this.props.model.with({ content });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   onPulloutTypeChange(pulloutType) {
@@ -76,7 +76,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
           <ToolbarContentContainer
             {...this.props}
             model={model.title.text}
-            onEdit={text => this.onTitleEdit(model.title.with({ text }))} />
+            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>
       </SidebarContent>
     );
@@ -86,7 +86,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Section" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Pullout" highlightColor={colors.contentSelection}>
         <ToolbarLayout.Column>
           <Select editMode={this.props.editMode}
             value={this.props.model.pulloutType.caseOf({

@@ -28,6 +28,16 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={classes.unicodeIcon}>T</i>
         </ToolbarButton>
         <ToolbarButton
+            onClick={() => console.log('NOT IMPLEMENTED')}
+            tooltip="Ordered List">
+          <i className={'fa fa-list-ol'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => console.log('NOT IMPLEMENTED')}
+            tooltip="Unordered List">
+          <i className={'fa fa-list-ul'}/>
+        </ToolbarButton>
+        <ToolbarButton
             onClick={() => onInsert(new contentTypes.WorkbookSection())}
             tooltip="Insert Section"
             disabled={!parentSupportsElementType('section')}>

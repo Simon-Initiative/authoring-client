@@ -9,21 +9,17 @@ import activityLink from './ActivityLink';
 import xref from './Xref';
 import quote from './Quote';
 import image from './Image';
-import formulaBegin from './FormulaBegin';
-import formulaEnd from './FormulaEnd';
 
 const decorators = [
   unsupported,
   link,
   cite,
-  math, 
+  math,
   inputRef,
   activityLink,
   xref,
   quote,
   image,
-  formulaBegin,
-  formulaEnd,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

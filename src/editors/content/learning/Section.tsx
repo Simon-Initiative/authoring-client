@@ -33,14 +33,14 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body, sourceObject) {
     const model = this.props.model.with({ body });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   onPurposeChange(purpose) {
@@ -61,7 +61,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
           <ToolbarContentContainer
             {...this.props}
             model={model.title.text}
-            onEdit={text => this.onTitleEdit(model.title.with({ text }))} />
+            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>
       </SidebarContent>
     );

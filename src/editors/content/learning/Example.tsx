@@ -29,14 +29,14 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onContentEdit(content) {
+  onContentEdit(content, sourceObject) {
     const model = this.props.model.with({ content });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   renderSidebar(): JSX.Element {
@@ -48,7 +48,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
           <ToolbarContentContainer
             {...this.props}
             model={model.title.text}
-            onEdit={text => this.onTitleEdit(model.title.with({ text }))} />
+            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>
       </SidebarContent>
     );

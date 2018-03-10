@@ -323,6 +323,8 @@ function isLinkRange(er: common.RawEntity) : boolean {
     case common.EntityTypes.activity_link:
     case common.EntityTypes.link:
     case common.EntityTypes.xref:
+    case common.EntityTypes.quote:
+    case common.EntityTypes.cite:
       return true;
     default:
       return false;
@@ -579,7 +581,7 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
   const { data } = entityMap[s.key];
-  return data.link.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function formula_begin(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -594,14 +596,14 @@ function inlineImage(s : common.RawEntityRange, text : string, entityMap : commo
 
   const { data } = entityMap[s.key];
 
-  return data.image.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function activity_link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
 
-  return data.activity_link.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 
 }
 
@@ -610,7 +612,7 @@ function cite(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.cite.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 
 }
 
@@ -618,7 +620,7 @@ function xref(s : common.RawEntityRange, text : string, entityMap : common.RawEn
 
   const { data } = entityMap[s.key];
 
-  return data.xref.toPersistence(fromDraft);
+  return data.toPersistence(fromDraft);
 }
 
 function input_ref(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
@@ -640,23 +642,14 @@ function input_ref(s : common.RawEntityRange, text : string, entityMap : common.
 
 function quote(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
-  const { data, type } = entityMap[s.key];
-
-  const item = {};
-  item[type] = data;
-
-  return item;
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
 }
 
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
   const { data } = entityMap[s.key];
-
-  if (data['#cdata'] !== undefined) {
-    return { 'm:math': { '#cdata': data['#cdata'] } };
-  }
-
-  return { '#math': data['#math'] };
+  return data.toPersistence();
 }
 
 function translateInlineEntity(
@@ -702,28 +695,6 @@ function translateNonOverlapping(
       container.push({ '#text': rawBlock.text.substring((s.offset + s.length), endOrNext) });
     }
 
-  }
-
-  // Post process to identify inline formula sentinels and reparent the
-  // styles underneath a singular formula tag
-  let begin = null;
-  let end = null;
-  for (let i = 0; i < container.length; i += 1) {
-    const key = common.getKey(container[i]);
-    if (key === 'formula') {
-      begin = i;
-    } else if (key === 'formula_end') {
-      end = i;
-    }
-  }
-  if (begin !== null && end !== null) {
-    // We found both a begin and end, now slice the container array
-    // up to reposition the elements between the sentinels to be under
-    // the formula array
-    const deleted = container.splice(begin + 1, end - begin);
-    deleted.pop();
-
-    (container[begin] as any).formula['#array'] = deleted;
   }
 
 }

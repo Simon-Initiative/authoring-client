@@ -21,14 +21,14 @@ export default {
     borderBottom: [1, 'solid', colors.grayLight],
   },
   toolbarGroup: {
-    maxWidth: 600,
+    maxWidth: 366,
     minWidth: 200,
   },
   toolbarGroupContainer: {
     overflowX: 'hidden',
     height: 86,
     flexShrink: 0,
-    maxWidth: 600,
+    maxWidth: 400,
     marginRight: 5,
     paddingRight: 5,
     borderRight: '1px solid #ddd',
@@ -80,7 +80,7 @@ export default {
     borderBottom: props => `4px solid ${props.highlightColor || 'transparent'}`,
   },
   toolbarInsertGroup: {
-    width: 300,
+    width: 336,
   },
   toolbarFormatGroup: {
     width: 150,
