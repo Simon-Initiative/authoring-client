@@ -1,27 +1,28 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, SelectionState, Modifier, Entity } from 'draft-js';
+import { ContentState, SelectionState, Modifier, Entity, BlockMap } from 'draft-js';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
-
+import { TextSelection } from 'types/active';
 import { getEntities, removeInputRef as removeInputRefDraft,
   Changes, detectChanges, removeEntity as internalRemoveEntity} from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
+import createGuid from 'utils/guid';
 
 const emptyContent = ContentState.createFromText(' ');
 
+export type ContiguousTextPair = [ContiguousText, ContiguousText];
+
 export type ContiguousTextParams = {
   content?: ContentState,
-  selection?: SelectionState,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'ContiguousText',
   content: emptyContent,
-  selection: SelectionState.createEmpty('blockKey'),
   guid: '',
 };
 
@@ -63,7 +64,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
   content: ContentState;
-  selection: SelectionState;
   guid: string;
 
   constructor(params?: ContiguousTextParams) {
@@ -92,16 +92,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return fromDraft(this.content);
   }
 
-  hasSelection() : boolean {
-
-    if (this.selection.focusOffset === this.selection.anchorOffset
-      && this.selection.focusKey === this.selection.anchorKey) {
-      return false;
-    }
-    return true;
-  }
-
-  selectionOverlapsEntity() : boolean {
+  selectionOverlapsEntity(selection: TextSelection) : boolean {
     return this.content.getBlocksAsArray()
       .reduce(
         (acc, block) => {
@@ -112,7 +103,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           block.findEntityRanges(
             c => c.getEntity() !== null,
             (start: number, end: number) => {
-              overlaps = overlaps || this.selection.hasEdgeWithin(block.key, start, end);
+              overlaps = overlaps || selection.hasEdgeWithin(block.key, start, end);
             },
           );
           return overlaps;
@@ -120,13 +111,13 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         false);
   }
 
-  getEntityAtCursor() : Maybe<InlineEntity> {
-    const block = this.content.getBlockForKey(this.selection.focusKey);
+  getEntityAtCursor(selection: TextSelection) : Maybe<InlineEntity> {
+    const block = this.content.getBlockForKey(selection.getFocusKey());
 
     if (block === undefined) {
       return Maybe.nothing();
     }
-    const key = block.getEntityAt(this.selection.focusOffset);
+    const key = block.getEntityAt(selection.getFocusOffset());
 
     if (key === null) {
       return Maybe.nothing();
@@ -136,20 +127,20 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return Maybe.just({ key, data: entity.getData() });
   }
 
-  toggleStyle(style: InlineStyles) : ContiguousText {
+  toggleStyle(style: InlineStyles, selection: TextSelection) : ContiguousText {
 
     // Determine whether we need to apply or remove the style based
     // on the presence of the style at the first character of the
     // selection
-    const anchorKey = this.selection.getAnchorKey();
+    const anchorKey = selection.getAnchorKey();
     const currentContentBlock = this.content.getBlockForKey(anchorKey);
-    const start = this.selection.getStartOffset();
+    const start = selection.getAnchorOffset();
 
     const currentStyles = currentContentBlock.getInlineStyleAt(start);
 
     const content = currentStyles.has(style)
-      ? Modifier.removeInlineStyle(this.content, this.selection, style)
-      : Modifier.applyInlineStyle(this.content, this.selection, style);
+      ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
+      : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
 
     return this.with({
       content,
@@ -169,10 +160,11 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
   }
 
-  addEntity(type: string, isMutable: boolean, data: Object) : ContiguousText {
+  addEntity(
+    type: string, isMutable: boolean, data: Object, selection: TextSelection) : ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
-    let selectionState = this.selection;
+    let selectionState = selection.getRawSelectionState();
     let contentState = this.content;
 
     // We cannot insert an entity at the beginning of a content block,
@@ -231,6 +223,48 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   detectInputRefChanges(previous: ContiguousText) : Changes {
     return detectChanges(EntityTypes.input_ref, '@input', previous.content, this.content);
+  }
+
+  split(s: TextSelection) : ContiguousTextPair {
+
+    // Draft.js splitBlock should only be called when selection is collapsed.
+    // So, if it isn't, we adjust the selection to make it collapsed (just for
+    // the purpose of this split)
+    const raw = s.getRawSelectionState();
+    const selection = raw.isCollapsed()
+      ? raw
+      : raw.merge({
+        anchorKey: raw.focusKey,
+        anchorOffset: raw.focusOffset,
+      });
+
+    // Split the current block
+    const split = Modifier.splitBlock(this.content, selection);
+
+    // Now separate the blocks into two arrays, the first up to and including the
+    // block we split, and the second being the new block and all after it
+    const first = [];
+    const second = [];
+
+    let which = first;
+    split.getBlocksAsArray()
+      .forEach((b) => {
+        which.push(b);
+        if (b.key === selection.focusKey) {
+          which = second;
+        }
+      });
+
+    // Reconstruct ContentStates
+    const secondContent = ContentState.createFromBlockArray(second);
+    return [
+      this.with({
+        content: ContentState.createFromBlockArray(first),
+      }),
+      this.with({
+        guid: createGuid(),
+        content: secondContent,
+      })];
   }
 
   tagInputRefsWithType(byId: Object) {

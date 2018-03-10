@@ -3,7 +3,7 @@ import { CodeBlock } from '../learning/CodeBlock';
 import { Example } from '../learning/Example';
 import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
-import ContiguousTextEditor from '../learning/ContiguousTextEditor';
+import ContiguousTextEditor from '../learning/ContiguousTextEditor.controller';
 import Unsupported from '../learning/Unsupported';
 import { LinkEditor } from '../learning/LinkEditor';
 import { ActivityLinkEditor } from '../learning/ActivityLinkEditor';

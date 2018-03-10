@@ -50,6 +50,7 @@ export class RichTextEditor
   renderMain() : JSX.Element {
 
     const editor = <ContiguousTextEditor
+            onUpdateContentSelection={() => {}}
             onFocus={this.props.onFocus}
             context={this.props.context}
             services={this.props.services}

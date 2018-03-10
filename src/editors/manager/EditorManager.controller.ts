@@ -5,7 +5,7 @@ import EditorManager from './EditorManager';
 import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
-import { save } from 'actions/document';
+import { save, modelUpdated } from 'actions/document';
 
 interface StateProps {
   expanded: any;

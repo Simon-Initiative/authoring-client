@@ -1,4 +1,5 @@
-import { ParentContainer } from 'types/active';
+import { ParentContainer, TextSelection } from 'types/active';
+import { Maybe } from 'tsmonad';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -9,8 +10,10 @@ export type UpdateContentAction = {
   content: Object,
 };
 
+
 export const updateContent = (
-  documentId: string, content: Object): UpdateContentAction => ({
+  documentId: string,
+  content: Object): UpdateContentAction => ({
     type: UPDATE_CONTENT,
     documentId,
     content,
@@ -25,14 +28,18 @@ export type UpdateContextAction = {
   documentId: string,
   content: Object,
   container: ParentContainer,
+  textSelection: Maybe<TextSelection>,
 };
 
 export const updateContext = (
-  documentId: string, content: Object, container: ParentContainer): UpdateContextAction => ({
+  documentId: string,
+  content: Object, container: ParentContainer,
+  textSelection: Maybe<TextSelection>): UpdateContextAction => ({
     type: UPDATE_CONTEXT,
     documentId,
     content,
     container,
+    textSelection,
   });
 
 export type RESET_ACTIVE = 'active/RESET_ACTIVE';
@@ -47,12 +54,12 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: Object) {
+export function insert(content: Object, textSelection: Maybe<TextSelection>) {
   return function (dispatch, getState) {
 
     const { activeContext } = getState();
     activeContext.container.lift((parent : ParentContainer) => {
-      parent.onAddNew(content);
+      parent.onAddNew(content, textSelection);
     });
   };
 }

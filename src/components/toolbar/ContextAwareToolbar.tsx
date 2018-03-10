@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active.ts';
+import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { InsertToolbar } from './InsertToolbar';
@@ -60,7 +60,8 @@ export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
-  onInsert: (content: Object) => void;
+  textSelection: Maybe<TextSelection>;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   hideLabels?: boolean;
   onShowPageDetails: () => void;
@@ -76,7 +77,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      onInsert, onEdit, content, container, supportedElements, classes, onShowPageDetails,
+      onInsert, onEdit, content, container, supportedElements,
+      textSelection, classes, onShowPageDetails,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -123,7 +125,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
-            onInsert={onInsert}
+            onInsert={item => onInsert(item, textSelection)}
             parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
 

@@ -36,7 +36,7 @@ export interface InputListItemProps {
   options?: any;
   controls?: any;
   editMode: boolean;
-  onFocus: (child, parent) => void;
+  onFocus: (child, parent, textSelection) => void;
   onEdit: (body: ContentElements) => void;
   onRemove?: (id: string) => void;
 

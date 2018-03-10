@@ -5,6 +5,7 @@ import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
 import { CommandProcessor } from '../common/command';
 import { EditorState } from 'draft-js';
+import { Maybe } from 'tsmonad';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
@@ -24,7 +25,7 @@ const REMOVE_QUESTION_DISABLED_MSG =
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
-  onItemFocus: (child, model) => void;
+  onItemFocus: (child, model, textSelection) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -223,7 +224,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              onFocus={() => this.props.onItemFocus(part.concepts, this)}
+              onFocus={() => this.props.onItemFocus(
+                part.concepts, this, Maybe.nothing())}
               model={part.skills}
               onEdit={skills => this.onSkillsEdit(skills, item, part)} />
           </TabSectionContent>

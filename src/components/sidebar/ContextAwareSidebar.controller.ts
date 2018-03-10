@@ -16,7 +16,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
 }
@@ -43,7 +43,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onInsert: content => dispatch(insert(content)),
+    onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onEdit: content =>  dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
   };

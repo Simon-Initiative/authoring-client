@@ -6,7 +6,8 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { WorkbookPageModel } from 'data/models';
 import { Resource } from 'data/contentTypes';
 import { preview } from 'actions/preview';
-import { ParentContainer } from 'types/active';
+import { ParentContainer, TextSelection } from 'types/active';
+import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
 
 interface StateProps {
@@ -18,7 +19,8 @@ interface DispatchProps {
   preview: (courseId: string, resource: Resource) => Promise<any>;
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer) => void;
+    documentId: string, content: Object, container: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
@@ -44,8 +46,10 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       return dispatch(activeActions.updateContent(documentId, content));
     },
     onUpdateContentSelection: (
-      documentId: string, content: Object, parent: ParentContainer) => {
-      return dispatch(activeActions.updateContext(documentId, content, parent));
+      documentId: string, content: Object,
+      parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
+
+      return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));
     },
   };
 };

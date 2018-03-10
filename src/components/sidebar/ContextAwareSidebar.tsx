@@ -16,7 +16,7 @@ export interface ContextAwareSidebarProps {
   container: Maybe<ParentContainer>;
   supportedElements: Immutable.List<string>;
   show: boolean;
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
 }
