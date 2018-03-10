@@ -1,3 +1,5 @@
+const BORDER_STYLE = '1px solid #ced4da';
+
 export default {
   toolbarContentContainer: {
     display: 'flex',
@@ -7,7 +9,7 @@ export default {
     display: 'flex',
     flexDirection: 'row',
     background: '#fafafa',
-    border: '1px solid #ced4da',
+    border: BORDER_STYLE,
     borderBottom: 'none',
     padding: 2,
   },
@@ -21,5 +23,9 @@ export default {
   content: {
     flex: 1,
     minHeight: 200,
+
+    '& .content-decorator': {
+      border: BORDER_STYLE,
+    },
   },
 };
