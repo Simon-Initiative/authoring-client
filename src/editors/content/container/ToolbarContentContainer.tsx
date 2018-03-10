@@ -104,7 +104,6 @@ export class ToolbarContentContainer
         <div className="flex-spacer" />
 
         <ToolbarDropdown
-            tooltip="More"
             hideArrow
             label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])}/>} >
           <button className="dropdown-item"
