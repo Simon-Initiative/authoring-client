@@ -160,7 +160,7 @@ export class ToolbarContentContainer
         <div className={classes.content}>
           <ContentContainer
             {...this.props}
-            onFocus={this.onFocus}
+            onFocus={this.onFocus.bind(this)}
             renderContext={RenderContext.MainEditor}
             activeContentGuid={model.guid} />
         </div>
