@@ -44,7 +44,7 @@ export class ToolbarButton extends React.PureComponent<ToolbarButtonProps & JSSP
 
     return tooltip ?
       (
-        <Tooltip title={tooltip} delay={1000}
+        <Tooltip title={tooltip} delay={1000} distance={5} style={{ display: 'inline-block' }}
             size="small" arrowSize="small">
           {button}
         </Tooltip>

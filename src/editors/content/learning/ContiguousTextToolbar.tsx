@@ -5,11 +5,13 @@ import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { ToolbarGroup, ToolbarLayoutInline } from 'components/toolbar/ContextAwareToolbar.tsx';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+
 
 import colors from 'styles/colors';
 import styles from './ContiguousTextEditor.styles';
@@ -81,7 +83,7 @@ export default class ContiguousTextToolbar
     if (entity !== null) {
       return this.renderActiveEntity(entity);
     }
-    return null;
+    return <SidebarContent title="Text Block" isEmpty />;
   }
 
   renderToolbar() {
@@ -105,7 +107,7 @@ export default class ContiguousTextToolbar
     return (
       <ToolbarGroup
         label="Text Block" highlightColor={colors.contentSelection}>
-        <ToolbarLayoutInline>
+        <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
@@ -245,7 +247,7 @@ export default class ContiguousTextToolbar
             <i className={'fa fa-map-signs'}/>
           </ToolbarButton>
 
-        </ToolbarLayoutInline>
+        </ToolbarLayout.Inline>
       </ToolbarGroup>
     );
   }

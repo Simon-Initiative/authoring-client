@@ -5,18 +5,18 @@ import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
+
 import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
 import { Maybe } from 'tsmonad';
 import { TextSelection, ParentContainer } from 'types/active';
+import { getEditorByContentType } from 'editors/content/container/registry';
 
+import colors from 'styles/colors';
 import styles from './ContiguousTextEditor.styles';
-
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
-  onUpdateContentSelection: (
-    documentId: string, content: Object,
-    parent: ParentContainer, textSelection: Maybe<TextSelection>) => void;
+
 }
 
 export interface ContiguousTextEditorState {
@@ -45,6 +45,25 @@ export default class ContiguousTextEditor
     return false;
   }
 
+  renderActiveEntity(entity) {
+
+    const { key, data } = entity;
+
+    const props = {
+      ...this.props,
+      renderContext: RenderContext.Sidebar,
+      onFocus: (c, p) => true,
+      model: data,
+      onEdit: (updated) => {
+        this.props.onEdit(this.props.model.updateEntity(key, updated));
+      },
+    };
+
+    return React.createElement(
+      getEditorByContentType((data as any).contentType), props);
+
+  }
+
   renderSidebar() {
     return <ContiguousTextToolbar {...this.props} renderContext={RenderContext.Sidebar} />;
   }
@@ -56,7 +75,8 @@ export default class ContiguousTextEditor
   handleOnFocus(e) {
     // We override the parent implementation, and instead
     // defer to the DraftWrapper onSelectionChange for
-    // broadcast of the change in content selection
+    // broadcast of the change in content selection so that
+    // we can get our hands on the text selection
     e.stopPropagation();
   }
 
@@ -64,9 +84,8 @@ export default class ContiguousTextEditor
 
     const { context, model, parent } = this.props;
 
-    const broadcastSelection = (selection) => {
-      this.props.onUpdateContentSelection(
-        context.documentId, model, parent, Maybe.just(new TextSelection(selection)));
+    const draftDrivenFocus = (selection) => {
+      this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
     };
 
     const { classes } = this.props;
@@ -77,7 +96,7 @@ export default class ContiguousTextEditor
           <DraftWrapper
             activeItemId=""
             editorStyles={{}}
-            onSelectionChange={broadcastSelection}
+            onSelectionChange={draftDrivenFocus}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}

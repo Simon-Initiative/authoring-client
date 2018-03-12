@@ -7,13 +7,12 @@ import { ContentDecorator } from './ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
-import { TextSelection } from 'types/active';
+import { TextSelection, ParentContainer } from 'types/active';
 
 import './ContentContainer.scss';
 
 export interface ContentContainerProps
   extends AbstractContentEditorProps<ContentElements> {
-
 
 }
 
@@ -127,8 +126,9 @@ export class ContentContainer
           onEdit: this.onChildEdit,
           parent: this,
         };
+
         const childRenderer = React.createElement(
-          getEditorByContentType((model as any).contentType), props);
+            getEditorByContentType((model as any).contentType), props);
 
         return (
           <ContentDecorator

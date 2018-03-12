@@ -2,31 +2,37 @@ import colors from 'styles/colors';
 import chroma from 'chroma-js';
 
 export default {
-  toolbarButton: {
+  toolbarDropdown: {
+    '& button': {
+      cursor: 'pointer',
+      '&:active': {
+        color: colors.selection,
+      },
+      '&:focus': {
+        outline: 0,
+      },
+
+      '&[disabled]': {
+        cursor: 'default',
+        color: colors.gray,
+      },
+    },
+  },
+  toolbarDropdownButton: {
+    display: 'flex',
+    flexDirection: 'row',
     background: 'transparent',
     fontSize: 12,
-    color: colors.black,
     textAlign: 'center',
     verticalAlign: 'top',
     border: '1px solid transparent',
-    cursor: 'pointer',
 
     '&:hover': {
       color: colors.hover,
       border: `1px solid ${colors.grayLighter}`,
     },
-    '&:active': {
-      color: colors.selection,
-    },
-    '&:focus': {
-      outline: 0,
-    },
-
     '&[disabled]': {
-      color: colors.gray,
-
       '&:hover': {
-        cursor: 'default',
         color: colors.gray,
         border: '1px solid transparent',
       },
@@ -37,25 +43,17 @@ export default {
       border: `1px solid ${chroma.mix(colors.selection, 'white', 0.75).hex()}`,
     },
 
+    '& .droparrow': {
+      margin: [0, 5],
+    },
+
     '& i': {
       fontSize: 16,
-
-      'not(.fa)': {
-        font: {
-          style: 'normal',
-          family: 'serif',
-          weight: 700,
-        },
-      },
     },
 
     '&.small': {
-      width: 36,
+      width: props => props.hideArrow ? 36 : 52,
       height: 32,
-
-      '& i': {
-        fontSize: 16,
-      },
     },
     '&.large': {
       minWidth: 72,

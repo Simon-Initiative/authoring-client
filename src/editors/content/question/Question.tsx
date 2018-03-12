@@ -13,7 +13,7 @@ import { Hints } from '../part/Hints';
 import SkillsEditor from '../skills/SkillsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
-import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
 
 import './Question.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';

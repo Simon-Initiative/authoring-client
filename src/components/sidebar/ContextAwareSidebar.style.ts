@@ -1,4 +1,3 @@
-import chroma from 'chroma-js';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
@@ -39,11 +38,11 @@ export default {
     marginTop: -2,
 
     '&:hover': {
-      color: colors.remove,
+      color: colors.hover,
     },
 
     '&:active': {
-      color: chroma(colors.remove).brighten(1).hex(),
+      color: colors.selection,
     },
 
     '& i': {
@@ -53,6 +52,25 @@ export default {
     '&:focus': {
       outline: 0,
     },
+  },
+
+  sidebarContent: {
+
+  },
+
+  sidebarEmptyMsg: {
+    color: colors.gray,
+    fontSize: '.9em',
+    marginTop: 80,
+    textAlign: 'center',
+  },
+
+  sidebarGroup: {
+
+  },
+
+  sidebarLabel: {
+
   },
 
   // slide-in/out animations

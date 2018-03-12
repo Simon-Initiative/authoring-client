@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
-import { ToolbarLayoutInline } from './ContextAwareToolbar';
+import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 
 import styles from './InsertToolbar.style';
@@ -20,7 +20,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
-      <ToolbarLayoutInline>
+      <ToolbarLayout.Inline>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
             tooltip="Insert Text Block"
@@ -127,7 +127,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled>
           <i className={'fa fa-check'}/>
         </ToolbarButton>
-      </ToolbarLayoutInline>
+      </ToolbarLayout.Inline>
     </React.Fragment>
   );
 });
