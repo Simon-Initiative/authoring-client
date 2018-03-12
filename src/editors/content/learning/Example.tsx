@@ -7,6 +7,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import colors from 'styles/colors';
 
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {
@@ -70,7 +71,12 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
   renderMain(): JSX.Element {
     return (
       <div className="exampleEditor">
-        <h5>{this.props.model.title.text.extractPlainText().valueOr(null)}</h5>
+        <ContiguousTextEditor
+          {...this.props}
+          model={(this.props.model.title.text.content as any).first()}
+          editorStyles={{ fontSize: 20 }}
+          viewOnly
+          onEdit={() => {}} />
         <ContentContainer
           {...this.props}
           model={this.props.model.content}

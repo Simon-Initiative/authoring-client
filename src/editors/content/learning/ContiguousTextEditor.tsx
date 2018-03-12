@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { StyledComponentProps } from 'types/component';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -15,7 +16,8 @@ import styles from './ContiguousTextEditor.styles';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
-
+  viewOnly?: boolean;
+  editorStyles?: any;
 }
 
 export interface ContiguousTextEditorState {
@@ -28,7 +30,7 @@ export interface ContiguousTextEditorState {
 @injectSheet(styles)
 export default class ContiguousTextEditor
   extends AbstractContentEditor<contentTypes.ContiguousText,
-    ContiguousTextEditorProps & JSSProps, ContiguousTextEditorState> {
+  StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
 
   constructor(props) {
     super(props);
@@ -81,26 +83,25 @@ export default class ContiguousTextEditor
 
   renderMain() : JSX.Element {
 
-    const { model, parent } = this.props;
+    const { className, classes, model, parent, editMode, viewOnly, editorStyles } = this.props;
 
     const draftDrivenFocus = (selection) => {
       this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
     };
 
-    const { classes } = this.props;
-
     return (
-      <div className={classNames(['contiguousTextEditor', classes.contiguousText])}>
+      <div className={classNames([
+        'contiguousTextEditor', classes.contiguousText, viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
             activeItemId=""
-            editorStyles={{}}
+            editorStyles={Object.assign({}, editorStyles)}
             onSelectionChange={draftDrivenFocus}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}
             undoRedoGuid={this.props.context.undoRedoGuid}
-            locked={!this.props.editMode}
+            locked={!editMode || viewOnly}
             onEdit={c => this.props.onEdit(c, c)} />
 
       </div>);

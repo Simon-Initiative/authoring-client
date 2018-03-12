@@ -5,4 +5,8 @@ export default {
     border: '1px solid #ced4da',
     borderRadius: 4,
   },
+  viewOnly: {
+    backgroundColor: 'transparent',
+    border: 'none',
+  },
 };

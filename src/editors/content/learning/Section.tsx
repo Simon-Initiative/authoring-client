@@ -10,6 +10,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import colors from 'styles/colors';
 
 export interface SectionProps extends AbstractContentEditorProps<SectionType> {
@@ -105,7 +106,12 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
   renderMain(): JSX.Element {
     return (
     <div className="pulloutEditor">
-      <h5>{this.props.model.title.text.extractPlainText().valueOr(null)}</h5>
+      <ContiguousTextEditor
+        {...this.props}
+        model={(this.props.model.title.text.content as any).first()}
+        editorStyles={{ fontSize: 20 }}
+        viewOnly
+        onEdit={() => {}} />
       <ContentContainer
         {...this.props}
         model={this.props.model.body}
