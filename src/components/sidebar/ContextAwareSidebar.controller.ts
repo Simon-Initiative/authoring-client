@@ -2,7 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { State } from 'reducers';
-import { ContextAwareSidebar } from './ContextAwareSidebar';
+import { ContextAwareSidebar, SidebarContent } from './ContextAwareSidebar';
 import { showSidebar } from 'actions/editorSidebar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
@@ -16,7 +16,7 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
 }
@@ -43,7 +43,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onInsert: content => dispatch(insert(content)),
+    onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onEdit: content =>  dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
   };
@@ -53,3 +53,38 @@ export const controller = connect<StateProps, DispatchProps, OwnProps>
     (mapStateToProps, mapDispatchToProps)(ContextAwareSidebar);
 
 export { controller as ContextAwareSidebar };
+
+interface SidebarContentStateProps {
+
+}
+
+interface SidebarContentDispatchProps {
+  onHide: () => void;
+}
+
+interface SidebarContentOwnProps {
+  title: string;
+  isEmpty?: boolean;
+}
+
+const mapSidebarContentStateToProps = (
+  state: State,
+  ownProps: SidebarContentOwnProps): SidebarContentStateProps => {
+  return {
+
+  };
+};
+
+const mapSidebarContentDispatchToProps = (
+  dispatch: Dispatch<State>,
+  ownProps: SidebarContentOwnProps): SidebarContentDispatchProps => {
+  return {
+    onHide: () => dispatch(showSidebar(false)),
+  };
+};
+
+export const sideBarController =
+  connect<SidebarContentStateProps, SidebarContentDispatchProps, SidebarContentOwnProps>
+    (mapSidebarContentStateToProps, mapSidebarContentDispatchToProps)(SidebarContent);
+
+export { sideBarController as SidebarContent };

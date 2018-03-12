@@ -3,7 +3,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
-} from 'editors/content/common/InputList.tsx';
+} from 'editors/content/common/InputList';
 import { ContentElements } from 'data/content/common/elements';
 import './Feedback.scss';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
-import { ToolbarLayoutInline } from './ContextAwareToolbar';
+import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection';
@@ -27,12 +27,22 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
-      <ToolbarLayoutInline>
+      <ToolbarLayout.Inline>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
             tooltip="Insert Text Block"
             disabled>
           <i className={classes.unicodeIcon}>T</i>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => console.log('NOT IMPLEMENTED')}
+            tooltip="Ordered List">
+          <i className={'fa fa-list-ol'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => console.log('NOT IMPLEMENTED')}
+            tooltip="Unordered List">
+          <i className={'fa fa-list-ul'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.WorkbookSection())}
@@ -156,7 +166,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('activity')}>
           <i className={'fa fa-check'}/>
         </ToolbarButton>
-      </ToolbarLayoutInline>
+      </ToolbarLayout.Inline>
     </React.Fragment>
   );
 });

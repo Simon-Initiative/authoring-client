@@ -30,18 +30,21 @@ export const activeContext = (
         activeChild: Maybe.just(action.content),
         container: Maybe.just(action.container),
         documentId: Maybe.just(action.documentId),
+        textSelection: action.textSelection,
       });
     case documentActions.DOCUMENT_RELEASED:
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.nothing(),
+        textSelection: Maybe.nothing(),
       });
     case documentActions.DOCUMENT_LOADED:
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),
         documentId: Maybe.just(action.documentId),
+        textSelection: Maybe.nothing(),
       });
     case actions.RESET_ACTIVE:
       return new ActiveContext();

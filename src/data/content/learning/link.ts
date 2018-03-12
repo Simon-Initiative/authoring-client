@@ -2,9 +2,10 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { augment, getChildren } from '../common';
 import { Image } from './image';
+import { LinkTarget } from './common';
 
 export type LinkParams = {
-  target?: string,
+  target?: LinkTarget,
   href?: string,
   internal?: boolean,
   title?: string,
@@ -14,7 +15,7 @@ export type LinkParams = {
 
 const defaultContent = {
   contentType: 'Link',
-  target: 'self',
+  target: LinkTarget.New,
   href: 'www.google.com',
   internal: false,
   title: '',
@@ -25,7 +26,7 @@ const defaultContent = {
 export class Link extends Immutable.Record(defaultContent) {
   contentType: 'Link';
   content: Maybe<Image>;
-  target: string;
+  target: LinkTarget;
   href: string;
   internal: boolean;
   title: string;

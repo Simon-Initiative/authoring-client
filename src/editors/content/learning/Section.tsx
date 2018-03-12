@@ -1,15 +1,19 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/controls';
-import { Label } from '../common/Sidebar';
-import { TitleContentEditor } from 'editors/content/title//TitleContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Maybe } from 'tsmonad';
 import { Section as SectionType } from 'data/content/workbook/section';
 import { PurposeTypes } from 'data/content/learning/common';
+import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import colors from 'styles/colors';
 
 export interface SectionProps extends AbstractContentEditorProps<SectionType> {
-
+  onShowSidebar: () => void;
 }
 
 export interface SectionState {
@@ -28,15 +32,15 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
   shouldComponentUpdate(nextProps) {
     return this.props.model !== nextProps.model;
   }
-  
-  onTitleEdit(title) {
+
+  onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body, sourceObject) {
     const model = this.props.model.with({ body });
-    this.props.onEdit(model, model);
+    this.props.onEdit(model, sourceObject);
   }
 
   onPurposeChange(purpose) {
@@ -49,53 +53,59 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
   }
 
   renderSidebar(): JSX.Element {
+    const { model } = this.props;
+
     return (
-      <div>
-        <Label>Title</Label>
-        <TitleContentEditor
-          {...this.props}
-          model={this.props.model.title}
-          onEdit={this.onTitleEdit}
-        />
-      </div>
+      <SidebarContent title="Section">
+        <SidebarGroup label="Title">
+          <ToolbarContentContainer
+            {...this.props}
+            model={model.title.text}
+            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
+        </SidebarGroup>
+      </SidebarContent>
     );
   }
 
   renderToolbar(): JSX.Element {
+    const { onShowSidebar } = this.props;
+
     return (
-      <div>
-        <Label>Purpose</Label>
-        <Select
-          editMode={this.props.editMode}
-          label=""
-          value={this.props.model.purpose.caseOf({
-            nothing: () => '',
-            just: p => p,
-          })}
-          onChange={this.onPurposeChange}>
-          <option value={''}>
-            {''}
-          </option>
-          {PurposeTypes.map(p =>
-            <option 
-              key={p.value}
-              value={p.value}>
-              {p.label}
-            </option>)}
-        </Select>
-      </div>
+      <ToolbarGroup label="Section" highlightColor={colors.contentSelection}>
+        <ToolbarLayout.Column>
+            <div style={{ marginLeft: 8 }}>Purpose</div>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={this.props.model.purpose.caseOf({
+                nothing: () => '',
+                just: p => p,
+              })}
+              onChange={this.onPurposeChange}>
+              <option value={''}>
+                {''}
+              </option>
+              {PurposeTypes.map(p =>
+                <option
+                  key={p.value}
+                  value={p.value}>
+                  {p.label}
+                </option>)}
+            </Select>
+        </ToolbarLayout.Column>
+
+        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+          <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
+          <div>Title</div>
+        </ToolbarButton>
+      </ToolbarGroup>
     );
   }
 
   renderMain(): JSX.Element {
     return (
     <div className="pulloutEditor">
-      <TitleContentEditor
-        {...this.props}
-        model={this.props.model.title}
-        onEdit={this.onTitleEdit}
-      />
-      <Label>Content</Label>
+      <h5>{this.props.model.title.text.extractPlainText().valueOr(null)}</h5>
       <ContentContainer
         {...this.props}
         model={this.props.model.body}

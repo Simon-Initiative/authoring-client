@@ -22,11 +22,9 @@ export class TitleContentEditor
     return this.props.model !== nextProps.model;
   }
 
-  onTitleEdit(text) {
-
+  onTitleEdit(text, source) {
     const updatedContent = this.props.model.with({ text });
-    this.props.onEdit(updatedContent);
-
+    this.props.onEdit(updatedContent, source);
   }
 
   renderSidebar() {

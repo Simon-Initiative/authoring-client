@@ -1,14 +1,12 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer } from 'types/active.ts';
+import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { InsertToolbar } from './InsertToolbar';
-import { FormatToolbar } from './FormatToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
 import { AppContext } from 'editors/common/AppContext';
 
@@ -22,7 +20,7 @@ interface ToolbarGroupProps {
 }
 
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
-  (({ className, classes, label, hide, children }) => {
+  (({ className, classes, label, hide, children }: StyledComponentProps<ToolbarGroupProps>) => {
     return (
       <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
         <div className={classNames([classes.toolbarGroup, className])}>
@@ -33,39 +31,59 @@ export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
     );
   });
 
-interface ToolbarLayoutInlineProps {
+interface ToolbarLayoutProps {
   className?: string;
 }
 
-export const ToolbarLayoutInline = injectSheetSFC<ToolbarLayoutInlineProps>(styles)
-  (({ className, classes, children }) => {
+export const ToolbarLayout = {
+  Inline: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
     return (
-      <div className={`${classes.toolbarLayoutInline} ${className}`}>
+      <div className={classNames([classes.toolbarLayoutInline, className])}>
         {children}
       </div>
     );
-  });
+  }),
 
-interface ToolbarLayoutGridProps {
-  className?: string;
-}
-
-export const ToolbarLayoutGrid = injectSheetSFC<ToolbarLayoutGridProps>(styles)
-  (({ className, classes, children }) => {
+  Grid: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
     return (
-      <div className={`${classes.toolbarLayoutGrid} ${className}`}>
+      <div className={classNames([classes.toolbarLayoutGrid, className])}>
         {children}
       </div>
     );
-  });
+  }),
+
+  Row: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
+    return (
+      <div className={classNames([classes.toolbarLayoutRow, className])}>
+        {children}
+      </div>
+    );
+  }),
+
+  Column: injectSheetSFC<ToolbarLayoutProps>(styles)(({
+    className, classes, children,
+  }: StyledComponentProps<ToolbarLayoutProps>) => {
+    return (
+      <div className={classNames([classes.toolbarLayoutColumn, className])}>
+        {children}
+      </div>
+    );
+  }),
+};
 
 export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
-  onInsert: (content: Object) => void;
+  textSelection: Maybe<TextSelection>;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
-  hideLabels?: boolean;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
   context: AppContext;
@@ -82,14 +100,10 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      onInsert, onEdit, content, container, supportedElements, classes, onShowPageDetails,
+      onInsert, onEdit, content, container, supportedElements,
+      textSelection, classes, onShowPageDetails,
       displayModal, dismissModal,
     } = this.props;
-
-    const isText = content.caseOf({
-      just: c => c instanceof contentTypes.ContiguousText,
-      nothing: () => false,
-    });
 
     const contentModel = content.caseOf({
       just: c => c,
@@ -135,22 +149,16 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
-            onInsert={onInsert}
+            onInsert={item => onInsert(item, textSelection)}
             parentSupportsElementType={parentSupportsElementType}
             context={this.props.context}
             displayModal={displayModal}
             dismissModal={dismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarFormatGroup} label="Format">
-          <FormatToolbar
-            content={content}
-            onEdit={onEdit}
-            isText={isText}
-            />
-        </ToolbarGroup>
-
         {contentRenderer}
+
+        <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
           <ActionsToolbar onShowPageDetails={onShowPageDetails} />

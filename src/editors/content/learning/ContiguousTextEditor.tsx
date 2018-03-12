@@ -1,13 +1,17 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
+import { injectSheet, JSSProps } from 'styles/jss';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
-  AbstractContentEditor, AbstractContentEditorProps,
+  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
-import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { ToolbarGroup, ToolbarLayoutInline } from 'components/toolbar/ContextAwareToolbar.tsx';
-import { InlineStyles } from 'data/content/learning/contiguous';
-import colors from 'styles/colors';
+
+import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
+import { Maybe } from 'tsmonad';
+import { TextSelection } from 'types/active';
+import { getEditorByContentType } from 'editors/content/container/registry';
+
+import styles from './ContiguousTextEditor.styles';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
@@ -16,19 +20,18 @@ export interface ContiguousTextEditorProps
 
 export interface ContiguousTextEditorState {
 
-
 }
 
 /**
  * The content editor for contiguous text.
  */
+@injectSheet(styles)
 export default class ContiguousTextEditor
   extends AbstractContentEditor<contentTypes.ContiguousText,
-    ContiguousTextEditorProps, ContiguousTextEditorState> {
+    ContiguousTextEditorProps & JSSProps, ContiguousTextEditorState> {
 
   constructor(props) {
     super(props);
-
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -41,82 +44,58 @@ export default class ContiguousTextEditor
     return false;
   }
 
+  renderActiveEntity(entity) {
+
+    const { key, data } = entity;
+
+    const props = {
+      ...this.props,
+      renderContext: RenderContext.Sidebar,
+      onFocus: (c, p) => true,
+      model: data,
+      onEdit: (updated) => {
+        this.props.onEdit(this.props.model.updateEntity(key, updated));
+      },
+    };
+
+    return React.createElement(
+      getEditorByContentType((data as any).contentType), props);
+
+  }
+
   renderSidebar() {
-    return null;
+    return <ContiguousTextToolbar {...this.props} renderContext={RenderContext.Sidebar} />;
   }
 
   renderToolbar() {
-    const { model, onEdit } = this.props;
+    return <ContiguousTextToolbar {...this.props} renderContext={RenderContext.Toolbar} />;
+  }
 
-    return (
-      <ToolbarGroup
-        label="Text Block" highlightColor={colors.contentSelection}>
-        <ToolbarLayoutInline>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Term));
-              }}
-              tooltip="Term">
-            <i className={'fa fa-book'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Foreign));
-              }}
-              tooltip="Foreign">
-            <i className={'fa fa-globe'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="Quotation">
-            <i className={'fa fa-quote-right'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="Citation">
-            <i className={'fa fa-asterisk'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="External Hyperlink">
-            <i className={'fa fa-external-link'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="High Stakes Assessment Link">
-            <i className={'fa fa-check'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="Cross Reference Link">
-            <i className={'fa fa-map-signs'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="Ordered List">
-            <i className={'fa fa-list-ol'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => console.log('NOT IMPLEMENTED')}
-              tooltip="Unordered List">
-            <i className={'fa fa-list-ul'}/>
-          </ToolbarButton>
-        </ToolbarLayoutInline>
-      </ToolbarGroup>
-    );
+  handleOnFocus(e) {
+    // We override the parent implementation, and instead
+    // defer to the DraftWrapper onSelectionChange for
+    // broadcast of the change in content selection so that
+    // we can get our hands on the text selection
+    e.stopPropagation();
   }
 
   renderMain() : JSX.Element {
 
-    const ignoreSelection = () => {};
+    const { model, parent } = this.props;
+
+    const draftDrivenFocus = (selection) => {
+      this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
+    };
+
+    const { classes } = this.props;
 
     return (
-      <div className="contiguous-text">
+      <div className={classes.contiguousText}>
 
           <DraftWrapper
             activeItemId=""
             editorStyles={{}}
-            onSelectionChange={ignoreSelection}
+            onSelectionChange={draftDrivenFocus}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}

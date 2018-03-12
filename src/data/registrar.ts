@@ -27,6 +27,7 @@ export function registerContentTypes() {
   registerType('link', ct.Link.fromPersistence);
   registerType('material', ct.Material.fromPersistence);
   registerType('materials', ct.Materials.fromPersistence);
+  registerType('math', ct.Math.fromPersistence);
   registerType('meaning', ct.Meaning.fromPersistence);
   registerType('objref', ct.ObjRef.fromPersistence);
   registerType('ol', ct.Ol.fromPersistence);

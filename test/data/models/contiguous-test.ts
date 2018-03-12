@@ -144,7 +144,7 @@ it('inline entities', () => {
   expect(styles[0]).toEqual({ offset: 8, length: 11, style: 'BOLD' });
   expect(raw.entityMap['0'].type).toBe('link');
   expect(raw.entityMap['0'].mutability).toBe('MUTABLE');
-  expect(raw.entityMap['0'].data.link.href).toBe('http://www.google.com');
+  expect(raw.entityMap['0'].data.href).toBe('http://www.google.com');
 
 
 });

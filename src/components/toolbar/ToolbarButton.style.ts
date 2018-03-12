@@ -5,10 +5,12 @@ export default {
   toolbarButton: {
     background: 'transparent',
     fontSize: 12,
+    color: colors.black,
     textAlign: 'center',
     verticalAlign: 'top',
     border: '1px solid transparent',
     cursor: 'pointer',
+
     '&:hover': {
       color: colors.hover,
       border: `1px solid ${colors.grayLighter}`,
@@ -37,11 +39,23 @@ export default {
 
     '& i': {
       fontSize: 16,
+
+      'not(.fa)': {
+        font: {
+          style: 'normal',
+          family: 'serif',
+          weight: 700,
+        },
+      },
     },
 
     '&.small': {
       width: 36,
       height: 32,
+
+      '& i': {
+        fontSize: 16,
+      },
     },
     '&.large': {
       minWidth: 72,
