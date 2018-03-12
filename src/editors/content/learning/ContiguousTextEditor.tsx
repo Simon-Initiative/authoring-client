@@ -8,10 +8,9 @@ import {
 
 import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
 import { Maybe } from 'tsmonad';
-import { TextSelection, ParentContainer } from 'types/active';
+import { TextSelection } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 
-import colors from 'styles/colors';
 import styles from './ContiguousTextEditor.styles';
 
 export interface ContiguousTextEditorProps
@@ -82,7 +81,7 @@ export default class ContiguousTextEditor
 
   renderMain() : JSX.Element {
 
-    const { context, model, parent } = this.props;
+    const { model, parent } = this.props;
 
     const draftDrivenFocus = (selection) => {
       this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));

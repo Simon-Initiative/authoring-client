@@ -7,7 +7,7 @@ import { ContentDecorator } from './ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
-import { TextSelection, ParentContainer } from 'types/active';
+import { TextSelection } from 'types/active';
 
 import './ContentContainer.scss';
 
