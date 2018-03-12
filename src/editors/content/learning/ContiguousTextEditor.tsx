@@ -6,7 +6,8 @@ import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { ToolbarGroup, ToolbarLayoutInline } from 'components/toolbar/ContextAwareToolbar.tsx';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
@@ -76,7 +77,7 @@ export default class ContiguousTextEditor
     if (entity !== null) {
       return this.renderActiveEntity(entity);
     }
-    return null;
+    return <SidebarContent title="Text Block" isEmpty />;
   }
 
   renderToolbar() {
@@ -100,7 +101,7 @@ export default class ContiguousTextEditor
     return (
       <ToolbarGroup
         label="Text Block" highlightColor={colors.contentSelection}>
-        <ToolbarLayoutInline>
+        <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Bold))
@@ -234,8 +235,17 @@ export default class ContiguousTextEditor
               tooltip="Cross Reference Link">
             <i className={'fa fa-map-signs'}/>
           </ToolbarButton>
-
-        </ToolbarLayoutInline>
+          <ToolbarButton
+              onClick={() => console.log('NOT IMPLEMENTED')}
+              tooltip="Ordered List">
+            <i className={'fa fa-list-ol'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={() => console.log('NOT IMPLEMENTED')}
+              tooltip="Unordered List">
+            <i className={'fa fa-list-ul'}/>
+          </ToolbarButton>
+        </ToolbarLayout.Inline>
       </ToolbarGroup>
     );
   }

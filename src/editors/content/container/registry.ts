@@ -5,6 +5,7 @@ import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
+import { connectSidebarActions } from './connectSidebarActions';
 import { LinkEditor } from '../learning/LinkEditor';
 import { ActivityLinkEditor } from '../learning/ActivityLinkEditor';
 import { QuoteEditor } from '../learning/QuoteEditor';
@@ -28,14 +29,14 @@ export function getEditorByContentType(contentType: string) {
 function init() {
   registry = {};
   registry['ContiguousText'] = ContiguousTextEditor;
-  registry['CodeBlock'] = CodeBlock;
+  registry['CodeBlock'] = connectSidebarActions()(CodeBlock);
   registry['Link'] = LinkEditor;
   registry['ActivityLink'] = ActivityLinkEditor;
   registry['Quote'] = QuoteEditor;
   registry['Math'] = MathEditor;
   registry['Cite'] = CiteEditor;
   registry['Xref'] = XrefEditor;
-  registry['Example'] = Example;
-  registry['Pullout'] = Pullout;
-  registry['Section'] = Section;
+  registry['Example'] = connectSidebarActions()(Example);
+  registry['Pullout'] = connectSidebarActions()(Pullout);
+  registry['Section'] = connectSidebarActions()(Section);
 }

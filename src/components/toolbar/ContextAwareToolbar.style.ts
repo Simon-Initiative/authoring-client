@@ -14,18 +14,21 @@ export default {
     overflowY: 'hidden',
     margin: [10, 0],
     padding: 5,
-    height: props => props.hideLabels ? 74 : 92,
+    paddingBottom: 8,
+    height: 100,
     fontSize: 12,
+    color: colors.grayDark,
     borderBottom: [1, 'solid', colors.grayLight],
   },
   toolbarGroup: {
-    width: 300,
+    maxWidth: 366,
+    minWidth: 200,
   },
   toolbarGroupContainer: {
     overflowX: 'hidden',
     height: 86,
     flexShrink: 0,
-    maxWidth: 600,
+    maxWidth: 400,
     marginRight: 5,
     paddingRight: 5,
     borderRight: '1px solid #ddd',
@@ -39,6 +42,9 @@ export default {
     '&.hide': {
       maxWidth: 0,
       opacity: 0,
+      marginRight: 0,
+      paddingRight: 0,
+      borderRight: 'none',
     },
 
     transition: `max-width ${TOOLBAR_HIDE_ANIMATION_DURATION_S}s ease-in, \
@@ -53,14 +59,21 @@ export default {
     width: 72,
     height: 72,
   },
+  toolbarLayoutRow: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  toolbarLayoutColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   tbGroupItems: {
     display: 'flex',
     flexDirection: 'row',
     height: 64,
-    overflow: 'hidden',
   },
   tbGroupLabel: {
-    display: props => props.hideLabels ? 'none' : 'block',
+    display: 'block',
     textAlign: 'center',
     textTransform: 'uppercase',
     color: colors.grayDark,

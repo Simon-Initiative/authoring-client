@@ -7,7 +7,7 @@ import { Select, TextInput } from '../common/controls';
 import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { Skill } from 'types/course';
-import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
 
 import './SelectionEditor.scss';
 

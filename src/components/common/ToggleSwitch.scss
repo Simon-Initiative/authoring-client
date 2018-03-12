@@ -1,6 +1,10 @@
 @import 'oli/colors';
 
 .toggle-switch {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+
   input[type="checkbox"].toggle {
     display: none;
 
@@ -60,6 +64,18 @@
 
     &:checked + .toggle-btn:after {
       left: 45%;
+    }
+  }
+
+  .label {
+    color: $black;
+
+    &.before {
+      margin-right: 5px;
+    }
+
+    &.after {
+      margin-left: 5px;
     }
   }
 }

@@ -8,7 +8,7 @@ import { convert } from 'utils/format';
 import { ContentElements } from 'data/content/common/elements';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
-} from 'editors/content/common/InputList.tsx';
+} from 'editors/content/common/InputList';
 import {
   AUTOGEN_MAX_CHOICES, autogenResponseFilter, getGeneratedResponseBody,
   getGeneratedResponseScore, modelWithDefaultFeedback,

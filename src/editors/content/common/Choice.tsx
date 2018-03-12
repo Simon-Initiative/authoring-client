@@ -8,7 +8,7 @@ import { DragTypes } from 'utils/drag';
 import { convert } from 'utils/format';
 import {
   InputList, InputListItem, ItemControls, ItemControl, ItemOptions, ItemOption, ItemOptionFlex,
-} from 'editors/content/common/InputList.tsx';
+} from 'editors/content/common/InputList';
 import { Button } from 'editors/content/common/Button';
 
 import './Choice.scss';
