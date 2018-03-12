@@ -113,8 +113,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => 
-            displayModal(
+            onClick={() => displayModal(
               <ResourceSelection 
                 filterPredicate={(
                   res: persistence.CourseResource): boolean => 
@@ -125,19 +124,34 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                   const resources = context.courseModel.resources.toArray();
                   const found = resources.find(r => r.guid === resource.id);
                   if (found !== undefined) {
-                    onInsert(new contentTypes.WbInline().with({ idRef: found.id }));
+                    onInsert(new contentTypes.WbInline().with({ idref: found.id }));
                   }
                 }}
                 onCancel={dismissModal}
               />)
-            // )
             }
             tooltip="Insert Inline Assessment"
             disabled={!parentSupportsElementType('wb:inline')}>
           <i className={'fa fa-flask'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Activity())}
+            onClick={() => displayModal(
+              <ResourceSelection 
+                filterPredicate={(
+                  res: persistence.CourseResource): boolean => 
+                    res.type === LegacyTypes.assessment2}
+                courseId={context.courseId}
+                onInsert={(resource) => {
+                  dismissModal();
+                  const resources = context.courseModel.resources.toArray();
+                  const found = resources.find(r => r.guid === resource.id);
+                  if (found !== undefined) {
+                    onInsert(new contentTypes.Activity().with({ idref: found.id }));
+                  }
+                }}
+                onCancel={dismissModal}
+              />)
+            }
             tooltip="Insert Activity"
             disabled={!parentSupportsElementType('activity')}>
           <i className={'fa fa-check'}/>

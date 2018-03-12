@@ -6,7 +6,7 @@ import { getKey } from '../../common';
 import { Param } from '../learning/param';
 
 export type WbInlineParams = {
-  idRef?: string,
+  idref?: string,
   src?: string,
   width?: string,
   height?: string,
@@ -17,7 +17,7 @@ export type WbInlineParams = {
 
 const defaultContent = {
   contentType: 'WbInline',
-  idRef: '',
+  idref: '',
   src: '',
   width: '',
   height: '',
@@ -29,7 +29,7 @@ const defaultContent = {
 export class WbInline extends Immutable.Record(defaultContent) {
 
   contentType: 'WbInline';
-  idRef: string;
+  idref: string;
   src: string;
   width: string;
   height: string;
@@ -56,7 +56,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
     let model = new WbInline({ guid });
 
     if (wb['@idref'] !== undefined) {
-      model = model.with({ idRef: wb['@idref'] });
+      model = model.with({ idref: wb['@idref'] });
     }
     if (wb['@src'] !== undefined) {
       model = model.with({ src: wb['@src'] });
@@ -91,7 +91,7 @@ export class WbInline extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       'wb:inline': {
-        '@idref': this.idRef,
+        '@idref': this.idref,
         '@src': this.src,
         '@height': this.height,
         '@width': this.width,
