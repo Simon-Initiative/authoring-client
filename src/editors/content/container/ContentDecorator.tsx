@@ -3,7 +3,6 @@ import * as React from 'react';
 import './ContentDecorator.scss';
 
 export interface ContentDecoratorProps {
-  onFocus: () => void;
   onRemove: () => void;
   isActiveContent: boolean;
 }
@@ -26,7 +25,7 @@ export class ContentDecorator
       (this.props.isActiveContent ? ' active-content' : '');
 
     return (
-      <div className={classes} onFocus={this.props.onFocus}>
+      <div className={classes}>
         {this.props.children}
       </div>
     );

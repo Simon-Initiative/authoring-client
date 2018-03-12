@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
-import { ParentContainer } from 'types/active';
+import { ParentContainer, TextSelection } from 'types/active';
+import { Maybe } from 'tsmonad';
 
 export interface AbstractContentEditor<ModelType, P extends AbstractContentEditorProps<ModelType>,
   S extends AbstractContentEditorState> {}
@@ -17,7 +18,9 @@ export interface AbstractContentEditorProps<ModelType> {
   parent?: ParentContainer;
   activeContentGuid?: string;
   onEdit: (updated: ModelType, source?: Object) => void;
-  onFocus: (model: any, parent) => void;
+  onFocus: (
+    model: any, parent: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
   context: AppContext;
   services: AppServices;
   editMode: boolean;
@@ -48,6 +51,14 @@ export abstract class
 
   abstract renderSidebar() : JSX.Element;
 
+  handleOnFocus(e) {
+
+    e.stopPropagation();
+
+    const { model, parent, onFocus } = this.props;
+    onFocus(model, parent, Maybe.nothing());
+  }
+
   render() : JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
@@ -60,7 +71,11 @@ export abstract class
     if (renderContext === RenderContext.Sidebar) {
       return this.renderSidebar();
     }
-    return this.renderMain();
+    return (
+      <div onFocus={e => this.handleOnFocus(e)}>
+        {this.renderMain()}
+      </div>
+    );
 
   }
 

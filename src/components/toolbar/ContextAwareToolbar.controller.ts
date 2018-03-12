@@ -4,17 +4,18 @@ import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit, resetActive } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
-import { ParentContainer } from 'types/active.ts';
+import { ParentContainer, TextSelection } from 'types/active.ts';
 import { Maybe } from 'tsmonad';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
   content: Object;
   container: Maybe<ParentContainer>;
+  textSelection: Maybe<TextSelection>;
 }
 
 interface DispatchProps {
-  onInsert: (content: Object) => void;
+  onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
@@ -35,6 +36,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     supportedElements,
     content: activeContext.activeChild,
     container: activeContext.container,
+    textSelection: activeContext.textSelection,
   };
 
 
@@ -44,7 +46,7 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
   return {
     onEdit: content =>  dispatch(edit(content)),
-    onInsert: content => dispatch(insert(content)),
+    onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onShowPageDetails: () => {
       dispatch(resetActive());
       dispatch(showSidebar(true));

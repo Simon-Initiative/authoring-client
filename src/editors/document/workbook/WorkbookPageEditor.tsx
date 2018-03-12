@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-
+import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { Resource } from 'data/content/resource';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -8,7 +8,7 @@ import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ActiveContext, ParentContainer } from 'types/active';
+import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
 
 import './WorkbookPageEditor.scss';
@@ -19,7 +19,8 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   activeContext: ActiveContext;
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
-    documentId: string, content: Object, container: ParentContainer) => void;
+    documentId: string, content: Object, container: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -117,9 +118,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
-  onFocus(model, parent, e) {
-    e.stopPropagation();
-    this.props.onUpdateContentSelection(this.props.context.documentId, model, parent);
+  onFocus(model, parent, textSelection) {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, model, parent, textSelection);
   }
 
   render() {
