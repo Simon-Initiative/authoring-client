@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -90,7 +90,7 @@ export default class ContiguousTextEditor
     const { classes } = this.props;
 
     return (
-      <div className={classes.contiguousText}>
+      <div className={classNames(['contiguousTextEditor', classes.contiguousText])}>
 
           <DraftWrapper
             activeItemId=""
