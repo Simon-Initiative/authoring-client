@@ -7,8 +7,6 @@ import { PurposeTypes } from 'data/content/learning/common';
 import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Maybe } from 'tsmonad';
-import { Image } from 'data/content/learning/Image';
 
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
@@ -31,7 +29,6 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
     this.onAssessmentChange = this.onAssessmentChange.bind(this);
-    this.onImageChange = this.onImageChange.bind(this);
     this.onClick = this.onClick.bind(this);
   }
 
@@ -49,19 +46,10 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
     this.props.onEdit(model, model);
   }
 
-  onImageChange(image) {
-    const model = this.props.model.with({ 
-      image: image === '' 
-        ? Maybe.nothing<Image>() 
-        : Maybe.just<Image>(image),
-    });
-    this.props.onEdit(model, model);
-  }
-
   onClick() {
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
-    
+
     this.props.services.viewDocument(guid, this.props.context.courseId);
   }
 
@@ -82,10 +70,10 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
     return (
       <div className="activityEditor">
         <div className="activity">
-          <Select 
+          <Select
             editMode={this.props.editMode}
-            label="Assessment" 
-            value={this.props.model.idref} 
+            label="Assessment"
+            value={this.props.model.idref}
             onChange={this.onAssessmentChange}>
             {activityOptions}
           </Select>
@@ -94,27 +82,18 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
         </div>
 
         <div>
-          <Select 
+          <Select
             editMode={this.props.editMode}
-            label="Purpose" 
-            value={this.props.model.purpose} 
+            label="Purpose"
+            value={this.props.model.purpose}
             onChange={this.onPurposeEdit}>
-            {PurposeTypes.map(p => 
-              <option 
-                key={p.value} 
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
                 value={p.value}>
                 {p.label}
               </option>)}
           </Select>
-        </div>
-
-        <div>
-          <button 
-            onClick={() => console.log('Not implemented')} 
-            type="button" 
-            className="btn btn-link">
-            Add image
-          </button>
         </div>
       </div>
     );
