@@ -10,6 +10,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import ResourceSelection from 'utils/selection/ResourceSelection';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
 export interface ActivityProps extends AbstractContentEditorProps<ActivityType> {
 
@@ -55,41 +56,25 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
   }
 
   renderSidebar() {
-    return (
-      <SidebarContent title="Assessment" isEmpty />
-    );
-  }
-
-  renderToolbar() {
-    return (
-      <ToolbarGroup label="Assessment" hide />
-    );
-  }
-
-  renderMain() {
     const activityOptions = this.props.context.courseModel.resources
       .toArray()
       .filter(r => r.type === LegacyTypes.assessment2)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (
-      <div className="activityEditor">
-        <div className="activity">
+      <SidebarContent title="Activity">
+        <SidebarGroup label="Assessment">
           <Select
             editMode={this.props.editMode}
-            label="Assessment"
             value={this.props.model.idref}
             onChange={this.onAssessmentChange}>
             {activityOptions}
           </Select>
-          <button onClick={this.onClick} type="button"
-          className="btn btn-link">View</button>
-        </div>
+        </SidebarGroup>
 
-        <div>
+        <SidebarGroup label="Purpose">
           <Select
             editMode={this.props.editMode}
-            label="Purpose"
             value={this.props.model.purpose}
             onChange={this.onPurposeEdit}>
             {PurposeTypes.map(p =>
@@ -99,7 +84,27 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
                 {p.label}
               </option>)}
           </Select>
-        </div>
+        </SidebarGroup>
+      </SidebarContent>
+    );
+  }
+
+  renderToolbar() {
+    return (
+      <ToolbarGroup label="Activity" hide />
+    );
+  }
+
+  renderMain() {
+    return (
+      <div className="activityEditor">
+      <h5>Activity</h5>
+        <button
+          onClick={this.onClick}
+          type="button"
+          className="btn btn-link">
+          View assessment in editor
+        </button>
       </div>
     );
   }

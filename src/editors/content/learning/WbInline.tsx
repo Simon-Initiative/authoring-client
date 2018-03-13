@@ -9,6 +9,7 @@ import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './wbinline.scss';
@@ -57,8 +58,35 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
   }
 
   renderSidebar() {
+    const inlineAssessmentOptions = this.props.context.courseModel.resources
+      .toArray()
+      .filter(r => r.type === LegacyTypes.inline)
+      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
+
     return (
-      <SidebarContent title="Assessment" isEmpty />
+      <SidebarContent title="Inline Assessment">
+        <SidebarGroup label="Assessment">
+          <Select
+            editMode={this.props.editMode}
+            value={this.props.model.idref}
+            onChange={this.onAssessmentChange}>
+            {inlineAssessmentOptions}
+          </Select>
+        </SidebarGroup>
+        <SidebarGroup label="Purpose">
+          <Select
+            editMode={this.props.editMode}
+            value={this.props.model.purpose}
+            onChange={this.onPurposeEdit}>
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
+                value={p.value}>
+                {p.label}
+              </option>)}
+          </Select>
+        </SidebarGroup>
+      </SidebarContent>
     );
   }
 
@@ -69,39 +97,15 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
   }
 
   renderMain() {
-    const inlineAssessmentOptions = this.props.context.courseModel.resources
-      .toArray()
-      .filter(r => r.type === LegacyTypes.inline)
-      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
-
     return (
       <div className="wbInlineEditor">
-        <div className="wbInline">
-          <Select
-            editMode={this.props.editMode}
-            label="Assessment"
-            value={this.props.model.idref}
-            onChange={this.onAssessmentChange}>
-            {inlineAssessmentOptions}
-          </Select>
-          <button onClick={this.onClick} type="button"
-          className="btn btn-link">View</button>
-        </div>
-
-        <div>
-          <Select
-            editMode={this.props.editMode}
-            label="Purpose"
-            value={this.props.model.purpose}
-            onChange={this.onPurposeEdit}>
-            {PurposeTypes.map(p =>
-              <option
-                key={p.value}
-                value={p.value}>
-                {p.label}
-              </option>)}
-          </Select>
-        </div>
+        <h5>Inline Assessment</h5>
+        <button
+          onClick={this.onClick}
+          type="button"
+          className="btn btn-link">
+          View assessment in editor
+        </button>
       </div>
     );
   }
