@@ -18,6 +18,7 @@ export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   viewOnly?: boolean;
   editorStyles?: any;
+  onTextSelectionChange?: (selection: any) => void;
 }
 
 export interface ContiguousTextEditorState {
@@ -29,21 +30,14 @@ export interface ContiguousTextEditorState {
  */
 @injectSheet(styles)
 export default class ContiguousTextEditor
-  extends AbstractContentEditor<contentTypes.ContiguousText,
-  StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+    extends AbstractContentEditor<contentTypes.ContiguousText,
+    StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+  selectionState: any;
 
   constructor(props) {
     super(props);
-  }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    return false;
+    this.draftDrivenFocus = this.draftDrivenFocus.bind(this);
   }
 
   renderActiveEntity(entity) {
@@ -81,13 +75,14 @@ export default class ContiguousTextEditor
     e.stopPropagation();
   }
 
+  draftDrivenFocus(model, parent, selection) {
+    this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
+    this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
+  }
+
   renderMain() : JSX.Element {
 
     const { className, classes, model, parent, editMode, viewOnly, editorStyles } = this.props;
-
-    const draftDrivenFocus = (selection) => {
-      this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
-    };
 
     return (
       <div className={classNames([
@@ -96,7 +91,7 @@ export default class ContiguousTextEditor
           <DraftWrapper
             activeItemId=""
             editorStyles={Object.assign({}, editorStyles)}
-            onSelectionChange={draftDrivenFocus}
+            onSelectionChange={selection => this.draftDrivenFocus(model, parent, selection)}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}

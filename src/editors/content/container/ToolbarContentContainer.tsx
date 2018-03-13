@@ -169,6 +169,7 @@ export class ToolbarContentContainer
             onFocus={this.onFocus}
             renderContext={RenderContext.MainEditor}
             onEdit={this.onEdit}
+            hideContentLabel
             activeContentGuid={model.guid} />
         </div>
       </div>

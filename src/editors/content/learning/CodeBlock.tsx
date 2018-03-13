@@ -39,10 +39,6 @@ export class CodeBlock
     this.onHighlightEdit = this.onHighlightEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
-  }
-
   onSourceEdit(source) {
     const model = this.props.model.with({ source });
     this.props.onEdit(model, model);

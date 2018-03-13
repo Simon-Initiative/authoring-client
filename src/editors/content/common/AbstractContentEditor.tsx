@@ -42,8 +42,18 @@ export abstract class
     super(props);
   }
 
-  // Force concrete classes to implement their own logic
-  abstract shouldComponentUpdate(nextProps, nextState);
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextProps.context !== this.props.context) {
+      return true;
+    }
+    return false;
+  }
 
   abstract renderMain() : JSX.Element;
 

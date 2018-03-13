@@ -45,13 +45,6 @@ export class ContentEditor
     this.props.onEdit(this.props.model.with({ availability }));
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   renderTitle() {
     const { model, onRemove } = this.props;
 

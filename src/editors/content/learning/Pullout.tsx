@@ -32,10 +32,6 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     this.onEditOrient = this.onEditOrient.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
-  }
-
   onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
     this.props.onEdit(model, sourceObject);

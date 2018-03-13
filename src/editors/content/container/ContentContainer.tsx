@@ -12,8 +12,8 @@ import { TextSelection } from 'types/active';
 import './ContentContainer.scss';
 
 export interface ContentContainerProps
-  extends AbstractContentEditorProps<ContentElements> {
-
+    extends AbstractContentEditorProps<ContentElements> {
+  hideContentLabel?: boolean;
 }
 
 export interface ContentContainerState {
@@ -27,6 +27,7 @@ export class ContentContainer
   extends AbstractContentEditor<ContentElements,
     ContentContainerProps, ContentContainerState> {
 
+  textSelections: Immutable.Map<string, any>;
   supportedElements: Immutable.List<string>;
 
   constructor(props) {
@@ -35,6 +36,7 @@ export class ContentContainer
     this.onChildEdit = this.onChildEdit.bind(this);
 
     this.supportedElements = this.props.model.supportedElements;
+    this.textSelections = Immutable.Map<string, any>();
   }
 
   onEdit(childModel) {
@@ -95,19 +97,6 @@ export class ContentContainer
     onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    return false;
-  }
-
   renderSidebar() {
     return null;
   }
@@ -117,6 +106,7 @@ export class ContentContainer
   }
 
   renderMain() : JSX.Element {
+    const { hideContentLabel } = this.props;
 
     const editors = this.props.model.content
       .toArray()
@@ -125,13 +115,29 @@ export class ContentContainer
           ...this.props, model,
           onEdit: this.onChildEdit,
           parent: this,
+          onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
         };
 
         const childRenderer = React.createElement(
             getEditorByContentType((model as any).contentType), props);
 
+        const onSelect = (model, parent) => {
+          const { onFocus } = this.props;
+
+          if (model.contentType === 'ContiguousText') {
+            const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
+              || model.content.selectionAfter);
+            return onFocus(model, parent, currentTextSelection);
+          }
+
+          return onFocus(model, parent, Maybe.nothing());
+        };
+
         return (
           <ContentDecorator
+            contentType={model.contentType}
+            onSelect={() => onSelect(model, this)}
+            hideContentLabel={hideContentLabel}
             key={model.guid}
             isActiveContent={model.guid === this.props.activeContentGuid}
             onRemove={this.onRemove.bind(this, model)}>

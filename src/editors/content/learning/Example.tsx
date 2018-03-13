@@ -26,10 +26,6 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     this.onContentEdit = this.onContentEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
-  }
-
   onTitleEdit(title, sourceObject) {
     const model = this.props.model.with({ title });
     this.props.onEdit(model, sourceObject);

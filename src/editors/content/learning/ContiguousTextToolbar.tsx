@@ -41,6 +41,9 @@ export default class ContiguousTextToolbar
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
       return true;
     }

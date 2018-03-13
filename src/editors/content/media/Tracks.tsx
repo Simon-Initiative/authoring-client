@@ -27,13 +27,6 @@ export class Tracks
     this.onEdit = this.onEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onAddClick() {
     const track = new Track();
     this.props.onEdit(this.props.model.set(track.guid, track));

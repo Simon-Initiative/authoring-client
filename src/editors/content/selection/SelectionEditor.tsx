@@ -40,10 +40,6 @@ export class SelectionEditor
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model);
-  }
-
   onStrategyChange(strategy) {
     this.props.onEdit(this.props.model.with({ strategy }));
   }

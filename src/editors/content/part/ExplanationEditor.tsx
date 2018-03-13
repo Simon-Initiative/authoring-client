@@ -21,13 +21,6 @@ export class ExplanationEditor
     super(props);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   renderSidebar() {
     return null;
   }
