@@ -7,7 +7,8 @@ import { PurposeTypes } from 'data/content/learning/common';
 import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './wbinline.scss';
@@ -51,16 +52,20 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
   onClick() {
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
-    
+
     this.props.services.viewDocument(guid, this.props.context.courseId);
   }
 
   renderSidebar() {
-    return null;
+    return (
+      <SidebarContent title="Assessment" isEmpty />
+    );
   }
 
   renderToolbar() {
-    return null;
+    return (
+      <ToolbarGroup label="Assessment" hide />
+    );
   }
 
   renderMain() {
@@ -72,10 +77,10 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
     return (
       <div className="wbInlineEditor">
         <div className="wbInline">
-          <Select 
+          <Select
             editMode={this.props.editMode}
-            label="Assessment" 
-            value={this.props.model.idref} 
+            label="Assessment"
+            value={this.props.model.idref}
             onChange={this.onAssessmentChange}>
             {inlineAssessmentOptions}
           </Select>
@@ -84,14 +89,14 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
         </div>
 
         <div>
-          <Select 
+          <Select
             editMode={this.props.editMode}
-            label="Purpose" 
-            value={this.props.model.purpose} 
+            label="Purpose"
+            value={this.props.model.purpose}
             onChange={this.onPurposeEdit}>
-            {PurposeTypes.map(p => 
-              <option 
-                key={p.value} 
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
                 value={p.value}>
                 {p.label}
               </option>)}

@@ -7,7 +7,8 @@ import { PurposeTypes } from 'data/content/learning/common';
 import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
 export interface ActivityProps extends AbstractContentEditorProps<ActivityType> {
@@ -54,11 +55,15 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
   }
 
   renderSidebar() {
-    return null;
+    return (
+      <SidebarContent title="Assessment" isEmpty />
+    );
   }
 
   renderToolbar() {
-    return null;
+    return (
+      <ToolbarGroup label="Assessment" hide />
+    );
   }
 
   renderMain() {
