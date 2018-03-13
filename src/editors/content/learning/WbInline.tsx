@@ -7,8 +7,8 @@ import { PurposeTypes } from 'data/content/learning/common';
 import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
@@ -99,12 +99,12 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
   renderMain() {
     return (
       <div className="wbInlineEditor">
-        <h5>Inline Assessment</h5>
+        <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          View assessment in editor
+          Edit assessment
         </button>
       </div>
     );

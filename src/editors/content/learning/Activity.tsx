@@ -98,12 +98,12 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
   renderMain() {
     return (
       <div className="activityEditor">
-      <h5>Activity</h5>
+        <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          View assessment in editor
+          Edit activity
         </button>
       </div>
     );
