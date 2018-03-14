@@ -31,6 +31,13 @@ export class Content extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  static fromText(text: string, guid: string) : Content {
+    return new Content().with({
+      guid,
+      body: ContentElements.fromText(text, '', Immutable.List(BOX_ELEMENTS).toArray()),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Content {
 
     const content = (root as any).content;

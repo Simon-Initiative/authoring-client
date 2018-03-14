@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 
-import { ContentElements } from 'data/content/common//elements';
+import { ContentElements } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS } from './types';
 import { augment } from '../common';
 
@@ -30,6 +30,13 @@ export class Feedback extends Immutable.Record(defaultContent) {
 
   with(values: FeedbackParams) {
     return this.merge(values) as this;
+  }
+
+  static fromText(text: string, guid: string) : Feedback {
+    return new Feedback().with({
+      guid,
+      body: ContentElements.fromText(text, '', Immutable.List(ALT_FLOW_ELEMENTS).toArray()),
+    });
   }
 
   static fromPersistence(root: Object, guid: string) : Feedback {

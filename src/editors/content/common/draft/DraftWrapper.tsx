@@ -386,6 +386,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return false;
   }
 
+  onGainFocus() {
+    this.props.onSelectionChange(this.state.editorState.getSelection());
+  }
+
   render() {
 
     const editorStyle : any = this.props.editorStyles !== undefined
@@ -404,6 +408,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           onClick={this.focus}>
 
           <Editor ref="editor"
+            onFocus={this.onGainFocus.bind(this)}
             spellCheck={true}
             stripPastedStyles={false}
             handleCutFragment={this.handleCutFragment.bind(this)}

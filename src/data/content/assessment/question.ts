@@ -85,7 +85,7 @@ export function detectInputRefChanges(
     deletions: Immutable.List(),
   };
 
-  return this.content.toArray()
+  return current.toArray()
     .filter(c => c.contentType === 'ContiguousText')
     .reduce(
       (delta, c) => {
@@ -248,6 +248,10 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
     return this.with({ body });
   }
 
+  static emptyBody() {
+    return ContentElements.fromText('', '', QUESTION_BODY_ELEMENTS);
+  }
+
   static fromPersistence(json: any, guid: string) {
 
     let model = new Question({ guid });
@@ -309,6 +313,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
         case 'explanation':
           model = model.with({ explanation:
             ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
+          break;
         case 'skillref':
           model = model.with({ skills: model.skills.add((item as any).skillref['@idref']) });
           break;

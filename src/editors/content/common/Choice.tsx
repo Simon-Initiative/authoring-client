@@ -73,9 +73,9 @@ export interface ChoiceProps  {
     selected?: boolean;
   };
   onReorderChoice?: (originalIndex: number, newIndex: number) => void;
-  onFocus: (child, parent) => void;
-  onEditChoice: (choice: contentTypes.Choice) => void;
-  onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback) => void;
+  onFocus: (child, parent, textSelection) => void;
+  onEditChoice: (choice: contentTypes.Choice, src) => void;
+  onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback, src) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
   onRemove: (choiceId: string) => void;
 }
@@ -113,9 +113,10 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
           editMode={editMode}
           context={context}
           services={services}
-          onEdit={body => onEditFeedback(
+          onEdit={(body, src) => onEditFeedback(
             response,
-            feedback.with({ body: (body as ContentElements) }))} />;
+            feedback.with({ body: (body as ContentElements) }),
+            src)} />;
 
 
       scoreEditor = (
@@ -144,7 +145,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         onDragDrop={onReorderChoice}
         dragType={DragTypes.Choice}
         body={choice.body}
-        onEdit={body => onEditChoice(choice.with({ body }))}
+        onEdit={(body, src) => onEditChoice(choice.with({ body }), src)}
         onRemove={id => onRemove(id)}
         controls={
           <ItemControls>

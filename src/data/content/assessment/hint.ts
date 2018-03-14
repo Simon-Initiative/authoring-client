@@ -32,6 +32,13 @@ export class Hint extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  static fromText(text: string, guid: string) : Hint {
+    return new Hint().with({
+      guid,
+      body: ContentElements.fromText(text, '', Immutable.List(ALT_FLOW_ELEMENTS).toArray()),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Hint {
 
     const hint = (root as any).hint;
