@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
-import { Maybe } from 'tsmonad';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
@@ -340,7 +339,6 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   render() {
     const {
       model,
-      onFocus,
       onBlur,
       onItemFocus,
     } = this.props;

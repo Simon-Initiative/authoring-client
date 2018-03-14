@@ -7,7 +7,6 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from '../assessment/Outline';
-import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { renderAssessmentNode } from '../common/questions';
 import { findNodeByGuid } from '../assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';

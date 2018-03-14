@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { InsertInputRefCommand } from '../question/commands';
 import {
   Question, QuestionProps, QuestionState,
 } from './Question';

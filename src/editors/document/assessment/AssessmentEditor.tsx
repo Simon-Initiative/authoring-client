@@ -21,7 +21,6 @@ import * as persistence from 'data/persistence';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContentElements } from 'data/content/common/elements';
 
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
