@@ -33,7 +33,7 @@ function selectImage(resourcePath, courseModel, display, dismiss) : Promise<cont
     const selected = { img: null };
 
     const mediaLibrary =
-      <ModalSelection title="Select an image"
+      <ModalSelection title="Select an Image"
         onInsert={() => { dismiss(); resolve(selected.img); }}
         onCancel={() => dismiss()}
       >

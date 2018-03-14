@@ -6,11 +6,11 @@ import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
-import { InsertToolbar } from './InsertToolbar';
-import { ActionsToolbar } from './ActionsToolbar';
-import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
 import { Resource } from 'data/content/resource';
+import { AppContext } from 'editors/common/AppContext';
+import { InsertToolbar } from './InsertToolbar';
+import { ActionsToolbar } from './ActionsToolbar.controller';
+import { CourseModel } from 'data/models/course';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -95,13 +95,13 @@ export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
+  context: AppContext;
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
-  onShowPageDetails: () => void;
+  hideLabels?: boolean;
   onShowSidebar: () => void;
-  context: AppContext;
-  onDisplayModal: (component: any) => void;
+  onDisplayModal: (component) => void;
   onDismissModal: () => void;
 }
 
@@ -115,8 +115,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
   render() {
     const {
       onInsert, onEdit, content, container, supportedElements,
-      textSelection, classes, onShowPageDetails,
-      onDisplayModal, onDismissModal,
+      textSelection, classes, onDisplayModal, onDismissModal, context, resource,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -163,11 +162,11 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
+            context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
             onInsert={item => onInsert(item, textSelection)}
             parentSupportsElementType={parentSupportsElementType}
-            context={this.props.context}
             onDisplayModal={onDisplayModal}
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
@@ -177,7 +176,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ActionsToolbar onShowPageDetails={onShowPageDetails} />
+          <ActionsToolbar documentResource={resource} documentId={context.documentId} />
         </ToolbarGroup>
       </div>
     );

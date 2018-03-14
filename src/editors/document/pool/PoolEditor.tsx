@@ -151,7 +151,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   render() {
 
-    const { model } = this.props;
+    const { model, context } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
@@ -162,7 +162,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     return (
       <div className="pool-editor">
         <h2 className="title-row">{text}</h2>
-        <ContextAwareToolbar context={this.props.context} />
+        <ContextAwareToolbar context={context} />
         <div className="pool-content">
           <div className="html-editor-well">
             <AddQuestion

@@ -6,6 +6,8 @@ import { Maybe } from 'tsmonad';
 export type ActionTypes =
   documentActions.DocumentReleasedAction |
   documentActions.DocumentLoadedAction |
+  documentActions.ChangeUndoneAction |
+  documentActions.ChangeRedoneAction |
   actions.UpdateContentAction |
   actions.UpdateContextAction |
   actions.ResetActiveAction;
@@ -50,6 +52,8 @@ export const activeContext = (
         textSelection: Maybe.nothing(),
       });
     case actions.RESET_ACTIVE:
+    case documentActions.CHANGE_UNDONE:
+    case documentActions.CHANGE_REDONE:
       return state.with({
         activeChild: Maybe.nothing(),
         container: Maybe.nothing(),

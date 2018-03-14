@@ -2,25 +2,39 @@ import * as React from 'react';
 import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
+import { Resource } from 'data/content/resource';
 
 export interface ActionsToolbarProps {
+  courseId: string;
+  documentResource: Resource;
+  documentId: string;
+  canUndo: boolean;
+  canRedo: boolean;
   onShowPageDetails: () => void;
+  onPreview: (courseId: string, resource: Resource) => Promise<any>;
+  onUndo: (documentId: string) => void;
+  onRedo: (documentId: string) => void;
 }
 
 /**
  * ActionsToolbar React Stateless Component
  */
-export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToolbarProps>) => {
+export const ActionsToolbar = (({
+  courseId, documentResource, documentId, canUndo, canRedo,
+  onShowPageDetails, onPreview, onUndo, onRedo,
+}: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
       <ToolbarLayout.Column>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onUndo(documentId)}
+            disabled={!canUndo}
             size={ToolbarButtonSize.Wide}>
           <i className={'fa fa-undo'}/> Undo
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onRedo(documentId)}
+            disabled={!canRedo}
             size={ToolbarButtonSize.Wide}>
           <i className={'fa fa-repeat'}/> Redo
         </ToolbarButton>
@@ -42,7 +56,7 @@ export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToo
           <div>Delete</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onPreview(courseId, documentResource)}
             tooltip="Preview this Page"
             size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-eye"/></div>

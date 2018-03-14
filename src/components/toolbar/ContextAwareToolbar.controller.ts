@@ -2,14 +2,14 @@ import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
-import { insert, edit, resetActive } from 'actions/active';
+import { insert, edit } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer, TextSelection } from 'types/active.ts';
+import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { modalActions } from 'actions/modal';
-import { Resource } from 'data/content/resource';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -23,9 +23,8 @@ interface StateProps {
 interface DispatchProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
-  onShowPageDetails: () => void;
   onShowSidebar: () => void;
-  onDisplayModal: (component: any) => void;
+  onDisplayModal: (component) => void;
   onDismissModal: () => void;
 }
 
@@ -61,10 +60,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
-    onShowPageDetails: () => {
-      dispatch(resetActive());
-      dispatch(showSidebar(true));
-    },
     onShowSidebar: () => dispatch(showSidebar(true)),
   };
 };
