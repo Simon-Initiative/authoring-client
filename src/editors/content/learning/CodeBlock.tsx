@@ -7,7 +7,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { Checkbox, Select, TextInput } from '../common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import colors from 'styles/colors';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import './markers.scss';
 
@@ -117,7 +117,7 @@ export class CodeBlock
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Code Block" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-file-code-o"/></div>
           <div>Language</div>

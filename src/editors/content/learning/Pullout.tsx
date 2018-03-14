@@ -12,7 +12,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
-import colors from 'styles/colors';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface PulloutProps extends AbstractContentEditorProps<PulloutType> {
   onShowSidebar: () => void;
@@ -83,7 +83,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Pullout" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Pullout" highlightColor={CONTENT_COLORS.Pullout}>
         <ToolbarLayout.Column>
           <Select editMode={this.props.editMode}
             value={this.props.model.pulloutType.caseOf({

@@ -11,7 +11,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
-import colors from 'styles/colors';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface SectionProps extends AbstractContentEditorProps<SectionType> {
   onShowSidebar: () => void;
@@ -68,7 +68,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Section" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Section" highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
             <div style={{ marginLeft: 8 }}>Purpose</div>
             <Select

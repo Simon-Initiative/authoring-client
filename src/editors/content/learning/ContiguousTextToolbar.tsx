@@ -11,7 +11,7 @@ import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import colors from 'styles/colors';
 import styles from './ContiguousTextEditor.styles';
@@ -109,7 +109,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={colors.contentSelection}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
