@@ -211,8 +211,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     onEdit(updatedModels.itemModel, updatedModels.partModel, updatedModels.itemModel);
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel, partModel);
+  onPartEdit(partModel: contentTypes.Part, src) {
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   onResponseAdd() {
@@ -232,7 +232,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, null);
   }
 
   onAddChoice() {
@@ -423,7 +423,6 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
           <TabSectionContent>
             <ChoiceFeedback
               {...this.props}
-              onFocus={this.props.onItemFocus}
               simpleFeedback={!advancedScoring}
               model={partModel}
               choices={itemModel.choices.toArray()}

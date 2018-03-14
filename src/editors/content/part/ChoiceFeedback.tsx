@@ -120,7 +120,7 @@ export abstract class ChoiceFeedback
       AUTOGEN_MAX_CHOICES,
       onGetChoiceCombinations,
     );
-    onEdit(updatedModel);
+    onEdit(updatedModel, src);
   }
 
   onEditMatchSelections(responseId, choices, selected) {
