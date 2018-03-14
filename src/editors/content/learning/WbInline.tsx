@@ -8,7 +8,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
-import './wbinline.scss';
+import './Wbinline.scss';
 
 export interface WbInlineProps extends AbstractContentEditorProps<WbInlineType> {
 
@@ -94,13 +94,13 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
 
   renderMain() {
     return (
-      <div className="wbInlineEditor">
+      <div className="wbinline">
         <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit assessment
+          Edit Assessment
         </button>
       </div>
     );

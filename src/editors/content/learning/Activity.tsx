@@ -8,6 +8,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
+import './Activity.scss';
+
 export interface ActivityProps extends AbstractContentEditorProps<ActivityType> {
 
 }
@@ -93,7 +95,7 @@ export class Activity extends AbstractContentEditor<ActivityType, ActivityProps,
 
   renderMain() {
     return (
-      <div className="activityEditor">
+      <div className="activity">
         <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
         <button
           onClick={this.onClick}

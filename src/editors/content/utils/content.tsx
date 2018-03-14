@@ -1,12 +1,11 @@
 import * as React from 'react';
 import colors from 'styles/colors';
 import distinct from 'styles/palettes/distinct';
+import flatui from 'styles/palettes/flatui';
 
 export const CONTENT_COLORS = {
-  ContiguousText: distinct.distinctOrange,
-  CodeBlock: distinct.distinctGrey,
-  Link: distinct.distinctCyan,
-  ActivityLink: distinct.distinctGreen,
+  ContiguousText: flatui.orange,
+  CodeBlock: flatui.wetAsphalt,
   Quote: distinct.distinctLavender,
   Math: distinct.distinctLime,
   Cite: distinct.distinctMagenta,
@@ -14,7 +13,9 @@ export const CONTENT_COLORS = {
   Example: distinct.distinctMint,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
-  Image: distinct.distinctRed,
+  Image: flatui.emerald,
+  Activity: distinct.distinctGreen,
+  WbInline: flatui.amethyst,
 };
 
 export const CONTENT_ICONS = {
@@ -24,6 +25,8 @@ export const CONTENT_ICONS = {
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
   Image: <i className={'fa fa-image'}/>,
+  WbInline: <i className={'fa fa-flask'}/>,
+  Activity: <i className={'fa fa-check'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
