@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
-import { insert, edit, resetActive } from 'actions/active';
+import { insert, edit } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer, TextSelection } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
