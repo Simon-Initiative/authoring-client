@@ -25,7 +25,7 @@ interface DispatchProps {
   onEdit: (content: Object) => void;
   onShowSidebar: () => void;
   onShowPageDetails: () => void;
-  onDisplayModal: (comp) => void;
+  onDisplayModal: (component) => void;
   onDismissModal: () => void;
 }
 
@@ -65,8 +65,8 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(showSidebar(true));
     },
     onShowSidebar: () => dispatch(showSidebar(true)),
-    onDisplayModal: (comp) => {
-      dispatch(modalActions.display(comp));
+    onDisplayModal: (component) => {
+      dispatch(modalActions.display(component));
     },
     onDismissModal: () => {
       dispatch(modalActions.dismiss());

@@ -102,7 +102,7 @@ export interface ToolbarProps {
   onShowPageDetails: () => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
-  onDisplayModal: (comp) => void;
+  onDisplayModal: (component) => void;
   onDismissModal: () => void;
 }
 

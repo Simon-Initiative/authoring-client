@@ -9,6 +9,7 @@ import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager
 import { CourseModel } from 'data/models/course';
 import { adjustPath } from 'editors/content/media/utils';
 import ModalSelection from 'utils/selection/ModalSelection';
+import { AppContext } from 'editors/common/AppContext';
 
 import styles from './InsertToolbar.style';
 
@@ -17,8 +18,9 @@ export interface InsertToolbarProps {
   parentSupportsElementType: (type: string) => boolean;
   resourcePath: string;
   courseModel: CourseModel;
-  displayModal: (comp) => void;
-  dismissModal: () => void;
+  context: AppContext;
+  onDisplayModal: (component) => void;
+  onDismissModal: () => void;
 }
 
 function selectImage(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Image> {
@@ -28,7 +30,7 @@ function selectImage(resourcePath, courseModel, display, dismiss) : Promise<cont
     const selected = { img: null };
 
     const mediaLibrary =
-      <ModalSelection title="Select an image"
+      <ModalSelection title="Select an Image"
         onInsert={() => { dismiss(); resolve(selected.img); }}
         onCancel={() => dismiss()}
       >
@@ -55,7 +57,7 @@ function selectImage(resourcePath, courseModel, display, dismiss) : Promise<cont
  */
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
   classes, onInsert, parentSupportsElementType, resourcePath,
-  courseModel, displayModal, dismissModal,
+  courseModel, onDisplayModal, onDismissModal,
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
@@ -110,7 +112,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              selectImage(resourcePath, courseModel, displayModal, dismissModal)
+              selectImage(resourcePath, courseModel, onDisplayModal, onDismissModal)
                 .then((image) => {
                   if (image !== null) {
                     onInsert(image);
