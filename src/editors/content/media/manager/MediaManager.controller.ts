@@ -4,7 +4,6 @@ import { State } from 'reducers';
 import { fetchCourseMediaNextPage, resetMedia, fetchMediaItemByPath } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
-import { AppContext } from 'editors/common/AppContext';
 import { MediaManager, SELECTION_TYPES } from './MediaManager';
 import { CourseModel } from 'data/models/course';
 

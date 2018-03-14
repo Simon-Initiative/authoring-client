@@ -4,10 +4,9 @@ import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
-import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
+import { injectSheet } from 'styles/jss';
 import { Select } from '../common/Select';
 import { StyledComponentProps } from 'types/component';
-import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
@@ -15,7 +14,6 @@ import { adjustPath } from './utils';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Button } from 'editors/content/common/Button';
 import { buildUrl } from 'utils/path';
@@ -315,7 +313,6 @@ export class ImageEditor
     );
   }
   renderToolbar(): JSX.Element {
-    const { onShowSidebar } = this.props;
 
     return (
       <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Image}>

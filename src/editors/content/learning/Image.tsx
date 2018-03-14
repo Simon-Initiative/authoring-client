@@ -3,8 +3,6 @@ import { Image as ImageType } from 'data/content/learning/image';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
-import { ImageEditor } from 'editors/content/media/ImageEditor';
 import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
@@ -43,7 +41,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
   }
 
   onClick() {
-    const b = this.props.blockProps;
+
   }
 
   render() : JSX.Element {

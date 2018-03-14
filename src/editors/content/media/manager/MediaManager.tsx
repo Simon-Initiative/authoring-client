@@ -7,7 +7,6 @@ import { Media, MediaItem, MediaRef } from 'types/media';
 import guid from 'utils/guid';
 import { convert, stringFormat } from 'utils/format';
 import * as persistence from 'data/persistence';
-import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { webContentsPath } from '../utils';
 import { CourseModel } from 'data/models/course';
