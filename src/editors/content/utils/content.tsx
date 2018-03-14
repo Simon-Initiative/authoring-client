@@ -13,9 +13,10 @@ export const CONTENT_COLORS = {
   Example: distinct.distinctMint,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
-  Image: flatui.emerald,
+  Image: flatui.sunflower,
   Activity: distinct.distinctGreen,
   WbInline: flatui.amethyst,
+  YouTube: colors.youtubeRed,
 };
 
 export const CONTENT_ICONS = {
@@ -24,6 +25,7 @@ export const CONTENT_ICONS = {
   Example: <i className={'fa fa-bar-chart'}/>,
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
+  YouTube: <i className={'fa fa-youtube'}/>,
   Image: <i className={'fa fa-image'}/>,
   WbInline: <i className={'fa fa-flask'}/>,
   Activity: <i className={'fa fa-check'}/>,

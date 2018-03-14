@@ -138,9 +138,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-film'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.YouTube())}
             tooltip="Insert YouTube Video"
-            disabled>
+            disabled={!parentSupportsElementType('youtube')}>
           <i className={'fa fa-youtube'}/>
         </ToolbarButton>
         <ToolbarButton
