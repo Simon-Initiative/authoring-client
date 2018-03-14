@@ -10,7 +10,7 @@ export const CONTENT_COLORS = {
   Math: distinct.distinctLime,
   Cite: distinct.distinctMagenta,
   Xref: distinct.distinctMaroon,
-  Example: distinct.distinctMint,
+  Example: flatui.turquoise,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
   Image: flatui.sunflower,
