@@ -14,6 +14,7 @@ import { adjustPath } from './utils';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Button } from 'editors/content/common/Button';
 import { buildUrl } from 'utils/path';
@@ -313,13 +314,24 @@ export class ImageEditor
     );
   }
   renderToolbar(): JSX.Element {
+    const { onShowSidebar } = this.props;
 
     return (
       <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Image}>
         <ToolbarLayout.Column>
-          <Button
-            editMode={this.props.editMode}
-            onClick={this.onSelect.bind(this)}>Change Image</Button>
+          <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-image"/></div>
+            <div>Select Image</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-expand"/> Sizing
+          </ToolbarButton>
+          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-sliders"/> Details
+          </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>
     );
