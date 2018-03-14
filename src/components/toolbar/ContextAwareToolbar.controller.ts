@@ -24,7 +24,6 @@ interface DispatchProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onShowSidebar: () => void;
-  onShowPageDetails: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
 }
@@ -61,10 +60,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
-    onShowPageDetails: () => {
-      dispatch(resetActive());
-      dispatch(showSidebar(true));
-    },
     onShowSidebar: () => dispatch(showSidebar(true)),
   };
 };

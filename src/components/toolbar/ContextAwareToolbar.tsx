@@ -99,7 +99,6 @@ export interface ToolbarProps {
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
-  onShowPageDetails: () => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
@@ -116,8 +115,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
   render() {
     const {
       onInsert, onEdit, content, container, supportedElements,
-      textSelection, classes, onShowPageDetails,
-      onDisplayModal, onDismissModal, context, resource,
+      textSelection, classes, onDisplayModal, onDismissModal, context, resource,
     } = this.props;
 
     const contentModel = content.caseOf({
