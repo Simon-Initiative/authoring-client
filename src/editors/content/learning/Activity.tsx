@@ -1,15 +1,11 @@
 import * as React from 'react';
 import { Activity as ActivityType } from 'data/content/workbook/activity';
-import * as persistence from 'data/persistence';
 import { Select } from '../common/Select';
-import { Button } from '../common/Button';
 import { PurposeTypes } from 'data/content/learning/common';
-import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import ResourceSelection from 'utils/selection/ResourceSelection';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
 export interface ActivityProps extends AbstractContentEditorProps<ActivityType> {
