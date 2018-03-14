@@ -3,6 +3,7 @@ import { CodeBlock } from '../learning/CodeBlock';
 import { Example } from '../learning/Example';
 import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
+import { YouTube } from '../learning/YouTube';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 import { connectSidebarActions } from './connectSidebarActions';
@@ -39,4 +40,5 @@ function init() {
   registry['Example'] = connectSidebarActions()(Example);
   registry['Pullout'] = connectSidebarActions()(Pullout);
   registry['Section'] = connectSidebarActions()(Section);
+  registry['YouTube'] = connectSidebarActions()(YouTube);
 }
