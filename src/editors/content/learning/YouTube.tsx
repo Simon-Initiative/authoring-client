@@ -7,16 +7,31 @@ import { TextInput } from '../common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import colors from 'styles/colors';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
-
+  onShowSidebar: () => void;
 }
 
 export interface YouTubeState {
 
 }
+
+export const SidebarRow = (text: string, width: string, control: any) => {
+  const widthClass = `col-${width}`;
+  return (
+    <div className="form-group row">
+      {text !== ''
+        ? <label className="col-3 col-form-label">{text}</label>
+        : null}
+      <div className={widthClass}>
+        {control}
+      </div>
+    </div>
+  );
+};
 
 export class YouTube
   extends AbstractContentEditor<YouTubeType, YouTubeProps, YouTubeState> {
@@ -74,27 +89,13 @@ export class YouTube
     this.props.onEdit(this.props.model.with({ caption }));
   }
 
-  row(text: string, width: string, control: any) {
-    const widthClass = 'col-' + width;
-    return (
-      <div className="form-group row">
-        {text !== ''
-          ? <label className="col-3 col-form-label">{text}</label>
-          : null}
-        <div className={widthClass}>
-          {control}
-        </div>
-      </div>
-    );
-  }
-
   renderSidebar(): JSX.Element {
     const { popout, src, height, width } = this.props.model;
     // titleContent, caption,
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="">
-        {this.row('', '12', <div className="input-group">
+        {SidebarRow('', '12', <div className="input-group">
             <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
               <TextInput
                 {...this.props}
@@ -106,7 +107,7 @@ export class YouTube
           </div>)}
         </SidebarGroup>
 
-        {this.row('Height', '9', <div className="input-group input-group-sm">
+        {SidebarRow('Height', '9', <div className="input-group input-group-sm">
             <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={height}
@@ -114,7 +115,7 @@ export class YouTube
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
 
-        {this.row('Width', '9', <div className="input-group input-group-sm">
+        {SidebarRow('Width', '9', <div className="input-group input-group-sm">
            <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={width}
@@ -122,21 +123,21 @@ export class YouTube
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
 
-          {this.row('Popout', '9', <TextInput width="100%" label=""
+          {SidebarRow('Popout', '9', <TextInput width="100%" label=""
               editMode={this.props.editMode}
               value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}
 
-          {/* {this.row('Title', '9', <ContentContainer
+          {/* {SidebarRow('Title', '9', <ContentContainer
             {...this.props}
             model={titleContent.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit}
           />)}
 
-          {this.row('Caption', '9', <ContentContainer
+          {SidebarRow('Caption', '9', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
@@ -149,7 +150,11 @@ export class YouTube
     return (
       <ToolbarGroup
         label="YouTube"
-        highlightColor={colors.contentSelection}>
+        highlightColor={CONTENT_COLORS.YouTube}>
+        <ToolbarButton onClick={() => this.props.onShowSidebar()} size={ToolbarButtonSize.Large}>
+          <div><i className="fa fa-file-code-o"/></div>
+          <div>Language</div>
+        </ToolbarButton>
       </ToolbarGroup>
     );
   }
