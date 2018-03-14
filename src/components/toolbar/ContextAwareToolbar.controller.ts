@@ -7,9 +7,9 @@ import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer, TextSelection } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
+import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { modalActions } from 'actions/modal';
-import { AppContext } from 'editors/common/AppContext';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -52,7 +52,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     textSelection: activeContext.textSelection,
   };
 
-
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
@@ -60,17 +59,13 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onEdit: content =>  dispatch(edit(content)),
     onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
+    onDisplayModal: component => dispatch(modalActions.display(component)),
+    onDismissModal: () => dispatch(modalActions.dismiss()),
     onShowPageDetails: () => {
       dispatch(resetActive());
       dispatch(showSidebar(true));
     },
     onShowSidebar: () => dispatch(showSidebar(true)),
-    onDisplayModal: (component) => {
-      dispatch(modalActions.display(component));
-    },
-    onDismissModal: () => {
-      dispatch(modalActions.dismiss());
-    },
   };
 };
 

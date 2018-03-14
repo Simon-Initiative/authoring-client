@@ -115,8 +115,9 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      content, container, resource, supportedElements, classes,
-      onInsert, onEdit, textSelection, context,
+      onInsert, onEdit, content, container, supportedElements,
+      textSelection, classes, onShowPageDetails,
+      onDisplayModal, onDismissModal, context, resource,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -165,11 +166,11 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
-            onDismissModal={this.props.onDismissModal}
-            onDisplayModal={this.props.onDisplayModal}
             resourcePath={determineBaseUrl(this.props.resource)}
             onInsert={item => onInsert(item, textSelection)}
-            parentSupportsElementType={parentSupportsElementType} />
+            parentSupportsElementType={parentSupportsElementType}
+            onDisplayModal={onDisplayModal}
+            onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
         {contentRenderer}
