@@ -9,7 +9,7 @@ import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
-import { MultipartInput } from './MultipartInput';
+import { MultipartInput } from './MultipartInput.controller';
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from './commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
@@ -201,6 +201,17 @@ export class QuestionEditor
     // Do nothing for questions
   }
 
+  onAddItemPart(item, part, body) {
+
+    const model = this.props.model.with({
+      body,
+      items: this.props.model.items.set(item.guid, item),
+      parts: this.props.model.parts.set(part.guid, part),
+    });
+
+    this.props.onEdit(model, null);
+  }
+
   renderQuestionBody(): JSX.Element {
     const { canRemove } = this.props;
 
@@ -227,14 +238,12 @@ export class QuestionEditor
           key={key}
           itemModel={item}
           partModel={part}
+          onAddItemPart={this.onAddItemPart.bind(this)}
           body={this.props.model.body}
           grading={this.props.model.grading}
           onGradingChange={this.onGradingChange}
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          fillInTheBlankCommand={this.fillInTheBlankCommand}
-          numericCommand={this.numericCommand}
-          textCommand={this.textCommand}
           canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
           model={this.props.model}
           canRemoveQuestion={canRemove}

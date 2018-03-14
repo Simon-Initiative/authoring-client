@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Skill } from 'types/course';
 import * as contentTypes from 'data/contentTypes';
+import { Maybe } from 'tsmonad';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -41,7 +42,7 @@ export default class SkillsEditor
   }
 
   componentWillReceiveProps(nextProps: SkillsEditorProps) {
-    if (nextProps.model !== this.props.model || 
+    if (nextProps.model !== this.props.model ||
         this.props.context.skills !== nextProps.context.skills) {
       this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
@@ -66,6 +67,10 @@ export default class SkillsEditor
   }
   renderToolbar() {
     return null;
+  }
+
+  handleOnFocus() {
+    this.props.onFocus(null, null, Maybe.nothing());
   }
 
   renderMain() : JSX.Element {

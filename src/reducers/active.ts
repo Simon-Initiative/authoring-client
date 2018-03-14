@@ -30,7 +30,8 @@ export const activeContext = (
       return state.with({
         activeChild: action.content === null || action.content === undefined
           ? Maybe.nothing() : Maybe.just(action.content),
-        container: Maybe.just(action.container),
+        container: action.container === null || action.container === undefined
+          ? Maybe.nothing() : Maybe.just(action.container),
         documentId: Maybe.just(action.documentId),
         textSelection: action.textSelection,
       });

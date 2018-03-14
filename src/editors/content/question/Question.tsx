@@ -3,8 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
-import { CommandProcessor } from '../common/command';
-import { EditorState } from 'draft-js';
 import { Maybe } from 'tsmonad';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
@@ -14,6 +12,7 @@ import SkillsEditor from '../skills/SkillsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
+import guid from 'utils/guid';
 
 import './Question.scss';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -27,6 +26,7 @@ export interface QuestionProps<ModelType>
   onBodyEdit: (...args: any[]) => any;
   onFocus: (child, model, textSelection) => void;
   onItemFocus: (itemId: string) => void;
+  onAddItemPart?: (item, part, body) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -78,7 +78,8 @@ export const OptionControl = TabOptionControl;
  */
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
   S extends QuestionState> extends React.PureComponent<P, S> {
-  htmlEditor: CommandProcessor<EditorState>;
+
+
   className: string;
 
   constructor(props) {
@@ -97,12 +98,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   abstract getClassName(): string;
 
   onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    const hint = new contentTypes.Hint();
+    const hint = contentTypes.Hint.fromText('', guid());
     this.onHintsEdit(part.hints.set(hint.guid, hint), item, part, hint);
   }
 
   onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
+    const c = contentTypes.GradingCriteria.fromText('', guid());
     const criteria = this.props.partModel.criteria.set(c.guid, c);
     this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
@@ -225,8 +226,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              onFocus={() => this.props.onFocus(
-                part.concepts, this, Maybe.nothing())}
+              onFocus={this.props.onFocus}
               model={part.skills}
               onEdit={skills => this.onSkillsEdit(skills, item, part)} />
           </TabSectionContent>

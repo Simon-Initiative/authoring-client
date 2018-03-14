@@ -51,6 +51,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
+    this.onFocus = this.onFocus.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -93,6 +94,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
+
+    this.props.onUpdateContent(this.props.context.documentId, src);
+
     this.handleEdit(this.props.model.with({ pool }));
   }
 
@@ -111,8 +115,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.setState({ currentNode });
   }
 
-  onFocus(child, parent) {
-
+  onFocus(model: Object, parent, textSelection) {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, model, parent, textSelection);
   }
 
   onRemove(guid: string) {

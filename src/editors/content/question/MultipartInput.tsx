@@ -9,17 +9,18 @@ import { FillInTheBlank } from '../items/FillInTheBlank';
 import { Text } from '../items/Text';
 import { Numeric } from '../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
-
+import { ActiveContext, TextSelection } from 'types/active';
+import { EntityTypes } from '../../../data/content/learning/common';
+import guid from 'utils/guid';
 import './MultipartInput.scss';
 import { Button } from 'editors/content/common/Button';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
-type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
+export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
 
 export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
-  fillInTheBlankCommand: InsertInputRefCommand;
-  numericCommand: InsertInputRefCommand;
-  textCommand: InsertInputRefCommand;
+  activeContext: ActiveContext;
   canInsertAnotherPart: PartAddPredicate;
 }
 
@@ -40,21 +41,76 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return 'multipart-input';
   }
 
-  onInsertNumeric(numericCommand, canInsertAnotherPart: PartAddPredicate) {
-    if (canInsertAnotherPart('Numeric')) {
-      this.htmlEditor.process(numericCommand);
+  onInsertInputRef(
+    canInsertAnotherPart: PartAddPredicate,
+    type: 'FillInTheBlank' | 'Numeric' | 'Text') {
+
+    let result = null;
+
+    if (canInsertAnotherPart(type)) {
+
+      const { activeContext } = this.props;
+
+      activeContext.container.lift((p) => {
+        activeContext.activeChild.lift((c) => {
+
+          if (this.props.model.body.content.has((c as any).guid)
+            && (c instanceof contentTypes.ContiguousText)) {
+
+            const selection = activeContext.textSelection.caseOf({
+              just: s => s,
+              nothing: () =>
+                TextSelection.createEmpty((c as ContiguousText).content.getFirstBlock().getKey()),
+            });
+
+            const input = guid();
+            const data = {};
+            data['@input'] = input;
+            data['$type'] = type;
+
+            const updated = (c as contentTypes.ContiguousText).addEntity(
+              EntityTypes.input_ref, false, data, selection);
+
+            result = [this.props.model.body.with({ content:
+              this.props.model.body.content.set(updated.guid, updated),
+            }), input];
+
+          }
+
+        });
+      });
+    }
+
+    return result;
+  }
+
+  onInsertNumeric(canInsertAnotherPart: PartAddPredicate) {
+    const result = this.onInsertInputRef(canInsertAnotherPart, 'Numeric');
+
+    if (result !== null) {
+      const item = new contentTypes.Numeric().with({ id: result[1] });
+      const part = new contentTypes.Part();
+      this.props.onAddItemPart(item, part, result[0]);
     }
   }
 
-  onInsertText(textCommand, canInsertAnotherPart: PartAddPredicate) {
-    if (canInsertAnotherPart('Text')) {
-      this.htmlEditor.process(textCommand);
+  onInsertText(canInsertAnotherPart: PartAddPredicate) {
+    const result = this.onInsertInputRef(canInsertAnotherPart, 'Text');
+
+    if (result !== null) {
+      const item = new contentTypes.Text().with({ id: result[1] });
+      const part = new contentTypes.Part();
+      this.props.onAddItemPart(item, part, result[0]);
     }
   }
 
-  onInsertFillInTheBlank(fillInTheBlankCommand, canInsertAnotherPart: PartAddPredicate) {
-    if (canInsertAnotherPart('FillInTheBlank')) {
-      this.htmlEditor.process(fillInTheBlankCommand);
+  onInsertFillInTheBlank(canInsertAnotherPart: PartAddPredicate) {
+    const result = this.onInsertInputRef(canInsertAnotherPart, 'FillInTheBlank');
+
+    if (result !== null) {
+      const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
+      const part = new contentTypes.Part();
+      this.props.onAddItemPart(item, part, result[0]);
     }
   }
 
@@ -79,9 +135,6 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
       services,
       context,
       body,
-      numericCommand,
-      textCommand,
-      fillInTheBlankCommand,
       canInsertAnotherPart,
       onBodyEdit,
     } = this.props;
@@ -92,18 +145,17 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             <span>Insert:</span>
             <button className="btn btn-sm btn-link" type="button"
               disabled={!this.props.editMode || !canInsertAnotherPart('Numeric')}
-              onClick={() => this.onInsertNumeric(numericCommand, canInsertAnotherPart)}>
+              onClick={() => this.onInsertNumeric(canInsertAnotherPart)}>
               Numeric
             </button>
             <button className="btn btn-sm btn-link" type="button"
               disabled={!this.props.editMode || !canInsertAnotherPart('Text')}
-              onClick={() => this.onInsertText(textCommand, canInsertAnotherPart)}>
+              onClick={() => this.onInsertText(canInsertAnotherPart)}>
               Text
             </button>
             <button className="btn btn-sm btn-link" type="button"
               disabled={!this.props.editMode || !canInsertAnotherPart('FillInTheBlank')}
-              onClick={() => this.onInsertFillInTheBlank(
-                fillInTheBlankCommand, canInsertAnotherPart)}>
+              onClick={() => this.onInsertFillInTheBlank(canInsertAnotherPart)}>
               Dropdown
             </button>
 

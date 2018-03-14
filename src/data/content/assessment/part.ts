@@ -146,10 +146,6 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(concept => ({ 'cmd:concept': { '#text': concept } })),
 
-      ...this.criteria
-        .toArray()
-        .map(item => item.toPersistence()),
-
       ...this.responses
         // filter out responses with empty matches
         .filter(r => r.match !== '')
@@ -159,6 +155,10 @@ export class Part extends Immutable.Record(defaultPartParams) {
       ...this.responseMult
         .toArray()
         .map(response => response.toPersistence()),
+
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
 
       ...this.hints
         .toArray()
