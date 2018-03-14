@@ -25,13 +25,6 @@ export class LinkEditor
     this.onHrefEdit = this.onHrefEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState: LinkEditorState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onTargetEdit(target) {
     this.props.onEdit(this.props.model.with({ target }));
   }

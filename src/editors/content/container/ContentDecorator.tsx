@@ -1,35 +1,63 @@
 import * as React from 'react';
+import { StyledComponentProps } from 'types/component';
+import { injectSheet, classNames } from 'styles/jss';
+import { getContentIcon } from 'editors/content/utils/content';
 
-import './ContentDecorator.scss';
+import styles from './ContentDecorator.style';
 
 export interface ContentDecoratorProps {
   onRemove: () => void;
+  onSelect: () => void;
   isActiveContent: boolean;
+  contentType: string;
+  hideContentLabel?: boolean;
+  isHoveringContent: boolean;
+  onMouseOver: () => void;
 }
 
 export interface ContentDecoratorState {
 
 }
 
+@injectSheet(styles)
 export class ContentDecorator
-  extends React.Component<ContentDecoratorProps, ContentDecoratorState> {
+  extends React.Component<StyledComponentProps<ContentDecoratorProps>,
+    ContentDecoratorState> {
 
   constructor(props, childState) {
     super(props);
-
   }
 
   render() {
-
-    const classes = 'content-decorator ' +
-      (this.props.isActiveContent ? ' active-content' : '');
+    const {
+      classes, isActiveContent, contentType, hideContentLabel,
+      children, onSelect, onMouseOver, isHoveringContent,
+    } = this.props;
 
     return (
-      <div className={classes}>
-        {this.props.children}
+      <div className={classNames([
+        'content-decorator',
+        classes.contentDecorator,
+        isActiveContent && 'active-content',
+        isHoveringContent && classes.hover,
+      ])}
+      onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
+        {!hideContentLabel &&
+          <div className={classNames([
+            classes.handle,
+            isActiveContent && 'active-content',
+          ])}
+            onMouseDown={onSelect}>
+            <div className={classes.label}>
+              {getContentIcon(contentType)}
+            </div>
+            <div className={classes.grip} />
+          </div>
+        }
+        <div className={classes.content}>
+        {children}
+        </div>
       </div>
     );
-
   }
-
 }

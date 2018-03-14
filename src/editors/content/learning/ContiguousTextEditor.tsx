@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
+import { StyledComponentProps } from 'types/component';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
@@ -15,7 +16,9 @@ import styles from './ContiguousTextEditor.styles';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
-
+  viewOnly?: boolean;
+  editorStyles?: any;
+  onTextSelectionChange?: (selection: any) => void;
 }
 
 export interface ContiguousTextEditorState {
@@ -27,21 +30,14 @@ export interface ContiguousTextEditorState {
  */
 @injectSheet(styles)
 export default class ContiguousTextEditor
-  extends AbstractContentEditor<contentTypes.ContiguousText,
-    ContiguousTextEditorProps & JSSProps, ContiguousTextEditorState> {
+    extends AbstractContentEditor<contentTypes.ContiguousText,
+    StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+  selectionState: any;
 
   constructor(props) {
     super(props);
-  }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    return false;
+    this.draftDrivenFocus = this.draftDrivenFocus.bind(this);
   }
 
   renderActiveEntity(entity) {
@@ -79,28 +75,28 @@ export default class ContiguousTextEditor
     e.stopPropagation();
   }
 
+  draftDrivenFocus(model, parent, selection) {
+    this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
+    this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
+  }
+
   renderMain() : JSX.Element {
 
-    const { model, parent } = this.props;
-
-    const draftDrivenFocus = (selection) => {
-      this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
-    };
-
-    const { classes } = this.props;
+    const { className, classes, model, parent, editMode, viewOnly, editorStyles } = this.props;
 
     return (
-      <div className={classes.contiguousText}>
+      <div className={classNames([
+        'contiguousTextEditor', classes.contiguousText, viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
             activeItemId=""
-            editorStyles={{}}
-            onSelectionChange={draftDrivenFocus}
+            editorStyles={Object.assign({}, editorStyles)}
+            onSelectionChange={selection => this.draftDrivenFocus(model, parent, selection)}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}
             undoRedoGuid={this.props.context.undoRedoGuid}
-            locked={!this.props.editMode}
+            locked={!editMode || viewOnly}
             onEdit={c => this.props.onEdit(c, c)} />
 
       </div>);

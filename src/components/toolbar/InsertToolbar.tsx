@@ -32,7 +32,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => console.log('NOT IMPLEMENTED')}
             tooltip="Insert Text Block"
             disabled>
-          <i className={classes.unicodeIcon}>T</i>
+          <i className="unicode-icon">T</i>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
@@ -72,7 +72,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => console.log('NOT IMPLEMENTED')}
             tooltip="Insert Formula Block"
             disabled>
-          <i className={classes.unicodeIcon}>&#8721;</i>
+          <i className="unicode-icon">&#8721;</i>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}

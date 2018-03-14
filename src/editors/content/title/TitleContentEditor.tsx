@@ -18,10 +18,6 @@ export class TitleContentEditor
 
   }
 
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
-  }
-
   onTitleEdit(text, source) {
     const updatedContent = this.props.model.with({ text });
     this.props.onEdit(updatedContent, source);
