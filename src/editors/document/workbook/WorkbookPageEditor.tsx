@@ -130,7 +130,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   render() {
-    const { model, hover, onUpdateHover } = this.props;
+    const { context, model, hover, onUpdateHover } = this.props;
 
     const text = this.props.model.head.title.text.extractPlainText().caseOf({
       just: s => s,
@@ -145,7 +145,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div className="workbookpage-editor">
         <h2 className="title-row">{text}</h2>
-        <ContextAwareToolbar documentResource={model.resource} />
+        <ContextAwareToolbar documentResource={model.resource} documentId={context.documentId} />
         <div className="wb-content">
           <div className="html-editor-well">
             {this.renderObjectives()}

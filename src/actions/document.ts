@@ -219,7 +219,7 @@ export function release(documentId: string) {
   };
 }
 
-export function save(documentId: string, model: models.ContentModel) {
+export function save(documentId: string, model: models.ContentModel, isUndoRedo?: boolean) {
   return function (dispatch, getState) {
 
     const editedDocument : EditedDocument = getState().documents.get(documentId);
@@ -230,7 +230,9 @@ export function save(documentId: string, model: models.ContentModel) {
       dispatch(updateCourseResources(resources));
     }
 
-    dispatch(modelUpdated(documentId, model));
+    if (!isUndoRedo) {
+      dispatch(modelUpdated(documentId, model));
+    }
 
     const doc = editedDocument.document.with({ model });
     editedDocument.persistence.save(doc);
@@ -243,10 +245,12 @@ export function undo(documentId: string) {
   return function (dispatch, getState) {
 
     const editedDocument : EditedDocument = getState().documents.get(documentId);
-    const model = editedDocument.undoStack.pop().peek();
+    const model = editedDocument.undoStack.peek();
 
-    dispatch(save(documentId, model));
-    dispatch(changeUndone(documentId));
+    if (model) {
+      dispatch(save(documentId, model, true));
+      dispatch(changeUndone(documentId));
+    }
 
   };
 }
@@ -255,9 +259,11 @@ export function redo(documentId: string) {
   return function (dispatch, getState) {
 
     const editedDocument : EditedDocument = getState().documents.get(documentId);
-    const model = editedDocument.redoStack.pop().peek();
+    const model = editedDocument.redoStack.peek();
 
-    dispatch(save(documentId, model));
-    dispatch(changeRedone(documentId));
+    if (model) {
+      dispatch(save(documentId, model, true));
+      dispatch(changeRedone(documentId));
+    }
   };
 }

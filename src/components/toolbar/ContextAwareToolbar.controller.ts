@@ -24,6 +24,7 @@ interface DispatchProps {
 
 interface OwnProps {
   documentResource: Resource;
+  documentId: string;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

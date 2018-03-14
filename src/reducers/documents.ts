@@ -21,21 +21,18 @@ function processUndo(
   state: DocumentsState, action: documentActions.ChangeUndoneAction) : DocumentsState {
 
   const ed = state.get(action.documentId);
-  const currentModel = ed.undoStack.peek();
+  const model = ed.undoStack.peek();
+  const document = ed.document.with({ model });
 
   const undoStack = ed.undoStack.pop();
-
-  const model = undoStack.peek();
-  const document = ed.document.with({ model });
+  const redoStack = ed.redoStack.push(ed.document.model);
 
   return state.set(action.documentId, ed.with({
     undoRedoGuid: createGuid(),
-    redoStack: ed.redoStack.push(currentModel),
-    undoStack: ed.undoStack.pop(),
+    redoStack,
+    undoStack,
     document,
   }));
-
-
 }
 
 function processRedo(
@@ -44,7 +41,7 @@ function processRedo(
   const ed = state.get(action.documentId);
 
   const model = ed.redoStack.peek();
-  const undoStack = ed.undoStack.push(model);
+  const undoStack = ed.undoStack.push(ed.document.model);
   const redoStack = ed.redoStack.pop();
 
   const document = ed.document.with({ model });
@@ -55,7 +52,6 @@ function processRedo(
     undoStack,
     document,
   }));
-
 }
 
 export const documents = (
@@ -102,6 +98,9 @@ export const documents = (
       const document = ed.document.with({ model: action.model });
       return state.set(action.documentId, ed.with({
         document,
+        undoRedoGuid: createGuid(),
+        undoStack: ed.undoStack.push(ed.document.model),
+        redoStack: ed.redoStack.clear(),
       }));
 
     default:

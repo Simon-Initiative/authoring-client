@@ -7,26 +7,34 @@ import { Resource } from 'data/content/resource';
 export interface ActionsToolbarProps {
   courseId: string;
   documentResource: Resource;
+  documentId: string;
+  canUndo: boolean;
+  canRedo: boolean;
   onShowPageDetails: () => void;
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
+  onUndo: (documentId: string) => void;
+  onRedo: (documentId: string) => void;
 }
 
 /**
  * ActionsToolbar React Stateless Component
  */
 export const ActionsToolbar = (({
-  courseId, documentResource, onShowPageDetails, onPreview,
+  courseId, documentResource, documentId, canUndo, canRedo,
+  onShowPageDetails, onPreview, onUndo, onRedo,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
       <ToolbarLayout.Column>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onUndo(documentId)}
+            disabled={!canUndo}
             size={ToolbarButtonSize.Wide}>
           <i className={'fa fa-undo'}/> Undo
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onRedo(documentId)}
+            disabled={!canRedo}
             size={ToolbarButtonSize.Wide}>
           <i className={'fa fa-repeat'}/> Redo
         </ToolbarButton>

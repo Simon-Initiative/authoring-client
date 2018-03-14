@@ -82,6 +82,7 @@ export interface ToolbarProps {
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   documentResource: Resource;
+  documentId: string;
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
@@ -100,7 +101,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
   render() {
     const {
       content, container, documentResource, supportedElements, classes,
-      onInsert, onEdit, textSelection,
+      onInsert, onEdit, textSelection, documentId,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -156,7 +157,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ActionsToolbar documentResource={documentResource} />
+          <ActionsToolbar documentResource={documentResource} documentId={documentId} />
         </ToolbarGroup>
       </div>
     );
