@@ -49,6 +49,8 @@ export class WbInline extends AbstractContentEditor<WbInlineType, WbInlineProps,
   onClick() {
     const guid = this.props.context.courseModel.resourcesById
       .get(this.props.model.idref).guid;
+
+    this.props.services.viewDocument(guid, this.props.context.courseId);
   }
 
   renderSidebar() {
