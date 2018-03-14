@@ -34,15 +34,21 @@ export class ToolbarContentContainer
     this.state = {
       textSelection: Maybe.nothing(),
     };
+
+    this.onEdit = this.onEdit.bind(this);
+    this.onFormatEdit = this.onFormatEdit.bind(this);
+    this.onFocus = this.onFocus.bind(this);
   }
 
-  onEdit(childModel) {
-    this.onChildEdit(childModel, childModel);
+  onEdit(model, sourceObject) {
+    const { onEdit } = this.props;
+
+    onEdit(model.with({ content: model.content }), sourceObject);
   }
 
-  onChildEdit(childModel, sourceObject) {
+  onFormatEdit(childModel) {
     const { onEdit, model } = this.props;
-    onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), sourceObject);
+    onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), childModel);
   }
 
   onFocus(child, parent, textSelection) {
@@ -73,7 +79,7 @@ export class ToolbarContentContainer
       <div className={classes.miniToolbar}>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Bold, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Bold, selection));
             }}
             tooltip="Bold"
             disabled={!formatEnabled}>
@@ -81,7 +87,7 @@ export class ToolbarContentContainer
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Italic, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Italic, selection));
             }}
             tooltip="Italic"
             disabled={!formatEnabled}>
@@ -89,7 +95,7 @@ export class ToolbarContentContainer
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Strikethrough, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Strikethrough, selection));
             }}
             tooltip="Strikethrough"
             disabled={!formatEnabled}>
@@ -97,7 +103,7 @@ export class ToolbarContentContainer
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Highlight, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Highlight, selection));
             }}
             tooltip="Highlight"
             disabled={!formatEnabled}>
@@ -105,7 +111,7 @@ export class ToolbarContentContainer
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Superscript, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Superscript, selection));
             }}
             tooltip="Superscript"
             disabled={!formatEnabled}>
@@ -113,7 +119,7 @@ export class ToolbarContentContainer
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Subscript, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Subscript, selection));
             }}
             tooltip="Subscript"
             disabled={!formatEnabled}>
@@ -127,21 +133,21 @@ export class ToolbarContentContainer
             label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])}/>} >
           <button className="dropdown-item"
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Code, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Code, selection));
             }}
             disabled={!formatEnabled}>
             <i className="fa fa-code"/> Code
           </button>
           <button className="dropdown-item"
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Term, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Term, selection));
             }}
             disabled={!formatEnabled}>
             <i className="fa fa-book"/> Term
           </button>
           <button className="dropdown-item"
             onClick={() => {
-              this.onEdit(text.toggleStyle(InlineStyles.Foreign, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Foreign, selection));
             }}
             disabled={!formatEnabled}>
             <i className="fa fa-globe"/> Foreign
@@ -160,8 +166,10 @@ export class ToolbarContentContainer
         <div className={classes.content}>
           <ContentContainer
             {...this.props}
-            onFocus={this.onFocus.bind(this)}
+            onFocus={this.onFocus}
             renderContext={RenderContext.MainEditor}
+            onEdit={this.onEdit}
+            hideContentLabel
             activeContentGuid={model.guid} />
         </div>
       </div>

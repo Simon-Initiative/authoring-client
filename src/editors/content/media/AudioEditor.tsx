@@ -41,13 +41,6 @@ export class AudioEditor
     this.renderSources = this.renderSources.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({
       text,

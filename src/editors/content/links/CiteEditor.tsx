@@ -25,13 +25,6 @@ export class CiteEditor
 
   }
 
-  shouldComponentUpdate(nextProps, nextState: CiteEditorState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onEntryEdit(entry) {
     this.props.onEdit(this.props.model.with({ entry }));
   }

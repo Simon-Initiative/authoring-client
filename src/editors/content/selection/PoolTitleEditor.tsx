@@ -30,10 +30,6 @@ export class PoolTitleEditor
       });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.model.text !== this.state.text;
-  }
-
   renderView(): JSX.Element {
     if (this.props.styles) {
       return <div style={this.props.styles}>{this.props.model.text}</div>;

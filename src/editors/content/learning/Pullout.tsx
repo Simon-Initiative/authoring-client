@@ -11,7 +11,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import colors from 'styles/colors';
+import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface PulloutProps extends AbstractContentEditorProps<PulloutType> {
   onShowSidebar: () => void;
@@ -29,10 +30,6 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     this.onContentEdit = this.onContentEdit.bind(this);
     this.onPulloutTypeChange = this.onPulloutTypeChange.bind(this);
     this.onEditOrient = this.onEditOrient.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
   }
 
   onTitleEdit(title, sourceObject) {
@@ -86,7 +83,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Pullout" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Pullout" highlightColor={CONTENT_COLORS.Pullout}>
         <ToolbarLayout.Column>
           <Select editMode={this.props.editMode}
             value={this.props.model.pulloutType.caseOf({
@@ -123,7 +120,12 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
   renderMain(): JSX.Element {
     return (
     <div className="pulloutEditor">
-      <h5>{this.props.model.title.text.extractPlainText().valueOr(null)}</h5>
+      <ContiguousTextEditor
+        {...this.props}
+        model={(this.props.model.title.text.content as any).first()}
+        editorStyles={{ fontSize: 20 }}
+        viewOnly
+        onEdit={() => {}} />
       <ContentContainer
         {...this.props}
         model={this.props.model.content}

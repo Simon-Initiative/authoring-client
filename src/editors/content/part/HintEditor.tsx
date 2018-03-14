@@ -34,13 +34,6 @@ export class HintEditor
     this.onTargetChange = this.onTargetChange.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onBodyEdit(body) {
     const concept = this.props.model.with({ body });
     this.props.onEdit(concept);

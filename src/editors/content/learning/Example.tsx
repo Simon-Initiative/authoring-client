@@ -7,7 +7,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import colors from 'styles/colors';
+import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {
   onShowSidebar: () => void;
@@ -23,10 +24,6 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onContentEdit = this.onContentEdit.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return this.props.model !== nextProps.model;
   }
 
   onTitleEdit(title, sourceObject) {
@@ -58,7 +55,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Example" highlightColor={colors.contentSelection}>
+      <ToolbarGroup label="Example" highlightColor={CONTENT_COLORS.Example}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
@@ -70,7 +67,12 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
   renderMain(): JSX.Element {
     return (
       <div className="exampleEditor">
-        <h5>{this.props.model.title.text.extractPlainText().valueOr(null)}</h5>
+        <ContiguousTextEditor
+          {...this.props}
+          model={(this.props.model.title.text.content as any).first()}
+          editorStyles={{ fontSize: 20 }}
+          viewOnly
+          onEdit={() => {}} />
         <ContentContainer
           {...this.props}
           model={this.props.model.content}

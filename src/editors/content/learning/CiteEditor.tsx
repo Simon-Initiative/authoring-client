@@ -28,13 +28,6 @@ export class CiteEditor
     super(props);
   }
 
-  shouldComponentUpdate(nextProps) {
-    if (this.props.model !== nextProps.model) {
-      return true;
-    }
-    return false;
-  }
-
   renderMain() {
     return null;
   }
