@@ -25,7 +25,8 @@ const REMOVE_QUESTION_DISABLED_MSG =
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
-  onItemFocus: (child, model, textSelection) => void;
+  onFocus: (child, model, textSelection) => void;
+  onItemFocus: (itemId: string) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -97,35 +98,35 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
   onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const hint = new contentTypes.Hint();
-    this.onHintsEdit(part.hints.set(hint.guid, hint), item, part);
+    this.onHintsEdit(part.hints.set(hint.guid, hint), item, part, hint);
   }
 
   onCriteriaAdd() {
     const c = new contentTypes.GradingCriteria();
     const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
   onCriteriaRemove(guid) {
     const criteria = this.props.partModel.criteria.delete(guid);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), null);
   }
 
   onCriteriaEdit(c) {
     const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
   onSkillsEdit(skills, item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ skills }));
+    onEdit(item, part.with({ skills }), skills);
   }
 
-  onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part, src) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ hints }));
+    onEdit(item, part.with({ hints }), src);
   }
 
   renderQuestionTitle(): JSX.Element {
@@ -224,7 +225,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              onFocus={() => this.props.onItemFocus(
+              onFocus={() => this.props.onFocus(
                 part.concepts, this, Maybe.nothing())}
               model={part.skills}
               onEdit={skills => this.onSkillsEdit(skills, item, part)} />
@@ -296,7 +297,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               services={this.props.services}
               editMode={this.props.editMode}
               model={part}
-              onEdit={hints => this.onHintsEdit(hints, item, part)} />
+              onEdit={(hints, h) => this.onHintsEdit(hints, item, part, h)} />
           </TabSectionContent>
         </TabSection>
       </Tab>
@@ -341,12 +342,15 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       model,
       onFocus,
       onBlur,
+      onItemFocus,
     } = this.props;
 
     return (
       <div
         className={`question ${this.getClassName() || ''}`}
-        onFocus={() => onFocus(model.id)}
+        onFocus={() => {
+          onItemFocus(model.id);
+        }}
         onBlur={() => onBlur(model.id)}>
 
         {this.renderQuestionTitle()}

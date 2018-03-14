@@ -136,7 +136,7 @@ export class ContextAwareSidebar
     });
 
     let contentRenderer;
-    if (contentParent) {
+    if (contentParent && contentModel) {
       const props: AbstractContentEditorProps<any> = {
         renderContext: RenderContext.Sidebar,
         model: contentModel,

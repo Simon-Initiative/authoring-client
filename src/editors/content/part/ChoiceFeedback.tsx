@@ -49,7 +49,7 @@ export abstract class ChoiceFeedback
     this.getSelectedMatches = this.getSelectedMatches.bind(this);
   }
 
-  onResponseEdit(response) {
+  onResponseEdit(response, src) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
     let updatedModel = model.with({
@@ -65,7 +65,7 @@ export abstract class ChoiceFeedback
       onGetChoiceCombinations,
     );
 
-    onEdit(updatedModel);
+    onEdit(updatedModel, src);
   }
 
   onResponseRemove(response) {
@@ -98,7 +98,7 @@ export abstract class ChoiceFeedback
     }));
   }
 
-  onBodyEdit(body, response) {
+  onBodyEdit(body, response, source) {
     let feedback = response.feedback.first();
     feedback = feedback.with({ body });
 
@@ -106,10 +106,10 @@ export abstract class ChoiceFeedback
       feedback: response.feedback.set(feedback.guid, feedback),
     });
 
-    this.onResponseEdit(updatedResponse);
+    this.onResponseEdit(updatedResponse, source);
   }
 
-  onDefaultFeedbackEdit(body: ContentElements, score: string) {
+  onDefaultFeedbackEdit(body: ContentElements, score: string, src) {
     const { model, choices, onGetChoiceCombinations, onEdit } = this.props;
 
     const updatedModel = modelWithDefaultFeedback(
@@ -126,17 +126,19 @@ export abstract class ChoiceFeedback
   onEditMatchSelections(responseId, choices, selected) {
     const { model, onEdit } = this.props;
 
-    onEdit(model.with({
-      responses: model.responses.set(
-        responseId,
-        model.responses.get(responseId).with({
-          match: selected.map(id =>
-            choices.find(c => c.guid === id).value,
-          )
-          .join(','),
-        }),
-      ),
-    }));
+    onEdit(
+      model.with({
+        responses: model.responses.set(
+          responseId,
+          model.responses.get(responseId).with({
+            match: selected.map(id =>
+              choices.find(c => c.guid === id).value,
+            )
+            .join(','),
+          }),
+        ),
+      }),
+      null);
   }
 
   getSelectedMatches(response, choices) {
@@ -180,7 +182,7 @@ export abstract class ChoiceFeedback
         guid: r.guid,
         isDefault: false,
         feedbackBody: r.feedback.first().body,
-        onEdit: (body, item) => this.onBodyEdit(body, item),
+        onEdit: (body, item, source) => this.onBodyEdit(body, item, source),
         score: r.score,
         onScoreEdit: (response, value) => this.onScoreEdit(response, value),
         item: r,
@@ -190,9 +192,10 @@ export abstract class ChoiceFeedback
         guid: 'default-feedback',
         isDefault: true,
         feedbackBody: defaultFeedbackBody,
-        onEdit: (body, item) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore),
+        onEdit: (body, item, src) => this.onDefaultFeedbackEdit(body, defaultFeedbackScore, src),
         score: defaultFeedbackScore,
-        onScoreEdit: (response, value) => this.onDefaultFeedbackEdit(defaultFeedbackBody, value),
+        onScoreEdit: (response, value) => this.onDefaultFeedbackEdit(
+          defaultFeedbackBody, value, null),
         item: undefined,
       }])
       // finally, render all response elements and the psudo-feedback element for all other choices
@@ -211,7 +214,7 @@ export abstract class ChoiceFeedback
           services={services}
           editMode={editMode}
           body={response.feedbackBody}
-          onEdit={body => response.onEdit(body, response.item)}
+          onEdit={(body, src) => response.onEdit(body, response.item, src)}
           onRemove={response.isDefault || userResponses.length === 1
             ? null
             : () => this.onResponseRemove(response.item)

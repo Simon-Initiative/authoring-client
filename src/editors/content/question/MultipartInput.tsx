@@ -148,6 +148,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               services={props.services}
               editMode={props.editMode}
               onRemove={props.onRemove}
+              onItemFocus={props.onItemFocus}
               onFocus={props.onFocus}
               onBlur={props.onBlur}
               itemModel={item}
@@ -162,6 +163,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               editMode={props.editMode}
               onRemove={props.onRemove}
               onFocus={props.onFocus}
+              onItemFocus={props.onItemFocus}
               onBlur={props.onBlur}
               itemModel={item}
               partModel={part}
@@ -175,6 +177,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
               editMode={props.editMode}
               onRemove={props.onRemove}
               onFocus={props.onFocus}
+              onItemFocus={props.onItemFocus}
               onBlur={props.onBlur}
               itemModel={item}
               partModel={part}

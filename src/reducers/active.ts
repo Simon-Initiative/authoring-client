@@ -22,12 +22,14 @@ export const activeContext = (
   switch (action.type) {
     case actions.UPDATE_CONTENT:
       return state.with({
-        activeChild: Maybe.just(action.content),
+        activeChild: action.content === null || action.content === undefined
+          ? Maybe.nothing() : Maybe.just(action.content),
         documentId: Maybe.just(action.documentId),
       });
     case actions.UPDATE_CONTEXT:
       return state.with({
-        activeChild: Maybe.just(action.content),
+        activeChild: action.content === null || action.content === undefined
+          ? Maybe.nothing() : Maybe.just(action.content),
         container: Maybe.just(action.container),
         documentId: Maybe.just(action.documentId),
         textSelection: action.textSelection,

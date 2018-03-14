@@ -16,6 +16,7 @@ import {
   getGeneratedResponseScore, modelWithDefaultFeedback,
 } from 'editors/content/part/defaultFeedbackGenerator.ts';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import createGuid from 'utils/guid';
 
 export interface CheckAllThatApplyProps extends QuestionProps<contentTypes.MultipleChoice> {
   advancedScoringInitialized: boolean;
@@ -134,8 +135,8 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       partModel,
       onEdit,
     } = this.props;
-
-    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
+    const updated = itemModel.with({ shuffle: !itemModel.shuffle });
+    onEdit(updated, partModel, updated);
   }
 
   onToggleAdvanced() {
@@ -159,7 +160,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
         onGetChoiceCombinations,
       );
 
-      onEdit(itemModel, updatedPartModel);
+      onEdit(itemModel, updatedPartModel, updatedPartModel);
     }
 
     onToggleAdvancedScoring(model.guid);
@@ -207,17 +208,17 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     // because we changed response match values, we must update choice refs
     const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
-    onEdit(updatedModels.itemModel, updatedModels.partModel);
+    onEdit(updatedModels.itemModel, updatedModels.partModel, updatedModels.itemModel);
   }
 
   onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+    this.props.onEdit(this.props.itemModel, partModel, partModel);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', createGuid());
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -242,7 +243,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     const count = itemModel.choices.size;
     const value = String.fromCharCode(65 + count);
 
-    const choice = new contentTypes.Choice().with({ value });
+    const choice = contentTypes.Choice.fromText('', createGuid()).with({ value });
 
     let updatedItemModel = itemModel;
     let updatedPartModel = partModel;
@@ -262,6 +263,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     onEdit(
       updatedItemModel,
       updatedPartModel,
+      null,
     );
   }
 
@@ -294,6 +296,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     onEdit(
       updatedItemModel,
       updatedPartModel,
+      null,
     );
   }
 
@@ -328,14 +331,15 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     onEdit(
       updatedItemModel,
       updatedPartModel,
+      null,
     );
   }
 
-  onChoiceEdit(c) {
+  onChoiceEdit(c, src) {
     this.props.onEdit(
       this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(c.guid, c) }),
-      this.props.partModel);
+      this.props.partModel, src);
   }
 
   renderChoices() {
@@ -419,6 +423,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
           <TabSectionContent>
             <ChoiceFeedback
               {...this.props}
+              onFocus={this.props.onItemFocus}
               simpleFeedback={!advancedScoring}
               model={partModel}
               choices={itemModel.choices.toArray()}

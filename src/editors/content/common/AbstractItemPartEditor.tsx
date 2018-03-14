@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AppServices } from '../../common/AppServices';
 import { AppContext } from '../../common/AppContext';
+import { ParentContainer, TextSelection } from 'types/active';
+import { Maybe } from 'tsmonad';
 
 export interface AbstractItemPartEditorProps<ItemType> {
 
@@ -9,7 +11,7 @@ export interface AbstractItemPartEditorProps<ItemType> {
 
   partModel: contentTypes.Part;
 
-  onEdit: (item: ItemType, part: contentTypes.Part) => void;
+  onEdit: (item: ItemType, part: contentTypes.Part, source: Object) => void;
 
   context: AppContext;
 
@@ -17,7 +19,11 @@ export interface AbstractItemPartEditorProps<ItemType> {
 
   editMode: boolean;
 
-  onFocus: (itemId: string) => void;
+  onItemFocus: (itemId: string) => void;
+
+  onFocus: (
+    model: any, parent: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
 
   onBlur: (itemId: string) => void;
 

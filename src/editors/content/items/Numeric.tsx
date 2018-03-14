@@ -10,6 +10,7 @@ import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
+import guid from 'utils/guid';
 
 export interface NumericProps extends AbstractItemPartEditorProps<contentTypes.Numeric> {
 
@@ -35,14 +36,14 @@ export class Numeric
     this.onEditMult = this.onEditMult.bind(this);
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+  onPartEdit(partModel: contentTypes.Part, src) {
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -55,21 +56,23 @@ export class Numeric
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, feedback);
   }
 
   onSizeChange(inputSize) {
-    this.props.onEdit(this.props.itemModel.with({ inputSize }), this.props.partModel);
+    const updated = this.props.itemModel.with({ inputSize });
+    this.props.onEdit(updated, this.props.partModel, updated);
   }
 
   onNotationChange(notation) {
-    this.props.onEdit(this.props.itemModel.with({ notation }), this.props.partModel);
+    const updated = this.props.itemModel.with({ notation });
+    this.props.onEdit(updated, this.props.partModel, updated);
   }
 
-  onEditMult(mult) {
+  onEditMult(mult, src) {
     const responseMult = this.props.partModel.responseMult.set(mult.guid, mult);
     const partModel = this.props.partModel.with({ responseMult });
-    this.props.onEdit(this.props.itemModel, partModel);
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   render() {

@@ -24,14 +24,14 @@ const defaultContent = {
 };
 
 export class FillInTheBlank extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'FillInTheBlank';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
   name : string;
   shuffle : boolean;
   guid: string;
-  
+
   constructor(params?: FillInTheBlankParams) {
     super(augment(params));
   }
@@ -41,7 +41,7 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : FillInTheBlank {
-    
+
     const q = (json as any).fill_in_the_blank;
     let model = new FillInTheBlank({ guid });
 
@@ -54,9 +54,9 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
     if (q['@shuffle'] !== undefined) {
       model = model.with({ shuffle: q['@shuffle'] === 'true' });
     }
-    
+
     getChildren(q).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -79,7 +79,7 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
 
     const choices = arr.length > 0
       ? this.choices.toArray().map(c => c.toPersistence())
-      : [new Choice().toPersistence()];
+      : [Choice.fromText('', '').toPersistence()];
 
     return {
       fill_in_the_blank: {
