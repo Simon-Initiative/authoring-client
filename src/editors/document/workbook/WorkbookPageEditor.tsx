@@ -145,7 +145,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <div className="workbookpage-editor">
         <h2 className="title-row">{text}</h2>
-        <ContextAwareToolbar />
+        <ContextAwareToolbar
+          context={this.props.context}
+        />
         <div className="wb-content">
           <div className="html-editor-well">
             {this.renderObjectives()}

@@ -4,6 +4,10 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
+import { AppContext } from 'editors/common/AppContext';
+import ResourceSelection from 'utils/selection/ResourceSelection';
+import { LegacyTypes } from 'data/types';
+import * as persistence from 'data/persistence';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { CourseModel } from 'data/models/course';
@@ -15,10 +19,11 @@ import styles from './InsertToolbar.style';
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
   parentSupportsElementType: (type: string) => boolean;
+  context: AppContext;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
   resourcePath: string;
   courseModel: CourseModel;
-  displayModal: (comp) => void;
-  dismissModal: () => void;
 }
 
 function selectImage(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Image> {
@@ -47,15 +52,14 @@ function selectImage(resourcePath, courseModel, display, dismiss) : Promise<cont
 
     display(mediaLibrary);
   });
-
 }
 
 /**
  * InsertToolbar React Stateless Component
  */
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
-  classes, onInsert, parentSupportsElementType, resourcePath,
-  courseModel, displayModal, dismissModal,
+  classes, onInsert, parentSupportsElementType, resourcePath, context,
+  courseModel, onDisplayModal, onDismissModal,
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
@@ -110,7 +114,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              selectImage(resourcePath, courseModel, displayModal, dismissModal)
+              selectImage(resourcePath, courseModel, onDisplayModal, onDismissModal)
                 .then((image) => {
                   if (image !== null) {
                     onInsert(image);
@@ -164,15 +168,47 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onDisplayModal(
+              <ResourceSelection
+                filterPredicate={(
+                  res: persistence.CourseResource): boolean =>
+                    res.type === LegacyTypes.inline}
+                courseId={context.courseId}
+                onInsert={(resource) => {
+                  onDismissModal();
+                  const resources = context.courseModel.resources.toArray();
+                  const found = resources.find(r => r.guid === resource.id);
+                  if (found !== undefined) {
+                    onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                  }
+                }}
+                onCancel={onDismissModal}
+              />)
+            }
             tooltip="Insert Inline Assessment"
-            disabled>
+            disabled={!parentSupportsElementType('wb:inline')}>
           <i className={'fa fa-flask'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onDisplayModal(
+              <ResourceSelection
+                filterPredicate={(
+                  res: persistence.CourseResource): boolean =>
+                    res.type === LegacyTypes.assessment2}
+                courseId={context.courseId}
+                onInsert={(resource) => {
+                  onDismissModal();
+                  const resources = context.courseModel.resources.toArray();
+                  const found = resources.find(r => r.guid === resource.id);
+                  if (found !== undefined) {
+                    onInsert(new contentTypes.Activity().with({ idref: found.id }));
+                  }
+                }}
+                onCancel={onDismissModal}
+              />)
+            }
             tooltip="Insert Activity"
-            disabled>
+            disabled={!parentSupportsElementType('activity')}>
           <i className={'fa fa-check'}/>
         </ToolbarButton>
       </ToolbarLayout.Inline>

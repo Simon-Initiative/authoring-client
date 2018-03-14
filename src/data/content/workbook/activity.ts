@@ -14,6 +14,7 @@ export type ActivityParams = {
 };
 
 const defaultContent = {
+  contentType: 'Activity',
   idref: '',
   purpose: 'checkpoint',
   image: Maybe.nothing<Image>(),

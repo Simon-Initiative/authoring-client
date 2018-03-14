@@ -321,7 +321,7 @@ export class ImageEditor
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-image"/></div>
-            <div>Select Image</div>
+            <div>Change Image</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
 

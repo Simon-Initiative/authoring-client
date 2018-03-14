@@ -3,6 +3,8 @@ import { CodeBlock } from '../learning/CodeBlock';
 import { Example } from '../learning/Example';
 import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
+import { WbInline } from '../learning/WbInline';
+import { Activity } from '../learning/Activity';
 import { YouTube } from '../learning/YouTube';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
@@ -41,5 +43,7 @@ function init() {
   registry['Example'] = connectSidebarActions()(Example);
   registry['Pullout'] = connectSidebarActions()(Pullout);
   registry['Section'] = connectSidebarActions()(Section);
+  registry['WbInline'] = connectSidebarActions()(WbInline);
+  registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTube);
 }

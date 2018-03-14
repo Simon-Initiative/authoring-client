@@ -1,28 +1,20 @@
 import * as React from 'react';
 import { Activity as ActivityType } from 'data/content/workbook/activity';
-import * as persistence from 'data/persistence';
-import {
-  InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
-} from './InteractiveRenderer';
 import { Select } from '../common/Select';
-import { Button } from '../common/Button';
 import { PurposeTypes } from 'data/content/learning/common';
-import { handleInsertion } from './common';
 import { LegacyTypes } from 'data/types';
+import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
-import ResourceSelection from 'utils/selection/ResourceSelection';
+import './Activity.scss';
 
-import './wbinline.scss';
+export interface ActivityProps extends AbstractContentEditorProps<ActivityType> {
 
-type Data = {
-  activity: ActivityType;
-};
-
-export interface ActivityProps extends InteractiveRendererProps {
-  data: Data;
 }
 
-export interface ActivityState extends InteractiveRendererState {
+export interface ActivityState {
 
 }
 
@@ -31,109 +23,87 @@ export interface ActivityProps {
 }
 
 
-export class Activity extends InteractiveRenderer<ActivityProps, ActivityState> {
-
-  title: string;
-  guid: string;
-
+export class Activity extends AbstractContentEditor<ActivityType, ActivityProps, ActivityState> {
   constructor(props) {
-    super(props, {});
+    super(props);
 
     this.onPurposeEdit = this.onPurposeEdit.bind(this);
+    this.onAssessmentChange = this.onAssessmentChange.bind(this);
     this.onClick = this.onClick.bind(this);
-    this.onSelectActivity = this.onSelectActivity.bind(this);
-    this.onInsert = this.onInsert.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-
-    this.findTitleId(this.props.data.activity.idref);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.findTitleId(nextProps.data.activity.idref);
-  }
-
-  onClick() {
-    if (this.guid !== null) {
-      this.props.blockProps.services.viewDocument(
-      this.guid, this.props.blockProps.context.courseId);
-    }
-
+  shouldComponentUpdate(nextProps) {
+    return this.props.model !== nextProps.model;
   }
 
   onPurposeEdit(purpose) {
-    this.props.blockProps.onEdit(
-      { activity: this.props.data.activity.with({ purpose }) });
+    const model = this.props.model.with({ purpose });
+    this.props.onEdit(model, model);
   }
 
-  onCancel() {
-    this.props.blockProps.services.dismissModal();
+  onAssessmentChange(idref) {
+    const model = this.props.model.with({ idref });
+    this.props.onEdit(model, model);
   }
 
-  onInsert(resource) {
+  onClick() {
+    const guid = this.props.context.courseModel.resourcesById
+      .get(this.props.model.idref).guid;
 
-    this.props.blockProps.services.dismissModal();
-
-    const resources = this.props.blockProps
-      .context.courseModel.resources.toArray();
-
-    const found = resources.find(r => r.guid === resource.id);
-
-    if (found !== undefined) {
-
-      this.props.blockProps.onEdit(
-        { activity: this.props.data.activity.with({ idref: found.id }) });
-    }
-
-
+    this.props.services.viewDocument(guid, this.props.context.courseId);
   }
 
-  onSelectActivity() {
+  renderSidebar() {
+    const activityOptions = this.props.context.courseModel.resources
+      .toArray()
+      .filter(r => r.type === LegacyTypes.assessment2)
+      .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
-    const predicate =
-      (res: persistence.CourseResource) : boolean => {
-        return res.type === LegacyTypes.assessment2;
-      };
-
-    this.props.blockProps.services.displayModal(
-        <ResourceSelection
-          filterPredicate={predicate}
-          courseId={this.props.blockProps.context.courseId}
-          onInsert={this.onInsert}
-          onCancel={this.onCancel}/>);
-  }
-
-
-  findTitleId(idref) {
-    const resources = this.props.blockProps
-      .context.courseModel.resources.toArray();
-
-    const resource = resources.find(resource => resource.id === idref);
-
-    if (resource === undefined) {
-      this.title = 'Not set';
-      this.guid = null;
-    } else {
-      this.title = resource.title;
-      this.guid = resource.guid;
-    }
-  }
-
-  render() : JSX.Element {
     return (
-      <div className="wbinline"
-        ref={c => this.focusComponent = c} onFocus={this.onFocus}
-        onBlur={this.onBlur}  onClick={handleInsertion.bind(undefined, this.props)}>
+      <SidebarContent title="Activity">
+        <SidebarGroup label="Assessment">
+          <Select
+            editMode={this.props.editMode}
+            value={this.props.model.idref}
+            onChange={this.onAssessmentChange}>
+            {activityOptions}
+          </Select>
+        </SidebarGroup>
 
-        <b>Activity:</b>&nbsp;&nbsp;&nbsp;
-        <button onClick={this.onClick} type="button"
-          className="btn btn-link">{this.title}</button>
-        <Button editMode={this.props.blockProps.editMode}
-          onClick={this.onSelectActivity}>Set</Button>
-        &nbsp;&nbsp;&nbsp;
-        <Select editMode={this.props.blockProps.editMode}
-          label="Purpose" value={this.props.data.activity.purpose} onChange={this.onPurposeEdit}>
-          {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-        </Select>
-      </div>);
+        <SidebarGroup label="Purpose">
+          <Select
+            editMode={this.props.editMode}
+            value={this.props.model.purpose}
+            onChange={this.onPurposeEdit}>
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
+                value={p.value}>
+                {p.label}
+              </option>)}
+          </Select>
+        </SidebarGroup>
+      </SidebarContent>
+    );
+  }
+
+  renderToolbar() {
+    return (
+      <ToolbarGroup label="Activity" hide />
+    );
+  }
+
+  renderMain() {
+    return (
+      <div className="activity">
+        <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
+        <button
+          onClick={this.onClick}
+          type="button"
+          className="btn btn-link">
+          Edit activity
+        </button>
+      </div>
+    );
   }
 }
