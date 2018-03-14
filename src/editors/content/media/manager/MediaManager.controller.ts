@@ -4,8 +4,8 @@ import { State } from 'reducers';
 import { fetchCourseMediaNextPage, resetMedia, fetchMediaItemByPath } from 'actions/media';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { Media, MediaItem } from 'types/media';
-import { AppContext } from 'editors/common/AppContext';
 import { MediaManager, SELECTION_TYPES } from './MediaManager';
+import { CourseModel } from 'data/models/course';
 
 interface StateProps {
   media: Maybe<OrderedMediaLibrary>;
@@ -22,7 +22,8 @@ interface DispatchProps {
 interface OwnProps {
   className?: string;
   model: Media;
-  context: AppContext;
+  courseModel: CourseModel;
+  resourcePath: string;
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
   initialSelectionPaths?: string[];
@@ -32,7 +33,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    media: Maybe.maybe(state.media.get(ownProps.context.courseId)),
+    media: Maybe.maybe(state.media.get(ownProps.courseModel.guid)),
   };
 };
 
@@ -40,13 +41,13 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
   return {
     onLoadCourseMediaNextPage: (mimeFilter, searchText, orderBy, order) => {
       dispatch(fetchCourseMediaNextPage(
-        ownProps.context.courseId, mimeFilter, searchText, orderBy, order));
+        ownProps.courseModel.guid, mimeFilter, searchText, orderBy, order));
     },
     onResetMedia: () => {
-      dispatch(resetMedia(ownProps.context.courseId));
+      dispatch(resetMedia(ownProps.courseModel.guid));
     },
     onLoadMediaItemByPath: (path: string) => (
-      dispatch(fetchMediaItemByPath(ownProps.context.courseId, path))
+      dispatch(fetchMediaItemByPath(ownProps.courseModel.guid, path))
     ),
   };
 };

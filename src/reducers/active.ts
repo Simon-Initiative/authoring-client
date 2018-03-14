@@ -50,7 +50,11 @@ export const activeContext = (
         textSelection: Maybe.nothing(),
       });
     case actions.RESET_ACTIVE:
-      return new ActiveContext();
+      return state.with({
+        activeChild: Maybe.nothing(),
+        container: Maybe.nothing(),
+        textSelection: Maybe.nothing(),
+      });
 
     default:
       return state;

@@ -12,7 +12,7 @@ import { QuoteEditor } from '../learning/QuoteEditor';
 import { MathEditor } from '../learning/MathEditor';
 import { CiteEditor } from '../learning/CiteEditor';
 import { XrefEditor } from '../learning/XrefEditor';
-
+import { ImageEditor } from '../media/ImageEditor';
 
 let registry = null;
 
@@ -31,6 +31,7 @@ function init() {
   registry['ContiguousText'] = ContiguousTextEditor;
   registry['CodeBlock'] = connectSidebarActions()(CodeBlock);
   registry['Link'] = LinkEditor;
+  registry['Image'] = connectSidebarActions()(ImageEditor);
   registry['ActivityLink'] = ActivityLinkEditor;
   registry['Quote'] = QuoteEditor;
   registry['Math'] = MathEditor;
@@ -39,4 +40,5 @@ function init() {
   registry['Example'] = connectSidebarActions()(Example);
   registry['Pullout'] = connectSidebarActions()(Pullout);
   registry['Section'] = connectSidebarActions()(Section);
+
 }
