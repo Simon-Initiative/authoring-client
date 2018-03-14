@@ -111,7 +111,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
     });
 
     let contentRenderer;
-    if (contentParent) {
+    if (contentParent && contentModel) {
       const props = {
         renderContext: RenderContext.Toolbar,
         model: contentModel,
