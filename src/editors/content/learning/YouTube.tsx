@@ -4,12 +4,11 @@ import { YouTube as YouTubeType } from '../../../data/content/learning/youtube';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ContentElements } from 'data/content/common/elements';
 import { TextInput } from '../common/TextInput';
-import { Collapse } from '../common/Collapse';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import colors from 'styles/colors';
+import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
 
@@ -19,9 +18,6 @@ export interface YouTubeState {
 
 }
 
-/**
- * The content editor for Table.
- */
 export class YouTube
   extends AbstractContentEditor<YouTubeType, YouTubeProps, YouTubeState> {
 
@@ -82,7 +78,9 @@ export class YouTube
     const widthClass = 'col-' + width;
     return (
       <div className="form-group row">
-        <label className="col-1 col-form-label">{text}</label>
+        {text !== ''
+          ? <label className="col-3 col-form-label">{text}</label>
+          : null}
         <div className={widthClass}>
           {control}
         </div>
@@ -95,23 +93,20 @@ export class YouTube
 
     return (
       <SidebarContent title="YouTube">
-        <SidebarGroup label="Video Source">
-        {this.row('', '9', <div className="input-group">
-            <span className="input-group-addon">https://youtube.com/watch?v=</span>
-            <input type="text" value={src}
-              onChange={this.onSrcEdit.bind(this)} className="form-control"/>
-            </div>)}
-          <TextInput
-            {...this.props}
-            width="100%"
-            type="text"
-            label=""
-            value={src}
-            onEdit={this.onSrcEdit} />
+        <SidebarGroup label="">
+        {this.row('', '12', <div className="input-group">
+            <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+              <TextInput
+                {...this.props}
+                width="100%"
+                type="text"
+                label=""
+                value={src}
+                onEdit={this.onSrcEdit} />
+          </div>)}
         </SidebarGroup>
-        <Collapse caption="Additional properties">
 
-        {this.row('Height', '2', <div className="input-group input-group-sm">
+        {this.row('Height', '9', <div className="input-group input-group-sm">
             <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={height}
@@ -119,7 +114,7 @@ export class YouTube
             onEdit={this.onHeightEdit}
           /><span className="input-group-addon ">pixels</span></div>)}
 
-        {this.row('Width', '2', <div className="input-group input-group-sm">
+        {this.row('Width', '9', <div className="input-group input-group-sm">
            <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={width}
@@ -127,31 +122,28 @@ export class YouTube
             onEdit={this.onWidthEdit}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
 
-          {this.row('Popout', '8', <TextInput width="100%" label=""
+          {this.row('Popout', '9', <TextInput width="100%" label=""
               editMode={this.props.editMode}
               value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}
             />)}
 
-          {this.row('Title', '8', <ContentContainer
+          {/* {this.row('Title', '9', <ContentContainer
             {...this.props}
             model={titleContent.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit}
           />)}
 
-          {this.row('Caption', '8', <ContentContainer
+          {this.row('Caption', '9', <ContentContainer
           {...this.props}
           model={caption.content}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}
-          />)}
-        </Collapse>
+          />)} */}
       </SidebarContent>
     );
-
-        // <p>Enter the id of the YouTube video you wish to display:</p>
   }
   renderToolbar(): JSX.Element {
     return (
@@ -165,108 +157,12 @@ export class YouTube
   renderMain(): JSX.Element {
     const { src, height, width } = this.props.model;
     const fullSrc = 'https://www.youtube.com/embed/'
-      + (src === '' ? 'C0DPdy98e4c' : src);
+      + (src === '' ? 'zHIIzcWqsP0' : src);
 
     return (
       <div className="youtubeEditor">
-        <h3> Youtube </h3>
         <iframe src={fullSrc} height={height} width={width}/>
       </div>
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-// import * as React from 'react';
-// import { YouTube as YouTubeType } from 'data/content/learning/youtube';
-// import {
-//   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
-// } from './InteractiveRenderer';
-// import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
-// import { YouTubeEditor } from 'editors/content/media/YouTubeEditor';
-// import AutoHideEditRemove from './AutoHideEditRemove';
-
-// import './markers.scss';
-
-// type Data = {
-//   youtube: YouTubeType;
-// };
-
-// export interface YouTubeProps extends InteractiveRendererProps {
-//   data: Data;
-// }
-
-// export interface YouTubeState extends InteractiveRendererState {
-
-// }
-
-// export interface YouTubeProps {
-
-// }
-
-
-// export class YouTube extends InteractiveRenderer<YouTubeProps, YouTubeState> {
-
-//   constructor(props) {
-//     super(props, {});
-
-//     this.onClick = this.onClick.bind(this);
-//     this.onRemove = this.onRemove.bind(this);
-//   }
-
-//   onClick() {
-//     const b = this.props.blockProps;
-//     this.props.blockProps.services.displayModal(
-//       <ModalMediaEditor
-//         editMode={true}
-//         context={b.context}
-//         services={b.services}
-
-//         model={this.props.data.youtube}
-//         onCancel={() => this.props.blockProps.services.dismissModal()}
-//         onInsert={(youtube) => {
-//           this.props.blockProps.services.dismissModal();
-//           this.props.blockProps.onEdit({ youtube });
-//         }
-//       }>
-//         <YouTubeEditor
-//           onFocus={null}
-//           model={this.props.data.youtube}
-//           context={b.context}
-//           services={b.services}
-//           editMode={true}
-//           onEdit={c => true}/>
-//       </ModalMediaEditor>,
-//     );
-//   }
-
-//   onRemove() {
-//     this.props.blockProps.onRemove();
-//   }
-
-//   render() : JSX.Element {
-
-//     const { src, height, width } = this.props.data.youtube;
-//     const fullSrc = 'https://www.youtube.com/embed/'
-//       + (src === '' ? 'C0DPdy98e4c' : src);
-
-//     return (
-//       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-//         <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
-//           editMode={this.props.blockProps.editMode} >
-//           <iframe src={fullSrc} height={height} width={width}/>
-//         </AutoHideEditRemove>
-
-//       </div>);
-//   }
-// }
-
-// export default YouTube;
