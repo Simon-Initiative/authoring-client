@@ -1,7 +1,6 @@
 import * as React from 'react';
 import colors from 'styles/colors';
 import distinct from 'styles/palettes/distinct';
-import flat from 'styles/palettes/flatui';
 
 export const CONTENT_COLORS = {
   ContiguousText: distinct.distinctOrange,
@@ -15,7 +14,8 @@ export const CONTENT_COLORS = {
   Example: distinct.distinctMint,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
-  YouTube: flat.pomegranite,
+  YouTube: colors.youtubeRed,
+  Image: distinct.distinctRed,
 };
 
 export const CONTENT_ICONS = {
@@ -25,6 +25,7 @@ export const CONTENT_ICONS = {
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
   YouTube: <i className={'fa fa-youtube'}/>,
+  Image: <i className={'fa fa-image'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

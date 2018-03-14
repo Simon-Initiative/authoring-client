@@ -3,8 +3,6 @@ import { Image as ImageType } from 'data/content/learning/image';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
-import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
-import { ImageEditor } from 'editors/content/media/ImageEditor';
 import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
@@ -43,29 +41,7 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
   }
 
   onClick() {
-    const b = this.props.blockProps;
-    this.props.blockProps.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={b.context}
-        services={b.services}
 
-        model={this.props.data.image}
-        onCancel={() => this.props.blockProps.services.dismissModal()}
-        onInsert={(image) => {
-          this.props.blockProps.services.dismissModal();
-          this.props.blockProps.onEdit({ image });
-        }
-      }>
-        <ImageEditor
-          onFocus={null}
-          model={this.props.data.image}
-          context={b.context}
-          services={b.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
   }
 
   render() : JSX.Element {

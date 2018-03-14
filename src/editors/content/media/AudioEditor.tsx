@@ -167,7 +167,8 @@ export class AudioEditor
     const { context, model, onEdit } = this.props;
 
     return (
-      <MediaManager context={context} model={model}
+      <MediaManager resourcePath={context.resourcePath}
+        courseModel={context.courseModel} model={model}
         onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.AUDIO}
         selectionType={SELECTION_TYPES.SINGLE}
         initialSelectionPaths={model.sources.map(s => s.src).toArray()}
