@@ -109,7 +109,6 @@ export class ContentContainer
 
   renderMain() : JSX.Element {
     const { hideContentLabel, hover, onUpdateHover } = this.props;
-    // const { hover } = this.state;
 
     const editors = this.props.model.content
       .toArray()
@@ -142,11 +141,7 @@ export class ContentContainer
             onSelect={() => onSelect(model, this)}
             hideContentLabel={hideContentLabel}
             key={model.guid}
-            // onHoverEnter={() => onUpdateHover(hover.push(model.guid)) }
-            // onHoverLeave={() => onUpdateHover(hover.pop())}
-            onMouseOver={() => onUpdateHover(model.guid) }
-            // onHoverLeave={() => onUpdateHover(null)}
-            // isHoveringContent={hover && hover.last() === model.guid}
+            onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
             isHoveringContent={hover === model.guid}
             isActiveContent={model.guid === this.props.activeContentGuid}
             onRemove={this.onRemove.bind(this, model)}>
@@ -159,8 +154,7 @@ export class ContentContainer
 
     return (
       <div className="content-container"
-        // onMouseOver={() => onUpdateHover(hover.clear())}>
-        onMouseOver={() => onUpdateHover(null)}>
+        onMouseOver={() => onUpdateHover && onUpdateHover(null)}>
         {editors}
       </div>
     );
