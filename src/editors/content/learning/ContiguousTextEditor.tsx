@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as contentTypes from 'data/contentTypes';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {

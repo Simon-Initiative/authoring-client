@@ -1,4 +1,3 @@
-import * as Immutable from 'immutable';
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import WorkbookPageEditor from './WorkbookPageEditor';

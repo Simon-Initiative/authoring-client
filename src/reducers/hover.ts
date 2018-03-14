@@ -1,4 +1,3 @@
-import { List } from 'immutable';
 import {
   HoverAction,
   UPDATE_HOVER,
