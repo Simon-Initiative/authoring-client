@@ -6,7 +6,7 @@ import { ContentElements } from 'data/content/common/elements';
 import { TextInput } from '../common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import './YouTube.scss';
@@ -19,15 +19,19 @@ export interface YouTubeState {
 
 }
 
-export const SidebarRow = (text: string, width: string, control: any) => {
-  const widthClass = `col-${width}`;
+interface SidebarRow {
+  text: string;
+  width: string;
+}
+
+const SidebarRow: React.StatelessComponent<SidebarRow> = ({ text, width, children }) => {
   return (
     <div className="form-group row">
       {text !== ''
         ? <label className="col-3 col-form-label">{text}</label>
         : null}
-      <div className={widthClass}>
-        {control}
+      <div className={`col-${width}`}>
+        {children}
       </div>
     </div>
   );
@@ -95,54 +99,64 @@ export class YouTube
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="">
-        {SidebarRow('', '12', <div className="input-group">
-            <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
-              <TextInput
-                {...this.props}
-                width="100%"
-                type="text"
-                label=""
-                value={src}
-                onEdit={this.onSrcEdit} />
-          </div>)}
-        </SidebarGroup>
-
-        {SidebarRow('Height', '9', <div className="input-group input-group-sm">
+          <SidebarRow text="" width="12">
+            <div className="input-group">
+              <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+                <TextInput
+                  {...this.props}
+                  width="100%"
+                  type="text"
+                  label=""
+                  value={src}
+                  onEdit={this.onSrcEdit} />
+            </div>
+          </SidebarRow>
+          <SidebarRow text="Height" width="9">
+            <div className="input-group input-group-sm">
+              <TextInput width="100%" label=""
+                editMode={this.props.editMode}
+                value={height}
+                type="number"
+                onEdit={this.onHeightEdit}/>
+              <span className="input-group-addon ">pixels</span>
+            </div>
+          </SidebarRow>
+          <SidebarRow text="Width" width="9">
+            <div className="input-group input-group-sm">
+              <TextInput width="100%" label=""
+                editMode={this.props.editMode}
+                value={width}
+                type="number"
+                onEdit={this.onWidthEdit}/>
+              <span className="input-group-addon" id="basic-addon2">pixels</span>
+            </div>
+          </SidebarRow>
+          <SidebarRow text="Popout" width="9">
             <TextInput width="100%" label=""
-            editMode={this.props.editMode}
-            value={height}
-            type="number"
-            onEdit={this.onHeightEdit}
-          /><span className="input-group-addon ">pixels</span></div>)}
-
-        {SidebarRow('Width', '9', <div className="input-group input-group-sm">
-           <TextInput width="100%" label=""
-            editMode={this.props.editMode}
-            value={width}
-            type="number"
-            onEdit={this.onWidthEdit}
-          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
-
-          {SidebarRow('Popout', '9', <TextInput width="100%" label=""
               editMode={this.props.editMode}
               value={popout.content}
               type="text"
-              onEdit={this.onPopoutEdit}
-            />)}
+              onEdit={this.onPopoutEdit}/>
+          </SidebarRow>
 
-          {/* {SidebarRow('Title', '9', <ContentContainer
-            {...this.props}
-            model={titleContent.text}
-            editMode={this.props.editMode}
-            onEdit={this.onTitleEdit}
-          />)}
+          {/*
+          <SidebarRow text="Title" width="9">
+            <ContentContainer
+              {...this.props}
+              model={titleContent.text}
+              editMode={this.props.editMode}
+              onEdit={this.onTitleEdit}/>
+          </SidebarRow>
+          <SidebarRow text="Caption" width="9">
+            <ContentContainer
+              {...this.props}
+              model={caption.content}
+              editMode={this.props.editMode}
+              onEdit={this.onCaptionEdit} />
+          </SidebarRow>
+          */}
 
-          {SidebarRow('Caption', '9', <ContentContainer
-          {...this.props}
-          model={caption.content}
-          editMode={this.props.editMode}
-          onEdit={this.onCaptionEdit}
-          />)} */}
+        </SidebarGroup>
       </SidebarContent>
     );
   }
@@ -152,9 +166,15 @@ export class YouTube
         label="YouTube"
         highlightColor={CONTENT_COLORS.YouTube}>
         <ToolbarButton onClick={() => this.props.onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-file-code-o"/></div>
-          <div>Language</div>
+          <div><i className="fa fa-youtube-play"/></div>
+          <div>Source URL</div>
         </ToolbarButton>
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={() => window.open('https://youtube.com', '_blank').focus()}
+            size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-youtube"/> YouTube.com
+          </ToolbarButton>
+        </ToolbarLayout.Column>
       </ToolbarGroup>
     );
   }

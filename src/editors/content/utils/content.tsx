@@ -1,6 +1,7 @@
 import * as React from 'react';
 import colors from 'styles/colors';
 import distinct from 'styles/palettes/distinct';
+import flat from 'styles/palettes/flatui';
 
 export const CONTENT_COLORS = {
   ContiguousText: distinct.distinctOrange,
@@ -14,7 +15,7 @@ export const CONTENT_COLORS = {
   Example: distinct.distinctMint,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
-  YouTube: distinct.distinctCoral,
+  YouTube: flat.pomegranite,
 };
 
 export const CONTENT_ICONS = {
