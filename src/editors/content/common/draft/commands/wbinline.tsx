@@ -15,7 +15,7 @@ export class InsertAssessmentCommand extends AbstractCommand<EditorState> {
 
     services.dismissModal();
 
-    const data = { wbinline: new WbInline({ idRef: assessment.resource.id }) };
+    const data = { wbinline: new WbInline({ idref: assessment.resource.id }) };
 
     const delegate = new InsertBlockEntityCommand(EntityTypes.image, 'IMMUTABLE', data);
     delegate.execute(editorState, context, services)

@@ -14,6 +14,7 @@ export const CONTENT_COLORS = {
   Example: distinct.distinctMint,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
+  YouTube: colors.youtubeRed,
   Image: distinct.distinctRed,
 };
 
@@ -23,6 +24,7 @@ export const CONTENT_ICONS = {
   Example: <i className={'fa fa-bar-chart'}/>,
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
+  YouTube: <i className={'fa fa-youtube'}/>,
   Image: <i className={'fa fa-image'}/>,
 };
 
