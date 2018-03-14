@@ -8,6 +8,7 @@ import { Collapse } from '../common/Collapse';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 import colors from 'styles/colors';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
@@ -30,8 +31,8 @@ export class YouTube
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onHeightEdit = this.onHeightEdit.bind(this);
     this.onWidthEdit = this.onWidthEdit.bind(this);
-    // this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    // this.onAlternateEdit = this.onAlternateEdit.bind(this);
+    this.onPopoutEdit = this.onPopoutEdit.bind(this);
+    this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
@@ -40,15 +41,17 @@ export class YouTube
     return nextProps.model !== this.props.model;
   }
 
-  // onPopoutEdit(content: string) {
-  //   const popout = this.props.model.popout.with({ content });
-  //   this.props.onEdit(this.props.model.with({ popout }));
-  // }
+  onPopoutEdit(content: string) {
+    const popout = this.props.model.popout.with({ content });
+    const model = this.props.model.with({ popout });
+    this.props.onEdit(model, model);
+  }
 
-  // onAlternateEdit(content: ContentElements) {
-  //   const alternate = this.props.model.alternate.with({ content });
-  //   this.props.onEdit(this.props.model.with({ alternate }));
-  // }
+  onAlternateEdit(content: ContentElements) {
+    const alternate = this.props.model.alternate.with({ content });
+    const model = this.props.model.with({ alternate });
+    this.props.onEdit(model, model);
+  }
 
   onSrcEdit(src: string) {
     const model = this.props.model.with({ src });
@@ -64,7 +67,6 @@ export class YouTube
     const model = this.props.model.with({ width });
     this.props.onEdit(model, model);
   }
-
 
   onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
@@ -88,49 +90,25 @@ export class YouTube
     );
   }
 
-
   renderSidebar(): JSX.Element {
-    const { model } = this.props;
+    const { titleContent, caption, popout, src, height, width } = this.props.model;
 
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="Video Source">
+        {this.row('', '9', <div className="input-group">
+            <span className="input-group-addon">https://youtube.com/watch?v=</span>
+            <input type="text" value={src}
+              onChange={this.onSrcEdit.bind(this)} className="form-control"/>
+            </div>)}
           <TextInput
             {...this.props}
             width="100%"
             type="text"
             label=""
-            value={this.props.model.src}
+            value={src}
             onEdit={this.onSrcEdit} />
         </SidebarGroup>
-      </SidebarContent>
-    );
-  }
-  renderToolbar(): JSX.Element {
-    return (
-      <ToolbarGroup
-        label="YouTube"
-        highlightColor={colors.contentSelection}>
-      </ToolbarGroup>
-    );
-  }
-
-  renderMain() : JSX.Element {
-
-    const { titleContent, caption, popout, height, width } = this.props.model;
-
-    return (
-      <div className="itemWrapper container">
-        <br/>
-
-        <p>Enter the id of the YouTube video you wish to display:</p>
-
-        {this.row('', '9', <div className="input-group">
-            <span className="input-group-addon">https://youtube.com/watch?v=</span>
-            <input type="text" value={this.state.src}
-              onChange={this.onSrcEdit.bind(this)} className="form-control"/>
-            </div>)}
-
         <Collapse caption="Additional properties">
 
         {this.row('Height', '2', <div className="input-group input-group-sm">
@@ -170,10 +148,32 @@ export class YouTube
           onEdit={this.onCaptionEdit}
           />)}
         </Collapse>
+      </SidebarContent>
+    );
 
-      </div>);
+        // <p>Enter the id of the YouTube video you wish to display:</p>
+  }
+  renderToolbar(): JSX.Element {
+    return (
+      <ToolbarGroup
+        label="YouTube"
+        highlightColor={colors.contentSelection}>
+      </ToolbarGroup>
+    );
   }
 
+  renderMain(): JSX.Element {
+    const { src, height, width } = this.props.model;
+    const fullSrc = 'https://www.youtube.com/embed/'
+      + (src === '' ? 'C0DPdy98e4c' : src);
+
+    return (
+      <div className="youtubeEditor">
+        <h3> Youtube </h3>
+        <iframe src={fullSrc} height={height} width={width}/>
+      </div>
+    );
+  }
 }
 
 
