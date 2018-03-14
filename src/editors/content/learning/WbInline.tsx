@@ -8,7 +8,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 
-import './Wbinline.scss';
+import './WbInline.scss';
 
 export interface WbInlineProps extends AbstractContentEditorProps<WbInlineType> {
 
