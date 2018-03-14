@@ -43,16 +43,7 @@ export abstract class
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    return false;
+    return true;
   }
 
   abstract renderMain() : JSX.Element;

@@ -11,6 +11,8 @@ export interface ContentDecoratorProps {
   isActiveContent: boolean;
   contentType: string;
   hideContentLabel?: boolean;
+  isHoveringContent: boolean;
+  onMouseOver: () => void;
 }
 
 export interface ContentDecoratorState {
@@ -24,13 +26,12 @@ export class ContentDecorator
 
   constructor(props, childState) {
     super(props);
-
   }
 
   render() {
     const {
       classes, isActiveContent, contentType, hideContentLabel,
-      children, onSelect,
+      children, onSelect, onMouseOver, isHoveringContent,
     } = this.props;
 
     return (
@@ -38,10 +39,15 @@ export class ContentDecorator
         'content-decorator',
         classes.contentDecorator,
         isActiveContent && 'active-content',
-      ])}>
+        isHoveringContent && classes.hover,
+      ])}
+      onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
         {!hideContentLabel &&
-          <div className={classNames([classes.handle, isActiveContent && 'active-content'])}
-            onClick={onSelect}>
+          <div className={classNames([
+            classes.handle,
+            isActiveContent && 'active-content',
+          ])}
+            onMouseDown={onSelect}>
             <div className={classes.label}>
               {getContentIcon(contentType)}
             </div>

@@ -4,6 +4,7 @@ import { choices, ChoicesState } from './choices';
 import { course, CourseState } from './course';
 import { editorSidebar, EditorSidebarState } from './editorSidebar';
 import { expanded, ExpandedState } from './expanded';
+import { hover, HoverState } from './hover';
 import { locks, LocksState } from './locks';
 import { media, MediaState } from './media';
 import { messages, MessageState } from './messages';
@@ -24,6 +25,7 @@ export interface State {
   course: CourseState;
   editorSidebar: EditorSidebarState;
   expanded: ExpandedState;
+  hover: HoverState;
   locks: LocksState;
   media: MediaState;
   messages: MessageState;
@@ -43,6 +45,7 @@ const reducers = combineReducers({
   course,         // Information about current course
   editorSidebar,  // Editor sidebar state
   expanded,       // preserves expaned state of tree UIs
+  hover,          // content hover state
   locks,          // The current, registered document locks
   media,          // Course media state
   messages,       // Active application messages

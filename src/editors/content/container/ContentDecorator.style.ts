@@ -1,5 +1,6 @@
 import chroma from 'chroma-js';
 import colors from 'styles/colors';
+import { disableSelect } from 'styles/mixins';
 import { getContentColor } from 'editors/content/utils/content';
 
 const gripBGTemplate = (color: string) => `-webkit-repeating-radial-gradient(\
@@ -7,26 +8,43 @@ const gripBGTemplate = (color: string) => `-webkit-repeating-radial-gradient(\
 
 export default {
   contentDecorator: {
+    position: 'relative',
     display: 'flex',
     flexDirection: 'row',
+  },
+  hover: {
+    '& > $handle': {
+      // display: 'flex',
+      left: -18,
+      opacity: 1,
+      borderLeft: props => '2px solid ' + getContentColor(props.contentType),
 
-    '&:hover': {
-      '& $handle': {
-        borderLeft: props => '2px solid ' + getContentColor(props.contentType),
-      },
+      transition: 'opacity .1s ease-in',
     },
   },
   handle: {
+    extend: [disableSelect],
+    position: 'absolute',
+    zIndex: 999,
+    top: 0,
+    left: -14,
     width: 18,
-    marginRight: 4,
+    height: '100%',
     cursor: 'grab',
-    display: 'flex',
     flexDirection: 'column',
     color: 'rgba(0,0,0,.2)',
     borderLeft: '2px solid transparent',
     padding: [0, 2, 2, 2],
+    // display: 'none',         // switch opacity to diplay to disable invisible handle grab
+    display: 'flex',
+    opacity: 0,
+    backgroundColor: '#f1f1f1',
 
     '&.active-content': {
+      // display: 'flex',
+      opacity: 1,
+      left: -22,
+      width: 22,
       color: colors.white,
       backgroundColor: props => getContentColor(props.contentType),
       borderColor: props => getContentColor(props.contentType),
@@ -34,9 +52,15 @@ export default {
       borderTopLeftRadius: 4,
       borderBottomLeftRadius: 4,
 
+      transition: 'left .1s ease-in, width .1s ease-in, margin-left .1s ease-in',
+
       '& $grip': {
         backgroundImage: props => gripBGTemplate(
           chroma(getContentColor(props.contentType)).brighten(1).hex()),
+      },
+
+      '& $label': {
+        marginLeft: 2,
       },
     },
   },
