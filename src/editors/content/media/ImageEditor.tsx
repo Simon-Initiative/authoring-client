@@ -4,15 +4,29 @@ import { ContentElements } from 'data/content/common/elements';
 import { ContentContainer } from '../container/ContentContainer';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
+import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { Select } from '../common/Select';
+import { StyledComponentProps } from 'types/component';
 import { TabContainer } from '../common/TabContainer';
 import { MediaManager } from './manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
 import { adjustPath } from './utils';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { Button } from 'editors/content/common/Button';
+import { buildUrl } from 'utils/path';
+import ModalSelection from 'utils/selection/ModalSelection';
+import { modalActions } from 'actions/modal';
+
+import styles from './MediaElement.style';
+
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
-
+  onShowSidebar: () => void;
 }
 
 export interface ImageEditorState {
@@ -21,11 +35,42 @@ export interface ImageEditorState {
 }
 
 
+function selectImage(model, resourcePath, courseModel, display, dismiss) : Promise<Image> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { img: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select an image"
+        onInsert={() => { dismiss(); resolve(selected.img); }}
+        onCancel={() => dismiss()}
+      >
+        <MediaManager model={model}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[model.src]}
+          onSelectionChange={(img) => {
+            console.log(selected);
+            selected.img =
+            new Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
+            console.log(selected);
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+
+}
+
 /**
  * The content editor for Table.
  */
+@injectSheet(styles)
 export class ImageEditor
-  extends AbstractContentEditor<Image, ImageEditorProps, ImageEditorState> {
+  extends AbstractContentEditor<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
 
   constructor(props) {
     super(props);
@@ -81,10 +126,13 @@ export class ImageEditor
   }
 
   onSourceSelectionChange(selection: MediaItem[]) {
-    const { context, onEdit } = this.props;
+    const { context, onEdit, services } = this.props;
+    services.dismissModal();
 
     if (selection[0]) {
-      onEdit(this.props.model.with({ src: adjustPath(selection[0].pathTo, context.resourcePath) }));
+      const updated = this.props.model.with(
+        { src: adjustPath(selection[0].pathTo, context.resourcePath) });
+      onEdit(updated, updated);
     }
   }
 
@@ -126,22 +174,15 @@ export class ImageEditor
   }
 
   renderSource() {
-    const { context, model, onEdit } = this.props;
 
-    return (
-      <MediaManager context={context} model={model}
-        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.IMAGE}
-        selectionType={SELECTION_TYPES.SINGLE}
-        initialSelectionPaths={[model.src]}
-        onSelectionChange={this.onSourceSelectionChange} />
-    );
   }
 
   changeSizing(isDefaultSizing) {
     this.setState({ isDefaultSizing });
 
     if (isDefaultSizing) {
-      this.props.onEdit(this.props.model.with({ width: '', height: '' }));
+      const updated = this.props.model.with({ width: '', height: '' });
+      this.props.onEdit(updated, updated);
     }
   }
 
@@ -149,7 +190,7 @@ export class ImageEditor
     const { width, height } = this.props.model;
 
     return (
-      <div style={ { marginTop: '70px', marginLeft: '75px' } }>
+      <div>
 
         <div className="form-check">
           <label className="form-check-label">
@@ -240,26 +281,69 @@ export class ImageEditor
     );
   }
 
+  onSelect() {
+    const { context, services, onEdit, model } = this.props;
+
+    const dispatch = (services as any).dispatch;
+    const dismiss = () => dispatch(modalActions.dismiss());
+    const display = c => dispatch(modalActions.display(c));
+
+    selectImage(
+      model,
+      context.resourcePath, context.courseModel,
+      display, dismiss)
+      .then((image) => {
+        if (image !== null) {
+          const updated = model.with({ src: image.src });
+          onEdit(updated, updated);
+        }
+      });
+  }
 
   renderSidebar() {
-    return null;
+    return (
+      <SidebarContent title="Image">
+        <SidebarGroup label="Media">
+          <Button
+            editMode={this.props.editMode}
+            onClick={this.onSelect.bind(this)}>Change Image</Button>
+        </SidebarGroup>
+        <SidebarGroup label="Sizing">
+          {this.renderSizing()}
+        </SidebarGroup>
+      </SidebarContent>
+    );
   }
-  renderToolbar() {
-    return null;
+  renderToolbar(): JSX.Element {
+    const { onShowSidebar } = this.props;
+
+    return (
+      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Image}>
+        <ToolbarLayout.Column>
+          <Button
+            editMode={this.props.editMode}
+            onClick={this.onSelect.bind(this)}>Change Image</Button>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
+    );
   }
 
   renderMain() : JSX.Element {
 
+    const { classes, model } = this.props;
+    const { src, height, width } = model;
+
+    const fullSrc = buildUrl(
+      this.props.context.baseUrl,
+      this.props.context.courseId,
+      this.props.context.resourcePath,
+      src);
+
     return (
-      <div className="itemWrapper">
-
-        <TabContainer labels={['Source', 'Sizing', 'Other']}>
-          {this.renderSource()}
-          {this.renderSizing()}
-          {this.renderOther()}
-        </TabContainer>
-
-      </div>);
+      <div className={classes.mediaElement}>
+        <img src={fullSrc} height={height} width={width}/>
+      </div>
+    );
   }
 
 }

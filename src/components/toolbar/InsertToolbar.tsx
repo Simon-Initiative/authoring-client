@@ -4,19 +4,58 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
+import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
+import { CourseModel } from 'data/models/course';
+import { adjustPath } from 'editors/content/media/utils';
+import ModalSelection from 'utils/selection/ModalSelection';
 
 import styles from './InsertToolbar.style';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
   parentSupportsElementType: (type: string) => boolean;
+  resourcePath: string;
+  courseModel: CourseModel;
+  displayModal: (comp) => void;
+  dismissModal: () => void;
+}
+
+function selectImage(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Image> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { img: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select an image"
+        onInsert={() => { dismiss(); resolve(selected.img); }}
+        onCancel={() => dismiss()}
+      >
+        <MediaManager model={new contentTypes.Image()}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[]}
+          onSelectionChange={(img) => {
+            selected.img =
+            new contentTypes.Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
+
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+
 }
 
 /**
  * InsertToolbar React Stateless Component
  */
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
-  classes, onInsert, parentSupportsElementType,
+  classes, onInsert, parentSupportsElementType, resourcePath,
+  courseModel, displayModal, dismissModal,
 }: StyledComponentProps<InsertToolbarProps>) => {
   return (
     <React.Fragment>
@@ -68,9 +107,16 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className="unicode-icon">&#8721;</i>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              selectImage(resourcePath, courseModel, displayModal, dismissModal)
+                .then((image) => {
+                  if (image !== null) {
+                    onInsert(image);
+                  }
+                });
+            }}
             tooltip="Insert Image"
-            disabled>
+            disabled={!parentSupportsElementType('image')}>
           <i className={'fa fa-image'}/>
         </ToolbarButton>
         <ToolbarButton

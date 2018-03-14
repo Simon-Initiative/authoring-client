@@ -10,7 +10,7 @@ import * as persistence from 'data/persistence';
 import { AppContext } from 'editors/common/AppContext';
 import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { webContentsPath } from '../utils';
-
+import { CourseModel } from 'data/models/course';
 import './MediaManager.scss';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
@@ -77,7 +77,8 @@ const getSortMappingKey = (orderBy: string, order?: string) => {
 export interface MediaManagerProps {
   className?: string;
   model: Media;
-  context: AppContext;
+  courseModel: CourseModel;
+  resourcePath: string;
   media: Maybe<OrderedMediaLibrary>;
   mimeFilter?: string;
   selectionType: SELECTION_TYPES;
@@ -202,7 +203,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   onFileUpload(files: FileList) {
-    const { context: { courseId }, mimeFilter, onLoadCourseMediaNextPage,
+    const { courseModel , mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
     const { searchText, orderBy, order } = this.state;
 
@@ -224,7 +225,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
         });
 
     // sequentially upload files one at a time, then reload the media page
-    createWebContentPromiseFactory(courseId, fileList.pop())
+    createWebContentPromiseFactory(courseModel.guid, fileList.pop())
       .then((result) => {
         onResetMedia();
         onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
@@ -297,7 +298,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaList() {
-    const { media, selectionType, context } = this.props;
+    const { media, selectionType, courseModel, resourcePath } = this.props;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -348,7 +349,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   <MediaIcon
                       filename={item.fileName}
                       mimeType={item.mimeType}
-                      url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
+                      url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
                   {` ${item.fileName}`}
                 </div>
                 <div className="refs-col">
@@ -374,7 +375,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaGrid() {
-    const { media, selectionType, context } = this.props;
+    const { media, selectionType, resourcePath, courseModel } = this.props;
 
     const isLoadingMedia = media.caseOf({
       just: ml => ml.isLoading,
@@ -408,7 +409,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               <MediaIcon
                   filename={item.fileName}
                   mimeType={item.mimeType}
-                  url={webContentsPath(item.pathTo, context.resourcePath, context.courseId)} />
+                  url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
               <div className="name">
                 {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
@@ -429,7 +430,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
   }
 
   renderMediaSelectionDetails() {
-    const { media, context } = this.props;
+    const { media, courseModel, resourcePath } = this.props;
     const { selection, showDetails } = this.state;
 
     const selectedMediaItems: Immutable.List<MediaItem> = media.caseOf({
@@ -460,7 +461,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           <div className="details-title">
             <a
               href={webContentsPath(
-                selectedItem.pathTo, context.resourcePath, context.courseId)}
+                selectedItem.pathTo, resourcePath, courseModel.guid)}
               target="_blank"  >
               {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
             <div className="flex-spacer" />
@@ -475,7 +476,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 filename={selectedItem.fileName}
                 mimeType={selectedItem.mimeType}
                 url={webContentsPath(
-                  selectedItem.pathTo, context.resourcePath, context.courseId)} />
+                  selectedItem.pathTo, resourcePath, courseModel.guid)} />
               <div className="details-info">
                 <div className="detail-row date-created">
                   <b>Created:</b> {selectedItem.dateCreated}
@@ -503,10 +504,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                   {mediaItemRefs.get(selectedItem.guid)
                     && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
                       <span key={ref.guid}>
-                        <a href={`./#${ref.guid}-${context.courseId}`}
+                        <a href={`./#${ref.guid}-${courseModel.guid}`}
                             target="_blank">
                             {stringFormat.ellipsize(
-                              context.courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
+                              courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
                         </a>
                         {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
                       </span>

@@ -8,6 +8,8 @@ import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { InsertToolbar } from './InsertToolbar';
 import { ActionsToolbar } from './ActionsToolbar';
+import { CourseModel } from 'data/models/course';
+import { Resource } from 'data/content/resource';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -16,6 +18,16 @@ interface ToolbarGroupProps {
   label: string;
   highlightColor?: string;
   hide?: boolean;
+}
+
+function determineBaseUrl(resource: Resource) : string {
+  if (resource === undefined) return '';
+
+  const pathTo = resource.fileNode.pathTo;
+  const stem = pathTo
+    .substr(pathTo.indexOf('content\/') + 8);
+  return stem
+    .substr(0, stem.lastIndexOf('\/'));
 }
 
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
@@ -77,6 +89,8 @@ export const ToolbarLayout = {
 };
 
 export interface ToolbarProps {
+  courseModel: CourseModel;
+  resource: Resource;
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
@@ -85,6 +99,8 @@ export interface ToolbarProps {
   onEdit: (content: Object) => void;
   onShowPageDetails: () => void;
   onShowSidebar: () => void;
+  onDisplayModal: (comp) => void;
+  onDismissModal: () => void;
 }
 
 @injectSheet(styles)
@@ -144,6 +160,10 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
+            courseModel={this.props.courseModel}
+            dismissModal={this.props.onDismissModal}
+            displayModal={this.props.onDisplayModal}
+            resourcePath={determineBaseUrl(this.props.resource)}
             onInsert={item => onInsert(item, textSelection)}
             parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>

@@ -56,11 +56,7 @@ export class ImageLinkEditor
           {...this.props}
           onEdit={this.onLinkEdit}
           model={link} />
-        <ImageEditor
-          {...this.props}
-          onEdit={this.onImageEdit}
-          model={image}
-          />
+
       </div>);
   }
 

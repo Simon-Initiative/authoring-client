@@ -44,28 +44,6 @@ class Image extends InteractiveRenderer<ImageProps, ImageState> {
 
   onClick() {
     const b = this.props.blockProps;
-    this.props.blockProps.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={b.context}
-        services={b.services}
-
-        model={this.props.data.image}
-        onCancel={() => this.props.blockProps.services.dismissModal()}
-        onInsert={(image) => {
-          this.props.blockProps.services.dismissModal();
-          this.props.blockProps.onEdit({ image });
-        }
-      }>
-        <ImageEditor
-          onFocus={null}
-          model={this.props.data.image}
-          context={b.context}
-          services={b.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
   }
 
   render() : JSX.Element {
