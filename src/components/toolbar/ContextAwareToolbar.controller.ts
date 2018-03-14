@@ -5,6 +5,7 @@ import { ActiveContextState } from 'reducers/active';
 import { insert, edit, resetActive } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer, TextSelection } from 'types/active.ts';
+import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 
 interface StateProps {
@@ -22,7 +23,7 @@ interface DispatchProps {
 }
 
 interface OwnProps {
-
+  documentResource: Resource;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

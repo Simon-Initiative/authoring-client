@@ -6,7 +6,7 @@ import { Resource } from 'data/content/resource';
 
 export interface ActionsToolbarProps {
   courseId: string;
-  resource: Resource;
+  documentResource: Resource;
   onShowPageDetails: () => void;
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
 }
@@ -15,7 +15,7 @@ export interface ActionsToolbarProps {
  * ActionsToolbar React Stateless Component
  */
 export const ActionsToolbar = (({
-  courseId, resource, onShowPageDetails, onPreview,
+  courseId, documentResource, onShowPageDetails, onPreview,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -48,7 +48,7 @@ export const ActionsToolbar = (({
           <div>Delete</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onPreview(courseId, resource)}
+            onClick={() => onPreview(courseId, documentResource)}
             tooltip="Preview this Page"
             size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-eye"/></div>

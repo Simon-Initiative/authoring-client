@@ -6,6 +6,7 @@ import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
+import { Resource } from 'data/content/resource';
 import { InsertToolbar } from './InsertToolbar';
 import { ActionsToolbar } from './ActionsToolbar.controller';
 
@@ -80,6 +81,7 @@ export interface ToolbarProps {
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
+  documentResource: Resource;
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
@@ -97,7 +99,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      content, container, supportedElements, classes, onInsert, onEdit, textSelection,
+      content, container, documentResource, supportedElements, classes,
+      onInsert, onEdit, textSelection,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -153,7 +156,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ActionsToolbar />
+          <ActionsToolbar documentResource={documentResource} />
         </ToolbarGroup>
       </div>
     );
