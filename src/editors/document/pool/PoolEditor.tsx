@@ -5,14 +5,15 @@ import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
-import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from '../assessment/Outline';
-import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { renderAssessmentNode } from '../common/questions';
 import { findNodeByGuid } from '../assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
+import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 
 import './PoolEditor.scss';
 
@@ -23,6 +24,11 @@ interface PoolEditor {
 export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onFetchSkills: (courseId: string) => void;
   skills: Immutable.OrderedMap<string, Skill>;
+  activeContext: ActiveContext;
+  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContentSelection: (
+    documentId: string, content: Object, container: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -44,6 +50,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
+    this.onFocus = this.onFocus.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -82,10 +89,13 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.handleEdit(updated);
   }
 
-  onEdit(guid : string, question : contentTypes.Question) {
+  onEdit(guid : string, question : contentTypes.Question, src) {
 
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
+
+    this.props.onUpdateContent(this.props.context.documentId, src);
+
     this.handleEdit(this.props.model.with({ pool }));
   }
 
@@ -104,8 +114,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.setState({ currentNode });
   }
 
-  onFocus(child, parent) {
-
+  onFocus(model: Object, parent, textSelection) {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, model, parent, textSelection);
   }
 
   onRemove(guid: string) {
@@ -146,47 +157,41 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(model.pool.questions.toArray().map(n => n.guid));
 
+    const text = this.props.model.resource.title;
+
     return (
       <div className="pool-editor">
-        <div className="docHead">
-          <UndoRedoToolbar
-              undoEnabled={this.state.undoStackSize > 0}
-              redoEnabled={this.state.redoStackSize > 0}
-              onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-          <TitleContentEditor
-              parent={null}
-              onFocus={this.onFocus.bind(this, this.props.model.pool.title, this)}
-              services={this.props.services}
-              context={this.props.context}
+        <h2 className="title-row">{text}</h2>
+        <ContextAwareToolbar />
+        <div className="pool-content">
+          <div className="html-editor-well">
+            <AddQuestion
               editMode={this.props.editMode}
-              model={this.props.model.pool.title}
-              onEdit={this.onTitleEdit}
-              />
-          <AddQuestion
-            editMode={this.props.editMode}
-            onQuestionAdd={this.addQuestion.bind(this)}
-            isSummative={true}/>
+              onQuestionAdd={this.addQuestion.bind(this)}
+              isSummative={true}/>
 
-          <div className="outline">
-            <div className="outlineContainer">
-              <Outline
-                editMode={this.props.editMode}
-                nodes={model.pool.questions}
-                expandedNodes={expanded}
-                selected={this.state.currentNode.guid}
-                onEdit={this.onEditNodes.bind(this)}
-                onChangeExpansion={this.onChangeExpansion.bind(this)}
-                onSelect={this.onSelect.bind(this)}
-                />
-            </div>
-            <div className="nodeContainer">
-              {renderAssessmentNode(
-                this.state.currentNode, this.props, this.onEdit,
-                this.onRemove, this.onFocus,
-                true, null)}
+            <div className="outline">
+              <div className="outlineContainer">
+                <Outline
+                  editMode={this.props.editMode}
+                  nodes={model.pool.questions}
+                  expandedNodes={expanded}
+                  selected={this.state.currentNode.guid}
+                  onEdit={this.onEditNodes.bind(this)}
+                  onChangeExpansion={this.onChangeExpansion.bind(this)}
+                  onSelect={this.onSelect.bind(this)}
+                  />
+              </div>
+              <div className="nodeContainer">
+                {renderAssessmentNode(
+                  this.state.currentNode, this.props, this.onEdit,
+                  this.onRemove, this.onFocus,
+                  true, null)}
+              </div>
             </div>
           </div>
         </div>
+        <ContextAwareSidebar />
       </div>
     );
   }

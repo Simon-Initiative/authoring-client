@@ -10,6 +10,7 @@ import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
+import guid from 'utils/guid';
 
 export interface TextProps extends AbstractItemPartEditorProps<contentTypes.Text> {
 
@@ -35,19 +36,19 @@ export class Text
     this.onSizeChange = this.onSizeChange.bind(this);
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
+  onPartEdit(partModel: contentTypes.Part, src) {
     const {
       itemModel,
       onEdit,
     } = this.props;
 
-    onEdit(itemModel, partModel);
+    onEdit(itemModel, partModel, src);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -60,7 +61,7 @@ export class Text
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, feedback);
   }
 
   onWhitespaceChange(whitespace) {
@@ -70,7 +71,9 @@ export class Text
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ whitespace }), partModel);
+    const updated = itemModel.with({ whitespace });
+
+    onEdit(updated, partModel, updated);
   }
 
   onCaseSensitive(caseSensitive) {
@@ -80,7 +83,9 @@ export class Text
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ caseSensitive }), partModel);
+    const updated = itemModel.with({ caseSensitive });
+
+    onEdit(updated, partModel, updated);
   }
 
   onSizeChange(inputSize) {
@@ -90,7 +95,9 @@ export class Text
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ inputSize }), partModel);
+    const updated = itemModel.with({ inputSize });
+
+    onEdit(updated, partModel, updated);
   }
 
   render() {

@@ -84,7 +84,7 @@ export class Objectives
     return (
       <div className="objectives-editor">
 
-        <p>Objectives that pertain to this page:</p>
+        <p>Learning Objectives</p>
 
         <Typeahead
           multiple

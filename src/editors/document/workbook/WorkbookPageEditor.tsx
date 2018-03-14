@@ -7,6 +7,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
@@ -39,6 +40,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     super(props, {});
 
     this.onModelEdit = this.onModelEdit.bind(this);
+    this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -112,6 +114,21 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  onObjectivesEdit(objrefs: Immutable.List<string>) {
+    const head = this.props.model.head.with({ objrefs });
+    this.handleEdit(this.props.model.with({ head }));
+  }
+
+  renderObjectives() {
+    return (
+      <Objectives
+        {...this.props}
+        model={this.props.model.head.objrefs}
+        onFocus={() => {}}
+        onEdit={this.onObjectivesEdit}/>
+    );
+  }
+
   render() {
     const { hover, onUpdateHover } = this.props;
 
@@ -133,6 +150,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         />
         <div className="wb-content">
           <div className="html-editor-well">
+            {this.renderObjectives()}
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}

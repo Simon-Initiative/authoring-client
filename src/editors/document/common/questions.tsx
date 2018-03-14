@@ -20,11 +20,11 @@ export type Props = {
   skills: Immutable.OrderedMap<string, Skill>,
 };
 
-export type EditHandler = (guid: string, node: contentTypes.Node) => void;
+export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
 
 export type RemoveHandler = (guid: string) => void;
 
-export type FocusHandler = (child: Object, parent: any) => void;
+export type FocusHandler = (child: Object, parent: any, textSelection) => void;
 
 export function renderAssessmentNode(
   n : models.Node, props: Props, onEdit: EditHandler,
@@ -44,7 +44,7 @@ export function renderAssessmentNode(
             allSkills={props.skills}
             context={props.context}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             canRemove={canRemove}
             onRemove={() => onRemove(n.guid)}
             />;
@@ -59,7 +59,7 @@ export function renderAssessmentNode(
             services={props.services}
             context={props.context}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
             />;
   }
@@ -74,7 +74,7 @@ export function renderAssessmentNode(
             context={props.context}
             allSkills={props.skills}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
             />;
   }

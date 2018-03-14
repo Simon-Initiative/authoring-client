@@ -34,9 +34,16 @@ export class HintEditor
     this.onTargetChange = this.onTargetChange.bind(this);
   }
 
-  onBodyEdit(body) {
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    return false;
+  }
+
+  onBodyEdit(body, src) {
     const concept = this.props.model.with({ body });
-    this.props.onEdit(concept);
+    this.props.onEdit(concept, src);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -63,11 +70,13 @@ export class HintEditor
 
       <InputLabel editMode={this.props.editMode}
         label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
-          <ContentContainer
-            {...this.props}
-            model={this.props.model.body}
-            onEdit={this.onBodyEdit}
-            />
+          <div style={ { width: '100%' } }>
+            <ContentContainer
+              {...this.props}
+              model={this.props.model.body}
+              onEdit={this.onBodyEdit}
+              />
+          </div>
         </InputLabel>
 
       </div>);

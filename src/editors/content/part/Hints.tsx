@@ -7,8 +7,8 @@ import { HintEditor } from './HintEditor';
 
 export interface HintsProps {
   model: contentTypes.Part;
-  onFocus: (child, parent) => void;
-  onEdit: (hints: Immutable.Map<string, contentTypes.Hint>) => void;
+  onFocus: (child, parent, textSelection) => void;
+  onEdit: (hints: Immutable.Map<string, contentTypes.Hint>, src) => void;
   context: AppContext;
   editMode: boolean;
   services: AppServices;
@@ -31,16 +31,16 @@ export abstract class Hints
     this.onRemove = this.onRemove.bind(this);
   }
 
-  onHintEdit(hint: contentTypes.Hint) {
+  onHintEdit(hint: contentTypes.Hint, src) {
     const { onEdit } = this.props;
 
-    onEdit(this.props.model.hints.set(hint.guid, hint));
+    onEdit(this.props.model.hints.set(hint.guid, hint), src);
   }
 
   onRemove(hint: contentTypes.Hint) {
     const { onEdit } = this.props;
 
-    onEdit(this.props.model.hints.delete(hint.guid));
+    onEdit(this.props.model.hints.delete(hint.guid), null);
   }
 
   renderHints() {

@@ -7,6 +7,7 @@ import {
 import { ContentElements } from 'data/content/common/elements';
 import './Feedback.scss';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
+import guid from 'utils/guid';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
 
@@ -31,14 +32,14 @@ export abstract class Feedback
     this.onBodyEdit = this.onBodyEdit.bind(this);
   }
 
-  onResponseEdit(response) {
+  onResponseEdit(response, source) {
     const { model, onEdit } = this.props;
 
     const updatedModel = model.with({
       responses: model.responses.set(response.guid, response),
     });
 
-    onEdit(updatedModel);
+    onEdit(updatedModel, source);
   }
 
   onResponseRemove(response) {
@@ -62,15 +63,15 @@ export abstract class Feedback
     }));
   }
 
-  onBodyEdit(body, response) {
-    let feedback = response.feedback.first() || new contentTypes.Feedback();
+  onBodyEdit(body, response, source) {
+    let feedback = response.feedback.first() || contentTypes.Feedback.fromText('', guid());
     feedback = feedback.with({ body });
 
     const updatedResponse = response.with({
       feedback: response.feedback.set(feedback.guid, feedback),
     });
 
-    this.onResponseEdit(updatedResponse);
+    this.onResponseEdit(updatedResponse, source);
   }
 
   onEditMatch(responseId, match: string) {
@@ -117,7 +118,7 @@ export abstract class Feedback
             editMode={editMode}
             body={response.feedback.first() ? response.feedback.first().body
               : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS)}
-            onEdit={body => this.onBodyEdit(body, response)}
+            onEdit={(body, source) => this.onBodyEdit(body, response, source)}
             onRemove={isDefault ? undefined : () => this.onResponseRemove(response)}
             options={
             <ItemOptions>

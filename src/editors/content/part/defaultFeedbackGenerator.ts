@@ -108,7 +108,7 @@ export const getGeneratedResponseBody = (partModel) => {
   const defaultResponseItem = getGeneratedResponseItem(partModel);
 
   return defaultResponseItem ? defaultResponseItem.feedback.first().body
-    : ContentElements.fromPersistence('', '', ALT_FLOW_ELEMENTS);
+    : ContentElements.fromText('', '', ALT_FLOW_ELEMENTS);
 };
 
 export const getGeneratedResponseScore = (partModel) => {
