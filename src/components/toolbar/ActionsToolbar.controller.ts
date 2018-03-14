@@ -6,8 +6,6 @@ import { showSidebar } from 'actions/editorSidebar';
 import { preview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
-import * as persistence from 'data/persistence';
-import * as models from 'data/models';
 
 interface StateProps {
   courseId: string;

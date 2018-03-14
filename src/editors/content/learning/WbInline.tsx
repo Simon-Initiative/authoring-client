@@ -46,7 +46,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
 
   onClick() {
     const guid = this.props.blockProps.context.courseModel.resourcesById.get(
-      this.props.data.wbinline.idRef).guid;
+      this.props.data.wbinline.idref).guid;
 
     this.props.blockProps.services.viewDocument(
         guid,
@@ -72,7 +72,7 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
     if (found !== undefined) {
 
       this.props.blockProps.onEdit(
-        { wbinline: this.props.data.wbinline.with({ idRef: found.id }) });
+        { wbinline: this.props.data.wbinline.with({ idref: found.id }) });
     }
 
   }
@@ -95,13 +95,13 @@ export class WbInline extends InteractiveRenderer<WbInlineProps, WbInlineState> 
   render() : JSX.Element {
 
     const title = this.props.blockProps.context.courseModel
-      .resourcesById.has(this.props.data.wbinline.idRef)
+      .resourcesById.has(this.props.data.wbinline.idref)
       ? this.props.blockProps.context.courseModel
-      .resourcesById.get(this.props.data.wbinline.idRef).title
+      .resourcesById.get(this.props.data.wbinline.idref).title
       : 'Loading...';
 
     const canLoad = this.props.blockProps.context.courseModel
-      .resourcesById.has(this.props.data.wbinline.idRef);
+      .resourcesById.has(this.props.data.wbinline.idref);
 
     return (
       <div className="wbinline"

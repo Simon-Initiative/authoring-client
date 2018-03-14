@@ -2,13 +2,14 @@ import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { Button } from '../common/controls';
-import { 
+import {
   Question, QuestionProps, QuestionState,
 } from './Question';
 import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
+import guid from 'utils/guid';
 
 export interface EssayProps extends QuestionProps<contentTypes.Essay> {
 
@@ -36,14 +37,14 @@ export class Essay
     return 'essay';
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+  onPartEdit(partModel: contentTypes.Part, src) {
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -56,12 +57,12 @@ export class Essay
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, feedback);
   }
 
   renderDetails() {
-    const { 
-      partModel, 
+    const {
+      partModel,
       editMode,
     } = this.props;
 

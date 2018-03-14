@@ -7,8 +7,10 @@ import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
+import { AppContext } from 'editors/common/AppContext';
 import { InsertToolbar } from './InsertToolbar';
 import { ActionsToolbar } from './ActionsToolbar.controller';
+import { CourseModel } from 'data/models/course';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -17,6 +19,16 @@ interface ToolbarGroupProps {
   label: string;
   highlightColor?: string;
   hide?: boolean;
+}
+
+function determineBaseUrl(resource: Resource) : string {
+  if (resource === undefined) return '';
+
+  const pathTo = resource.fileNode.pathTo;
+  const stem = pathTo
+    .substr(pathTo.indexOf('content\/') + 8);
+  return stem
+    .substr(0, stem.lastIndexOf('\/'));
 }
 
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
@@ -78,17 +90,20 @@ export const ToolbarLayout = {
 };
 
 export interface ToolbarProps {
+  courseModel: CourseModel;
+  resource: Resource;
   supportedElements: Immutable.List<string>;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
-  documentResource: Resource;
-  documentId: string;
+  context: AppContext;
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onShowPageDetails: () => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
+  onDisplayModal: (comp) => void;
+  onDismissModal: () => void;
 }
 
 @injectSheet(styles)
@@ -100,8 +115,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      content, container, documentResource, supportedElements, classes,
-      onInsert, onEdit, textSelection, documentId,
+      content, container, resource, supportedElements, classes,
+      onInsert, onEdit, textSelection, context,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -115,7 +130,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
     });
 
     let contentRenderer;
-    if (contentParent) {
+    if (contentParent && contentModel) {
       const props = {
         renderContext: RenderContext.Toolbar,
         model: contentModel,
@@ -148,6 +163,11 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
           <InsertToolbar
+            context={context}
+            courseModel={this.props.courseModel}
+            onDismissModal={this.props.onDismissModal}
+            onDisplayModal={this.props.onDisplayModal}
+            resourcePath={determineBaseUrl(this.props.resource)}
             onInsert={item => onInsert(item, textSelection)}
             parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
@@ -157,7 +177,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ActionsToolbar documentResource={documentResource} documentId={documentId} />
+          <ActionsToolbar documentResource={resource} documentId={context.documentId} />
         </ToolbarGroup>
       </div>
     );

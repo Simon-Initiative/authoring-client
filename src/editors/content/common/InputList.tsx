@@ -37,7 +37,7 @@ export interface InputListItemProps {
   controls?: any;
   editMode: boolean;
   onFocus: (child, parent, textSelection) => void;
-  onEdit: (body: ContentElements) => void;
+  onEdit: (body: ContentElements, source: Object) => void;
   onRemove?: (id: string) => void;
 
   // required props if draggable

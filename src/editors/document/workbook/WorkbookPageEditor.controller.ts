@@ -4,8 +4,6 @@ import WorkbookPageEditor from './WorkbookPageEditor';
 import { fetchObjectives } from 'actions/objectives';
 import { AbstractEditorProps } from '../common/AbstractEditor';
 import { WorkbookPageModel } from 'data/models';
-import { Resource } from 'data/contentTypes';
-import { preview } from 'actions/preview';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';

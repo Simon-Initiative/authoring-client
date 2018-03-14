@@ -24,14 +24,14 @@ const defaultContent = {
 };
 
 export class Ordering extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Ordering';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
   name : string;
   shuffle : boolean;
   guid: string;
-  
+
   constructor(params?: OrderingParams) {
     super(augment(params));
   }
@@ -41,7 +41,7 @@ export class Ordering extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : Ordering {
-    
+
     const q = (json as any).ordering;
     let model = new Ordering({ guid });
 
@@ -54,9 +54,9 @@ export class Ordering extends Immutable.Record(defaultContent) {
     if (q['@shuffle'] !== undefined) {
       model = model.with({ shuffle: q['@shuffle'] === 'true' });
     }
-    
+
     getChildren(q).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -78,7 +78,7 @@ export class Ordering extends Immutable.Record(defaultContent) {
 
     const choices = arr.length > 0
       ? this.choices.toArray().map(c => c.toPersistence())
-      : [new Choice().toPersistence()];
+      : [Choice.fromText('', '').toPersistence()];
 
     return {
       ordering: {

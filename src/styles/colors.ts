@@ -18,6 +18,8 @@ export default {
   get grayLighter() { return chroma(this.grayBase).brighten(1.5).hex(); },
   get grayLightest() { return chroma(this.grayBase).brighten(2).hex(); },
 
+  youtubeRed: '#ff0000',
+
   // Indication Colors
   primary: '#2780E3',
   secondary: '#a3b8cc',

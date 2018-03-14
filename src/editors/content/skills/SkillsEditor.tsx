@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Skill } from 'types/course';
 import * as contentTypes from 'data/contentTypes';
+import { Maybe } from 'tsmonad';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -69,6 +70,10 @@ export default class SkillsEditor
   }
   renderToolbar() {
     return null;
+  }
+
+  handleOnFocus() {
+    this.props.onFocus(null, null, Maybe.nothing());
   }
 
   renderMain() : JSX.Element {

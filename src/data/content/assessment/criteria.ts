@@ -34,6 +34,14 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
     return this.merge(values) as this;
   }
 
+
+  static fromText(text: string, guid: string) : GradingCriteria {
+    return new GradingCriteria().with({
+      guid,
+      body: ContentElements.fromText(text, '', Immutable.List(MATERIAL_ELEMENTS).toArray()),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : GradingCriteria {
 
     const c = (root as any).grading_criteria;

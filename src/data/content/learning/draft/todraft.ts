@@ -391,8 +391,18 @@ function parse(item: Object, context: ParsingContext) {
   const handler = blockHandlers[key];
 
   if (handler === undefined) {
-    console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
-    console.dir(item);
+
+    const inlineHandler = getInlineHandler(key);
+
+    // Handle the case where all that was serialized was a
+    // single inline style tag (e.g. an entire 'choice' was
+    // bold)
+    if (inlineHandler !== undefined) {
+      blockHandlers['p']({ p: { '#array': [item] } }, context);
+    } else {
+      console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
+      console.dir(item);
+    }
 
   } else {
     handler(item, context);

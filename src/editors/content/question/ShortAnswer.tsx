@@ -9,6 +9,7 @@ import {
   TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
+import guid from 'utils/guid';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -38,14 +39,14 @@ export class ShortAnswer
     return 'short-answer';
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+  onPartEdit(partModel: contentTypes.Part, src) {
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -58,15 +59,15 @@ export class ShortAnswer
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, feedback);
   }
 
   onWhitespaceChange(whitespace) {
-    this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel);
+    this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel, null);
   }
 
   onCaseSensitive(caseSensitive) {
-    this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel);
+    this.props.onEdit(this.props.itemModel.with({ caseSensitive }), this.props.partModel, null);
   }
 
   renderDetails() {

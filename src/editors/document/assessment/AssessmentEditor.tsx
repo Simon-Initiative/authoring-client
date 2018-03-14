@@ -7,7 +7,6 @@ import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { PageSelection } from './PageSelection';
 import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
-import { UndoRedoToolbar } from '../common/UndoRedoToolbar';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
@@ -19,12 +18,21 @@ import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import * as persistence from 'data/persistence';
+import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
+
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
+  activeContext: ActiveContext;
+  onUpdateContent: (documentId: string, content: Object) => void;
+  onUpdateContentSelection: (
+    documentId: string, content: Object, container: ParentContainer,
+    textSelection: Maybe<TextSelection>) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -61,6 +69,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onNodeRemove = this.onNodeRemove.bind(this);
     this.onEditNode = this.onEditNode.bind(this);
 
+    this.onFocus = this.onFocus.bind(this);
+
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
 
     if (hasUnknownSkill(props.model, props.context.skills)) {
@@ -73,6 +83,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     nextState: AssessmentEditorState) : boolean {
 
     const shouldUpdate = this.props.model !== nextProps.model
+        || this.props.activeContext !== nextProps.activeContext
         || this.props.expanded !== nextProps.expanded
         || this.props.editMode !== nextProps.editMode
         || this.state.currentPage !== nextState.currentPage
@@ -137,11 +148,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  onEditNode(guid : string, node : models.Node) {
+  onEditNode(guid : string, node : models.Node, src) {
 
     const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
+
+    this.props.onUpdateContent(this.props.context.documentId, src);
 
     this.onEditNodes(Tree.updateNode(guid, node, nodes, getChildren, setChildren));
   }
@@ -203,7 +216,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onAddContent() {
-    let content = new contentTypes.Content();
+    let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
     this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
@@ -418,25 +431,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     );
   }
 
-  onAddNew(content: Object) {
-
-  }
-  onEdit(content: Object) {
-
+  onFocus(model: Object, parent, textSelection) {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, model, parent, textSelection);
   }
 
-  onFocus(child, parent) {
+  onAddNew(item) {
+
+  }
+
+  onEdit(item) {
 
   }
 
   render() {
 
-    const titleEditor = this.renderTitle();
     const page = this.getCurrentPage(this.props);
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
+
+    const text = this.props.model.title.text.extractPlainText().caseOf({
+      just: s => s,
+      nothing: () => '',
+    });
 
     const rendererProps = {
       model: this.props.model,
@@ -448,45 +467,32 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <div className="docHead">
+        <h2 className="title-row">{text}</h2>
+        <ContextAwareToolbar context={this.props.context}/>
+        <div className="assessment-content">
+          <div className="html-editor-well">
+            {this.renderAdd()}
 
-          <UndoRedoToolbar
-            undoEnabled={this.state.undoStackSize > 0}
-            redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
-
-          {titleEditor}
-
-          <div style={ { marginTop: '10px' } }/>
-
-          <div>
-            {this.props.model.type === LegacyTypes.assessment2
-              ? this.renderSettings() : null}
-            {this.renderPagination()}
-          </div>
-
-          <div style={ { marginTop: '5px' } }/>
-
-          {this.renderAdd()}
-
-          <div className="outline">
-            <div className="outlineContainer">
-              <Outline
-                editMode={this.props.editMode}
-                nodes={page.nodes}
-                expandedNodes={expanded}
-                selected={this.state.currentNode.guid}
-                onEdit={this.onEditNodes.bind(this)}
-                onChangeExpansion={this.onChangeExpansion.bind(this)}
-                onSelect={this.onSelect.bind(this)}
-                />
-            </div>
-            <div className="nodeContainer">
-              {renderAssessmentNode(
-                this.state.currentNode, rendererProps, this.onEdit,
-                this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
+            <div className="outline">
+              <div className="outlineContainer">
+                <Outline
+                  editMode={this.props.editMode}
+                  nodes={page.nodes}
+                  expandedNodes={expanded}
+                  selected={this.state.currentNode.guid}
+                  onEdit={this.onEditNodes.bind(this)}
+                  onChangeExpansion={this.onChangeExpansion.bind(this)}
+                  onSelect={this.onSelect.bind(this)}
+                  />
+              </div>
+              <div className="nodeContainer">
+                {renderAssessmentNode(
+                  this.state.currentNode, rendererProps, this.onEditNode,
+                  this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
+              </div>
             </div>
           </div>
+          <ContextAwareSidebar />
         </div>
       </div>);
 

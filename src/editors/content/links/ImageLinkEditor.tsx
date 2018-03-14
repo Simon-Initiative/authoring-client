@@ -3,7 +3,6 @@ import { Link } from '../../../data/content/learning/link';
 import { Image } from '../../../data/content/learning/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkEditor } from './LinkEditor';
-import { ImageEditor } from '../media/ImageEditor';
 
 export interface ImageLinkEditorProps extends AbstractContentEditorProps<ImageLinkModel> {
 
@@ -48,7 +47,7 @@ export class ImageLinkEditor
 
   renderMain() : JSX.Element {
 
-    const { link, image } = this.props.model;
+    const { link } = this.props.model;
 
     return (
       <div className="itemWrapper">
@@ -56,11 +55,7 @@ export class ImageLinkEditor
           {...this.props}
           onEdit={this.onLinkEdit}
           model={link} />
-        <ImageEditor
-          {...this.props}
-          onEdit={this.onImageEdit}
-          model={image}
-          />
+
       </div>);
   }
 
