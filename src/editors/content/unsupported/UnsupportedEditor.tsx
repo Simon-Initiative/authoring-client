@@ -23,13 +23,5 @@ export class UnsupportedEditor
     return <div className="unsupported-editor">{JSON.stringify(this.props.model.data)}</div>;
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-
-    return false;
-  }
-
 }
 

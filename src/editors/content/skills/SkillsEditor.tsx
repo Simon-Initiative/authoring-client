@@ -50,10 +50,13 @@ export default class SkillsEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
       return true;
     }
-    if (nextProps.context.skills !== this.props.context.skills) {
+    if (nextProps.context !== this.props.context) {
       return true;
     }
     if (nextState.selected !== this.state.selected) {

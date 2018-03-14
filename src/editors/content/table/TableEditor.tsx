@@ -29,13 +29,6 @@ export class TableEditor
     this.onColAdd = this.onColAdd.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onCellEdit(rowGuid: string, cellGuid: string, content) {
 
     let model = this.props.model;

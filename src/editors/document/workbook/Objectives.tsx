@@ -50,10 +50,13 @@ export class Objectives
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
       return true;
     }
-    if (nextProps.context.objectives !== this.props.context.objectives) {
+    if (nextProps.context !== this.props.context) {
       return true;
     }
     if (nextState.selected !== this.state.selected) {
@@ -81,7 +84,7 @@ export class Objectives
     return (
       <div className="objectives-editor">
 
-        <p>Objectives that pertain to this page:</p>
+        <p>Learning Objectives</p>
 
         <Typeahead
           multiple

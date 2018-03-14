@@ -6,12 +6,14 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { WorkbookPageModel } from 'data/models';
 import { Resource } from 'data/contentTypes';
 import { preview } from 'actions/preview';
+import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
 
 interface StateProps {
   activeContext: any;
+  hover: string;
 }
 
 interface DispatchProps {
@@ -21,16 +23,18 @@ interface DispatchProps {
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
-  const { activeContext } = state;
+  const { activeContext, hover } = state;
 
   return {
     activeContext,
+    hover,
   };
 };
 
@@ -50,6 +54,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));
+    },
+    onUpdateHover: (hover: string) => {
+      return dispatch(updateHover(hover));
     },
   };
 };

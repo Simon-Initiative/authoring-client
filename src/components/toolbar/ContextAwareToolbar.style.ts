@@ -29,12 +29,14 @@ export default {
     height: 86,
     flexShrink: 0,
     maxWidth: 400,
-    marginRight: 5,
-    paddingRight: 5,
+    padding: [0, 15],
     borderRight: '1px solid #ddd',
 
+    '&:first-child': {
+      paddingLeft: 0,
+    },
+
     '&:last-child': {
-      marginRight: 0,
       paddingRight: 0,
       borderRight: 'none',
     },
