@@ -7,6 +7,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import * as models from 'data/models';
 import * as contentTypes from 'data/contentTypes';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
+import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
@@ -21,6 +22,8 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -37,6 +40,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     super(props, {});
 
     this.onModelEdit = this.onModelEdit.bind(this);
+    this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -47,21 +51,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
-  shouldComponentUpdate(nextProps: WorkbookPageEditorProps) : boolean {
-    if (this.props.activeContext !== nextProps.activeContext) {
-      return true;
-    }
-    if (this.props.model !== nextProps.model) {
-      return true;
-    }
-    if (this.props.editMode !== nextProps.editMode) {
-      return true;
-    }
-    if (this.props.context !== nextProps.context) {
-      return true;
-    }
-
-    return false;
+  shouldComponentUpdate() {
+    return true;
   }
 
   onModelEdit(model) {
@@ -123,7 +114,24 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  onObjectivesEdit(objrefs: Immutable.List<string>) {
+    const head = this.props.model.head.with({ objrefs });
+    this.handleEdit(this.props.model.with({ head }));
+  }
+
+  renderObjectives() {
+    return (
+      <Objectives
+        {...this.props}
+        model={this.props.model.head.objrefs}
+        onFocus={() => {}}
+        onEdit={this.onObjectivesEdit}/>
+    );
+  }
+
   render() {
+    const { hover, onUpdateHover } = this.props;
+
     const text = this.props.model.head.title.text.extractPlainText().caseOf({
       just: s => s,
       nothing: () => '',
@@ -140,9 +148,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         <ContextAwareToolbar />
         <div className="wb-content">
           <div className="html-editor-well">
+            {this.renderObjectives()}
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}
+              hover={hover}
+              onUpdateHover={onUpdateHover}
               onFocus={this.onFocus.bind(this)}
               editMode={this.props.editMode}
               services={this.props.services}

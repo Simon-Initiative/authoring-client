@@ -31,13 +31,6 @@ export class ImageLinkEditor
     this.onLinkEdit = this.onLinkEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState: ImageLinkEditorState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onImageEdit(image) {
     this.props.onEdit({ image, link: this.props.model.link });
   }

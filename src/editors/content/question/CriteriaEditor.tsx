@@ -46,13 +46,6 @@ export class CriteriaEditor
     this.props.onEdit(this.props.model.with({ score }));
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   renderSidebar() {
     return null;
   }

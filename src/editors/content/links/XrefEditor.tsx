@@ -42,16 +42,6 @@ export class XrefEditor
     .then(resources => this.setState({ resources }));
   }
 
-  shouldComponentUpdate(nextProps, nextState: XrefEditorState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextState.resources !== this.state.resources) {
-      return true;
-    }
-    return false;
-  }
-
   onTargetEdit(target) {
     this.props.onEdit(this.props.model.with({ target }));
   }

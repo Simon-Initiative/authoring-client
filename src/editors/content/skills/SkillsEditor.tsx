@@ -41,7 +41,7 @@ export default class SkillsEditor
   }
 
   componentWillReceiveProps(nextProps: SkillsEditorProps) {
-    if (nextProps.model !== this.props.model || 
+    if (nextProps.model !== this.props.model ||
         this.props.context.skills !== nextProps.context.skills) {
       this.setState({ selected: toSkillArray(nextProps.model, nextProps.context.skills) });
     }
@@ -49,10 +49,13 @@ export default class SkillsEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
       return true;
     }
-    if (nextProps.context.skills !== this.props.context.skills) {
+    if (nextProps.context !== this.props.context) {
       return true;
     }
     if (nextState.selected !== this.state.selected) {

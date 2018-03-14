@@ -28,13 +28,6 @@ export class RichTextEditor
     this.onEdit = this.onEdit.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onEdit(html: contentTypes.ContiguousText) {
     this.props.onEdit(html);
   }

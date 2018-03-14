@@ -73,11 +73,25 @@ export class QuestionEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const should = this.props.model !== nextProps.model
-      || this.props.allSkills !== nextProps.allSkills
-      || this.state.activeItemId !== nextState.activeItemId;
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextProps.context !== this.props.context) {
+      return true;
+    }
 
-    return should;
+    if (nextProps.allSkills !== this.props.allSkills) {
+      return true;
+    }
+
+    if (nextProps.activeItemId !== this.state.activeItemId) {
+      return true;
+    }
+
+    return false;
   }
 
   onBlur(activeItemId: string) {

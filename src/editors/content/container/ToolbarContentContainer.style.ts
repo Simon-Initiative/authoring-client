@@ -27,5 +27,10 @@ export default {
     '& .content-decorator': {
       border: BORDER_STYLE,
     },
+
+    '& .contiguousTextEditor': {
+      border: 'none',
+      borderRadius: 0,
+    },
   },
 };
