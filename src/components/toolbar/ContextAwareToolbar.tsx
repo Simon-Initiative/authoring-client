@@ -7,7 +7,7 @@ import { ParentContainer, TextSelection } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { InsertToolbar } from './InsertToolbar';
-import { ActionsToolbar } from './ActionsToolbar';
+import { ActionsToolbar } from './ActionsToolbar.controller';
 
 import styles from './ContextAwareToolbar.style';
 
@@ -84,6 +84,7 @@ export interface ToolbarProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onShowPageDetails: () => void;
+  hideLabels?: boolean;
   onShowSidebar: () => void;
 }
 
@@ -96,8 +97,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      onInsert, onEdit, content, container, supportedElements,
-      textSelection, classes, onShowPageDetails,
+      content, container, supportedElements, classes, onInsert, onEdit, textSelection,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -153,7 +153,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
-          <ActionsToolbar onShowPageDetails={onShowPageDetails} />
+          <ActionsToolbar />
         </ToolbarGroup>
       </div>
     );

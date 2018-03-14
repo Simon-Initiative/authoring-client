@@ -17,11 +17,12 @@ interface StateProps {
 interface DispatchProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
-  onShowPageDetails: () => void;
   onShowSidebar: () => void;
+  onShowPageDetails: () => void;
 }
 
 interface OwnProps {
+
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

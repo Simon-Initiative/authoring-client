@@ -18,7 +18,6 @@ interface StateProps {
 
 interface DispatchProps {
   fetchObjectives: (courseId: string) => void;
-  preview: (courseId: string, resource: Resource) => Promise<any>;
   onUpdateContent: (documentId: string, content: Object) => void;
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
@@ -42,9 +41,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
   return {
     fetchObjectives: (courseId: string) => {
       return dispatch(fetchObjectives(courseId));
-    },
-    preview: (courseId: string, resource: Resource) => {
-      return dispatch(preview(courseId, resource, false));
     },
     onUpdateContent: (documentId: string, content: Object) => {
       return dispatch(activeActions.updateContent(documentId, content));

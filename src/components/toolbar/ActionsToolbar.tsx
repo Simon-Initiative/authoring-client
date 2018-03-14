@@ -2,15 +2,21 @@ import * as React from 'react';
 import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
+import { Resource } from 'data/content/resource';
 
 export interface ActionsToolbarProps {
+  courseId: string;
+  resource: Resource;
   onShowPageDetails: () => void;
+  onPreview: (courseId: string, resource: Resource) => Promise<any>;
 }
 
 /**
  * ActionsToolbar React Stateless Component
  */
-export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToolbarProps>) => {
+export const ActionsToolbar = (({
+  courseId, resource, onShowPageDetails, onPreview,
+}: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
       <ToolbarLayout.Column>
@@ -42,7 +48,7 @@ export const ActionsToolbar = (({ onShowPageDetails }: ComponentProps<ActionsToo
           <div>Delete</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onPreview(courseId, resource)}
             tooltip="Preview this Page"
             size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-eye"/></div>
