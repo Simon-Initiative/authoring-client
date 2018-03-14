@@ -68,12 +68,14 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Ordered List">
+            tooltip="Ordered List"
+            disabled>
           <i className={'fa fa-list-ol'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Unordered List">
+            tooltip="Unordered List"
+            disabled>
           <i className={'fa fa-list-ul'}/>
         </ToolbarButton>
         <ToolbarButton
