@@ -9,7 +9,7 @@ import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
-import { MultipartInput } from './MultipartInput';
+import { MultipartInput } from './MultipartInput.controller';
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from './commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
@@ -47,7 +47,7 @@ export class QuestionEditor
 
     const createFillInTheBlank = () => {
       const value = guid().replace('-', '');
-      const choice = new contentTypes.Choice().with({ value, guid: guid() });
+      const choice = contentTypes.Choice.fromText('', guid()).with({ value });
 
       const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
 
@@ -117,7 +117,7 @@ export class QuestionEditor
       || question.items.first().contentType === contentTypeToAdd;
   }
 
-  onBodyEdit(body: ContentElements) {
+  onBodyEdit(body: ContentElements, src) {
 
     let question = this.props.model.with({ body });
 
@@ -160,7 +160,7 @@ export class QuestionEditor
         let responses = Immutable.OrderedMap<string, contentTypes.Response>();
         if (item.contentType === 'FillInTheBlank') {
 
-          const feedback = new contentTypes.Feedback();
+          const feedback = contentTypes.Feedback.fromText('', guid());
           let response = new contentTypes.Response({ match: item.choices.first().value });
 
           response = response.with({ guid: guid(),
@@ -180,13 +180,13 @@ export class QuestionEditor
 
 
 
-    this.props.onEdit(question);
+    this.props.onEdit(question, src);
   }
 
-  onItemPartEdit(item, part) {
+  onItemPartEdit(item, part, src) {
     let model = this.props.model.with({ items: this.props.model.items.set(item.guid, item) });
     model = model.with({ parts: model.parts.set(part.guid, part) });
-    this.props.onEdit(model);
+    this.props.onEdit(model, src);
   }
 
   onRemove(itemModel: contentTypes.QuestionItem, partModel) {
@@ -211,6 +211,21 @@ export class QuestionEditor
     this.props.onEdit(this.props.model.with({ grading }));
   }
 
+  handleOnFocus() {
+    // Do nothing for questions
+  }
+
+  onAddItemPart(item, part, body) {
+
+    const model = this.props.model.with({
+      body,
+      items: this.props.model.items.set(item.guid, item),
+      parts: this.props.model.parts.set(part.guid, part),
+    });
+
+    this.props.onEdit(model, null);
+  }
+
   renderQuestionBody(): JSX.Element {
     const { canRemove } = this.props;
 
@@ -226,41 +241,39 @@ export class QuestionEditor
       const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={key}
           itemModel={item}
           partModel={part}
+          onAddItemPart={this.onAddItemPart.bind(this)}
           body={this.props.model.body}
           grading={this.props.model.grading}
           onGradingChange={this.onGradingChange}
           onBodyEdit={this.onBodyEdit}
           hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          fillInTheBlankCommand={this.fillInTheBlankCommand}
-          numericCommand={this.numericCommand}
-          textCommand={this.textCommand}
           canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
         <MultipleChoice
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={item.guid}
@@ -274,18 +287,18 @@ export class QuestionEditor
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
         <CheckAllThatApply
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={item.guid}
@@ -299,18 +312,18 @@ export class QuestionEditor
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
     if (item.contentType === 'ShortAnswer') {
       return (
         <ShortAnswer
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={item.guid}
@@ -324,18 +337,18 @@ export class QuestionEditor
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
     if (item.contentType === 'Ordering') {
       return (
         <Ordering
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={item.guid}
@@ -349,18 +362,18 @@ export class QuestionEditor
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
     if (item.contentType === 'Essay') {
       return (
         <Essay
-          onItemFocus={this.props.onFocus}
+          onFocus={this.props.onFocus}
+          onItemFocus={this.onFocusChange}
           context={this.props.context}
           services={this.props.services}
           editMode={this.props.editMode}
           onRemove={this.onRemove}
-          onFocus={this.onFocusChange}
           onBlur={this.onBlur}
           allSkills={this.props.allSkills}
           key={item.guid}
@@ -374,7 +387,7 @@ export class QuestionEditor
           model={this.props.model}
           canRemoveQuestion={canRemove}
           onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p) => this.onItemPartEdit(c, p)} />
+          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
       );
     }
   }

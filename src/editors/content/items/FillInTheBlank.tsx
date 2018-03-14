@@ -25,7 +25,8 @@ export interface FillInTheBlankState extends AbstractItemPartEditorState {
 /**
  * FillInTheBlank Question Editor
  */
-export class FillInTheBlank
+export class
+FillInTheBlank
   extends AbstractItemPartEditor<contentTypes.FillInTheBlank,
     FillInTheBlankProps, FillInTheBlankState> {
 
@@ -42,7 +43,7 @@ export class FillInTheBlank
     this.onReorderChoices = this.onReorderChoices.bind(this);
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
+  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const {
       partModel,
       itemModel,
@@ -53,7 +54,7 @@ export class FillInTheBlank
     const part = partModel.with(
       { responses: partModel.responses.set(updated.guid, updated) },
     );
-    onEdit(itemModel, part);
+    onEdit(itemModel, part, src);
   }
 
   onAddChoice() {
@@ -65,8 +66,8 @@ export class FillInTheBlank
 
     const value = guid().replace('-', '');
     const match = value;
-    const choice = new contentTypes.Choice().with({ value });
-    const feedback = new contentTypes.Feedback();
+    const choice = contentTypes.Choice.fromText('', guid()).with({ value });
+    const feedback = contentTypes.Feedback.fromText('', guid());
     let response = new contentTypes.Response().with({ match, input: itemModel.id });
     response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
@@ -75,7 +76,7 @@ export class FillInTheBlank
     const newPartModel = partModel.with(
       { responses: partModel.responses.set(response.guid, response) });
 
-    onEdit(newItemModel, newPartModel);
+    onEdit(newItemModel, newPartModel, choice);
   }
 
   onRemoveChoice(choiceId: string, response: contentTypes.Response) {
@@ -90,10 +91,10 @@ export class FillInTheBlank
     const newPartModel = partModel.with(
       { responses: partModel.responses.delete(response.guid) });
 
-    onEdit(newItemModel, newPartModel);
+    onEdit(newItemModel, newPartModel, null);
   }
 
-  onChoiceEdit(choice: contentTypes.Choice) {
+  onChoiceEdit(choice: contentTypes.Choice, src) {
     const {
       itemModel,
       partModel,
@@ -103,7 +104,7 @@ export class FillInTheBlank
     onEdit(
       itemModel.with(
       { choices: itemModel.choices.set(choice.guid, choice) }),
-      partModel);
+      partModel, src);
   }
 
   onReorderChoices(originalIndex: number, newIndex: number) {
@@ -137,6 +138,7 @@ export class FillInTheBlank
     onEdit(
       newModels.itemModel,
       newModels.partModel,
+      choice,
     );
   }
 
@@ -147,10 +149,10 @@ export class FillInTheBlank
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel, null);
   }
 
-  onEditMult(mult: contentTypes.ResponseMult) {
+  onEditMult(mult: contentTypes.ResponseMult, src) {
     const {
       itemModel,
       partModel,
@@ -159,7 +161,7 @@ export class FillInTheBlank
 
     const responseMult = partModel.responseMult.set(mult.guid, mult);
     const newPartModel = partModel.with({ responseMult });
-    onEdit(itemModel, newPartModel);
+    onEdit(itemModel, newPartModel, src);
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
@@ -172,7 +174,7 @@ export class FillInTheBlank
     const updated = response.with({ score });
     const newPartModel = partModel.with(
       { responses: partModel.responses.set(updated.guid, updated) });
-    onEdit(itemModel, newPartModel);
+    onEdit(itemModel, newPartModel, updated);
   }
 
   renderChoices() {

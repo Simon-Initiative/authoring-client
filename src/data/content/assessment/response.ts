@@ -84,7 +84,7 @@ export class Response extends Immutable.Record(defaultContent) {
 
     // We need to have at least one feedback
     if (model.feedback.size === 0) {
-      const empty = new Feedback();
+      const empty = Feedback.fromText('', createGuid());
       let feedback =
         Immutable.OrderedMap<string, Feedback>();
       feedback = feedback.set(empty.guid, empty);

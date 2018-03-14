@@ -11,6 +11,20 @@
     overflow: auto;
   }
 
+  .assessment-content {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    flex: 1;
+
+    .html-editor-well {
+      flex: 1;
+      overflow: auto;
+      padding: 0 10px 20px 10px;
+
+    }
+  }
+
   .slash {
     color: #606060;
   }
