@@ -21,8 +21,7 @@ export default {
     borderBottom: [1, 'solid', colors.grayLight],
   },
   toolbarGroup: {
-    maxWidth: 366,
-    minWidth: 200,
+    width: 366,
   },
   toolbarGroupContainer: {
     overflowX: 'hidden',
@@ -32,21 +31,24 @@ export default {
     padding: [0, 15],
     borderRight: '1px solid #ddd',
 
-    '&:first-child': {
-      paddingLeft: 0,
-    },
-
-    '&:last-child': {
-      paddingRight: 0,
-      borderRight: 'none',
-    },
-
-    '&.hide': {
+    '&.contextToolbar-enter': {
       maxWidth: 0,
       opacity: 0,
-      marginRight: 0,
-      paddingRight: 0,
-      borderRight: 'none',
+    },
+
+    '&.contextToolbar-enter.contextToolbar-enter-active': {
+      maxWidth: 400,
+      opacity: 1,
+    },
+
+    '&.contextToolbar-leave': {
+      maxWidth: 400,
+      opacity: 1,
+    },
+
+    '&.contextToolbar-leave.contextToolbar-leave-active': {
+      maxWidth: 0,
+      opacity: 0,
     },
 
     transition: `max-width ${TOOLBAR_HIDE_ANIMATION_DURATION_S}s ease-in, \
@@ -83,11 +85,14 @@ export default {
   },
   toolbarInsertGroup: {
     width: 336,
+    paddingLeft: 0,
   },
-  toolbarFormatGroup: {
+  toolbarItemGroup: {
     width: 150,
   },
   toolbarActionsGroup: {
     width: 'initial',
+    paddingRight: 0,
+    borderRight: 'none',
   },
 };
