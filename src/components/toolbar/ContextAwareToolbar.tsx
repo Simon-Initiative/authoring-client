@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
-import { StyledComponentProps } from 'types/component';
+import { ComponentProps, StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer, TextSelection } from 'types/active.ts';
@@ -20,6 +20,7 @@ interface ToolbarGroupProps {
   label: string;
   highlightColor?: string;
   hide?: boolean;
+  columns?: number;
 }
 
 function determineBaseUrl(resource: Resource) : string {
@@ -32,11 +33,18 @@ function determineBaseUrl(resource: Resource) : string {
     .substr(0, stem.lastIndexOf('\/'));
 }
 
-export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
-  (({ className, classes, label, hide, children }: StyledComponentProps<ToolbarGroupProps>) => {
+const TOOLBAR_COL_WIDTH = 36;
+const TOOLBAR_PADDING = 30;
+const DEFAULT_TOOLBAR_GROUP_COLS = 10;
+
+export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
+  = injectSheetSFC<ToolbarGroupProps>(styles)(({
+    className, classes, columns, label, hide, children,
+  }) => {
+    const width = ((columns || DEFAULT_TOOLBAR_GROUP_COLS) * TOOLBAR_COL_WIDTH);
     return hide ? null : (
-      <div className={classNames([classes.toolbarGroupContainer])}>
-        <div className={classNames([classes.toolbarGroup, className])}>
+      <div className={classNames([classes.toolbarGroupContainer, className])}>
+        <div style={{ width }} className={classNames([classes.toolbarGroup])}>
             <div className={classes.tbGroupItems}>{children}</div>
             <div className={classes.tbGroupLabel}>{label}</div>
         </div>
@@ -161,7 +169,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={9}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -181,7 +189,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
         <div className="flex-spacer"/>
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8}>
           <ActionsToolbar documentResource={resource} documentId={context.documentId} />
         </ToolbarGroup>
       </div>

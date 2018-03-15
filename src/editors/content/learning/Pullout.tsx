@@ -83,7 +83,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Pullout" highlightColor={CONTENT_COLORS.Pullout}>
+      <ToolbarGroup label="Pullout" columns={6} highlightColor={CONTENT_COLORS.Pullout}>
         <ToolbarLayout.Column>
           <Select editMode={this.props.editMode}
             value={this.props.model.pulloutType.caseOf({
