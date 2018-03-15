@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
-import { ComponentProps, StyledComponentProps } from 'types/component';
+import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer, TextSelection } from 'types/active.ts';
@@ -34,7 +34,6 @@ function determineBaseUrl(resource: Resource) : string {
 }
 
 const TOOLBAR_COL_WIDTH = 36;
-const TOOLBAR_PADDING = 30;
 const DEFAULT_TOOLBAR_GROUP_COLS = 10;
 
 export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
