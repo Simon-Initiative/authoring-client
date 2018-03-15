@@ -25,7 +25,7 @@ const defaultLearningObjectivesModelParams = {
 };
 
 
-export class LearningObjectivesModel 
+export class LearningObjectivesModel
   extends Immutable.Record(defaultLearningObjectivesModelParams) {
 
   modelType: 'LearningObjectivesModel';
@@ -50,7 +50,7 @@ export class LearningObjectivesModel
     let model = new LearningObjectivesModel();
 
     const a = (json as any);
-    model = model.with({ 
+    model = model.with({
       resource: contentTypes.Resource.fromPersistence(a),
       guid: a.guid,
       title: a.title,
@@ -89,13 +89,13 @@ export class LearningObjectivesModel
           // Find the objective and update it's skills
           const o = objById[objskills.idref];
           if (o !== undefined) {
-            const updated = o.with({ skills: objskills.skills });
+            const updated = o.with({ skills: objskills.skills.toList() });
             model = model.with({ objectives: model.objectives.set(updated.guid, updated) });
           }
 
           break;
         default:
-          
+
       }
     });
 
@@ -105,7 +105,7 @@ export class LearningObjectivesModel
   toPersistence(): Object {
     const children : Object[] = [
       { title: { '#text': this.title } }];
-    
+
     if (this.objectives.size === 0) {
       const id = guid();
       const o = new contentTypes.LearningObjective().with({
@@ -118,7 +118,7 @@ export class LearningObjectivesModel
       const objectiveSkills = [];
 
       // Create ephemeral ObjectiveSkill objects that contain the objective
-      // skills and serialize them as separate elements in the data 
+      // skills and serialize them as separate elements in the data
       this.objectives.toArray().forEach((o) => {
         children.push(o.toPersistence());
 
@@ -134,7 +134,7 @@ export class LearningObjectivesModel
     }
 
 
-    
+
     const resource = this.resource.toPersistence();
     const doc = [{
       objectives: {
