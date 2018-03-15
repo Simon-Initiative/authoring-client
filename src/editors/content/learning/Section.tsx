@@ -68,7 +68,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Section" highlightColor={CONTENT_COLORS.Section}>
+      <ToolbarGroup label="Section" columns={8} highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
             <div style={{ marginLeft: 8 }}>Purpose</div>
             <Select

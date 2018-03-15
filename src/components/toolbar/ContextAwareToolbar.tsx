@@ -20,6 +20,7 @@ interface ToolbarGroupProps {
   label: string;
   highlightColor?: string;
   hide?: boolean;
+  columns?: number;
 }
 
 function determineBaseUrl(resource: Resource) : string {
@@ -32,11 +33,17 @@ function determineBaseUrl(resource: Resource) : string {
     .substr(0, stem.lastIndexOf('\/'));
 }
 
-export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
-  (({ className, classes, label, hide, children }: StyledComponentProps<ToolbarGroupProps>) => {
-    return (
-      <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
-        <div className={classNames([classes.toolbarGroup, className])}>
+const TOOLBAR_COL_WIDTH = 36;
+const DEFAULT_TOOLBAR_GROUP_COLS = 10;
+
+export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
+  = injectSheetSFC<ToolbarGroupProps>(styles)(({
+    className, classes, columns, label, hide, children,
+  }) => {
+    const width = ((columns || DEFAULT_TOOLBAR_GROUP_COLS) * TOOLBAR_COL_WIDTH);
+    return hide ? null : (
+      <div className={classNames([classes.toolbarGroupContainer, className])}>
+        <div style={{ width }} className={classNames([classes.toolbarGroup])}>
             <div className={classes.tbGroupItems}>{children}</div>
             <div className={classes.tbGroupLabel}>{label}</div>
         </div>
@@ -132,7 +139,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
     let contentRenderer;
     if (contentParent && contentModel) {
       const props = {
-        key: 'contextContent',
         renderContext: RenderContext.Toolbar,
         model: contentModel,
         onEdit,
@@ -162,7 +168,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert">
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={9}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -182,7 +188,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
         <div className="flex-spacer"/>
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions">
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8}>
           <ActionsToolbar documentResource={resource} documentId={context.documentId} />
         </ToolbarGroup>
       </div>
