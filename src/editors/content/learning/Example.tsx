@@ -55,7 +55,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Example" highlightColor={CONTENT_COLORS.Example}>
+      <ToolbarGroup label="Example" columns={2} highlightColor={CONTENT_COLORS.Example}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
