@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
@@ -12,7 +13,7 @@ import { InsertToolbar } from './InsertToolbar';
 import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 
-import styles from './ContextAwareToolbar.style';
+import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -131,6 +132,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
     let contentRenderer;
     if (contentParent && contentModel) {
       const props = {
+        key: 'contextContent',
         renderContext: RenderContext.Toolbar,
         model: contentModel,
         onEdit,
@@ -171,7 +173,12 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        {contentRenderer}
+        <ReactCSSTransitionGroup
+            transitionName="contextToolbar"
+            transitionEnterTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}
+            transitionLeaveTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}>
+          {contentRenderer}
+        </ReactCSSTransitionGroup>
 
         <div className="flex-spacer"/>
 
