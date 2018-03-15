@@ -49,7 +49,7 @@ export default class ContiguousTextToolbar
     if (nextProps.context !== this.props.context) {
       return true;
     }
-    if (nextProps.selection.getRawSelectionState()
+    if (nextProps.selection && nextProps.selection.getRawSelectionState()
       !== this.props.selection.getRawSelectionState()) {
       return true;
     }
