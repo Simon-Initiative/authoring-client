@@ -1,7 +1,7 @@
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
-export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 250;
+export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 200;
 
 const TOOLBAR_HIDE_ANIMATION_DURATION_S = TOOLBAR_HIDE_ANIMATION_DURATION_MS / 1000;
 

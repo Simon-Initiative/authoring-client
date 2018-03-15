@@ -34,8 +34,8 @@ function determineBaseUrl(resource: Resource) : string {
 
 export const ToolbarGroup = injectSheetSFC<ToolbarGroupProps>(styles)
   (({ className, classes, label, hide, children }: StyledComponentProps<ToolbarGroupProps>) => {
-    return (
-      <div key={label} className={classNames([classes.toolbarGroupContainer, hide && 'hide'])}>
+    return hide ? null : (
+      <div className={classNames([classes.toolbarGroupContainer])}>
         <div className={classNames([classes.toolbarGroup, className])}>
             <div className={classes.tbGroupItems}>{children}</div>
             <div className={classes.tbGroupLabel}>{label}</div>
@@ -132,7 +132,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
     let contentRenderer;
     if (contentParent && contentModel) {
       const props = {
-        key: 'contextContent',
         renderContext: RenderContext.Toolbar,
         model: contentModel,
         onEdit,
