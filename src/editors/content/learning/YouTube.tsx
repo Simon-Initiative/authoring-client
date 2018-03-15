@@ -9,6 +9,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { SidebarRow, MediaMetadata, MediaWidthHeight } from './Media';
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
@@ -19,24 +20,6 @@ export interface YouTubeState {
 
 }
 
-interface SidebarRow {
-  text: string;
-  width: string;
-}
-
-const SidebarRow: React.StatelessComponent<SidebarRow> = ({ text, width, children }) => {
-  return (
-    <div className="form-group row">
-      {text !== ''
-        ? <label className="col-3 col-form-label">{text}</label>
-        : null}
-      <div className={`col-${width}`}>
-        {children}
-      </div>
-    </div>
-  );
-};
-
 export class YouTube
   extends AbstractContentEditor<YouTubeType, YouTubeProps, YouTubeState> {
 
@@ -44,8 +27,6 @@ export class YouTube
     super(props);
 
     this.onSrcEdit = this.onSrcEdit.bind(this);
-    this.onHeightEdit = this.onHeightEdit.bind(this);
-    this.onWidthEdit = this.onWidthEdit.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
@@ -70,16 +51,6 @@ export class YouTube
 
   onSrcEdit(src: string) {
     const model = this.props.model.with({ src });
-    this.props.onEdit(model, model);
-  }
-
-  onHeightEdit(height: string) {
-    const model = this.props.model.with({ height });
-    this.props.onEdit(model, model);
-  }
-
-  onWidthEdit(width: string) {
-    const model = this.props.model.with({ width });
     this.props.onEdit(model, model);
   }
 
@@ -111,33 +82,24 @@ export class YouTube
                   onEdit={this.onSrcEdit} />
             </div>
           </SidebarRow>
-          <SidebarRow text="Height" width="9">
-            <div className="input-group input-group-sm">
-              <TextInput width="100%" label=""
-                editMode={this.props.editMode}
-                value={height}
-                type="number"
-                onEdit={this.onHeightEdit}/>
-              <span className="input-group-addon ">pixels</span>
-            </div>
-          </SidebarRow>
-          <SidebarRow text="Width" width="9">
-            <div className="input-group input-group-sm">
-              <TextInput width="100%" label=""
-                editMode={this.props.editMode}
-                value={width}
-                type="number"
-                onEdit={this.onWidthEdit}/>
-              <span className="input-group-addon" id="basic-addon2">pixels</span>
-            </div>
-          </SidebarRow>
-          <SidebarRow text="Popout" width="9">
-            <TextInput width="100%" label=""
-              editMode={this.props.editMode}
-              value={popout.content}
-              type="text"
-              onEdit={this.onPopoutEdit}/>
-          </SidebarRow>
+
+          <MediaWidthHeight
+            width={this.props.model.width}
+            height={this.props.model.height}
+            editMode={this.props.editMode}
+            onEditWidth={(width) => {
+              const model = this.props.model.with({ width });
+              this.props.onEdit(model, model);
+            }}
+            onEditHeight={(height) => {
+              const model = this.props.model.with({ height });
+              this.props.onEdit(model, model);
+            }} />
+
+          <MediaMetadata
+            model={this.props.model}
+            editMode={this.props.editMode}
+            onEdit={this.props.onEdit} />
 
           {/*
           <SidebarRow text="Title" width="9">
