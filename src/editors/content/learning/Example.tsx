@@ -10,6 +10,8 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
+import './nested.scss';
+
 export interface ExampleProps extends AbstractContentEditorProps<ExampleType> {
   onShowSidebar: () => void;
 }
@@ -66,18 +68,20 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
 
   renderMain(): JSX.Element {
     return (
-      <div className="exampleEditor">
+      <div>
         <ContiguousTextEditor
           {...this.props}
           model={(this.props.model.title.text.content as any).first()}
           editorStyles={{ fontSize: 20 }}
           viewOnly
           onEdit={() => {}} />
-        <ContentContainer
-          {...this.props}
-          model={this.props.model.content}
-          onEdit={this.onContentEdit}
-        />
+        <div className="nested-container">
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.content}
+            onEdit={this.onContentEdit}
+          />
+        </div>
       </div>
     );
   }
