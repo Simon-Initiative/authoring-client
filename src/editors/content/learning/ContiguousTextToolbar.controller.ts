@@ -23,7 +23,10 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   const { activeContext } = state;
 
   return {
-    selection: activeContext.textSelection.caseOf({ just: s => s, nothing: () => null }),
+    selection: activeContext.textSelection.caseOf({ just: s => s, nothing: () => {
+      return TextSelection.createEmpty('');
+    },
+    }),
   };
 };
 

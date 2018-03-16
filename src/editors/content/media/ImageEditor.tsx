@@ -150,9 +150,9 @@ export class ImageEditor
     this.props.onEdit(this.props.model.with({ titleContent }));
   }
 
-  onCaptionEdit(content: ContentElements) {
+  onCaptionEdit(content: ContentElements, src) {
     const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }));
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onSetClick() {
@@ -299,7 +299,10 @@ export class ImageEditor
       });
   }
 
+
+
   renderSidebar() {
+
     return (
       <SidebarContent title="Image">
         <SidebarGroup label="Media">
