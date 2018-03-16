@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Track } from '../../../data/content/learning/track';
+import { Track } from 'data/content/learning/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TrackEditor } from './TrackEditor';
 

@@ -27,11 +27,18 @@ import styles from './MediaElement.style';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
   onShowSidebar: () => void;
+  img: any;
+}
+
+interface Sizing {
+  width: string;
+  height: string;
 }
 
 export interface ImageEditorState {
   failure: boolean;
   isDefaultSizing: boolean;
+  customSizing: Sizing;
 }
 
 function selectImage(model, resourcePath, courseModel, display, dismiss) : Promise<Image> {
@@ -70,6 +77,8 @@ function selectImage(model, resourcePath, courseModel, display, dismiss) : Promi
 export class ImageEditor
   extends AbstractContentEditor<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
 
+  img: any;
+
   constructor(props) {
     super(props);
 
@@ -88,6 +97,10 @@ export class ImageEditor
     this.state = {
       failure: false,
       isDefaultSizing: this.props.model.height === '' && this.props.model.width === '',
+      customSizing: {
+        width: '',
+        height: '',
+      },
     };
   }
 
@@ -167,8 +180,22 @@ export class ImageEditor
     this.setState({ isDefaultSizing });
 
     if (isDefaultSizing) {
+      this.setState({ customSizing: {
+        width: this.props.model.width,
+        height: this.props.model.height,
+      } });
+
       const updated = this.props.model.with({ width: '', height: '' });
       this.props.onEdit(updated, updated);
+    } else {
+      if (this.state.customSizing.width !== '' &&
+          this.state.customSizing.height !== '') {
+        const updated = this.props.model.with({
+          width: this.state.customSizing.width,
+          height: this.state.customSizing.height,
+        });
+        this.props.onEdit(updated, updated);
+      }
     }
   }
 
@@ -333,7 +360,7 @@ export class ImageEditor
 
     return (
       <div className={classes.mediaElement}>
-        <img src={fullSrc} height={height} width={width}/>
+        <img ref={input => this.img = input} src={fullSrc} height={height} width={width}/>
       </div>
     );
   }
