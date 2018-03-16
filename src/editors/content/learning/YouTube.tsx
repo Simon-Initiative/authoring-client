@@ -5,11 +5,11 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { ContentElements } from 'data/content/common/elements';
 import { TextInput } from '../common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { SidebarRow, MediaMetadata, MediaWidthHeight } from './Media';
+import { MediaMetadata, MediaWidthHeight } from './MediaItems';
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
@@ -27,9 +27,6 @@ export class YouTube
     super(props);
 
     this.onSrcEdit = this.onSrcEdit.bind(this);
-    this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
   }
 
@@ -37,26 +34,9 @@ export class YouTube
     return nextProps.model !== this.props.model;
   }
 
-  onPopoutEdit(content: string) {
-    const popout = this.props.model.popout.with({ content });
-    const model = this.props.model.with({ popout });
-    this.props.onEdit(model, model);
-  }
-
-  onAlternateEdit(content: ContentElements) {
-    const alternate = this.props.model.alternate.with({ content });
-    const model = this.props.model.with({ alternate });
-    this.props.onEdit(model, model);
-  }
-
   onSrcEdit(src: string) {
     const model = this.props.model.with({ src });
     this.props.onEdit(model, model);
-  }
-
-  onTitleEdit(text: ContentElements, src) {
-    const titleContent = this.props.model.titleContent.with({ text });
-    this.props.onEdit(this.props.model.with({ titleContent }), src);
   }
 
   onCaptionEdit(content: ContentElements, src) {
@@ -65,8 +45,8 @@ export class YouTube
   }
 
   renderSidebar(): JSX.Element {
-    const { popout, src, height, width } = this.props.model;
-    // titleContent, caption,
+    const { src, height, width } = this.props.model;
+
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="">
@@ -100,23 +80,6 @@ export class YouTube
             {...this.props}
             model={this.props.model}
             onEdit={this.props.onEdit} />
-
-          {/*
-          <SidebarRow text="Title" width="9">
-            <ContentContainer
-              {...this.props}
-              model={titleContent.text}
-              editMode={this.props.editMode}
-              onEdit={this.onTitleEdit}/>
-          </SidebarRow>
-          <SidebarRow text="Caption" width="9">
-            <ContentContainer
-              {...this.props}
-              model={caption.content}
-              editMode={this.props.editMode}
-              onEdit={this.onCaptionEdit} />
-          </SidebarRow>
-          */}
 
         </SidebarGroup>
       </SidebarContent>

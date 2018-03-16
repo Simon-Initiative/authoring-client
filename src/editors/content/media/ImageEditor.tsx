@@ -12,7 +12,7 @@ import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
 import { MediaItem } from 'types/media';
 import { adjustPath } from './utils';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -20,6 +20,7 @@ import { Button } from 'editors/content/common/Button';
 import { buildUrl } from 'utils/path';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
+import { MediaMetadata } from 'editors/content/learning/MediaItems';
 
 import styles from './MediaElement.style';
 
@@ -32,7 +33,6 @@ export interface ImageEditorState {
   failure: boolean;
   isDefaultSizing: boolean;
 }
-
 
 function selectImage(model, resourcePath, courseModel, display, dismiss) : Promise<Image> {
 
@@ -48,14 +48,13 @@ function selectImage(model, resourcePath, courseModel, display, dismiss) : Promi
         <MediaManager model={model}
           resourcePath={resourcePath}
           courseModel={courseModel}
-          onEdit={() => {}} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.IMAGE}
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model.src]}
           onSelectionChange={(img) => {
-            console.log(selected);
             selected.img =
-            new Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
-            console.log(selected);
+              new Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
           }} />
       </ModalSelection>;
 
@@ -74,6 +73,7 @@ export class ImageEditor
   constructor(props) {
     super(props);
 
+    this.onSelect = this.onSelect.bind(this);
     this.onSetClick = this.onSetClick.bind(this);
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onAlternateEdit = this.onAlternateEdit.bind(this);
@@ -140,36 +140,23 @@ export class ImageEditor
     this.props.onEdit(this.props.model.with({ popout }));
   }
 
-  onAlternateEdit(content: ContentElements) {
+  onAlternateEdit(content: ContentElements, src) {
     const alternate = this.props.model.alternate.with({ content });
-    this.props.onEdit(this.props.model.with({ alternate }));
+    this.props.onEdit(this.props.model.with({ alternate }), src);
   }
 
-  onTitleEdit(text: ContentElements) {
+  onTitleEdit(text: ContentElements, src) {
     const titleContent = this.props.model.titleContent.with({ text });
-    this.props.onEdit(this.props.model.with({ titleContent }));
+    this.props.onEdit(this.props.model.with({ titleContent }), src);
   }
 
-  onCaptionEdit(content: ContentElements) {
+  onCaptionEdit(content: ContentElements, src) {
     const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }));
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   onSetClick() {
     // TODO
-  }
-
-  row(text: string, width: string, control: any) {
-    const widthClass = 'col-' + width;
-    return (
-      <div className="row justify-content-start">
-        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
-          className="col-1 col-form-label">{text}</label>
-        <div className={widthClass}>
-          {control}
-        </div>
-      </div>
-    );
   }
 
   renderSource() {
@@ -199,10 +186,9 @@ export class ImageEditor
               defaultChecked={this.state.isDefaultSizing}
               onChange={this.changeSizing.bind(this, true)}
               type="radio"/>&nbsp;
-              Display the image at the image's native width and height
+              Native
           </label>
         </div>
-        <br/>
         <div className="form-check" style={ { marginBottom: '30px' } }>
           <label className="form-check-label">
             <input className="form-check-input"
@@ -211,24 +197,29 @@ export class ImageEditor
               value="custom"
               defaultChecked={!this.state.isDefaultSizing}
               type="radio"/>&nbsp;
-              Display the image at a custom width and height
+              Custom
           </label>
         </div>
 
-        {this.row('Height', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label=""
-            editMode={this.props.editMode && !this.state.isDefaultSizing}
-            value={height}
-            type="number"
-            onEdit={this.onHeightEdit}
-          /><span className="input-group-addon ">pixels</span></div>)}
-        {this.row('Width', '1', <div className="input-group input-group-sm">
+        <SidebarRow text="Width" width="9">
+          <div className="input-group input-group-sm">
            <TextInput width="100px" label=""
             editMode={this.props.editMode && !this.state.isDefaultSizing}
             value={width}
             type="number"
             onEdit={this.onWidthEdit}
-          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
+        </SidebarRow>
+        <SidebarRow text="Height" width="9">
+          <div className="input-group input-group-sm">
+            <TextInput width="100px" label=""
+            editMode={this.props.editMode && !this.state.isDefaultSizing}
+            value={height}
+            type="number"
+            onEdit={this.onHeightEdit} />
+            <span className="input-group-addon ">pixels</span>
+          </div>
+        </SidebarRow>
 
       </div>
     );
@@ -240,41 +231,28 @@ export class ImageEditor
     return (
       <div style={ { marginTop: '30px' } }>
 
-        {this.row('Align', '4', <Select label="" editMode={this.props.editMode}
-              value={valign} onChange={this.onValignEdit}>
-              <option value="top">Top</option>
-              <option value="middle">Middle</option>
-              <option value="baseline">Baseline</option>
-              <option value="bottom">Bottom</option>
-            </Select>)}
+        <SidebarRow text="Align" width="6">
+          <Select label="" editMode={this.props.editMode}
+            value={valign} onChange={this.onValignEdit}>
+            <option value="top">Top</option>
+            <option value="middle">Middle</option>
+            <option value="baseline">Baseline</option>
+            <option value="bottom">Bottom</option>
+          </Select>
+        </SidebarRow>
 
-          {this.row('Alt', '8', <TextInput width="100%" label=""
-              editMode={this.props.editMode}
-              value={alt}
-              type="text"
-              onEdit={this.onAltEdit}
-            />)}
-
-          {this.row('Popout', '8', <TextInput width="100%" label=""
-              editMode={this.props.editMode}
-              value={popout.content}
-              type="text"
-              onEdit={this.onPopoutEdit}
-            />)}
-
-          {this.row('Title', '8', <ContentContainer
-            {...this.props}
-            model={titleContent.text}
+        <SidebarRow text="Alt" width="9">
+          <TextInput width="100%" label=""
             editMode={this.props.editMode}
-            onEdit={this.onTitleEdit}
-          />)}
+            value={alt}
+            type="text"
+            onEdit={this.onAltEdit} />
+        </SidebarRow>
 
-          {this.row('Caption', '8', <ContentContainer
+        <MediaMetadata
           {...this.props}
-          model={caption.content}
-          editMode={this.props.editMode}
-          onEdit={this.onCaptionEdit}
-          />)}
+          model={this.props.model}
+          onEdit={this.props.onEdit} />
 
       </div>
     );
@@ -302,13 +280,17 @@ export class ImageEditor
   renderSidebar() {
     return (
       <SidebarContent title="Image">
-        <SidebarGroup label="Media">
+        <SidebarGroup label="">
           <Button
             editMode={this.props.editMode}
-            onClick={this.onSelect.bind(this)}>Change Image</Button>
+            onClick={this.onSelect}>Change Image</Button>
         </SidebarGroup>
+        <br/>
         <SidebarGroup label="Sizing">
           {this.renderSizing()}
+        </SidebarGroup>
+        <SidebarGroup label="Other">
+          {this.renderOther()}
         </SidebarGroup>
       </SidebarContent>
     );
@@ -326,11 +308,12 @@ export class ImageEditor
         </ToolbarLayout.Column>
 
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+          {/* <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Wide}>
             <i className="fa fa-expand"/> Sizing
-          </ToolbarButton>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-sliders"/> Details
+          </ToolbarButton> */}
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-sliders"/></div>
+            <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>

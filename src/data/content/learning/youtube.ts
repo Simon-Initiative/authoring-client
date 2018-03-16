@@ -27,7 +27,7 @@ const defaultContent = {
   contentType: 'YouTube',
   id: '',
   title: '',
-  src: 'C0DPdy98e4c',
+  src: 'zHIIzcWqsP0',
   width: '500',
   height: '300',
   popout: new Popout(),

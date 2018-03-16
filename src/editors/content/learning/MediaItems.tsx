@@ -4,7 +4,7 @@ import { Alternate } from 'data/content/learning/alternate';
 import { Title } from 'data/content/learning/title';
 import { Caption } from 'data/content/learning/caption';
 import { Cite } from 'data/content/learning/cite';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { TextInput } from '../common/TextInput';
 import { MediaItem } from 'data/contentTypes';
 import { YouTube } from '../../../data/content/learning/youtube';
@@ -19,22 +19,14 @@ import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
-interface SidebarRow {
-  text: string;
-  width: string;
-}
-
-export const SidebarRow: React.StatelessComponent<SidebarRow> = ({ text, width, children }) => {
-  return (
-    <div className="form-group row">
-      {text !== ''
-        ? <label className="col-3 col-form-label">{text}</label>
-        : null}
-      <div className={`col-${width}`}>
-        {children}
-      </div>
-    </div>
-  );
+export type MediaType = {
+  with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
+    MediaItem;
+  popout: Popout;
+  alternate: Alternate;
+  titleContent: Title;
+  caption: Caption;
+  cite: Cite;
 };
 
 export interface MediaWidthHeightProps {
@@ -97,21 +89,12 @@ export interface MediaMetadataState {
 
 }
 
-export type MediaType = {
-  with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
-    MediaItem;
-  popout: Popout;
-  alternate: Alternate;
-  titleContent: Title;
-  caption: Caption;
-  cite: Cite;
-};
-
 export class MediaMetadata extends React.PureComponent<MediaMetadataProps, MediaMetadataState> {
   constructor(props) {
     super(props);
 
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
+    this.onPopoutEnableToggle = this.onPopoutEnableToggle.bind(this);
     // this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
@@ -183,9 +166,8 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
               onEdit={this.onTitleEdit} />
           </SidebarRow>
         </SidebarGroup>
-        <SidebarGroup label="Popout">
-          {/* <SidebarRow text="Popout" width="9"> */}
-          <ToggleSwitch
+          <SidebarRow text="Popout" width="9">
+            <ToggleSwitch
               {...this.props}
               checked={popout.enable}
               onClick={this.onPopoutEnableToggle}
@@ -195,9 +177,8 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
               value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}/>
-        </SidebarGroup>
+          </SidebarRow>
         <SidebarGroup label="Caption">
-          {/* </SidebarRow> */}
           {/* Leaving alternate out for now */}
           {/* <SidebarRow text="Alternate" width="9">
             <ContentContainer
@@ -211,21 +192,22 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
               onEdit={this.onCaptionEdit} />
           </SidebarGroup>
           <SidebarGroup label="Citation">
-            <TextInput width="100%" label="Title"
-              editMode={this.props.editMode}
-              value={cite.title}
-              type="text"
-              onEdit={this.onCitationTitleEdit}/>
-            <TextInput width="100%" label="Entry"
-              editMode={this.props.editMode}
-              value={cite.entry}
-              type="text"
-              onEdit={this.onCitationEntryEdit}/>
-            Content
-            <ContentContainer
-              {...this.props}
-              model={cite.content}
-              onEdit={this.onCitationContentEdit} />
+            <SidebarRow text="" width="9">
+              <TextInput width="100%" label="Title"
+                editMode={this.props.editMode}
+                value={cite.title}
+                type="text"
+                onEdit={this.onCitationTitleEdit}/>
+              <TextInput width="100%" label="Entry"
+                editMode={this.props.editMode}
+                value={cite.entry}
+                type="text"
+                onEdit={this.onCitationEntryEdit}/>
+              <ContentContainer
+                {...this.props}
+                model={cite.content}
+                onEdit={this.onCitationContentEdit} />
+            </SidebarRow>
           </SidebarGroup>
       </div>
     );
