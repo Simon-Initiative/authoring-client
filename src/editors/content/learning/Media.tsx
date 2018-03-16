@@ -112,8 +112,12 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
     super(props);
 
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
+    // this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onCitationTitleEdit = this.onCitationTitleEdit.bind(this);
+    this.onCitationEntryEdit = this.onCitationEntryEdit.bind(this);
+    this.onCitationContentEdit = this.onCitationContentEdit.bind(this);
   }
 
   onPopoutEdit(content: string) {
@@ -122,11 +126,19 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
     this.props.onEdit(model, model);
   }
 
-  onAlternateEdit(content: ContentElements) {
-    const alternate = this.props.model.alternate.with({ content });
-    const model: MediaItem = (this.props.model as MediaType).with({ alternate });
+  onPopoutEnableToggle() {
+    const popout = this.props.model.popout.with({
+      enable: !this.props.model.popout.enable,
+    });
+    const model = (this.props.model as MediaType).with({ popout });
     this.props.onEdit(model, model);
   }
+
+  // onAlternateEdit(content: ContentElements) {
+  //   const alternate = this.props.model.alternate.with({ content });
+  //   const model: MediaItem = (this.props.model as MediaType).with({ alternate });
+  //   this.props.onEdit(model, model);
+  // }
 
   onTitleEdit(text: ContentElements) {
     const titleContent = this.props.model.titleContent.with({ text });
@@ -134,62 +146,88 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
     this.props.onEdit(model, model);
   }
 
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    const model = (this.props.model as MediaType).with({ caption });
+    this.props.onEdit(model, src);
+  }
+
+  onCitationTitleEdit(title: string) {
+    const cite = this.props.model.cite.with({ title });
+    const model = (this.props.model as MediaType).with({ cite });
+    this.props.onEdit(model, model);
+  }
+
+  onCitationEntryEdit(entry: string) {
+    const cite = this.props.model.cite.with({ entry });
+    const model = (this.props.model as MediaType).with({ cite });
+    this.props.onEdit(model, model);
+  }
+
+  onCitationContentEdit(content: ContentElements, src) {
+    const cite = this.props.model.cite.with({ content });
+    const model = (this.props.model as MediaType).with({ cite });
+    this.props.onEdit(model, src);
+  }
+
   render() {
     const { popout, alternate, titleContent, caption, cite } = this.props.model;
 
     return (
-      <SidebarGroup label="">
-        <SidebarRow text="Title" width="9">
-          <ContentContainer
-            {...this.props}
-            model={titleContent.text}
-            onEdit={this.onTitleEdit} />
-        </SidebarRow>
-        <SidebarRow text="Popout" width="9">
-        <ToggleSwitch
-            {...this.props}
-            checked={popout.enable}
-            onClick={() => this.props.model.popout.with({
-              enable: !this.props.model.popout.enable,
-            })}
-            labelBefore="Enabled" />
-          <TextInput width="100%" label=""
-            editMode={this.props.editMode}
-            value={popout.content}
-            type="text"
-            onEdit={this.onPopoutEdit}/>
-        </SidebarRow>
-        <SidebarRow text="Alternate" width="9">
-          <div className="input-group input-group-sm">
+      <div>
+        <SidebarGroup label="Title">
+          <SidebarRow text="" width="12">
+            <ContentContainer
+              {...this.props}
+              model={titleContent.text}
+              onEdit={this.onTitleEdit} />
+          </SidebarRow>
+        </SidebarGroup>
+        <SidebarGroup label="Popout">
+          {/* <SidebarRow text="Popout" width="9"> */}
+          <ToggleSwitch
+              {...this.props}
+              checked={popout.enable}
+              onClick={this.onPopoutEnableToggle}
+              labelBefore="Enabled" />
             <TextInput width="100%" label=""
               editMode={this.props.editMode}
-              value={height}
-              type="number"
-              onEdit={this.onHeightEdit}/>
-            <span className="input-group-addon ">pixels</span>
-          </div>
-        </SidebarRow>
-        <SidebarRow text="Caption" width="9">
-          <div className="input-group input-group-sm">
-            <TextInput width="100%" label=""
+              value={popout.content}
+              type="text"
+              onEdit={this.onPopoutEdit}/>
+        </SidebarGroup>
+        <SidebarGroup label="Caption">
+          {/* </SidebarRow> */}
+          {/* Leaving alternate out for now */}
+          {/* <SidebarRow text="Alternate" width="9">
+            <ContentContainer
+              {...this.props}
+              model={alternate.content}
+              onEdit={this.onAlternateEdit} />
+          </SidebarRow> */}
+            <ContentContainer
+              {...this.props}
+              model={caption.content}
+              onEdit={this.onCaptionEdit} />
+          </SidebarGroup>
+          <SidebarGroup label="Citation">
+            <TextInput width="100%" label="Title"
               editMode={this.props.editMode}
-              value={width}
-              type="number"
-              onEdit={this.onWidthEdit}/>
-            <span className="input-group-addon" id="basic-addon2">pixels</span>
-          </div>
-        </SidebarRow>
-        <SidebarRow text="Citation" width="9">
-          <div className="input-group input-group-sm">
-            <TextInput width="100%" label=""
+              value={cite.title}
+              type="text"
+              onEdit={this.onCitationTitleEdit}/>
+            <TextInput width="100%" label="Entry"
               editMode={this.props.editMode}
-              value={width}
-              type="number"
-              onEdit={this.onWidthEdit}/>
-            <span className="input-group-addon" id="basic-addon2">pixels</span>
-          </div>
-        </SidebarRow>
-      </SidebarGroup>
+              value={cite.entry}
+              type="text"
+              onEdit={this.onCitationEntryEdit}/>
+            Content
+            <ContentContainer
+              {...this.props}
+              model={cite.content}
+              onEdit={this.onCitationContentEdit} />
+          </SidebarGroup>
+      </div>
     );
   }
 }

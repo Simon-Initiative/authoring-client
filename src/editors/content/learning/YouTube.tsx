@@ -54,14 +54,14 @@ export class YouTube
     this.props.onEdit(model, model);
   }
 
-  onTitleEdit(text: ContentElements) {
+  onTitleEdit(text: ContentElements, src) {
     const titleContent = this.props.model.titleContent.with({ text });
-    this.props.onEdit(this.props.model.with({ titleContent }));
+    this.props.onEdit(this.props.model.with({ titleContent }), src);
   }
 
-  onCaptionEdit(content: ContentElements) {
+  onCaptionEdit(content: ContentElements, src) {
     const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }));
+    this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
   renderSidebar(): JSX.Element {
@@ -97,8 +97,8 @@ export class YouTube
             }} />
 
           <MediaMetadata
+            {...this.props}
             model={this.props.model}
-            editMode={this.props.editMode}
             onEdit={this.props.onEdit} />
 
           {/*
