@@ -8,6 +8,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
+import guid from 'utils/guid';
 
 import './ContentContainer.scss';
 
@@ -22,6 +23,18 @@ export interface ContentContainerState {
 
 }
 
+function indexOf(guid: string, model: ContentElements) : number {
+  let index = -1;
+  const arr = model.content.toArray();
+  for (let i = 0; i < arr.length; i += 1) {
+    if (arr[i].guid === guid) {
+      index = i;
+      break;
+    }
+  }
+  return index;
+}
+
 /**
  * The content container editor.
  */
@@ -31,6 +44,7 @@ export class ContentContainer
 
   textSelections: Immutable.Map<string, any>;
   supportedElements: Immutable.List<string>;
+  placeholder: Immutable.OrderedMap<string, ContentElement>;
 
   constructor(props) {
     super(props);
@@ -39,6 +53,9 @@ export class ContentContainer
 
     this.supportedElements = this.props.model.supportedElements;
     this.textSelections = Immutable.Map<string, any>();
+    const placeholderText = ContiguousText.fromText('', guid());
+    this.placeholder = Immutable.OrderedMap<string, ContentElement>()
+      .set(placeholderText.guid, placeholderText);
   }
 
   onEdit(childModel) {
@@ -50,7 +67,7 @@ export class ContentContainer
       .map((v, k) => [k, v])
       .toArray();
 
-    arr.splice(index, 0, [toInsert.guid, toInsert]);
+    arr.splice(index + 1, 0, [toInsert.guid, toInsert]);
 
     return model.with({ content: Immutable.OrderedMap<string, ContentElement>(arr) });
   }
@@ -58,46 +75,61 @@ export class ContentContainer
   onAddNew(toAdd, textSelection: Maybe<TextSelection>) {
     const { onEdit, model, activeContentGuid } = this.props;
 
-    const selection = textSelection.caseOf({ just: s => s, nothing: () => null });
+    // The following defines the insertion logic
 
     if (model.content.has(activeContentGuid)) {
 
-      let index = -1;
-      const arr = model.content.toArray();
-      for (let i = 0; i < arr.length; i += 1) {
-        if (arr[i].guid === activeContentGuid) {
-          index = i;
-          break;
-        }
-      }
+      const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);
+
       if (active instanceof ContiguousText) {
 
-        const pair = active.split(selection);
-        let updated = model.with({ content: model.content.set(pair[0].guid, pair[0]) });
-        updated = this.insertAfter(updated, toAdd, index + 1);
-        updated = this.insertAfter(updated, pair[1], index + 2);
-        onEdit(updated, toAdd);
+        const selection = textSelection.caseOf({
+          just: s => s,
+          nothing: () => TextSelection.createEmpty(active.content.getFirstBlock().key),
+        });
+
+        // We replace the text when it is effectively empty
+        if (active.isEffectivelyEmpty()) {
+          const updated : ContentElements = this.insertAfter(model, toAdd, index);
+          onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), toAdd);
+
+        // We insert after when the cursor is at the end
+        } else if (active.isCursorAtEffectiveEnd(selection)) {
+          onEdit(this.insertAfter(model, toAdd, index), toAdd);
+
+        // Otherwise we split the contiguous block in two parts and insert in between
+        } else {
+          const pair = active.split(selection);
+          let updated = model.with({ content: model.content.set(pair[0].guid, pair[0]) });
+          updated = this.insertAfter(updated, toAdd, index);
+          updated = this.insertAfter(updated, pair[1], index + 1);
+          onEdit(updated, toAdd);
+        }
 
       } else {
         onEdit(this.insertAfter(model, toAdd, index), toAdd);
       }
 
     } else {
+      // If somehow the active selected item isn't in this ContentElements, we
+      // still want to support addition of the new element.  Just insert it at the end
       onEdit(model.with({ content: model.content.set(toAdd.guid, toAdd) }), toAdd);
     }
 
   }
 
   onChildEdit(childModel, sourceObject) {
+    // When childModel is the placeholder, it will simply be added to the model
     const { onEdit, model } = this.props;
     onEdit(model.with({ content: model.content.set(childModel.guid, childModel) }), sourceObject);
   }
 
   onRemove(childModel) {
     const { onEdit, model } = this.props;
-
-    onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
+    if (model.content.has(childModel.guid)) {
+      onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
+    }
   }
 
   renderSidebar() {
@@ -111,7 +143,13 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, hover, onUpdateHover } = this.props;
 
-    const editors = this.props.model.content
+    // We want this component to display a ContiguousTextEditor in the
+    // case where there is no content at all in the model
+    const contentOrPlaceholder = this.props.model.content.size === 0
+      ? this.placeholder
+      : this.props.model.content;
+
+    const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
         const props = {

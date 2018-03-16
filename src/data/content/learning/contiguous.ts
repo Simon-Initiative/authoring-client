@@ -267,6 +267,24 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       })];
   }
 
+  // Returns true if the contiguous text contains one block and
+  // the text in that block is empty or contains all spaces
+  isEffectivelyEmpty() : boolean {
+    return this.content.getBlockMap().size === 1
+      && this.content.getFirstBlock().text.trim() === '';
+  }
+
+  // Returns true if the selection is collapsed and the cursor is
+  // positioned in the last block and no text other than spaces
+  // follows the cursor
+  isCursorAtEffectiveEnd(textSelection: TextSelection) : boolean {
+    const last = this.content.getLastBlock();
+    return textSelection.isCollapsed()
+      && last.key === textSelection.getAnchorKey()
+      && (last.text.length <= textSelection.getAnchorOffset()
+      || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
+  }
+
   tagInputRefsWithType(byId: Object) {
 
     const content = getEntities(EntityTypes.input_ref, this.content)
