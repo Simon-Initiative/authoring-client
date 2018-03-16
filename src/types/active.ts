@@ -59,6 +59,7 @@ export interface ParentContainer {
   supportedElements: Immutable.List<string>;
   onAddNew: (content: Object, textSelection: Maybe<TextSelection>) => void;
   onEdit: (content: Object, source: Object) => void;
+  onRemove: (content: Object) => void;
 }
 
 export type ActiveContextParams = {

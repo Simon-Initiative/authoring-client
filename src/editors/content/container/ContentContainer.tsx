@@ -96,6 +96,7 @@ export class ContentContainer
 
   onRemove(childModel) {
     const { onEdit, model } = this.props;
+
     onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
   }
 

@@ -267,6 +267,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     );
   }
 
+  onRemove() {
+    // this method is never used, but is required by ParentContainer
+    // do nothing
+  }
+
   onRemovePage(page: contentTypes.Page) {
     if (this.props.model.pages.size > 1) {
 
