@@ -40,13 +40,69 @@ function selectImage(resourcePath, courseModel, display, dismiss) : Promise<cont
         <MediaManager model={new contentTypes.Image()}
           resourcePath={resourcePath}
           courseModel={courseModel}
-          onEdit={() => {}} mimeFilter={MIMETYPE_FILTERS.IMAGE}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.IMAGE}
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[]}
           onSelectionChange={(img) => {
             selected.img =
-            new contentTypes.Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
+              new contentTypes.Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
+          }} />
+      </ModalSelection>;
 
+    display(mediaLibrary);
+  });
+}
+
+function selectAudio(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Audio> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { audio: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select an Audio File"
+        onInsert={() => { dismiss(); resolve(selected.audio); }}
+        onCancel={() => dismiss()}
+      >
+        <MediaManager model={new contentTypes.Audio()}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.AUDIO}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[]}
+          onSelectionChange={(audio) => {
+            selected.audio =
+              new contentTypes.Audio().with({ src: adjustPath(audio[0].pathTo, resourcePath) });
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+}
+
+function selectVideo(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Video> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { video: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select a Video File"
+        onInsert={() => { dismiss(); resolve(selected.video); }}
+        onCancel={() => dismiss()}
+      >
+        <MediaManager model={new contentTypes.Video()}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.VIDEO}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[]}
+          onSelectionChange={(video) => {
+            selected.video =
+              new contentTypes.Video().with({ src: adjustPath(video[0].pathTo, resourcePath) });
           }} />
       </ModalSelection>;
 
@@ -126,15 +182,29 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-image'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              selectAudio(resourcePath, courseModel, onDisplayModal, onDismissModal)
+                .then((audio) => {
+                  if (audio !== null) {
+                    onInsert(audio);
+                  }
+                });
+            }}
             tooltip="Insert Audio Clip"
-            disabled>
+            disabled={!parentSupportsElementType('audio')}>
           <i className={'fa fa-volume-up'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              selectVideo(resourcePath, courseModel, onDisplayModal, onDismissModal)
+                .then((video) => {
+                  if (video !== null) {
+                    onInsert(video);
+                  }
+                });
+            }}
             tooltip="Insert Video Clip"
-            disabled>
+            disabled={!parentSupportsElementType('audio')}>
           <i className={'fa fa-film'}/>
         </ToolbarButton>
         <ToolbarButton

@@ -27,7 +27,6 @@ import styles from './MediaElement.style';
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
   onShowSidebar: () => void;
-  img: any;
 }
 
 interface Sizing {
@@ -76,8 +75,6 @@ function selectImage(model, resourcePath, courseModel, display, dismiss) : Promi
 @injectSheet(styles)
 export class ImageEditor
   extends AbstractContentEditor<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
-
-  img: any;
 
   constructor(props) {
     super(props);
