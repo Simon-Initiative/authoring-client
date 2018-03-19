@@ -32,12 +32,18 @@ export interface ContiguousTextEditorState {
 export default class ContiguousTextEditor
     extends AbstractContentEditor<contentTypes.ContiguousText,
     StyledComponentProps<ContiguousTextEditorProps>, ContiguousTextEditorState> {
+
   selectionState: any;
 
   constructor(props) {
     super(props);
 
     this.draftDrivenFocus = this.draftDrivenFocus.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps: StyledComponentProps<ContiguousTextEditorProps>) {
+
+    return nextProps.model !== this.props.model;
   }
 
   renderActiveEntity(entity) {
@@ -95,7 +101,6 @@ export default class ContiguousTextEditor
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}
-            undoRedoGuid={this.props.context.undoRedoGuid}
             locked={!editMode || viewOnly}
             onEdit={c => this.props.onEdit(c, c)} />
 

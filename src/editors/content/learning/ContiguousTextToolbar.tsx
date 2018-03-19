@@ -66,7 +66,8 @@ export default class ContiguousTextToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        this.props.onEdit(this.props.model.updateEntity(key, updated));
+        const updatedModel = this.props.model.updateEntity(key, updated);
+        this.props.onEdit(updatedModel, updated);
       },
     };
 
