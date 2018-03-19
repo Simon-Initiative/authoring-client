@@ -3,7 +3,6 @@ import { Image } from '../../../data/content/learning/image';
 import { ContentElements } from 'data/content/common/elements';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
-import { injectSheet } from 'styles/jss';
 import { Select } from '../common/Select';
 import { StyledComponentProps } from 'types/component';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
@@ -21,7 +20,7 @@ import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
 import { MediaMetadata } from 'editors/content/learning/MediaItems';
 
-import styles from './MediaElement.style';
+// import styles from './MediaElement.style';
 
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
@@ -71,7 +70,6 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss) 
 /**
  * The content editor for Table.
  */
-@injectSheet(styles)
 export class ImageEditor
   extends AbstractContentEditor<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
 

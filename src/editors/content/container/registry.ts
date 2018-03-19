@@ -16,7 +16,8 @@ import { MathEditor } from '../learning/MathEditor';
 import { CiteEditor } from '../learning/CiteEditor';
 import { XrefEditor } from '../learning/XrefEditor';
 import { ImageEditor } from '../media/ImageEditor';
-import { AudioEditor } from '../learning/AudioEditor';
+import { AudioEditor } from '../media/AudioEditor';
+import { VideoEditor } from '../media/VideoEditor';
 
 let registry = null;
 
@@ -48,4 +49,5 @@ function init() {
   registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTube);
   registry['Audio'] = connectSidebarActions()(AudioEditor);
+  registry['Video'] = connectSidebarActions()(VideoEditor);
 }

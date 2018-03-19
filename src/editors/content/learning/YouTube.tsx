@@ -45,7 +45,7 @@ export class YouTube
   }
 
   renderSidebar(): JSX.Element {
-    const { src, height, width } = this.props.model;
+    const { src } = this.props.model;
 
     return (
       <SidebarContent title="YouTube">

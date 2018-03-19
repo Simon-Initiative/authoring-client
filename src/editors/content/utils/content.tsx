@@ -18,6 +18,7 @@ export const CONTENT_COLORS = {
   WbInline: flatui.amethyst,
   YouTube: colors.youtubeRed,
   Audio: flatui.pumpkin,
+  Video: flatui.midnightBlue,
 };
 
 export const CONTENT_ICONS = {
@@ -31,6 +32,7 @@ export const CONTENT_ICONS = {
   Audio: <i className={'fa fa-volume-up'}/>,
   WbInline: <i className={'fa fa-flask'}/>,
   Activity: <i className={'fa fa-check'}/>,
+  Video: <i className={'fa fa-film'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

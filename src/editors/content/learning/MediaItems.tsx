@@ -7,7 +7,6 @@ import { Cite } from 'data/content/learning/cite';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { TextInput } from '../common/TextInput';
 import { MediaItem } from 'data/contentTypes';
-import { YouTube } from '../../../data/content/learning/youtube';
 import { ImageParams } from 'data/content/learning/image';
 import { AudioParams } from 'data/content/learning/audio';
 import { VideoParams } from 'data/content/learning/video';
@@ -154,7 +153,7 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
   }
 
   render() {
-    const { popout, alternate, titleContent, caption, cite } = this.props.model;
+    const { popout, titleContent, caption, cite } = this.props.model;
 
     return (
       <div>

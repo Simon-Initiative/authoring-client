@@ -126,7 +126,7 @@ export class VideoEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Audio">
+      <SidebarContent title="Video">
         <SidebarGroup label="">
           <SidebarRow text="" width="12">
             <ToggleSwitch
@@ -181,7 +181,7 @@ export class VideoEditor
   renderMain() : JSX.Element {
 
     const { sources, controls } = this.props.model;
-
+    console.log('sources', sources);
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;
