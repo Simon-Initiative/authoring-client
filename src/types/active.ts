@@ -60,6 +60,7 @@ export interface ParentContainer {
   onAddNew: (content: Object, textSelection: Maybe<TextSelection>) => void;
   onEdit: (content: Object, source: Object) => void;
   onRemove: (content: Object) => void;
+  onDuplicate: (content: Object) => void;
 }
 
 export type ActiveContextParams = {
