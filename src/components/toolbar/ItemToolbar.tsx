@@ -7,7 +7,6 @@ import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
 import { ParentContainer } from 'types/active';
-import { WbInline } from 'data/content/workbook/wbinline.ts';
 
 import styles from './ItemToolbar.style';
 
