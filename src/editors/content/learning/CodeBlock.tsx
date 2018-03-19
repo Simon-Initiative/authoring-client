@@ -177,6 +177,7 @@ export class CodeBlock
       <div>
         <AceEditor
           name={this.uniqueName}
+          width="initial"
           mode={syntaxToMode(syntax)}
           theme="github"
           readOnly={!editMode}

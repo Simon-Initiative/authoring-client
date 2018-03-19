@@ -68,7 +68,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
         mode="xml"
         theme="github"
         readOnly={!editMode}
-        width="100%"
+        width="initial"
         height="350px"
         value={this.state.beautified}
         onChange={this.onChange}
