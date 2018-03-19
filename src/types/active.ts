@@ -61,6 +61,8 @@ export interface ParentContainer {
   onEdit: (content: Object, source: Object) => void;
   onRemove: (content: Object) => void;
   onDuplicate: (content: Object) => void;
+  onMoveUp: (content: Object) => void;
+  onMoveDown: (content: Object) => void;
 }
 
 export type ActiveContextParams = {

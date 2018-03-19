@@ -43,7 +43,6 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
       nothing: () => false,
     });
 
-    const canRemove = true;
     const canMoveUp = true;
     const canMoveDown = true;
 
@@ -65,20 +64,20 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
               }}
               tooltip="Remove Item"
               size={ToolbarButtonSize.Wide}
-              disabled={!(hasSelection && canRemove)}>
+              disabled={!(hasSelection)}>
               <i className="fa fa-close"/> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>
           <ToolbarLayout.Column>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={() => container.onMoveUp(item)}
                 tooltip="Move Item Up"
                 size={ToolbarButtonSize.Small}
                 disabled={!(hasSelection && canMoveUp)}>
                 <i className="fa fa-long-arrow-up"/>
             </ToolbarButton>
             <ToolbarButton
-                onClick={() => console.log('NOT IMPLEMENTED')}
+                onClick={() => container.onMoveDown(item)}
                 tooltip="Move Item Down"
                 size={ToolbarButtonSize.Small}
                 disabled={!(hasSelection && canMoveDown)}>

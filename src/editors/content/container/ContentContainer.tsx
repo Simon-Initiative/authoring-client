@@ -7,7 +7,7 @@ import { ContentDecorator } from './ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
-import { TextSelection } from 'types/active';
+import { ParentContainer, TextSelection } from 'types/active';
 import guid from 'utils/guid';
 
 import './ContentContainer.scss';
@@ -64,14 +64,18 @@ export class ContentContainer
     this.onChildEdit(childModel, childModel);
   }
 
-  insertAfter(model, toInsert, index) {
+  insertAt(model, toInsert, index) {
     const arr = model.content
       .map((v, k) => [k, v])
       .toArray();
 
-    arr.splice(index + 1, 0, [toInsert.guid, toInsert]);
+    arr.splice(index, 0, [toInsert.guid, toInsert]);
 
     return model.with({ content: Immutable.OrderedMap<string, ContentElement>(arr) });
+  }
+
+  insertAfter(model, toInsert, index) {
+    return this.insertAt(model, toInsert, index + 1);
   }
 
   onAddNew(toAdd, textSelection: Maybe<TextSelection>) {
@@ -152,6 +156,36 @@ export class ContentContainer
     }
   }
 
+  onMoveUp(childModel) {
+    const { onEdit, model, activeContentGuid } = this.props;
+
+    if (model.content.has(childModel.guid)) {
+      const index = indexOf(activeContentGuid, model);
+      const active = model.content.get(activeContentGuid);
+
+      const newModel = model.with({
+        content: model.content.delete(childModel.guid)});
+
+      onEdit(this.insertAt(newModel, childModel, (Math.max(index - 1, 0))), childModel);
+    }
+  }
+
+  onMoveDown(childModel) {
+    const { onEdit, model, activeContentGuid } = this.props;
+
+    if (model.content.has(childModel.guid)) {
+      const index = indexOf(activeContentGuid, model);
+      const active = model.content.get(activeContentGuid);
+
+      const newModel = model.with({
+        content: model.content.delete(childModel.guid)});
+
+      onEdit(
+        this.insertAt(
+          newModel, childModel, (Math.min(index + 1, newModel.content.size))),
+        childModel);
+    }
+  }
 
   onSelect(model) {
     const { onFocus } = this.props;
@@ -164,7 +198,6 @@ export class ContentContainer
 
     return onFocus(model, this, Maybe.nothing());
   }
-
 
   renderSidebar() {
     return null;
