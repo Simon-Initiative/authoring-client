@@ -1,26 +1,32 @@
 import * as React from 'react';
 import { Math } from './Math';
+import beautifyXml from 'xml-beautifier';
 import guid from '../../utils/guid';
+
+import * as brace from 'brace';
+import AceEditor from 'react-ace';
+
+import 'brace/mode/xml';
+import 'brace/theme/github';
 
 import './MathEditor.scss';
 
 type GeneratedIds = {
   mathEditor: string,
-  preview: string,
 };
 
 export interface MathEditor {
   ids: GeneratedIds;
-  _onChange: any;
 }
 
 export interface MathEditorProps {
   content: string;
   onChange: (content: string) => void;
+  editMode: boolean;
 }
 
 export interface MathEditorState {
-  content: string;
+  beautified: string;
 }
 
 export class MathEditor extends React.Component<MathEditorProps, MathEditorState> {
@@ -29,34 +35,51 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
     super(props);
     this.ids = {
       mathEditor: guid(),
-      preview: guid(),
     };
+
+    this.onChange = this.onChange.bind(this);
 
     this.state = {
-      content: this.props.content,
+      beautified: props.content.indexOf('\n') === -1
+        ? beautifyXml(props.content)
+        : props.content,
     };
-
-    this._onChange = this.onChange.bind(this);
   }
 
-  onChange(e) {
-    const content = e.target.value;
-    this.setState({ content }, () => this.props.onChange(content));
+  onChange(content) {
+    console.log(content);
+    this.props.onChange(content);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.content !== nextProps.content) {
+      this.setState({
+        beautified: nextProps.content.indexOf('\n') === -1
+        ? beautifyXml(nextProps.content)
+        : nextProps.content,
+      });
+    }
   }
 
   render() {
-    return (
-      <form className="math-editor">
-        <div className="form-group">
-          <textarea onChange={this._onChange} className="form-control"
-            id={this.ids.mathEditor} rows={10} value={this.state.content}></textarea>
-        </div>
-        <div className="form-group mathPreview">
-          <label className="labelPreview" htmlFor={this.ids.preview}>Preview</label>
-          <Math inline>{this.state.content}</Math>
-        </div>
 
-      </form>
+    const { content, editMode } = this.props;
+
+    return (
+      <AceEditor
+        name={this.ids.mathEditor}
+        mode="xml"
+        theme="github"
+        readOnly={!editMode}
+        width="100%"
+        height="350px"
+        value={this.state.beautified}
+        onChange={this.onChange}
+        setOptions={{
+          showLineNumbers: false,
+          tabSize: 2,
+        }}
+      />
     );
   }
 }

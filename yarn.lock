@@ -6885,6 +6885,12 @@ xdg-basedir@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xdg-basedir/-/xdg-basedir-3.0.0.tgz#496b2cc109eca8dbacfe2dc72b603c17c5870ad4"
 
+xml-beautifier@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/xml-beautifier/-/xml-beautifier-0.3.0.tgz#18325cd567e4662f38b1ba0eaeb55fda4cb91203"
+  dependencies:
+    repeat-string "^1.5.2"
+
 xml-char-classes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/xml-char-classes/-/xml-char-classes-1.0.0.tgz#64657848a20ffc5df583a42ad8a277b4512bbc4d"
