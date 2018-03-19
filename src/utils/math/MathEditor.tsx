@@ -45,7 +45,6 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
   }
 
   onChange(content) {
-    console.log(content);
     this.props.onChange(content);
   }
 

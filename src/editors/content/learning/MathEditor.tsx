@@ -44,8 +44,6 @@ export class MathEditor
           content={model.data}
           editMode={editMode}
           onChange={(data) => {
-            console.log('Math Editor');
-            console.log(data);
             onEdit(model.with({ data }));
           }}
           />
