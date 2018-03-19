@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { Math } from './Math';
 import beautifyXml from 'xml-beautifier';
 import guid from '../../utils/guid';
 
-import * as brace from 'brace';
 import AceEditor from 'react-ace';
 
 import 'brace/mode/xml';
@@ -63,7 +61,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
 
   render() {
 
-    const { content, editMode } = this.props;
+    const { editMode } = this.props;
 
     return (
       <AceEditor

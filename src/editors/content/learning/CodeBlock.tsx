@@ -9,7 +9,6 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import guid from 'utils/guid';
 
-import * as brace from 'brace';
 import AceEditor from 'react-ace';
 
 import 'brace/mode/java';
