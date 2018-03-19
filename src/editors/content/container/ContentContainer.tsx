@@ -58,6 +58,13 @@ export class ContentContainer
       .set(placeholderText.guid, placeholderText);
   }
 
+  shouldComponentUpdate(nextProps: ContentContainerProps) {
+    return this.props.model !== nextProps.model
+      || this.props.context !== nextProps.context
+      || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.hover !== nextProps.hover;
+  }
+
   onEdit(childModel) {
     this.onChildEdit(childModel, childModel);
   }
