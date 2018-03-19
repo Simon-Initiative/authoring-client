@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { CodeBlock as CodeBlockType } from 'data/content/learning/codeblock';
-import PreformattedText from './PreformattedText';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
@@ -8,6 +7,21 @@ import { Checkbox, Select, TextInput } from '../common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import guid from 'utils/guid';
+
+import * as brace from 'brace';
+import AceEditor from 'react-ace';
+
+import 'brace/mode/java';
+import 'brace/mode/python';
+import 'brace/mode/html';
+import 'brace/mode/xml';
+import 'brace/mode/actionscript';
+import 'brace/mode/sh';
+import 'brace/mode/c_cpp';
+import 'brace/mode/text';
+
+import 'brace/theme/github';
 
 import './markers.scss';
 
@@ -28,6 +42,7 @@ export class CodeBlock
   extends AbstractContentEditor<CodeBlockType,
   CodeBlockProps, CodeBlockState> {
 
+  uniqueName: string;
 
   constructor(props) {
     super(props);
@@ -37,9 +52,11 @@ export class CodeBlock
     this.onNumberEdit = this.onNumberEdit.bind(this);
     this.onStartEdit = this.onStartEdit.bind(this);
     this.onHighlightEdit = this.onHighlightEdit.bind(this);
+
+    this.uniqueName = guid();
   }
 
-  onSourceEdit(source) {
+  onSourceEdit(source, e) {
     const model = this.props.model.with({ source });
     this.props.onEdit(model, model);
   }
@@ -136,9 +153,48 @@ export class CodeBlock
   }
 
   renderMain() : JSX.Element {
+
+    const { source, syntax, number, start } = this.props.model;
+    const { editMode } = this.props;
+
+    const firstLineNumber = start === '' ? 1 : parseInt(start, 10);
+
+    const syntaxToMode = (syntax) => {
+      switch (syntax) {
+        case 'actionscript3':
+          return 'actionscript';
+        case 'bash':
+          return 'sh';
+        case 'c':
+        case 'cpp':
+          return 'c_cpp';
+        default: // xml, html, java, python, text
+          // The mode matches the syntax
+          return syntax;
+      }
+    };
+
     return (
-      <PreformattedText onEdit={this.onSourceEdit}
-        src={this.props.model.source} editMode={this.props.editMode} />
+      <div>
+        <AceEditor
+          name={this.uniqueName}
+          mode={syntaxToMode(syntax)}
+          theme="github"
+          readOnly={!editMode}
+          minLines={2}
+          maxLines={40}
+          value={source}
+          onChange={this.onSourceEdit}
+          setOptions={{
+            enableBasicAutocompletion: false,
+            enableLiveAutocompletion: false,
+            enableSnippets: false,
+            showLineNumbers: number,
+            tabSize: 2,
+            firstLineNumber,
+          }}
+        />
+      </div>
     );
   }
 }
