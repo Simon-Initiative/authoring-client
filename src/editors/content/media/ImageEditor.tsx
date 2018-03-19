@@ -357,7 +357,7 @@ export class ImageEditor
 
     return (
       <div className={classes.mediaElement}>
-        <img ref={input => this.img = input} src={fullSrc} height={height} width={width}/>
+        <img src={fullSrc} height={height} width={width}/>
       </div>
     );
   }

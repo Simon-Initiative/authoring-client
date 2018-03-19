@@ -17,6 +17,7 @@ export const CONTENT_COLORS = {
   Activity: distinct.distinctGreen,
   WbInline: flatui.amethyst,
   YouTube: colors.youtubeRed,
+  Audio: flatui.pumpkin,
 };
 
 export const CONTENT_ICONS = {
@@ -27,6 +28,7 @@ export const CONTENT_ICONS = {
   Section: <i className={'fa fa-list-alt'}/>,
   YouTube: <i className={'fa fa-youtube'}/>,
   Image: <i className={'fa fa-image'}/>,
+  Audio: <i className={'fa fa-volume-up'}/>,
   WbInline: <i className={'fa fa-flask'}/>,
   Activity: <i className={'fa fa-check'}/>,
 };

@@ -63,22 +63,24 @@ export class Tracks
       <div>
         <button onClick={this.onAddClick} type="button"
           className="btn btn-link btn-sm">Add Track</button>
-        <table className="table table-sm">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Source</th>
-              <th>Kind</th>
-              <th>Label</th>
-              <th>Language</th>
-              <th>Default</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.renderRows()}
-          </tbody>
-        </table>
+        {this.props.model.size > 0
+          ? <table className="table table-sm">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Source</th>
+                  <th>Kind</th>
+                  <th>Label</th>
+                  <th>Language</th>
+                  <th>Default</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.renderRows()}
+              </tbody>
+            </table>
+          : null}
       </div>
     );
   }

@@ -196,10 +196,10 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              selectVideo(resourcePath, courseModel, onDisplayModal, onDismissModal)
-                .then((video) => {
-                  if (video !== null) {
-                    onInsert(video);
+              selectAudio(resourcePath, courseModel, onDisplayModal, onDismissModal)
+                .then((audio) => {
+                  if (audio !== null) {
+                    onInsert(audio);
                   }
                 });
             }}
