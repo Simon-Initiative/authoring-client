@@ -13,7 +13,6 @@ import { TextSelection } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 
 import styles from './ContiguousTextEditor.styles';
-import { ContiguousText } from 'data/content/learning/contiguous';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {

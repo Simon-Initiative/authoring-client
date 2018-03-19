@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 
 import {
-  CharacterMetadata, ContentBlock, ContentState, Editor,
+  ContentState, Editor,
   EditorState, Modifier, SelectionState,
 } from 'draft-js';
 
@@ -13,10 +13,8 @@ import {
 } from './utils';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
-import * as common from 'data/content/learning/common';
 import { ContiguousText } from 'data/content/learning//contiguous';
 import { buildCompositeDecorator } from './decorators/composite';
-import { insertBlocksAfter } from './commands/common';
 
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
@@ -328,8 +326,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   render() {
-
-    console.log('rendered draftwrapper');
 
     const editorStyle : any = this.props.editorStyles !== undefined
       ? Object.assign({}, this.props.editorStyles)
