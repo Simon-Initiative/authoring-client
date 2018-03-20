@@ -16,6 +16,8 @@ import { MathEditor } from '../learning/MathEditor';
 import { CiteEditor } from '../learning/CiteEditor';
 import { XrefEditor } from '../learning/XrefEditor';
 import { ImageEditor } from '../media/ImageEditor';
+import OrderedList from '../learning/OrderedList';
+import ListItem from '../learning/ListItem';
 
 let registry = null;
 
@@ -46,4 +48,9 @@ function init() {
   registry['WbInline'] = connectSidebarActions()(WbInline);
   registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTube);
+  registry['Ol'] = connectSidebarActions()(OrderedList);
+  registry['Li'] = connectSidebarActions()(ListItem);
+
+
+
 }

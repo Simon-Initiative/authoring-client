@@ -17,6 +17,10 @@ export const CONTENT_COLORS = {
   Activity: distinct.distinctGreen,
   WbInline: flatui.amethyst,
   YouTube: colors.youtubeRed,
+  Ul: distinct.distinctOlive,
+  Ol: distinct.distinctOlive,
+  Li: distinct.distinctMint,
+
 };
 
 export const CONTENT_ICONS = {
@@ -29,6 +33,9 @@ export const CONTENT_ICONS = {
   Image: <i className={'fa fa-image'}/>,
   WbInline: <i className={'fa fa-flask'}/>,
   Activity: <i className={'fa fa-check'}/>,
+  Ul: <i className={'fa fa-list-ul'}/>,
+  Ol: <i className={'fa fa-list-ol'}/>,
+  Li: <i className={'fa fa-list'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
