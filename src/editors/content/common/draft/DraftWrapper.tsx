@@ -3,10 +3,9 @@ import * as Immutable from 'immutable';
 
 
 import {
-  CharacterMetadata, ContentBlock, ContentState, Editor,
+  ContentState, Editor,
   EditorState, Modifier, SelectionState,
 } from 'draft-js';
-import { Command, CommandProcessor } from '../command';
 
 import {
     cloneDuplicatedEntities, determineChangeType,
@@ -14,10 +13,8 @@ import {
 } from './utils';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
-import * as common from 'data/content/learning/common';
 import { ContiguousText } from 'data/content/learning//contiguous';
 import { buildCompositeDecorator } from './decorators/composite';
-import { insertBlocksAfter } from './commands/common';
 
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
@@ -27,7 +24,6 @@ export interface DraftWrapperProps {
   onEdit: (text : ContiguousText) => void;
   onSelectionChange: (state: SelectionState) => void;
   content: ContiguousText;
-  undoRedoGuid: string;
   locked: boolean;
   context: AppContext;
   services: AppServices;
@@ -167,8 +163,7 @@ function deDupeIds(stateAndSeen: StateAndSeen, block) {
 }
 
 
-class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
-  implements CommandProcessor<EditorState> {
+class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState> {
 
   onChange: any;
   focus: () => any;
@@ -249,20 +244,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
   }
 
-  forceContentChangeWithSelection(contentState, changeType, selection) {
-    this.lastContent = contentState;
-
-    const es = EditorState.push(this.state.editorState, contentState, changeType);
-    const editorState = EditorState.forceSelection(
-      EditorState.set(es, { allowUndo: false }), selection);
-
-    this.setState({ editorState }, () => {
-
-      this.props.onEdit(new ContiguousText({ content: contentState }));
-      this.forceRender();
-    });
-  }
-
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
 
@@ -272,37 +253,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       this.forceRender();
     });
   }
-
-  insertEmptyBlockAfter(key) {
-
-    const emptyCharList = Immutable.List().push(new CharacterMetadata());
-
-    const blocks = [
-      new ContentBlock({
-        type: 'unstyled',
-        text: ' ',
-        key: common.generateRandomKey(),
-        characterList: emptyCharList,
-      }),
-    ];
-
-    const contentState = insertBlocksAfter(
-      this.state.editorState.getCurrentContent(),
-      key, blocks);
-
-    const newKey = blocks[0].key;
-
-    const selection = new SelectionState({
-      anchorKey: newKey,
-      focusKey: newKey,
-      anchorOffset: 0,
-      focusOffset: 0,
-    });
-
-    this.forceContentChangeWithSelection(
-      contentState, 'insert-fragment', selection);
-  }
-
 
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
@@ -314,8 +264,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
       const current = this.state.editorState.getCurrentContent();
 
-      if (nextProps.content.content !== current
-        || nextProps.undoRedoGuid !== this.props.undoRedoGuid) {
+      if (nextProps.content.content !== current) {
 
         this.lastContent = nextProps.content.content;
         const newEditorState = EditorState.push(
@@ -326,16 +275,16 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         });
       }
 
+    } else if (this.props.content.entityEditCount !== nextProps.content.entityEditCount) {
+
+      this.lastContent = nextProps.content.content;
+
+      const es = EditorState.createWithContent(
+        nextProps.content.content,
+        this.getCompositeDecorator());
+      const newEditorState = EditorState.set(es, { allowUndo: false });
+      this.setState({ editorState: newEditorState });
     }
-  }
-
-  process(command: Command<EditorState>) {
-    command.execute(this.state.editorState, this.props.context, this.props.services)
-      .then(newState => this.onChange(newState));
-  }
-
-  checkPrecondition(command: Command<EditorState>) {
-    return command.precondition(this.state.editorState, this.props.context);
   }
 
   getCompositeDecorator() {
@@ -357,20 +306,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const es = EditorState.createWithContent(content, this.getCompositeDecorator());
     const newEditorState = EditorState.set(es, { allowUndo: false });
     this.setState({ editorState: newEditorState });
-  }
-
-  isAtEmptyBlock() : boolean {
-    const ss = this.state.editorState.getSelection();
-
-    if (ss.getAnchorKey() === ss.getFocusKey()) {
-      if (ss.getAnchorOffset() === 0 && ss.getFocusOffset() === 0) {
-
-        const block = this.state.editorState.getCurrentContent().getBlockForKey(ss.getAnchorKey());
-        return block.type === 'unstyled' && block.text === '';
-      }
-    }
-
-    return false;
   }
 
   handlePastedText(text, html) {
