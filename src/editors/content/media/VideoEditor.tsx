@@ -45,9 +45,11 @@ export function selectVideo(
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.sources.first().src : model]}
           onSelectionChange={(video) => {
-            selected.video = new Video().with({
+            const source = new Source({
               src: adjustPath(video[0].pathTo, resourcePath),
             });
+            const sources = OrderedMap<string, Source>().set(source.guid, source);
+            selected.video = new Video().with({ sources });
           }} />
       </ModalSelection>;
 
@@ -63,8 +65,6 @@ export class VideoEditor
 
     this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onSourcesEdit = this.onSourcesEdit.bind(this);
-    this.onTracksEdit = this.onTracksEdit.bind(this);
   }
 
   onTypeEdit(type: string) {
@@ -76,55 +76,6 @@ export class VideoEditor
     const controls = !this.props.model.controls;
     const model = this.props.model.with({ controls });
     this.props.onEdit(model, model);
-  }
-
-  onSourcesEdit(sources, src) {
-    const model = this.props.model.with({ sources });
-    this.props.onEdit(model, src);
-  }
-
-  onTracksEdit(tracks, src) {
-    const model = this.props.model.with({ tracks });
-    this.props.onEdit(model, src);
-  }
-
-  renderTracks() {
-
-    const { tracks } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '5px' } }>
-        <Tracks
-          {...this.props}
-          mediaType="video"
-          accept="video/*"
-          model={tracks}
-          onEdit={this.onTracksEdit}
-        />
-      </div>
-    );
-  }
-
-  onSelect() {
-    const { context, services, onEdit, model } = this.props;
-
-    const dispatch = (services as any).dispatch;
-    const dismiss = () => dispatch(modalActions.dismiss());
-    const display = c => dispatch(modalActions.display(c));
-
-    selectVideo(model, context.resourcePath, context.courseModel, display, dismiss)
-      .then((video) => {
-        if (video !== null) {
-          const source = new Source({
-            src: adjustPath(video.src, this.props.context.resourcePath),
-          });
-          console.log('source', source);
-          const model = this.props.model.with({ sources:
-            OrderedMap<string, Source>().set(source.guid, source),
-          });
-          onEdit(model, model);
-        }
-      });
   }
 
   renderSidebar() {
@@ -165,13 +116,6 @@ export class VideoEditor
     return (
       <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video}>
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-film"/></div>
-            <div>Change Video</div>
-          </ToolbarButton>
-        </ToolbarLayout.Column>
-
-        <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>
             <div>Details</div>
@@ -183,8 +127,8 @@ export class VideoEditor
 
   renderMain() : JSX.Element {
 
-    const { sources, controls } = this.props.model;
-    // console.log('sources', sources);
+    const { sources, controls, width, height } = this.props.model;
+
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;
@@ -197,113 +141,8 @@ export class VideoEditor
 
     return (
       <div className="videoEditor">
-        <video src={fullSrc} controls={controls}/>
-        {this.renderTracks()}
+        <video width={width} height={height} src={fullSrc} controls={controls}/>
       </div>
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-// import * as React from 'react';
-// import { Video as Video } from 'data/content/learning/video';
-// import {
-//   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
-// } from './InteractiveRenderer';
-// import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
-// import { VideoEditor } from 'editors/content/media/VideoEditor';
-// import { buildUrl } from 'utils/path';
-// import AutoHideEditRemove from './AutoHideEditRemove';
-
-// import './markers.scss';
-
-// type Data = {
-//   video: Video;
-// };
-
-// export interface VideoProps extends InteractiveRendererProps {
-//   data: Data;
-// }
-
-// export interface VideoState extends InteractiveRendererState {
-
-// }
-
-// export interface VideoProps {
-
-// }
-
-
-// class Video extends InteractiveRenderer<VideoProps, VideoState> {
-
-//   constructor(props) {
-//     super(props, {});
-
-//     this.onClick = this.onClick.bind(this);
-//     this.onRemove = this.onRemove.bind(this);
-//   }
-
-//   onClick() {
-//     const b = this.props.blockProps;
-//     this.props.blockProps.services.displayModal(
-//       <ModalMediaEditor
-//         editMode={true}
-//         context={b.context}
-//         services={b.services}
-
-//         model={this.props.data.video}
-//         onCancel={() => this.props.blockProps.services.dismissModal()}
-//         onInsert={(video) => {
-//           this.props.blockProps.services.dismissModal();
-//           this.props.blockProps.onEdit({ video });
-//         }
-//       }>
-//         <VideoEditor
-//           onFocus={null}
-//           model={this.props.data.video}
-//           context={b.context}
-//           services={b.services}
-//           editMode={true}
-//           onEdit={c => true}/>
-//       </ModalMediaEditor>,
-//     );
-//   }
-
-//   onRemove() {
-//     this.props.blockProps.onRemove();
-//   }
-
-//   render() : JSX.Element {
-
-//     const { sources, controls } = this.props.data.video;
-
-//     let fullSrc = '';
-//     if (sources.size > 0) {
-//       const src = sources.first().src;
-//       fullSrc = buildUrl(
-//       this.props.blockProps.context.baseUrl,
-//       this.props.blockProps.context.courseId,
-//       this.props.blockProps.context.resourcePath,
-//       src);
-//     }
-
-//     return (
-//       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
-//         <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
-//           editMode={this.props.blockProps.editMode} >
-//           <video src={fullSrc} controls={controls}/>
-//         </AutoHideEditRemove>
-//       </div>);
-//   }
-// }
-
-// export default Video;

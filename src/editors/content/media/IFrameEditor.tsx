@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { ContentElements } from 'data/content/common/elements';
 import { IFrame } from '../../../data/content/learning/iframe';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
-import { ContentContainer } from '../container/ContentContainer';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -12,7 +10,6 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { buildUrl } from 'utils/path';
 
-import { TabContainer } from '../common/TabContainer';
 
 export interface IFrameEditorProps extends AbstractContentEditorProps<IFrame> {
   onShowSidebar: () => void;

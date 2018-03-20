@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Audio } from 'data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Tracks } from 'editors/content/media/Tracks';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';
@@ -15,7 +14,6 @@ import { modalActions } from 'actions/modal';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { buildUrl } from 'utils/path';
-import { Track } from 'data/content/learning/track';
 import { MediaMetadata } from 'editors/content/learning/MediaItems';
 import { Source } from 'data/content/learning/source';
 
