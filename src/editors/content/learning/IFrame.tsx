@@ -52,6 +52,7 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
         }
       }>
         <IFrameEditor
+          onShowSidebar={() => {}}
           onFocus={null}
           model={this.props.data.iframe}
           context={b.context}

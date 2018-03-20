@@ -129,9 +129,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-youtube'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.IFrame())}
             tooltip="Insert iFrame"
-            disabled>
+            disabled={!parentSupportsElementType('iframe')}>
           <i className={'fa fa-html5'}/>
         </ToolbarButton>
         <ToolbarButton

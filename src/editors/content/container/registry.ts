@@ -18,6 +18,7 @@ import { XrefEditor } from '../learning/XrefEditor';
 import { ImageEditor } from '../media/ImageEditor';
 import { AudioEditor } from '../media/AudioEditor';
 import { VideoEditor } from '../media/VideoEditor';
+import { IFrameEditor } from '../media/IFrameEditor';
 
 let registry = null;
 
@@ -50,4 +51,5 @@ function init() {
   registry['YouTube'] = connectSidebarActions()(YouTube);
   registry['Audio'] = connectSidebarActions()(AudioEditor);
   registry['Video'] = connectSidebarActions()(VideoEditor);
+  registry['IFrame'] = connectSidebarActions()(IFrameEditor);
 }

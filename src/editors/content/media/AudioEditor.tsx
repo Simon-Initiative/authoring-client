@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Audio as AudioType } from 'data/content/learning/audio';
+import { Audio } from 'data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Tracks } from 'editors/content/media/Tracks';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
@@ -17,8 +17,9 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { buildUrl } from 'utils/path';
 import { Track } from 'data/content/learning/track';
 import { MediaMetadata } from 'editors/content/learning/MediaItems';
+import { Source } from 'data/content/learning/source';
 
-export interface AudioEditorProps extends AbstractContentEditorProps<AudioType> {
+export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
   onShowSidebar: () => void;
 }
 
@@ -27,7 +28,7 @@ export interface AudioEditorState {
 }
 
 export function selectAudio(
-  model, resourcePath, courseModel, display, dismiss) : Promise<AudioType> {
+  model, resourcePath, courseModel, display, dismiss) : Promise<Audio> {
 
   return new Promise((resolve, reject) => {
 
@@ -36,35 +37,35 @@ export function selectAudio(
     const mediaLibrary =
       <ModalSelection title="Select an Audio File"
         onInsert={() => { dismiss(); resolve(selected.audio); }}
-        onCancel={() => dismiss()}
-      >
-        <MediaManager model={model ? model : new AudioType()}
+        onCancel={() => dismiss()}>
+        <MediaManager model={model ? model : new Audio()}
           resourcePath={resourcePath}
           courseModel={courseModel}
           onEdit={() => {}}
           mimeFilter={MIMETYPE_FILTERS.AUDIO}
           selectionType={SELECTION_TYPES.SINGLE}
-          initialSelectionPaths={[model ? model.src : model]}
+          initialSelectionPaths={[model ? model.sources.first().src : model]}
           onSelectionChange={(audio) => {
-            selected.audio =
-              new AudioType().with({ src: adjustPath(audio[0].pathTo, resourcePath) });
+            const source = new Source({
+              src: adjustPath(audio[0].pathTo, resourcePath),
+            });
+            const sources = Immutable.OrderedMap<string, Source>().set(source.guid, source);
+            selected.audio = new Audio().with({ sources });
           }} />
       </ModalSelection>;
 
     display(mediaLibrary);
   });
-
 }
 
 export class AudioEditor
-  extends AbstractContentEditor<AudioType, AudioEditorProps, AudioEditorState> {
+  extends AbstractContentEditor<Audio, AudioEditorProps, AudioEditorState> {
 
   constructor(props) {
     super(props);
 
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onTracksEdit = this.onTracksEdit.bind(this);
   }
 
   onPopoutEdit(content: string) {
@@ -79,42 +80,6 @@ export class AudioEditor
     this.props.onEdit(model, model);
   }
 
-  onTracksEdit(tracks: Immutable.OrderedMap<string, Track>, src) {
-    const model = this.props.model.with({ tracks });
-    this.props.onEdit(model, src);
-  }
-
-  renderTracks() {
-    const { tracks } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '5px' } }>
-
-        <Tracks
-          {...this.props}
-          mediaType="audio"
-          accept="audio/*"
-          model={tracks}
-          onEdit={this.onTracksEdit}
-        />
-
-      </div>
-    );
-  }
-
-  row(text: string, width: string, control: any) {
-    const widthClass = 'col-' + width;
-    return (
-      <div className="row justify-content-start">
-        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
-          className="col-1 col-form-label">{text}</label>
-        <div className={widthClass}>
-          {control}
-        </div>
-      </div>
-    );
-  }
-
   onSelect() {
     const { context, services, onEdit, model } = this.props;
 
@@ -122,20 +87,17 @@ export class AudioEditor
     const dismiss = () => dispatch(modalActions.dismiss());
     const display = c => dispatch(modalActions.display(c));
 
-    selectAudio(
-      model,
-      context.resourcePath,
-      context.courseModel,
-      display,
-      dismiss)
+    selectAudio(model, context.resourcePath, context.courseModel, display, dismiss)
       .then((audio) => {
         if (audio !== null) {
-          const updated = model.with({ src: audio.src });
-          onEdit(updated, updated);
+          const source = new Source({ src: audio.sources.first().src });
+          const model = this.props.model.with({ sources:
+            Immutable.OrderedMap<string, Source>().set(source.guid, source),
+          });
+          onEdit(model, model);
         }
       });
   }
-
 
   renderSidebar(): JSX.Element {
     return (
@@ -158,6 +120,7 @@ export class AudioEditor
       </SidebarContent>
     );
   }
+
   renderToolbar(): JSX.Element {
     const { onShowSidebar } = this.props;
 
@@ -197,7 +160,6 @@ export class AudioEditor
     return (
       <div className="audioEditor">
         <audio src={fullSrc} controls={controls}/>
-        {this.renderTracks()}
       </div>
     );
   }

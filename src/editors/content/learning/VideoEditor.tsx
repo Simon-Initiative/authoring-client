@@ -181,7 +181,6 @@ export class VideoEditor
   renderMain() : JSX.Element {
 
     const { sources, controls } = this.props.model;
-    console.log('sources', sources);
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;

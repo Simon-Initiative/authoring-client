@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Video as VideoType } from 'data/content/learning/video';
+import { OrderedMap } from 'immutable';
+import { Video } from 'data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Tracks } from 'editors/content/media/Tracks';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
@@ -15,8 +16,9 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
+import { Source } from 'data/content/learning/source';
 
-export interface VideoEditorProps extends AbstractContentEditorProps<VideoType> {
+export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
   onShowSidebar: () => void;
 }
 
@@ -25,7 +27,7 @@ export interface VideoEditorState {
 }
 
 export function selectVideo(
-  model, resourcePath, courseModel, display, dismiss) : Promise<VideoType> {
+  model, resourcePath, courseModel, display, dismiss) : Promise<Video> {
 
   return new Promise((resolve, reject) => {
 
@@ -35,15 +37,15 @@ export function selectVideo(
       <ModalSelection title="Select a Video File"
         onInsert={() => { dismiss(); resolve(selected.video); }}
         onCancel={() => dismiss()}>
-        <MediaManager model={model ? model : new VideoType()}
+        <MediaManager model={model ? model : new Video()}
           resourcePath={resourcePath}
           courseModel={courseModel}
           onEdit={() => {}}
           mimeFilter={MIMETYPE_FILTERS.VIDEO}
           selectionType={SELECTION_TYPES.SINGLE}
-          initialSelectionPaths={[model ? model.src : model]}
+          initialSelectionPaths={[model ? model.sources.first().src : model]}
           onSelectionChange={(video) => {
-            selected.video = new VideoType().with({
+            selected.video = new Video().with({
               src: adjustPath(video[0].pathTo, resourcePath),
             });
           }} />
@@ -54,7 +56,7 @@ export function selectVideo(
 }
 
 export class VideoEditor
-  extends AbstractContentEditor<VideoType, VideoEditorProps, VideoEditorState> {
+  extends AbstractContentEditor<Video, VideoEditorProps, VideoEditorState> {
 
   constructor(props) {
     super(props);
@@ -110,16 +112,17 @@ export class VideoEditor
     const dismiss = () => dispatch(modalActions.dismiss());
     const display = c => dispatch(modalActions.display(c));
 
-    selectVideo(
-      model,
-      context.resourcePath,
-      context.courseModel,
-      display,
-      dismiss)
+    selectVideo(model, context.resourcePath, context.courseModel, display, dismiss)
       .then((video) => {
         if (video !== null) {
-          const updated = model.with({ src: video.src });
-          onEdit(updated, updated);
+          const source = new Source({
+            src: adjustPath(video.src, this.props.context.resourcePath),
+          });
+          console.log('source', source);
+          const model = this.props.model.with({ sources:
+            OrderedMap<string, Source>().set(source.guid, source),
+          });
+          onEdit(model, model);
         }
       });
   }
@@ -181,7 +184,7 @@ export class VideoEditor
   renderMain() : JSX.Element {
 
     const { sources, controls } = this.props.model;
-
+    // console.log('sources', sources);
     let fullSrc = '';
     if (sources.size > 0) {
       const src = sources.first().src;
@@ -212,7 +215,7 @@ export class VideoEditor
 
 
 // import * as React from 'react';
-// import { Video as VideoType } from 'data/content/learning/video';
+// import { Video as Video } from 'data/content/learning/video';
 // import {
 //   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 // } from './InteractiveRenderer';
@@ -224,7 +227,7 @@ export class VideoEditor
 // import './markers.scss';
 
 // type Data = {
-//   video: VideoType;
+//   video: Video;
 // };
 
 // export interface VideoProps extends InteractiveRendererProps {
