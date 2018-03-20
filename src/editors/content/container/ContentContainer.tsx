@@ -50,6 +50,7 @@ export class ContentContainer
     super(props);
 
     this.onChildEdit = this.onChildEdit.bind(this);
+    this.onSelect = this.onSelect.bind(this);
 
     this.supportedElements = this.props.model.supportedElements;
     this.textSelections = Immutable.Map<string, any>();
@@ -69,14 +70,18 @@ export class ContentContainer
     this.onChildEdit(childModel, childModel);
   }
 
-  insertAfter(model, toInsert, index) {
+  insertAt(model, toInsert, index) {
     const arr = model.content
       .map((v, k) => [k, v])
       .toArray();
 
-    arr.splice(index + 1, 0, [toInsert.guid, toInsert]);
+    arr.splice(index, 0, [toInsert.guid, toInsert]);
 
     return model.with({ content: Immutable.OrderedMap<string, ContentElement>(arr) });
+  }
+
+  insertAfter(model, toInsert, index) {
+    return this.insertAt(model, toInsert, index + 1);
   }
 
   onAddNew(toAdd, textSelection: Maybe<TextSelection>) {
@@ -124,6 +129,7 @@ export class ContentContainer
       onEdit(model.with({ content: model.content.set(toAdd.guid, toAdd) }), toAdd);
     }
 
+    this.onSelect(toAdd);
   }
 
   onChildEdit(childModel, sourceObject) {
@@ -137,6 +143,64 @@ export class ContentContainer
     if (model.content.has(childModel.guid)) {
       onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
     }
+  }
+
+  onDuplicate(childModel) {
+    const { onEdit, model, activeContentGuid } = this.props;
+
+    if (model.content.has(childModel.guid)) {
+      const index = indexOf(activeContentGuid, model);
+      const active = model.content.get(activeContentGuid);
+
+      const duplicate = (active.clone() as any).with({
+        guid: guid(),
+      });
+
+      onEdit(this.insertAfter(model, duplicate, index), duplicate);
+
+      this.onSelect(duplicate);
+    }
+  }
+
+  onMoveUp(childModel) {
+    const { onEdit, model, activeContentGuid } = this.props;
+
+    if (model.content.has(childModel.guid)) {
+      const index = indexOf(activeContentGuid, model);
+
+      const newModel = model.with({
+        content: model.content.delete(childModel.guid)});
+
+      onEdit(this.insertAt(newModel, childModel, (Math.max(index - 1, 0))), childModel);
+    }
+  }
+
+  onMoveDown(childModel) {
+    const { onEdit, model, activeContentGuid } = this.props;
+
+    if (model.content.has(childModel.guid)) {
+      const index = indexOf(activeContentGuid, model);
+
+      const newModel = model.with({
+        content: model.content.delete(childModel.guid)});
+
+      onEdit(
+        this.insertAt(
+          newModel, childModel, (Math.min(index + 1, newModel.content.size))),
+        childModel);
+    }
+  }
+
+  onSelect(model) {
+    const { onFocus } = this.props;
+
+    if (model.contentType === 'ContiguousText') {
+      const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
+        || model.content.selectionAfter);
+      return onFocus(model, this, currentTextSelection);
+    }
+
+    return onFocus(model, this, Maybe.nothing());
   }
 
   renderSidebar() {
@@ -169,22 +233,10 @@ export class ContentContainer
         const childRenderer = React.createElement(
             getEditorByContentType((model as any).contentType), props);
 
-        const onSelect = (model, parent) => {
-          const { onFocus } = this.props;
-
-          if (model.contentType === 'ContiguousText') {
-            const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
-              || model.content.selectionAfter);
-            return onFocus(model, parent, currentTextSelection);
-          }
-
-          return onFocus(model, parent, Maybe.nothing());
-        };
-
         return (
           <ContentDecorator
             contentType={model.contentType}
-            onSelect={() => onSelect(model, this)}
+            onSelect={() => this.onSelect(model)}
             hideContentLabel={hideContentLabel}
             key={model.guid}
             onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
