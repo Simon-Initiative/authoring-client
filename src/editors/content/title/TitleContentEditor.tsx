@@ -33,6 +33,9 @@ export class TitleContentEditor
   renderMain() : JSX.Element {
     return <ContentContainer
       {...this.props}
+      activeContentGuid={null}
+      hover={null}
+      onUpdateHover={() => {}}
       model={this.props.model.text}
       onEdit={this.onTitleEdit.bind(this)}
     />;

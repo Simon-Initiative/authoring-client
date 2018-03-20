@@ -13,6 +13,9 @@ type IdTypes = {
 
 export interface ContentEditorProps extends AbstractContentEditorProps<contentTypes.Content> {
   onRemove: (guid: string) => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface ContentEditorState {

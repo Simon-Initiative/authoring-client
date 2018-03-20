@@ -68,10 +68,10 @@ export function assessmentTemplate(title: string) {
                         '@match': 'yes',
                         '@score': '0',
                         feedback: {
-                          '#text': 'Incorrect; using another student?s password is not acceptable, '
-                          + 'even if it?s left out in the open. Further, Albert has assumed his '
-                          + 'girlfriend\'s identity by using her account, which is also a '
-                          + 'violation of the Computing Policy.',
+                          '#text': 'Incorrect; using another student\'s password is not '
+                          + 'acceptable, even if it\'s left out in the open. Further, '
+                          + 'Albert has assumed his girlfriend\'s identity by using her '
+                          + 'account, which is also a violation of the Computing Policy.',
                         },
                       },
                     },
@@ -81,7 +81,7 @@ export function assessmentTemplate(title: string) {
                         '@score': '1',
                         feedback: {
                           '#text': 'Correct; this is a pretty clear violation of the policy, '
-                          + 'including using another person?s account and impersonating another '
+                          + 'including using another person\'s account and impersonating another '
                           + 'individual.',
                         },
                       },

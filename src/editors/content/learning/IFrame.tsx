@@ -52,6 +52,9 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
         }
       }>
         <IFrameEditor
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={null}
           model={this.props.data.iframe}
           context={b.context}

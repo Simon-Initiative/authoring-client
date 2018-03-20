@@ -46,6 +46,9 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
         <SidebarGroup label="Title">
           <ToolbarContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={model.title.text}
             onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>
@@ -78,6 +81,9 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
         <div className="nested-container">
           <ContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={this.props.model.content}
             onEdit={this.onContentEdit}
           />

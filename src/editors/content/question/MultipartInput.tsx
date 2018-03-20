@@ -21,6 +21,7 @@ export interface MultipartInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   activeContext: ActiveContext;
   canInsertAnotherPart: PartAddPredicate;
+  onAddItemPart: (item, part, body) => void;
 }
 
 export interface MultipartInputState extends QuestionState {
@@ -160,6 +161,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
         </div>
         <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
           onFocus={this.props.onFocus}
           editMode={editMode}
           services={services}
@@ -195,6 +199,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         case 'FillInTheBlank':
           return (
             <FillInTheBlank
+              activeContentGuid={this.props.activeContentGuid}
+              hover={this.props.hover}
+              onUpdateHover={this.props.onUpdateHover}
               context={props.context}
               services={props.services}
               editMode={props.editMode}
@@ -209,6 +216,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         case 'Numeric':
           return (
             <Numeric
+              activeContentGuid={this.props.activeContentGuid}
+              hover={this.props.hover}
+              onUpdateHover={this.props.onUpdateHover}
               context={props.context}
               services={props.services}
               editMode={props.editMode}
@@ -223,6 +233,9 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
         case 'Text':
           return (
             <Text
+              activeContentGuid={this.props.activeContentGuid}
+              hover={this.props.hover}
+              onUpdateHover={this.props.onUpdateHover}
               context={props.context}
               services={props.services}
               editMode={props.editMode}

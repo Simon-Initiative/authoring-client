@@ -42,19 +42,26 @@ export class ContentDecorator
         isHoveringContent && classes.hover,
       ])}
       onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
-        {!hideContentLabel &&
-          <div className={classNames([
-            classes.handle,
-            isActiveContent && 'active-content',
-          ])}
-            onMouseDown={onSelect}>
-            <div className={classes.label}>
-              {getContentIcon(contentType)}
+        {hideContentLabel
+          ? null
+          : (
+            <div
+              className={classNames([
+                classes.handle,
+                isActiveContent && 'active-content',
+              ])}
+              onMouseDown={onSelect}>
+              <div className={classes.label}>
+                {getContentIcon(contentType)}
+              </div>
+              <div className={classes.grip} />
             </div>
-            <div className={classes.grip} />
-          </div>
+          )
         }
-        <div className={classes.content}>
+        <div className={classNames([
+          classes.content,
+          isActiveContent && 'active-content',
+        ])}>
         {children}
         </div>
       </div>

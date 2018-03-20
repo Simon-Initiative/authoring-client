@@ -25,7 +25,6 @@ export interface QuestionProps<ModelType>
   onBodyEdit: (...args: any[]) => any;
   onFocus: (child, model, textSelection) => void;
   onItemFocus: (itemId: string) => void;
-  onAddItemPart?: (item, part, body) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -34,6 +33,9 @@ export interface QuestionProps<ModelType>
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
   onRemoveQuestion: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface QuestionState {
@@ -197,6 +199,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <div className="question-body" key="question">
           <ContentContainer
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
             onFocus={this.props.onFocus}
             editMode={editMode}
             services={services}
@@ -222,6 +227,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           <TabSectionHeader title="Attached Skills"/>
           <TabSectionContent>
             <SkillsEditor
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -259,6 +267,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                activeContentGuid={null}
+                hover={null}
+                onUpdateHover={() => {}}
                 onFocus={this.props.onItemFocus.bind(this, c, this)}
                 parent={null}
                 key={c.guid}

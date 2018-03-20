@@ -15,8 +15,7 @@ import './ContentContainer.scss';
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
   hideContentLabel?: boolean;
-  hover?: string;
-  onUpdateHover?: (hover: string) => void;
+  activeContentGuid: string;
 }
 
 export interface ContentContainerState {
@@ -237,7 +236,7 @@ export class ContentContainer
           <ContentDecorator
             contentType={model.contentType}
             onSelect={() => this.onSelect(model)}
-            hideContentLabel={hideContentLabel}
+            hideContentLabel={hideContentLabel || !hover}
             key={model.guid}
             onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
             isHoveringContent={hover === model.guid}
