@@ -35,6 +35,7 @@
     "keycloak-js": "^3.1.0",
     "node-sass": "4.0.0",
     "react": "16.2.0",
+    "react-ace": "^5.9.0",
     "react-addons-css-transition-group": "^15.6.2",
     "react-addons-shallow-compare": "^15.3.0",
     "react-bootstrap-typeahead": "^2.0.2",
@@ -59,7 +60,8 @@
     "underscore-template-loader": "^0.8.0",
     "webpack": "3.10.0",
     "webpack-dev-server": "2.9.7",
-    "whatwg-fetch": "^2.0.2"
+    "whatwg-fetch": "^2.0.2",
+    "xml-beautifier": "^0.3.0"
   },
   "devDependencies": {
     "chokidar-cli": "^1.2.0",
