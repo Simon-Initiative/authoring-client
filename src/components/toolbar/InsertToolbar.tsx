@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
@@ -71,15 +72,27 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className="unicode-icon">T</i>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              const li = new contentTypes.Li();
+              onInsert(new contentTypes.Ol()
+              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
+              }));
+            }
+          }
             tooltip="Ordered List"
-            disabled>
+            disabled={!parentSupportsElementType('ol')}>
           <i className={'fa fa-list-ol'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              const li = new contentTypes.Li();
+              onInsert(new contentTypes.Ul()
+              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
+              }));
+            }
+          }
             tooltip="Unordered List"
-            disabled>
+            disabled={!parentSupportsElementType('ul')}>
           <i className={'fa fa-list-ul'}/>
         </ToolbarButton>
         <ToolbarButton

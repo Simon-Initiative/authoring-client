@@ -12,9 +12,15 @@ import guid from 'utils/guid';
 
 import './ContentContainer.scss';
 
+export type BoundProperty = {
+  propertyName: string,
+  value: any,
+};
+
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
   hideContentLabel?: boolean;
+  bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
 }
 
@@ -213,6 +219,10 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, hover, onUpdateHover } = this.props;
 
+    const bindProperties = this.props.bindProperties === undefined
+      ? element => []
+      : this.props.bindProperties;
+
     // We want this component to display a ContiguousTextEditor in the
     // case where there is no content at all in the model
     const contentOrPlaceholder = this.props.model.content.size === 0
@@ -222,12 +232,15 @@ export class ContentContainer
     const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
+
         const props = {
           ...this.props, model,
           onEdit: this.onChildEdit,
           parent: this,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
         };
+
+        bindProperties(model).forEach(p => props[p.propertyName] = p.value);
 
         const childRenderer = React.createElement(
             getEditorByContentType((model as any).contentType), props);
