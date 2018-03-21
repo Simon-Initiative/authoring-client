@@ -67,6 +67,9 @@ export default class UnorderedList
         <SidebarGroup label="Title">
           <ToolbarContentContainer
             onFocus={() => {}}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}

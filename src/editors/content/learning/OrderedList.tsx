@@ -77,6 +77,9 @@ export default class OrderedList
             context={this.props.context}
             services={this.props.services}
             editMode={this.props.editMode}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={title.text}
             onEdit={this.onTitleEdit.bind(this)} />
         </SidebarGroup>
