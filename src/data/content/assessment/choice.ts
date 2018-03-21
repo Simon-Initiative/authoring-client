@@ -40,7 +40,7 @@ function simplifyBody(body: Object) : Object {
     }
   }
 
-  return body;
+  return { '#array': arr };
 
 }
 
