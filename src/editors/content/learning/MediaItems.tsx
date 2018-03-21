@@ -161,6 +161,9 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
           <SidebarRow text="" width="12">
             <ContentContainer
               {...this.props}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
               model={titleContent.text}
               onEdit={this.onTitleEdit} />
           </SidebarRow>
@@ -187,6 +190,9 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
           </SidebarRow> */}
             <ContentContainer
               {...this.props}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
               model={caption.content}
               onEdit={this.onCaptionEdit} />
           </SidebarGroup>
@@ -204,6 +210,9 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
                 onEdit={this.onCitationEntryEdit}/>
               <ContentContainer
                 {...this.props}
+                activeContentGuid={null}
+                hover={null}
+                onUpdateHover={() => {}}
                 model={cite.content}
                 onEdit={this.onCitationContentEdit} />
             </SidebarRow>
