@@ -17,7 +17,7 @@ export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'term', 'var'];
 
 export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math'];
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'p'];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS];

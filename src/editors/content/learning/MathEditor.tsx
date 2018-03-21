@@ -34,7 +34,7 @@ export class MathEditor
   }
 
   renderSidebar() {
-    const { className, classes, model, onEdit } = this.props;
+    const { className, classes, model, onEdit, editMode } = this.props;
 
     return (
       <div className={classNames([classes.entityRenderer, className])}>
@@ -42,7 +42,10 @@ export class MathEditor
         <Label>Math Editor</Label>
         <SourceBasedMathEditor
           content={model.data}
-          onChange={data => onEdit(model.with({ data })) }
+          editMode={editMode}
+          onChange={(data) => {
+            onEdit(model.with({ data }));
+          }}
           />
       </div>
     );

@@ -1,9 +1,13 @@
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
-export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 250;
+export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 200;
 
 const TOOLBAR_HIDE_ANIMATION_DURATION_S = TOOLBAR_HIDE_ANIMATION_DURATION_MS / 1000;
+const TOOLBAR_GROUP_MAX_WIDTH = 600;
+const TOOLBAR_COL_WIDTH = 36;
+const TOOLBAR_COL_HEIGHT = 32;
+const TOOLBAR_LABEL_HEIGHT = 22;
 
 export default {
   toolbar: {
@@ -21,13 +25,13 @@ export default {
     borderBottom: [1, 'solid', colors.grayLight],
   },
   toolbarGroup: {
-    width: 366,
+    maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
   },
   toolbarGroupContainer: {
-    overflowX: 'hidden',
-    height: 86,
+    overflow: 'hidden',
+    height: (TOOLBAR_COL_HEIGHT * 2) + TOOLBAR_LABEL_HEIGHT,
     flexShrink: 0,
-    maxWidth: 400,
+    maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
     padding: [0, 15],
     borderRight: '1px solid #ddd',
 
@@ -37,12 +41,12 @@ export default {
     },
 
     '&.contextToolbar-enter.contextToolbar-enter-active': {
-      maxWidth: 400,
+      maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
       opacity: 1,
     },
 
     '&.contextToolbar-leave': {
-      maxWidth: 400,
+      maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
       opacity: 1,
     },
 
@@ -56,11 +60,11 @@ export default {
   },
   toolbarLayoutInline: {
     display: 'inline-block',
-    height: 72,
+    height: TOOLBAR_COL_WIDTH * 2,
   },
   toolbarLayoutGrid: {
     display: 'inline-block',
-    width: 72,
+    width: TOOLBAR_COL_WIDTH * 2,
     height: 72,
   },
   toolbarLayoutRow: {
@@ -74,24 +78,21 @@ export default {
   tbGroupItems: {
     display: 'flex',
     flexDirection: 'row',
-    height: 64,
+    height: TOOLBAR_COL_HEIGHT * 2,
+    overflow: 'hidden',
   },
   tbGroupLabel: {
     display: 'block',
+    height: TOOLBAR_LABEL_HEIGHT,
     textAlign: 'center',
     textTransform: 'uppercase',
     color: colors.grayDark,
     borderBottom: props => `4px solid ${props.highlightColor || 'transparent'}`,
   },
   toolbarInsertGroup: {
-    width: 336,
     paddingLeft: 0,
   },
-  toolbarItemGroup: {
-    width: 150,
-  },
   toolbarActionsGroup: {
-    width: 'initial',
     paddingRight: 0,
     borderRight: 'none',
   },
