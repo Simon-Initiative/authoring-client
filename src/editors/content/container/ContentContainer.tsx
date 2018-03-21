@@ -245,15 +245,18 @@ export class ContentContainer
         const childRenderer = React.createElement(
             getEditorByContentType((model as any).contentType), props);
 
+        const isHoverContent = (hover === model.guid);
+        const isActiveContent = (model.guid === this.props.activeContentGuid);
+
         return (
           <ContentDecorator
             contentType={model.contentType}
             onSelect={() => this.onSelect(model)}
-            hideContentLabel={hideContentLabel || !hover}
+            hideContentLabel={hideContentLabel}
             key={model.guid}
             onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
-            isHoveringContent={hover === model.guid}
-            isActiveContent={model.guid === this.props.activeContentGuid}
+            isHoveringContent={isHoverContent}
+            isActiveContent={isActiveContent}
             onRemove={this.onRemove.bind(this, model)}>
 
             {childRenderer}
