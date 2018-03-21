@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Image } from '../../../data/content/learning/image';
 import { ContentElements } from 'data/content/common/elements';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps } from
+'../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
 import { injectSheet } from 'styles/jss';
 import { Select } from '../common/Select';
@@ -20,23 +21,208 @@ import { buildUrl } from 'utils/path';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
 import { MediaMetadata } from 'editors/content/learning/MediaItems';
+import { AppContext } from 'editors/common/AppContext';
+import { CourseModel } from 'data/models';
+import { Checkbox } from 'editors/content/common/Checkbox';
 
 import styles from './MediaElement.style';
 
+interface Size {
+  width: number;
+  height: number;
+}
+
+export interface ImageSizeSidebarProps {
+  editMode: boolean;
+  model: Image;
+  onEdit: (model: Image, source?: Object) => void;
+  context: AppContext;
+}
+
+export interface ImageSizeSidebarState {
+  size: Size;
+  aspectRatio: number;
+  isNativeSize: boolean;
+  isProportionConstrained: boolean;
+  isSizeReceived: boolean;
+}
+
+export class ImageSizeSidebar extends
+  React.PureComponent<ImageSizeSidebarProps, ImageSizeSidebarState> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      aspectRatio: 1,
+      size: {
+        width: 0,
+        height: 0,
+      },
+      isNativeSize:
+        this.props.model.height === '' &&
+        this.props.model.width === '',
+      isProportionConstrained: false,
+      isSizeReceived: false,
+    };
+
+    this.onEditWidth = this.onEditWidth.bind(this);
+    this.onEditHeight = this.onEditHeight.bind(this);
+    this.onToggleNativeSizing = this.onToggleNativeSizing.bind(this);
+  }
+
+  componentDidMount() {
+    this.getImageSize(this.props.model.src)
+      .then(size => this.setState({
+        aspectRatio: size.width / size.height,
+        size,
+        isProportionConstrained: true,
+        isSizeReceived: true,
+      }))
+      .catch(err => this.setState({ isNativeSize: true }));
+  }
+
+  // shouldComponentUpdate(nextState) {
+  //   if (nextState.isNativeSize !== this.state.isNativeSize) {
+  //     return true;
+  //   }
+  // }
+
+  getImageSize(src: string) : Promise<Size> {
+    const fullSrc = buildUrl(
+      this.props.context.baseUrl,
+      this.props.context.courseId,
+      this.props.context.resourcePath,
+      src);
+    const img = new (window as any).Image();
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        resolve({ height: img.height, width: img.width });
+      };
+      img.onerror = (err) => {
+        reject(err);
+      };
+      img.src = fullSrc;
+    });
+  }
+
+  // Need to change to handle constraining proportions
+  onEditWidth(width) {
+    const height = this.state.isProportionConstrained
+      ? Math.round(width / this.state.aspectRatio).toString()
+      : this.props.model.height;
+
+    const model = this.props.model.with({ width, height });
+    this.props.onEdit(model, model);
+  }
+
+  onEditHeight(height) {
+    const width = this.state.isProportionConstrained
+      ? Math.round(height * this.state.aspectRatio).toString()
+      : this.props.model.width;
+
+    const model = this.props.model.with({ width, height });
+    this.props.onEdit(model, model);
+  }
+
+  onToggleProportionContrained(isProportionConstrained: boolean) {
+    this.setState({
+      isProportionConstrained,
+    });
+  }
+
+  // This function maintains the user's custom size settings when toggling
+  // between native and custom sizing.
+  onToggleNativeSizing(isNativeSize) {
+    this.setState({ isNativeSize });
+
+    if (isNativeSize) {
+      // Save the model's width and height in state and clear the model's width and height
+      this.setState({ size: {
+        width: parseInt(this.props.model.width, 10),
+        height: parseInt(this.props.model.height, 10),
+      } });
+
+      const model = this.props.model.with({ width: '', height: '' });
+      this.props.onEdit(model, model);
+
+    } else {
+      // Custom size, so update the model with the size stored in state if it exists
+      if (this.state.size.width !== 0 &&
+          this.state.size.height !== 0) {
+        const model = this.props.model.with({
+          width: this.state.size.width.toString(),
+          height: this.state.size.height.toString(),
+        });
+        this.props.onEdit(model, model);
+      }
+    }
+  }
+
+  render() {
+    const { width, height } = this.props.model;
+
+    return (
+      <div>
+        <div className="form-check">
+          <label className="form-check-label">
+            <input className="form-check-input"
+              name="sizingOptions"
+              value="native"
+              defaultChecked={this.state.isNativeSize}
+              onChange={() => this.onToggleNativeSizing(true)}
+              type="radio"/>&nbsp;
+              Native
+          </label>
+        </div>
+        <div className="form-check" style={ { marginBottom: '30px' } }>
+          <label className="form-check-label">
+            <input className="form-check-input"
+              name="sizingOptions"
+              onChange={() => this.onToggleNativeSizing(false)}
+              value="custom"
+              defaultChecked={!this.state.isNativeSize}
+              type="radio"/>&nbsp;
+              Custom
+          </label>
+        </div>
+
+        <SidebarRow text="Native Proportions" width="9">
+          <Checkbox label=""
+            editMode={this.props.editMode && this.state.isSizeReceived}
+            value={this.state.isProportionConstrained}
+            onEdit={() =>
+              this.onToggleProportionContrained(!this.state.isProportionConstrained)}/>
+        </SidebarRow>
+        <SidebarRow text="Width" width="9">
+          <div className="input-group input-group-sm">
+           <TextInput width="100px" label=""
+            editMode={this.props.editMode && !this.state.isNativeSize}
+            value={width.toString()}
+            type="number"
+            onEdit={this.onEditWidth}
+          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
+        </SidebarRow>
+        <SidebarRow text="Height" width="9">
+          <div className="input-group input-group-sm">
+            <TextInput width="100px" label=""
+            editMode={this.props.editMode && !this.state.isNativeSize}
+            value={height.toString()}
+            type="number"
+            onEdit={this.onEditHeight} />
+            <span className="input-group-addon ">pixels</span>
+          </div>
+        </SidebarRow>
+      </div>
+    );
+  }
+}
 
 export interface ImageEditorProps extends AbstractContentEditorProps<Image> {
   onShowSidebar: () => void;
 }
 
-interface Sizing {
-  width: string;
-  height: string;
-}
-
 export interface ImageEditorState {
   failure: boolean;
-  isDefaultSizing: boolean;
-  customSizing: Sizing;
 }
 
 export function selectImage(model, resourcePath, courseModel, display, dismiss) : Promise<Image> {
@@ -48,8 +234,7 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss) 
     const mediaLibrary =
       <ModalSelection title="Select an image"
         onInsert={() => { dismiss(); resolve(selected.img); }}
-        onCancel={() => dismiss()}
-      >
+        onCancel={() => dismiss()}>
         <MediaManager model={model ? model : new Image()}
           resourcePath={resourcePath}
           courseModel={courseModel}
@@ -65,52 +250,32 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss) 
 
     display(mediaLibrary);
   });
-
 }
 
-/**
- * The content editor for Table.
- */
 @injectSheet(styles)
 export class ImageEditor
-  extends AbstractContentEditor<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
+  extends AbstractContentEditor
+<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
 
   constructor(props) {
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
-    this.onSetClick = this.onSetClick.bind(this);
-    this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
-    this.onWidthEdit = this.onWidthEdit.bind(this);
-    this.onHeightEdit = this.onHeightEdit.bind(this);
-    this.onAltEdit = this.onAltEdit.bind(this);
-    this.onValignEdit = this.onValignEdit.bind(this);
+    this.onEditAlt = this.onEditAlt.bind(this);
+    this.onEditValign = this.onEditValign.bind(this);
     this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
-    this.onCaptionEdit = this.onCaptionEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
 
     this.state = {
       failure: false,
-      isDefaultSizing: this.props.model.height === '' && this.props.model.width === '',
-      customSizing: {
-        width: '',
-        height: '',
-      },
     };
   }
-
-  onWidthEdit(width) {
-    this.props.onEdit(this.props.model.with({ width }));
+  onEditAlt(alt) {
+    const model = this.props.model.with({ alt });
+    this.props.onEdit(model, model);
   }
-  onHeightEdit(height) {
-    this.props.onEdit(this.props.model.with({ height }));
-  }
-  onAltEdit(alt) {
-    this.props.onEdit(this.props.model.with({ alt }));
-  }
-  onValignEdit(valign) {
-    this.props.onEdit(this.props.model.with({ valign }));
+  onEditValign(valign) {
+    const model = this.props.model.with({ valign });
+    this.props.onEdit(model, model);
   }
 
   shouldComponentUpdate(nextProps, nextState: ImageEditorState) {
@@ -127,9 +292,6 @@ export class ImageEditor
     if (nextState.failure !== this.state.failure) {
       return true;
     }
-    if (nextState.isDefaultSizing !== this.state.isDefaultSizing) {
-      return true;
-    }
     return false;
   }
 
@@ -144,110 +306,6 @@ export class ImageEditor
     }
   }
 
-  onPopoutEdit(content: string) {
-    const popout = this.props.model.popout.with({ content });
-    this.props.onEdit(this.props.model.with({ popout }));
-  }
-
-  onAlternateEdit(content: ContentElements, src) {
-    const alternate = this.props.model.alternate.with({ content });
-    this.props.onEdit(this.props.model.with({ alternate }), src);
-  }
-
-  onTitleEdit(text: ContentElements, src) {
-    const titleContent = this.props.model.titleContent.with({ text });
-    this.props.onEdit(this.props.model.with({ titleContent }), src);
-  }
-
-  onCaptionEdit(content: ContentElements, src) {
-    const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }), src);
-  }
-
-  onSetClick() {
-    // TODO
-  }
-
-  renderSource() {
-
-  }
-
-  changeSizing(isDefaultSizing) {
-    this.setState({ isDefaultSizing });
-
-    if (isDefaultSizing) {
-      this.setState({ customSizing: {
-        width: this.props.model.width,
-        height: this.props.model.height,
-      } });
-
-      const updated = this.props.model.with({ width: '', height: '' });
-      this.props.onEdit(updated, updated);
-    } else {
-      if (this.state.customSizing.width !== '' &&
-          this.state.customSizing.height !== '') {
-        const updated = this.props.model.with({
-          width: this.state.customSizing.width,
-          height: this.state.customSizing.height,
-        });
-        this.props.onEdit(updated, updated);
-      }
-    }
-  }
-
-  renderSizing() {
-    const { width, height } = this.props.model;
-
-    return (
-      <div>
-
-        <div className="form-check">
-          <label className="form-check-label">
-            <input className="form-check-input"
-              name="sizingOptions"
-              value="native"
-              defaultChecked={this.state.isDefaultSizing}
-              onChange={this.changeSizing.bind(this, true)}
-              type="radio"/>&nbsp;
-              Native
-          </label>
-        </div>
-        <div className="form-check" style={ { marginBottom: '30px' } }>
-          <label className="form-check-label">
-            <input className="form-check-input"
-              name="sizingOptions"
-              onChange={this.changeSizing.bind(this, false)}
-              value="custom"
-              defaultChecked={!this.state.isDefaultSizing}
-              type="radio"/>&nbsp;
-              Custom
-          </label>
-        </div>
-
-        <SidebarRow text="Width" width="9">
-          <div className="input-group input-group-sm">
-           <TextInput width="100px" label=""
-            editMode={this.props.editMode && !this.state.isDefaultSizing}
-            value={width}
-            type="number"
-            onEdit={this.onWidthEdit}
-          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
-        </SidebarRow>
-        <SidebarRow text="Height" width="9">
-          <div className="input-group input-group-sm">
-            <TextInput width="100px" label=""
-            editMode={this.props.editMode && !this.state.isDefaultSizing}
-            value={height}
-            type="number"
-            onEdit={this.onHeightEdit} />
-            <span className="input-group-addon ">pixels</span>
-          </div>
-        </SidebarRow>
-
-      </div>
-    );
-  }
-
   renderOther() {
     const { alt, valign } = this.props.model;
 
@@ -256,7 +314,7 @@ export class ImageEditor
 
         <SidebarRow text="Align" width="6">
           <Select label="" editMode={this.props.editMode}
-            value={valign} onChange={this.onValignEdit}>
+            value={valign} onChange={this.onEditValign}>
             <option value="top">Top</option>
             <option value="middle">Middle</option>
             <option value="baseline">Baseline</option>
@@ -269,7 +327,7 @@ export class ImageEditor
             editMode={this.props.editMode}
             value={alt}
             type="text"
-            onEdit={this.onAltEdit} />
+            onEdit={this.onEditAlt} />
         </SidebarRow>
 
         <MediaMetadata
@@ -303,16 +361,14 @@ export class ImageEditor
   renderSidebar() {
     return (
       <SidebarContent title="Image">
-        <SidebarGroup label="">
-          <Button
+        <SidebarGroup label="Size">
+          <ImageSizeSidebar
             editMode={this.props.editMode}
-            onClick={this.onSelect}>Change Image</Button>
+            model={this.props.model}
+            context={this.props.context}
+            onEdit={this.props.onEdit}/>
         </SidebarGroup>
-        <br/>
-        <SidebarGroup label="Sizing">
-          {this.renderSizing()}
-        </SidebarGroup>
-        <SidebarGroup label="Other">
+        <SidebarGroup label="">
           {this.renderOther()}
         </SidebarGroup>
       </SidebarContent>
@@ -324,7 +380,7 @@ export class ImageEditor
     return (
       <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Image}>
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
+          <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-image"/></div>
             <div>Change Image</div>
           </ToolbarButton>
@@ -360,6 +416,4 @@ export class ImageEditor
       </div>
     );
   }
-
 }
-
