@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Image } from '../../../data/content/learning/image';
-import { ContentElements } from 'data/content/common/elements';
 import { AbstractContentEditor, AbstractContentEditorProps } from
 '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
@@ -16,14 +15,11 @@ import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Button } from 'editors/content/common/Button';
 import { buildUrl } from 'utils/path';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
 import { MediaMetadata } from 'editors/content/learning/MediaItems';
 import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models';
-import { Checkbox } from 'editors/content/common/Checkbox';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import styles from './MediaElement.style';
@@ -82,12 +78,6 @@ export class ImageSizeSidebar extends
       .catch(err => this.setState({ isNativeSize: true }));
   }
 
-  // shouldComponentUpdate(nextState) {
-  //   if (nextState.isNativeSize !== this.state.isNativeSize) {
-  //     return true;
-  //   }
-  // }
-
   getImageSize(src: string) : Promise<Size> {
     const fullSrc = buildUrl(
       this.props.context.baseUrl,
@@ -106,7 +96,6 @@ export class ImageSizeSidebar extends
     });
   }
 
-  // Need to change to handle constraining proportions
   onEditWidth(width) {
     const height = this.state.isProportionConstrained
       ? Math.round(width / this.state.aspectRatio).toString()

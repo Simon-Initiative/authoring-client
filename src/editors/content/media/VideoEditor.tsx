@@ -2,7 +2,6 @@ import * as React from 'react';
 import { OrderedMap } from 'immutable';
 import { Video } from 'data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Tracks } from 'editors/content/media/Tracks';
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';
@@ -15,7 +14,6 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import ModalSelection from 'utils/selection/ModalSelection';
-import { modalActions } from 'actions/modal';
 import { Source } from 'data/content/learning/source';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
