@@ -39,23 +39,6 @@ export default class ContiguousTextToolbar
 
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
-      return true;
-    }
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextProps.context !== this.props.context) {
-      return true;
-    }
-    if (nextProps.selection && nextProps.selection.getRawSelectionState()
-      !== this.props.selection.getRawSelectionState()) {
-      return true;
-    }
-    return false;
-  }
-
   renderActiveEntity(entity) {
 
     const { key, data } = entity;
@@ -66,7 +49,8 @@ export default class ContiguousTextToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        this.props.onEdit(this.props.model.updateEntity(key, updated));
+        const updatedModel = this.props.model.updateEntity(key, updated);
+        this.props.onEdit(updatedModel, updated);
       },
     };
 
@@ -93,13 +77,13 @@ export default class ContiguousTextToolbar
     const { model, onEdit, editMode, selection } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
 
-    const noTextSelected = selection.isCollapsed();
+    const noTextSelected = selection && selection.isCollapsed();
 
-    const bareTextSelected = selection.isCollapsed()
+    const bareTextSelected = selection && selection.isCollapsed()
       ? false
       : !model.selectionOverlapsEntity(selection);
 
-    const cursorInEntity = selection.isCollapsed()
+    const cursorInEntity = selection && selection.isCollapsed()
       ? model.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
       : false;
 

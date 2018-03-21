@@ -36,9 +36,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
     <React.Fragment>
       <ToolbarLayout.Inline>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onInsert(new contentTypes.ContiguousText())}
             tooltip="Insert Text Block"
-            disabled>
+            disabled={!parentSupportsElementType('p')}>
           <i className="unicode-icon">T</i>
         </ToolbarButton>
         <ToolbarButton

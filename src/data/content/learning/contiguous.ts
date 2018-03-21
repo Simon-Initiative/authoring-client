@@ -17,12 +17,14 @@ export type ContiguousTextPair = [ContiguousText, ContiguousText];
 
 export type ContiguousTextParams = {
   content?: ContentState,
+  entityEditCount?: number,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'ContiguousText',
   content: emptyContent,
+  entityEditCount: 0,
   guid: '',
 };
 
@@ -64,6 +66,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
   content: ContentState;
+  entityEditCount: number;
   guid: string;
 
   constructor(params?: ContiguousTextParams) {
@@ -149,14 +152,17 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   updateEntity(key: string, data: Object) {
-    return this.with({
+    return new ContiguousText().with({
+      guid: this.guid,
       content: this.content.replaceEntityData(key, data),
+      entityEditCount: this.entityEditCount + 1,
     });
   }
 
   removeEntity(key: string) : ContiguousText {
     return this.with({
       content: internalRemoveEntity((k, e) => k === key, this.content),
+      entityEditCount: this.entityEditCount + 1,
     });
   }
 
@@ -212,6 +218,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     return this.with({
       content: contentStateWithLink,
+      entityEditCount: this.entityEditCount + 1,
     });
   }
 
@@ -265,6 +272,24 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         guid: createGuid(),
         content: secondContent,
       })];
+  }
+
+  // Returns true if the contiguous text contains one block and
+  // the text in that block is empty or contains all spaces
+  isEffectivelyEmpty() : boolean {
+    return this.content.getBlockMap().size === 1
+      && this.content.getFirstBlock().text.trim() === '';
+  }
+
+  // Returns true if the selection is collapsed and the cursor is
+  // positioned in the last block and no text other than spaces
+  // follows the cursor
+  isCursorAtEffectiveEnd(textSelection: TextSelection) : boolean {
+    const last = this.content.getLastBlock();
+    return textSelection.isCollapsed()
+      && last.key === textSelection.getAnchorKey()
+      && (last.text.length <= textSelection.getAnchorOffset()
+      || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
   }
 
   tagInputRefsWithType(byId: Object) {

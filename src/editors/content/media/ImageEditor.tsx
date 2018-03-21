@@ -361,7 +361,10 @@ export class ImageEditor
       });
   }
 
+
+
   renderSidebar() {
+
     return (
       <SidebarContent title="Image">
         <SidebarGroup label="Size">
@@ -381,7 +384,7 @@ export class ImageEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Image}>
+      <ToolbarGroup label="Image" columns={6} highlightColor={CONTENT_COLORS.Image}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-image"/></div>

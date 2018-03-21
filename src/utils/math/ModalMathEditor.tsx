@@ -10,7 +10,7 @@ export interface ModalMathEditor {
 export interface ModalMathEditorProps {
   onInsert: (content: string) => void;
   onCancel: () => void;
-  content: string; 
+  content: string;
 }
 
 
@@ -24,11 +24,11 @@ export class ModalMathEditor extends React.PureComponent<ModalMathEditorProps, a
 
   render() {
     return (
-      <ModalSelection title="Edit Math Expression" 
+      <ModalSelection title="Edit Math Expression"
         onCancel={this.props.onCancel} onInsert={() => this.props.onInsert(this.currentContent)}>
-        <MathEditor content={this.props.content} 
+        <MathEditor content={this.props.content} editMode={false}
           onChange={content => this.currentContent = content} />
-      </ModalSelection>    
+      </ModalSelection>
     );
   }
 

@@ -13,6 +13,8 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
+import './nested.scss';
+
 export interface SectionProps extends AbstractContentEditorProps<SectionType> {
   onShowSidebar: () => void;
 }
@@ -68,7 +70,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Section" highlightColor={CONTENT_COLORS.Section}>
+      <ToolbarGroup label="Section" columns={8} highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
             <div style={{ marginLeft: 8 }}>Purpose</div>
             <Select
@@ -101,18 +103,20 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
 
   renderMain(): JSX.Element {
     return (
-    <div className="pulloutEditor">
+    <div>
       <ContiguousTextEditor
         {...this.props}
         model={(this.props.model.title.text.content as any).first()}
         editorStyles={{ fontSize: 20 }}
         viewOnly
         onEdit={() => {}} />
-      <ContentContainer
-        {...this.props}
-        model={this.props.model.body}
-        onEdit={this.onBodyEdit}
-      />
+      <div className="nested-container">
+        <ContentContainer
+          {...this.props}
+          model={this.props.model.body}
+          onEdit={this.onBodyEdit}
+        />
+      </div>
     </div>
     );
   }

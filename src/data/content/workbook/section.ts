@@ -20,9 +20,9 @@ export type SectionParams = {
 
 const defaultContent = {
   id: Maybe.nothing(),
-  title: Title.fromText('Title'),
+  title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
-  body: ContentElements.fromText('Content', '', WB_BODY_EXTENSIONS),
+  body: ContentElements.fromText('', '', [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS]),
   guid: '',
   contentType: 'Section',
 };
@@ -87,7 +87,7 @@ export class Section extends Immutable.Record(defaultContent) {
       section: {
         '#array': [
           this.title.toPersistence(),
-          { 
+          {
             body: {
               '#array': this.body.toPersistence(),
             },
