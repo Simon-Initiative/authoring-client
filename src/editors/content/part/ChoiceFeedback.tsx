@@ -254,7 +254,6 @@ export abstract class ChoiceFeedback
 
   renderDefaultResponse() {
     const { choices, model, context, services, editMode, simpleFeedback } = this.props;
-    const { invalidFeedback } = this.state;
 
     if (!this.defaultFeedbackResponse) {
       const newGuid = guid();

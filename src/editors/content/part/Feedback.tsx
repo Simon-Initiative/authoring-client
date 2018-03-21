@@ -5,9 +5,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
 } from 'editors/content/common/InputList';
-import { ContentElements } from 'data/content/common/elements';
 import './Feedback.scss';
-import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import guid from 'utils/guid';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
@@ -146,7 +144,7 @@ export abstract class Feedback
   }
 
   renderDefaultResponse() {
-    const { model, context, services, editMode } = this.props;
+    const { context, services, editMode } = this.props;
 
     if (!this.defaultFeedbackResponse) {
       const newGuid = guid();
