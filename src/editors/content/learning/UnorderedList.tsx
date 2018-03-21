@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
-import * as numbering from 'utils/numbering';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
@@ -15,17 +14,16 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../common/controls';
+import { Select } from '../common/controls';
 import { Maybe } from 'tsmonad';
-
 import styles from './List.styles';
 
-export interface OrderedListProps
-  extends AbstractContentEditorProps<contentTypes.Ol> {
+export interface UnorderedListProps
+  extends AbstractContentEditorProps<contentTypes.Ul> {
   onShowSidebar: () => void;
 }
 
-export interface OrderedListState {
+export interface UnorderedListState {
 
 }
 
@@ -33,9 +31,9 @@ export interface OrderedListState {
  * The content editor for contiguous text.
  */
 @injectSheet(styles)
-export default class OrderedList
-    extends AbstractContentEditor<contentTypes.Ol,
-    StyledComponentProps<OrderedListProps>, OrderedListState> {
+export default class UnorderedList
+    extends AbstractContentEditor<contentTypes.Ul,
+    StyledComponentProps<UnorderedListProps>, UnorderedListState> {
   selectionState: any;
 
   constructor(props) {
@@ -64,13 +62,8 @@ export default class OrderedList
       nothing: () => '',
     });
 
-    const start = this.props.model.start.caseOf({
-      just: s => s,
-      nothing: () => '',
-    });
-
     return (
-      <SidebarContent title="Ordered List">
+      <SidebarContent title="Unordered List">
         <SidebarGroup label="Title">
           <ToolbarContentContainer
             onFocus={() => {}}
@@ -88,26 +81,10 @@ export default class OrderedList
             onChange={this.onStyleChange.bind(this)}>
             <option value=""></option>
             <option value="none">None</option>
-            <option value="decimal">Decimal</option>
-            <option value="decimal-leading-zero">Decimal with leading zero</option>
-            <option value="lower-roman">Lowercase Roman numerals</option>
-            <option value="upper-roman">Uppercase Roman numerals</option>
-            <option value="lower-alpha">Lowercase alpha</option>
-            <option value="upper-alpha">Uppercase alpha</option>
-            <option value="lower-latin">Lowercase latin</option>
-            <option value="upper-latin">Uppercase latin</option>
+            <option value="disc">Disc</option>
+            <option value="circle">Circle</option>
+            <option value="square">Square</option>
           </Select>
-        </SidebarGroup>
-        <SidebarGroup label="Start">
-          <TextInput
-            editMode={this.props.editMode}
-            label=""
-            value={start}
-            type="number"
-            width="100%"
-            onEdit={this.onStartChange.bind(this)}>
-
-          </TextInput>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -133,18 +110,14 @@ export default class OrderedList
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Ordered List" columns={8} highlightColor={CONTENT_COLORS.Ol}>
+      <ToolbarGroup label="Unordered List" columns={8} highlightColor={CONTENT_COLORS.Ul}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-list-ol"></i></div>
+          <div><i className="fa fa-list-ul"></i></div>
           <div>Style</div>
-        </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i style={{ textDecoration: 'underline' }}>1.</i></div>
-          <div>Start</div>
         </ToolbarButton>
       </ToolbarGroup>
     );
@@ -179,34 +152,18 @@ export default class OrderedList
     const { className, classes, model } = this.props;
     const { style } = model;
 
-    const totalItems = model.listItems.size;
+    const actualStyle = style.caseOf({ just: s => s, nothing: () => 'disc' });
 
-    const actualStyle = style.caseOf({ just: s => s, nothing: () => 'decimal' });
-
-    const start = this.props.model.start.caseOf({
-      just: s => Math.max(parseInt(s, 10), 1),
-      nothing: () => 1,
-    });
-
-    const getLabel = (e, i) => {
-      const value = i + start;
+    const getLabel = (e) => {
       switch (actualStyle) {
         case 'none':
           return '';
-        case 'decimal':
-          return numbering.asDecimal(value);
-        case 'decimal-leading-zero':
-          return numbering.asDecimalLeadingZero(value, totalItems);
-        case 'lower-roman':
-          return numbering.asLowerRoman(value);
-        case 'upper-roman':
-          return numbering.asUpperRoman(value);
-        case 'lower-alpha':
-        case 'lower-latin':
-          return numbering.asLowerAlpha(value);
-        case 'upper-alpha':
-        case 'upper-latin':
-          return numbering.asUpperAlpha(value);
+        case 'disc':
+          return <span>{'\u25cf'}</span>;
+        case 'circle':
+          return <span>{'\u25e6'}</span>;
+        case 'square':
+          return <span>{'\u25fc'}</span>;
       }
     };
 
@@ -215,9 +172,8 @@ export default class OrderedList
     });
 
     const labels = {};
-    model.listItems.toArray().map((e, i) => {
-      labels[e.guid]
-        = <span style={ { display: 'inline-block', minWidth: '12px' } }>{getLabel(e, i)}</span>;
+    model.listItems.toArray().map((e) => {
+      labels[e.guid] = getLabel(e);
     });
 
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];

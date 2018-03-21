@@ -67,6 +67,13 @@ export class Ol extends Immutable.Record(defaultContent) {
 
     let model = new Ol().with({ guid });
 
+    if (t['@style'] !== undefined) {
+      model = model.with({ style: Maybe.just(t['@style']) });
+    }
+    if (t['@start'] !== undefined) {
+      model = model.with({ start: Maybe.just(t['@start']) });
+    }
+
     getChildren(t).forEach((item) => {
 
       const key = getKey(item);
@@ -90,8 +97,9 @@ export class Ol extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
 
-    const children = this.listItems.toArray().map(t => t.toPersistence());
+    const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
+    this.listItems.toArray().forEach(t => children.push(t.toPersistence()));
 
     const ol = {
       ol: {

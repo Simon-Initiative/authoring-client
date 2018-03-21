@@ -1,8 +1,15 @@
 export default {
   list: {
-    backgroundColor: 'white',
-    padding: 5,
-    border: '1px solid #ced4da',
-    borderRadius: 4,
+    paddingLeft: 20,
+  },
+  listItem: {
+    display: 'flex',
+  },
+  listItemContent: {
+    flexGrow: 1,
+    paddingLeft: 20,
+  },
+  listItemLabel: {
+
   },
 };

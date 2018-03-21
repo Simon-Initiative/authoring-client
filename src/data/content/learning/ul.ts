@@ -60,6 +60,10 @@ export class Ul extends Immutable.Record(defaultContent) {
 
     let model = new Ul().with({ guid });
 
+    if (t['@style'] !== undefined) {
+      model = model.with({ style: Maybe.just(t['@style']) });
+    }
+
     getChildren(t).forEach((item) => {
 
       const key = getKey(item);
@@ -83,8 +87,9 @@ export class Ul extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
 
-    const children = this.listItems.toArray().map(t => t.toPersistence());
+    const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
+    this.listItems.toArray().forEach(t => children.push(t.toPersistence()));
 
     const ul = {
       ul: {

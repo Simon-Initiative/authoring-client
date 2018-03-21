@@ -17,6 +17,7 @@ import { CiteEditor } from '../learning/CiteEditor';
 import { XrefEditor } from '../learning/XrefEditor';
 import { ImageEditor } from '../media/ImageEditor';
 import OrderedList from '../learning/OrderedList';
+import UnorderedList from '../learning/UnorderedList';
 import ListItem from '../learning/ListItem';
 
 let registry = null;
@@ -49,6 +50,7 @@ function init() {
   registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTube);
   registry['Ol'] = connectSidebarActions()(OrderedList);
+  registry['Ul'] = connectSidebarActions()(UnorderedList);
   registry['Li'] = connectSidebarActions()(ListItem);
 
 

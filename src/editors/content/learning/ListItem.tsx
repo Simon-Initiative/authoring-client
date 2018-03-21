@@ -3,18 +3,19 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
-  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
+  AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select } from '../common/controls';
-import { Maybe } from 'tsmonad';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+
 
 import styles from './List.styles';
 
 export interface ListItemProps
   extends AbstractContentEditorProps<contentTypes.Li> {
   onShowSidebar: () => void;
+  label: any;
 }
 
 export interface ListItemState {
@@ -39,7 +40,10 @@ export default class ListItem
   }
 
   renderToolbar() {
-    return null;
+    return (
+      <ToolbarGroup label="List Item" columns={8} highlightColor={CONTENT_COLORS.Li}>
+      </ToolbarGroup>
+    );
   }
 
   onEdit(content, src) {
@@ -48,15 +52,18 @@ export default class ListItem
 
   renderMain() : JSX.Element {
 
-    const { className, classes, model, parent, editMode } = this.props;
+    const { className, classes, label } = this.props;
 
     return (
-      <div className={classNames([classes.list, className])}>
-        <ContentContainer
-          {...this.props}
-          model={this.props.model.content}
-          onEdit={this.onEdit}
-        />
+      <div className={classNames([classes.listItem, className])}>
+        <div className={classNames([classes.listItemLabel, className])}>{label}</div>
+        <div className={classNames([classes.listItemContent, className])}>
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.content}
+            onEdit={this.onEdit.bind(this)}
+          />
+        </div>
       </div>);
   }
 

@@ -73,9 +73,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              const initialItem = new contentTypes.Li();
+              const li = new contentTypes.Li();
               onInsert(new contentTypes.Ol()
-              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>(initialItem),
+              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
               }));
             }
           }
@@ -84,9 +84,15 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-list-ol'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              const li = new contentTypes.Li();
+              onInsert(new contentTypes.Ul()
+              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
+              }));
+            }
+          }
             tooltip="Unordered List"
-            disabled>
+            disabled={!parentSupportsElementType('ul')}>
           <i className={'fa fa-list-ul'}/>
         </ToolbarButton>
         <ToolbarButton
