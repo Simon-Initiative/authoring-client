@@ -112,6 +112,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     return (
       <Objectives
         {...this.props}
+        activeContentGuid={null}
+        hover={null}
+        onUpdateHover={() => {}}
         model={this.props.model.head.objrefs}
         onFocus={() => {}}
         onEdit={this.onObjectivesEdit}/>

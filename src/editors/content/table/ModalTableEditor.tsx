@@ -48,6 +48,9 @@ class ModalTableEditor extends React.PureComponent<ModalTableEditorProps, ModalT
         onInsert={() => this.props.onInsert(this.state.model)}>
 
         <TableEditor
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={null}
           context={this.props.context}
           services={this.props.services}

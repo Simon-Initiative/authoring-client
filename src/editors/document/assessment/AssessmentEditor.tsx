@@ -33,6 +33,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -86,6 +88,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         || this.props.activeContext !== nextProps.activeContext
         || this.props.expanded !== nextProps.expanded
         || this.props.editMode !== nextProps.editMode
+        || this.props.hover !== nextProps.hover
         || this.state.currentPage !== nextState.currentPage
         || this.state.currentNode !== nextState.currentNode
         || this.state.undoStackSize !== nextState.undoStackSize
@@ -204,15 +207,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
 
   renderTitle() {
-    return <TitleContentEditor
-            parent={null}
-            onFocus={this.onFocus.bind(this, this.props.model.title, this)}
-            services={this.props.services}
-            context={this.props.context}
-            editMode={this.props.editMode}
-            model={this.props.model.title}
-            onEdit={this.onTitleEdit}
-            />;
+    return (
+      <TitleContentEditor
+        activeContentGuid={null}
+        hover={null}
+        onUpdateHover={() => {}}
+        parent={null}
+        onFocus={this.onFocus.bind(this, this.props.model.title, this)}
+        services={this.props.services}
+        context={this.props.context}
+        editMode={this.props.editMode}
+        model={this.props.model.title}
+        onEdit={this.onTitleEdit} />
+    );
   }
 
   onAddContent() {
@@ -477,12 +484,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       nothing: () => '',
     });
 
-    const rendererProps = {
-      model: this.props.model,
+    const activeContentGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
+    const assessmentNodeProps = {
+      ...this.props,
       skills: this.props.context.skills,
-      editMode: this.props.editMode,
-      context: this.props.context,
-      services: this.props.services,
+      activeContentGuid,
     };
 
     return (
@@ -507,7 +517,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               </div>
               <div className="nodeContainer">
                 {renderAssessmentNode(
-                  this.state.currentNode, rendererProps, this.onEditNode,
+                  this.state.currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
               </div>
             </div>

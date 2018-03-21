@@ -21,6 +21,9 @@ export interface QuestionEditorProps extends AbstractContentEditorProps<contentT
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface QuestionEditorState {
@@ -61,6 +64,7 @@ export class QuestionEditor
     this.onItemPartEdit = this.onItemPartEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onGradingChange = this.onGradingChange.bind(this);
+    this.onAddItemPart = this.onAddItemPart.bind(this);
 
     this.fillInTheBlankCommand
       = new InsertInputRefCommand(this, createFillInTheBlank, 'FillInTheBlank');
@@ -88,6 +92,14 @@ export class QuestionEditor
     }
 
     if (nextProps.activeItemId !== this.state.activeItemId) {
+      return true;
+    }
+
+    if (nextProps.hover !== this.props.hover) {
+      return true;
+    }
+
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
       return true;
     }
 
@@ -237,157 +249,54 @@ export class QuestionEditor
       || item.contentType === 'Numeric'
       || item.contentType === 'FillInTheBlank';
 
+    const questionProps = {
+      ...this.props,
+      onItemFocus: this.onFocusChange,
+      onRemove: this.onRemove,
+      onBlur: this.onBlur,
+      itemModel: item,
+      partModel: part,
+      body: this.props.model.body,
+      grading: this.props.model.grading,
+      onGradingChange: this.onGradingChange,
+      onBodyEdit: this.onBodyEdit,
+      hideGradingCriteria: !this.props.isParentAssessmentGraded,
+      canRemoveQuestion: canRemove,
+      onRemoveQuestion: this.props.onRemove.bind(this, this.props.model.guid),
+      onEdit: (c, p, src) => this.onItemPartEdit(c, p, src),
+    };
+
     if (isMultipart) {
-      const key = item ? item.guid : Math.random() + '';
       return (
         <MultipartInput
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={key}
-          itemModel={item}
-          partModel={part}
-          onAddItemPart={this.onAddItemPart.bind(this)}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
+          {...questionProps} itemModel={item}
           canInsertAnotherPart={part => this.canInsertAnotherPart(this.props.model, part)}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+          onAddItemPart={this.onAddItemPart}/>
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'single') {
       return (
-        <MultipleChoice
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+        <MultipleChoice {...questionProps} itemModel={item} />
       );
     }
     if (item.contentType === 'MultipleChoice' && item.select === 'multiple') {
       return (
-        <CheckAllThatApply
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+        <CheckAllThatApply {...questionProps} itemModel={item} />
       );
     }
     if (item.contentType === 'ShortAnswer') {
       return (
-        <ShortAnswer
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+        <ShortAnswer {...questionProps} itemModel={item} />
       );
     }
     if (item.contentType === 'Ordering') {
       return (
-        <Ordering
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+        <Ordering {...questionProps} itemModel={item} />
       );
     }
     if (item.contentType === 'Essay') {
       return (
-        <Essay
-          onFocus={this.props.onFocus}
-          onItemFocus={this.onFocusChange}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={this.props.editMode}
-          onRemove={this.onRemove}
-          onBlur={this.onBlur}
-          allSkills={this.props.allSkills}
-          key={item.guid}
-          itemModel={item}
-          partModel={part}
-          body={this.props.model.body}
-          grading={this.props.model.grading}
-          onGradingChange={this.onGradingChange}
-          onBodyEdit={this.onBodyEdit}
-          hideGradingCriteria={!this.props.isParentAssessmentGraded}
-          model={this.props.model}
-          canRemoveQuestion={canRemove}
-          onRemoveQuestion={this.props.onRemove.bind(this, this.props.model.guid)}
-          onEdit={(c, p, src) => this.onItemPartEdit(c, p, src)} />
+        <Essay {...questionProps} itemModel={item} />
       );
     }
   }

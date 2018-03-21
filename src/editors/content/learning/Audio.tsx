@@ -52,6 +52,9 @@ class Audio extends InteractiveRenderer<AudioProps, AudioState> {
         }
       }>
         <AudioEditor
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={null}
           model={this.props.data.audio}
           context={b.context}

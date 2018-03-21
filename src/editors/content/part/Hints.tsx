@@ -47,6 +47,9 @@ export abstract class Hints
     return this.props.model.hints.toArray().map((i) => {
       return (
         <HintEditor
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={this.props.onFocus}
           key={i.guid}
           {...this.props}

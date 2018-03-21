@@ -51,6 +51,10 @@ export interface InputListItemProps {
   connectDropTarget?: any;
   isHovered?: boolean;
   canDrop?: boolean;
+
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 const source = {
@@ -139,6 +143,9 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
                 : (null)
               }
               <ContentContainer
+                activeContentGuid={this.props.activeContentGuid}
+                hover={this.props.hover}
+                onUpdateHover={this.props.onUpdateHover}
                 onFocus={this.props.onFocus}
                 context={context}
                 services={services}

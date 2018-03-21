@@ -16,7 +16,6 @@ export enum RenderContext {
 export interface AbstractContentEditorProps<ModelType> {
   model: ModelType;
   parent?: ParentContainer;
-  activeContentGuid?: string;
   onEdit: (updated: ModelType, source?: Object) => void;
   onFocus: (
     model: any, parent: ParentContainer,
@@ -26,6 +25,9 @@ export interface AbstractContentEditorProps<ModelType> {
   editMode: boolean;
   renderContext?: RenderContext;
   styles?: any;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface AbstractContentEditorState {}

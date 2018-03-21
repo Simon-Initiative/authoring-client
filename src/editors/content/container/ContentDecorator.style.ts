@@ -17,6 +17,7 @@ export default {
       // display: 'flex',
       left: -18,
       opacity: 1,
+      cursor: 'grab',
       borderLeft: props => '2px solid ' + getContentColor(props.contentType),
 
       transition: 'opacity .1s ease-in',
@@ -30,7 +31,6 @@ export default {
     left: -14,
     width: 18,
     height: '100%',
-    cursor: 'grab',
     flexDirection: 'column',
     color: 'rgba(0,0,0,.2)',
     borderLeft: '2px solid transparent',
@@ -62,6 +62,11 @@ export default {
       '& $label': {
         marginLeft: 2,
       },
+
+      '& .contiguousTextEditor': {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+      },
     },
   },
   label: {
@@ -84,5 +89,10 @@ export default {
   },
   content: {
     flex: 1,
+
+    '&.active-content .contiguousTextEditor': {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+    },
   },
 };

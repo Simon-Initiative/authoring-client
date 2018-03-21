@@ -15,6 +15,7 @@ interface DispatchProps {
 
 interface OwnProps extends QuestionProps<contentTypes.QuestionItem> {
   canInsertAnotherPart: PartAddPredicate;
+  onAddItemPart: (item, part, body) => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

@@ -29,6 +29,9 @@ export interface AbstractItemPartEditorProps<ItemType> {
 
   onRemove: (item: ItemType, part: contentTypes.Part) => void;
 
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface AbstractItemPartEditorState {
@@ -50,7 +53,9 @@ export abstract class
 
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.partModel !== nextProps.partModel
-      || this.props.itemModel !== nextProps.itemModel;
+      || this.props.itemModel !== nextProps.itemModel
+      || this.props.hover !== nextProps.hover
+      || this.props.activeContentGuid !== nextProps.activeContentGuid;
   }
 
 }

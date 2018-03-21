@@ -51,6 +51,9 @@ export class Details
           <div className="col-11">
             <ContentContainer
               {...this.props}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
               editMode={this.props.editMode}
               model={this.props.model.head.title.text}
               onEdit={this.onTitleEdit} />
