@@ -165,6 +165,8 @@ export class ContextAwareSidebar
         context: contentParent.props.context,
         services: contentParent.props.services,
         editMode: contentParent.props.editMode,
+        hover: null,
+        onUpdateHover: () => {},
       };
 
       contentRenderer = React.createElement(

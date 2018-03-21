@@ -353,6 +353,9 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
       .map((choice, index) => {
         return (
           <Choice
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
             onFocus={this.props.onFocus}
             key={choice.guid}
             index={index}

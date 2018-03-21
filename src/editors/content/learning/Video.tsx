@@ -1,33 +1,33 @@
 import * as React from 'react';
-import { IFrame as IFrameType } from 'data/content/learning/iframe';
+import { Video as VideoType } from 'data/content/learning/video';
 import {
   InteractiveRenderer, InteractiveRendererProps, InteractiveRendererState,
 } from './InteractiveRenderer';
 import ModalMediaEditor from 'editors/content/media/ModalMediaEditor';
-import { IFrameEditor } from 'editors/content/media/IFrameEditor';
+import { VideoEditor } from 'editors/content/media/VideoEditor';
 import { buildUrl } from 'utils/path';
 import AutoHideEditRemove from './AutoHideEditRemove';
 
 import './markers.scss';
 
 type Data = {
-  iframe: IFrameType;
+  video: VideoType;
 };
 
-export interface IFrameProps extends InteractiveRendererProps {
+export interface VideoProps extends InteractiveRendererProps {
   data: Data;
 }
 
-export interface IFrameState extends InteractiveRendererState {
+export interface VideoState extends InteractiveRendererState {
 
 }
 
-export interface IFrameProps {
+export interface VideoProps {
 
 }
 
 
-class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
+class Video extends InteractiveRenderer<VideoProps, VideoState> {
 
   constructor(props) {
     super(props, {});
@@ -44,20 +44,20 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
         context={b.context}
         services={b.services}
 
-        model={this.props.data.iframe}
+        model={this.props.data.video}
         onCancel={() => this.props.blockProps.services.dismissModal()}
-        onInsert={(iframe) => {
+        onInsert={(video) => {
           this.props.blockProps.services.dismissModal();
-          this.props.blockProps.onEdit({ iframe });
+          this.props.blockProps.onEdit({ video });
         }
       }>
-        <IFrameEditor
-          onShowSidebar={() => {}}
+        <VideoEditor
+          onShowSidebar={() => ({})}
           activeContentGuid={null}
           hover={null}
           onUpdateHover={() => {}}
           onFocus={null}
-          model={this.props.data.iframe}
+          model={this.props.data.video}
           context={b.context}
           services={b.services}
           editMode={true}
@@ -72,22 +72,26 @@ class IFrame extends InteractiveRenderer<IFrameProps, IFrameState> {
 
   render() : JSX.Element {
 
-    const { src, height, width } = this.props.data.iframe;
-    const fullSrc = buildUrl(
-        this.props.blockProps.context.baseUrl,
-        this.props.blockProps.context.courseId,
-        this.props.blockProps.context.resourcePath,
-        src);
+    const { sources, controls } = this.props.data.video;
+
+    let fullSrc = '';
+    if (sources.size > 0) {
+      const src = sources.first().src;
+      fullSrc = buildUrl(
+      this.props.blockProps.context.baseUrl,
+      this.props.blockProps.context.courseId,
+      this.props.blockProps.context.resourcePath,
+      src);
+    }
 
     return (
       <div ref={c => this.focusComponent = c} onFocus={this.onFocus} onBlur={this.onBlur}>
         <AutoHideEditRemove onEdit={this.onClick} onRemove={this.onRemove}
           editMode={this.props.blockProps.editMode} >
-          <iframe src={fullSrc} height={height} width={width}/>
+          <video src={fullSrc} controls={controls}/>
         </AutoHideEditRemove>
-
       </div>);
   }
 }
 
-export default IFrame;
+export default Video;

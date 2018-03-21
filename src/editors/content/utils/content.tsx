@@ -20,6 +20,9 @@ export const CONTENT_COLORS = {
   Audio: flatui.pumpkin,
   Video: flatui.midnightBlue,
   IFrame: flatui.carrot,
+  Ul: distinct.distinctOlive,
+  Ol: distinct.distinctOlive,
+  Li: distinct.distinctMint,
 };
 
 export const CONTENT_ICONS = {
@@ -35,6 +38,9 @@ export const CONTENT_ICONS = {
   Activity: <i className={'fa fa-check'}/>,
   Video: <i className={'fa fa-film'}/>,
   IFrame: <i className={'fa fa-html5'}/>,
+  Ul: <i className={'fa fa-list-ul'}/>,
+  Ol: <i className={'fa fa-list-ol'}/>,
+  Li: <i className={'fa fa-list'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

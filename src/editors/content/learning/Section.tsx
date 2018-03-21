@@ -59,6 +59,9 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
         <SidebarGroup label="Title">
           <ToolbarContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={model.title.text}
             onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>
@@ -112,6 +115,9 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
         onEdit={() => {}} />
       <div className="nested-container">
         <ContentContainer
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           {...this.props}
           model={this.props.model.body}
           onEdit={this.onBodyEdit}

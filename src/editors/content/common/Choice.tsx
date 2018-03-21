@@ -78,6 +78,9 @@ export interface ChoiceProps  {
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback, src) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
   onRemove: (choiceId: string) => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface ChoiceState {
@@ -108,6 +111,9 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
 
       feedbackEditor =
         <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
           onFocus={this.props.onFocus}
           model={feedback.body}
           editMode={editMode}
@@ -135,6 +141,9 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
       <InputListItem
         className="choice"
         id={choice.guid}
+        activeContentGuid={this.props.activeContentGuid}
+        hover={this.props.hover}
+        onUpdateHover={this.props.onUpdateHover}
         onFocus={this.props.onFocus}
         label={convert.toAlphaNotation(index)}
         context={context}

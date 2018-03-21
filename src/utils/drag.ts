@@ -4,4 +4,5 @@ export enum DragTypes {
     OrganizationNode = 'OrganizationNode',
     Choice = 'Choice',
     InputItem = 'InputItem',
+    ListItem = 'ListItem',
 }

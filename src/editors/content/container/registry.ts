@@ -19,6 +19,9 @@ import { ImageEditor } from '../media/ImageEditor';
 import { AudioEditor } from '../media/AudioEditor';
 import { VideoEditor } from '../media/VideoEditor';
 import { IFrameEditor } from '../media/IFrameEditor';
+import OrderedList from '../learning/OrderedList';
+import UnorderedList from '../learning/UnorderedList';
+import ListItem from '../learning/ListItem';
 
 let registry = null;
 
@@ -52,4 +55,7 @@ function init() {
   registry['Audio'] = connectSidebarActions()(AudioEditor);
   registry['Video'] = connectSidebarActions()(VideoEditor);
   registry['IFrame'] = connectSidebarActions()(IFrameEditor);
+  registry['Ol'] = connectSidebarActions()(OrderedList);
+  registry['Ul'] = connectSidebarActions()(UnorderedList);
+  registry['Li'] = connectSidebarActions()(ListItem);
 }

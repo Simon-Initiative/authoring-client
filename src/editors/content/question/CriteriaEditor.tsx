@@ -78,6 +78,9 @@ export class CriteriaEditor
         {controls}
 
         <ContentContainer
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={this.props.onFocus}
           services={this.props.services}
           context={this.props.context}

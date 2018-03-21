@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import {
@@ -100,13 +101,22 @@ export abstract class Feedback
     return model.responses.toArray()
       // if a default response doesnt exist, create one and append it to the list
       .concat(this.getDefaultResponse() ? [] : new contentTypes.Response({
-        match : '*',
+        match: '*',
+        feedback: Immutable.OrderedMap((() => {
+          const newGuid = guid();
+          return ({
+            [newGuid]: contentTypes.Feedback.fromText('', newGuid),
+          });
+        })()),
       }))
       .map((response, i) => {
         const isDefault = response.match === '*';
 
         return (
           <InputListItem
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
             onFocus={this.props.onFocus}
             key={response.guid}
             className="response"
