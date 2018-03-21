@@ -18,6 +18,9 @@ export type Props = {
   context: AppContext,
   services: AppServices,
   skills: Immutable.OrderedMap<string, Skill>,
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 };
 
 export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
@@ -43,6 +46,9 @@ export function renderAssessmentNode(
             services={props.services}
             allSkills={props.skills}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             model={n}
             onEdit={(c, src) => onEdit(n.guid, c, src)}
             canRemove={canRemove}
@@ -58,6 +64,9 @@ export function renderAssessmentNode(
             editMode={props.editMode}
             services={props.services}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             model={n}
             onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
@@ -72,6 +81,9 @@ export function renderAssessmentNode(
             editMode={props.editMode}
             services={props.services}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             allSkills={props.skills}
             model={n}
             onEdit={(c, src) => onEdit(n.guid, c, src)}

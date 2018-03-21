@@ -52,6 +52,9 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         }
       }>
         <VideoEditor
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           onFocus={null}
           model={this.props.data.video}
           context={b.context}

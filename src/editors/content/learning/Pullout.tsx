@@ -74,6 +74,9 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
         <SidebarGroup label="Title">
           <ToolbarContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={model.title.text}
             onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
         </SidebarGroup>

@@ -201,6 +201,9 @@ export abstract class ChoiceFeedback
       // finally, render all response elements and the psudo-feedback element for all other choices
       .map((response, i) => (
         <InputListItem
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
           onFocus={this.props.onFocus}
           key={response.guid}
           className="response"

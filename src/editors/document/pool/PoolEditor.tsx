@@ -29,6 +29,8 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -159,6 +161,17 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     const text = this.props.model.resource.title;
 
+
+    const activeContentGuid = this.props.activeContext.activeChild.caseOf({
+      just: c => (c as any).guid,
+      nothing: () => '',
+    });
+
+    const assesmentNodeProps = {
+      ...this.props,
+      activeContentGuid,
+    };
+
     return (
       <div className="pool-editor">
         <h2 className="title-row">{text}</h2>
@@ -184,7 +197,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               </div>
               <div className="nodeContainer">
                 {renderAssessmentNode(
-                  this.state.currentNode, this.props, this.onEdit,
+                  this.state.currentNode, assesmentNodeProps, this.onEdit,
                   this.onRemove, this.onFocus,
                   true, null)}
               </div>

@@ -264,6 +264,9 @@ export class ImageEditor
 
           {this.row('Title', '8', <ContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             model={titleContent.text}
             editMode={this.props.editMode}
             onEdit={this.onTitleEdit}
@@ -271,6 +274,9 @@ export class ImageEditor
 
           {this.row('Caption', '8', <ContentContainer
           {...this.props}
+          activeContentGuid={null}
+          hover={null}
+          onUpdateHover={() => {}}
           model={caption.content}
           editMode={this.props.editMode}
           onEdit={this.onCaptionEdit}

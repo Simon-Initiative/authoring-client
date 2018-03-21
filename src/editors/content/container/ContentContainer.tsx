@@ -20,9 +20,8 @@ export type BoundProperty = {
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
   hideContentLabel?: boolean;
-  hover?: string;
-  onUpdateHover?: (hover: string) => void;
   bindProperties?: (element: ContentElement) => BoundProperty[];
+  activeContentGuid: string;
 }
 
 export interface ContentContainerState {
@@ -250,7 +249,7 @@ export class ContentContainer
           <ContentDecorator
             contentType={model.contentType}
             onSelect={() => this.onSelect(model)}
-            hideContentLabel={hideContentLabel}
+            hideContentLabel={hideContentLabel || !hover}
             key={model.guid}
             onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
             isHoveringContent={hover === model.guid}

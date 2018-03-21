@@ -64,6 +64,9 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
           <ContentContainer
             {...this.props}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => {}}
             parent={null}
             onFocus={this.props.onFocus}
             model={page.title.text}

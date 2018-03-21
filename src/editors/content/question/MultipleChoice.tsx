@@ -252,6 +252,9 @@ export class MultipleChoice
       const response = responses[i];
       return (
         <Choice
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
           onFocus={this.props.onFocus}
           key={choice.guid}
           index={i}
