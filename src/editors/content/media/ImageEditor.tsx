@@ -24,6 +24,7 @@ import { MediaMetadata } from 'editors/content/learning/MediaItems';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models';
 import { Checkbox } from 'editors/content/common/Checkbox';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 import styles from './MediaElement.style';
 
@@ -186,13 +187,6 @@ export class ImageSizeSidebar extends
           </label>
         </div>
 
-        <SidebarRow text="Native Proportions" width="9">
-          <Checkbox label=""
-            editMode={this.props.editMode && this.state.isSizeReceived}
-            value={this.state.isProportionConstrained}
-            onEdit={() =>
-              this.onToggleProportionContrained(!this.state.isProportionConstrained)}/>
-        </SidebarRow>
         <SidebarRow text="Width" width="9">
           <div className="input-group input-group-sm">
            <TextInput width="100px" label=""
@@ -211,6 +205,15 @@ export class ImageSizeSidebar extends
             onEdit={this.onEditHeight} />
             <span className="input-group-addon ">pixels</span>
           </div>
+        </SidebarRow>
+        <SidebarRow text="" width="12">
+          <ToggleSwitch
+            {...this.props}
+            editMode={this.props.editMode && this.state.isSizeReceived && !this.state.isNativeSize}
+            checked={this.state.isProportionConstrained}
+            onClick={() =>
+              this.onToggleProportionContrained(!this.state.isProportionConstrained)}
+            labelBefore="Native Aspect Ratio" />
         </SidebarRow>
       </div>
     );
