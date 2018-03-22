@@ -11,7 +11,6 @@ import { LegacyTypes } from 'data/types';
 import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/media/AudioEditor';
-import { selectVideo } from 'editors/content/media/VideoEditor';
 import { selectImage } from 'editors/content/media/ImageEditor';
 
 import styles from './InsertToolbar.style';
