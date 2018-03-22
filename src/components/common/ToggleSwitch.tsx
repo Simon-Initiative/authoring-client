@@ -18,7 +18,7 @@ export interface ToggleSwitchProps {
 export const ToggleSwitch: React.StatelessComponent<ToggleSwitchProps> = ({
   className, style, checked, onClick, labelBefore, labelAfter, editMode,
 }) => {
-  const disabled = (editMode === false);
+  const disabled = (editMode !== undefined && !editMode);
 
   return (
     <div
