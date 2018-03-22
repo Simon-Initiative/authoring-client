@@ -18,8 +18,14 @@ export default {
   },
 
   sidebarRow: {
-    p: {
-      marginBottom: '0px',
+    '& p': {
+      marginBottom: '.5rem',
+    },
+    '& .toggle-switch': {
+      fontSize: '.8em',
+    },
+    '& input': {
+      marginBottom: '6px',
     },
     marginBottom: '1rem',
   },

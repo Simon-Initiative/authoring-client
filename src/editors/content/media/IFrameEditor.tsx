@@ -75,8 +75,9 @@ export class IFrameEditor
   renderToolbar() {
     return (
       <ToolbarGroup
-        label="YouTube"
-        highlightColor={CONTENT_COLORS.IFrame}>
+        label="Web Page"
+        highlightColor={CONTENT_COLORS.IFrame}
+        columns={4}>
         <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-window-maximize"/></div>
           <div>Web Page URL</div>

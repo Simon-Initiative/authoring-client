@@ -89,7 +89,7 @@ export class YouTubeEditor
     return (
       <ToolbarGroup
         label="YouTube"
-        columns={6}
+        columns={5}
         highlightColor={CONTENT_COLORS.YouTube}>
         <ToolbarButton onClick={() => this.props.onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-youtube-play"/></div>
