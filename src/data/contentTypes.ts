@@ -128,6 +128,11 @@ import { Text } from './content/assessment/text';
 import { MultipleChoice } from './content/assessment/multiple_choice';
 import { Numeric } from './content/assessment/numeric';
 import { Unsupported } from './content/unsupported';
+import { Image } from './content/learning/image';
+import { Audio } from './content/learning/audio';
+import { Video } from './content/learning/video';
+import { YouTube } from './content/learning/youtube';
+import { IFrame } from './content/learning/iframe';
 
 export type QuestionItem =
   Essay |
@@ -138,3 +143,10 @@ export type QuestionItem =
   ShortAnswer |
   Text |
   Unsupported;
+
+export type MediaItem =
+  Image |
+  Audio |
+  Video |
+  YouTube |
+  IFrame;

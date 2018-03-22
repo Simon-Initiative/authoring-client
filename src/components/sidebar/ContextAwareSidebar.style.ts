@@ -17,6 +17,13 @@ export default {
     borderLeft: [[1, 'solid', colors.grayLight]],
   },
 
+  sidebarRow: {
+    p: {
+      marginBottom: '0px',
+    },
+    marginBottom: '1rem',
+  },
+
   content: {
     flex: 1,
     display: 'flex',
