@@ -80,7 +80,7 @@ export class VideoEditor
     return (
       <SidebarContent title="Video">
         <SidebarGroup label="">
-          <SidebarRow heading="">
+          <SidebarRow label="">
             <ToggleSwitch
               checked={this.props.model.controls}
               onClick={this.onControlEdit}
