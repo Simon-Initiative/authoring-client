@@ -15,7 +15,7 @@ import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
 import { ContiguousText } from 'data/content/learning//contiguous';
 import { buildCompositeDecorator } from './decorators/composite';
-
+import { findEntity, EntityRange } from 'data/content/learning/draft/changes';
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
@@ -291,9 +291,17 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
-    const onSelect = () => {
-      // Force selection
-
+    const onSelect = (entityKey) => {
+      // Force selection just before the entity
+      const range : EntityRange = findEntity(
+        (key, e) => entityKey === key, this.state.editorState.getCurrentContent());
+      const ss = SelectionState.createEmpty(range.contentBlock.key).merge({
+        anchorKey: range.contentBlock.key,
+        focusKey: range.contentBlock.key,
+        anchorOffset: range.start,
+        focusOffset: range.start,
+      });
+      this.props.onSelectionChange(ss);
     };
     const compositeDecorator = buildCompositeDecorator({
       activeItemId: this.props.activeItemId, services: this.props.services,
