@@ -9,11 +9,9 @@ import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 import { LegacyTypes } from 'data/types';
 import * as persistence from 'data/persistence';
-import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
-import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { CourseModel } from 'data/models/course';
-import { adjustPath } from 'editors/content/media/utils';
-import ModalSelection from 'utils/selection/ModalSelection';
+import { selectAudio } from 'editors/content/media/AudioEditor';
+import { selectImage } from 'editors/content/media/ImageEditor';
 
 import styles from './InsertToolbar.style';
 
@@ -25,34 +23,6 @@ export interface InsertToolbarProps {
   onDismissModal: () => void;
   resourcePath: string;
   courseModel: CourseModel;
-}
-
-function selectImage(resourcePath, courseModel, display, dismiss) : Promise<contentTypes.Image> {
-
-  return new Promise((resolve, reject) => {
-
-    const selected = { img: null };
-
-    const mediaLibrary =
-      <ModalSelection title="Select an Image"
-        onInsert={() => { dismiss(); resolve(selected.img); }}
-        onCancel={() => dismiss()}
-      >
-        <MediaManager model={new contentTypes.Image()}
-          resourcePath={resourcePath}
-          courseModel={courseModel}
-          onEdit={() => {}} mimeFilter={MIMETYPE_FILTERS.IMAGE}
-          selectionType={SELECTION_TYPES.SINGLE}
-          initialSelectionPaths={[]}
-          onSelectionChange={(img) => {
-            selected.img =
-            new contentTypes.Image().with({ src: adjustPath(img[0].pathTo, resourcePath) });
-
-          }} />
-      </ModalSelection>;
-
-    display(mediaLibrary);
-  });
 }
 
 /**
@@ -139,7 +109,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-              selectImage(resourcePath, courseModel, onDisplayModal, onDismissModal)
+              selectImage(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
                 .then((image) => {
                   if (image !== null) {
                     onInsert(image);
@@ -151,16 +121,17 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-image'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              selectAudio(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
+                .then((audio) => {
+                  if (audio !== null) {
+                    onInsert(audio);
+                  }
+                });
+            }}
             tooltip="Insert Audio Clip"
-            disabled>
+            disabled={!parentSupportsElementType('audio')}>
           <i className={'fa fa-volume-up'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Insert Video Clip"
-            disabled>
-          <i className={'fa fa-film'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.YouTube())}
@@ -169,10 +140,10 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-youtube'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Insert iFrame"
-            disabled>
-          <i className={'fa fa-html5'}/>
+            onClick={() => onInsert(new contentTypes.IFrame())}
+            tooltip="Embed Web Page"
+            disabled={!parentSupportsElementType('iframe')}>
+          <i className={'fa fa-window-maximize'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.Pullout())}
