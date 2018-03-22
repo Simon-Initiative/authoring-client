@@ -20,7 +20,9 @@ export const CONTENT_COLORS = {
   Ul: distinct.distinctOlive,
   Ol: distinct.distinctOlive,
   Li: distinct.distinctMint,
-
+  Table: flatui.pomegranite,
+  CellData: flatui.pomegranite,
+  CellHeader: flatui.pomegranite,
 };
 
 export const CONTENT_ICONS = {
@@ -36,6 +38,9 @@ export const CONTENT_ICONS = {
   Ul: <i className={'fa fa-list-ul'}/>,
   Ol: <i className={'fa fa-list-ol'}/>,
   Li: <i className={'fa fa-list'}/>,
+  Table: <i className={'fa fa-table'}/>,
+  CellData: <i className={'fa fa-table'}/>,
+  CellHeader: <i className={'fa fa-table'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
