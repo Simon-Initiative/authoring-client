@@ -18,6 +18,7 @@ interface MathProps {
   contentState: ContentState;
   entityKey: string;
   onEdit: (c: ContentState) => void;
+  onDecoratorClick: (offsetKey) => void;
 }
 
 class Math extends React.Component<MathProps, any> {

@@ -291,9 +291,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
+    const onSelect = () => {
+      // Force selection
+
+    };
     const compositeDecorator = buildCompositeDecorator({
       activeItemId: this.props.activeItemId, services: this.props.services,
       context: this.props.context, onEdit: onDecoratorEdit,
+      onDecoratorClick: onSelect,
     });
     return compositeDecorator;
   }
