@@ -63,7 +63,7 @@ export function removeEntity(
 }
 
 
-function findEntity(
+export function findEntity(
   isEntity: (key: string, entity) => boolean, contentState: ContentState) : EntityRange {
 
   const matchPredicate = (key: string) => {

@@ -18,6 +18,7 @@ interface MathProps {
   contentState: ContentState;
   entityKey: string;
   onEdit: (c: ContentState) => void;
+  onDecoratorClick: (offsetKey) => void;
 }
 
 class Math extends React.Component<MathProps, any> {
@@ -31,7 +32,8 @@ class Math extends React.Component<MathProps, any> {
       = this.props.contentState.getEntity(this.props.entityKey).getData();
 
     return (
-      <span data-offset-key={this.props.offsetKey}>
+      <span data-offset-key={this.props.offsetKey}
+        onClick={e => this.props.onDecoratorClick(this.props.entityKey)}>
         <MathRenderer inline>{data.data}</MathRenderer>
       </span>
     );
