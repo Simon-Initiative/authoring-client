@@ -50,7 +50,7 @@ export class ShortAnswer
     const feedbacks = OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
-      score: '0',
+      score: '1',
       match: '',
       feedback: feedbacks.set(feedback.guid, feedback),
     });
