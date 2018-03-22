@@ -79,9 +79,21 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-quote-right'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+              const cell1 = new contentTypes.CellData();
+              const cell2 = new contentTypes.CellData();
+              const row = new contentTypes.Row().with({
+                cells: Immutable.OrderedMap
+                <string, contentTypes.CellData | contentTypes.CellHeader>(
+                  [[cell1.guid, cell1], [cell2.guid, cell2]]),
+              });
+              onInsert(new contentTypes.Table()
+              .with({ rows: Immutable.OrderedMap<string, contentTypes.Row>().set(row.guid, row),
+              }));
+            }
+          }
             tooltip="Insert Table"
-            disabled>
+            disabled={!parentSupportsElementType('table')}>
           <i className={'fa fa-table'}/>
         </ToolbarButton>
         <ToolbarButton

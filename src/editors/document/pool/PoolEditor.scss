@@ -6,6 +6,10 @@
   flex-direction: column;
   overflow: hidden;
 
+  .title-row {
+    margin: 10px;
+  }
+
   .pool-content {
     display: flex;
     flex-direction: row;

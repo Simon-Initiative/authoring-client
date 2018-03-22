@@ -6,6 +6,10 @@
   flex-direction: column;
   overflow: hidden;
 
+  .title-row {
+    margin: 10px;
+  }
+
 	.docHead {
     flex: 1;
     overflow: auto;
