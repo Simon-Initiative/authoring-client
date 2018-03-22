@@ -22,6 +22,9 @@ import { YouTubeEditor } from '../media/YouTubeEditor';
 import OrderedList from '../learning/OrderedList';
 import UnorderedList from '../learning/UnorderedList';
 import ListItem from '../learning/ListItem';
+import { TableEditor } from '../learning/table/TableEditor';
+import { CellEditor } from '../learning/table/CellEditor';
+
 
 let registry = null;
 
@@ -58,4 +61,7 @@ function init() {
   registry['Ol'] = connectSidebarActions()(OrderedList);
   registry['Ul'] = connectSidebarActions()(UnorderedList);
   registry['Li'] = connectSidebarActions()(ListItem);
+  registry['Table'] = connectSidebarActions()(TableEditor);
+  registry['CellData'] = connectSidebarActions()(CellEditor);
+  registry['CellHeader'] = connectSidebarActions()(CellEditor);
 }
