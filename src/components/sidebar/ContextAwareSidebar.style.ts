@@ -12,6 +12,9 @@ export default {
     flexDirection: 'column',
     width: SIDEBAR_WIDTH,
     overflow: 'hidden',
+    height: '100%',
+    backgroundColor: '#fafafa',
+    borderLeft: [[1, 'solid', colors.grayLight]],
   },
 
   content: {
@@ -20,7 +23,6 @@ export default {
     flexDirection: 'column',
     width: SIDEBAR_WIDTH,
     padding: 10,
-    paddingTop: 0,
   },
 
   header: {

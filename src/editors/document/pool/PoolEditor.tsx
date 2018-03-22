@@ -174,10 +174,11 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <div className="pool-editor">
-        <h2 className="title-row">{text}</h2>
         <ContextAwareToolbar context={context} />
         <div className="pool-content">
           <div className="html-editor-well">
+            <h2 className="title-row">{text}</h2>
+
             <AddQuestion
               editMode={this.props.editMode}
               onQuestionAdd={this.addQuestion.bind(this)}

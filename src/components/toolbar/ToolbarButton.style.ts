@@ -5,7 +5,7 @@ export default {
   toolbarButton: {
     background: 'transparent',
     fontSize: 12,
-    color: colors.black,
+    color: colors.grayDarkest,
     textAlign: 'center',
     verticalAlign: 'top',
     border: '1px solid transparent',
@@ -23,11 +23,11 @@ export default {
     },
 
     '&[disabled]': {
-      color: colors.gray,
+      color: colors.grayLight,
 
       '&:hover': {
         cursor: 'default',
-        color: colors.gray,
+        color: colors.grayLight,
         border: '1px solid transparent',
       },
     },

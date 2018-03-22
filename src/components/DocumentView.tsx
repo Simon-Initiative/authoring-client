@@ -46,7 +46,7 @@ export default class DocumentView
     const { course, documentId, profile, userId, userName } = this.props;
 
     return (
-      <div className="document-view container-fluid">
+      <div className="document-view">
         <EditorManager
           course={course}
           profile={profile}

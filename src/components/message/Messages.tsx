@@ -49,9 +49,9 @@ export class Messages
     const messages = [...errors, ...warnings, ...infos];
 
     return (
-      <div>
+      <div className="messages">
         <ReactCSSTransitionGroup transitionName="message"
-        transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+        transitionEnterTimeout={250} transitionLeaveTimeout={250}>
           {messages.map(m => <Message key={m.guid} {...this.props} message={m}/>)}
         </ReactCSSTransitionGroup>
       </div>
