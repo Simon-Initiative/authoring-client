@@ -1,257 +1,146 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import { ContentElements } from 'data/content/common/elements';
-import { ContentContainer } from '../container/ContentContainer';
-import { Video } from '../../../data/content/learning/video';
+import { OrderedMap } from 'immutable';
+import { Video } from 'data/content/learning/video';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Tracks } from './Tracks';
-import { TextInput } from '../common/TextInput';
-import { TabContainer } from '../common/TabContainer';
-import { MediaManager } from './manager/MediaManager.controller';
-import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
-import { MediaItem } from 'types/media';
+import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
+import { adjustPath } from 'editors/content/media/utils';
+import { SidebarRow, SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { MediaMetadata, MediaWidthHeight } from 'editors/content/learning/MediaItems';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { buildUrl } from 'utils/path';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import ModalSelection from 'utils/selection/ModalSelection';
 import { Source } from 'data/content/learning/source';
-import { adjustPath } from './utils';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
-
+  onShowSidebar: () => void;
 }
 
 export interface VideoEditorState {
 
 }
 
-/**
- * The content editor for Table.
- */
+export function selectVideo(
+  model, resourcePath, courseModel, display, dismiss) : Promise<Video> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { video: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select a Video File"
+        onInsert={() => { dismiss(); resolve(selected.video); }}
+        onCancel={() => dismiss()}>
+        <MediaManager model={model ? model : new Video()}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.VIDEO}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[model ? model.sources.first().src : model]}
+          onSelectionChange={(video) => {
+            const source = new Source({
+              src: adjustPath(video[0].pathTo, resourcePath),
+            });
+            const sources = OrderedMap<string, Source>().set(source.guid, source);
+            selected.video = new Video().with({ sources });
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+}
+
 export class VideoEditor
   extends AbstractContentEditor<Video, VideoEditorProps, VideoEditorState> {
 
   constructor(props) {
     super(props);
 
-    this.onSetClick = this.onSetClick.bind(this);
-    this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onSourcesEdit = this.onSourcesEdit.bind(this);
-    this.onTracksEdit = this.onTracksEdit.bind(this);
-    this.onHeightEdit = this.onHeightEdit.bind(this);
-    this.onWidthEdit = this.onWidthEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onCaptionEdit = this.onCaptionEdit.bind(this);
-    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
-    this.renderSources = this.renderSources.bind(this);
-  }
-
-  onPopoutEdit(content: string) {
-    const popout = this.props.model.popout.with({ content });
-    this.props.onEdit(this.props.model.with({ popout }));
-  }
-
-
-  onTitleEdit(text: ContentElements) {
-    const titleContent = this.props.model.titleContent.with({ text });
-    this.props.onEdit(this.props.model.with({ titleContent }));
-  }
-
-  onCaptionEdit(content: ContentElements) {
-    const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }));
-  }
-
-  onAlternateEdit(content: ContentElements) {
-    const alternate = this.props.model.alternate.with({ content });
-    this.props.onEdit(this.props.model.with({ alternate }));
   }
 
   onTypeEdit(type: string) {
-    this.props.onEdit(this.props.model.with({ type }));
+    const model = this.props.model.with({ type });
+    this.props.onEdit(model, model);
   }
 
-  onControlEdit(e) {
-    const controls = e.checked;
-    this.props.onEdit(this.props.model.with({ controls }));
+  onControlEdit() {
+    const controls = !this.props.model.controls;
+    const model = this.props.model.with({ controls });
+    this.props.onEdit(model, model);
   }
-
-  onSetClick() {
-    // TODO
-  }
-
-  onSourcesEdit(sources) {
-    this.props.onEdit(this.props.model.with({ sources }));
-  }
-
-  onTracksEdit(tracks) {
-    this.props.onEdit(this.props.model.with({ tracks }));
-  }
-
-  onHeightEdit(height: string) {
-    this.props.onEdit(this.props.model.with({ height }));
-  }
-
-  onWidthEdit(width: string) {
-    this.props.onEdit(this.props.model.with({ width }));
-  }
-
-  renderTracks() {
-
-    const { tracks } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '5px' } }>
-
-        <Tracks
-          {...this.props}
-          mediaType="video"
-          accept="video/*"
-          model={tracks}
-          onEdit={this.onTracksEdit}
-        />
-
-      </div>
-    );
-  }
-
-  renderOther() {
-    const { titleContent, caption, popout } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '30px' } }>
-
-          {this.row('', '8', <label className="form-check-label">
-            &nbsp;&nbsp;&nbsp;
-            <input type="checkbox" readOnly
-              onClick={this.onControlEdit}
-              className="form-check-input"
-              checked={this.props.model.controls}
-              value="option1"/>&nbsp;&nbsp;
-            Display video controls
-          </label>)}
-
-          <br/>
-
-
-          {this.row('Title', '8', <ContentContainer
-            {...this.props}
-            model={titleContent.text}
-            editMode={this.props.editMode}
-            onEdit={this.onTitleEdit}
-          />)}
-
-          <br/>
-
-          {this.row('Caption', '8', <ContentContainer
-          {...this.props}
-          model={caption.content}
-          editMode={this.props.editMode}
-          onEdit={this.onCaptionEdit}
-          />)}
-
-          <br/>
-
-          {this.row('Popout', '8', <TextInput width="100%" label=""
-              editMode={this.props.editMode}
-              value={popout.content}
-              type="text"
-              onEdit={this.onPopoutEdit}
-            />)}
-
-      </div>
-    );
-  }
-
-  row(text: string, width: string, control: any) {
-    const widthClass = 'col-' + width;
-    return (
-      <div className="row justify-content-start">
-        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
-          className="col-1 col-form-label">{text}</label>
-        <div className={widthClass}>
-          {control}
-        </div>
-      </div>
-    );
-  }
-
-
-  renderSizing() {
-    const { width, height } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '70px', marginLeft: '75px' } }>
-
-        {this.row('Height', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label=""
-            editMode={this.props.editMode}
-            value={height}
-            type="number"
-            onEdit={this.onHeightEdit}
-          /><span className="input-group-addon ">pixels</span></div>)}
-        {this.row('Width', '1', <div className="input-group input-group-sm">
-            <TextInput width="100px" label=""
-            editMode={this.props.editMode}
-            value={width}
-            type="number"
-            onEdit={this.onWidthEdit}
-          /><span className="input-group-addon" id="basic-addon2">pixels</span></div>)}
-
-      </div>
-    );
-  }
-
-  onSourceSelectionChange(selections: MediaItem[]) {
-    const { model, context, onEdit } = this.props;
-
-    if (selections.length > 0) {
-      const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
-
-      onEdit(model.with({
-        sources: Immutable.OrderedMap<string, Source>().set(source.guid, source),
-      }));
-    }
-  }
-
-  renderSources() {
-    const { context, model, onEdit } = this.props;
-
-    return (
-      <MediaManager resourcePath={context.resourcePath}
-        courseModel={context.courseModel} model={model}
-        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.VIDEO}
-        selectionType={SELECTION_TYPES.SINGLE}
-        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
-        onSelectionChange={this.onSourceSelectionChange} />
-    );
-  }
-
 
   renderSidebar() {
-    return null;
+    return (
+      <SidebarContent title="Video">
+        <SidebarGroup label="">
+          <SidebarRow label="">
+            <ToggleSwitch
+              checked={this.props.model.controls}
+              onClick={this.onControlEdit}
+              labelBefore="Display video controls" />
+          </SidebarRow>
+
+        <MediaWidthHeight
+            width={this.props.model.width}
+            height={this.props.model.height}
+            editMode={this.props.editMode}
+            onEditWidth={(width) => {
+              const model = this.props.model.with({ width });
+              this.props.onEdit(model, model);
+            }}
+            onEditHeight={(height) => {
+              const model = this.props.model.with({ height });
+              this.props.onEdit(model, model);
+            }} />
+
+        <MediaMetadata
+          {...this.props}
+          model={this.props.model}
+          onEdit={this.props.onEdit} />
+        </SidebarGroup>
+      </SidebarContent>
+    );
   }
   renderToolbar() {
-    return null;
+    const { onShowSidebar } = this.props;
+
+    return (
+      <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video}>
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-sliders"/></div>
+            <div>Details</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
+    );
   }
 
   renderMain() : JSX.Element {
 
+    const { sources, controls, width, height } = this.props.model;
+
+    let fullSrc = '';
+    if (sources.size > 0) {
+      const src = sources.first().src;
+      fullSrc = buildUrl(
+      this.props.context.baseUrl,
+      this.props.context.courseId,
+      this.props.context.resourcePath,
+      src);
+    }
+
     return (
-      <div className="itemWrapper">
-
-        <br/>
-
-        <TabContainer labels={['Sources', 'Tracks', 'Sizing', 'Other']}>
-          {this.renderSources()}
-          {this.renderTracks()}
-          {this.renderSizing()}
-          {this.renderOther()}
-        </TabContainer>
-
+      <div className="videoEditor">
+        <video width={width} height={height} src={fullSrc} controls={controls}/>
       </div>
     );
-
   }
-
 }
-

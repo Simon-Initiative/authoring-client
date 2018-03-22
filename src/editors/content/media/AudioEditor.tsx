@@ -1,30 +1,61 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { ContentElements } from 'data/content/common/elements';
-import { ContentContainer } from '../container/ContentContainer';
-import { Audio } from '../../../data/content/learning/audio';
+import { Audio } from 'data/content/learning/audio';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Tracks } from './Tracks';
-import { TextInput } from '../common/TextInput';
-import { TabContainer } from '../common/TabContainer';
-
-import { MediaManager } from './manager/MediaManager.controller';
-import { MIMETYPE_FILTERS, SELECTION_TYPES } from './manager/MediaManager';
-import { MediaItem } from 'types/media';
+import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
+import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
+import { adjustPath } from 'editors/content/media/utils';
+import { SidebarRow, SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { modalActions } from 'actions/modal';
+import ModalSelection from 'utils/selection/ModalSelection';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { buildUrl } from 'utils/path';
+import { MediaMetadata } from 'editors/content/learning/MediaItems';
 import { Source } from 'data/content/learning/source';
-import { adjustPath } from './utils';
 
 export interface AudioEditorProps extends AbstractContentEditorProps<Audio> {
-
+  onShowSidebar: () => void;
 }
 
 export interface AudioEditorState {
 
 }
 
-/**
- * The content editor for Table.
- */
+export function selectAudio(
+  model, resourcePath, courseModel, display, dismiss) : Promise<Audio> {
+
+  return new Promise((resolve, reject) => {
+
+    const selected = { audio: null };
+
+    const mediaLibrary =
+      <ModalSelection title="Select an Audio File"
+        onInsert={() => { dismiss(); resolve(selected.audio); }}
+        onCancel={() => dismiss()}>
+        <MediaManager model={model ? model : new Audio()}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => {}}
+          mimeFilter={MIMETYPE_FILTERS.AUDIO}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[model ? model.sources.first().src : model]}
+          onSelectionChange={(audio) => {
+            const source = new Source({
+              src: adjustPath(audio[0].pathTo, resourcePath),
+            });
+            const sources = Immutable.OrderedMap<string, Source>().set(source.guid, source);
+            selected.audio = new Audio().with({ sources });
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+}
+
 export class AudioEditor
   extends AbstractContentEditor<Audio, AudioEditorProps, AudioEditorState> {
 
@@ -32,176 +63,102 @@ export class AudioEditor
     super(props);
 
     this.onPopoutEdit = this.onPopoutEdit.bind(this);
-    this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
-    this.onTracksEdit = this.onTracksEdit.bind(this);
-    this.onTitleEdit = this.onTitleEdit.bind(this);
-    this.onCaptionEdit = this.onCaptionEdit.bind(this);
-    this.onSourceSelectionChange = this.onSourceSelectionChange.bind(this);
-    this.renderSources = this.renderSources.bind(this);
-  }
-
-  onTitleEdit(text: ContentElements) {
-    const titleContent = this.props.model.titleContent.with({
-      text,
-    });
-    this.props.onEdit(this.props.model.with({ titleContent }));
-  }
-
-  onCaptionEdit(content: ContentElements) {
-    const caption = this.props.model.caption.with({ content });
-    this.props.onEdit(this.props.model.with({ caption }));
   }
 
   onPopoutEdit(content: string) {
     const popout = this.props.model.popout.with({ content });
-    this.props.onEdit(this.props.model.with({ popout }));
+    const model = this.props.model.with({ popout });
+    this.props.onEdit(model, model);
   }
 
-  onAlternateEdit(content: ContentElements) {
-    const alternate = this.props.model.alternate.with({ content });
-    this.props.onEdit(this.props.model.with({ alternate }));
+  onControlEdit() {
+    const controls = !this.props.model.controls;
+    const model = this.props.model.with({ controls });
+    this.props.onEdit(model, model);
   }
 
-  onControlEdit(e) {
-    const controls = e.checked;
-    this.props.onEdit(this.props.model.with({ controls }));
+  onSelect() {
+    const { context, services, onEdit, model } = this.props;
+
+    const dispatch = (services as any).dispatch;
+    const dismiss = () => dispatch(modalActions.dismiss());
+    const display = c => dispatch(modalActions.display(c));
+
+    selectAudio(model, context.resourcePath, context.courseModel, display, dismiss)
+      .then((audio) => {
+        if (audio !== null) {
+          const source = new Source({ src: audio.sources.first().src });
+          const model = this.props.model.with({ sources:
+            Immutable.OrderedMap<string, Source>().set(source.guid, source),
+          });
+          onEdit(model, model);
+        }
+      });
   }
 
-  onTracksEdit(tracks) {
-    this.props.onEdit(this.props.model.with({ tracks }));
-  }
-
-  renderTracks() {
-    const { tracks } = this.props.model;
-
+  renderSidebar(): JSX.Element {
     return (
-      <div style={ { marginTop: '5px' } }>
+      <SidebarContent title="Audio">
+        <SidebarGroup label="">
 
-        <Tracks
-          {...this.props}
-          mediaType="audio"
-          accept="audio/*"
-          model={tracks}
-          onEdit={this.onTracksEdit}
-        />
-
-      </div>
-    );
-  }
-
-  renderOther() {
-    const { titleContent, caption, popout } = this.props.model;
-
-    return (
-      <div style={ { marginTop: '30px' } }>
-
-          {this.row('', '8', <label className="form-check-label">
-            &nbsp;&nbsp;&nbsp;
-            <input type="checkbox"
-              onClick={this.onControlEdit}
-              className="form-check-input"
+          <SidebarRow label="">
+            <ToggleSwitch
               checked={this.props.model.controls}
-              value="option1"/>&nbsp;&nbsp;
-            Display audio controls
-          </label>)}
+              onClick={this.onControlEdit}
+              labelBefore="Display audio controls" />
+          </SidebarRow>
 
-          <br/>
-
-
-          {this.row('Title', '8', <ContentContainer
+          <MediaMetadata
             {...this.props}
-            model={titleContent.text}
-            editMode={this.props.editMode}
-            onEdit={this.onTitleEdit}
-          />)}
+            model={this.props.model}
+            onEdit={this.props.onEdit} />
 
-          <br/>
-
-          {this.row('Caption', '8', <ContentContainer
-          {...this.props}
-          model={caption.content}
-          editMode={this.props.editMode}
-          onEdit={this.onCaptionEdit}
-          />)}
-
-          <br/>
-
-          {this.row('Popout', '8', <TextInput width="100%" label=""
-              editMode={this.props.editMode}
-              value={popout.content}
-              type="text"
-              onEdit={this.onPopoutEdit}
-            />)}
-
-      </div>
+        </SidebarGroup>
+      </SidebarContent>
     );
   }
 
-  row(text: string, width: string, control: any) {
-    const widthClass = 'col-' + width;
-    return (
-      <div className="row justify-content-start">
-        <label style={{ display: 'block', width: '100px', textAlign: 'right' }}
-          className="col-1 col-form-label">{text}</label>
-        <div className={widthClass}>
-          {control}
-        </div>
-      </div>
-    );
-  }
-
-  onSourceSelectionChange(selections: MediaItem[]) {
-    const { model, context, onEdit } = this.props;
-
-    if (selections.length > 0) {
-      const source = new Source({ src: adjustPath(selections[0].pathTo, context.resourcePath) });
-
-      onEdit(model.with({
-        sources: Immutable.OrderedMap<string, Source>().set(source.guid, source),
-      }));
-    }
-  }
-
-  renderSources() {
-    const { context, model, onEdit } = this.props;
+  renderToolbar(): JSX.Element {
+    const { onShowSidebar } = this.props;
 
     return (
-      <MediaManager resourcePath={context.resourcePath}
-        courseModel={context.courseModel} model={model}
-        onEdit={onEdit} mimeFilter={MIMETYPE_FILTERS.AUDIO}
-        selectionType={SELECTION_TYPES.SINGLE}
-        initialSelectionPaths={model.sources.map(s => s.src).toArray()}
-        onSelectionChange={this.onSourceSelectionChange} />
+      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio}>
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-volume-up"/></div>
+            <div>Change Audio</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-sliders"/></div>
+            <div>Details</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
     );
-
-  }
-
-
-  renderSidebar() {
-    return null;
-  }
-  renderToolbar() {
-    return null;
   }
 
   renderMain() : JSX.Element {
 
+    const { sources, controls } = this.props.model;
+
+    let fullSrc = '';
+    if (sources.size > 0) {
+      const src = sources.first().src;
+      fullSrc = buildUrl(
+      this.props.context.baseUrl,
+      this.props.context.courseId,
+      this.props.context.resourcePath,
+      src);
+    }
+
     return (
-      <div className="itemWrapper">
-
-        <br/>
-
-        <TabContainer labels={['Sources', 'Tracks', 'Other']}>
-          {this.renderSources()}
-          {this.renderTracks()}
-          {this.renderOther()}
-        </TabContainer>
-
+      <div className="audioEditor">
+        <audio src={fullSrc} controls={controls}/>
       </div>
     );
-
   }
-
 }
-

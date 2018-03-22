@@ -52,6 +52,7 @@ class Video extends InteractiveRenderer<VideoProps, VideoState> {
         }
       }>
         <VideoEditor
+          onShowSidebar={() => ({})}
           activeContentGuid={null}
           hover={null}
           onUpdateHover={() => {}}

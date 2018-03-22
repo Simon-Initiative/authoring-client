@@ -18,7 +18,7 @@ export const Select = (props: SelectProps) => {
     {props.children}
   </select>;
 
-  if (props.label !== undefined) {
+  if (props.label !== undefined && props.label !== '') {
     return (
       <label className="mr-sm-2" htmlFor={id}>{props.label}&nbsp;&nbsp;
         {select}
