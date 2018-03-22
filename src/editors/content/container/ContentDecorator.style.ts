@@ -17,7 +17,7 @@ export default {
       // display: 'flex',
       left: -18,
       opacity: 1,
-      cursor: 'grab',
+      cursor: 'pointer',
       borderLeft: props => '2px solid ' + getContentColor(props.contentType),
 
       transition: 'opacity .1s ease-in',

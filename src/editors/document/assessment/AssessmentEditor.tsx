@@ -497,10 +497,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <h2 className="title-row">{text}</h2>
         <ContextAwareToolbar context={this.props.context}/>
         <div className="assessment-content">
           <div className="html-editor-well">
+            <h2 className="title-row">{text}</h2>
+
             {this.renderAdd()}
 
             <div className="outline">

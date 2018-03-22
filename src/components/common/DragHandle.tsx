@@ -18,14 +18,10 @@ export class DragHandle
 
     const dragHandle = (
       <div className="dragHandleGrab">
-        <span>
-          <i className="fa fa-bars"></i>
-        </span>
+        <div className="grip" />
       </div>
     );
 
     return connectDragSource ? this.props.connectDragSource(dragHandle) : dragHandle;
   }
-
 }
-
