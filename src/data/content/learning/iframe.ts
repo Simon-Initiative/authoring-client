@@ -27,7 +27,7 @@ const defaultContent = {
   contentType: 'IFrame',
   id: '',
   title: '',
-  src: 'www.example.com',
+  src: 'https://www.example.com',
   width: '1000',
   height: '400',
   popout: new Popout(),
