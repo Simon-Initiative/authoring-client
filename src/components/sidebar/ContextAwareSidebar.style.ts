@@ -30,6 +30,7 @@ export default {
     flexDirection: 'column',
     width: SIDEBAR_WIDTH,
     padding: 10,
+    overflowY: 'auto',
   },
 
   header: {
