@@ -102,7 +102,7 @@ export class AudioEditor
       <SidebarContent title="Audio">
         <SidebarGroup label="">
 
-          <SidebarRow text="" width="12">
+          <SidebarRow label="">
             <ToggleSwitch
               checked={this.props.model.controls}
               onClick={this.onControlEdit}

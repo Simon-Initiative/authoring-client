@@ -27,7 +27,7 @@ const defaultContent = {
   contentType: 'IFrame',
   id: '',
   title: '',
-  src: 'http://adarkroom.doublespeakgames.com/',
+  src: 'www.example.com',
   width: '1000',
   height: '400',
   popout: new Popout(),

@@ -161,7 +161,7 @@ export class ImageSizeSidebar extends
               defaultChecked={this.state.isNativeSize}
               onChange={() => this.onToggleNativeSizing(true)}
               type="radio"/>&nbsp;
-              Native
+              Default
           </label>
         </div>
         <div className="form-check" style={ { marginBottom: '30px' } }>
@@ -176,7 +176,7 @@ export class ImageSizeSidebar extends
           </label>
         </div>
 
-        <SidebarRow text="Width" width="9">
+        <SidebarRow label="Width">
           <div className="input-group input-group-sm">
            <TextInput width="100px" label=""
             editMode={this.props.editMode && !this.state.isNativeSize}
@@ -185,7 +185,7 @@ export class ImageSizeSidebar extends
             onEdit={this.onEditWidth}
           /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
         </SidebarRow>
-        <SidebarRow text="Height" width="9">
+        <SidebarRow label="Height">
           <div className="input-group input-group-sm">
             <TextInput width="100px" label=""
             editMode={this.props.editMode && !this.state.isNativeSize}
@@ -195,14 +195,14 @@ export class ImageSizeSidebar extends
             <span className="input-group-addon ">pixels</span>
           </div>
         </SidebarRow>
-        <SidebarRow text="" width="12">
+        <SidebarRow label="">
           <ToggleSwitch
             {...this.props}
             editMode={this.props.editMode && this.state.isSizeReceived && !this.state.isNativeSize}
             checked={this.state.isProportionConstrained}
             onClick={() =>
               this.onToggleProportionContrained(!this.state.isProportionConstrained)}
-            labelBefore="Native Aspect Ratio" />
+            labelBefore="Maintain Aspect Ratio" />
         </SidebarRow>
       </div>
     );
@@ -304,7 +304,7 @@ export class ImageEditor
     return (
       <div style={ { marginTop: '30px' } }>
 
-        <SidebarRow text="Align" width="6">
+        <SidebarRow label="Align">
           <Select label="" editMode={this.props.editMode}
             value={valign} onChange={this.onEditValign}>
             <option value="top">Top</option>
@@ -314,7 +314,7 @@ export class ImageEditor
           </Select>
         </SidebarRow>
 
-        <SidebarRow text="Alt" width="9">
+        <SidebarRow label="Alt">
           <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={alt}
@@ -350,18 +350,18 @@ export class ImageEditor
       });
   }
 
-
-
   renderSidebar() {
 
     return (
       <SidebarContent title="Image">
-        <SidebarGroup label="Size">
-          <ImageSizeSidebar
-            editMode={this.props.editMode}
-            model={this.props.model}
-            context={this.props.context}
-            onEdit={this.props.onEdit}/>
+        <SidebarGroup label="">
+          <SidebarRow label="Size">
+            <ImageSizeSidebar
+              editMode={this.props.editMode}
+              model={this.props.model}
+              context={this.props.context}
+              onEdit={this.props.onEdit}/>
+          </SidebarRow>
         </SidebarGroup>
         <SidebarGroup label="">
           {this.renderOther()}

@@ -78,9 +78,9 @@ export class VideoEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Audio">
+      <SidebarContent title="Video">
         <SidebarGroup label="">
-          <SidebarRow text="" width="12">
+          <SidebarRow heading="">
             <ToggleSwitch
               checked={this.props.model.controls}
               onClick={this.onControlEdit}

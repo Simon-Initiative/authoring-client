@@ -50,7 +50,7 @@ export class YouTubeEditor
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="">
-          <SidebarRow text="" width="12">
+          <SidebarRow label="">
             <div className="input-group">
               <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
                 <TextInput

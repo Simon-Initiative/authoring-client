@@ -35,9 +35,9 @@ export class IFrameEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="IFrame">
+      <SidebarContent title="Web Page">
         <SidebarGroup label="">
-          <SidebarRow text="" width="12">
+          <SidebarRow label="URL">
             <div className="input-group">
               <TextInput
                 {...this.props}
@@ -78,8 +78,8 @@ export class IFrameEditor
         label="YouTube"
         highlightColor={CONTENT_COLORS.IFrame}>
         <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-html5"/></div>
-          <div>Source URL</div>
+          <div><i className="fa fa-window-maximize"/></div>
+          <div>Web Page URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>

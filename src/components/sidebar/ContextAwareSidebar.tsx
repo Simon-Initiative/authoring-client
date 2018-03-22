@@ -12,23 +12,23 @@ import { getEditorByContentType } from 'editors/content/container/registry.ts';
 
 import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
 
-interface SidebarRow {
-  text: string;
-  width: string;
+interface SidebarRowProps {
+  label: string;
 }
 
-export const SidebarRow: React.StatelessComponent<SidebarRow> = ({ text, width, children }) => {
+export const SidebarRow = injectSheetSFC<SidebarRowProps>(styles)(({
+  classes, label, children }) => {
   return (
-    <div className="form-group row">
-      {text !== ''
-        ? <label className="col-3 col-form-label">{text}</label>
+    <div className={classes.sidebarRow}>
+      {label !== ''
+        ? <p>{label}</p>
         : null}
-      <div className={`col-${width}`}>
+      <div className={'col-12'}>
         {children}
       </div>
     </div>
   );
-};
+});
 
 interface SidebarHeaderProps {
   title: string;

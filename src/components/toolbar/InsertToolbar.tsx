@@ -123,19 +123,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-volume-up'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => {
-              selectVideo(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
-                .then((video) => {
-                  if (video !== null) {
-                    onInsert(video);
-                  }
-                });
-            }}
-            tooltip="Insert Video Clip"
-            disabled={!parentSupportsElementType('video')}>
-          <i className={'fa fa-film'}/>
-        </ToolbarButton>
-        <ToolbarButton
             onClick={() => onInsert(new contentTypes.YouTube())}
             tooltip="Insert YouTube Video"
             disabled={!parentSupportsElementType('youtube')}>
@@ -143,9 +130,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.IFrame())}
-            tooltip="Insert iFrame"
+            tooltip="Embed Web Page"
             disabled={!parentSupportsElementType('iframe')}>
-          <i className={'fa fa-html5'}/>
+          <i className={'fa fa-window-maximize'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.Pullout())}

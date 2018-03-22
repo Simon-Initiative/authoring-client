@@ -50,7 +50,7 @@ export class MediaWidthHeight extends React.PureComponent
   render() {
     return (
       <div>
-        <SidebarRow text="Width" width="9">
+        <SidebarRow label="Width">
           <div className="input-group input-group-sm">
             <TextInput width="100%" label=""
               editMode={this.props.editMode}
@@ -60,7 +60,7 @@ export class MediaWidthHeight extends React.PureComponent
             <span className="input-group-addon ">pixels</span>
           </div>
         </SidebarRow>
-        <SidebarRow text="Height" width="9">
+        <SidebarRow label="Height">
           <div className="input-group input-group-sm">
             <TextInput width="100%" label=""
               editMode={this.props.editMode}
@@ -157,30 +157,29 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
 
     return (
       <div>
-        <SidebarGroup label="Title">
-          <SidebarRow text="" width="12">
+        <SidebarGroup label="">
+          <SidebarRow label="Title">
             <ContentContainer
               {...this.props}
+              renderContext={undefined}
               activeContentGuid={null}
               hover={null}
               onUpdateHover={() => {}}
               model={titleContent.text}
               onEdit={this.onTitleEdit} />
           </SidebarRow>
-        </SidebarGroup>
-          <SidebarRow text="Popout" width="9">
+          <SidebarRow label="Popout">
             <ToggleSwitch
               {...this.props}
               checked={popout.enable}
               onClick={this.onPopoutEnableToggle}
               labelBefore="Enabled" />
-            <TextInput width="100%" label=""
+            <TextInput width="100%" label="Content"
               editMode={this.props.editMode}
               value={popout.content}
               type="text"
               onEdit={this.onPopoutEdit}/>
           </SidebarRow>
-        <SidebarGroup label="Caption">
           {/* Leaving alternate out for now */}
           {/* <SidebarRow text="Alternate" width="9">
             <ContentContainer
@@ -188,16 +187,17 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
               model={alternate.content}
               onEdit={this.onAlternateEdit} />
           </SidebarRow> */}
+          <SidebarRow label="Caption">
             <ContentContainer
               {...this.props}
+              renderContext={undefined}
               activeContentGuid={null}
               hover={null}
               onUpdateHover={() => {}}
               model={caption.content}
               onEdit={this.onCaptionEdit} />
-          </SidebarGroup>
-          <SidebarGroup label="Citation">
-            <SidebarRow text="" width="9">
+            </SidebarRow>
+            <SidebarRow label="Citation">
               <TextInput width="100%" label="Title"
                 editMode={this.props.editMode}
                 value={cite.title}
@@ -210,6 +210,7 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
                 onEdit={this.onCitationEntryEdit}/>
               <ContentContainer
                 {...this.props}
+                renderContext={undefined}
                 activeContentGuid={null}
                 hover={null}
                 onUpdateHover={() => {}}
