@@ -112,7 +112,7 @@ export class VideoEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video}>
+      <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video} columns={2}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>

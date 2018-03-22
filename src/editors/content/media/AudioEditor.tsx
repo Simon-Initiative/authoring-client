@@ -123,7 +123,7 @@ export class AudioEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio}>
+      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio} columns={4}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-volume-up"/></div>
