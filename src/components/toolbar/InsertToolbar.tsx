@@ -102,7 +102,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-code'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockCode())}
+            onClick={() => onInsert(new contentTypes.BlockCode().with({
+              text: contentTypes.ContiguousText.fromText('Text', ''),
+            }))}
             tooltip="Insert Code (For testing only)"
             disabled={!parentSupportsElementType('code')}>
           <i className={'fa fa-code'}/>

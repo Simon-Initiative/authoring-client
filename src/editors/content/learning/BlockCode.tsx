@@ -34,6 +34,7 @@ export class BlockCode
   }
 
   onEditText(content: ContentElement, source) {
+    console.log('content1', content);
     const updatedText = this.props.model.text.with({ content });
     const model = this.props.model.with({ text: updatedText });
     this.props.onEdit(model, source);
@@ -70,11 +71,9 @@ export class BlockCode
         <ContiguousTextEditor
           {...this.props}
           model={this.props.model.text.with({ mode: ContiguousTextMode.SimpleText })}
-          // model={((this.props.model.text.content as any).first() as ContiguousText)
-            // .with({ mode: ContiguousTextMode.SimpleText })}
           editorStyles={{ fontSize: 20 }}
-          onEdit={this.onEditText}
-           />
+          onEdit={() => {}}
+        />
       </div>
     );
   }
