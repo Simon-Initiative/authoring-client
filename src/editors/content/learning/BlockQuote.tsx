@@ -56,8 +56,8 @@ export class BlockQuote
 
     return (
       <div className="quoteEditor">
-    {/* Do we need the entry property? What is this? */}
         <Label>Entry</Label>
+        {/* Add Entry */}
         <ContiguousTextEditor
           {...this.props}
           model={this.props.model.text}
