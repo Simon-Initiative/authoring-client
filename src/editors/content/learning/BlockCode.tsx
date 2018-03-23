@@ -8,6 +8,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
+import { ContentElement } from 'data/content/common/interfaces';
 
 import styles from './Entity.style';
 
@@ -31,8 +33,10 @@ export class BlockCode
     this.onEditText = this.onEditText.bind(this);
   }
 
-  onEditText() {
-    return;
+  onEditText(content: ContentElement, source) {
+    const updatedText = this.props.model.text.with({ content });
+    const model = this.props.model.with({ text: updatedText });
+    this.props.onEdit(model, source);
   }
 
   renderSidebar() {
@@ -62,12 +66,15 @@ export class BlockCode
 
     return (
       <div className="codeEditor">
-        <Label>Entry</Label>
+        <Label>Code</Label>
         <ContiguousTextEditor
           {...this.props}
-          model={this.props.model.text}
+          model={this.props.model.text.with({ mode: ContiguousTextMode.SimpleText })}
+          // model={((this.props.model.text.content as any).first() as ContiguousText)
+            // .with({ mode: ContiguousTextMode.SimpleText })}
           editorStyles={{ fontSize: 20 }}
-          onEdit={(s) => {console.log(s);}} />
+          onEdit={this.onEditText}
+           />
       </div>
     );
   }

@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { augment, getChildren } from '../common';
 
-import { ContiguousText, ContigiousTextMode } from 'data/content/learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 export type BlockQuoteParams = {
   text?: ContiguousText,
@@ -12,7 +12,7 @@ export type BlockQuoteParams = {
 
 const defaultContent = {
   contentType: 'BlockQuote',
-  text: ContiguousText.fromText('', '').with({ mode: ContigiousTextMode.SimpleText }),
+  text: ContiguousText.fromText('', '').with({ mode: ContiguousTextMode.SimpleText }),
   entry: Maybe.nothing(),
   guid: '',
 };
@@ -43,7 +43,7 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
     const t = (root as any).quote;
 
     const text = ContiguousText.fromPersistence(getChildren(t), '')
-      .with({ mode: ContigiousTextMode.SimpleText });
+      .with({ mode: ContiguousTextMode.SimpleText });
     const entry = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);

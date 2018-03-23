@@ -13,7 +13,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { ContiguousText, ContigiousTextMode } from 'data/content/learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 import './nested.scss';
 
@@ -136,7 +136,7 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     <div>
       <ContiguousTextEditor
         {...this.props}
-        model={t.with({ mode: ContigiousTextMode.SimpleText })}
+        model={t.with({ mode: ContiguousTextMode.SimpleText })}
         editorStyles={{ fontSize: 20 }}
         onEdit={this.onTitleEdit.bind(this)} />
       <div className="nested-container">

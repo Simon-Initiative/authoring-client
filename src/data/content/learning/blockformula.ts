@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 
 import { augment, getChildren } from '../common';
 
-import { ContiguousText, ContigiousTextMode } from 'data/content/learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 export type BlockFormulaParams = {
   text?: ContiguousText,
@@ -11,7 +11,7 @@ export type BlockFormulaParams = {
 
 const defaultContent = {
   contentType: 'BlockFormula',
-  text: ContiguousText.fromText('', '').with({ mode: ContigiousTextMode.SimpleText }),
+  text: ContiguousText.fromText('', '').with({ mode: ContiguousTextMode.SimpleText }),
   guid: '',
 };
 
@@ -40,7 +40,7 @@ export class BlockFormula extends Immutable.Record(defaultContent) {
     const t = (root as any).formula;
 
     const text = ContiguousText.fromPersistence(getChildren(t), '')
-      .with({ mode: ContigiousTextMode.SimpleText });
+      .with({ mode: ContiguousTextMode.SimpleText });
 
     return new BlockFormula({ guid, text });
 

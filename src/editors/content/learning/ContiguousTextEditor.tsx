@@ -11,7 +11,7 @@ import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
-import { ContigiousTextMode } from 'data/content/learning/contiguous';
+import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import styles from './ContiguousTextEditor.styles';
 
 export interface ContiguousTextEditorProps
@@ -95,7 +95,7 @@ export default class ContiguousTextEditor
         'contiguousTextEditor', classes.contiguousText, viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
-            singleBlockOnly={model.mode === ContigiousTextMode.SimpleText}
+            singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
             activeItemId=""
             editorStyles={Object.assign({}, editorStyles)}
             onSelectionChange={selection => this.draftDrivenFocus(model, parent, selection)}
