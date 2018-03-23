@@ -14,22 +14,19 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import styles from './Entity.style';
 
-export interface FormulaEditorProps
-  extends AbstractContentEditorProps<contentTypes.Formula> {
+export interface BlockFormulaProps
+  extends AbstractContentEditorProps<contentTypes.BlockFormula> {
   onShowSidebar: () => void;
 }
 
-export interface FormulaEditorState {
+export interface BlockFormulaState {
 
 }
 
-/**
- * React Component
- */
 @injectSheet(styles)
-export class FormulaEditor
+export class BlockFormula
     extends AbstractContentEditor
-    <contentTypes.Formula, FormulaEditorProps & JSSProps, FormulaEditorState> {
+    <contentTypes.BlockFormula, BlockFormulaProps & JSSProps, BlockFormulaState> {
 
   constructor(props) {
     super(props);
@@ -46,7 +43,7 @@ export class FormulaEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Formula" highlightColor={CONTENT_COLORS.Formula} columns={2}>
+      <ToolbarGroup label="Formula" highlightColor={CONTENT_COLORS.BlockFormula} columns={2}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>
@@ -65,7 +62,7 @@ export class FormulaEditor
         <Label>Entry</Label>
         <ContiguousTextEditor
           {...this.props}
-          model={(this.props.model.text.content as any).first()}
+          model={this.props.model.text}
           editorStyles={{ fontSize: 20 }}
           viewOnly
           onEdit={() => {}} />

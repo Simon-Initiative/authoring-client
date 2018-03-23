@@ -14,22 +14,19 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import styles from './Entity.style';
 
-export interface CodeEditorProps
-  extends AbstractContentEditorProps<contentTypes.Code> {
+export interface BlockCodeProps
+  extends AbstractContentEditorProps<contentTypes.BlockCode> {
   onShowSidebar: () => void;
 }
 
-export interface CodeEditorState {
+export interface BlockCodeState {
 
 }
 
-/**
- * React Component
- */
 @injectSheet(styles)
-export class CodeEditor
+export class BlockCode
     extends AbstractContentEditor
-    <contentTypes.Code, CodeEditorProps & JSSProps, CodeEditorState> {
+    <contentTypes.BlockCode, BlockCodeProps & JSSProps, BlockCodeState> {
 
   constructor(props) {
     super(props);
@@ -46,7 +43,7 @@ export class CodeEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Code" highlightColor={CONTENT_COLORS.Code} columns={2}>
+      <ToolbarGroup label="Code" highlightColor={CONTENT_COLORS.BlockCode} columns={2}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>

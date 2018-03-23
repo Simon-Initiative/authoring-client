@@ -72,7 +72,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-list-alt'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Quote())}
+            onClick={() => onInsert(new contentTypes.BlockQuote())}
             tooltip="Insert Quote Block"
             disabled={!parentSupportsElementType('quote')}>
           <i className={'fa fa-quote-right'}/>
@@ -102,13 +102,13 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-code'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Code())}
+            onClick={() => onInsert(new contentTypes.BlockCode())}
             tooltip="Insert Code (For testing only)"
             disabled={!parentSupportsElementType('code')}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Formula())}
+            onClick={() => onInsert(new contentTypes.BlockFormula())}
             tooltip="Insert Formula Block"
             disabled={!parentSupportsElementType('formula')}>
           <i className="unicode-icon">&#8721;</i>

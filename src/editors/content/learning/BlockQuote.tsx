@@ -14,22 +14,19 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import styles from './Entity.style';
 
-export interface QuoteEditorProps
-  extends AbstractContentEditorProps<contentTypes.Quote> {
+export interface BlockQuoteProps
+  extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   onShowSidebar: () => void;
 }
 
-export interface QuoteEditorState {
+export interface BlockQuoteState {
 
 }
 
-/**
- * React Component
- */
 @injectSheet(styles)
-export class QuoteEditor
+export class BlockQuote
     extends AbstractContentEditor
-    <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
+    <contentTypes.BlockQuote, BlockQuoteProps & JSSProps, BlockQuoteState> {
 
   constructor(props) {
     super(props);
@@ -46,7 +43,7 @@ export class QuoteEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Quote" highlightColor={CONTENT_COLORS.Quote} columns={2}>
+      <ToolbarGroup label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={2}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>
@@ -66,7 +63,7 @@ export class QuoteEditor
         <Label>Entry</Label>
         <ContiguousTextEditor
           {...this.props}
-          model={(this.props.model.text.content as any).first()}
+          model={this.props.model.text}
           editorStyles={{ fontSize: 20 }}
           viewOnly
           onEdit={() => {}} />
