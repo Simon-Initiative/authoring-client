@@ -1,13 +1,10 @@
 import * as React from 'react';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { Label } from '../common/Sidebar';
-import { SidebarRow, SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { MediaMetadata, MediaWidthHeight } from 'editors/content/learning/MediaItems';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -30,6 +27,12 @@ export class BlockCode
 
   constructor(props) {
     super(props);
+
+    this.onEditText = this.onEditText.bind(this);
+  }
+
+  onEditText() {
+    return;
   }
 
   renderSidebar() {
@@ -64,7 +67,7 @@ export class BlockCode
           {...this.props}
           model={this.props.model.text}
           editorStyles={{ fontSize: 20 }}
-          onEdit={() => {}} />
+          onEdit={(s) => {console.log(s);}} />
       </div>
     );
   }
