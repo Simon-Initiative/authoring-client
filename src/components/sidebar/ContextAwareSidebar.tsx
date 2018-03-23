@@ -9,6 +9,12 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
+import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
+import { Resource } from 'data/content/resource';
+import { ModelTypes, ContentModel, WorkbookPageModel } from 'data/models';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
+import { ContentElements } from 'data/content/common/elements';
 
 import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
 
@@ -100,6 +106,12 @@ export interface ContextAwareSidebarProps {
   className?: string;
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
+  context: AppContext;
+  editMode: boolean;
+  services: AppServices;
+  resource: Resource;
+  model: ContentModel;
+  onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
   onInsert: (content: Object, textSelection) => void;
@@ -120,15 +132,60 @@ export class ContextAwareSidebar
 
   constructor(props) {
     super(props);
+
+    this.onWBPTitleEdit = this.onWBPTitleEdit.bind(this);
+  }
+
+  onWBPTitleEdit(text: ContentElements) {
+    const { model, onEditModel } = this.props;
+
+    const wbpModel = (model as WorkbookPageModel);
+
+    const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+
+    const resource = wbpModel.resource.with({ title: t });
+    const title = wbpModel.head.title.with({ text });
+    const head = wbpModel.head.with({ title });
+
+    onEditModel(wbpModel.with({ head, resource }));
   }
 
   renderPageDetails() {
-    return (
-      <div>
-        <SidebarHeader title="Page Details" onHide={this.props.onHide} />
-        Page Details
-      </div>
-    );
+    const {
+      model, resource, context, services, editMode,
+    } = this.props;
+
+    switch (model.modelType) {
+      case ModelTypes.WorkbookPageModel:
+        return (
+          <SidebarContent title="Page Details" onHide={this.props.onHide}>
+            <SidebarGroup label="">
+              <SidebarRow label="Title">
+                <ToolbarContentContainer
+                  activeContentGuid={null}
+                  hover={null}
+                  onUpdateHover={() => {}}
+                  onFocus={() => {}}
+                  model={model.head.title.text}
+                  context={context}
+                  services={services}
+                  editMode={editMode}
+                  onEdit={text => this.onWBPTitleEdit(text)} />
+              </SidebarRow>
+              <SidebarRow label="Created">
+                {`${resource.dateCreated.toLocaleDateString()}, \
+                ${resource.dateCreated.toLocaleTimeString()}`}
+              </SidebarRow>
+              <SidebarRow label="Last Updated">
+                {`${resource.dateUpdated.toLocaleDateString()}, \
+                ${resource.dateUpdated.toLocaleTimeString()}`}
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
+      default:
+        return null;
+    }
   }
 
   renderSidebarContent(contentRenderer, contentModel) {

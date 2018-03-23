@@ -472,6 +472,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   render() {
+    const { context, services, editMode, model, onEdit } = this.props;
+
 
     const page = this.getCurrentPage(this.props);
 
@@ -523,7 +525,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               </div>
             </div>
           </div>
-          <ContextAwareSidebar />
+          <ContextAwareSidebar
+            context={context} services={services} editMode={editMode} model={model}
+            onEditModel={onEdit} />
         </div>
       </div>);
 

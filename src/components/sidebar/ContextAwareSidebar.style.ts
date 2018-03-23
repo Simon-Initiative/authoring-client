@@ -1,7 +1,7 @@
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
-export const SIDEBAR_WIDTH = 300;
+export const SIDEBAR_WIDTH = 310;
 export const SIDEBAR_CLOSE_ANIMATION_DURATION_MS = 200;
 
 const SIDEBAR_CLOSE_ANIMATION_DURATION_S = SIDEBAR_CLOSE_ANIMATION_DURATION_MS / 1000;

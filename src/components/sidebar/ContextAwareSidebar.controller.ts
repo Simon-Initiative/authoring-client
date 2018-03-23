@@ -7,12 +7,17 @@ import { showSidebar } from 'actions/editorSidebar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
 import { ParentContainer } from 'types/active.ts';
+import { Resource } from 'data/content/resource';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
+import { ContentModel } from 'data/models';
 
 interface StateProps {
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   supportedElements: Immutable.List<string>;
   show: boolean;
+  resource: Resource;
 }
 
 interface DispatchProps {
@@ -23,10 +28,18 @@ interface DispatchProps {
 
 interface OwnProps {
   show?: boolean;
+  context: AppContext;
+  services: AppServices;
+  model: ContentModel;
+  editMode: boolean;
+  onEditModel: (model: ContentModel) => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const activeContext : ActiveContextState = state.activeContext;
+
+  const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
+  const resource = (state.documents.get(documentId).document.model as any).resource;
 
   const supportedElements = activeContext.container.caseOf({
     just: c => c.supportedElements,
@@ -38,6 +51,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     container: activeContext.container,
     supportedElements,
     show: state.editorSidebar.show,
+    resource,
   };
 };
 
