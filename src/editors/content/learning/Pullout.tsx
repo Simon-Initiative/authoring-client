@@ -13,6 +13,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { ContiguousText, ContigiousTextMode } from 'data/content/learning/contiguous';
 
 import './nested.scss';
 
@@ -34,8 +35,12 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     this.onEditOrient = this.onEditOrient.bind(this);
   }
 
-  onTitleEdit(title, sourceObject) {
+  onTitleEdit(t, sourceObject) {
+    const content = this.props.model.title.text.content.set(t.guid, t);
+    const text = this.props.model.title.text.with({ content });
+    const title = this.props.model.title.with({ text });
     const model = this.props.model.with({ title });
+
     this.props.onEdit(model, sourceObject);
   }
 
@@ -123,14 +128,17 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
   }
 
   renderMain(): JSX.Element {
+
+    const t = ((this.props.model.title.text.content as any).first() as ContiguousText);
+
+
     return (
     <div>
       <ContiguousTextEditor
         {...this.props}
-        model={(this.props.model.title.text.content as any).first()}
+        model={t.with({ mode: ContigiousTextMode.SimpleText })}
         editorStyles={{ fontSize: 20 }}
-        viewOnly
-        onEdit={() => {}} />
+        onEdit={this.onTitleEdit.bind(this)} />
       <div className="nested-container">
         <ContentContainer
           {...this.props}

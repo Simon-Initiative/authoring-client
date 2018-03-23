@@ -5,6 +5,9 @@ export { Alternate } from './content/learning/alternate';
 export { Alternative } from './content/learning/alternative';
 export { Alternatives } from './content/learning/alternatives';
 export { Audio } from './content/learning/audio';
+export { BlockCode } from './content/learning/blockcode';
+export { BlockFormula } from './content/learning/blockformula';
+export { BlockQuote } from './content/learning/blockquote';
 export { Caption } from './content/learning/caption';
 export { CellData } from './content/learning/celldata';
 export { CellHeader } from './content/learning/cellheader';
@@ -46,6 +49,7 @@ export { Translation } from './content/learning/translation';
 export { Ul } from './content/learning/ul';
 export { Video } from './content/learning/video';
 export { YouTube } from './content/learning/youtube';
+
 
 
 // Assessment

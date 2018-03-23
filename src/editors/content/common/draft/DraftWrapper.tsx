@@ -29,6 +29,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   activeItemId: string;
   editorStyles?: Object;
+  singleBlockOnly: boolean;
 }
 
 interface DraftWrapperState {
@@ -323,14 +324,30 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   handlePastedText(text, html) {
 
+    // Returning true prevents pasting
+
+    // Prevent pasting in single block mode if it would introduce
+    // a line break
+    if (this.props.singleBlockOnly) {
+      return text.indexOf('\n') !== -1;
+    }
     return false;
   }
 
   handlePastedFragment(fragment, editorState) {
-    return false;
+
+    // Returning true prevents pasting
+
+    // We do not allow pasting fragments when in singleBlockOnly mode
+    return this.props.singleBlockOnly;
+  }
+
+  handleReturn() {
+    return this.props.singleBlockOnly ? 'handled' : 'not-handled';
   }
 
   handleCutFragment(fragment, editorState, previewEditorState) {
+    // Returning false allows cutting
     return false;
   }
 
@@ -359,6 +376,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             onFocus={this.onGainFocus.bind(this)}
             spellCheck={true}
             stripPastedStyles={false}
+            handleReturn={this.handleReturn.bind(this)}
             handleCutFragment={this.handleCutFragment.bind(this)}
             handlePastedText={this.handlePastedText.bind(this)}
             handlePastedFragment={this.handlePastedFragment.bind(this)}
