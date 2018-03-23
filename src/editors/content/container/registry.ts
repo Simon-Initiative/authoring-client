@@ -5,6 +5,8 @@ import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
 import { WbInline } from '../learning/WbInline';
 import { Activity } from '../learning/Activity';
+import { CodeEditor } from '../learning/Code';
+import { FormulaEditor } from '../learning/Formula';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 import { connectSidebarActions } from './connectSidebarActions';
@@ -45,7 +47,7 @@ function init() {
   registry['Link'] = LinkEditor;
   registry['Image'] = connectSidebarActions()(ImageEditor);
   registry['ActivityLink'] = ActivityLinkEditor;
-  registry['Quote'] = QuoteEditor;
+  registry['Quote'] = connectSidebarActions()(QuoteEditor);
   registry['Math'] = MathEditor;
   registry['Cite'] = CiteEditor;
   registry['Xref'] = XrefEditor;
@@ -55,6 +57,8 @@ function init() {
   registry['WbInline'] = connectSidebarActions()(WbInline);
   registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTubeEditor);
+  registry['Code'] = connectSidebarActions()(CodeEditor);
+  registry['Formula'] = connectSidebarActions()(FormulaEditor);
   registry['Audio'] = connectSidebarActions()(AudioEditor);
   registry['Video'] = connectSidebarActions()(VideoEditor);
   registry['IFrame'] = connectSidebarActions()(IFrameEditor);

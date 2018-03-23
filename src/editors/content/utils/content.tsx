@@ -26,11 +26,14 @@ export const CONTENT_COLORS = {
   Table: flatui.pomegranite,
   CellData: flatui.pomegranite,
   CellHeader: flatui.pomegranite,
+  Code: flatui.concrete,
+  Formula: flatui.asbestos,
 };
 
 export const CONTENT_ICONS = {
   ContiguousText: <i className="unicode-icon">T</i>,
   CodeBlock: <i className={'fa fa-code'}/>,
+  Code: <i className={'fa fa-file-code'}/>,
   Example: <i className={'fa fa-bar-chart'}/>,
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
@@ -47,6 +50,8 @@ export const CONTENT_ICONS = {
   Table: <i className={'fa fa-table'}/>,
   CellData: <i className={'fa fa-table'}/>,
   CellHeader: <i className={'fa fa-table'}/>,
+  Quote: <i className={'fa fa-quote-right'}/>,
+  Formula: <i className="unicode-icon">&#8721;</i>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

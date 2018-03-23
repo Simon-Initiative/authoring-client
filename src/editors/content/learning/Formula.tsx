@@ -14,12 +14,12 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import styles from './Entity.style';
 
-export interface QuoteEditorProps
-  extends AbstractContentEditorProps<contentTypes.Quote> {
+export interface FormulaEditorProps
+  extends AbstractContentEditorProps<contentTypes.Formula> {
   onShowSidebar: () => void;
 }
 
-export interface QuoteEditorState {
+export interface FormulaEditorState {
 
 }
 
@@ -27,9 +27,9 @@ export interface QuoteEditorState {
  * React Component
  */
 @injectSheet(styles)
-export class QuoteEditor
+export class FormulaEditor
     extends AbstractContentEditor
-    <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
+    <contentTypes.Formula, FormulaEditorProps & JSSProps, FormulaEditorState> {
 
   constructor(props) {
     super(props);
@@ -37,7 +37,7 @@ export class QuoteEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Quote">
+      <SidebarContent title="Formula">
       </SidebarContent>
     );
   }
@@ -46,7 +46,7 @@ export class QuoteEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Quote" highlightColor={CONTENT_COLORS.Quote} columns={2}>
+      <ToolbarGroup label="Formula" highlightColor={CONTENT_COLORS.Formula} columns={2}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>
@@ -61,8 +61,7 @@ export class QuoteEditor
     const { } = this.props;
 
     return (
-      <div className="quoteEditor">
-    {/* Do we need the entry property? What is this? */}
+      <div className="formulaEditor">
         <Label>Entry</Label>
         <ContiguousTextEditor
           {...this.props}
