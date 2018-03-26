@@ -27,7 +27,7 @@ export const CONTENT_COLORS = {
   CellData: flatui.pomegranite,
   CellHeader: flatui.pomegranite,
   BlockCode: flatui.concrete,
-  BlockFormula: flatui.asbestos,
+  BlockFormula: 'pink',
 };
 
 export const CONTENT_ICONS = {

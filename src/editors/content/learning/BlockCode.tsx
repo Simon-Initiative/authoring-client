@@ -1,17 +1,15 @@
 import * as React from 'react';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
-import { Label } from '../common/Sidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
-import { ContentElement } from 'data/content/common/interfaces';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
-import styles from './Entity.style';
+import styles from './BlockCode.style';
 
 export interface BlockCodeProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {
@@ -40,8 +38,7 @@ export class BlockCode
 
   renderSidebar() {
     return (
-      <SidebarContent title="Code">
-      </SidebarContent>
+      <SidebarContent title="Code"/>
     );
   }
 
@@ -61,18 +58,13 @@ export class BlockCode
   }
 
   renderMain() {
-    const { } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div className="codeEditor">
+      <div className={classNames(['codeEditor', classes.codeEditor])}>
         <ContiguousTextEditor
           {...this.props}
           model={this.props.model.text}
-          editorStyles={{
-            fontFamily: 'Inconsolata, Consolas, monospace',
-            // backgroundColor: '#222',
-            // color: 'white',
-            fontSize: 20 }}
           onEdit={this.onEditText}
         />
       </div>

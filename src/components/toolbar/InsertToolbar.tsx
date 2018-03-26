@@ -74,7 +74,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockQuote())}
-            tooltip="Insert Quote Block"
+            tooltip="Insert Quote"
             disabled={!parentSupportsElementType('quote')}>
           <i className={'fa fa-quote-right'}/>
         </ToolbarButton>
@@ -102,18 +102,21 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('codeblock')}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockCode().with({
+        {/* <ToolbarButton
+            onClick={() => onInsert(new contentTypes.BlockFormula().with({
               text: contentTypes.ContiguousText.fromText('Text', '')
                 .with({ mode: ContiguousTextMode.SimpleText }),
             }))}
-            tooltip="Insert Code (For testing only)"
-            disabled={!parentSupportsElementType('code')}>
+            tooltip="Insert Formula (For testing only)"
+            disabled={!parentSupportsElementType('formula')}>
           <i className={'fa fa-code'}/>
-        </ToolbarButton>
+        </ToolbarButton> */}
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockFormula())}
-            tooltip="Insert Formula Block"
+            onClick={() => onInsert(new contentTypes.BlockFormula().with({
+              text: contentTypes.ContiguousText.fromText('Formula', '')
+                .with({ mode: ContiguousTextMode.SimpleText }),
+            }))}
+            tooltip="Insert Formula"
             disabled={!parentSupportsElementType('formula')}>
           <i className="unicode-icon">&#8721;</i>
         </ToolbarButton>
