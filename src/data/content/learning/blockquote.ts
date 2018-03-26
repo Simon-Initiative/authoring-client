@@ -44,10 +44,12 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
 
     const text = ContiguousText.fromPersistence(getChildren(t), '')
       .with({ mode: ContiguousTextMode.SimpleText });
+
     const entry = t['@entry'] === undefined
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);
 
+    // changed this instead of 'with'
     return new BlockQuote({ guid, text, entry });
 
   }
@@ -56,7 +58,8 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
 
     const q = {
       quote: {
-        '#array': this.text.toPersistence(),
+        // added this. should it be #array?
+        '#text': this.text.toPersistence(),
       },
     };
 

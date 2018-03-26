@@ -92,7 +92,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={8}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
