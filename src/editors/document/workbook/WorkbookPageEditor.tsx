@@ -11,7 +11,7 @@ import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
-import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
+import { ContiguousTextViewer } from 'editors/content/learning/ContiguousTextViewer';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './WorkbookPageEditor.scss';
@@ -133,24 +133,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     return (
       <div className="workbookpage-editor">
-        <ContextAwareToolbar context={context} />
+        <ContextAwareToolbar context={context} model={model} />
         <div className="wb-content">
           <div className="html-editor-well">
 
-            <ContiguousTextEditor
-              activeContentGuid={null}
-              hover={null}
-              onUpdateHover={() => {}}
-              onFocus={() => {}}
+            <ContiguousTextViewer
               context={context}
               services={services}
-              editMode={false}
               model={(model.head.title.text.content.first() as ContiguousText)}
-              editorStyles={{ fontSize: 32 }}
-              viewOnly
-              onEdit={() => {}} />
+              editorStyles={{ fontSize: 32 }} />
 
             {this.renderObjectives()}
+
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}
@@ -164,7 +158,10 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               onEdit={(c, s) => this.onBodyEdit(c, s)} />
           </div>
           <ContextAwareSidebar
-            context={context} services={services} editMode={editMode} model={model}
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={model}
             onEditModel={onEdit} />
         </div>
       </div>

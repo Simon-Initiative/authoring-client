@@ -30,6 +30,10 @@ export default {
     marginBottom: '1rem',
   },
 
+  sidebarRowLabel: {
+    fontWeight: 600,
+  },
+
   content: {
     flex: 1,
     display: 'flex',
@@ -43,7 +47,7 @@ export default {
     extend: [disableSelect],
     display: 'flex',
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 20,
     fontSize: 20,
   },
 

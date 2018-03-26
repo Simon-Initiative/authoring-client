@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { PageSelection } from './PageSelection';
@@ -21,7 +20,8 @@ import * as persistence from 'data/persistence';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-
+import { ContiguousTextViewer } from 'editors/content/learning/ContiguousTextViewer';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
 import './AssessmentEditor.scss';
@@ -481,11 +481,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(page.nodes.toArray().map(n => n.guid));
 
-    const text = this.props.model.title.text.extractPlainText().caseOf({
-      just: s => s,
-      nothing: () => '',
-    });
-
     const activeContentGuid = this.props.activeContext.activeChild.caseOf({
       just: c => (c as any).guid,
       nothing: () => '',
@@ -499,10 +494,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <ContextAwareToolbar context={this.props.context}/>
+        <ContextAwareToolbar context={this.props.context} model={model}/>
         <div className="assessment-content">
           <div className="html-editor-well">
-            <h2 className="title-row">{text}</h2>
+
+            <ContiguousTextViewer
+              context={context}
+              services={services}
+              model={(model.title.text.content.first() as ContiguousText)}
+              editorStyles={{ fontSize: 32 }} />
 
             {this.renderAdd()}
 
@@ -526,7 +526,10 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             </div>
           </div>
           <ContextAwareSidebar
-            context={context} services={services} editMode={editMode} model={model}
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={model}
             onEditModel={onEdit} />
         </div>
       </div>);

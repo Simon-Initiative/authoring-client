@@ -11,7 +11,9 @@ import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { Resource } from 'data/content/resource';
-import { ModelTypes, ContentModel, WorkbookPageModel } from 'data/models';
+import {
+  ModelTypes, ContentModel, WorkbookPageModel, AssessmentModel, PoolModel,
+} from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElements } from 'data/content/common/elements';
@@ -27,7 +29,7 @@ export const SidebarRow = injectSheetSFC<SidebarRowProps>(styles)(({
   return (
     <div className={classes.sidebarRow}>
       {label !== ''
-        ? <p>{label}</p>
+        ? <p className={classes.sidebarRowLabel}>{label}</p>
         : null}
       <div className={'col-12'}>
         {children}
@@ -133,21 +135,44 @@ export class ContextAwareSidebar
   constructor(props) {
     super(props);
 
-    this.onWBPTitleEdit = this.onWBPTitleEdit.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
-  onWBPTitleEdit(text: ContentElements) {
+  onTitleEdit(text: ContentElements) {
     const { model, onEditModel } = this.props;
-
-    const wbpModel = (model as WorkbookPageModel);
 
     const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
 
-    const resource = wbpModel.resource.with({ title: t });
-    const title = wbpModel.head.title.with({ text });
-    const head = wbpModel.head.with({ title });
+    let updatedModel;
+    let resource;
+    let title;
+    switch (model.modelType) {
+      case ModelTypes.WorkbookPageModel:
+        updatedModel = (model as WorkbookPageModel);
+        resource = updatedModel.resource.with({ title: t });
+        title = updatedModel.head.title.with({ text });
+        const head = updatedModel.head.with({ title });
 
-    onEditModel(wbpModel.with({ head, resource }));
+        onEditModel(updatedModel.with({ head, resource }));
+        return;
+      case ModelTypes.AssessmentModel:
+        updatedModel = (model as AssessmentModel);
+        resource = updatedModel.resource.with({ title: t });
+        title = updatedModel.title.with({ text });
+
+        onEditModel(updatedModel.with({ title, resource }));
+        return;
+      case ModelTypes.PoolModel:
+        updatedModel = (model as PoolModel);
+        resource = updatedModel.resource.with({ title: t });
+        title = updatedModel.pool.title.with({ text });
+        const pool = updatedModel.pool.with({ title });
+
+        onEditModel(updatedModel.with({ pool, resource }));
+        return;
+      default:
+        return;
+    }
   }
 
   renderPageDetails() {
@@ -170,7 +195,61 @@ export class ContextAwareSidebar
                   context={context}
                   services={services}
                   editMode={editMode}
-                  onEdit={text => this.onWBPTitleEdit(text)} />
+                  onEdit={text => this.onTitleEdit(text)} />
+              </SidebarRow>
+              <SidebarRow label="Created">
+                {`${resource.dateCreated.toLocaleDateString()}, \
+                ${resource.dateCreated.toLocaleTimeString()}`}
+              </SidebarRow>
+              <SidebarRow label="Last Updated">
+                {`${resource.dateUpdated.toLocaleDateString()}, \
+                ${resource.dateUpdated.toLocaleTimeString()}`}
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
+      case ModelTypes.AssessmentModel:
+        return (
+          <SidebarContent title="Assessment Details" onHide={this.props.onHide}>
+            <SidebarGroup label="">
+              <SidebarRow label="Title">
+                <ToolbarContentContainer
+                  activeContentGuid={null}
+                  hover={null}
+                  onUpdateHover={() => {}}
+                  onFocus={() => {}}
+                  model={model.title.text}
+                  context={context}
+                  services={services}
+                  editMode={editMode}
+                  onEdit={text => this.onTitleEdit(text)} />
+              </SidebarRow>
+              <SidebarRow label="Created">
+                {`${resource.dateCreated.toLocaleDateString()}, \
+                ${resource.dateCreated.toLocaleTimeString()}`}
+              </SidebarRow>
+              <SidebarRow label="Last Updated">
+                {`${resource.dateUpdated.toLocaleDateString()}, \
+                ${resource.dateUpdated.toLocaleTimeString()}`}
+              </SidebarRow>
+            </SidebarGroup>
+          </SidebarContent>
+        );
+      case ModelTypes.PoolModel:
+        return (
+          <SidebarContent title="Question Pool Details" onHide={this.props.onHide}>
+            <SidebarGroup label="">
+              <SidebarRow label="Title">
+                <ToolbarContentContainer
+                  activeContentGuid={null}
+                  hover={null}
+                  onUpdateHover={() => {}}
+                  onFocus={() => {}}
+                  model={model.pool.title.text}
+                  context={context}
+                  services={services}
+                  editMode={editMode}
+                  onEdit={text => this.onTitleEdit(text)} />
               </SidebarRow>
               <SidebarRow label="Created">
                 {`${resource.dateCreated.toLocaleDateString()}, \

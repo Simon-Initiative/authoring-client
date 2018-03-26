@@ -13,6 +13,7 @@ import { InsertToolbar } from './InsertToolbar';
 import { ItemToolbar } from './ItemToolbar.controller';
 import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
+import { ContentModel } from 'data/models';
 
 import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
 
@@ -105,6 +106,7 @@ export interface ToolbarProps {
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   context: AppContext;
+  model: ContentModel;
   textSelection: Maybe<TextSelection>;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
