@@ -33,10 +33,8 @@ export class BlockCode
     this.onEditText = this.onEditText.bind(this);
   }
 
-  onEditText(content: ContentElement, source) {
-    console.log('content1', content);
-    const updatedText = this.props.model.text.with({ content });
-    const model = this.props.model.with({ text: updatedText });
+  onEditText(text: ContiguousText, source) {
+    const model = this.props.model.with({ text });
     this.props.onEdit(model, source);
   }
 
@@ -67,12 +65,15 @@ export class BlockCode
 
     return (
       <div className="codeEditor">
-        <Label>Code</Label>
         <ContiguousTextEditor
           {...this.props}
-          model={this.props.model.text.with({ mode: ContiguousTextMode.SimpleText })}
-          editorStyles={{ fontSize: 20 }}
-          onEdit={() => {}}
+          model={this.props.model.text}
+          editorStyles={{
+            fontFamily: 'Inconsolata, Consolas, monospace',
+            // backgroundColor: '#222',
+            // color: 'white',
+            fontSize: 20 }}
+          onEdit={this.onEditText}
         />
       </div>
     );

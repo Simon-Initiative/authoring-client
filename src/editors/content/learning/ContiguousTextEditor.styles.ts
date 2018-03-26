@@ -1,4 +1,10 @@
 export default {
+  codeEditor: {
+    '& .contiguousText': {
+      backgroundColor: '#222',
+      color: 'white',
+    },
+  },
   contiguousText: {
     backgroundColor: 'white',
     padding: 5,

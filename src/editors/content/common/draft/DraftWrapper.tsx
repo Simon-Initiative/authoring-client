@@ -116,7 +116,6 @@ function appendText(contentBlock, contentState, text) {
     contentState,
     targetRange,
     text);
-
 }
 
 function addSpaceAfterEntity(editorState, block) {
@@ -124,7 +123,6 @@ function addSpaceAfterEntity(editorState, block) {
   if (block.type !== 'atomic' && (!characterList.isEmpty() && characterList.last().getEntity())) {
     const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
     return EditorState.push(editorState, modifiedContent, editorState.getLastChangeType());
-
   }
 
   return editorState;
@@ -224,8 +222,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           this.setState(
             { editorState },
-            () => this.props.onEdit(new ContiguousText({ content: contentState,
-              guid: this.props.content.guid })));
+            () => this.props.onEdit(this.props.content.with({ content: contentState })));
         } else {
 
           if (changeType === SelectionChangeType.Selection
@@ -237,10 +234,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           } else {
             this.setState({ editorState });
           }
-
         }
-
-
       }
     };
   }
@@ -250,11 +244,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
     this.setState({ editorState }, () => {
-      this.props.onEdit(new ContiguousText({ content: contentState }));
+      this.props.onEdit(this.props.content.with({ content: contentState }));
       this.forceRender();
     });
   }
-
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 

@@ -12,6 +12,7 @@ import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/media/AudioEditor';
 import { selectImage } from 'editors/content/media/ImageEditor';
+import { ContiguousTextMode } from 'data/content/learning/contiguous';
 
 import styles from './InsertToolbar.style';
 
@@ -103,7 +104,8 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockCode().with({
-              text: contentTypes.ContiguousText.fromText('Text', ''),
+              text: contentTypes.ContiguousText.fromText('Text', '')
+                .with({ mode: ContiguousTextMode.SimpleText }),
             }))}
             tooltip="Insert Code (For testing only)"
             disabled={!parentSupportsElementType('code')}>
