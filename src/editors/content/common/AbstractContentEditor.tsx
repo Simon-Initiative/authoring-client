@@ -66,7 +66,7 @@ export abstract class
   handleOnClick(e) {
 
     if (this.props.onHandleClick !== undefined) {
-      this.props.onHandleClick(e, this.props.model);
+      this.props.onHandleClick(e);
     } else {
 
       e.stopPropagation();

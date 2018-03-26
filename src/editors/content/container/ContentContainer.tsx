@@ -231,6 +231,10 @@ export class ContentContainer
     return null;
   }
 
+  handleOnClick(e) {
+    e.stopPropagation();
+  }
+
   renderMain() : JSX.Element {
     const { hideContentLabel, hover, onUpdateHover } = this.props;
 
