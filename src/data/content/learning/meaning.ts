@@ -82,10 +82,13 @@ export class Meaning extends Immutable.Record(defaultContent) {
       meaning: {
         '#array': [
           this.material.toPersistence(),
-          this.examples.toArray().map(m => m.toPersistence()),
         ],
       },
     };
+
+    if (this.examples.size > 0) {
+      this.examples.toArray().forEach(e => m.meaning['#array'].push(e.toPersistence()));
+    }
 
     this.id.lift(id => m.meaning['@id'] = id);
     this.title.lift(title => m.meaning['@title'] = title);

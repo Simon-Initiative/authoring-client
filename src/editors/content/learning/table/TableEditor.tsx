@@ -171,7 +171,7 @@ export class TableEditor
 
   renderMain() : JSX.Element {
 
-    const { className, classes, model } = this.props;
+    const { className, classes, model, editMode } = this.props;
     const { rowstyle } = model;
 
     const rows = model.rows.toArray().map((row, i) => {
@@ -192,9 +192,13 @@ export class TableEditor
           {rows}
           </tbody>
         </table>
-        <button type="button" onClick={this.onRowAdd.bind(this)}
+        <button type="button"
+          disabled={!editMode}
+          onClick={this.onRowAdd.bind(this)}
           className="btn btn-link">+ Add row</button>
-        <button type="button" onClick={this.onColumnAdd.bind(this)}
+        <button type="button"
+          disabled={!editMode}
+          onClick={this.onColumnAdd.bind(this)}
           className="btn btn-link">+ Add column</button>
       </React.Fragment>
     );
