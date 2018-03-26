@@ -28,6 +28,7 @@ export interface AbstractContentEditorProps<ModelType> {
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  onHandleClick?: (e) => void;
 }
 
 export interface AbstractContentEditorState {}
@@ -62,6 +63,21 @@ export abstract class
     onFocus(model, parent, Maybe.nothing());
   }
 
+  handleOnClick(e) {
+
+    if (this.props.onHandleClick !== undefined) {
+      this.props.onHandleClick(e, this.props.model);
+    } else {
+
+      e.stopPropagation();
+
+      const { model, parent, onFocus } = this.props;
+      onFocus(model, parent, Maybe.nothing());
+
+    }
+
+  }
+
   render() : JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
@@ -75,7 +91,7 @@ export abstract class
       return this.renderSidebar();
     }
     return (
-      <div onFocus={e => this.handleOnFocus(e)}>
+      <div onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
         {this.renderMain()}
       </div>
     );

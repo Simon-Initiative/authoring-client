@@ -74,6 +74,7 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
       <div>
         <ContiguousTextEditor
           {...this.props}
+          onHandleClick={(e) => {}}
           model={(this.props.model.title.text.content as any).first()}
           editorStyles={{ fontSize: 20 }}
           viewOnly
