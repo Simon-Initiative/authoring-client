@@ -34,6 +34,13 @@ export class Material extends Immutable.Record(defaultContent) {
     });
   }
 
+  static fromText(text: string, guid: string) : Material {
+    return new Material().with({
+      guid,
+      content: ContentElements.fromText(text, '', Immutable.List(MATERIAL_ELEMENTS).toArray()),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Material {
 
     const cb = (root as any).material;

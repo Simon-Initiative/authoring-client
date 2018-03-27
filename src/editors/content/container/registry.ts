@@ -26,7 +26,10 @@ import UnorderedList from '../learning/UnorderedList';
 import ListItem from '../learning/ListItem';
 import { TableEditor } from '../learning/table/TableEditor';
 import { CellEditor } from '../learning/table/CellEditor';
-
+import DefinitionEditor from '../learning/DefinitionEditor';
+import MeaningEditor from '../learning/MeaningEditor';
+import TranslationEditor from '../learning/TranslationEditor';
+import PronunciationEditor from '../learning/PronunciationEditor';
 
 let registry = null;
 
@@ -68,4 +71,10 @@ function init() {
   registry['Table'] = connectSidebarActions()(TableEditor);
   registry['CellData'] = connectSidebarActions()(CellEditor);
   registry['CellHeader'] = connectSidebarActions()(CellEditor);
+  registry['Definition'] = connectSidebarActions()(DefinitionEditor);
+  registry['Meaning'] = connectSidebarActions()(MeaningEditor);
+  registry['Translation'] = connectSidebarActions()(TranslationEditor);
+  registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
+
+
 }

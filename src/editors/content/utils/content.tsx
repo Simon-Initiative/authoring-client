@@ -28,6 +28,10 @@ export const CONTENT_COLORS = {
   BlockCode: flatui.concrete,
   BlockFormula: colors.pink,
   BlockQuote: distinct.distinctLavender,
+  Definition: flatui.orange,
+  Meaning: flatui.asbestos,
+  Translation: flatui.amethyst,
+  Pronunciation: flatui.alizarin,
 };
 
 export const CONTENT_ICONS = {
@@ -52,6 +56,10 @@ export const CONTENT_ICONS = {
   CellHeader: <i className={'fa fa-table'}/>,
   BlockQuote: <i className={'fa fa-quote-right'}/>,
   BlockFormula: <i className="unicode-icon">&#8721;</i>,
+  Definition: <i className={'fa fa-book'}/>,
+  Meaning: <i className={'fa fa-comment'}/>,
+  Translation: <i className={'fa fa-globe'}/>,
+  Pronunciation: <i className={'fa fa-headphones'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
