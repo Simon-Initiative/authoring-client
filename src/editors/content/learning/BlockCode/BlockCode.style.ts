@@ -4,7 +4,6 @@ export default {
       backgroundColor: '#222',
       color: 'white',
       fontFamily: 'Inconsolata, Consolas, monospace',
-      fontSize: 20,
     },
   },
 };

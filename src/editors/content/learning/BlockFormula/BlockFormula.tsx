@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { injectSheet, JSSProps, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps, RenderContext }
+  from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
-import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import { CONTENT_COLORS } from 'editors/content/utils/content';
+import BlockFormulaToolbar from './BlockFormulaToolbar.controller';
 
 import styles from './BlockFormula.style';
 
@@ -29,6 +27,7 @@ export class BlockFormula
     super(props);
 
     this.onEditText = this.onEditText.bind(this);
+    this.onFocusOverride = this.onFocusOverride.bind(this);
   }
 
   onEditText(text: ContiguousText, source) {
@@ -36,25 +35,16 @@ export class BlockFormula
     this.props.onEdit(model, source);
   }
 
+  onFocusOverride(model, parent, selection) {
+    this.props.onFocus(this.props.model, this.props.parent, selection);
+  }
+
   renderSidebar() {
-    return (
-      <SidebarContent title="Formula"/>
-    );
+    return <BlockFormulaToolbar {...this.props} renderContext={RenderContext.Sidebar} />;
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
-
-    return (
-      <ToolbarGroup label="Formula" highlightColor={CONTENT_COLORS.BlockFormula} columns={2}>
-        <ToolbarLayout.Column>
-          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
-            <div>Details</div>
-          </ToolbarButton>
-        </ToolbarLayout.Column>
-      </ToolbarGroup>
-    );
+    return <BlockFormulaToolbar {...this.props} renderContext={RenderContext.Toolbar} />;
   }
 
   renderMain() {
@@ -65,6 +55,7 @@ export class BlockFormula
         <div className={classes.formulaWrapper}>
           <ContiguousTextEditor
             {...this.props}
+            onFocus={this.onFocusOverride}
             model={this.props.model.text}
             onEdit={this.onEditText}>
           </ContiguousTextEditor>

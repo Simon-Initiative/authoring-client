@@ -105,8 +105,7 @@ export default class ContiguousTextEditor
             locked={!editMode || viewOnly}
             onEdit={c => this.props.onEdit(c, c)} />
 
-      </div>);
+      </div>
+    );
   }
-
 }
-

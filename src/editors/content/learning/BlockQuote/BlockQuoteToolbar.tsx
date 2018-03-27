@@ -13,29 +13,24 @@ import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-import styles from './ContiguousTextEditor.styles';
+import styles from './BlockQuote.style';
 
-export interface ContiguousTextToolbarProps
-  extends AbstractContentEditorProps<contentTypes.ContiguousText> {
-
+export interface BlockQuoteToolbarProps
+  extends AbstractContentEditorProps<contentTypes.BlockQuote> {
   selection: TextSelection;
 }
 
-export interface ContiguousTextToolbarState {
+export interface BlockQuoteToolbarState {
 
 }
 
-/**
- * The content editor for contiguous text.
- */
 @injectSheet(styles)
-export default class ContiguousTextToolbar
-  extends AbstractContentEditor<contentTypes.ContiguousText,
-    ContiguousTextToolbarProps & JSSProps, ContiguousTextToolbarState> {
+export default class BlockQuoteToolbar
+  extends AbstractContentEditor<contentTypes.BlockQuote,
+  BlockQuoteToolbarProps & JSSProps, BlockQuoteToolbarState> {
 
   constructor(props) {
     super(props);
-
   }
 
   renderActiveEntity(entity) {
@@ -48,8 +43,8 @@ export default class ContiguousTextToolbar
       onFocus: (c, p) => true,
       model: data,
       onEdit: (updated) => {
-        const updatedModel = this.props.model.updateEntity(key, updated);
-        this.props.onEdit(updatedModel, updated);
+        const text = this.props.model.text.updateEntity(key, updated);
+        this.props.onEdit(this.props.model.with({ text }), updated);
       },
     };
 
@@ -62,28 +57,27 @@ export default class ContiguousTextToolbar
     const { model, selection } = this.props;
 
     const entity = selection.isCollapsed()
-      ? model.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
+      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => n, nothing: () => null })
       : null;
 
     if (entity !== null) {
       return this.renderActiveEntity(entity);
     }
-    return <SidebarContent title="Text Block" isEmpty />;
+    return <SidebarContent title="Quote" isEmpty />;
   }
 
   renderToolbar() {
 
     const { model, onEdit, editMode, selection } = this.props;
     const supports = el => this.props.parent.supportedElements.contains(el);
-
     const noTextSelected = selection && selection.isCollapsed();
 
     const bareTextSelected = selection && selection.isCollapsed()
       ? false
-      : !model.selectionOverlapsEntity(selection);
+      : !model.text.selectionOverlapsEntity(selection);
 
     const cursorInEntity = selection && selection.isCollapsed()
-      ? model.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
+      ? model.text.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
       : false;
 
     const rangeEntitiesEnabled = editMode && bareTextSelected;
@@ -91,11 +85,13 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={8}>
+        label="Quote" highlightColor={CONTENT_COLORS.BlockQuote} columns={5}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Bold, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Bold">
@@ -103,7 +99,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Italic, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Italic">
@@ -111,7 +109,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Strikethrough">
@@ -119,7 +119,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Highlight, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Highlight">
@@ -127,7 +129,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Superscript, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Superscript">
@@ -135,7 +139,9 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Subscript, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Subscript">
@@ -143,33 +149,21 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Code, selection))
+                () => onEdit(model.with({
+                  text: model.text.toggleStyle(InlineStyles.Code, selection),
+                }))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Code">
             <i className={'fa fa-code'}/>
           </ToolbarButton>
           <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Term, selection));
-              }}
-              disabled={noTextSelected || !editMode}
-              tooltip="Term">
-            <i className={'fa fa-book'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
-              }}
-              disabled={noTextSelected || !editMode}
-              tooltip="Foreign">
-            <i className={'fa fa-globe'}/>
-          </ToolbarButton>
-          <ToolbarButton
               onClick={
                 () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.math, true, new contentTypes.Math(), selection));
+                  onEdit(model.with({
+                    text: model.text.addEntity(
+                      EntityTypes.math, true, new contentTypes.Math(), selection),
+                  }));
                 }
               }
               disabled={!supports('m:math') || !pointEntitiesEnabled}
@@ -179,30 +173,10 @@ export default class ContiguousTextToolbar
           <ToolbarButton
               onClick={
                 () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.quote, true, new contentTypes.Quote(), selection));
-                }
-              }
-              disabled={!supports('quote') || !rangeEntitiesEnabled}
-              tooltip="Quotation">
-            <i className={'fa fa-quote-right'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.cite, true, new contentTypes.Cite(), selection));
-                }
-              }
-              disabled={!supports('cite') || !rangeEntitiesEnabled}
-              tooltip="Citation">
-            <i className={'fa fa-asterisk'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.link, true, new contentTypes.Link(), selection));
+                  onEdit(model.with({
+                    text: model.text.addEntity(EntityTypes.link, true,
+                                               new contentTypes.Link(), selection),
+                  }));
                 }
               }
               disabled={!supports('link') || !rangeEntitiesEnabled}
@@ -212,26 +186,16 @@ export default class ContiguousTextToolbar
           <ToolbarButton
               onClick={
                 () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.activity_link, true, new contentTypes.ActivityLink(), selection));
-                }
-              }
-              disabled={!supports('activity_link') || !rangeEntitiesEnabled}
-              tooltip="High Stakes Assessment Link">
-            <i className={'fa fa-check'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.xref, true, new contentTypes.Xref(), selection));
+                  onEdit(model.with({
+                    text: model.text.addEntity(EntityTypes.xref, true,
+                                               new contentTypes.Xref(), selection),
+                  }));
                 }
               }
               disabled={!supports('xref') || !rangeEntitiesEnabled}
               tooltip="Cross Reference Link">
             <i className={'fa fa-map-signs'}/>
           </ToolbarButton>
-
         </ToolbarLayout.Inline>
       </ToolbarGroup>
     );
@@ -240,6 +204,4 @@ export default class ContiguousTextToolbar
   renderMain() : JSX.Element {
     return null;
   }
-
 }
-

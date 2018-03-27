@@ -91,7 +91,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-table'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockQuote())}
+            onClick={() => onInsert(new contentTypes.BlockQuote()
+              .with({ text: contentTypes.ContiguousText.fromText('Quote', '')
+                .with({ mode: ContiguousTextMode.SimpleText }) }))}
             tooltip="Insert Quote"
             disabled={!parentSupportsElementType('quote')}>
           <i className={'fa fa-quote-right'}/>
@@ -103,7 +105,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-code'}/>
         </ToolbarButton>
         {/* Remove later. Adding for easier pull request review */}
-        {/* <ToolbarButton
+        <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockCode().with({
               text: contentTypes.ContiguousText.fromText('Code', '')
                 .with({ mode: ContiguousTextMode.SimpleText }),
@@ -111,7 +113,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             tooltip="Insert Formula (For testing only)"
             disabled={!parentSupportsElementType('formula')}>
           <i className={'fa fa-code'}/>
-        </ToolbarButton> */}
+        </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockFormula().with({
               text: contentTypes.ContiguousText.fromText('Formula', '')

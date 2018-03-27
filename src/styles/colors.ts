@@ -8,6 +8,7 @@ export default {
   offwhite: '#f0f4fa',
   blue: '#0067cb',
   blueLight: '#a3b8cc',
+  pink: 'pink',
 
   grayBase: '#999',
   get grayDarkest() { return chroma(this.grayBase).darken(2).hex(); },

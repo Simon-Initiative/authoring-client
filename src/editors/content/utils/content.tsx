@@ -6,7 +6,6 @@ import flatui from 'styles/palettes/flatui';
 export const CONTENT_COLORS = {
   ContiguousText: flatui.orange,
   CodeBlock: flatui.wetAsphalt,
-  BlockQuote: distinct.distinctLavender,
   Math: distinct.distinctLime,
   Cite: distinct.distinctMagenta,
   Xref: distinct.distinctMaroon,
@@ -27,7 +26,8 @@ export const CONTENT_COLORS = {
   CellData: flatui.pomegranite,
   CellHeader: flatui.pomegranite,
   BlockCode: flatui.concrete,
-  BlockFormula: 'pink',
+  BlockFormula: colors.pink,
+  BlockQuote: distinct.distinctLavender,
 };
 
 export const CONTENT_ICONS = {
