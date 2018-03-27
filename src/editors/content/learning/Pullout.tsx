@@ -129,17 +129,10 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
   renderMain(): JSX.Element {
 
     return (
-    <div>
-      <ContiguousTextEditor
-        {...this.props}
-        onHandleClick={(e) => {}}
-        model={(this.props.model.title.text.content as any).first()}
-        editorStyles={{ fontSize: 20 }}
-        viewOnly
-        onEdit={() => {}} />
-      <div className="nested-container">
-        <ContentContainer
+      <div>
+        <ContiguousTextEditor
           {...this.props}
+          onHandleClick={(e) => {}}
           model={(this.props.model.title.text.content as any).first()}
           editorStyles={{ fontSize: 20 }}
           viewOnly
