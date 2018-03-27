@@ -3,7 +3,6 @@ export default {
     borderLeft: '5px solid pink',
   },
   formulaEditor: {
-    fontSize: 20,
     '& .contiguousTextEditor': {
       fontFamily: 'Inconsolata, Consolas, monospace',
       borderTopLeftRadius: 0,

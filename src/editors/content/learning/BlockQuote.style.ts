@@ -5,7 +5,6 @@ export default {
     borderLeft: '5px solid ' + distinct.distinctLavender,
   },
   quoteEditor: {
-    fontSize: 20,
     '& .contiguousTextEditor': {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
