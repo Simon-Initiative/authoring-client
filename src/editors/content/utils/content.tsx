@@ -26,6 +26,10 @@ export const CONTENT_COLORS = {
   Table: flatui.pomegranite,
   CellData: flatui.pomegranite,
   CellHeader: flatui.pomegranite,
+  Definition: flatui.orange,
+  Meaning: flatui.asbestos,
+  Translation: flatui.amethyst,
+  Pronunciation: flatui.alizarin,
 };
 
 export const CONTENT_ICONS = {
@@ -47,6 +51,10 @@ export const CONTENT_ICONS = {
   Table: <i className={'fa fa-table'}/>,
   CellData: <i className={'fa fa-table'}/>,
   CellHeader: <i className={'fa fa-table'}/>,
+  Definition: <i className={'fa fa-book'}/>,
+  Meaning: <i className={'fa fa-comment'}/>,
+  Translation: <i className={'fa fa-globe'}/>,
+  Pronunciation: <i className={'fa fa-headphones'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

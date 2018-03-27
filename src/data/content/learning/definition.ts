@@ -99,15 +99,12 @@ export class Definition extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    const children = [
-      { term: { '#text': this.term } },
-      ...this.translation.toArray().map(t => t.toPersistence()),
-      ...this.meaning.toArray().map(t => t.toPersistence()),
-    ];
-
+    const children : any = [];
     this.title.lift(t => children.push(t.toPersistence()));
+    children.push({ term: { '#text': this.term } });
     this.pronunciation.lift(p => children.push(p.toPersistence()));
-
+    this.translation.toArray().map(t => children.push(t.toPersistence()));
+    this.meaning.toArray().forEach(t => children.push(t.toPersistence()));
 
     const m = {
       definition: {

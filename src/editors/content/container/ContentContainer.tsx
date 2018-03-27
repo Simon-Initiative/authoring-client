@@ -146,7 +146,22 @@ export class ContentContainer
   onRemove(childModel) {
     const { onEdit, model } = this.props;
     if (model.content.has(childModel.guid)) {
-      onEdit(model.with({ content: model.content.delete(childModel.guid) }), childModel);
+
+      const updated = model.with({ content: model.content.delete(childModel.guid) });
+
+      const indexOf = model.content.toArray().map(c => c.guid).indexOf(childModel.guid);
+      let newSelection = null;
+      if (model.content.size > 1) {
+        newSelection = indexOf === 0
+          ? updated.content.first()
+          : model.content.toArray()[indexOf - 1];
+      }
+
+      onEdit(updated, newSelection);
+
+      if (newSelection !== null) {
+        this.onSelect(newSelection);
+      }
     }
   }
 
@@ -214,6 +229,10 @@ export class ContentContainer
 
   renderToolbar() {
     return null;
+  }
+
+  handleOnClick(e) {
+    e.stopPropagation();
   }
 
   renderMain() : JSX.Element {

@@ -109,6 +109,10 @@ function identifyNewNodes(last: string[], current: string[]) : string[] {
 
 export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationModel> {
   onUpdateTitle: (title: Title) => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: (documentId: string) => void;
+  onRedo: (documentId: string) => void;
 }
 
 const enum TABS {
@@ -437,13 +441,17 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
   render() {
 
+    const { canUndo, canRedo, onUndo, onRedo } = this.props;
+    const documentId = this.props.context.documentId;
+
     return (
       <div className="org-editor">
         <div className="doc-head">
           <UndoRedoToolbar
-            undoEnabled={this.state.undoStackSize > 0}
-            redoEnabled={this.state.redoStackSize > 0}
-            onUndo={this.undo.bind(this)} onRedo={this.redo.bind(this)}/>
+            undoEnabled={canUndo}
+            redoEnabled={canRedo}
+            onUndo={onUndo.bind(this, documentId)}
+            onRedo={onRedo.bind(this, documentId)}/>
 
           <h3>Organization: {this.props.model.title}</h3>
 
