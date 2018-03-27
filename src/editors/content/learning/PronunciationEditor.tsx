@@ -34,8 +34,7 @@ export default class PronunciationEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Pronunciation">
-      </SidebarContent>
+      <SidebarContent title="Pronunciation" isEmpty />
     );
   }
 

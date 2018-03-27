@@ -34,8 +34,7 @@ export default class MeaningEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Meaning">
-      </SidebarContent>
+      <SidebarContent title="Meaning" isEmpty />
     );
   }
 
