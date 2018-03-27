@@ -12,7 +12,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
-
+import { Maybe } from 'tsmonad';
 import styles from './Table.styles';
 
 export interface CellEditorProps
@@ -113,12 +113,29 @@ export class CellEditor
   }
 
   renderMain() : JSX.Element {
-    const { className, classes } = this.props;
+    const { className, classes, model, parent, activeContentGuid } = this.props;
+
+    const cellClass =
+      activeContentGuid === model.guid
+      ? classes.innerCellSelected : classes.innerCell;
+
+    const bindProps = (element) => {
+
+      if (element instanceof contentTypes.ContiguousText) {
+        return [{ propertyName: 'hideBorder', value: true }];
+      }
+      return [];
+    };
+
 
     return (
-      <div className={classNames([classes.table, className])}>
+      <div className={classNames([cellClass, className])}
+        onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
         <ContentContainer
           {...this.props}
+          topMargin="0px"
+          hideSingleDecorator={true}
+          bindProperties={bindProps}
           model={this.props.model.content}
           onEdit={this.onCellEdit.bind(this)}
         />

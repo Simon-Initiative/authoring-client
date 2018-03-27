@@ -22,6 +22,8 @@ export interface ContentContainerProps
   hideContentLabel?: boolean;
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
+  topMargin?: string;
+  hideSingleDecorator?: boolean;
 }
 
 export interface ContentContainerState {
@@ -217,7 +219,9 @@ export class ContentContainer
   }
 
   renderMain() : JSX.Element {
-    const { hideContentLabel, hover, onUpdateHover } = this.props;
+    const { hideContentLabel, hover,
+      hideSingleDecorator = false,
+      onUpdateHover, topMargin } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -228,6 +232,8 @@ export class ContentContainer
     const contentOrPlaceholder = this.props.model.content.size === 0
       ? this.placeholder
       : this.props.model.content;
+
+    const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1;
 
     const editors = contentOrPlaceholder
       .toArray()
@@ -248,21 +254,24 @@ export class ContentContainer
         const isHoverContent = (hover === model.guid);
         const isActiveContent = (model.guid === this.props.activeContentGuid);
 
-        return (
-          <ContentDecorator
-            contentType={model.contentType}
-            onSelect={() => this.onSelect(model)}
-            hideContentLabel={hideContentLabel}
-            key={model.guid}
-            onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
-            isHoveringContent={isHoverContent}
-            isActiveContent={isActiveContent}
-            onRemove={this.onRemove.bind(this, model)}>
+        return hideDecorator
+          ? childRenderer
+          : (
+            <ContentDecorator
+              topMargin={topMargin}
+              contentType={model.contentType}
+              onSelect={() => this.onSelect(model)}
+              hideContentLabel={hideContentLabel}
+              key={model.guid}
+              onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
+              isHoveringContent={isHoverContent}
+              isActiveContent={isActiveContent}
+              onRemove={this.onRemove.bind(this, model)}>
 
-            {childRenderer}
+              {childRenderer}
 
-          </ContentDecorator>
-        );
+            </ContentDecorator>
+          );
       });
 
     return (

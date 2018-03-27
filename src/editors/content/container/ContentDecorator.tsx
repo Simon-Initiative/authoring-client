@@ -13,6 +13,7 @@ export interface ContentDecoratorProps {
   hideContentLabel?: boolean;
   isHoveringContent: boolean;
   onMouseOver: () => void;
+  topMargin?: string;
 }
 
 export interface ContentDecoratorState {
@@ -32,15 +33,21 @@ export class ContentDecorator
     const {
       classes, isActiveContent, contentType, hideContentLabel,
       children, onSelect, onMouseOver, isHoveringContent,
+      topMargin,
     } = this.props;
 
+    const marginTop = topMargin === undefined
+      ? '12px' : topMargin;
+
     return (
-      <div className={classNames([
-        'content-decorator',
-        classes.contentDecorator,
-        isActiveContent && 'active-content',
-        isHoveringContent && classes.hover,
-      ])}
+      <div
+        style={ { marginTop } }
+        className={classNames([
+          'content-decorator',
+          classes.contentDecorator,
+          isActiveContent && 'active-content',
+          isHoveringContent && classes.hover,
+        ])}
       onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
         {hideContentLabel
           ? null

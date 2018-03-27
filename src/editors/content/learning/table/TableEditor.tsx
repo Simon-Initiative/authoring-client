@@ -11,11 +11,15 @@ import { ContentElements } from 'data/content/common/elements';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import { ContentElement } from 'data/content/common/interfaces';
+import { CellEditor } from './CellEditor';
 import styles from './Table.styles';
+
+import { connectSidebarActions } from '../../container/connectSidebarActions';
 
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
@@ -24,6 +28,13 @@ export interface TableEditorProps
 
 export interface TableEditorState {
 
+}
+
+function getKey(
+  index: number, collection:
+  Immutable.OrderedMap<string,
+    contentTypes.CellData | contentTypes.CellHeader | contentTypes.Row>) {
+  return collection.toArray()[index].guid;
 }
 
 /**
@@ -37,6 +48,12 @@ export class TableEditor
 
   constructor(props) {
     super(props);
+
+    this.onInsertColumn = this.onInsertColumn.bind(this);
+    this.onInsertRow = this.onInsertRow.bind(this);
+    this.onRemoveRow = this.onRemoveRow.bind(this);
+    this.onRemoveColumn = this.onRemoveColumn.bind(this);
+
   }
 
   onTitleEdit(title) {
@@ -95,27 +112,6 @@ export class TableEditor
     );
   }
 
-  onRowAdd() {
-
-    const columnsToAdd = this.props.model.rows.last().cells.size;
-
-    const kvPairs = [];
-    for (let i = 0; i < columnsToAdd; i += 1) {
-      const cell = new contentTypes.CellData();
-      kvPairs.push([cell.guid, cell]);
-    }
-
-    const cells = Immutable.OrderedMap
-      <string, contentTypes.CellData | contentTypes.CellHeader>(kvPairs);
-
-    const row = new contentTypes.Row({ cells });
-    const model = this.props.model.with({
-      rows: this.props.model.rows.set(row.guid, row),
-    });
-
-    this.props.onEdit(model, row);
-  }
-
   onColumnAdd() {
 
     const rows = this.props.model.rows.map((row) => {
@@ -130,10 +126,7 @@ export class TableEditor
     this.props.onEdit(model, firstCell);
   }
 
-  onCellEdit(row, contentElements: ContentElements, src) {
-
-    // first unpack the cell from the ephemeral contentElements
-    const cell = contentElements.content.first();
+  onCellEdit(row, cell, src) {
 
     const updatedRow = row.with({ cells: row.cells.set(cell.guid, cell) });
     const model = this.props.model
@@ -144,13 +137,25 @@ export class TableEditor
 
   renderCell(row: contentTypes.Row, cell: contentTypes.CellData | contentTypes.CellHeader) {
 
-    const { className, classes } = this.props;
+    const { className, classes, parent } = this.props;
 
     const textAlign = cell.align;
 
-    const elements = new ContentElements().with({
-      content: Immutable.OrderedMap<string, ContentElement>([[cell.guid, cell]]),
-    });
+    const ConnectedCellEditor = connectSidebarActions()(CellEditor);
+
+    const noManualControl = {
+      supportedElements: Immutable.List<string>(),
+      onAddNew: (e) => {},
+      onEdit: (e, s) => {
+        this.onCellEdit.call(this, row, e, s);
+      },
+      onRemove: (e) => {},
+      onDuplicate: (e) => {},
+      onMoveUp: (e) => {},
+      onMoveDown: (e) => {},
+      props: this.props,
+    };
+
 
     return (
       <td
@@ -159,13 +164,158 @@ export class TableEditor
         colSpan={parseInt(cell.colspan, 10)}
         rowSpan={parseInt(cell.rowspan, 10)}>
 
-        <ContentContainer
+        <CellEditor
           {...this.props}
-          model={elements}
+          model={cell}
+          parent={noManualControl}
           onEdit={this.onCellEdit.bind(this, row)}
         />
 
       </td>
+    );
+  }
+
+  renderHeaderRow(columns: number) {
+
+    const { classes, className } = this.props;
+
+    const headers = [];
+    for (let i = 0; i < columns; i += 1) {
+      headers.push(
+        this.renderColumnHeader(i),
+      );
+    }
+
+    return (
+      <tr>
+        <td className={classNames([classes.cornerHeader, className])}></td>
+        {headers}
+      </tr>
+    );
+  }
+
+  renderRowHeader(index: number) {
+
+    const { classes, className } = this.props;
+
+    return (
+      <td className={classNames([classes.rowHeader, className])}>
+        {this.renderDropdown(index, this.onInsertRow, this.onRemoveRow, 'row', false)}
+      </td>
+    );
+
+  }
+
+  renderColumnHeader(index: number) {
+
+    const { classes, className } = this.props;
+
+    return (
+      <td className={classNames([classes.colHeader, className])}>
+        {this.renderDropdown(index, this.onInsertColumn, this.onRemoveColumn, 'column', true)}
+      </td>
+    );
+
+  }
+
+
+  insertAt(model, toInsert, index) {
+    const arr = model
+      .map((v, k) => [k, v])
+      .toArray();
+
+    arr.splice(index, 0, [toInsert.guid, toInsert]);
+
+    return Immutable.OrderedMap<string, any>(arr);
+  }
+
+  onInsertRow(index: number) {
+
+    const columnsToAdd = this.props.model.rows.last().cells.size;
+
+    const kvPairs = [];
+    for (let i = 0; i < columnsToAdd; i += 1) {
+      const cell = new contentTypes.CellData();
+      kvPairs.push([cell.guid, cell]);
+    }
+
+    const cells = Immutable.OrderedMap
+      <string, contentTypes.CellData | contentTypes.CellHeader>(kvPairs);
+
+    const row = new contentTypes.Row({ cells });
+    const rows = this.insertAt(this.props.model.rows, row, index);
+
+    this.props.onEdit(this.props.model.with({ rows }), row);
+  }
+
+  onInsertColumn(index: number) {
+
+    const { model } = this.props;
+
+    const rows = model.rows.map((row) => {
+
+      const cell = new contentTypes.CellData();
+      const cells = this.insertAt(row.cells, cell, index);
+      return row.with({ cells });
+
+    }).toOrderedMap();
+
+    this.props.onEdit(model.with({ rows }));
+  }
+
+  onRemoveRow(index: number) {
+    const rows = this.props.model.rows.delete(getKey(index, this.props.model.rows));
+    this.props.onEdit(this.props.model.with({ rows }));
+  }
+
+  onRemoveColumn(index: number) {
+    const model = this.props.model;
+    let rows = model.rows;
+
+    rows = rows.map((row) => {
+
+      const before = row.cells.toSeq().slice(0, index);
+      const after = row.cells.toSeq().slice(index + 1);
+      const cells = before.concat(after).toOrderedMap();
+
+      return row.with({ cells });
+
+    }).toOrderedMap();
+
+    this.props.onEdit(model.with({ rows }));
+  }
+
+  renderDropdown(
+    index: number, onInsert: (index: number) => void,
+    onRemove: (index: number) => void,
+    term: string, showOnRight: boolean) {
+
+    const { classes, className, editMode } = this.props;
+    return (
+      <div className={classNames([classes.dropdown, className])}>
+        <ToolbarDropdown
+          size={ToolbarDropdownSize.Tiny}
+          hideArrow
+          positionMenuOnRight={showOnRight}
+          label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
+            classes.moreLabel])}/>} >
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onInsert(index) }>
+            {`Insert ${term} before`}
+          </button>
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onInsert(index + 1) }>
+            {`Insert ${term} after`}
+          </button>
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onRemove(index) }>
+            {`Remove ${term}`}
+          </button>
+        </ToolbarDropdown>
+      </div>
     );
   }
 
@@ -174,29 +324,37 @@ export class TableEditor
     const { className, classes, model } = this.props;
     const { rowstyle } = model;
 
+    let maxColumns = 0;
     const rows = model.rows.toArray().map((row, i) => {
+
+      maxColumns = Math.max(maxColumns, row.cells.size);
+
       const styleClass = rowstyle === 'alternating' && (i % 2 === 0)
         ? classNames([classes.stripedRow, className])
         : classNames([classes.regularRow, className]);
       return (
         <tr className={styleClass}>
+          {this.renderRowHeader(i)}
           {row.cells.toArray().map(cell => this.renderCell(row, cell))}
         </tr>
       );
     });
 
+    const headerRow = this.renderHeaderRow(maxColumns);
+
     return (
-      <React.Fragment>
-        <table className={classNames(['table', 'table-bordered', classes.table, className])}>
+      <div className={classNames([classes.tableEditor, className])}>
+        <table className={classNames([classes.table, className])}>
           <tbody>
+          {headerRow}
           {rows}
           </tbody>
         </table>
-        <button type="button" onClick={this.onRowAdd.bind(this)}
+        <button type="button" onClick={this.onInsertRow.bind(this, model.rows.size)}
           className="btn btn-link">+ Add row</button>
         <button type="button" onClick={this.onColumnAdd.bind(this)}
           className="btn btn-link">+ Add column</button>
-      </React.Fragment>
+      </div>
     );
   }
 
