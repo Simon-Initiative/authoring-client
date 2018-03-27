@@ -110,6 +110,7 @@ export class Section extends AbstractContentEditor<SectionType, SectionProps, Se
       <ContiguousTextEditor
         {...this.props}
         model={(this.props.model.title.text.content as any).first()}
+        onHandleClick={(e) => {}}
         editorStyles={{ fontSize: 20 }}
         viewOnly
         onEdit={() => {}} />

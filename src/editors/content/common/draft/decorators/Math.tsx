@@ -33,7 +33,10 @@ class Math extends React.Component<MathProps, any> {
 
     return (
       <span data-offset-key={this.props.offsetKey}
-        onClick={e => this.props.onDecoratorClick(this.props.entityKey)}>
+        onClick={(e) => {
+          e.stopPropagation();
+          this.props.onDecoratorClick(this.props.entityKey);
+        }}>
         <MathRenderer inline>{data.data}</MathRenderer>
       </span>
     );
