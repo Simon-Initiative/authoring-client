@@ -158,9 +158,18 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-bar-chart'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => {
+
+              const material = contentTypes.Material.fromText('', '');
+              const meaning = new contentTypes.Meaning().with({
+                material,
+              });
+              const definition = new contentTypes.Definition();
+
+              onInsert(definition.with({ meaning: definition.meaning.set(meaning.guid, meaning) }));
+            }}
             tooltip="Insert Definition"
-            disabled>
+            disabled={!parentSupportsElementType('definition')}>
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
