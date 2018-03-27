@@ -1,6 +1,6 @@
 export default {
   formulaWrapper: {
-    borderLeft: '20px solid pink',
+    borderLeft: '5px solid pink',
   },
   formulaEditor: {
     fontSize: 20,

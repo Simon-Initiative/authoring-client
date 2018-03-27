@@ -133,20 +133,21 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
 
 
     return (
-    <div>
-      <ContiguousTextEditor
-        {...this.props}
-        model={t.with({ mode: ContiguousTextMode.SimpleText })}
-        editorStyles={{ fontSize: 20 }}
-        onEdit={this.onTitleEdit.bind(this)} />
-      <div className="nested-container">
-        <ContentContainer
+      <div>
+        <ContiguousTextEditor
           {...this.props}
-          model={this.props.model.content}
-          onEdit={this.onContentEdit}
-        />
+          model={(this.props.model.title.text.content as any).first()}
+          editorStyles={{ fontSize: 20 }}
+          viewOnly
+          onEdit={() => {}} />
+        <div className="nested-container">
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.content}
+            onEdit={this.onContentEdit}
+          />
+        </div>
       </div>
-    </div>
     );
   }
 }

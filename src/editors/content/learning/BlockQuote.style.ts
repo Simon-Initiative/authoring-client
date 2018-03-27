@@ -2,7 +2,7 @@ import distinct from 'styles/palettes/distinct';
 
 export default {
   quoteWrapper: {
-    borderLeft: '20px solid ' + distinct.distinctLavender,
+    borderLeft: '5px solid ' + distinct.distinctLavender,
   },
   quoteEditor: {
     fontSize: 20,
