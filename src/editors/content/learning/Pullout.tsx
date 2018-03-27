@@ -13,7 +13,6 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/ContiguousTextEditor.tsx';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 
 import './nested.scss';
 
@@ -128,9 +127,6 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
   }
 
   renderMain(): JSX.Element {
-
-    const t = ((this.props.model.title.text.content as any).first() as ContiguousText);
-
 
     return (
       <div>
