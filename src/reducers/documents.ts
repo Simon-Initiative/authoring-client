@@ -2,6 +2,8 @@ import * as Immutable from 'immutable';
 import * as documentActions from 'actions/document';
 import { EditedDocument } from 'types/document';
 import createGuid from 'utils/guid';
+import { ModelTypes, AssessmentModel } from 'data/models';
+import { Maybe } from 'tsmonad';
 
 export type ActionTypes =
   documentActions.ChangeRedoneAction |
@@ -10,7 +12,9 @@ export type ActionTypes =
   documentActions.DocumentFailedAction |
   documentActions.DocumentLoadedAction |
   documentActions.DocumentRequestedAction |
-  documentActions.ModelUpdatedAction;
+  documentActions.ModelUpdatedAction |
+  documentActions.SetCurrentPageAction |
+  documentActions.SetCurrentNodeAction;
 
 
 export type DocumentsState = Immutable.Map<string, EditedDocument>;
@@ -74,6 +78,10 @@ export const documents = (
         document: action.document,
         persistence: action.persistence,
         editingAllowed: action.editingAllowed,
+        currentPage: action.document.model.modelType === ModelTypes.AssessmentModel ?
+          Maybe.just(action.document.model.pages.first().guid) : Maybe.nothing(),
+        currentNode: action.document.model.modelType === ModelTypes.AssessmentModel ?
+          Maybe.just(action.document.model.pages.first().nodes.first()) : Maybe.nothing(),
       }));
 
     case documentActions.DOCUMENT_FAILED:
@@ -103,6 +111,18 @@ export const documents = (
         redoStack: ed.redoStack.clear(),
       }));
 
+    case documentActions.SET_CURRENT_PAGE:
+      const currentNode = (state.get(action.documentId).document.model as AssessmentModel)
+        .pages.get(action.page).nodes.first();
+      return state.set(action.documentId, state.get(action.documentId).with({
+        currentPage: Maybe.just(action.page),
+        currentNode: Maybe.just(currentNode),
+      }));
+
+    case documentActions.SET_CURRENT_NODE:
+      return state.set(action.documentId, state.get(action.documentId).with({
+        currentNode: Maybe.just(action.node),
+      }));
     default:
       return state;
   }

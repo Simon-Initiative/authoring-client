@@ -6,6 +6,7 @@ import { ContextAwareSidebar, SidebarContent } from './ContextAwareSidebar';
 import { showSidebar } from 'actions/editorSidebar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
+import { setCurrentPage } from 'actions/document';
 import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { AppContext } from 'editors/common/AppContext';
@@ -18,12 +19,14 @@ interface StateProps {
   supportedElements: Immutable.List<string>;
   show: boolean;
   resource: Resource;
+  currentPage: string;
 }
 
 interface DispatchProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
 }
 
 interface OwnProps {
@@ -52,6 +55,10 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     supportedElements,
     show: state.editorSidebar.show,
     resource,
+    currentPage: activeContext.documentId.caseOf({
+      just: docId => state.documents.get(docId).currentPage.valueOr(null),
+      nothing: null,
+    }),
   };
 };
 
@@ -60,6 +67,8 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onEdit: content =>  dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
+    onSetCurrentPage: (documentId: string, pageId: string) =>
+      dispatch(setCurrentPage(documentId, pageId)),
   };
 };
 

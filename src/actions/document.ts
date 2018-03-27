@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import * as persistence from 'data/persistence';
+import * as contentTypes from 'data/contentTypes';
 import { EditedDocument } from 'types/document';
 import { courseChanged, updateCourseResources } from './course';
 import { Resource } from 'data/content/resource';
@@ -267,3 +268,34 @@ export function redo(documentId: string) {
     }
   };
 }
+
+export type SET_CURRENT_PAGE = 'document/SET_CURRENT_PAGE';
+export const SET_CURRENT_PAGE: SET_CURRENT_PAGE = 'document/SET_CURRENT_PAGE';
+
+export type SetCurrentPageAction = {
+  type: SET_CURRENT_PAGE,
+  documentId: string,
+  page: string,
+};
+
+export const setCurrentPage = (documentId: string, page: string): SetCurrentPageAction => ({
+  type: SET_CURRENT_PAGE,
+  documentId,
+  page,
+});
+
+export type SET_CURRENT_NODE = 'document/SET_CURRENT_NODE';
+export const SET_CURRENT_NODE: SET_CURRENT_NODE = 'document/SET_CURRENT_NODE';
+
+export type SetCurrentNodeAction = {
+  type: SET_CURRENT_NODE,
+  documentId,
+  node: contentTypes.Node,
+};
+
+export const setCurrentNode
+  = (documentId: string, node: contentTypes.Node): SetCurrentNodeAction => ({
+    type: SET_CURRENT_NODE,
+    documentId,
+    node,
+  });

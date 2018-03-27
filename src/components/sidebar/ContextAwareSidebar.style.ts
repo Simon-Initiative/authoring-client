@@ -32,6 +32,7 @@ export default {
 
   sidebarRowLabel: {
     fontWeight: 600,
+    color: colors.grayDarker,
   },
 
   content: {
@@ -89,8 +90,13 @@ export default {
 
   },
 
-  sidebarLabel: {
-
+  sidebarGroupLabel: {
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottom: `1px solid ${colors.grayLighter}`,
+    color: colors.gray,
+    fontSize: 16,
+    textTransform: 'uppercase',
   },
 
   // slide-in/out animations

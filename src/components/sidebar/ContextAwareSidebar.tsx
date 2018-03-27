@@ -1,6 +1,7 @@
 import * as React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as Immutable from 'immutable';
+import * as contentTypes from 'data/contentTypes';
 import { Maybe } from 'tsmonad';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames, JSSProps } from 'styles/jss';
@@ -17,6 +18,10 @@ import {
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ContentElements } from 'data/content/common/elements';
+import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
+import guid from 'utils/guid';
+import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
+
 
 import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
 
@@ -98,7 +103,7 @@ export const SidebarGroup = injectSheetSFC<SidebarGroupProps>(styles)(({
 }: StyledComponentProps<SidebarGroupProps>) => {
   return (
     <div className={classNames([classes.sidebarGroup, className])}>
-      <div>{label}</div>
+      <div className={classes.sidebarGroupLabel}>{label}</div>
       {children}
     </div>
   );
@@ -113,12 +118,14 @@ export interface ContextAwareSidebarProps {
   services: AppServices;
   resource: Resource;
   model: ContentModel;
+  currentPage: string;
   onEditModel: (model: ContentModel) => void;
   supportedElements: Immutable.List<string>;
   show: boolean;
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
 }
 
 export interface ContextAwareSidebarState {
@@ -136,6 +143,9 @@ export class ContextAwareSidebar
     super(props);
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onRemovePage = this.onRemovePage.bind(this);
+    this.onPageEdit = this.onPageEdit.bind(this);
+    this.onAddPage = this.onAddPage.bind(this);
   }
 
   onTitleEdit(text: ContentElements) {
@@ -175,9 +185,66 @@ export class ContextAwareSidebar
     }
   }
 
+  onRemovePage(page: contentTypes.Page) {
+    const { model, onEditModel } = this.props;
+    const assessmentModel = model as AssessmentModel;
+
+    if (assessmentModel.pages.size > 1) {
+
+      const guid = page.guid;
+      const removed = assessmentModel.with({ pages: assessmentModel.pages.delete(guid) });
+
+      onEditModel(removed);
+
+      // TODO:
+      // if (guid === this.state.currentPage) {
+      //   this.setState(
+      //     {
+      //       currentPage: removed.pages.first().guid,
+      //       currentNode: removed.pages.first().nodes.first(),
+      //     },
+      //     () => this.handleEdit(removed),
+      //   );
+      // } else {
+      //   this.handleEdit(removed);
+      // }
+    }
+  }
+
+  onPageEdit(page: contentTypes.Page) {
+    const { model, onEditModel } = this.props;
+    const assessmentModel = model as AssessmentModel;
+
+    onEditModel(assessmentModel.with({ pages: assessmentModel.pages.set(page.guid, page) }));
+  }
+
+  onAddPage() {
+    const { model, onEditModel } = this.props;
+    const assessmentModel = model as AssessmentModel;
+
+    const text = 'Page ' + (assessmentModel.pages.size + 1);
+    let page = new contentTypes.Page()
+      .with({ title: contentTypes.Title.fromText(text) });
+
+    let content = new contentTypes.Content();
+    content = content.with({ guid: guid() });
+
+    const question = createMultipleChoiceQuestion('single');
+
+    page = page.with({
+      nodes: page.nodes.set(content.guid, content)
+        .set(question.guid, question),
+    });
+
+    onEditModel(
+      assessmentModel.with({
+        pages: assessmentModel.pages.set(page.guid, page) }),
+    );
+  }
+
   renderPageDetails() {
     const {
-      model, resource, context, services, editMode,
+      model, resource, context, services, editMode, currentPage, onSetCurrentPage,
     } = this.props;
 
     switch (model.modelType) {
@@ -211,7 +278,7 @@ export class ContextAwareSidebar
       case ModelTypes.AssessmentModel:
         return (
           <SidebarContent title="Assessment Details" onHide={this.props.onHide}>
-            <SidebarGroup label="">
+            <SidebarGroup label="General">
               <SidebarRow label="Title">
                 <ToolbarContentContainer
                   activeContentGuid={null}
@@ -232,6 +299,54 @@ export class ContextAwareSidebar
                 {`${resource.dateUpdated.toLocaleDateString()}, \
                 ${resource.dateUpdated.toLocaleTimeString()}`}
               </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Pages">
+              <SidebarRow label="Title">
+              <PageSelection
+                {...this.props}
+                // onFocus={() => this.onFocus.call(this, this.getCurrentPage(this.props), this)}
+                onFocus={() => {}}
+                onRemove={this.onRemovePage}
+                editMode={editMode}
+                pages={model.pages}
+                current={model.pages.get(currentPage)}
+                onChangeCurrent={(newPage) => {
+                  // const page = model.pages.get(currentPage);
+                  // const currentNode = page.nodes.first();
+                  // this.setState({ currentPage, currentNode });
+
+                  onSetCurrentPage(this.props.context.documentId, newPage);
+                }}
+                onEdit={this.onPageEdit}/>
+                <button
+                  disabled={!this.props.editMode}
+                  type="button" className="btn btn-link btn-sm"
+                  onClick={this.onAddPage}>Add Page</button>
+              </SidebarRow>
+            </SidebarGroup>
+            <SidebarGroup label="Settings">
+              {/* <SidebarRow label="Recommended Attempts">
+              <TextInput
+                editMode={this.props.editMode}
+                width="50px"
+                label=""
+                type="number"
+                value={this.props.model.recommendedAttempts}
+                onEdit={
+                  recommendedAttempts => this.handleEdit(
+                    this.props.model.with({ recommendedAttempts }))} />
+              </SidebarRow>
+              <SidebarRow label="Maximum Attempts">
+                <TextInput
+                  editMode={this.props.editMode}
+                  width="50px"
+                  label=""
+                  type="number"
+                  value={this.props.model.maxAttempts}
+                  onEdit={
+                    maxAttempts => this.handleEdit(
+                      this.props.model.with({ maxAttempts }))} />
+              </SidebarRow> */}
             </SidebarGroup>
           </SidebarContent>
         );

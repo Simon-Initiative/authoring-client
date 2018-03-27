@@ -5,7 +5,7 @@ import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-
+import { Remove } from 'components/common/Remove';
 
 export interface PageSelectionProps {
   onChangeCurrent: (guid: string) => void;
@@ -27,6 +27,8 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
 
   constructor(props) {
     super(props);
+
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
   onChange(page: contentTypes.Page) {
@@ -54,13 +56,13 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
     return (
       <tr key={page.guid}>
 
-        <td style={ { minWidth: '75px' } } key="label">
+        <td style={ { minWidth: '75px', border: 'none' } } key="label">
           <a style={linkStyle} onClick={this.onChange.bind(this, page)}>
             {pageLabel}
           </a>
         </td>
 
-        <td style={ { width: '100%' } } key="title">
+        <td style={ { width: '100%', border: 'none' } } key="title">
 
           <ContentContainer
             {...this.props}
@@ -71,20 +73,16 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
             onFocus={this.props.onFocus}
             model={page.title.text}
             editMode={this.props.editMode}
-            onEdit={this.onTitleEdit.bind(this, page)}
+            onEdit={text => this.onTitleEdit(page, text.extractPlainText().valueOr(''))}
           />
 
         </td>
 
-        <td key="remove">
+        <td key="remove" style={{ border: 'none' }}>
           <span>
-            <button
-              disabled={!this.props.editMode}
-              onClick={this.props.onRemove.bind(this, page)}
-              type="button"
-              className="btn btn-sm btn-outline-secondary">
-              <i className="fa fa-close"></i>
-            </button>
+            <Remove
+              editMode={this.props.editMode}
+              onRemove={this.props.onRemove.bind(this, page)} />
           </span>
         </td>
       </tr>
@@ -97,21 +95,8 @@ export class PageSelection extends React.PureComponent<PageSelectionProps, {}> {
   }
 
   render() {
-
-    const headStyle = {
-      backgroundColor: 'white',
-    };
-
     return (
       <table className="table table-sm">
-        <thead style={headStyle}>
-          <tr>
-            <th key="placeholder"></th>
-            <th key="title">Title</th>
-            <th key="placeholder2"></th>
-          </tr>
-
-        </thead>
         <tbody>
           {this.renderRows()}
         </tbody>
