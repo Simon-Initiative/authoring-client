@@ -49,17 +49,14 @@ export class BlockQuote extends Immutable.Record(defaultContent) {
       ? Maybe.nothing()
       : Maybe.just(t['@entry']);
 
-    // changed this instead of 'with'
     return new BlockQuote({ guid, text, entry });
-
   }
 
   toPersistence() : Object {
 
     const q = {
       quote: {
-        // added this. should it be #array?
-        '#text': this.text.toPersistence(),
+        '#array': this.text.toPersistence(),
       },
     };
 

@@ -102,7 +102,8 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('codeblock')}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
-        {/* <ToolbarButton
+        {/* Remove later */}
+        <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockFormula().with({
               text: contentTypes.ContiguousText.fromText('Text', '')
                 .with({ mode: ContiguousTextMode.SimpleText }),
@@ -110,7 +111,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             tooltip="Insert Formula (For testing only)"
             disabled={!parentSupportsElementType('formula')}>
           <i className={'fa fa-code'}/>
-        </ToolbarButton> */}
+        </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockFormula().with({
               text: contentTypes.ContiguousText.fromText('Formula', '')
