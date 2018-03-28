@@ -82,9 +82,6 @@ export class Example extends AbstractContentEditor<ExampleType, ExampleProps, Ex
         <div className="nested-container">
           <ContentContainer
             {...this.props}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
             model={this.props.model.content}
             onEdit={this.onContentEdit}
           />
