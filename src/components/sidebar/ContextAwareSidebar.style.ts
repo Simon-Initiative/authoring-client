@@ -48,7 +48,7 @@ export default {
     extend: [disableSelect],
     display: 'flex',
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: 10,
     fontSize: 20,
   },
 

@@ -3,15 +3,14 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import { TitleContentEditor } from '../../content/title/TitleContentEditor';
-import { PageSelection } from './PageSelection';
 import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
-import { findNodeByGuid, locateNextOfKin } from './utils';
+import { locateNextOfKin } from './utils';
 import { Collapse } from '../../content/common/Collapse';
-import { AddQuestion, createMultipleChoiceQuestion } from '../../content/question/AddQuestion';
+import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
@@ -94,23 +93,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         || this.state.redoStackSize !== nextState.redoStackSize;
 
     return shouldUpdate;
-  }
-
-  componentWillReceiveProps(nextProps: AssessmentEditorProps) {
-
-    const currentPage = this.getCurrentPage(nextProps);
-
-    // // Handle the case that the current node has changed externally,
-    // // for instance, from an undo/redo
-    // findNodeByGuid(currentPage.nodes, this.props.currentNode.guid)
-    //   .lift(currentNode => this.setState({ currentNode }));
-
-    // this.pendingCurrentNode
-    //   .bind(node => findNodeByGuid(currentPage.nodes, node.guid))
-    //   .map((currentNode) => {
-    //     this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
-    //     this.setState({ currentNode });
-    //   });
   }
 
   getCurrentPage(props) {
