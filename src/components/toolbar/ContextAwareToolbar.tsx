@@ -13,7 +13,7 @@ import { InsertToolbar } from './InsertToolbar';
 import { ItemToolbar } from './ItemToolbar.controller';
 import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
-import { ContentModel } from 'data/models';
+import { ContentModel, ModelTypes } from 'data/models';
 
 import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
 
@@ -125,7 +125,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
   render() {
     const {
-      onInsert, onEdit, content, container, supportedElements,
+      onInsert, onEdit, content, container, supportedElements, model,
       textSelection, classes, onDisplayModal, onDismissModal, context, resource,
     } = this.props;
 
@@ -169,6 +169,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     const parentSupportsElementType = el => !!elementMap[el];
 
+    const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
+
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={9}>
@@ -198,7 +200,9 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <div className="flex-spacer"/>
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8}>
-          <ActionsToolbar documentResource={resource} documentId={context.documentId} />
+          <ActionsToolbar
+            documentResource={resource} documentId={context.documentId}
+            canPreview={canPreview} />
         </ToolbarGroup>
       </div>
     );
