@@ -25,13 +25,12 @@ export interface CellEditorState {
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for table cells.
  */
 @injectSheet(styles)
 export class CellEditor
     extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
     StyledComponentProps<CellEditorProps>, CellEditorState> {
-  selectionState: any;
 
   constructor(props) {
     super(props);

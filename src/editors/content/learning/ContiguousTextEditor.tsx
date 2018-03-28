@@ -83,7 +83,15 @@ export default class ContiguousTextEditor
     e.stopPropagation();
   }
 
+  handleOnClick(e) {
+    // Override to defer to DraftWrapper selection change
+    e.stopPropagation();
+  }
+
   draftDrivenFocus(model, parent, selection) {
+
+    console.log('draftDrivenFocus ' + selection.getAnchorOffset());
+
     this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
     this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
   }

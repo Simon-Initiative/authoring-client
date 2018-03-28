@@ -42,6 +42,7 @@ function indexOf(guid: string, model: ContentElements) : number {
   return index;
 }
 
+
 /**
  * The content container editor.
  */
@@ -116,6 +117,10 @@ export class ContentContainer
         // We insert after when the cursor is at the end
         } else if (active.isCursorAtEffectiveEnd(selection)) {
           onEdit(this.insertAfter(model, toAdd, index), toAdd);
+
+        // If it is at the beginning, insert the new item before the text
+        } else if (active.isCursorAtBeginning(selection)) {
+          onEdit(this.insertAfter(model, toAdd, index - 1), toAdd);
 
         // Otherwise we split the contiguous block in two parts and insert in between
         } else {
@@ -218,7 +223,7 @@ export class ContentContainer
 
     if (model.contentType === 'ContiguousText') {
       const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
-        || model.content.selectionAfter);
+        || new TextSelection(model.content.selectionAfter));
       return onFocus(model, this, currentTextSelection);
     }
 
@@ -262,6 +267,7 @@ export class ContentContainer
           ...this.props, model,
           onEdit: this.onChildEdit,
           parent: this,
+          key: model.guid,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
         };
 

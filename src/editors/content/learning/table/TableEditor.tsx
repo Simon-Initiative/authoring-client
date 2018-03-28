@@ -6,8 +6,6 @@ import { StyledComponentProps } from 'types/component';
 import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { ContentElements } from 'data/content/common/elements';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
@@ -15,7 +13,6 @@ import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/Toolbar
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
-import { ContentElement } from 'data/content/common/interfaces';
 import { CellEditor } from './CellEditor';
 import styles from './Table.styles';
 
@@ -30,6 +27,7 @@ export interface TableEditorState {
 
 }
 
+// Get the key of the nth element in an ordered map
 function getKey(
   index: number, collection:
   Immutable.OrderedMap<string,
@@ -38,7 +36,7 @@ function getKey(
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for tables.
  */
 @injectSheet(styles)
 export class TableEditor
@@ -137,12 +135,16 @@ export class TableEditor
 
   renderCell(row: contentTypes.Row, cell: contentTypes.CellData | contentTypes.CellHeader) {
 
-    const { className, classes, parent } = this.props;
+    const { className, classes } = this.props;
 
     const textAlign = cell.align;
 
-    const ConnectedCellEditor = connectSidebarActions()(CellEditor);
+    // Passing this fake parent to the CellEditor so that the
+    // empty supportedElements causes all Insert Toolbar buttons
+    // to be disabled, but allows editing of the cell's attributes
 
+    // For now, we disable duplication, removal, and reordering of cells.
+    // This doesn't disable the buttons, though.
     const noManualControl = {
       supportedElements: Immutable.List<string>(),
       onAddNew: (e) => {},
@@ -159,6 +161,7 @@ export class TableEditor
 
     return (
       <td
+        key={cell.guid}
         style={ { textAlign } }
         className={classNames([classes.cell, className])}
         colSpan={parseInt(cell.colspan, 10)}
@@ -187,7 +190,7 @@ export class TableEditor
     }
 
     return (
-      <tr>
+      <tr key="headerRow">
         <td className={classNames([classes.cornerHeader, className])}></td>
         {headers}
       </tr>
@@ -199,7 +202,9 @@ export class TableEditor
     const { classes, className } = this.props;
 
     return (
-      <td className={classNames([classes.rowHeader, className])}>
+      <td
+        key={'row-' + index}
+        className={classNames([classes.rowHeader, className])}>
         {this.renderDropdown(index, this.onInsertRow, this.onRemoveRow, 'row', false)}
       </td>
     );
@@ -211,7 +216,9 @@ export class TableEditor
     const { classes, className } = this.props;
 
     return (
-      <td className={classNames([classes.colHeader, className])}>
+      <td
+        key={'column-' + index}
+        className={classNames([classes.colHeader, className])}>
         {this.renderDropdown(index, this.onInsertColumn, this.onRemoveColumn, 'column', true)}
       </td>
     );
@@ -332,7 +339,9 @@ export class TableEditor
         ? classNames([classes.stripedRow, className])
         : classNames([classes.regularRow, className]);
       return (
-        <tr className={styleClass}>
+        <tr
+          key={row.guid}
+          className={styleClass}>
           {this.renderRowHeader(i)}
           {row.cells.toArray().map(cell => this.renderCell(row, cell))}
         </tr>
