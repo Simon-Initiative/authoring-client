@@ -19,7 +19,6 @@ export interface ContiguousTextEditorProps
   viewOnly?: boolean;
   editorStyles?: any;
   hideBorder?: boolean;
-  backgroundColor?: string;
   onTextSelectionChange?: (selection: any) => void;
 }
 
@@ -102,12 +101,9 @@ export default class ContiguousTextEditor
       hideBorder = false, editorStyles } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
-    const backgroundColor = this.props.backgroundColor === undefined
-      ? 'white' : this.props.backgroundColor;
 
     return (
       <div
-        style={ { backgroundColor } }
         className={classNames([
           'contiguousTextEditor', classes.contiguousText,
           showBorder && classes.showBorder,

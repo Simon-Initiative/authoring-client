@@ -91,12 +91,14 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromPersistence(root: Object[], guid: string) : ContiguousText {
-    return new ContiguousText({ guid, content: toDraft(root) });
+  static fromPersistence(
+    root: Object[], guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+    return new ContiguousText({ guid, mode,
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText) });
   }
 
-  static fromText(text: string, guid: string) : ContiguousText {
-    return new ContiguousText({ guid, content: ContentState.createFromText(text) });
+  static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+    return new ContiguousText({ guid, mode, content: ContentState.createFromText(text) });
   }
 
   toPersistence() : Object {
