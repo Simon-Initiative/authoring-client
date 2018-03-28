@@ -38,12 +38,8 @@ export class BlockFormula extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) : BlockFormula {
 
     const t = (root as any).formula;
-
-    const text = ContiguousText.fromPersistence(getChildren(t), '')
-      .with({ mode: ContiguousTextMode.SimpleText });
-
+    const text = ContiguousText.fromPersistence(getChildren(t), '', ContiguousTextMode.SimpleText);
     return new BlockFormula({ guid, text });
-
   }
 
   toPersistence() : Object {

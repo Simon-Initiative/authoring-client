@@ -38,12 +38,8 @@ export class BlockCode extends Immutable.Record(defaultContent) {
   static fromPersistence(root: Object, guid: string) : BlockCode {
 
     const t = (root as any).code;
-
-    const text = ContiguousText.fromPersistence(getChildren(t), '')
-      .with({ mode: ContiguousTextMode.SimpleText });
-
+    const text = ContiguousText.fromPersistence(getChildren(t), '', ContiguousTextMode.SimpleText);
     return new BlockCode({ guid, text });
-
   }
 
   toPersistence() : Object {

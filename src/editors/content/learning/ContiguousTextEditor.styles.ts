@@ -1,6 +1,7 @@
 export default {
   contiguousText: {
     padding: 5,
+    backgroundColor: 'white',
   },
   viewOnly: {
     backgroundColor: 'transparent',
