@@ -152,10 +152,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onEditNode(guid : string, node : models.Node, src) {
 
+    const { activeContext, onSetCurrentNode } = this.props;
+
     const nodes = this.getCurrentPage(this.props).nodes;
 
     this.detectPoolAdditions(node, nodes);
 
+    onSetCurrentNode(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
     this.onEditNodes(Tree.updateNode(guid, node, nodes, getChildren, setChildren));
