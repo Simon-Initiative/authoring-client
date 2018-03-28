@@ -15,15 +15,22 @@ const emptyContent = ContentState.createFromText(' ');
 
 export type ContiguousTextPair = [ContiguousText, ContiguousText];
 
+export enum ContiguousTextMode {
+  Regular,
+  SimpleText,
+}
+
 export type ContiguousTextParams = {
   content?: ContentState,
   entityEditCount?: number,
+  mode?: ContiguousTextMode,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'ContiguousText',
   content: emptyContent,
+  mode: ContiguousTextMode.Regular,
   entityEditCount: 0,
   guid: '',
 };
@@ -67,6 +74,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   contentType: 'ContiguousText';
   content: ContentState;
   entityEditCount: number;
+  mode: ContiguousTextMode;
   guid: string;
 
   constructor(params?: ContiguousTextParams) {
@@ -92,7 +100,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    return fromDraft(this.content);
+    return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
   }
 
   selectionOverlapsEntity(selection: TextSelection) : boolean {
