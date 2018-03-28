@@ -35,7 +35,7 @@ export class BlockCode
 
   onEditText(text: ContiguousText, source) {
     const model = this.props.model.with({ text });
-    this.props.onEdit(model, source);
+    this.props.onEdit(model, model);
   }
 
   onFocusOverride(model, parent, selection) {
@@ -44,7 +44,7 @@ export class BlockCode
 
   renderSidebar() {
     return (
-      <SidebarContent title="Code"/>
+      <SidebarContent title="Code" isEmpty/>
     );
   }
 

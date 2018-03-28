@@ -32,7 +32,7 @@ export class BlockQuote
 
   onEditText(text: ContiguousText, source) {
     const model = this.props.model.with({ text });
-    this.props.onEdit(model, source);
+    this.props.onEdit(model, model);
   }
 
   renderSidebar() {
