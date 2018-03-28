@@ -75,6 +75,4 @@ function init() {
   registry['Meaning'] = connectSidebarActions()(MeaningEditor);
   registry['Translation'] = connectSidebarActions()(TranslationEditor);
   registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
-
-
 }
