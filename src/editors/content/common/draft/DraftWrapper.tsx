@@ -29,6 +29,7 @@ export interface DraftWrapperProps {
   services: AppServices;
   activeItemId: string;
   editorStyles?: Object;
+  singleBlockOnly: boolean;
 }
 
 interface DraftWrapperState {
@@ -115,7 +116,6 @@ function appendText(contentBlock, contentState, text) {
     contentState,
     targetRange,
     text);
-
 }
 
 function addSpaceAfterEntity(editorState, block) {
@@ -123,7 +123,6 @@ function addSpaceAfterEntity(editorState, block) {
   if (block.type !== 'atomic' && (!characterList.isEmpty() && characterList.last().getEntity())) {
     const modifiedContent = appendText(block, editorState.getCurrentContent(), ' ');
     return EditorState.push(editorState, modifiedContent, editorState.getLastChangeType());
-
   }
 
   return editorState;
@@ -223,8 +222,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           this.setState(
             { editorState },
-            () => this.props.onEdit(new ContiguousText({ content: contentState,
-              guid: this.props.content.guid })));
+            () => this.props.onEdit(this.props.content.with({ content: contentState })));
         } else {
 
           if (changeType === SelectionChangeType.Selection
@@ -236,10 +234,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
           } else {
             this.setState({ editorState });
           }
-
         }
-
-
       }
     };
   }
@@ -249,11 +244,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
     const editorState = EditorState.push(this.state.editorState, contentState, changeType);
     this.setState({ editorState }, () => {
-      this.props.onEdit(new ContiguousText({ content: contentState }));
+      this.props.onEdit(this.props.content.with({ content: contentState }));
       this.forceRender();
     });
   }
-
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
@@ -323,14 +317,30 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   handlePastedText(text, html) {
 
+    // Returning true prevents pasting
+
+    // Prevent pasting in single block mode if it would introduce
+    // a line break
+    if (this.props.singleBlockOnly) {
+      return text.indexOf('\n') !== -1;
+    }
     return false;
   }
 
   handlePastedFragment(fragment, editorState) {
-    return false;
+
+    // Returning true prevents pasting
+
+    // We do not allow pasting fragments when in singleBlockOnly mode
+    return this.props.singleBlockOnly;
+  }
+
+  handleReturn() {
+    return this.props.singleBlockOnly ? 'handled' : 'not-handled';
   }
 
   handleCutFragment(fragment, editorState, previewEditorState) {
+    // Returning false allows cutting
     return false;
   }
 
@@ -359,6 +369,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             onFocus={this.onGainFocus.bind(this)}
             spellCheck={true}
             stripPastedStyles={false}
+            handleReturn={this.handleReturn.bind(this)}
             handleCutFragment={this.handleCutFragment.bind(this)}
             handlePastedText={this.handlePastedText.bind(this)}
             handlePastedFragment={this.handlePastedFragment.bind(this)}

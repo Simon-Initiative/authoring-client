@@ -12,7 +12,7 @@ export function registerContentTypes() {
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);
-  registerType('code', ct.Code.fromPersistence);
+  registerType('code', ct.BlockCode.fromPersistence);
   registerType('codeblock', ct.CodeBlock.fromPersistence);
   registerType('dd', ct.Dd.fromPersistence);
   registerType('default', ct.Default.fromPersistence);
@@ -20,7 +20,7 @@ export function registerContentTypes() {
   registerType('dl', ct.Dl.fromPersistence);
   registerType('dt', ct.Dt.fromPersistence);
   registerType('example', ct.Example.fromPersistence);
-  registerType('formula', ct.Formula.fromPersistence);
+  registerType('formula', ct.BlockFormula.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
   registerType('image', ct.Image.fromPersistence);
   registerType('li', ct.Li.fromPersistence);
@@ -37,7 +37,7 @@ export function registerContentTypes() {
   registerType('pref:value', ct.PrefValue.fromPersistence);
   registerType('pronunciation', ct.Pronunciation.fromPersistence);
   registerType('pullout', ct.Pullout.fromPersistence);
-  registerType('quote', ct.Quote.fromPersistence);
+  registerType('quote', ct.BlockQuote.fromPersistence);
   registerType('tr', ct.Row.fromPersistence);
   registerType('source', ct.Source.fromPersistence);
   registerType('table', ct.Table.fromPersistence);

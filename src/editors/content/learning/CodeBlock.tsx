@@ -133,7 +133,7 @@ export class CodeBlock
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock}>
+      <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={6}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-file-code-o"/></div>
           <div>Language</div>
