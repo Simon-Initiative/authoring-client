@@ -16,8 +16,6 @@ import { Select, TextInput } from '../../common/controls';
 import { CellEditor } from './CellEditor';
 import styles from './Table.styles';
 
-import { connectSidebarActions } from '../../container/connectSidebarActions';
-
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
   onShowSidebar: () => void;
