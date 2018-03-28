@@ -6,27 +6,43 @@ import { ContextAwareSidebar, SidebarContent } from './ContextAwareSidebar';
 import { showSidebar } from 'actions/editorSidebar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
+import { setCurrentPage } from 'actions/document';
 import { ParentContainer } from 'types/active.ts';
+import { Resource } from 'data/content/resource';
+import { AppContext } from 'editors/common/AppContext';
+import { AppServices } from 'editors/common/AppServices';
+import { ContentModel } from 'data/models';
 
 interface StateProps {
   content: Maybe<Object>;
   container: Maybe<ParentContainer>;
   supportedElements: Immutable.List<string>;
   show: boolean;
+  resource: Resource;
+  currentPage: string;
 }
 
 interface DispatchProps {
   onInsert: (content: Object, textSelection) => void;
   onEdit: (content: Object) => void;
   onHide: () => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
 }
 
 interface OwnProps {
   show?: boolean;
+  context: AppContext;
+  services: AppServices;
+  model: ContentModel;
+  editMode: boolean;
+  onEditModel: (model: ContentModel) => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   const activeContext : ActiveContextState = state.activeContext;
+
+  const documentId = activeContext.documentId.caseOf({ just: d => d, nothing: () => '' });
+  const resource = (state.documents.get(documentId).document.model as any).resource;
 
   const supportedElements = activeContext.container.caseOf({
     just: c => c.supportedElements,
@@ -38,6 +54,11 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     container: activeContext.container,
     supportedElements,
     show: state.editorSidebar.show,
+    resource,
+    currentPage: activeContext.documentId.caseOf({
+      just: docId => state.documents.get(docId).currentPage.valueOr(null),
+      nothing: null,
+    }),
   };
 };
 
@@ -46,6 +67,8 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
     onEdit: content =>  dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
+    onSetCurrentPage: (documentId: string, pageId: string) =>
+      dispatch(setCurrentPage(documentId, pageId)),
   };
 };
 

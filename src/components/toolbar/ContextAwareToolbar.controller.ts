@@ -10,6 +10,7 @@ import { Maybe } from 'tsmonad';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { modalActions } from 'actions/modal';
+import { ContentModel } from 'data/models';
 
 interface StateProps {
   supportedElements: Immutable.List<string>;
@@ -30,6 +31,7 @@ interface DispatchProps {
 
 interface OwnProps {
   context: AppContext;
+  model: ContentModel;
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {

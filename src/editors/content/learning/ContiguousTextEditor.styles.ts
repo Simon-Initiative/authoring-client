@@ -5,6 +5,7 @@ export default {
   viewOnly: {
     backgroundColor: 'transparent',
     border: 'none',
+    padding: 0,
   },
   showBorder: {
     border: '1px solid #ced4da',
