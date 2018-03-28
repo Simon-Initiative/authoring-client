@@ -15,15 +15,22 @@ const emptyContent = ContentState.createFromText(' ');
 
 export type ContiguousTextPair = [ContiguousText, ContiguousText];
 
+export enum ContiguousTextMode {
+  Regular,
+  SimpleText,
+}
+
 export type ContiguousTextParams = {
   content?: ContentState,
   entityEditCount?: number,
+  mode?: ContiguousTextMode,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'ContiguousText',
   content: emptyContent,
+  mode: ContiguousTextMode.Regular,
   entityEditCount: 0,
   guid: '',
 };
@@ -67,6 +74,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   contentType: 'ContiguousText';
   content: ContentState;
   entityEditCount: number;
+  mode: ContiguousTextMode;
   guid: string;
 
   constructor(params?: ContiguousTextParams) {
@@ -92,7 +100,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
-    return fromDraft(this.content);
+    return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
   }
 
   selectionOverlapsEntity(selection: TextSelection) : boolean {
@@ -290,6 +298,15 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       && last.key === textSelection.getAnchorKey()
       && (last.text.length <= textSelection.getAnchorOffset()
       || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
+  }
+
+  // Returns true if the selection is collapsed and is at the
+  // very beginning of the first block
+  isCursorAtBeginning(textSelection: TextSelection) : boolean {
+    const first = this.content.getFirstBlock();
+    return textSelection.isCollapsed()
+      && first.key === textSelection.getAnchorKey()
+      && textSelection.getAnchorOffset() === 0;
   }
 
   tagInputRefsWithType(byId: Object) {

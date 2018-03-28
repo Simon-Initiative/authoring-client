@@ -22,6 +22,8 @@ export interface ContentContainerProps
   hideContentLabel?: boolean;
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
+  topMargin?: string;
+  hideSingleDecorator?: boolean;
 }
 
 export interface ContentContainerState {
@@ -39,6 +41,7 @@ function indexOf(guid: string, model: ContentElements) : number {
   }
   return index;
 }
+
 
 /**
  * The content container editor.
@@ -114,6 +117,10 @@ export class ContentContainer
         // We insert after when the cursor is at the end
         } else if (active.isCursorAtEffectiveEnd(selection)) {
           onEdit(this.insertAfter(model, toAdd, index), toAdd);
+
+        // If it is at the beginning, insert the new item before the text
+        } else if (active.isCursorAtBeginning(selection)) {
+          onEdit(this.insertAfter(model, toAdd, index - 1), toAdd);
 
         // Otherwise we split the contiguous block in two parts and insert in between
         } else {
@@ -216,7 +223,7 @@ export class ContentContainer
 
     if (model.contentType === 'ContiguousText') {
       const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
-        || model.content.selectionAfter);
+        || new TextSelection(model.content.selectionAfter));
       return onFocus(model, this, currentTextSelection);
     }
 
@@ -236,7 +243,9 @@ export class ContentContainer
   }
 
   renderMain() : JSX.Element {
-    const { hideContentLabel, hover, onUpdateHover } = this.props;
+    const { hideContentLabel, hover,
+      hideSingleDecorator = false,
+      onUpdateHover, topMargin = '10px'} = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -248,6 +257,8 @@ export class ContentContainer
       ? this.placeholder
       : this.props.model.content;
 
+    const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1;
+
     const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
@@ -256,6 +267,7 @@ export class ContentContainer
           ...this.props, model,
           onEdit: this.onChildEdit,
           parent: this,
+          key: model.guid,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
         };
 
@@ -267,21 +279,24 @@ export class ContentContainer
         const isHoverContent = (hover === model.guid);
         const isActiveContent = (model.guid === this.props.activeContentGuid);
 
-        return (
-          <ContentDecorator
-            contentType={model.contentType}
-            onSelect={() => this.onSelect(model)}
-            hideContentLabel={hideContentLabel}
-            key={model.guid}
-            onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
-            isHoveringContent={isHoverContent}
-            isActiveContent={isActiveContent}
-            onRemove={this.onRemove.bind(this, model)}>
+        return hideDecorator
+          ? childRenderer
+          : (
+            <ContentDecorator
+              topMargin={topMargin}
+              contentType={model.contentType}
+              onSelect={() => this.onSelect(model)}
+              hideContentLabel={hideContentLabel}
+              key={model.guid}
+              onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
+              isHoveringContent={isHoverContent}
+              isActiveContent={isActiveContent}
+              onRemove={this.onRemove.bind(this, model)}>
 
-            {childRenderer}
+              {childRenderer}
 
-          </ContentDecorator>
-        );
+            </ContentDecorator>
+          );
       });
 
     return (

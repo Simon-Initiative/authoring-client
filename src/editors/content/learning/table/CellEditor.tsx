@@ -3,7 +3,7 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
-  AbstractContentEditor, AbstractContentEditorProps,
+  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -12,7 +12,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
-
+import { Maybe } from 'tsmonad';
 import styles from './Table.styles';
 
 export interface CellEditorProps
@@ -25,13 +25,12 @@ export interface CellEditorState {
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for table cells.
  */
 @injectSheet(styles)
 export class CellEditor
     extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
     StyledComponentProps<CellEditorProps>, CellEditorState> {
-  selectionState: any;
 
   constructor(props) {
     super(props);
@@ -112,13 +111,56 @@ export class CellEditor
     this.props.onEdit(model, src);
   }
 
+
+  render() : JSX.Element {
+
+    const renderContext = this.props.renderContext === undefined
+      ? RenderContext.MainEditor
+      : this.props.renderContext;
+
+    if (renderContext === RenderContext.Toolbar) {
+      return this.renderToolbar();
+    }
+    if (renderContext === RenderContext.Sidebar) {
+      return this.renderSidebar();
+    }
+    return (
+      <div style={ { height: '100%' } }
+        onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
+        {this.renderMain()}
+      </div>
+    );
+
+  }
+
   renderMain() : JSX.Element {
-    const { className, classes } = this.props;
+    const { className, classes, model, parent, activeContentGuid } = this.props;
+
+    const cellClass =
+      activeContentGuid === model.guid
+      ? classes.innerCellSelected : classes.innerCell;
+
+    const bindProps = (element) => {
+
+      if (element instanceof contentTypes.ContiguousText) {
+        return [{ propertyName: 'hideBorder', value: true }];
+      }
+      return [];
+    };
+
+    const hideDecorator = model.content.content.size === 0 ||
+     (model.content.content.size === 1
+      && model.content.first().contentType === 'ContiguousText');
+
 
     return (
-      <div className={classNames([classes.table, className])}>
+      <div className={classNames([cellClass, className])}
+        onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
         <ContentContainer
           {...this.props}
+          topMargin="0px"
+          hideSingleDecorator={hideDecorator}
+          bindProperties={bindProps}
           model={this.props.model.content}
           onEdit={this.onCellEdit.bind(this)}
         />

@@ -1,17 +1,75 @@
+const darkGray = '#aaaaaa';
+const lightGray = '#eeeeee';
+
 export default {
   table: {
-    paddingLeft: '20px',
+    borderCollapse: 'collapse',
+    backgroundColor: 'transparent',
+  },
+  tableEditor: {
+    marginLeft: '20px',
   },
   stripedRow: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: 'white',
   },
   regularRow: {
-
+    backgroundColor: 'white',
   },
   cell: {
-    paddingLeft: '25px',
+    border: '1px solid ' + darkGray,
+    minWidth: '100px',
   },
-  cellContainer: {
+  cellSelected: {
 
+  },
+  innerCell: {
+    height: '100%',
+    width: '100%',
+    border: '2px solid transparent',
+    '&:hover': {
+      border: '2px solid #ff9999',
+    },
+  },
+  innerCellSelected: {
+    height: '100%',
+    width: '100%',
+    border: '2px solid #b30000',
+  },
+  rowHeader: {
+    width: '30px',
+    border: '1px solid ' + darkGray,
+    backgroundColor: lightGray,
+    textAlign: 'left',
+    '&:hover $dropdownLabel': {
+      color: 'black',
+    },
+    '& $dropdownLabel': {
+      color: darkGray,
+    },
+  },
+  colHeader: {
+    height: '25px',
+    border: '1px solid ' + darkGray,
+    backgroundColor: lightGray,
+    textAlign: 'right',
+    '&:hover $dropdownLabel': {
+      color: 'black',
+    },
+    '& $dropdownLabel': {
+      color: darkGray,
+    },
+  },
+  dropdown: {
+    float: 'right',
+  },
+  dropdownLabel: {
+    color: darkGray,
+  },
+  cornerHeader: {
+    height: '30px',
+    backgroundColor: 'transparent',
+  },
+  menuIcon: {
+    color: darkGray,
   },
 };

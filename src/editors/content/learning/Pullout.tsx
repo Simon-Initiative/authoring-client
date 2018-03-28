@@ -34,8 +34,12 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
     this.onEditOrient = this.onEditOrient.bind(this);
   }
 
-  onTitleEdit(title, sourceObject) {
+  onTitleEdit(t, sourceObject) {
+    const content = this.props.model.title.text.content.set(t.guid, t);
+    const text = this.props.model.title.text.with({ content });
+    const title = this.props.model.title.with({ text });
     const model = this.props.model.with({ title });
+
     this.props.onEdit(model, sourceObject);
   }
 
@@ -123,23 +127,24 @@ export class Pullout extends AbstractContentEditor<PulloutType, PulloutProps, Pu
   }
 
   renderMain(): JSX.Element {
+
     return (
-    <div>
-      <ContiguousTextEditor
-        {...this.props}
-        onHandleClick={(e) => {}}
-        model={(this.props.model.title.text.content as any).first()}
-        editorStyles={{ fontSize: 20 }}
-        viewOnly
-        onEdit={() => {}} />
-      <div className="nested-container">
-        <ContentContainer
+      <div>
+        <ContiguousTextEditor
           {...this.props}
-          model={this.props.model.content}
-          onEdit={this.onContentEdit}
-        />
+          onHandleClick={(e) => {}}
+          model={(this.props.model.title.text.content as any).first()}
+          editorStyles={{ fontSize: 20 }}
+          viewOnly
+          onEdit={() => {}} />
+        <div className="nested-container">
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.content}
+            onEdit={this.onContentEdit}
+          />
+        </div>
       </div>
-    </div>
     );
   }
 }
