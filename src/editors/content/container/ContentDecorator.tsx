@@ -33,15 +33,12 @@ export class ContentDecorator
     const {
       classes, isActiveContent, contentType, hideContentLabel,
       children, onSelect, onMouseOver, isHoveringContent,
-      topMargin,
+      topMargin = '10px',
     } = this.props;
-
-    const marginTop = topMargin === undefined
-      ? '12px' : topMargin;
 
     return (
       <div
-        style={ { marginTop } }
+        style={ { marginTop: topMargin } }
         className={classNames([
           'content-decorator',
           classes.contentDecorator,

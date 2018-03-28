@@ -218,7 +218,6 @@ export class TableEditor
 
   }
 
-
   insertAt(model, toInsert, index) {
     const arr = model
       .map((v, k) => [k, v])
@@ -321,7 +320,7 @@ export class TableEditor
 
   renderMain() : JSX.Element {
 
-    const { className, classes, model } = this.props;
+    const { className, classes, model, editMode } = this.props;
     const { rowstyle } = model;
 
     let maxColumns = 0;
@@ -351,8 +350,11 @@ export class TableEditor
           </tbody>
         </table>
         <button type="button" onClick={this.onInsertRow.bind(this, model.rows.size)}
+          disabled={!editMode}
           className="btn btn-link">+ Add row</button>
-        <button type="button" onClick={this.onColumnAdd.bind(this)}
+        <button type="button"
+          disabled={!editMode}
+          onClick={this.onColumnAdd.bind(this)}
           className="btn btn-link">+ Add column</button>
       </div>
     );

@@ -127,7 +127,6 @@ export class CellEditor
       return [];
     };
 
-
     return (
       <div className={classNames([cellClass, className])}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>

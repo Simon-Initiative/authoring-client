@@ -91,7 +91,7 @@ export default class ContiguousTextEditor
   renderMain() : JSX.Element {
 
     const { className, classes, model, parent, editMode, viewOnly,
-      hideBorder, editorStyles } = this.props;
+      hideBorder = false, editorStyles } = this.props;
 
     const showBorder = !viewOnly && !hideBorder;
     const backgroundColor = this.props.backgroundColor === undefined

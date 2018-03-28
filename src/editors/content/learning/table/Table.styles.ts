@@ -8,8 +8,6 @@ export default {
   },
   tableEditor: {
     marginLeft: '20px',
-    borderCollapse: 'collapse',
-    backgroundColor: 'transparent',
   },
   stripedRow: {
     backgroundColor: 'white',
