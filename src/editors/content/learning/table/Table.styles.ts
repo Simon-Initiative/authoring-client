@@ -23,14 +23,16 @@ export default {
 
   },
   innerCell: {
-    padding: '0px',
+    height: '100%',
+    width: '100%',
     border: '2px solid transparent',
     '&:hover': {
       border: '2px solid #ff9999',
     },
   },
   innerCellSelected: {
-    padding: '0px',
+    height: '100%',
+    width: '100%',
     border: '2px solid #b30000',
   },
   rowHeader: {

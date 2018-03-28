@@ -3,7 +3,7 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
-  AbstractContentEditor, AbstractContentEditorProps,
+  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -111,6 +111,28 @@ export class CellEditor
     this.props.onEdit(model, src);
   }
 
+
+  render() : JSX.Element {
+
+    const renderContext = this.props.renderContext === undefined
+      ? RenderContext.MainEditor
+      : this.props.renderContext;
+
+    if (renderContext === RenderContext.Toolbar) {
+      return this.renderToolbar();
+    }
+    if (renderContext === RenderContext.Sidebar) {
+      return this.renderSidebar();
+    }
+    return (
+      <div style={ { height: '100%' } }
+        onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
+        {this.renderMain()}
+      </div>
+    );
+
+  }
+
   renderMain() : JSX.Element {
     const { className, classes, model, parent, activeContentGuid } = this.props;
 
@@ -126,13 +148,18 @@ export class CellEditor
       return [];
     };
 
+    const hideDecorator = model.content.content.size === 0 ||
+     (model.content.content.size === 1
+      && model.content.first().contentType === 'ContiguousText');
+
+
     return (
       <div className={classNames([cellClass, className])}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
         <ContentContainer
           {...this.props}
           topMargin="0px"
-          hideSingleDecorator={true}
+          hideSingleDecorator={hideDecorator}
           bindProperties={bindProps}
           model={this.props.model.content}
           onEdit={this.onCellEdit.bind(this)}

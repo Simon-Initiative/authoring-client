@@ -14,6 +14,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import { CellEditor } from './CellEditor';
+import { isFirefox, isEdge, isIE } from 'utils/browser';
 import styles from './Table.styles';
 
 export interface TableEditorProps
@@ -157,10 +158,16 @@ export class TableEditor
     };
 
 
+
+    const style = { textAlign };
+
+    if (!isFirefox && !isIE && !isEdge) {
+      style['height'] = '1px';
+    }
     return (
       <td
         key={cell.guid}
-        style={ { textAlign } }
+        style={style}
         className={classNames([classes.cell, className])}
         colSpan={parseInt(cell.colspan, 10)}
         rowSpan={parseInt(cell.rowspan, 10)}>
