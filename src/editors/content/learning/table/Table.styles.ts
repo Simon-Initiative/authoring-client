@@ -38,10 +38,10 @@ export default {
     border: '1px solid ' + darkGray,
     backgroundColor: lightGray,
     textAlign: 'left',
-    '&:hover > $dropdownLabel': {
+    '&:hover $dropdownLabel': {
       color: 'black',
     },
-    '& > $dropdownLabel': {
+    '& $dropdownLabel': {
       color: darkGray,
     },
   },
@@ -50,10 +50,10 @@ export default {
     border: '1px solid ' + darkGray,
     backgroundColor: lightGray,
     textAlign: 'right',
-    '&:hover > $dropdownLabel': {
+    '&:hover $dropdownLabel': {
       color: 'black',
     },
-    '& > $dropdownLabel': {
+    '& $dropdownLabel': {
       color: darkGray,
     },
   },
