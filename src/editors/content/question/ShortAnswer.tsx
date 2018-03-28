@@ -29,7 +29,6 @@ export class ShortAnswer
     super(props);
 
     this.onPartEdit = this.onPartEdit.bind(this);
-    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
   }
@@ -41,25 +40,6 @@ export class ShortAnswer
 
   onPartEdit(partModel: contentTypes.Part, src) {
     this.props.onEdit(this.props.itemModel, partModel, src);
-  }
-
-  onResponseAdd() {
-    const { partModel } = this.props;
-
-    const feedback = contentTypes.Feedback.fromText('', guid());
-    const feedbacks = OrderedMap<string, contentTypes.Feedback>();
-
-    const response = new contentTypes.Response({
-      score: '1',
-      match: '',
-      feedback: feedbacks.set(feedback.guid, feedback),
-    });
-
-    const updatedPartModel = partModel.with({
-      responses: partModel.responses.set(response.guid, response),
-    });
-
-    this.onPartEdit(updatedPartModel, feedback);
   }
 
   onWhitespaceChange(whitespace) {
@@ -99,16 +79,7 @@ export class ShortAnswer
                 onEdit={this.onCaseSensitive} />
             </div>
           </TabSectionContent>
-          <TabSectionHeader title="Feedback">
-            <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
-              <Button
-                editMode={editMode}
-                type="link"
-                onClick={this.onResponseAdd}>
-                Add Feedback
-              </Button>
-            </TabOptionControl>
-          </TabSectionHeader>
+          <TabSectionHeader title="Feedback"/>
           <TabSectionContent key="feedback" className="feedback">
             <Feedback
               {...this.props}
@@ -126,4 +97,3 @@ export class ShortAnswer
   }
 
 }
-
