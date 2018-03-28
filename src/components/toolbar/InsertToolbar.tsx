@@ -104,16 +104,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('codeblock')}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
-        {/* Remove later. Adding for easier pull request review */}
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockCode().with({
-              text: contentTypes.ContiguousText.fromText('Code', '')
-                .with({ mode: ContiguousTextMode.SimpleText }),
-            }))}
-            tooltip="Insert Formula (For testing only)"
-            disabled={!parentSupportsElementType('formula')}>
-          <i className={'fa fa-code'}/>
-        </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockFormula().with({
               text: contentTypes.ContiguousText.fromText('Formula', '')
