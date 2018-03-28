@@ -50,7 +50,10 @@ export default {
     '& i': {
       fontSize: 16,
     },
-
+    '&.tiny': {
+      width: 24,
+      height: 32,
+    },
     '&.small': {
       width: props => props.hideArrow ? 36 : 52,
       height: 32,

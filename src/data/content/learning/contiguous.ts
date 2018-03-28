@@ -300,6 +300,15 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
   }
 
+  // Returns true if the selection is collapsed and is at the
+  // very beginning of the first block
+  isCursorAtBeginning(textSelection: TextSelection) : boolean {
+    const first = this.content.getFirstBlock();
+    return textSelection.isCollapsed()
+      && first.key === textSelection.getAnchorKey()
+      && textSelection.getAnchorOffset() === 0;
+  }
+
   tagInputRefsWithType(byId: Object) {
 
     const content = getEntities(EntityTypes.input_ref, this.content)

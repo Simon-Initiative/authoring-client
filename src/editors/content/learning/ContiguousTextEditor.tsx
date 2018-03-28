@@ -18,6 +18,8 @@ export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
   viewOnly?: boolean;
   editorStyles?: any;
+  hideBorder?: boolean;
+  backgroundColor?: string;
   onTextSelectionChange?: (selection: any) => void;
 }
 
@@ -81,18 +83,35 @@ export default class ContiguousTextEditor
     e.stopPropagation();
   }
 
+  handleOnClick(e) {
+    // Override to defer to DraftWrapper selection change
+    e.stopPropagation();
+  }
+
   draftDrivenFocus(model, parent, selection) {
+
+    console.log('draftDrivenFocus ' + selection.getAnchorOffset());
+
     this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
     this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
   }
 
   renderMain() : JSX.Element {
 
-    const { className, classes, model, parent, editMode, viewOnly, editorStyles } = this.props;
+    const { className, classes, model, parent, editMode, viewOnly,
+      hideBorder = false, editorStyles } = this.props;
+
+    const showBorder = !viewOnly && !hideBorder;
+    const backgroundColor = this.props.backgroundColor === undefined
+      ? 'white' : this.props.backgroundColor;
 
     return (
-      <div className={classNames([
-        'contiguousTextEditor', classes.contiguousText, viewOnly && classes.viewOnly, className])}>
+      <div
+        style={ { backgroundColor } }
+        className={classNames([
+          'contiguousTextEditor', classes.contiguousText,
+          showBorder && classes.showBorder,
+          viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}

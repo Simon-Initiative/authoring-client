@@ -345,6 +345,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   onGainFocus() {
+    console.log('on Gainfocus)');
     this.props.onSelectionChange(this.state.editorState.getSelection());
   }
 

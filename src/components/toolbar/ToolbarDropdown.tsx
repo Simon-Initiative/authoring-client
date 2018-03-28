@@ -6,6 +6,7 @@ import styles from './ToolbarDropdown.style';
 export enum ToolbarDropdownSize {
   Large = 'large',
   Small = 'small',
+  Tiny = 'tiny',
   Wide = 'wide',
 }
 
@@ -15,6 +16,7 @@ export interface ToolbarDropdownProps {
   selected?: boolean;
   label: JSX.Element;
   hideArrow?: boolean;
+  positionMenuOnRight?: boolean;
 }
 
 @injectSheet(styles)
@@ -25,8 +27,15 @@ export class ToolbarDropdown extends React.PureComponent<ToolbarDropdownProps & 
 
   render() {
     const {
-      className, classes, selected, size = ToolbarDropdownSize.Small, label, hideArrow,
+      className, classes, selected,
+      size = ToolbarDropdownSize.Small,
+      positionMenuOnRight = true,
+      label, hideArrow,
     } = this.props;
+
+    const menuClasses = positionMenuOnRight
+      ? 'dropdown-menu dropdown-menu-right'
+      : 'dropdown-menu';
 
     return (
       <div className={classNames([classes.toolbarDropdown, 'dropdown'])}>
@@ -39,7 +48,7 @@ export class ToolbarDropdown extends React.PureComponent<ToolbarDropdownProps & 
           {label}
           {!hideArrow && <i className="droparrow fa fa-caret-down"/>}
         </button>
-        <div className="dropdown-menu dropdown-menu-right">
+        <div className={menuClasses}>
           {this.props.children}
         </div>
       </div>
