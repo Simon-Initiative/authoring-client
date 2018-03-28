@@ -21,19 +21,21 @@ import { ContentElements } from 'data/content/common/elements';
 import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
 import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
+import { TextInput } from 'editors/content/common/TextInput';
+import { LegacyTypes } from 'data/types';
 
 
 import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
 
 interface SidebarRowProps {
-  label: string;
+  label?: string;
 }
 
 export const SidebarRow = injectSheetSFC<SidebarRowProps>(styles)(({
   classes, label, children }) => {
   return (
     <div className={classes.sidebarRow}>
-      {label !== ''
+      {label && label !== ''
         ? <p className={classes.sidebarRowLabel}>{label}</p>
         : null}
       <div className={'col-12'}>
@@ -186,28 +188,18 @@ export class ContextAwareSidebar
   }
 
   onRemovePage(page: contentTypes.Page) {
-    const { model, onEditModel } = this.props;
+    const { context, model, onEditModel, onSetCurrentPage } = this.props;
     const assessmentModel = model as AssessmentModel;
 
     if (assessmentModel.pages.size > 1) {
-
       const guid = page.guid;
       const removed = assessmentModel.with({ pages: assessmentModel.pages.delete(guid) });
 
-      onEditModel(removed);
+      if (guid === this.props.currentPage) {
+        onSetCurrentPage(context.documentId, removed.pages.first().guid);
+      }
 
-      // TODO:
-      // if (guid === this.state.currentPage) {
-      //   this.setState(
-      //     {
-      //       currentPage: removed.pages.first().guid,
-      //       currentNode: removed.pages.first().nodes.first(),
-      //     },
-      //     () => this.handleEdit(removed),
-      //   );
-      // } else {
-      //   this.handleEdit(removed);
-      // }
+      onEditModel(removed);
     }
   }
 
@@ -222,7 +214,7 @@ export class ContextAwareSidebar
     const { model, onEditModel } = this.props;
     const assessmentModel = model as AssessmentModel;
 
-    const text = 'Page ' + (assessmentModel.pages.size + 1);
+    const text = 'New Page ' + (assessmentModel.pages.size + 1);
     let page = new contentTypes.Page()
       .with({ title: contentTypes.Title.fromText(text) });
 
@@ -245,6 +237,7 @@ export class ContextAwareSidebar
   renderPageDetails() {
     const {
       model, resource, context, services, editMode, currentPage, onSetCurrentPage,
+      onEditModel,
     } = this.props;
 
     switch (model.modelType) {
@@ -301,20 +294,15 @@ export class ContextAwareSidebar
               </SidebarRow>
             </SidebarGroup>
             <SidebarGroup label="Pages">
-              <SidebarRow label="Title">
+              <SidebarRow>
               <PageSelection
                 {...this.props}
-                // onFocus={() => this.onFocus.call(this, this.getCurrentPage(this.props), this)}
                 onFocus={() => {}}
                 onRemove={this.onRemovePage}
                 editMode={editMode}
                 pages={model.pages}
                 current={model.pages.get(currentPage)}
                 onChangeCurrent={(newPage) => {
-                  // const page = model.pages.get(currentPage);
-                  // const currentNode = page.nodes.first();
-                  // this.setState({ currentPage, currentNode });
-
                   onSetCurrentPage(this.props.context.documentId, newPage);
                 }}
                 onEdit={this.onPageEdit}/>
@@ -324,17 +312,18 @@ export class ContextAwareSidebar
                   onClick={this.onAddPage}>Add Page</button>
               </SidebarRow>
             </SidebarGroup>
+            {model.type === LegacyTypes.assessment2 &&
             <SidebarGroup label="Settings">
-              {/* <SidebarRow label="Recommended Attempts">
+              <SidebarRow label="Recommended Attempts">
               <TextInput
-                editMode={this.props.editMode}
+                editMode={editMode}
                 width="50px"
                 label=""
                 type="number"
-                value={this.props.model.recommendedAttempts}
+                value={model.recommendedAttempts}
                 onEdit={
-                  recommendedAttempts => this.handleEdit(
-                    this.props.model.with({ recommendedAttempts }))} />
+                  recommendedAttempts => onEditModel(
+                    model.with({ recommendedAttempts }))} />
               </SidebarRow>
               <SidebarRow label="Maximum Attempts">
                 <TextInput
@@ -342,12 +331,13 @@ export class ContextAwareSidebar
                   width="50px"
                   label=""
                   type="number"
-                  value={this.props.model.maxAttempts}
+                  value={model.maxAttempts}
                   onEdit={
-                    maxAttempts => this.handleEdit(
-                      this.props.model.with({ maxAttempts }))} />
-              </SidebarRow> */}
+                    maxAttempts => onEditModel(
+                      model.with({ maxAttempts }))} />
+              </SidebarRow>
             </SidebarGroup>
+            }
           </SidebarContent>
         );
       case ModelTypes.PoolModel:
