@@ -17,6 +17,7 @@ import { ContentContainer } from '../container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { ToolbarContentContainer } from '../container/ToolbarContentContainer';
 
 export type MediaType = {
   with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
@@ -188,7 +189,7 @@ export class MediaMetadata extends React.PureComponent<MediaMetadataProps, Media
               onEdit={this.onAlternateEdit} />
           </SidebarRow> */}
           <SidebarRow label="Caption">
-            <ContentContainer
+            <ToolbarContentContainer
               {...this.props}
               renderContext={undefined}
               activeContentGuid={null}
