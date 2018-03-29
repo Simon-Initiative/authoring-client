@@ -22,7 +22,7 @@ export interface LinkEditorState {
  * React Component
  */
 @injectSheet(styles)
-export class LinkEditor
+export default class LinkEditor
     extends AbstractContentEditor<contentTypes.Link, LinkEditorProps & JSSProps, LinkEditorState> {
 
   constructor(props) {

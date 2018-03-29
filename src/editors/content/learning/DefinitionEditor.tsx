@@ -30,7 +30,7 @@ export interface DefinitionEditorState {
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for definitions.
  */
 @injectSheet(styles)
 export default class DefinitionEditor
@@ -199,7 +199,6 @@ export default class DefinitionEditor
       }),
     });
 
-
     const labels = {};
     model.translation.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
     model.meaning.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
@@ -257,6 +256,4 @@ export default class DefinitionEditor
       </div>
     );
   }
-
 }
-

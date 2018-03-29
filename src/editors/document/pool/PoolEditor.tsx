@@ -13,7 +13,7 @@ import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContiguousTextViewer } from 'editors/content/learning/ContiguousTextViewer';
+import { ContiguousTextViewer } from 'editors/content/learning/contiguoustext/ContiguousTextViewer';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './PoolEditor.scss';

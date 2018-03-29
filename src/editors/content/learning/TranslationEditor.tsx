@@ -34,7 +34,7 @@ export default class TranslationEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Translation" isEmpty />
+      <SidebarContent title="Translation" />
     );
   }
 

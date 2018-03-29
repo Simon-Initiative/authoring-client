@@ -13,7 +13,7 @@ import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/Toolbar
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
-import { CellEditor } from './CellEditor';
+import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import styles from './Table.styles';
 
@@ -38,7 +38,7 @@ function getKey(
  * The content editor for tables.
  */
 @injectSheet(styles)
-export class TableEditor
+export default class TableEditor
     extends AbstractContentEditor<contentTypes.Table,
     StyledComponentProps<TableEditorProps>, TableEditorState> {
   selectionState: any;

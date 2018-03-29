@@ -28,7 +28,7 @@ export interface CellEditorState {
  * The content editor for table cells.
  */
 @injectSheet(styles)
-export class CellEditor
+export default class CellEditor
     extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
     StyledComponentProps<CellEditorProps>, CellEditorState> {
 
