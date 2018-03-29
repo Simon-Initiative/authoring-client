@@ -11,7 +11,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 
-import styles from './DefinitionEditor.styles';
+import styles from './Definition.styles';
 
 export interface MeaningEditorProps
   extends AbstractContentEditorProps<contentTypes.Meaning> {
@@ -40,8 +40,7 @@ export default class MeaningEditor
 
   renderToolbar() {
     return (
-      <ToolbarGroup label="Meaning" columns={8} highlightColor={CONTENT_COLORS.Meaning}>
-      </ToolbarGroup>
+      <ToolbarGroup label="Meaning" highlightColor={CONTENT_COLORS.Meaning}/>
     );
   }
 
@@ -71,4 +70,3 @@ export default class MeaningEditor
   }
 
 }
-

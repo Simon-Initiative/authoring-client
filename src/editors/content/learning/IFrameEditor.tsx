@@ -36,38 +36,35 @@ export default class IFrameEditor
   renderSidebar() {
     return (
       <SidebarContent title="Web Page">
-        <SidebarGroup label="">
-          <SidebarRow label="URL">
-            <div className="input-group">
-              <TextInput
-                {...this.props}
-                width="100%"
-                type="text"
-                label=""
-                value={this.props.model.src}
-                onEdit={this.onSrcEdit} />
-            </div>
-          </SidebarRow>
 
-          <MediaWidthHeightEditor
-            width={this.props.model.width}
-            height={this.props.model.height}
-            editMode={this.props.editMode}
-            onEditWidth={(width) => {
-              const model = this.props.model.with({ width });
-              this.props.onEdit(model, model);
-            }}
-            onEditHeight={(height) => {
-              const model = this.props.model.with({ height });
-              this.props.onEdit(model, model);
-            }} />
-
-          <MediaMetadataEditor
+        <SidebarGroup label="URL">
+          <TextInput
             {...this.props}
-            model={this.props.model}
-            onEdit={this.props.onEdit} />
-
+            width="100%"
+            type="text"
+            label=""
+            value={this.props.model.src}
+            onEdit={this.onSrcEdit} />
         </SidebarGroup>
+
+        <MediaWidthHeightEditor
+          width={this.props.model.width}
+          height={this.props.model.height}
+          editMode={this.props.editMode}
+          onEditWidth={(width) => {
+            const model = this.props.model.with({ width });
+            this.props.onEdit(model, model);
+          }}
+          onEditHeight={(height) => {
+            const model = this.props.model.with({ height });
+            this.props.onEdit(model, model);
+          }} />
+
+        <MediaMetadataEditor
+          {...this.props}
+          model={this.props.model}
+          onEdit={this.props.onEdit} />
+
       </SidebarContent>
     );
   }

@@ -100,21 +100,16 @@ export default class AudioEditor
   renderSidebar(): JSX.Element {
     return (
       <SidebarContent title="Audio">
-        <SidebarGroup label="">
-
-          <SidebarRow label="">
-            <ToggleSwitch
-              checked={this.props.model.controls}
-              onClick={this.onControlEdit}
-              labelBefore="Display audio controls" />
-          </SidebarRow>
-
-          <MediaMetadataEditor
-            {...this.props}
-            model={this.props.model}
-            onEdit={this.props.onEdit} />
-
+        <SidebarGroup label="Controls">
+          <ToggleSwitch
+            checked={this.props.model.controls}
+            onClick={this.onControlEdit}
+            labelBefore="Display audio controls" />
         </SidebarGroup>
+        <MediaMetadataEditor
+          {...this.props}
+          model={this.props.model}
+          onEdit={this.props.onEdit} />
       </SidebarContent>
     );
   }

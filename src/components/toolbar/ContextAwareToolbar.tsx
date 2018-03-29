@@ -53,13 +53,17 @@ export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
       )
       : (
         <div className={classes.toolbarGroupContainer}>
-          <div style={{ width }} className={classNames([classes.toolbarGroup])}>
-              <div className={classes.tbGroupItems}>
+          <div style={{ width: 4 * TOOLBAR_COL_WIDTH }}
+               className={classes.toolbarGroup}>
+            <div className={classes.tbVerticallyCentered}>
+              <div className={classes.tbNoAdvancedControls}>
                 This item does not have any advanced controls
               </div>
+            </div>
+            <div className={classes.tbGroupLabel}>{label}</div>
           </div>
         </div>
-      ) ;
+      );
   });
 
 interface ToolbarLayoutProps {

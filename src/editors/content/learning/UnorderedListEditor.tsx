@@ -113,7 +113,7 @@ export default class UnorderedList
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Unordered List" columns={8} highlightColor={CONTENT_COLORS.Ul}>
+      <ToolbarGroup label="Unordered List" columns={4} highlightColor={CONTENT_COLORS.Ul}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>

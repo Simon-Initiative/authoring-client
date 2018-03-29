@@ -79,32 +79,30 @@ export default class VideoEditor
   renderSidebar() {
     return (
       <SidebarContent title="Video">
-        <SidebarGroup label="">
-          <SidebarRow label="">
-            <ToggleSwitch
-              checked={this.props.model.controls}
-              onClick={this.onControlEdit}
-              labelBefore="Display video controls" />
-          </SidebarRow>
+        <SidebarGroup label="Controls">
+          <ToggleSwitch
+            checked={this.props.model.controls}
+            onClick={this.onControlEdit}
+            labelBefore="Display video controls" />
+        </SidebarGroup>
 
         <MediaWidthHeightEditor
-            width={this.props.model.width}
-            height={this.props.model.height}
-            editMode={this.props.editMode}
-            onEditWidth={(width) => {
-              const model = this.props.model.with({ width });
-              this.props.onEdit(model, model);
-            }}
-            onEditHeight={(height) => {
-              const model = this.props.model.with({ height });
-              this.props.onEdit(model, model);
-            }} />
+          width={this.props.model.width}
+          height={this.props.model.height}
+          editMode={this.props.editMode}
+          onEditWidth={(width) => {
+            const model = this.props.model.with({ width });
+            this.props.onEdit(model, model);
+          }}
+          onEditHeight={(height) => {
+            const model = this.props.model.with({ height });
+            this.props.onEdit(model, model);
+          }} />
 
         <MediaMetadataEditor
           {...this.props}
           model={this.props.model}
           onEdit={this.props.onEdit} />
-        </SidebarGroup>
       </SidebarContent>
     );
   }

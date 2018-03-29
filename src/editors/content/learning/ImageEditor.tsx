@@ -152,7 +152,7 @@ export class ImageSizeSidebar extends
     const { width, height } = this.props.model;
 
     return (
-      <div>
+      <SidebarGroup label="Size">
         <div className="form-check">
           <label className="form-check-label">
             <input className="form-check-input"
@@ -204,7 +204,7 @@ export class ImageSizeSidebar extends
               this.onToggleProportionContrained(!this.state.isProportionConstrained)}
             labelBefore="Maintain Aspect Ratio" />
         </SidebarRow>
-      </div>
+      </SidebarGroup>
     );
   }
 }
@@ -302,9 +302,8 @@ export default class ImageEditor
     const { alt, valign } = this.props.model;
 
     return (
-      <div style={ { marginTop: '30px' } }>
-
-        <SidebarRow label="Align">
+      <div>
+        <SidebarGroup label="Align">
           <Select label="" editMode={this.props.editMode}
             value={valign} onChange={this.onEditValign}>
             <option value="top">Top</option>
@@ -312,21 +311,20 @@ export default class ImageEditor
             <option value="baseline">Baseline</option>
             <option value="bottom">Bottom</option>
           </Select>
-        </SidebarRow>
+        </SidebarGroup>
 
-        <SidebarRow label="Alt">
+        <SidebarGroup label="Alt">
           <TextInput width="100%" label=""
             editMode={this.props.editMode}
             value={alt}
             type="text"
             onEdit={this.onEditAlt} />
-        </SidebarRow>
+        </SidebarGroup>
 
         <MediaMetadataEditor
           {...this.props}
           model={this.props.model}
           onEdit={this.props.onEdit} />
-
       </div>
     );
   }
@@ -354,18 +352,12 @@ export default class ImageEditor
 
     return (
       <SidebarContent title="Image">
-        <SidebarGroup label="">
-          <SidebarRow label="Size">
-            <ImageSizeSidebar
-              editMode={this.props.editMode}
-              model={this.props.model}
-              context={this.props.context}
-              onEdit={this.props.onEdit}/>
-          </SidebarRow>
-        </SidebarGroup>
-        <SidebarGroup label="">
-          {this.renderOther()}
-        </SidebarGroup>
+        <ImageSizeSidebar
+          editMode={this.props.editMode}
+          model={this.props.model}
+          context={this.props.context}
+          onEdit={this.props.onEdit}/>
+        {this.renderOther()}
       </SidebarContent>
     );
   }

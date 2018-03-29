@@ -15,7 +15,7 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export type MediaType = {
   with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
-  contentTypes.MediaItem;
+    contentTypes.MediaItem;
   popout: contentTypes.Popout;
   alternate: contentTypes.Alternate;
   titleContent: contentTypes.Title;
@@ -44,14 +44,14 @@ export class MediaWidthHeightEditor extends React.PureComponent
 
   render() {
     return (
-      <div>
+      <SidebarGroup label="Size">
         <SidebarRow label="Width">
           <div className="input-group input-group-sm">
             <TextInput width="100%" label=""
               editMode={this.props.editMode}
               value={this.props.width}
               type="number"
-              onEdit={this.props.onEditWidth}/>
+              onEdit={this.props.onEditWidth} />
             <span className="input-group-addon ">pixels</span>
           </div>
         </SidebarRow>
@@ -61,11 +61,11 @@ export class MediaWidthHeightEditor extends React.PureComponent
               editMode={this.props.editMode}
               value={this.props.height}
               type="number"
-              onEdit={this.props.onEditHeight}/>
+              onEdit={this.props.onEditHeight} />
             <span className="input-group-addon " id="basic-addon2">pixels</span>
           </div>
         </SidebarRow>
-      </div>
+      </SidebarGroup>
     );
   }
 }
@@ -153,67 +153,65 @@ export class MediaMetadataEditor
 
     return (
       <div>
-        <SidebarGroup label="">
-          <SidebarRow label="Title">
-            <ContentContainer
-              {...this.props}
-              renderContext={undefined}
-              activeContentGuid={null}
-              hover={null}
-              onUpdateHover={() => {}}
-              model={titleContent.text}
-              onEdit={this.onTitleEdit} />
-          </SidebarRow>
-          <SidebarRow label="Popout">
-            <ToggleSwitch
-              {...this.props}
-              checked={popout.enable}
-              onClick={this.onPopoutEnableToggle}
-              labelBefore="Enabled" />
-            <TextInput width="100%" label="Content"
-              editMode={this.props.editMode}
-              value={popout.content}
-              type="text"
-              onEdit={this.onPopoutEdit}/>
-          </SidebarRow>
-          {/* Leaving alternate out for now */}
-          {/* <SidebarRow text="Alternate" width="9">
-            <ContentContainer
-              {...this.props}
-              model={alternate.content}
-              onEdit={this.onAlternateEdit} />
-          </SidebarRow> */}
-          <SidebarRow label="Caption">
-            <ContentContainer
-              {...this.props}
-              renderContext={undefined}
-              activeContentGuid={null}
-              hover={null}
-              onUpdateHover={() => {}}
-              model={caption.content}
-              onEdit={this.onCaptionEdit} />
-            </SidebarRow>
-            <SidebarRow label="Citation">
-              <TextInput width="100%" label="Title"
-                editMode={this.props.editMode}
-                value={cite.title}
-                type="text"
-                onEdit={this.onCitationTitleEdit}/>
-              <TextInput width="100%" label="Entry"
-                editMode={this.props.editMode}
-                value={cite.entry}
-                type="text"
-                onEdit={this.onCitationEntryEdit}/>
-              <ContentContainer
-                {...this.props}
-                renderContext={undefined}
-                activeContentGuid={null}
-                hover={null}
-                onUpdateHover={() => {}}
-                model={cite.content}
-                onEdit={this.onCitationContentEdit} />
-            </SidebarRow>
-          </SidebarGroup>
+        <SidebarGroup label="Title">
+          <ContentContainer
+            {...this.props}
+            renderContext={undefined}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            model={titleContent.text}
+            onEdit={this.onTitleEdit} />
+        </SidebarGroup>
+        <SidebarGroup label="Popout">
+          <ToggleSwitch
+            {...this.props}
+            checked={popout.enable}
+            onClick={this.onPopoutEnableToggle}
+            labelBefore="Enabled" />
+          <TextInput width="100%" label="Content"
+            editMode={this.props.editMode}
+            value={popout.content}
+            type="text"
+            onEdit={this.onPopoutEdit} />
+        </SidebarGroup>
+        {/* Leaving alternate out for now */}
+        {/* <SidebarGroup label="Alternate">
+          <ContentContainer
+            {...this.props}
+            model={alternate.content}
+            onEdit={this.onAlternateEdit} />
+        </SidebarGroup> */}
+        <SidebarGroup label="Caption">
+          <ContentContainer
+            {...this.props}
+            renderContext={undefined}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            model={caption.content}
+            onEdit={this.onCaptionEdit} />
+        </SidebarGroup>
+        <SidebarGroup label="Citation">
+          <TextInput width="100%" label="Title"
+            editMode={this.props.editMode}
+            value={cite.title}
+            type="text"
+            onEdit={this.onCitationTitleEdit} />
+          <TextInput width="100%" label="Entry"
+            editMode={this.props.editMode}
+            value={cite.entry}
+            type="text"
+            onEdit={this.onCitationEntryEdit} />
+          <ContentContainer
+            {...this.props}
+            renderContext={undefined}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            model={cite.content}
+            onEdit={this.onCitationContentEdit} />
+        </SidebarGroup>
       </div>
     );
   }

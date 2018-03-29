@@ -4,14 +4,16 @@ import { Select } from '../common/Select';
 import { PurposeTypes } from 'data/content/learning/common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import './WbInline.scss';
 
 export interface WbInlineEditorProps extends AbstractContentEditorProps<contentTypes.WbInline> {
-
+  onShowSidebar: () => void;
 }
 
 export interface WbInlineEditorState {
@@ -88,8 +90,17 @@ export default class WbInlineEditor
   }
 
   renderToolbar() {
+    const { onShowSidebar } = this.props;
+
     return (
-      <ToolbarGroup label="Assessment" />
+      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={2}>
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-sliders"/></div>
+            <div>Details</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
     );
   }
 

@@ -136,7 +136,7 @@ export default class OrderedList
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Ordered List" columns={8} highlightColor={CONTENT_COLORS.Ol}>
+      <ToolbarGroup label="Ordered List" columns={6} highlightColor={CONTENT_COLORS.Ol}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>

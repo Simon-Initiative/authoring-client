@@ -11,7 +11,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 
-import styles from './DefinitionEditor.styles';
+import styles from './Definition.styles';
 
 export interface PronunciationEditorProps
   extends AbstractContentEditorProps<contentTypes.Pronunciation> {
@@ -40,8 +40,7 @@ export default class PronunciationEditor
 
   renderToolbar() {
     return (
-      <ToolbarGroup label="Pronunciation" columns={8} highlightColor={CONTENT_COLORS.Pronunciation}>
-      </ToolbarGroup>
+      <ToolbarGroup label="Pronunciation" highlightColor={CONTENT_COLORS.Pronunciation}/>
     );
   }
 
@@ -68,4 +67,3 @@ export default class PronunciationEditor
   }
 
 }
-

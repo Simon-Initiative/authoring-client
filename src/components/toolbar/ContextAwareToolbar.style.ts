@@ -96,4 +96,13 @@ export default {
     paddingRight: 0,
     borderRight: 'none',
   },
+  tbNoAdvancedControls: {
+    textAlign: 'center',
+    overflow: 'hidden',
+  },
+  tbVerticallyCentered: {
+    height: TOOLBAR_COL_HEIGHT * 2,
+    display: 'flex',
+    alignItems: 'center',
+  },
 };

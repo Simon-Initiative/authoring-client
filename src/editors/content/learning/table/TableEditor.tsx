@@ -96,7 +96,7 @@ export default class TableEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Table" columns={8} highlightColor={CONTENT_COLORS.Table}>
+      <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>

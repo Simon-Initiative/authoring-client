@@ -5,13 +5,17 @@ import { PurposeTypes } from 'data/content/learning/common';
 import { LegacyTypes } from 'data/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { injectSheet, classNames } from 'styles/jss';
+import { StyledComponentProps } from 'types/component';
 
-import './Activity.scss';
+import styles from './Activity.style';
 
 export interface ActivityEditorProps extends AbstractContentEditorProps<contentTypes.Activity> {
-
+  onShowSidebar: () => void;
 }
 
 export interface ActivityEditorState {
@@ -22,9 +26,10 @@ export interface ActivityEditorProps {
 
 }
 
-
+@injectSheet(styles)
 export default class ActivityEditor
-  extends AbstractContentEditor<contentTypes.Activity, ActivityEditorProps, ActivityEditorState> {
+  extends AbstractContentEditor<contentTypes.Activity,
+  StyledComponentProps<ActivityEditorProps>, ActivityEditorState> {
   constructor(props) {
     super(props);
 
@@ -89,8 +94,17 @@ export default class ActivityEditor
   }
 
   renderToolbar() {
+    const { onShowSidebar } = this.props;
+
     return (
-      <ToolbarGroup label="Activity" />
+      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={2}>
+        <ToolbarLayout.Column>
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-sliders"/></div>
+            <div>Details</div>
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+      </ToolbarGroup>
     );
   }
 

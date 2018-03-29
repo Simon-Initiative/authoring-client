@@ -49,39 +49,36 @@ export default class YouTubeEditor
 
     return (
       <SidebarContent title="YouTube">
-        <SidebarGroup label="">
-          <SidebarRow label="">
-            <div className="input-group">
-              <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
-                <TextInput
-                  {...this.props}
-                  width="100%"
-                  type="text"
-                  label=""
-                  value={src}
-                  onEdit={this.onSrcEdit} />
-            </div>
-          </SidebarRow>
-
-          <MediaWidthHeightEditor
-            width={this.props.model.width}
-            height={this.props.model.height}
-            editMode={this.props.editMode}
-            onEditWidth={(width) => {
-              const model = this.props.model.with({ width });
-              this.props.onEdit(model, model);
-            }}
-            onEditHeight={(height) => {
-              const model = this.props.model.with({ height });
-              this.props.onEdit(model, model);
-            }} />
-
-          <MediaMetadataEditor
-            {...this.props}
-            model={this.props.model}
-            onEdit={this.props.onEdit} />
-
+        <SidebarGroup label="Video URL">
+          <div className="input-group">
+            <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+              <TextInput
+                {...this.props}
+                width="100%"
+                type="text"
+                label=""
+                value={src}
+                onEdit={this.onSrcEdit} />
+          </div>
         </SidebarGroup>
+
+        <MediaWidthHeightEditor
+          width={this.props.model.width}
+          height={this.props.model.height}
+          editMode={this.props.editMode}
+          onEditWidth={(width) => {
+            const model = this.props.model.with({ width });
+            this.props.onEdit(model, model);
+          }}
+          onEditHeight={(height) => {
+            const model = this.props.model.with({ height });
+            this.props.onEdit(model, model);
+          }} />
+
+        <MediaMetadataEditor
+          {...this.props}
+          model={this.props.model}
+          onEdit={this.props.onEdit} />
       </SidebarContent>
     );
   }
@@ -97,7 +94,7 @@ export default class YouTubeEditor
         </ToolbarButton>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={() => window.open('https://youtube.com', '_blank').focus()}
-            size={ToolbarButtonSize.Wide}>
+            size={ToolbarButtonSize.Large}>
             <i className="fa fa-youtube"/> YouTube.com
           </ToolbarButton>
         </ToolbarLayout.Column>

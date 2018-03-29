@@ -8,7 +8,7 @@ import {
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 
 import styles from './List.styles';
 
@@ -23,7 +23,7 @@ export interface ListItemEditorState {
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for list items.
  */
 @injectSheet(styles)
 export default class ListItemEditor
@@ -36,14 +36,11 @@ export default class ListItemEditor
   }
 
   renderSidebar() {
-    return null;
+    return <SidebarContent title="List Item" />;
   }
 
   renderToolbar() {
-    return (
-      <ToolbarGroup label="List Item" columns={8} highlightColor={CONTENT_COLORS.Li}>
-      </ToolbarGroup>
-    );
+    return <ToolbarGroup label="List Item" highlightColor={CONTENT_COLORS.Li}/>;
   }
 
   onEdit(content, src) {
