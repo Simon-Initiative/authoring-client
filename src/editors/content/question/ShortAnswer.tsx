@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { Checkbox, Select } from '../common/controls';
 import {
@@ -9,7 +8,6 @@ import {
   TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
-import guid from 'utils/guid';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
