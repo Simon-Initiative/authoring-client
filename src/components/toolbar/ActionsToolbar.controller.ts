@@ -23,6 +23,7 @@ interface DispatchProps {
 interface OwnProps {
   documentResource: Resource;
   documentId: string;
+  canPreview: boolean;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

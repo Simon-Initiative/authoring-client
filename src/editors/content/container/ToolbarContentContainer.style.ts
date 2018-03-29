@@ -22,7 +22,6 @@ export default {
   },
   content: {
     flex: 1,
-    minHeight: 200,
 
     '& .content-decorator': {
       border: BORDER_STYLE,

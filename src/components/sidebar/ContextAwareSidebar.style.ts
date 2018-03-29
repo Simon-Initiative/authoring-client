@@ -1,7 +1,7 @@
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
-export const SIDEBAR_WIDTH = 300;
+export const SIDEBAR_WIDTH = 310;
 export const SIDEBAR_CLOSE_ANIMATION_DURATION_MS = 200;
 
 const SIDEBAR_CLOSE_ANIMATION_DURATION_S = SIDEBAR_CLOSE_ANIMATION_DURATION_MS / 1000;
@@ -28,6 +28,11 @@ export default {
       marginBottom: '6px',
     },
     marginBottom: '1rem',
+  },
+
+  sidebarRowLabel: {
+    fontWeight: 600,
+    color: colors.grayDarker,
   },
 
   content: {
@@ -85,8 +90,13 @@ export default {
 
   },
 
-  sidebarLabel: {
-
+  sidebarGroupLabel: {
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottom: `1px solid ${colors.grayLighter}`,
+    color: colors.gray,
+    fontSize: 16,
+    textTransform: 'uppercase',
   },
 
   // slide-in/out animations

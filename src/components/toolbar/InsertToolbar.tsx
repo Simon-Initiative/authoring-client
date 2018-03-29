@@ -12,6 +12,7 @@ import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/media/AudioEditor';
 import { selectImage } from 'editors/content/media/ImageEditor';
+import { ContiguousTextMode } from 'data/content/learning/contiguous';
 
 import styles from './InsertToolbar.style';
 
@@ -72,12 +73,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-list-alt'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Insert Quote Block"
-            disabled>
-          <i className={'fa fa-quote-right'}/>
-        </ToolbarButton>
-        <ToolbarButton
             onClick={() => {
               const cell1 = new contentTypes.CellData();
               const cell2 = new contentTypes.CellData();
@@ -96,15 +91,26 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-table'}/>
         </ToolbarButton>
         <ToolbarButton
+            onClick={() => onInsert(new contentTypes.BlockQuote()
+              .with({ text: contentTypes.ContiguousText.fromText('Quote', '')
+                .with({ mode: ContiguousTextMode.SimpleText }) }))}
+            tooltip="Insert Quote"
+            disabled={!parentSupportsElementType('quote')}>
+          <i className={'fa fa-quote-right'}/>
+        </ToolbarButton>
+        <ToolbarButton
             onClick={() => onInsert(new contentTypes.CodeBlock())}
             tooltip="Insert Code Block"
             disabled={!parentSupportsElementType('codeblock')}>
           <i className={'fa fa-code'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
-            tooltip="Insert Formula Block"
-            disabled>
+            onClick={() => onInsert(new contentTypes.BlockFormula().with({
+              text: contentTypes.ContiguousText.fromText('Formula', '')
+                .with({ mode: ContiguousTextMode.SimpleText }),
+            }))}
+            tooltip="Insert Formula"
+            disabled={!parentSupportsElementType('formula')}>
           <i className="unicode-icon">&#8721;</i>
         </ToolbarButton>
         <ToolbarButton

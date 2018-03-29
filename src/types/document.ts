@@ -1,4 +1,5 @@
 import * as Immutable from 'immutable';
+import * as contentTypes from 'data/contentTypes';
 import { Document } from 'data/persistence';
 import { ContentModel } from 'data/models';
 import { PersistenceStrategy } from 'editors/manager/persistence/PersistenceStrategy';
@@ -17,6 +18,8 @@ export type EditedDocumentParams = {
   redoStack?: Immutable.Stack<ContentModel>;
   undoRedoGuid?: string;
   editingAllowed?: boolean;
+  currentPage?: Maybe<string>;
+  currentNode?: Maybe<contentTypes.Node>;
 };
 
 const defaultContent = {
@@ -30,6 +33,8 @@ const defaultContent = {
   redoStack: Immutable.Stack<ContentModel>(),
   undoRedoGuid: createGuid(),
   editingAllowed: false,
+  currentPage: Maybe.nothing<string>(),
+  currentNode: Maybe.nothing<contentTypes.Node>(),
 };
 
 export class EditedDocument extends Immutable.Record(defaultContent) {
@@ -44,6 +49,8 @@ export class EditedDocument extends Immutable.Record(defaultContent) {
   redoStack: Immutable.Stack<ContentModel>;
   undoRedoGuid: string;
   editingAllowed: boolean;
+  currentPage: Maybe<string>;
+  currentNode: Maybe<contentTypes.Node>;
 
   constructor(params?: EditedDocumentParams) {
     super(params);

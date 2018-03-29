@@ -63,17 +63,12 @@ export class ToolbarContentContainer
 
     const text = model.content.first() as contentTypes.ContiguousText;
 
-    const isCollapsed = textSelection.caseOf({
-      just: selection => selection.isCollapsed(),
-      nothing: () => false,
-    });
-
     const selection = textSelection.caseOf({
       just: s => s,
       nothing: () => null,
     });
 
-    const formatEnabled = editMode && !isCollapsed;
+    const formatEnabled = editMode && selection && !selection.isCollapsed();
 
     return (
       <div className={classes.miniToolbar}>
