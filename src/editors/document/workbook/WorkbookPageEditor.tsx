@@ -11,6 +11,8 @@ import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { ContentElements } from 'data/content/common/elements';
+import { ContiguousTextViewer } from 'editors/content/learning/ContiguousTextViewer';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './WorkbookPageEditor.scss';
 
@@ -122,12 +124,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   render() {
-    const { context, hover, onUpdateHover } = this.props;
-
-    const text = this.props.model.head.title.text.extractPlainText().caseOf({
-      just: s => s,
-      nothing: () => '',
-    });
+    const { model, context, services, editMode, hover, onEdit, onUpdateHover } = this.props;
 
     const activeGuid = this.props.activeContext.activeChild.caseOf({
       just: c => (c as any).guid,
@@ -136,11 +133,18 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
     return (
       <div className="workbookpage-editor">
-        <ContextAwareToolbar context={context} />
+        <ContextAwareToolbar context={context} model={model} />
         <div className="wb-content">
           <div className="html-editor-well">
-            <h2 className="title-row">{text}</h2>
+
+            <ContiguousTextViewer
+              context={context}
+              services={services}
+              model={(model.head.title.text.content.first() as ContiguousText)}
+              editorStyles={{ fontSize: 32 }} />
+
             {this.renderObjectives()}
+
             <ContentContainer
               parent={null}
               activeContentGuid={activeGuid}
@@ -153,7 +157,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
               model={this.props.model.body}
               onEdit={(c, s) => this.onBodyEdit(c, s)} />
           </div>
-          <ContextAwareSidebar />
+          <ContextAwareSidebar
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={model}
+            onEditModel={onEdit} />
         </div>
       </div>
     );

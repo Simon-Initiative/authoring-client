@@ -5,6 +5,10 @@
   flex-direction: row;
   cursor: pointer;
 
+  &.disabled {
+    cursor: initial;
+  }
+
   input[type="checkbox"].toggle {
     display: none;
 
@@ -69,11 +73,16 @@
     &:disabled + .toggle-btn {
       background: $gray-lighter;
       border: 1px solid $gray-lighter;
+      cursor: initial;
     }
 
     &:checked:disabled + .toggle-btn {
-      background: #9FD6AE;
-      border-color: #9FD6AE;
+      background: #c4ddcb;
+      border-color: #c4ddcb;
+    }
+
+    &:checked:disabled + .toggle-btn:after {
+      background: $gray-lightest;
     }
   }
 

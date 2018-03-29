@@ -5,15 +5,18 @@ import guid from 'utils/guid';
 
 let inlineHandlers = null;
 
-export function toDraft(toParse: Object[]) : ContentState {
+export function toDraft(toParse: Object[], isInlineText : boolean = false) : ContentState {
 
   const draft : common.RawDraft = {
     entityMap : {},
     blocks : [],
   };
 
-  toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
-
+  if (isInlineText) {
+    parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+  } else {
+    toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
+  }
   return convertFromRaw(draft);
 }
 

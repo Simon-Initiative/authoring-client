@@ -5,12 +5,14 @@ import { Pullout } from '../learning/Pullout';
 import { Section } from '../learning/Section';
 import { WbInline } from '../learning/WbInline';
 import { Activity } from '../learning/Activity';
+import { BlockCode } from '../learning/blockcodeeditor/BlockCode';
+import { BlockFormula } from '../learning/blockformulaeditor/BlockFormula';
 import ContiguousTextEditor from '../learning/ContiguousTextEditor';
 import Unsupported from '../learning/Unsupported';
 import { connectSidebarActions } from './connectSidebarActions';
 import { LinkEditor } from '../learning/LinkEditor';
 import { ActivityLinkEditor } from '../learning/ActivityLinkEditor';
-import { QuoteEditor } from '../learning/QuoteEditor';
+import { BlockQuote } from '../learning/blockquoteeditor/BlockQuote';
 import { MathEditor } from '../learning/MathEditor';
 import { CiteEditor } from '../learning/CiteEditor';
 import { XrefEditor } from '../learning/XrefEditor';
@@ -48,7 +50,7 @@ function init() {
   registry['Link'] = LinkEditor;
   registry['Image'] = connectSidebarActions()(ImageEditor);
   registry['ActivityLink'] = ActivityLinkEditor;
-  registry['Quote'] = QuoteEditor;
+  registry['BlockQuote'] = connectSidebarActions()(BlockQuote);
   registry['Math'] = MathEditor;
   registry['Cite'] = CiteEditor;
   registry['Xref'] = XrefEditor;
@@ -58,6 +60,8 @@ function init() {
   registry['WbInline'] = connectSidebarActions()(WbInline);
   registry['Activity'] = connectSidebarActions()(Activity);
   registry['YouTube'] = connectSidebarActions()(YouTubeEditor);
+  registry['BlockCode'] = connectSidebarActions()(BlockCode);
+  registry['BlockFormula'] = connectSidebarActions()(BlockFormula);
   registry['Audio'] = connectSidebarActions()(AudioEditor);
   registry['Video'] = connectSidebarActions()(VideoEditor);
   registry['IFrame'] = connectSidebarActions()(IFrameEditor);
@@ -71,6 +75,4 @@ function init() {
   registry['Meaning'] = connectSidebarActions()(MeaningEditor);
   registry['Translation'] = connectSidebarActions()(TranslationEditor);
   registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
-
-
 }

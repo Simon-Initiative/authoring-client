@@ -230,6 +230,7 @@ export default class OrderedList
         <ContentContainer
           {...this.props}
           model={elements}
+          topMargin="0px"
           bindProperties={bindLabel}
           onEdit={this.onListItemsEdit.bind(this)}
         />

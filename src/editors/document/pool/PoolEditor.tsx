@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
@@ -14,6 +13,8 @@ import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
+import { ContiguousTextViewer } from 'editors/content/learning/ContiguousTextViewer';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './PoolEditor.scss';
 
@@ -152,15 +153,11 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   render() {
-
-    const { model, context } = this.props;
+    const { context, services, editMode, model, onEdit } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
     const expanded = Immutable.Set<string>(model.pool.questions.toArray().map(n => n.guid));
-
-    const text = this.props.model.resource.title;
-
 
     const activeContentGuid = this.props.activeContext.activeChild.caseOf({
       just: c => (c as any).guid,
@@ -174,10 +171,15 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <div className="pool-editor">
-        <ContextAwareToolbar context={context} />
+        <ContextAwareToolbar context={context} model={model}/>
         <div className="pool-content">
           <div className="html-editor-well">
-            <h2 className="title-row">{text}</h2>
+
+            <ContiguousTextViewer
+              context={context}
+              services={services}
+              model={(model.pool.title.text.content.first() as ContiguousText)}
+              editorStyles={{ fontSize: 32 }} />
 
             <AddQuestion
               editMode={this.props.editMode}
@@ -204,8 +206,13 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               </div>
             </div>
           </div>
+        <ContextAwareSidebar
+          context={context}
+          services={services}
+          editMode={editMode}
+          model={model}
+          onEditModel={onEdit} />
         </div>
-        <ContextAwareSidebar />
       </div>
     );
   }
