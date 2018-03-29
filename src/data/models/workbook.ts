@@ -98,12 +98,16 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
 
   toPersistence(): Object {
 
+    const content = this.body.content.size === 0
+       ? [{ p: { '#text': ' ' } }]
+       : this.body.toPersistence();
+
     const doc = [{
       workbook_page: {
         '@id': this.resource.id,
         '#array': [
           this.head.toPersistence(),
-          { body: { '#array': this.body.toPersistence() } },
+          { body: { '#array': content } },
         ],
       },
     }];

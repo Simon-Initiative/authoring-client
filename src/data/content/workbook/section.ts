@@ -83,13 +83,17 @@ export class Section extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    const content = this.body.content.size === 0
+       ? [{ p: { '#text': ' ' } }]
+       : this.body.toPersistence();
     const s = {
       section: {
         '#array': [
           this.title.toPersistence(),
           {
             body: {
-              '#array': this.body.toPersistence(),
+              '#array': content,
             },
           },
         ],
