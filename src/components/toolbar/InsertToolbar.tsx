@@ -13,7 +13,7 @@ import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/media/AudioEditor';
 import { selectImage } from 'editors/content/media/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
-
+import guid from 'utils/guid';
 import styles from './InsertToolbar.style';
 
 export interface InsertToolbarProps {
@@ -37,7 +37,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
     <React.Fragment>
       <ToolbarLayout.Inline>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.ContiguousText())}
+            onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid())) }
             tooltip="Insert Text Block"
             disabled={!parentSupportsElementType('p')}>
           <i className="unicode-icon">T</i>
