@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { MathEditor as SourceBasedMathEditor } from 'utils/math/MathEditor';
-import { Label } from '../common/Sidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';

@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkTarget } from 'data/content/learning/common';
 import { Select, TextInput } from '../common/controls';
-import { Label, VerticalSpacer } from '../common/Sidebar';
 import { LegacyTypes } from 'data/types';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';

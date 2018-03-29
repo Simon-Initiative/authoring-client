@@ -34,14 +34,12 @@ export default class UnsupportedEditor
   }
 
   renderSidebar() {
-    const { editMode, model, onEdit } = this.props;
-
     return (
       <SidebarContent title="Unsupported">
-          <SidebarGroup label="">
-            This is an unsupported element.
-          </SidebarGroup>
-        </SidebarContent>
+        <SidebarGroup label="">
+          This is an unsupported element.
+        </SidebarGroup>
+      </SidebarContent>
     );
   }
 

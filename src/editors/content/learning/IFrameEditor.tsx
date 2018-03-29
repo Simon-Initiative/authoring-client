@@ -7,7 +7,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { buildUrl } from 'utils/path';
 
 

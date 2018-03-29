@@ -4,7 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';

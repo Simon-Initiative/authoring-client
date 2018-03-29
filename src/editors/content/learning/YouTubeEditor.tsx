@@ -5,7 +5,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { ContentElements } from 'data/content/common/elements';
 import { TextInput } from '../common/TextInput';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';

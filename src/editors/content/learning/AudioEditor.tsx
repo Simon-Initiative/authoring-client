@@ -5,7 +5,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
 import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
 import { adjustPath } from 'editors/content/media/utils';
-import { SidebarRow, SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';

@@ -9,7 +9,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { injectSheet, classNames } from 'styles/jss';
+import { injectSheet } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 
 import styles from './Activity.style';
