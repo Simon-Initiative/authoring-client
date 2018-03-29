@@ -1,15 +1,13 @@
 import * as React from 'react';
-import { OrderedMap } from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { Checkbox, Select, Button } from '../common/controls';
+import { Checkbox, Select } from '../common/controls';
 import {
   Question, QuestionProps, QuestionState,
 } from './Question';
 import {
-  TabSection, TabSectionContent, TabSectionHeader, TabOptionControl,
+  TabSection, TabSectionContent, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
 import { Feedback } from '../part/Feedback';
-import guid from 'utils/guid';
 
 export interface ShortAnswerProps extends QuestionProps<contentTypes.ShortAnswer> {
 
@@ -29,7 +27,6 @@ export class ShortAnswer
     super(props);
 
     this.onPartEdit = this.onPartEdit.bind(this);
-    this.onResponseAdd = this.onResponseAdd.bind(this);
     this.onWhitespaceChange = this.onWhitespaceChange.bind(this);
     this.onCaseSensitive = this.onCaseSensitive.bind(this);
   }
@@ -43,25 +40,6 @@ export class ShortAnswer
     this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
-  onResponseAdd() {
-    const { partModel } = this.props;
-
-    const feedback = contentTypes.Feedback.fromText('', guid());
-    const feedbacks = OrderedMap<string, contentTypes.Feedback>();
-
-    const response = new contentTypes.Response({
-      score: '1',
-      match: '',
-      feedback: feedbacks.set(feedback.guid, feedback),
-    });
-
-    const updatedPartModel = partModel.with({
-      responses: partModel.responses.set(response.guid, response),
-    });
-
-    this.onPartEdit(updatedPartModel, feedback);
-  }
-
   onWhitespaceChange(whitespace) {
     this.props.onEdit(this.props.itemModel.with({ whitespace }), this.props.partModel, null);
   }
@@ -71,10 +49,7 @@ export class ShortAnswer
   }
 
   renderDetails() {
-    const {
-      partModel,
-      editMode,
-    } = this.props;
+    const { partModel } = this.props;
 
     return (
       <React.Fragment>
@@ -99,16 +74,7 @@ export class ShortAnswer
                 onEdit={this.onCaseSensitive} />
             </div>
           </TabSectionContent>
-          <TabSectionHeader title="Feedback">
-            <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
-              <Button
-                editMode={editMode}
-                type="link"
-                onClick={this.onResponseAdd}>
-                Add Feedback
-              </Button>
-            </TabOptionControl>
-          </TabSectionHeader>
+          <TabSectionHeader title="Feedback"/>
           <TabSectionContent key="feedback" className="feedback">
             <Feedback
               {...this.props}
@@ -126,4 +92,3 @@ export class ShortAnswer
   }
 
 }
-
