@@ -150,7 +150,7 @@ export default class CellEditor
 
     const hideDecorator = model.content.content.size === 0 ||
      (model.content.content.size === 1
-      && model.content.first().contentType === 'ContiguousText');
+      && model.content.content.first().contentType === 'ContiguousText');
 
 
     return (
