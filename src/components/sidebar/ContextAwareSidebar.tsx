@@ -68,19 +68,18 @@ interface SidebarContentProps {
   className?: string;
   title: string;
   onHide: () => void;
-  isEmpty?: boolean;
 }
 
 /**
  * SidebarGroup React Stateless Component
  */
 export const SidebarContent = injectSheetSFC<SidebarContentProps>(styles)(({
-  className, classes, children, title, onHide, isEmpty,
+  className, classes, children, title, onHide,
 }: StyledComponentProps<SidebarContentProps>) => {
   return (
     <div className={classNames([classes.sidebarContent, className])}>
       <SidebarHeader title={title} onHide={onHide}/>
-      {!isEmpty
+      {children
         ? children
         : (
           <div className={classes.sidebarEmptyMsg}>
