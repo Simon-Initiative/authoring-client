@@ -12,6 +12,7 @@ import { ContentContainer } from '../container/ContentContainer';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { ToolbarContentContainer } from '../container/ToolbarContentContainer';
 
 export type MediaType = {
   with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
@@ -183,14 +184,14 @@ export class MediaMetadataEditor
             onEdit={this.onAlternateEdit} />
         </SidebarGroup> */}
         <SidebarGroup label="Caption">
-          <ContentContainer
-            {...this.props}
-            renderContext={undefined}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => { }}
-            model={caption.content}
-            onEdit={this.onCaptionEdit} />
+          <ToolbarContentContainer
+              {...this.props}
+              renderContext={undefined}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
+              model={caption.content}
+              onEdit={this.onCaptionEdit} />
         </SidebarGroup>
         <SidebarGroup label="Citation">
           <TextInput width="100%" label="Title"
