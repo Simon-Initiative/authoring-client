@@ -28,12 +28,51 @@ export interface CellEditorState {
  * The content editor for table cells.
  */
 @injectSheet(styles)
-export class CellEditor
+export default class CellEditor
     extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
     StyledComponentProps<CellEditorProps>, CellEditorState> {
 
   constructor(props) {
     super(props);
+  }
+
+  onAlignmentChange(align) {
+    this.props.onEdit(this.props.model.with({ align }));
+  }
+
+  onRowSpanChange(rowspan) {
+    this.props.onEdit(this.props.model.with({ rowspan }));
+  }
+
+  onColSpanChange(colspan) {
+    this.props.onEdit(this.props.model.with({ colspan }));
+  }
+
+  onCellEdit(content, src) {
+    const model = this.props.model.with({ content });
+    this.props.onEdit(model, src);
+  }
+
+
+  render() : JSX.Element {
+
+    const renderContext = this.props.renderContext === undefined
+      ? RenderContext.MainEditor
+      : this.props.renderContext;
+
+    if (renderContext === RenderContext.Toolbar) {
+      return this.renderToolbar();
+    }
+    if (renderContext === RenderContext.Sidebar) {
+      return this.renderSidebar();
+    }
+    return (
+      <div style={ { height: '100%' } }
+        onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
+        {this.renderMain()}
+      </div>
+    );
+
   }
 
   renderSidebar() {
@@ -77,23 +116,11 @@ export class CellEditor
     );
   }
 
-  onAlignmentChange(align) {
-    this.props.onEdit(this.props.model.with({ align }));
-  }
-
-  onRowSpanChange(rowspan) {
-    this.props.onEdit(this.props.model.with({ rowspan }));
-  }
-
-  onColSpanChange(colspan) {
-    this.props.onEdit(this.props.model.with({ colspan }));
-  }
-
   renderToolbar() {
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Table Cell" columns={8} highlightColor={CONTENT_COLORS.CellData}>
+      <ToolbarGroup label="Table Cell" columns={4} highlightColor={CONTENT_COLORS.CellData}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-align-left"></i></div>
           <div>Alignment</div>
@@ -104,33 +131,6 @@ export class CellEditor
         </ToolbarButton>
       </ToolbarGroup>
     );
-  }
-
-  onCellEdit(content, src) {
-    const model = this.props.model.with({ content });
-    this.props.onEdit(model, src);
-  }
-
-
-  render() : JSX.Element {
-
-    const renderContext = this.props.renderContext === undefined
-      ? RenderContext.MainEditor
-      : this.props.renderContext;
-
-    if (renderContext === RenderContext.Toolbar) {
-      return this.renderToolbar();
-    }
-    if (renderContext === RenderContext.Sidebar) {
-      return this.renderSidebar();
-    }
-    return (
-      <div style={ { height: '100%' } }
-        onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
-        {this.renderMain()}
-      </div>
-    );
-
   }
 
   renderMain() : JSX.Element {
@@ -169,4 +169,3 @@ export class CellEditor
   }
 
 }
-
