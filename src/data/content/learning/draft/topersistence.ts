@@ -484,9 +484,8 @@ function translateOverlapping(
   const groups = groupOverlappingRanges(combineIntervals(rawBlock));
 
   // Create a bare text tag for the first unstyled part, if one exists
-  const styles = rawBlock.inlineStyleRanges;
-  if (styles[0].offset !== 0) {
-    const text = { '#text': rawBlock.text.substring(0, styles[0].offset) };
+  if (groups[0].offset !== 0) {
+    const text = { '#text': rawBlock.text.substring(0, groups[0].offset) };
     container.push(text);
   }
 
