@@ -23,7 +23,7 @@ export interface ActivityLinkEditorState {
  * React Component
  */
 @injectSheet(styles)
-export class ActivityLinkEditor
+export default class ActivityLinkEditor
     extends AbstractContentEditor
     <contentTypes.ActivityLink, ActivityLinkEditorProps & JSSProps, ActivityLinkEditorState> {
 
