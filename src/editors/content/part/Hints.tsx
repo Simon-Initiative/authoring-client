@@ -54,6 +54,10 @@ extends AbstractContentEditor<contentTypes.Part,
 
   renderMain() : JSX.Element {
 
+    if (this.props.model.hints.size === 0) {
+      return null;
+    }
+
     const elements = new ContentElements().with({
       content: this.props.model.hints,
     });
