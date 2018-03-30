@@ -47,9 +47,9 @@ export function getEditorByContentType(contentType: string) {
 function init() {
   registry = {};
   registry['Hint'] = HintEditor;
-  registry['ContiguousText'] = ContiguousTextEditor;
-  registry['CodeBlock'] = connectSidebarActions()(CodeBlock);
-  registry['Link'] = LinkEditor;
+  registry['ContiguousText'] = connectSidebarActions()(ContiguousTextEditor);
+  registry['CodeBlock'] = connectSidebarActions()(CodeBlockEditor);
+  registry['Link'] = connectSidebarActions()(LinkEditor);
   registry['Image'] = connectSidebarActions()(ImageEditor);
   registry['ActivityLink'] = connectSidebarActions()(ActivityLinkEditor);
   registry['BlockQuote'] = connectSidebarActions()(BlockQuoteEditor);
