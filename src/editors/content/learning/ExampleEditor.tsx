@@ -4,7 +4,6 @@ import * as contentTypes from 'data/contentTypes';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -48,14 +47,8 @@ export default class ExampleEditor
   }
 
   renderToolbar(): JSX.Element {
-    const { onShowSidebar } = this.props;
-
     return (
       <ToolbarGroup label="Example" columns={2} highlightColor={CONTENT_COLORS.Example}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
-          <div>Title</div>
-        </ToolbarButton>
       </ToolbarGroup>
     );
   }

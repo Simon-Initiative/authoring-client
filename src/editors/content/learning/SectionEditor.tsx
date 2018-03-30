@@ -7,7 +7,6 @@ import * as contentTypes from 'data/contentTypes';
 import { PurposeTypes } from 'data/content/learning/common';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -62,8 +61,6 @@ export default class SectionEditor extends AbstractContentEditor
   }
 
   renderToolbar(): JSX.Element {
-    const { onShowSidebar } = this.props;
-
     return (
       <ToolbarGroup label="Section" columns={8} highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
@@ -88,10 +85,6 @@ export default class SectionEditor extends AbstractContentEditor
             </Select>
         </ToolbarLayout.Column>
 
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
-          <div>Title</div>
-        </ToolbarButton>
       </ToolbarGroup>
     );
   }
