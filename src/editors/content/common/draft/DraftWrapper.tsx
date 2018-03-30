@@ -345,8 +345,14 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   onGainFocus() {
-    console.log('on Gainfocus)');
     this.props.onSelectionChange(this.state.editorState.getSelection());
+  }
+
+  blockStyleFn(contentBlock) {
+    const type = contentBlock.getType();
+    if (type === 'unstyled') {
+      return 'draft-paragraph';
+    }
   }
 
   render() {
@@ -376,6 +382,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             handlePastedFragment={this.handlePastedFragment.bind(this)}
             customStyleMap={styleMap}
             blockRenderMap={blockRenderMap}
+            blockStyleFn={this.blockStyleFn.bind(this)}
             editorState={this.state.editorState}
             readOnly={this.props.locked}
             onChange={this.onChange} />
