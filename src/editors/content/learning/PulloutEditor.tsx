@@ -35,9 +35,7 @@ export default class PulloutEditor
     this.onEditOrient = this.onEditOrient.bind(this);
   }
 
-  onTitleEdit(t, sourceObject) {
-    const content = this.props.model.title.text.content.set(t.guid, t);
-    const text = this.props.model.title.text.with({ content });
+  onTitleEdit(text, sourceObject) {
     const title = this.props.model.title.with({ text });
     const model = this.props.model.with({ title });
 
@@ -83,7 +81,7 @@ export default class PulloutEditor
             hover={null}
             onUpdateHover={() => {}}
             model={model.title.text}
-            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
+            onEdit={text => this.onTitleEdit(text, model)} />
         </SidebarGroup>
       </SidebarContent>
     );
