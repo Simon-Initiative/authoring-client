@@ -2,15 +2,19 @@ import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
-import { InputLabel } from '../common/InputLabel';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
+
+import './HintEditor.scss';
 
 type IdTypes = {
   targets: string,
 };
 
 export interface HintEditorProps extends AbstractContentEditorProps<contentTypes.Hint> {
-  onRemove: (hint: contentTypes.Hint) => void;
+  label: any;
 }
 
 export interface HintEditorState {
@@ -34,13 +38,6 @@ export class HintEditor
     this.onTargetChange = this.onTargetChange.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
   onBodyEdit(body, src) {
     const concept = this.props.model.with({ body });
     this.props.onEdit(concept, src);
@@ -56,30 +53,38 @@ export class HintEditor
       this.props.onEdit(this.props.model.with({ targets })));
   }
 
-  renderSidebar() {
-    return null;
-  }
+
   renderToolbar() {
-    return null;
+
+    return (
+      <ToolbarGroup label="Hint" columns={8} highlightColor={CONTENT_COLORS.Hint}>
+      </ToolbarGroup>
+    );
   }
+
+  renderSidebar() {
+
+    return (
+      <SidebarContent title="Hint">
+      </SidebarContent>
+    );
+  }
+
 
   renderMain() : JSX.Element {
 
     return (
-      <div className="itemWrapper">
-
-      <InputLabel editMode={this.props.editMode}
-        label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
-          <div style={ { width: '100%' } }>
-            <ContentContainer
-              {...this.props}
-              model={this.props.model.body}
-              onEdit={this.onBodyEdit}
-              />
-          </div>
-        </InputLabel>
-
-      </div>);
+      <div className="itemWrapper hint">
+        <div className="hint-label">{this.props.label}</div>
+        <div className="hint-content">
+          <ContentContainer
+            {...this.props}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit}
+            />
+        </div>
+      </div>
+    );
   }
 
 }

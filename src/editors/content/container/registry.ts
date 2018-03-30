@@ -30,6 +30,7 @@ import DefinitionEditor from '../learning/DefinitionEditor';
 import MeaningEditor from '../learning/MeaningEditor';
 import TranslationEditor from '../learning/TranslationEditor';
 import PronunciationEditor from '../learning/PronunciationEditor';
+import { HintEditor } from '../part/HintEditor';
 
 let registry = null;
 
@@ -45,6 +46,7 @@ export function getEditorByContentType(contentType: string) {
 
 function init() {
   registry = {};
+  registry['Hint'] = HintEditor;
   registry['ContiguousText'] = ContiguousTextEditor;
   registry['CodeBlock'] = connectSidebarActions()(CodeBlock);
   registry['Link'] = LinkEditor;
