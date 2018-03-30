@@ -13,7 +13,7 @@ import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContiguousTextViewer } from 'editors/content/learning/contiguoustext/ContiguousTextViewer';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './PoolEditor.scss';
@@ -85,11 +85,17 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.handleEdit(updated);
   }
 
-  onTitleEdit(title) {
-    const resource = this.props.model.resource.with({ title: title.text });
+  onTitleEdit(ct: ContiguousText, src) {
+    const t = ct.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+
+    const resource = this.props.model.resource.with({ title: t });
+
+    const content = this.props.model.pool.title.text.content.set(ct.guid, ct);
+    const text = this.props.model.pool.title.text.with({ content });
+    const title = this.props.model.pool.title.with({ text });
     const pool = this.props.model.pool.with({ title });
-    const updated = this.props.model.with({ pool, resource });
-    this.handleEdit(updated);
+
+    this.props.onEdit(this.props.model.with({ pool, resource }));
   }
 
   onEdit(guid : string, question : contentTypes.Question, src) {
@@ -175,10 +181,13 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
         <div className="pool-content">
           <div className="html-editor-well">
 
-            <ContiguousTextViewer
+            <TitleTextEditor
               context={context}
               services={services}
+              onFocus={this.onFocus.bind(this)}
               model={(model.pool.title.text.content.first() as ContiguousText)}
+              editMode={editMode}
+              onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
             <AddQuestion

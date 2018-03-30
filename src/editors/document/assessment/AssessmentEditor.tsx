@@ -19,7 +19,7 @@ import * as persistence from 'data/persistence';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContiguousTextViewer } from 'editors/content/learning/contiguoustext/ContiguousTextViewer';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 
@@ -105,10 +105,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.handleEdit(this.props.model.with({ pages }));
   }
 
-  onTitleEdit(content: contentTypes.Title) {
-    const resource = this.props.model.resource.with({ title: content.text
-      .extractPlainText().caseOf({ just: s => s, nothing: () => '' }) });
-    this.handleEdit(this.props.model.with({ title: content, resource }));
+  onTitleEdit(ct: ContiguousText, src) {
+    const t = ct.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+
+    const resource = this.props.model.resource.with({ title: t });
+
+    const content = this.props.model.title.text.content.set(ct.guid, ct);
+    const text = this.props.model.title.text.with({ content });
+    const title = this.props.model.title.with({ text });
+
+    this.props.onEdit(this.props.model.with({ title, resource }));
   }
 
   detectPoolAdditions(
@@ -188,24 +194,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       this.handleEdit(this.props.model.with({ pages }));
     }
 
-  }
-
-
-
-  renderTitle() {
-    return (
-      <TitleContentEditor
-        activeContentGuid={null}
-        hover={null}
-        onUpdateHover={() => {}}
-        parent={null}
-        onFocus={this.onFocus.bind(this, this.props.model.title, this)}
-        services={this.props.services}
-        context={this.props.context}
-        editMode={this.props.editMode}
-        model={this.props.model.title}
-        onEdit={this.onTitleEdit} />
-    );
   }
 
   onAddContent() {
@@ -406,10 +394,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <div className="assessment-content">
           <div className="html-editor-well">
 
-            <ContiguousTextViewer
+            <TitleTextEditor
               context={context}
               services={services}
+              onFocus={this.onFocus.bind(this)}
               model={(model.title.text.content.first() as ContiguousText)}
+              editMode={editMode}
+              onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
             {this.renderAdd()}
