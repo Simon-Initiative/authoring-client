@@ -3,12 +3,10 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import * as contentTypes from 'data/contentTypes';
 import { Select } from '../common/controls';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Maybe } from 'tsmonad';
 import { Orientation } from 'data/content/learning/common';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
@@ -73,8 +71,6 @@ export default class PulloutEditor
   }
 
   renderSidebar(): JSX.Element {
-    const { model } = this.props;
-
     return (
       <SidebarContent title="Pullout" />
     );

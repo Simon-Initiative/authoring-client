@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { AbstractEditor, AbstractEditorProps, AbstractEditorState } from '../common/AbstractEditor';
-import { TitleContentEditor } from '../../content/title/TitleContentEditor';
 import { TextInput } from '../../content/common/TextInput';
 import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';

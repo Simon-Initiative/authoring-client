@@ -10,7 +10,6 @@ import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.cont
 import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContentElements } from 'data/content/common/elements';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 

@@ -2,12 +2,9 @@ import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
@@ -45,8 +42,6 @@ export default class ExampleEditor
   }
 
   renderSidebar(): JSX.Element {
-    const { model } = this.props;
-
     return (
       <SidebarContent title="Example" />
     );
