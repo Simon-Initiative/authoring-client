@@ -81,9 +81,9 @@ export class Pullout extends Immutable.Record(defaultContent) {
       model = model.with({ id: Maybe.just(t['@id']) });
     }
     if (t['@orient'] !== undefined) {
-      model = model.with({ 
-        orient: t['@orient'] === 'vertical' 
-          ? Orientation.Vertical 
+      model = model.with({
+        orient: t['@orient'] === 'vertical'
+          ? Orientation.Vertical
           : Orientation.Horizontal,
       });
     }
@@ -111,12 +111,17 @@ export class Pullout extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    const content = this.content.content.size === 0
+       ? [{ p: { '#text': ' ' } }]
+       : this.content.toPersistence();
+
     const s = {
       pullout: {
         '@orient': this.orient,
         '#array': [
           this.title.toPersistence(),
-          ...this.content.toPersistence(),
+          ...content,
         ],
       },
     };
