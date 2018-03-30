@@ -30,6 +30,7 @@ import DefinitionEditor from '../learning/DefinitionEditor';
 import MeaningEditor from '../learning/MeaningEditor';
 import TranslationEditor from '../learning/TranslationEditor';
 import PronunciationEditor from '../learning/PronunciationEditor';
+import QuoteEditor from '../learning/QuoteEditor';
 
 let registry = null;
 
@@ -51,6 +52,7 @@ function init() {
   registry['Image'] = connectSidebarActions()(ImageEditor);
   registry['ActivityLink'] = connectSidebarActions()(ActivityLinkEditor);
   registry['BlockQuote'] = connectSidebarActions()(BlockQuoteEditor);
+  registry['Quote'] = connectSidebarActions()(QuoteEditor);
   registry['Math'] = connectSidebarActions()(MathEditor);
   registry['Cite'] = connectSidebarActions()(CiteEditor);
   registry['Xref'] = connectSidebarActions()(XrefEditor);
