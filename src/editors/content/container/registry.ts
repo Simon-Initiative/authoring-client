@@ -31,6 +31,7 @@ import MeaningEditor from '../learning/MeaningEditor';
 import TranslationEditor from '../learning/TranslationEditor';
 import PronunciationEditor from '../learning/PronunciationEditor';
 import QuoteEditor from '../learning/QuoteEditor';
+import MaterialsEditor from '../learning/MaterialsEditor';
 
 let registry = null;
 
@@ -77,4 +78,6 @@ function init() {
   registry['Meaning'] = connectSidebarActions()(MeaningEditor);
   registry['Translation'] = connectSidebarActions()(TranslationEditor);
   registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
+  registry['Materials'] = connectSidebarActions()(MaterialsEditor);
+
 }

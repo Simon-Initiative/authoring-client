@@ -24,6 +24,7 @@ export interface ContentContainerProps
   activeContentGuid: string;
   topMargin?: string;
   hideSingleDecorator?: boolean;
+  classNames?: string;
 }
 
 export interface ContentContainerState {
@@ -245,7 +246,7 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, hover,
       hideSingleDecorator = false,
-      onUpdateHover, topMargin = '10px'} = this.props;
+      onUpdateHover, topMargin = '10px', classNames = ''} = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -299,8 +300,9 @@ export class ContentContainer
           );
       });
 
+    const classes = 'content-container ' + classNames;
     return (
-      <div className="content-container"
+      <div className={classes}
         onMouseOver={() => onUpdateHover && onUpdateHover(null)}>
         {editors}
       </div>
