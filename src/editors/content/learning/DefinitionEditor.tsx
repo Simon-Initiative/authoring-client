@@ -18,7 +18,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
 
-import styles from './DefinitionEditor.styles';
+import styles from './Definition.styles';
 
 export interface DefinitionEditorProps
   extends AbstractContentEditorProps<contentTypes.Definition> {
@@ -30,7 +30,7 @@ export interface DefinitionEditorState {
 }
 
 /**
- * The content editor for contiguous text.
+ * The content editor for definitions.
  */
 @injectSheet(styles)
 export default class DefinitionEditor
@@ -82,7 +82,7 @@ export default class DefinitionEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Definition" columns={8} highlightColor={CONTENT_COLORS.Definition}>
+      <ToolbarGroup label="Definition" columns={2} highlightColor={CONTENT_COLORS.Definition}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
@@ -199,7 +199,6 @@ export default class DefinitionEditor
       }),
     });
 
-
     const labels = {};
     model.translation.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
     model.meaning.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
@@ -257,6 +256,4 @@ export default class DefinitionEditor
       </div>
     );
   }
-
 }
-

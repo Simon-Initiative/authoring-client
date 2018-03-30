@@ -13,7 +13,7 @@ import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/Toolbar
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
-import { CellEditor } from './CellEditor';
+import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import styles from './Table.styles';
 
@@ -38,7 +38,7 @@ function getKey(
  * The content editor for tables.
  */
 @injectSheet(styles)
-export class TableEditor
+export default class TableEditor
     extends AbstractContentEditor<contentTypes.Table,
     StyledComponentProps<TableEditorProps>, TableEditorState> {
   selectionState: any;
@@ -96,7 +96,7 @@ export class TableEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Table" columns={8} highlightColor={CONTENT_COLORS.Table}>
+      <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import ContiguousTextEditor from '../learning/ContiguousTextEditor';
+import ContiguousTextEditor from '../learning/contiguoustext/ContiguousTextEditor';
 import { InputLabel } from '../common/InputLabel';
 
 export interface RichTextEditorProps

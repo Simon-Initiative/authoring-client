@@ -11,7 +11,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 
-import styles from './DefinitionEditor.styles';
+import styles from './Definition.styles';
 
 export interface TranslationEditorProps
   extends AbstractContentEditorProps<contentTypes.Translation> {
@@ -34,14 +34,13 @@ export default class TranslationEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Translation" isEmpty />
+      <SidebarContent title="Translation" />
     );
   }
 
   renderToolbar() {
     return (
-      <ToolbarGroup label="Translation" columns={8} highlightColor={CONTENT_COLORS.Translation}>
-      </ToolbarGroup>
+      <ToolbarGroup label="Translation" highlightColor={CONTENT_COLORS.Translation}/>
     );
   }
 
@@ -68,4 +67,3 @@ export default class TranslationEditor
   }
 
 }
-

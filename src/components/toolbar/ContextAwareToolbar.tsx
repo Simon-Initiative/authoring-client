@@ -21,7 +21,6 @@ interface ToolbarGroupProps {
   className?: string;
   label: string;
   highlightColor?: string;
-  hide?: boolean;
   columns?: number;
 }
 
@@ -40,17 +39,31 @@ const DEFAULT_TOOLBAR_GROUP_COLS = 10;
 
 export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
   = injectSheetSFC<ToolbarGroupProps>(styles)(({
-    className, classes, columns, label, hide, children,
+    className, classes, columns, label, children,
   }) => {
     const width = ((columns || DEFAULT_TOOLBAR_GROUP_COLS) * TOOLBAR_COL_WIDTH);
-    return hide ? null : (
-      <div className={classNames([classes.toolbarGroupContainer, className])}>
-        <div style={{ width }} className={classNames([classes.toolbarGroup])}>
-            <div className={classes.tbGroupItems}>{children}</div>
-            <div className={classes.tbGroupLabel}>{label}</div>
+    return children
+      ? (
+        <div className={classNames([classes.toolbarGroupContainer, className])}>
+          <div style={{ width }} className={classNames([classes.toolbarGroup])}>
+              <div className={classes.tbGroupItems}>{children}</div>
+              <div className={classes.tbGroupLabel}>{label}</div>
+          </div>
         </div>
-      </div>
-    );
+      )
+      : (
+        <div className={classes.toolbarGroupContainer}>
+          <div style={{ width: 4 * TOOLBAR_COL_WIDTH }}
+               className={classes.toolbarGroup}>
+            <div className={classes.tbVerticallyCentered}>
+              <div className={classes.tbNoAdvancedControls}>
+                This item does not have any advanced controls
+              </div>
+            </div>
+            <div className={classes.tbGroupLabel}>{label}</div>
+          </div>
+        </div>
+      );
   });
 
 interface ToolbarLayoutProps {

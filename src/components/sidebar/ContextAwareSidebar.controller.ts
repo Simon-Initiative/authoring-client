@@ -87,7 +87,6 @@ interface SidebarContentDispatchProps {
 
 interface SidebarContentOwnProps {
   title: string;
-  isEmpty?: boolean;
 }
 
 const mapSidebarContentStateToProps = (
