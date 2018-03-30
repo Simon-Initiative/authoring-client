@@ -6,7 +6,7 @@ import * as courseActions from 'actions/course';
 
 function isDifferentCourse(getState, courseId) : boolean {
   const course: models.CourseModel = getState().course;
-  return course === null || course.id !== courseId;
+  return course === null || course.guid !== courseId;
 }
 
 
