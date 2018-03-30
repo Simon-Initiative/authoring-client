@@ -1,4 +1,4 @@
-
+import { connectSidebarActions } from './connectSidebarActions';
 import CodeBlockEditor from '../learning/CodeBlockEditor';
 import ExampleEditor from '../learning/ExampleEditor';
 import PulloutEditor from '../learning/PulloutEditor';
@@ -9,7 +9,6 @@ import BlockCodeEditor from '../learning/blockcode/BlockCodeEditor';
 import BlockFormulaEditor from '../learning/blockformula/BlockFormulaEditor';
 import ContiguousTextEditor from '../learning/contiguoustext/ContiguousTextEditor';
 import UnsupportedEditor from '../learning/UnsupportedEditor';
-import { connectSidebarActions } from './connectSidebarActions';
 import LinkEditor from '../learning/LinkEditor';
 import ActivityLinkEditor from '../learning/ActivityLinkEditor';
 import BlockQuoteEditor from '../learning/blockquote/BlockQuoteEditor';
@@ -30,7 +29,7 @@ import DefinitionEditor from '../learning/DefinitionEditor';
 import MeaningEditor from '../learning/MeaningEditor';
 import TranslationEditor from '../learning/TranslationEditor';
 import PronunciationEditor from '../learning/PronunciationEditor';
-import { HintEditor } from '../part/HintEditor';
+import HintEditor from '../part/HintEditor';
 
 let registry = null;
 

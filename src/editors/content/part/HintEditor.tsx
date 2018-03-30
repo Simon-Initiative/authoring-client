@@ -24,7 +24,7 @@ export interface HintEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class HintEditor
+export default class HintEditor
   extends AbstractContentEditor<contentTypes.Hint, HintEditorProps, HintEditorState> {
   ids: IdTypes;
 
