@@ -43,7 +43,7 @@ export default class XrefEditor
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (
-      <SidebarContent title="Math Editor">
+      <SidebarContent title="Cross Reference">
         <SidebarGroup label="">
           <SidebarRow label="Page to link to">
             <Select

@@ -18,7 +18,7 @@ class Image extends React.PureComponent<any, any> {
     const src = data.src;
 
     let fullSrc;
-    if (src === '') {
+    if (src === undefined || src === null || src === '') {
       fullSrc = IMAGE;
     } else {
       fullSrc = buildUrl(

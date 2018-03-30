@@ -6,6 +6,13 @@
     background-color: #999;
   }
 
+  .draft-paragraph {
+    padding-bottom: 15px;
+    &:last-child{
+      padding-bottom: 0px;
+    }
+  }
+
   h1 {
     .public-DraftStyleDefault-block {
       &.public-DraftStyleDefault-ltr {
