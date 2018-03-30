@@ -5,12 +5,10 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { Maybe } from 'tsmonad';
 import * as contentTypes from 'data/contentTypes';
 import { PurposeTypes } from 'data/content/learning/common';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
-import ContiguousTextEditor from 'editors/content/learning/contiguoustext/ContiguousTextEditor';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
+import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import './nested.scss';
@@ -34,7 +32,10 @@ export default class SectionEditor extends AbstractContentEditor
     this.onPurposeChange = this.onPurposeChange.bind(this);
   }
 
-  onTitleEdit(title, sourceObject) {
+  onTitleEdit(ct: ContiguousText, sourceObject) {
+    const content = this.props.model.title.text.content.set(ct.guid, ct);
+    const text = this.props.model.title.text.with({ content });
+    const title = this.props.model.title.with({ text });
     const model = this.props.model.with({ title });
     this.props.onEdit(model, sourceObject);
   }
@@ -54,26 +55,12 @@ export default class SectionEditor extends AbstractContentEditor
   }
 
   renderSidebar(): JSX.Element {
-    const { model } = this.props;
-
     return (
-      <SidebarContent title="Section">
-        <SidebarGroup label="Title">
-          <ToolbarContentContainer
-            {...this.props}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
-            model={model.title.text}
-            onEdit={text => this.onTitleEdit(model.title.with({ text }), model)} />
-        </SidebarGroup>
-      </SidebarContent>
+      <SidebarContent title="Section" />
     );
   }
 
   renderToolbar(): JSX.Element {
-    const { onShowSidebar } = this.props;
-
     return (
       <ToolbarGroup label="Section" columns={8} highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
@@ -98,10 +85,6 @@ export default class SectionEditor extends AbstractContentEditor
             </Select>
         </ToolbarLayout.Column>
 
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
-          <div>Title</div>
-        </ToolbarButton>
       </ToolbarGroup>
     );
   }
@@ -109,13 +92,15 @@ export default class SectionEditor extends AbstractContentEditor
   renderMain(): JSX.Element {
     return (
     <div>
-      <ContiguousTextEditor
-        {...this.props}
-        model={(this.props.model.title.text.content as any).first()}
-        onHandleClick={(e) => {}}
-        editorStyles={{ fontSize: 20 }}
-        viewOnly
-        onEdit={() => {}} />
+      <TitleTextEditor
+        context={this.props.context}
+        services={this.props.services}
+        onFocus={this.props.onFocus}
+        model={(this.props.model.title.text.content.first() as ContiguousText)}
+        editMode={this.props.editMode}
+        onEdit={this.onTitleEdit}
+        editorStyles={{ fontSize: 20 }} />
+
       <div className="nested-container">
         <ContentContainer
           activeContentGuid={null}
