@@ -22,6 +22,8 @@ import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
 import { AppContext } from 'editors/common/AppContext';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
+const IMAGE = require('../../../../assets/400x300.png');
+
 import styles from './MediaElement.style';
 
 interface Size {
@@ -392,11 +394,16 @@ export default class ImageEditor
     const { classes, model } = this.props;
     const { src, height, width } = model;
 
-    const fullSrc = buildUrl(
-      this.props.context.baseUrl,
-      this.props.context.courseId,
-      this.props.context.resourcePath,
-      src);
+    let fullSrc;
+    if (src === undefined || src === null || src === '') {
+      fullSrc = IMAGE;
+    } else {
+      fullSrc = buildUrl(
+        this.props.context.baseUrl,
+        this.props.context.courseId,
+        this.props.context.resourcePath,
+        src);
+    }
 
     return (
       <div className={classes.mediaElement}>

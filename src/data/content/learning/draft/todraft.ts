@@ -197,7 +197,7 @@ function imageInline(
   context.draft.entityMap[key] = {
     type: common.EntityTypes.image,
     mutability: 'IMMUTABLE',
-    data: { image },
+    data: image,
   };
 }
 
