@@ -33,6 +33,7 @@ export const CONTENT_COLORS = {
   Translation: flatui.amethyst,
   Pronunciation: flatui.alizarin,
   Materials: distinct.distinctBrown,
+  Hint: flatui.alizarin,
 };
 
 export const CONTENT_ICONS = {
@@ -62,6 +63,7 @@ export const CONTENT_ICONS = {
   Translation: <i className={'fa fa-globe'}/>,
   Pronunciation: <i className={'fa fa-headphones'}/>,
   Materials: <i className={'fa fa-columns'}/>,
+  Hint: <i className={'fa fa-hand-o-left'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

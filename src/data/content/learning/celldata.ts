@@ -71,7 +71,9 @@ export class CellData extends Immutable.Record(defaultContent) {
         '@colspan': this.colspan,
         '@rowspan': this.rowspan,
         '@align': this.align,
-        '#array': this.content.toPersistence(),
+        '#array': this.content.content.size === 0
+          ? [{ p: { '#text': ' ' } }]
+          : this.content.toPersistence(),
       },
     };
   }

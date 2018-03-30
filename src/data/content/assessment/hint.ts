@@ -32,6 +32,12 @@ export class Hint extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Hint {
+    return this.with({
+      body: this.body.clone(),
+    });
+  }
+
   static fromText(text: string, guid: string) : Hint {
     return new Hint().with({
       guid,
