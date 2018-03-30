@@ -10,8 +10,7 @@ import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.cont
 import { Objectives } from './Objectives';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
-import { ContentElements } from 'data/content/common/elements';
-import { ContiguousTextViewer } from 'editors/content/learning/contiguoustext/ContiguousTextViewer';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './WorkbookPageEditor.scss';
@@ -41,6 +40,7 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
+    this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onModelEdit = this.onModelEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
 
@@ -69,11 +69,14 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.handleEdit(model);
   }
 
-  onTitleEdit(text: ContentElements) {
+  onTitleEdit(ct: ContiguousText, src) {
 
-    const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
+    const t = ct.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
 
     const resource = this.props.model.resource.with({ title: t });
+
+    const content = this.props.model.head.title.text.content.set(ct.guid, ct);
+    const text = this.props.model.head.title.text.with({ content });
     const title = this.props.model.head.title.with({ text });
     const head = this.props.model.head.with({ title });
 
@@ -137,10 +140,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
         <div className="wb-content">
           <div className="html-editor-well">
 
-            <ContiguousTextViewer
+            <TitleTextEditor
               context={context}
               services={services}
+              onFocus={this.onFocus.bind(this)}
               model={(model.head.title.text.content.first() as ContiguousText)}
+              editMode={editMode}
+              onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
             {this.renderObjectives()}
