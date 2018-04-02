@@ -78,11 +78,16 @@ export class Example extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    const content = this.content.content.size === 0
+       ? [{ p: { '#text': ' ' } }]
+       : this.content.toPersistence();
+
     const s = {
       example: {
         '#array': [
           this.title.toPersistence(),
-          ...this.content.toPersistence(),
+          content,
         ],
       },
     };

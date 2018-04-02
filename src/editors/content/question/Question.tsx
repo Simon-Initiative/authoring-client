@@ -100,7 +100,8 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
   onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const hint = contentTypes.Hint.fromText('', guid());
-    this.onHintsEdit(part.hints.set(hint.guid, hint), item, part, hint);
+    const updated = part.with({ hints: part.hints.set(hint.guid, hint) });
+    this.onHintsEdit(item, updated, hint);
   }
 
   onCriteriaAdd() {
@@ -125,10 +126,10 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     onEdit(item, part.with({ skills }), skills);
   }
 
-  onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part, src) {
+  onHintsEdit(item: contentTypes.QuestionItem, part: contentTypes.Part, src) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ hints }), src);
+    onEdit(item, part, src);
   }
 
   renderQuestionTitle(): JSX.Element {
@@ -302,12 +303,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           </TabSectionHeader>
           <TabSectionContent>
             <Hints
-              onFocus={this.props.onFocus}
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
+              {...this.props}
               model={part}
-              onEdit={(hints, h) => this.onHintsEdit(hints, item, part, h)} />
+              onEdit={(part, h) => this.onHintsEdit(item, part, h)} />
           </TabSectionContent>
         </TabSection>
       </Tab>
