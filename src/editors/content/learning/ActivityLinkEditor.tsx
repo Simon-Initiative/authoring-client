@@ -6,13 +6,17 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { LinkTarget, PurposeTypes } from 'data/content/learning/common';
 import { Select } from '../common/controls';
 import { Label, VerticalSpacer, Header } from '../common/Sidebar';
-
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 import styles from './Entity.style';
 import { LegacyTypes } from 'data/types';
 
 export interface ActivityLinkEditorProps
   extends AbstractContentEditorProps<contentTypes.ActivityLink> {
-  className?: string;
+  onShowSidebar: () => void;
 }
 
 export interface ActivityLinkEditorState {
@@ -36,7 +40,7 @@ export default class ActivityLinkEditor
   }
 
   renderSidebar() {
-    const { className, classes, editMode, model, onEdit, context } = this.props;
+    const { editMode, model, onEdit, context } = this.props;
 
     const highStakesOptions = context.courseModel.resources
       .toArray()
@@ -44,11 +48,8 @@ export default class ActivityLinkEditor
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (
-      <div className={classNames([classes.entityRenderer, className])}>
-
-        <Header>Activity Link</Header>
-
-        <Label>Activity</Label>
+      <SidebarContent title="Activity Link">
+        <SidebarGroup label="Activity">
         <Select
           editMode={this.props.editMode}
           label=""
@@ -56,10 +57,8 @@ export default class ActivityLinkEditor
           onChange={idref => onEdit(model.with({ idref }))}>
           {highStakesOptions}
         </Select>
-
-        <VerticalSpacer/>
-
-        <Label>Purpose</Label>
+        </SidebarGroup>
+        <SidebarGroup label="Purpose">
         <Select
           editMode={this.props.editMode}
           label=""
@@ -67,10 +66,8 @@ export default class ActivityLinkEditor
           onChange={purpose => onEdit(model.with({ purpose }))}>
           {PurposeTypes.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </Select>
-
-        <VerticalSpacer/>
-
-        <Label>Target</Label>
+        </SidebarGroup>
+        <SidebarGroup label="Target">
         <Select
           editMode={editMode}
           value={model.target}
@@ -79,18 +76,21 @@ export default class ActivityLinkEditor
           <option value={LinkTarget.Self}>Open in this window</option>
           <option value={LinkTarget.New}>Open in new window</option>
         </Select>
-      </div>
+        </SidebarGroup>
+      </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { className, classes } = this.props;
+    const { onShowSidebar } = this.props;
 
     return (
-      <div className={classNames([classes.entityRenderer, className])}>
-        Activity Link
-      </div>
+      <ToolbarGroup label="Activity Link" columns={2} highlightColor={CONTENT_COLORS.Xref}>
+        <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
+          <div><i className="fa fa-sliders"/></div>
+          <div>Details</div>
+        </ToolbarButton>
+      </ToolbarGroup>
     );
   }
-
 }
