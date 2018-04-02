@@ -27,8 +27,8 @@ export interface XrefEditorState {
  */
 @injectSheet(styles)
 export default class XrefEditor
-    extends AbstractContentEditor
-    <contentTypes.Xref, XrefEditorProps & JSSProps, XrefEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.Xref, XrefEditorProps & JSSProps, XrefEditorState> {
 
   constructor(props) {
     super(props);
@@ -44,35 +44,33 @@ export default class XrefEditor
 
     return (
       <SidebarContent title="Cross Reference">
-        <SidebarGroup label="">
-          <SidebarRow label="Page to link to">
-            <Select
-              editMode={this.props.editMode}
-              label=""
-              value={model.page}
-              onChange={page => onEdit(model.with({ page }))}>
-              {pages}
-            </Select>
-          </SidebarRow>
-          <SidebarRow label="Element to link to">
-            <TextInput
-              editMode={this.props.editMode}
-              label=""
-              width="100%"
-              type="string"
-              value={model.idref}
-              onEdit={idref => onEdit(model.with({ idref }))} />
-          </SidebarRow>
-          <SidebarRow label="Target">
-            <Select
-              editMode={editMode}
-              value={model.target}
-              onChange={v =>
-                onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
-              <option value={LinkTarget.Self}>Open in this window</option>
-              <option value={LinkTarget.New}>Open in new window</option>
-            </Select>
-          </SidebarRow>
+        <SidebarGroup label="Page to link to">
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={model.page}
+            onChange={page => onEdit(model.with({ page }))}>
+            {pages}
+          </Select>
+        </SidebarGroup>
+        <SidebarGroup label="Element to link to">
+          <TextInput
+            editMode={this.props.editMode}
+            label=""
+            width="100%"
+            type="string"
+            value={model.idref}
+            onEdit={idref => onEdit(model.with({ idref }))} />
+        </SidebarGroup>
+        <SidebarGroup label="Target">
+          <Select
+            editMode={editMode}
+            value={model.target}
+            onChange={v =>
+              onEdit(model.with({ target: v === 'self' ? LinkTarget.Self : LinkTarget.New }))}>
+            <option value={LinkTarget.Self}>Open in this window</option>
+            <option value={LinkTarget.New}>Open in new window</option>
+          </Select>
         </SidebarGroup>
       </SidebarContent>
     );
