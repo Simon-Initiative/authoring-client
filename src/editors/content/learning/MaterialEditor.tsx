@@ -43,6 +43,7 @@ export default class MaterialEditor
   }
 
   onEdit(content, src) {
+
     this.props.onEdit(this.props.model.with({ content }), src);
   }
 

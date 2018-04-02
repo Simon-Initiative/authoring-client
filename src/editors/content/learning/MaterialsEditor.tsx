@@ -99,7 +99,11 @@ export default class MaterialsEditor
         supportedElements: Immutable.List<string>(MATERIAL_ELEMENTS),
         onAddNew: e => this.onInsert(material, e),
         onEdit: (e, s) => {
-          this.onMaterialEdit(e, s);
+          const updatedContent = material.content.content.set(s.guid, s);
+          const updatedElements = material.content.with({ content: updatedContent });
+          const updatedMaterial = material.with({ content: updatedElements });
+
+          this.onMaterialEdit(updatedMaterial, s);
         },
         onRemove: e => this.onRemove(e),
         onDuplicate: (e) => {},

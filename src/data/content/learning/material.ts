@@ -52,7 +52,7 @@ export class Material extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const content = this.content.content.size === 0
-       ? [{ p: { '#text': ' ' } }]
+       ? [{ p: { '#text': 'Empty text block' } }]
        : this.content.toPersistence();
 
     return {
