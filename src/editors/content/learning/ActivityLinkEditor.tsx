@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkTarget, PurposeTypes } from 'data/content/learning/common';
 import { Select } from '../common/controls';
-import { Label, VerticalSpacer, Header } from '../common/Sidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
+import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
