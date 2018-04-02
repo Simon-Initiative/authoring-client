@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames } from 'styles/jss';
+import { injectSheet, classNames as jssClassNames } from 'styles/jss';
 import { getContentIcon } from 'editors/content/utils/content';
 
 import styles from './ContentDecorator.style';
@@ -14,6 +14,7 @@ export interface ContentDecoratorProps {
   isHoveringContent: boolean;
   onMouseOver: () => void;
   topMargin?: string;
+  classNames?: string;
 }
 
 export interface ContentDecoratorState {
@@ -33,24 +34,25 @@ export class ContentDecorator
     const {
       classes, isActiveContent, contentType, hideContentLabel,
       children, onSelect, onMouseOver, isHoveringContent,
-      topMargin = '10px',
+      topMargin = '10px', classNames = '',
     } = this.props;
 
     return (
       <div
         style={ { marginTop: topMargin } }
-        className={classNames([
+        className={jssClassNames([
           'content-decorator',
           classes.contentDecorator,
           isActiveContent && 'active-content',
           isHoveringContent && classes.hover,
+          classNames,
         ])}
       onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
         {hideContentLabel
           ? null
           : (
             <div
-              className={classNames([
+              className={jssClassNames([
                 classes.handle,
                 isActiveContent && 'active-content',
               ])}
@@ -62,7 +64,7 @@ export class ContentDecorator
             </div>
           )
         }
-        <div className={classNames([
+        <div className={jssClassNames([
           classes.content,
           isActiveContent && 'active-content',
         ])}>

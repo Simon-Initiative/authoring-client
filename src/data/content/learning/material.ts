@@ -50,9 +50,14 @@ export class Material extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    const content = this.content.content.size === 0
+       ? [{ p: { '#text': ' ' } }]
+       : this.content.toPersistence();
+
     return {
       material: {
-        '#array': this.content.toPersistence(),
+        '#array': content,
       },
     };
   }

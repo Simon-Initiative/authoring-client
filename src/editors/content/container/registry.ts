@@ -32,6 +32,7 @@ import PronunciationEditor from '../learning/PronunciationEditor';
 import HintEditor from '../part/HintEditor';
 import QuoteEditor from '../learning/QuoteEditor';
 import MaterialsEditor from '../learning/MaterialsEditor';
+import MaterialEditor from '../learning/MaterialEditor';
 
 let registry = null;
 
@@ -80,5 +81,5 @@ function init() {
   registry['Translation'] = connectSidebarActions()(TranslationEditor);
   registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
   registry['Materials'] = connectSidebarActions()(MaterialsEditor);
-
+  registry['Material'] = connectSidebarActions()(MaterialEditor);
 }
