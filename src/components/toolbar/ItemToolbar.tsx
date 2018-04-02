@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC } from 'styles/jss';
+import * as contentTypes from 'data/contentTypes';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
@@ -45,6 +46,31 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
     const canMoveUp = true;
     const canMoveDown = true;
 
+    const onRemove = () => {
+      onClearSelection();
+
+      activeContext.textSelection.caseOf({
+        just: (textSelection) => {
+          if (item instanceof contentTypes.ContiguousText) {
+            const text = item as contentTypes.ContiguousText;
+            const entity = text.getEntityAtCursor(textSelection);
+            entity.caseOf({
+              just: (e) => {
+                const updated = text.removeEntity(e.key);
+                container.onEdit(updated, updated);
+              },
+              nothing: () => container.onRemove(item),
+            });
+          } else {
+            container.onRemove(item);
+          }
+        },
+        nothing: () => {
+          container.onRemove(item);
+        },
+      });
+    };
+
     return (
       <React.Fragment>
         <ToolbarLayout.Column>
@@ -57,10 +83,7 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
           </ToolbarButton>
           <ToolbarButton
               className={classes.removeButton}
-              onClick={() => {
-                onClearSelection();
-                container.onRemove(item);
-              }}
+              onClick={onRemove}
               tooltip="Remove Item"
               size={ToolbarButtonSize.Wide}
               disabled={!(hasSelection)}>

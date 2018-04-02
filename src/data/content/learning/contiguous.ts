@@ -171,7 +171,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   removeEntity(key: string) : ContiguousText {
     return this.with({
-      content: internalRemoveEntity((k, e) => k === key, this.content),
+      content: internalRemoveEntity(this.content, (k, e) => k === key),
       entityEditCount: this.entityEditCount + 1,
     });
   }
