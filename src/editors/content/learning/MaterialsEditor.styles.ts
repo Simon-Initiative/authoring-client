@@ -14,8 +14,11 @@ export default {
     textAlign: 'center',
     verticalAlign: 'middle',
     lineHeight: '300px',
+    border: '2px solid transparent',
+    cursor: 'pointer',
+
     '&:hover': {
-      border: '2px solid ' + colors.grayLight,
+      border: '2px solid ' + colors.selection,
     },
   },
   emptyMaterialActive: {

@@ -73,7 +73,7 @@ export default class MaterialEditor
 
     return (
       <div className={classNames([classes.emptyMaterialActive, className])}>
-        <div>Add content using toolbar above</div>
+        <div>Add content using the Insert toolbar above</div>
       </div>
     );
   }
