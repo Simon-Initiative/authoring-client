@@ -5,19 +5,26 @@ import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
 import { ToolbarButton } from 'components/toolbar/ToolbarButton';
-import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarGroup, ToolbarLayout, determineBaseUrl }
+  from 'components/toolbar/ContextAwareToolbar';
 import { InlineStyles } from 'data/content/learning/contiguous';
 import { EntityTypes } from 'data/content/learning/common';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { selectImage } from 'editors/content/learning/ImageEditor';
+import { Resource } from 'data/content/resource';
+import { CourseModel } from 'data/models/course';
 
 import styles from './ContiguousText.styles';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {
-
+  courseModel: CourseModel;
+  resource: Resource;
+  onDisplayModal: (component) => void;
+  onDismissModal: () => void;
   selection: TextSelection;
 }
 
@@ -169,17 +176,6 @@ export default class ContiguousTextToolbar
               onClick={
                 () => {
                   onEdit(model.addEntity(
-                    EntityTypes.math, true, new contentTypes.Math(), selection));
-                }
-              }
-              disabled={!supports('m:math') || !pointEntitiesEnabled}
-              tooltip="MathML or Latex formula">
-            <i className={'fa fa-etsy'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
                     EntityTypes.quote, true, new contentTypes.Quote(), selection));
                 }
               }
@@ -230,6 +226,31 @@ export default class ContiguousTextToolbar
               disabled={!supports('xref') || !rangeEntitiesEnabled}
               tooltip="Cross Reference Link">
             <i className={'fa fa-map-signs'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={
+                () => {
+                  onEdit(model.addEntity(
+                    EntityTypes.math, true, new contentTypes.Math(), selection));
+                }
+              }
+              disabled={!supports('m:math') || !pointEntitiesEnabled}
+              tooltip="MathML or Latex formula">
+            <i className={'fa fa-etsy'}/>
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+              selectImage(null, determineBaseUrl(this.props.resource), this.props.courseModel,
+                          this.props.onDisplayModal, this.props.onDismissModal)
+                .then((image) => {
+                  if (image !== null) {
+                    onEdit(model.addEntity(EntityTypes.image, true, image, selection));
+                  }
+                });
+            }}
+            tooltip="Insert Image"
+            disabled={!supports('image') || !pointEntitiesEnabled}>
+            <i className={'fa fa-image'}/>
           </ToolbarButton>
 
         </ToolbarLayout.Inline>

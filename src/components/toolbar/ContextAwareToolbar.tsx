@@ -24,7 +24,7 @@ interface ToolbarGroupProps {
   columns?: number;
 }
 
-function determineBaseUrl(resource: Resource) : string {
+export function determineBaseUrl(resource: Resource) : string {
   if (resource === undefined) return '';
 
   const pathTo = resource.fileNode.pathTo;
