@@ -17,6 +17,11 @@ export type BoundProperty = {
   value: any,
 };
 
+export enum Layout {
+  Vertical,
+  Horizontal,
+}
+
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
   hideContentLabel?: boolean;
@@ -24,6 +29,7 @@ export interface ContentContainerProps
   activeContentGuid: string;
   topMargin?: string;
   hideSingleDecorator?: boolean;
+  layout?: Layout;
 }
 
 export interface ContentContainerState {
@@ -246,7 +252,7 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, hover,
       hideSingleDecorator = false,
-      onUpdateHover, topMargin = '10px'} = this.props;
+      onUpdateHover, topMargin = '10px', layout = Layout.Vertical } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -259,6 +265,8 @@ export class ContentContainer
       : this.props.model.content;
 
     const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1;
+
+    const countForSizing = Math.max(1, Math.min(contentOrPlaceholder.size, 10));
 
     const editors = contentOrPlaceholder
       .toArray()
@@ -280,6 +288,10 @@ export class ContentContainer
         const isHoverContent = (hover === model.guid);
         const isActiveContent = (model.guid === this.props.activeContentGuid);
 
+
+        const decoratorClassNames = layout === Layout.Horizontal
+          ? 'decorator-horizontal-' + countForSizing : '';
+
         return hideDecorator
           ? childRenderer
           : (
@@ -292,6 +304,7 @@ export class ContentContainer
               onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
               isHoveringContent={isHoverContent}
               isActiveContent={isActiveContent}
+              classNames={decoratorClassNames}
               onRemove={this.onRemove.bind(this, model)}>
 
               {childRenderer}
@@ -300,8 +313,10 @@ export class ContentContainer
           );
       });
 
+    const classNames = layout === Layout.Horizontal ? 'layout-horizontal' : '';
+    const classes = 'content-container ' + classNames;
     return (
-      <div className="content-container"
+      <div className={classes}
         onMouseOver={() => onUpdateHover && onUpdateHover(null)}>
         {editors}
       </div>

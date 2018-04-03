@@ -32,6 +32,7 @@ export const CONTENT_COLORS = {
   Meaning: flatui.asbestos,
   Translation: flatui.amethyst,
   Pronunciation: flatui.alizarin,
+  Materials: distinct.distinctBrown,
   Hint: flatui.alizarin,
 };
 
@@ -61,6 +62,7 @@ export const CONTENT_ICONS = {
   Meaning: <i className={'fa fa-comment'}/>,
   Translation: <i className={'fa fa-globe'}/>,
   Pronunciation: <i className={'fa fa-headphones'}/>,
+  Materials: <i className={'fa fa-columns'}/>,
   Hint: <i className={'fa fa-hand-o-left'}/>,
 };
 

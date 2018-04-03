@@ -3,3 +3,49 @@
 .content-container {
   width: 100%;
 }
+
+.layout-horizontal {
+  flex-direction: row;
+  display: flex;
+}
+
+.decorator-horizontal-1 {
+  flex-grow: 1;
+  width: 100%;
+}
+.decorator-horizontal-2 {
+  flex-grow: 1;
+  width: 50%;
+}
+.decorator-horizontal-3 {
+  flex-grow: 1;
+  width: 33%;
+}
+.decorator-horizontal-4 {
+  flex-grow: 1;
+  width: 25%;
+}
+.decorator-horizontal-5 {
+  flex-grow: 1;
+  width: 20%;
+}
+.decorator-horizontal-6 {
+  flex-grow: 1;
+  width: 16%;
+}
+.decorator-horizontal-7 {
+  flex-grow: 1;
+  width: 14%;
+}
+.decorator-horizontal-8 {
+  flex-grow: 1;
+  width: 12%;
+}
+.decorator-horizontal-9 {
+  flex-grow: 1;
+  width: 11%;
+}
+.decorator-horizontal-10 {
+  flex-grow: 1;
+  width: 10%;
+}

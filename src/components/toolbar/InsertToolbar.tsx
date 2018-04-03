@@ -179,6 +179,24 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-book'}/>
         </ToolbarButton>
         <ToolbarButton
+            onClick={() => {
+
+              const material1 = new contentTypes.Material();
+              const material2 = new contentTypes.Material();
+
+              const materials = new contentTypes.Materials().with({
+                content: Immutable.OrderedMap<string, contentTypes.Material>()
+                  .set(material1.guid, material1)
+                  .set(material2.guid, material2),
+              });
+
+              onInsert(materials);
+            }}
+            tooltip="Insert Horizontal Layout"
+            disabled={!parentSupportsElementType('materials')}>
+          <i className={'fa fa-columns'}/>
+        </ToolbarButton>
+        <ToolbarButton
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(

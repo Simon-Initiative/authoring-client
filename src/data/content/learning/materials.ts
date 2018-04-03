@@ -78,10 +78,24 @@ export class Materials extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+
+    // We must enforce the DTD constraint that materials must contain at
+    // least two material elements:
+
+    const empty = { material: { p: { '#text': ' ' } } };
+
+    let content: any = [empty, empty];
+
+    if (this.content.size === 1) {
+      content = [...this.content.toArray().map(m => m.toPersistence()), empty];
+    } else if (this.content.size > 1) {
+      content = this.content.toArray().map(m => m.toPersistence());
+    }
+
     const m = {
       materials: {
-        '@orient': this.orient,
-        '#array': this.content.toArray().map(m => m.toPersistence()),
+        '@orient': 'horizontal',
+        '#array': content,
       },
     };
 
