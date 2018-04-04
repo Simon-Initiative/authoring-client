@@ -158,7 +158,6 @@ export default class CellEditor
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
         <ContentContainer
           {...this.props}
-          topMargin="0px"
           hideSingleDecorator={hideDecorator}
           bindProperties={bindProps}
           model={this.props.model.content}
