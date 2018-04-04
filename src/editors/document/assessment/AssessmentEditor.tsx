@@ -47,7 +47,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState>  {
 
-  pendingCurrentNode: Maybe<contentTypes.Node>;
   supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
@@ -67,8 +66,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEditNode = this.onEditNode.bind(this);
 
     this.onFocus = this.onFocus.bind(this);
-
-    this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
 
     this.supportedElements = Immutable.List<string>();
 
@@ -129,7 +126,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           // We detected an addition of a question to an embedded pool
           if (questions.size > prevQuestions.size) {
-            this.pendingCurrentNode = Maybe.just(questions.last());
+            this.props.onSetCurrentNode(
+              this.props.activeContext.documentId.valueOr(null), questions.last());
           }
 
         }
@@ -185,11 +183,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     if (removed.size > 0) {
 
-      this.pendingCurrentNode = locateNextOfKin(page.nodes, guid);
-
       page = page.with({ nodes: removed });
-
       const pages = this.props.model.pages.set(page.guid, page);
+
+      locateNextOfKin(page.nodes, guid).lift(node =>
+        this.props.onSetCurrentNode(
+          this.props.activeContext.documentId.valueOr(null), node));
+
       this.handleEdit(this.props.model.with({ pages }));
     }
 
@@ -198,19 +198,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddContent() {
     let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
-    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   addQuestion(question: contentTypes.Question) {
     const content = question.with({ guid: guid() });
-    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
-    this.pendingCurrentNode = Maybe.just(pool);
     this.addNode(pool);
   }
 
@@ -220,6 +217,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const pages = this.props.model.pages.set(page.guid, page);
 
+    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
     this.handleEdit(this.props.model.with({ pages }));
   }
 
