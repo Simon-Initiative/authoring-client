@@ -213,9 +213,9 @@ export function load(courseId: string, documentId: string) {
 
 export function release(documentId: string) {
   return function (dispatch, getState) {
+    const editedDocument: EditedDocument = getState().documents.get(documentId);
     dispatch(documentReleased(documentId));
 
-    const editedDocument: EditedDocument = getState().documents.get(documentId);
     editedDocument.persistence.destroy();
   };
 }
