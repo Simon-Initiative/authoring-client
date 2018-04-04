@@ -130,7 +130,12 @@ export class AddQuestion
 
     const item = new contentTypes.Essay();
 
-    const response = new contentTypes.Response({ match: '*', score: '1' });
+    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
+    const feedback = new contentTypes.Feedback().with({ body });
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
+      .set(feedback.guid, feedback);
+
+    const response = new contentTypes.Response({ match: '*', score: '1', feedback: feedbacks });
 
     const part = new contentTypes.Part()
       .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
