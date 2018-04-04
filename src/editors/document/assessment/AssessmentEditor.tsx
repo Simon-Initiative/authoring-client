@@ -182,13 +182,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
 
     if (removed.size > 0) {
-
-      page = page.with({ nodes: removed });
-      const pages = this.props.model.pages.set(page.guid, page);
-
       locateNextOfKin(page.nodes, guid).lift(node =>
         this.props.onSetCurrentNode(
           this.props.activeContext.documentId.valueOr(null), node));
+
+      page = page.with({ nodes: removed });
+      const pages = this.props.model.pages.set(page.guid, page);
 
       this.handleEdit(this.props.model.with({ pages }));
     }
