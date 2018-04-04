@@ -36,7 +36,7 @@ export class Row extends Immutable.Record(defaultContent) {
 
   clone() : Row {
     return this.with({
-      cells: this.cells.map(c => c.clone()).toOrderedMap(),
+      cells: this.cells.map(c => c.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 

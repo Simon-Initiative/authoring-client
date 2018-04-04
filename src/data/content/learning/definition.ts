@@ -6,7 +6,7 @@ import { Translation } from './translation';
 import { Meaning } from './meaning';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-import createGuid from 'utils//guid';
+import createGuid from 'utils/guid';
 
 export type DefinitionParams = {
   title?: Maybe<Title>;
@@ -51,11 +51,11 @@ export class Definition extends Immutable.Record(defaultContent) {
   clone() {
     return this.with({
       pronunciation: this.pronunciation.caseOf({
-        just: p => Maybe.just(p.clone()),
+        just: p => Maybe.just(p.clone().with({ guid: createGuid() })),
         nothing: () => Maybe.nothing<Pronunciation>(),
       }),
-      translation: this.translation.map(t => t.clone()).toOrderedMap(),
-      meaning: this.meaning.map(m => m.clone()).toOrderedMap(),
+      translation: this.translation.map(t => t.clone().with({ guid: createGuid() })).toOrderedMap(),
+      meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 
