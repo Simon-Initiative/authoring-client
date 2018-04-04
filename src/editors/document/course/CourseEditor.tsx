@@ -5,7 +5,9 @@ import * as models from 'data/models';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
-
+import { Button } from 'editors/content/common/Button';
+import guid from 'utils/guid';
+import { FileNode } from 'data/content/file_node';
 
 import './CourseEditor.scss';
 
@@ -18,9 +20,15 @@ export interface CourseEditorProps {
   editMode: boolean;
 }
 
+export interface SkillFiles {
+  learningObjectives: File;
+  problems: File;
+  skills: File;
+}
 
 interface CourseEditorState {
   selectedDevelopers: UserInfo[];
+  skillFiles: SkillFiles;
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -29,6 +37,11 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     this.state = {
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
+      skillFiles: {
+        learningObjectives: undefined,
+        problems: undefined,
+        skills: undefined,
+      },
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
@@ -119,12 +132,115 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  onUploadClick(id: string) {
+    (window as any).$('#' + id).trigger('click');
+  }
+
+  uploadSkillFiles(e) {
+    e.preventDefault();
+    const { model } = this.props;
+    const courseId = model.guid;
+
+    persistence.skillsUpload(courseId, this.state.skillFiles);
+
+    this.setState({
+      skillFiles: {
+        learningObjectives: undefined,
+        problems: undefined,
+        skills: undefined,
+      },
+    });
+  }
+
+  renderSkillsIngestion() {
+    const id1 = guid();
+    const id2 = guid();
+    const id3 = guid();
+
+    const { skillFiles } = this.state;
+
+    return (
+      <div className="row">
+        <div className="col-9">
+          <p>Upload</p>
+          <form>
+            <input
+              id={id1}
+              style={{ display: 'none' }}
+              accept={'.tsv'}
+              multiple={false}
+              onChange={({ target: { files } }) => {
+                const { skillFiles } = this.state;
+                this.setState({ skillFiles: { ...skillFiles, learningObjectives: files[0] } });
+
+                const button = (window as any).$('#' + id1);
+                button.innerHTML = skillFiles.learningObjectives.name;
+              }}
+              type="file" />
+            <input
+              id={id2}
+              style={{ display: 'none' }}
+              accept={'.tsv'}
+              multiple={false}
+              onChange={({ target: { files } }) => {
+                const { skillFiles } = this.state;
+                this.setState({ skillFiles: { ...skillFiles, problems: files[0] } });
+              }}
+              type="file" />
+            <input
+              id={id3}
+              style={{ display: 'none' }}
+              accept={'.tsv'}
+              multiple={false}
+              onChange={({ target: { files } }) => {
+                const { skillFiles } = this.state;
+                this.setState({ skillFiles: { ...skillFiles, skills: files[0] } });
+              }}
+              type="file" />
+
+            <Button
+              className="media-toolbar-item upload"
+              editMode
+              onClick={() => this.onUploadClick(id1)}>
+              <i className="fa fa-upload" /> Upload
+            </Button>
+            <Button
+              className="media-toolbar-item upload"
+              editMode
+              onClick={() => this.onUploadClick(id2)}>
+              <i className="fa fa-upload" /> Upload
+            </Button>
+            <Button
+              className="media-toolbar-item upload"
+              editMode
+              onClick={() => this.onUploadClick(id3)}>
+              <i className="fa fa-upload" /> Upload
+            </Button>
+
+            <input
+              type="submit"
+              value="Upload"
+              disabled={!(skillFiles.learningObjectives &&
+                          skillFiles.problems &&
+                          skillFiles.skills)}
+              onClick={e => this.uploadSkillFiles(e)} />
+          </form>
+        </div>
+        <div className="col-3">
+          <button onClick={() => persistence.skillsDownload(this.props.model.guid)}>
+            Download
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   removePackage() {
     persistence.deleteCoursePackage(this.props.model.guid)
-    .then((document) => {
-      this.props.viewAllCourses();
-    })
-    .catch(err => console.log(err));
+      .then((document) => {
+        this.props.viewAllCourses();
+      })
+      .catch(err => console.log(err));
   }
 
   render() {
@@ -134,15 +250,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const adminRow = isAdmin
       ? <div className="row">
-          <div className="col-3">Administer</div>
-          <div className="col-9">
+        <div className="col-3">Administer</div>
+        <div className="col-9">
           <button type="button"
             className="btn btn-danger"
             onClick={this.removePackage.bind(this)}>
             Remove Package
             </button>
-          </div>
         </div>
+      </div>
       : null;
 
     return (
@@ -168,11 +284,15 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-9">{this.renderDevelopers()}</div>
               </div>
               <div className="row">
+                <div className="col-3">Skills</div>
+                <div className="col-9">{this.renderSkillsIngestion()}</div>
+              </div>
+              <div className="row">
                 <div className="col-3">Version</div>
                 <div className="col-9">{model.version}</div>
               </div>
               <div className="row">
-                <div className="col-3">Thumbnail<br/><br/>
+                <div className="col-3">Thumbnail<br /><br />
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
