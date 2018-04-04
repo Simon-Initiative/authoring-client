@@ -27,7 +27,6 @@ export interface ContentContainerProps
   hideContentLabel?: boolean;
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
-  topMargin?: string;
   hideSingleDecorator?: boolean;
   layout?: Layout;
 }
@@ -252,7 +251,7 @@ export class ContentContainer
   renderMain() : JSX.Element {
     const { hideContentLabel, hover,
       hideSingleDecorator = false,
-      onUpdateHover, topMargin = '10px', layout = Layout.Vertical } = this.props;
+      onUpdateHover, layout = Layout.Vertical } = this.props;
 
     const bindProperties = this.props.bindProperties === undefined
       ? element => []
@@ -296,7 +295,6 @@ export class ContentContainer
           ? childRenderer
           : (
             <ContentDecorator
-              topMargin={topMargin}
               contentType={model.contentType}
               onSelect={() => this.onSelect(model)}
               hideContentLabel={hideContentLabel}
@@ -304,7 +302,7 @@ export class ContentContainer
               onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
               isHoveringContent={isHoverContent}
               isActiveContent={isActiveContent}
-              classNames={decoratorClassNames}
+              className={decoratorClassNames}
               onRemove={this.onRemove.bind(this, model)}>
 
               {childRenderer}
