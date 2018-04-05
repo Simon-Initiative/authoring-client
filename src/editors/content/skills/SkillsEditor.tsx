@@ -86,8 +86,10 @@ export default class SkillsEditor
         <Typeahead
           multiple
           onChange={(selected: Skill[]) => {
-            const model = Immutable.Set(selected.map(s => s.id));
-            this.setState({ selected }, () => this.props.onEdit(model));
+            if (this.state.selected.length !== selected.length) {
+              const model = Immutable.Set(selected.map(s => s.id));
+              this.setState({ selected }, () => this.props.onEdit(model));
+            }
           }}
           options={options}
           labelKey="title"
