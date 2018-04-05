@@ -12,6 +12,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { Maybe } from 'tsmonad';
 import styles from './Table.styles';
 
@@ -75,6 +76,22 @@ export default class CellEditor
 
   }
 
+  onToggleCellHeader() {
+    const { model, onEdit } = this.props;
+
+    const toggled = (model.contentType === 'CellData'
+      ? new contentTypes.CellHeader()
+      : new contentTypes.CellData()).with({
+        align: model.align,
+        colspan: model.colspan,
+        rowspan: model.rowspan,
+        content: model.content,
+        guid: model.guid,
+      });
+
+    onEdit(toggled, toggled);
+  }
+
   renderSidebar() {
     const { model, editMode } = this.props;
     const { align, colspan, rowspan } = model;
@@ -111,6 +128,14 @@ export default class CellEditor
             label=""
             onEdit={this.onRowSpanChange.bind(this)}
           />
+        </SidebarGroup>
+        <SidebarGroup label="Header">
+        <ToggleSwitch
+              {...this.props}
+              checked={this.props.model.contentType === 'CellHeader'}
+              onClick={() =>
+                this.onToggleCellHeader()}
+              labelBefore="Display cell as a header" />
         </SidebarGroup>
       </SidebarContent>
     );

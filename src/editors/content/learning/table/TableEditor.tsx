@@ -132,6 +132,17 @@ export default class TableEditor
     this.props.onEdit(model, src);
   }
 
+
+  onCellRemove(row, cell, src) {
+
+    const updatedRow = row.with({ cells: row.cells.delete(cell.guid) });
+    const model = this.props.model
+      .with({ rows: this.props.model.rows.set(updatedRow.guid, updatedRow) });
+
+    this.props.onEdit(model, src);
+  }
+
+
   renderCell(row: contentTypes.Row, cell: contentTypes.CellData | contentTypes.CellHeader) {
 
     const { className, classes } = this.props;
@@ -150,37 +161,52 @@ export default class TableEditor
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
-      onRemove: (e) => {},
+      onRemove: (e) => {
+        this.onCellRemove(row, e, null);
+      },
       onDuplicate: (e) => {},
       onMoveUp: (e) => {},
       onMoveDown: (e) => {},
       props: this.props,
     };
 
-
-
     const style = { textAlign };
 
     if (!isFirefox && !isIE && !isEdge) {
       style['height'] = '1px';
     }
+
+    const cellEditor = <CellEditor
+      {...this.props}
+      model={cell}
+      parent={noManualControl}
+      onEdit={this.onCellEdit.bind(this, row)}
+    />;
+
+    if (cell.contentType === 'CellData') {
+      return (
+        <td
+          key={cell.guid}
+          style={style}
+          className={classNames([classes.cell, className])}
+          colSpan={parseInt(cell.colspan, 10)}
+          rowSpan={parseInt(cell.rowspan, 10)}>
+          {cellEditor}
+        </td>
+      );
+    }
     return (
-      <td
+      <th
         key={cell.guid}
         style={style}
         className={classNames([classes.cell, className])}
         colSpan={parseInt(cell.colspan, 10)}
         rowSpan={parseInt(cell.rowspan, 10)}>
-
-        <CellEditor
-          {...this.props}
-          model={cell}
-          parent={noManualControl}
-          onEdit={this.onCellEdit.bind(this, row)}
-        />
-
-      </td>
+        {cellEditor}
+      </th>
     );
+
+
   }
 
   renderHeaderRow(columns: number) {
