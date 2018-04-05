@@ -87,7 +87,7 @@ export class Example extends Immutable.Record(defaultContent) {
       example: {
         '#array': [
           this.title.toPersistence(),
-          content,
+          ...content,
         ],
       },
     };
