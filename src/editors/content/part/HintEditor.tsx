@@ -1,20 +1,20 @@
 import * as React from 'react';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
 import guid from '../../../utils/guid';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { InputLabel } from '../common/InputLabel';
+import { ContentContainer } from 'editors/content/container//ContentContainer';
+import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { CONTENT_COLORS } from 'editors/content/utils/content';
 
+import './HintEditor.scss';
 
 type IdTypes = {
   targets: string,
 };
 
 export interface HintEditorProps extends AbstractContentEditorProps<contentTypes.Hint> {
-  onRemove: (hint: contentTypes.Hint) => void;
+  label: any;
 }
 
 export interface HintEditorState {
@@ -24,7 +24,7 @@ export interface HintEditorState {
 /**
  * The content editor for HtmlContent.
  */
-export class HintEditor
+export default class HintEditor
   extends AbstractContentEditor<contentTypes.Hint, HintEditorProps, HintEditorState> {
   ids: IdTypes;
 
@@ -38,16 +38,9 @@ export class HintEditor
     this.onTargetChange = this.onTargetChange.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
-  }
-
-  onBodyEdit(body) {
+  onBodyEdit(body, src) {
     const concept = this.props.model.with({ body });
-    this.props.onEdit(concept);
+    this.props.onEdit(concept, src);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -60,36 +53,38 @@ export class HintEditor
       this.props.onEdit(this.props.model.with({ targets })));
   }
 
-  render() : JSX.Element {
 
-    const inlineToolbar = <InlineToolbar/>;
-    const blockToolbar = <BlockToolbar/>;
-    const insertionToolbar = <InlineInsertionToolbar/>;
-
-    const bodyStyle = {
-      minHeight: '20px',
-      borderStyle: 'none',
-      borderWith: 1,
-      borderColor: '#AAAAAA',
-    };
+  renderToolbar() {
 
     return (
-      <div className="itemWrapper">
+      <ToolbarGroup label="Hint" columns={8} highlightColor={CONTENT_COLORS.Hint}>
+      </ToolbarGroup>
+    );
+  }
 
-      <InputLabel editMode={this.props.editMode}
-        label="Hint" style="default" onRemove={this.props.onRemove.bind(this, this.props.model)}>
-          <HtmlContentEditor
-            editorStyles={bodyStyle}
-            inlineToolbar={inlineToolbar}
-            blockToolbar={blockToolbar}
-            inlineInsertionToolbar={insertionToolbar}
+  renderSidebar() {
+
+    return (
+      <SidebarContent title="Hint">
+      </SidebarContent>
+    );
+  }
+
+
+  renderMain() : JSX.Element {
+
+    return (
+      <div className="itemWrapper hint">
+        <div className="hint-label">{this.props.label}</div>
+        <div className="hint-content">
+          <ContentContainer
             {...this.props}
             model={this.props.model.body}
             onEdit={this.onBodyEdit}
             />
-        </InputLabel>
-
-      </div>);
+        </div>
+      </div>
+    );
   }
 
 }

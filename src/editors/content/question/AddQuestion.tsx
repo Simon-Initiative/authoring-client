@@ -2,9 +2,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
-import { ContentState } from 'draft-js';
+import { ContentElements } from 'data/content/common/elements';
+import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 
-const defaultInputBody = ContentState.createFromText('Add numeric, text, or dropdown components');
+const defaultInputBody = () =>  ContentElements.fromText
+  ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
 
 export interface AddQuestion {
 
@@ -29,14 +31,14 @@ export interface AddQuestionState {
 
 
 export function createMultipleChoiceQuestion(select: string) {
-  let model = new contentTypes.Question();
+  let model = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
   let item = new contentTypes.MultipleChoice();
 
   const value = select === 'multiple' ? 'A' : guid().replace('-', '');
   const match = select === 'multiple' ? 'A' : value;
 
-  const choice = new contentTypes.Choice({ value, guid: guid() });
-  const feedback = new contentTypes.Feedback();
+  const choice = contentTypes.Choice.fromText('', guid()).with({ value });
+  const feedback = contentTypes.Feedback.fromText('', guid());
   let response = new contentTypes.Response({ match });
   response = response.with({ guid: guid(),
     feedback: response.feedback.set(feedback.guid, feedback) });
@@ -82,9 +84,9 @@ export class AddQuestion
 
     const value = 'A';
 
-    let question = new contentTypes.Question();
+    let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
 
-    const choice = new contentTypes.Choice().with({ value, guid: guid() });
+    const choice = contentTypes.Choice.fromText('', guid()).with({ value });
     const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
     const item = new contentTypes.Ordering().with({ choices });
     question = question.with({ items: question.items.set(item.guid, item) });
@@ -99,7 +101,8 @@ export class AddQuestion
 
     const item = new contentTypes.ShortAnswer();
 
-    const feedback = new contentTypes.Feedback();
+    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
+    const feedback = new contentTypes.Feedback().with({ body });
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
       .set(feedback.guid, feedback);
 
@@ -113,6 +116,7 @@ export class AddQuestion
 
     const question = new contentTypes.Question()
         .with({
+          body: contentTypes.Question.emptyBody(),
           items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
             .set(item.guid, item),
           parts: Immutable.OrderedMap<string, contentTypes.Part>()
@@ -126,7 +130,12 @@ export class AddQuestion
 
     const item = new contentTypes.Essay();
 
-    const response = new contentTypes.Response({ match: '*', score: '1' });
+    const body = ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS);
+    const feedback = new contentTypes.Feedback().with({ body });
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
+      .set(feedback.guid, feedback);
+
+    const response = new contentTypes.Response({ match: '*', score: '1', feedback: feedbacks });
 
     const part = new contentTypes.Part()
       .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
@@ -135,6 +144,7 @@ export class AddQuestion
 
     const question = new contentTypes.Question()
         .with({
+          body: contentTypes.Question.emptyBody(),
           items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
             .set(item.guid, item),
           parts: Immutable.OrderedMap<string, contentTypes.Part>()
@@ -147,7 +157,7 @@ export class AddQuestion
   onAddMultipart() {
     const q = new contentTypes.Question()
       .with({
-        body: new contentTypes.Html().with({ contentState:  defaultInputBody }),
+        body: defaultInputBody(),
       });
     this.props.onQuestionAdd(q);
   }

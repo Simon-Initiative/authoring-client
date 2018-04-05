@@ -1,69 +1,28 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
-import { CiteEditor } from '../../../links/CiteEditor';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
+import { EntityTypes } from '../../../../../data/content/learning/common';
+import { Cite as CiteData } from 'data/content/learning/cite';
+import { StyledInlineEntity } from './StyledInlineEntity';
+
+import './styles.scss';
 
 class Cite extends React.PureComponent<any, any> {
 
-  a: any;
-
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
-  }
-
-  componentDidMount() {
-    (window as any).$(this.a).tooltip();
-  }
-
-  componentWillUnmount() {
-    (window as any).$(this.a).tooltip('hide');
-  }
-
-  onClick() {
-    const key = this.props.entityKey;
-    const data = this.props.contentState.getEntity(key).getData();
-    
-    this.props.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={this.props.context}
-        services={this.props.services}
-
-        model={data.cite}
-        onCancel={() => this.props.services.dismissModal()} 
-        onInsert={(cite) => {
-          this.props.services.dismissModal();
-          const data = {
-            cite,
-          };
-          const contentState = this.props.contentState.replaceEntityData(key, data);
-
-          this.props.onEdit(contentState);
-        }
-      }>
-        <CiteEditor 
-          model={data.cite}
-          context={this.props.context}
-          services={this.props.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
   }
 
   render() : JSX.Element {
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const entry = data['@entry'];
+    const tooltip = (data as CiteData).entry === '' ? 'Citation' : (data as CiteData).entry;
+
     return (
-      <a
-        className="editor-link" 
-        data-offset-key={this.props.offsetKey} 
-        ref={a => this.a = a} data-toggle="tooltip" 
-        data-placement="top" title={entry} onClick={this.onClick}>
+      <StyledInlineEntity
+        offsetKey={this.props.offsetKey}
+        className="entity-hyperlink"
+        tooltip={tooltip}>
         {this.props.children}
-      </a>
+      </StyledInlineEntity>
     );
   }
 }

@@ -1,6 +1,8 @@
 @import 'oli/colors';
 
 .course-editor {
+  flex: 1;
+  overflow: auto;
 
   margin-left: 20px;
   margin-right: 20px;

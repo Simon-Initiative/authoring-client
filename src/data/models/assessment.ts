@@ -2,8 +2,10 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../contentTypes';
 import guid from '../../utils/guid';
 import { getKey } from '../common';
+
 import { assessmentTemplate } from '../activity_templates';
 import { isArray, isNullOrUndefined } from 'util';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 
 export type AssessmentModelParams = {
   resource?: contentTypes.Resource,
@@ -35,7 +37,7 @@ function migrateNodesToPage(model: AssessmentModel) {
   // Ensure that we have at least one page
   if (updated.pages.size === 0) {
     let newPage = new contentTypes.Page();
-    newPage = newPage.with({ title: new contentTypes.Title({ text: 'Page 1' }) });
+    newPage = newPage.with({ title: contentTypes.Title.fromText('Page 1') });
     updated = updated.with({ pages: updated.pages.set(newPage.guid, newPage) });
   }
 
@@ -91,7 +93,8 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
     model = model.with({ resource: contentTypes.Resource.fromPersistence(a) });
     model = model.with({ guid: a.guid });
     model = model.with({ type: a.type });
-    model = model.with({ title: new contentTypes.Title({ guid: guid(), text: a.title }) });
+    model = model.with({ title: new contentTypes.Title({ guid: guid(),
+      text: ContentElements.fromText(a.title, '', TEXT_ELEMENTS) }) });
 
     if (a.lock !== undefined && a.lock !== null) {
       model = model.with({ lock: contentTypes.Lock.fromPersistence(a.lock) });
@@ -147,8 +150,13 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
   }
 
   toPersistence(): Object {
-    const shortTitle = this.title.text.length > 30
-      ? this.title.text.substr(0, 30) : this.title.text;
+
+    const titleText = this.title.text.extractPlainText().caseOf({
+      just: str => str,
+      nothing: () => '',
+    });
+
+    const shortTitle =  titleText.length > 30 ? titleText.substr(0, 30) : titleText;
 
     const children = [
       this.title.toPersistence(),
@@ -160,10 +168,10 @@ export class AssessmentModel extends Immutable.Record(defaultAssessmentModelPara
 
     if (isNullOrUndefined(this.guid) || this.guid === '') {
       // Assume new assessment created if guid is null
-      const assessment = assessmentTemplate(this.title.text);
+      const assessment = assessmentTemplate(titleText);
       try {
         const id = assessment.assessment['@id'];
-        resource = new contentTypes.Resource({ id, title: this.title.text });
+        resource = new contentTypes.Resource({ id, title: titleText });
       } catch (err) {
         return null;
       }

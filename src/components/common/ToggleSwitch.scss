@@ -1,6 +1,14 @@
 @import 'oli/colors';
 
 .toggle-switch {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+
+  &.disabled {
+    cursor: initial;
+  }
+
   input[type="checkbox"].toggle {
     display: none;
 
@@ -26,9 +34,9 @@
       position: relative;
       cursor: pointer;
       user-select: none;
-      background: $gray-lighter;
+      background: $gray-light;
       border-radius: 2em;
-      border: 1px solid $gray-lighter;
+      border: 1px solid $gray-light;
       padding: 2px;
       transition: all .4s ease;
 
@@ -60,6 +68,68 @@
 
     &:checked + .toggle-btn:after {
       left: 45%;
+    }
+
+    &:disabled + .toggle-btn {
+      background: $gray-lighter;
+      border: 1px solid $gray-lighter;
+      cursor: initial;
+    }
+
+    &:checked:disabled + .toggle-btn {
+      background: #c4ddcb;
+      border-color: #c4ddcb;
+    }
+
+    &:checked:disabled + .toggle-btn:after {
+      background: $gray-lightest;
+    }
+  }
+
+  &:hover {
+    input[type="checkbox"].toggle {
+      + .toggle-btn {
+
+        &:after,
+        &:before {
+          width: 65%;
+        }
+
+        &:after {
+          border-radius: 45%;
+        }
+      }
+
+      &:checked + .toggle-btn:after {
+        left: 35%;
+      }
+
+      &:disabled + .toggle-btn {
+        &:after,
+        &:before {
+          width: 55%;
+        }
+
+        &:after {
+          border-radius: 50%;
+        }
+      }
+
+      &:checked:disabled + .toggle-btn:after {
+        left: 45%;
+      }
+    }
+  }
+
+  .label {
+    color: $black;
+
+    &.before {
+      margin-right: 5px;
+    }
+
+    &.after {
+      margin-left: 5px;
     }
   }
 }

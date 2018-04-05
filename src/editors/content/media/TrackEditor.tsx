@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
-import { Track } from '../../../data/content/html/track';
+
+import { Track } from '../../../data/content/learning/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import guid from '../../../utils/guid';
 import { extractFileName, adjustPath } from './utils';
@@ -38,7 +39,13 @@ export class TrackEditor
   }
 
   shouldComponentUpdate(nextProps, nextState: TrackEditorState) {
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
     if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextProps.context !== this.props.context) {
       return true;
     }
     if (nextState.failure !== this.state.failure) {
@@ -82,7 +89,14 @@ export class TrackEditor
     (window as any).$('#' + id).trigger('click');
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { src, kind, label, srclang } = this.props.model;
     let srcDisplay;

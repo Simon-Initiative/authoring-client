@@ -3,22 +3,18 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractItemPartEditorProps } from '../common/AbstractItemPartEditor';
 import { Button, Select } from '../common/controls';
-import { HtmlContentEditor } from '../html/HtmlContentEditor';
-import InlineToolbar from '../html/InlineToolbar';
-import BlockToolbar from '../html/BlockToolbar';
-import InlineInsertionToolbar from '../html/InlineInsertionToolbar';
-import { CommandProcessor } from '../common/command';
-import { EditorState } from 'draft-js';
 import {
   TabContainer, Tab, TabElement, TabSection, TabSectionHeader, TabSectionContent, TabOptionControl,
 } from 'editors/content/common/TabContainer';
 import { Hints } from '../part/Hints';
-import ConceptsEditor from '../concepts/ConceptsEditor';
+import SkillsEditor from '../skills/SkillsEditor';
 import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
-import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
+import guid from 'utils/guid';
 
 import './Question.scss';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question. '
@@ -27,6 +23,8 @@ const REMOVE_QUESTION_DISABLED_MSG =
 export interface QuestionProps<ModelType>
   extends AbstractItemPartEditorProps<ModelType> {
   onBodyEdit: (...args: any[]) => any;
+  onFocus: (child, model, textSelection) => void;
+  onItemFocus: (itemId: string) => void;
   body: any;
   grading: any;
   onGradingChange: (value) => void;
@@ -35,6 +33,9 @@ export interface QuestionProps<ModelType>
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
   onRemoveQuestion: () => void;
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 }
 
 export interface QuestionState {
@@ -78,7 +79,8 @@ export const OptionControl = TabOptionControl;
  */
 export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem>,
   S extends QuestionState> extends React.PureComponent<P, S> {
-  htmlEditor: CommandProcessor<EditorState>;
+
+
   className: string;
 
   constructor(props) {
@@ -88,7 +90,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     this.onCriteriaAdd = this.onCriteriaAdd.bind(this);
     this.onCriteriaRemove = this.onCriteriaRemove.bind(this);
     this.onCriteriaEdit = this.onCriteriaEdit.bind(this);
-    this.onConceptsEdit = this.onConceptsEdit.bind(this);
+    this.onSkillsEdit = this.onSkillsEdit.bind(this);
     this.onHintsEdit = this.onHintsEdit.bind(this);
   }
 
@@ -97,36 +99,37 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   abstract getClassName(): string;
 
   onAddHint(item: contentTypes.QuestionItem, part: contentTypes.Part) {
-    const hint = new contentTypes.Hint();
-    this.onHintsEdit(part.hints.set(hint.guid, hint), item, part);
+    const hint = contentTypes.Hint.fromText('', guid());
+    const updated = part.with({ hints: part.hints.set(hint.guid, hint) });
+    this.onHintsEdit(item, updated, hint);
   }
 
   onCriteriaAdd() {
-    const c = new contentTypes.GradingCriteria();
+    const c = contentTypes.GradingCriteria.fromText('', guid());
     const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
   onCriteriaRemove(guid) {
     const criteria = this.props.partModel.criteria.delete(guid);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), null);
   }
 
   onCriteriaEdit(c) {
     const criteria = this.props.partModel.criteria.set(c.guid, c);
-    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }));
+    this.props.onEdit(this.props.itemModel, this.props.partModel.with({ criteria }), c);
   }
 
-  onConceptsEdit(concepts, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onSkillsEdit(skills, item: contentTypes.QuestionItem, part: contentTypes.Part) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ concepts }));
+    onEdit(item, part.with({ skills }), skills);
   }
 
-  onHintsEdit(hints, item: contentTypes.QuestionItem, part: contentTypes.Part) {
+  onHintsEdit(item: contentTypes.QuestionItem, part: contentTypes.Part, src) {
     const { onEdit } = this.props;
 
-    onEdit(item, part.with({ hints }));
+    onEdit(item, part, src);
   }
 
   renderQuestionTitle(): JSX.Element {
@@ -194,24 +197,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       onBodyEdit,
     } = this.props;
 
-    const bodyStyle = {
-      minHeight: '50px',
-      borderStyle: 'none',
-      borderWith: '1px',
-      borderColor: '#AAAAAA',
-    };
-
     return (
       <div className="question-body" key="question">
-          <HtmlContentEditor
-            ref={c => this.htmlEditor = c}
+          <ContentContainer
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
             editMode={editMode}
             services={services}
             context={context}
-            editorStyles={bodyStyle}
-            inlineToolbar={<InlineToolbar/>}
-            inlineInsertionToolbar={<InlineInsertionToolbar/>}
-            blockToolbar={<BlockToolbar/>}
             model={body}
             onEdit={onBodyEdit} />
       </div>
@@ -232,12 +227,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
         <TabSection className="skills">
           <TabSectionHeader title="Attached Skills"/>
           <TabSectionContent>
-            <ConceptsEditor
+            <SkillsEditor
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
-              model={part.concepts}
-              onEdit={concepts => this.onConceptsEdit(concepts, item, part)} />
+              onFocus={this.props.onFocus}
+              model={part.skills}
+              onEdit={skills => this.onSkillsEdit(skills, item, part)} />
           </TabSectionContent>
         </TabSection>
       </Tab>
@@ -269,6 +268,11 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           {partModel.criteria.toArray()
             .map(c => (
               <CriteriaEditor
+                activeContentGuid={null}
+                hover={null}
+                onUpdateHover={() => {}}
+                onFocus={this.props.onItemFocus.bind(this, c, this)}
+                parent={null}
                 key={c.guid}
                 onRemove={this.onCriteriaRemove}
                 model={c}
@@ -299,11 +303,9 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
           </TabSectionHeader>
           <TabSectionContent>
             <Hints
-              context={this.props.context}
-              services={this.props.services}
-              editMode={this.props.editMode}
+              {...this.props}
               model={part}
-              onEdit={hints => this.onHintsEdit(hints, item, part)} />
+              onEdit={(part, h) => this.onHintsEdit(item, part, h)} />
           </TabSectionContent>
         </TabSection>
       </Tab>
@@ -346,14 +348,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   render() {
     const {
       model,
-      onFocus,
       onBlur,
+      onItemFocus,
     } = this.props;
 
     return (
       <div
         className={`question ${this.getClassName() || ''}`}
-        onFocus={() => onFocus(model.id)}
+        onFocus={() => {
+          onItemFocus(model.id);
+        }}
         onBlur={() => onBlur(model.id)}>
 
         {this.renderQuestionTitle()}

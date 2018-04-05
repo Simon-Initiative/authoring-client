@@ -4,7 +4,7 @@ import { Part, Question } from 'data/contentTypes';
 import { Skill } from 'types/course';
 
 // Does an assessment or standalone pool contain at least one
-// question that has a concept (skill) that we do no know about?
+// question that has a skill that we do no know about?
 export function hasUnknownSkill(
   model : AssessmentModel | PoolModel,
   knownSkills: Immutable.OrderedMap<string, Skill>) : boolean {
@@ -47,6 +47,6 @@ function doesPartHaveUnknownSkill(
   part : Part,
   knownSkills: Immutable.OrderedMap<string, Skill>) : boolean {
 
-  return part.concepts.toArray().some(c => !knownSkills.has(c));
+  return part.skills.toArray().some(c => !knownSkills.has(c));
 }
 

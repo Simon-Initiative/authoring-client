@@ -1,16 +1,15 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
-import { AppServices } from '../../common/AppServices';
-import { AppContext } from '../../common/AppContext';
-import { HintEditor } from './HintEditor';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { ContentElements } from 'data/content/common/elements';
+import {
+  AbstractContentEditor, AbstractContentEditorProps,
+} from 'editors/content/common/AbstractContentEditor';
 
-export interface HintsProps {
-  model: contentTypes.Part;
-  onEdit: (hints: Immutable.Map<string, contentTypes.Hint>) => void;
-  context: AppContext;
-  editMode: boolean;
-  services: AppServices;
+
+export interface HintsProps extends AbstractContentEditorProps<contentTypes.Part> {
+
 }
 
 export interface HintsState {
@@ -20,45 +19,67 @@ export interface HintsState {
 /**
  * The content editor for HtmlContent.
  */
-export abstract class Hints
-  extends React.PureComponent<HintsProps, HintsState> {
+export class Hints
+extends AbstractContentEditor<contentTypes.Part,
+  HintsProps, HintsState> {
 
   constructor(props) {
     super(props);
 
     this.onHintEdit = this.onHintEdit.bind(this);
-    this.onRemove = this.onRemove.bind(this);
   }
 
-  onHintEdit(hint: contentTypes.Hint) {
+  onHintEdit(elements, src) {
     const { onEdit } = this.props;
 
-    onEdit(this.props.model.hints.set(hint.guid, hint));
-  }
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
 
-  onRemove(hint: contentTypes.Hint) {
-    const { onEdit } = this.props;
-
-    onEdit(this.props.model.hints.delete(hint.guid));
-  }
-
-  renderHints() {
-    return this.props.model.hints.toArray().map((i) => {
-      return (
-        <HintEditor
-          key={i.guid}
-          {...this.props}
-          model={i}
-          onEdit={this.onHintEdit}
-          onRemove={this.onRemove} />
-      );
+    const model = this.props.model.with({
+      hints: Immutable.OrderedMap<string, contentTypes.Hint>(items),
     });
+
+    onEdit(model, src);
   }
 
-  render() : JSX.Element {
+  renderToolbar() {
+    return null;
+  }
+
+  renderSidebar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
+
+    if (this.props.model.hints.size === 0) {
+      return null;
+    }
+
+    const elements = new ContentElements().with({
+      content: this.props.model.hints,
+    });
+
+    const labels = {};
+    this.props.model.hints.toArray().map((e, i) => {
+      labels[e.guid]
+        = <span style={ { display: 'inline-block',
+          minWidth: '20px', marginRight: '5px' } }>{'Hint ' + (i + 1)}</span>;
+    });
+
+    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+
+
     return (
-      <div className="hints">
-        {this.renderHints()}
+      <div>
+        <ContentContainer
+          {...this.props}
+          model={elements}
+          bindProperties={bindLabel}
+          onEdit={this.onHintEdit.bind(this)}
+        />
       </div>
     );
   }

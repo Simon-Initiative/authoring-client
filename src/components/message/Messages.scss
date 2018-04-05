@@ -1,18 +1,40 @@
 
-.message-enter {
-  opacity: 0.01;
-}
+.messages {
+  background-color: #0067cb;
 
-.message-enter.message-enter-active {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
-}
+  .message-enter {
+    height: 0px;
 
-.message-leave {
-  opacity: 1;
-}
+    & > * {
+      opacity: 0;
+    }
+  }
 
-.message-leave.message-leave-active {
-  opacity: 0.01;
-  transition: opacity 300ms ease-in;
+  .message-enter.message-enter-active {
+    height: 40px;
+    transition: height 250ms ease-in-out;
+
+    & > * {
+      opacity: 1;
+      transition: opacity 350ms ease-in;
+    }
+  }
+
+  .message-leave {
+    height: 40px;
+
+    & > * {
+      opacity: 1;
+    }
+  }
+
+  .message-leave.message-leave-active {
+    height: 0px;
+    transition: height 250ms ease-in-out;
+
+    & > * {
+      opacity: 0;
+      transition: opacity 100ms ease-in;
+    }
+  }
 }

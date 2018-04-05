@@ -3,11 +3,11 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { PoolTitleEditor } from './PoolTitleEditor';
-import { Collapse, Select, TextInput } from '../common/controls';
+import { Select, TextInput } from '../common/controls';
 import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { Skill } from 'types/course';
-import { ContentTitle } from 'editors/content/common/ContentTitle.tsx';
+import { ContentTitle } from 'editors/content/common/ContentTitle';
 
 import './SelectionEditor.scss';
 
@@ -38,10 +38,6 @@ export class SelectionEditor
     this.onSourceEdit = this.onSourceEdit.bind(this);
     this.onAddQuestion = this.onAddQuestion.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model);
   }
 
   onStrategyChange(strategy) {
@@ -103,7 +99,14 @@ export class SelectionEditor
     );
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
     const controls = (
       <div className="controls">
         {
@@ -154,15 +157,15 @@ export class SelectionEditor
     let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
       titleEditor =
-        <Collapse caption="Title" details={this.props.model.source.title.text}>
             <PoolTitleEditor
+              {...this.props}
               services={this.props.services}
               context={this.props.context}
               editMode={this.props.editMode}
               model={this.props.model.source.title}
               onEdit={this.onTitleEdit}
-            />
-        </Collapse>;
+            />;
+
     }
 
     return (

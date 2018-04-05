@@ -1,6 +1,45 @@
 @import 'oli/typography';
 
 .assessment-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .title-row {
+    margin: 10px 0;
+  }
+
+	.docHead {
+    flex: 1;
+    overflow: auto;
+  }
+
+  .assessment-content {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    flex: 1;
+
+    .html-editor-well {
+      flex: 1;
+      overflow: auto;
+      padding: 0 30px 30px 30px;
+
+      .content-decorator {
+        margin-top: 20px;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      .content-container > * {
+        margin: 10px 0;
+      }
+    }
+  }
+
   .slash {
     color: #606060;
   }

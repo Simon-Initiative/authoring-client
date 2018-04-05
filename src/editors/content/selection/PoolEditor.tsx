@@ -33,10 +33,6 @@ export class PoolEditor
     this.canAcceptId = this.canAcceptId.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model);
-  }
-
   onRemoveQuestion(guid) {
 
     if (this.props.model.questions.size > 1) {
@@ -115,7 +111,14 @@ export class PoolEditor
            />;
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     return (
       <div>

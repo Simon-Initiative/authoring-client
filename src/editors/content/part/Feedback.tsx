@@ -1,12 +1,12 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Html } from 'data/content/html.ts';
 import {
   InputList, InputListItem, ItemOption, ItemOptionFlex, ItemOptions,
-} from 'editors/content/common/InputList.tsx';
-
+} from 'editors/content/common/InputList';
 import './Feedback.scss';
+import guid from 'utils/guid';
 
 export interface FeedbackProps extends AbstractContentEditorProps<contentTypes.Part> {
 
@@ -20,7 +20,8 @@ export interface FeedbackState {
  * The content editor for choice feedback.
  */
 export abstract class Feedback
-  extends AbstractContentEditor<contentTypes.Part, FeedbackProps, FeedbackState> {
+    extends AbstractContentEditor<contentTypes.Part, FeedbackProps, FeedbackState> {
+  defaultFeedbackResponse: contentTypes.Response;
 
   constructor(props) {
     super(props);
@@ -31,14 +32,14 @@ export abstract class Feedback
     this.onBodyEdit = this.onBodyEdit.bind(this);
   }
 
-  onResponseEdit(response) {
+  onResponseEdit(response, source) {
     const { model, onEdit } = this.props;
 
     const updatedModel = model.with({
       responses: model.responses.set(response.guid, response),
     });
 
-    onEdit(updatedModel);
+    onEdit(updatedModel, source);
   }
 
   onResponseRemove(response) {
@@ -62,15 +63,15 @@ export abstract class Feedback
     }));
   }
 
-  onBodyEdit(body, response) {
-    let feedback = response.feedback.first() || new contentTypes.Feedback();
+  onBodyEdit(body, response, source) {
+    let feedback = response.feedback.first();
     feedback = feedback.with({ body });
 
     const updatedResponse = response.with({
       feedback: response.feedback.set(feedback.guid, feedback),
     });
 
-    this.onResponseEdit(updatedResponse);
+    this.onResponseEdit(updatedResponse, source);
   }
 
   onEditMatch(responseId, match: string) {
@@ -96,58 +97,106 @@ export abstract class Feedback
   renderResponses() {
     const { model, context, services, editMode } = this.props;
 
-    return model.responses.toArray()
-      // if a default response doesnt exist, create one and append it to the list
-      .concat(this.getDefaultResponse() ? [] : new contentTypes.Response({
-        match : '*',
-      }))
+    return model.responses.toArray().filter(r => r.match !== '*')
       .map((response, i) => {
-        const isDefault = response.match === '*';
-
         return (
           <InputListItem
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
             key={response.guid}
             className="response"
             id={response.guid}
-            label={isDefault ? '' : `${i + 1}`}
-            contentTitle={isDefault ? 'Other Feedback' : ''}
+            label={`${i + 1}`}
+            contentTitle={''}
             context={context}
             services={services}
             editMode={editMode}
-            body={response.feedback.first() ? response.feedback.first().body : new Html()}
-            onEdit={body => this.onBodyEdit(body, response)}
-            onRemove={isDefault ? undefined : () => this.onResponseRemove(response)}
+            body={response.feedback.first().body}
+            onEdit={(body, source) => this.onBodyEdit(body, response, source)}
+            onRemove={() => this.onResponseRemove(response)}
             options={
-            <ItemOptions>
-              {!isDefault
-                ? (
-                  <ItemOption className="matches" label="Matching Pattern" flex>
-                    <input
-                      className="form-control input-sm form-control-sm"
-                      disabled={!this.props.editMode}
-                      value={response.match}
-                      onChange={({ target: { value } }) =>
-                        this.onEditMatch(response.guid, value)} />
-                  </ItemOption>
-                ) : (
-                  <ItemOptionFlex />
-                )
-              }
-              <ItemOption className="score" label="Score">
-                <div className="input-group">
+              <ItemOptions>
+                <ItemOption className="matches" label="Matching Pattern" flex>
                   <input
-                    type="number"
                     className="form-control input-sm form-control-sm"
                     disabled={!this.props.editMode}
-                    value={response.score}
-                    onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
-                    />
-                </div>
-              </ItemOption>
-            </ItemOptions>
+                    value={response.match}
+                    onChange={({ target: { value } }) =>
+                      this.onEditMatch(response.guid, value)} />
+                </ItemOption>
+                <ItemOption className="score" label="Score">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control input-sm form-control-sm"
+                      disabled={!this.props.editMode}
+                      value={response.score}
+                      onChange={({ target: { value } }) => this.onScoreEdit(response, value)}
+                      />
+                  </div>
+                </ItemOption>
+              </ItemOptions>
             } />
         );
       });
+  }
+
+  renderDefaultResponse() {
+    const { context, services, editMode } = this.props;
+
+    if (!this.defaultFeedbackResponse) {
+      const newGuid = guid();
+
+      this.defaultFeedbackResponse = new contentTypes.Response({
+        match: '*',
+        feedback: Immutable.OrderedMap({
+          [newGuid]: contentTypes.Feedback.fromText('', newGuid),
+        }),
+      });
+    }
+
+    const defaultResponseItem = this.getDefaultResponse();
+
+    let defaultResponse = this.defaultFeedbackResponse;
+    if (defaultResponseItem) {
+      defaultResponse = defaultResponseItem;
+    }
+
+    return (
+      <InputListItem
+        activeContentGuid={this.props.activeContentGuid}
+        hover={this.props.hover}
+        onUpdateHover={this.props.onUpdateHover}
+        onFocus={this.props.onFocus}
+        key={defaultResponse.guid}
+        className="response"
+        id={defaultResponse.guid}
+        label=""
+        contentTitle="Other Feedback"
+        context={context}
+        services={services}
+        editMode={editMode}
+        body={defaultResponse.feedback.first().body}
+        onEdit={(body, source) => this.onBodyEdit(body, defaultResponse, source)}
+        options={
+          <ItemOptions>
+            <ItemOptionFlex />
+            <ItemOption className="score" label="Score">
+              <div className="input-group">
+                <input
+                  type="number"
+                  className="form-control input-sm form-control-sm"
+                  disabled={!this.props.editMode}
+                  value={defaultResponse.score}
+                  onChange={({ target: { value } }) => this.onScoreEdit(defaultResponse, value)}
+                  />
+              </div>
+            </ItemOption>
+          </ItemOptions>
+        } />
+    );
   }
 
   render() : JSX.Element {
@@ -155,6 +204,7 @@ export abstract class Feedback
       <div className="feedback">
         <InputList className="feedback-items">
           {this.renderResponses()}
+          {this.renderDefaultResponse()}
         </InputList>
       </div>
     );

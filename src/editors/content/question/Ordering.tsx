@@ -52,36 +52,36 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
+    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel, null);
   }
 
   onAddChoice() {
     const count = this.props.itemModel.choices.size;
     const value = convert.toAlphaNotation(count);
 
-    const choice = new contentTypes.Choice().with({ value, guid: guid() });
+    const choice = contentTypes.Choice.fromText('', guid()).with({ value });
 
     const itemModel = this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) });
 
-    this.props.onEdit(itemModel, this.props.partModel);
+    this.props.onEdit(itemModel, this.props.partModel, choice);
   }
 
-  onChoiceEdit(choice: contentTypes.Choice) {
+  onChoiceEdit(choice: contentTypes.Choice, src) {
     this.props.onEdit(
       this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
-      this.props.partModel);
+      this.props.partModel, src);
   }
 
-  onPartEdit(partModel: contentTypes.Part) {
-    this.props.onEdit(this.props.itemModel, partModel);
+  onPartEdit(partModel: contentTypes.Part, src) {
+    this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
   onResponseAdd() {
     const { partModel } = this.props;
 
-    const feedback = new contentTypes.Feedback();
+    const feedback = contentTypes.Feedback.fromText('', guid());
     const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
 
     const response = new contentTypes.Response({
@@ -94,7 +94,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       responses: partModel.responses.set(response.guid, response),
     });
 
-    this.onPartEdit(updatedPartModel);
+    this.onPartEdit(updatedPartModel, feedback);
   }
 
   onRemoveChoice(choice: contentTypes.Choice) {
@@ -108,7 +108,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
     const newModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
 
-    this.props.onEdit(newModels.itemModel, newModels.partModel);
+    this.props.onEdit(newModels.itemModel, newModels.partModel, null);
   }
 
   onReorderChoices(originalIndex: number, newIndex: number) {
@@ -142,6 +142,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
     onEdit(
       updatedItemModel,
       updatedPartModel,
+      choice,
     );
   }
 
@@ -153,6 +154,10 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       .map((choice, index) => {
         return (
           <Choice
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
             key={choice.guid}
             index={index}
             choice={choice}

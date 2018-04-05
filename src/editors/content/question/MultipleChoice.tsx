@@ -108,7 +108,9 @@ export class MultipleChoice
       onEdit,
     } = this.props;
 
-    onEdit(itemModel.with({ shuffle: !itemModel.shuffle }), partModel);
+    const updated = itemModel.with({ shuffle: !itemModel.shuffle });
+
+    onEdit(updated, partModel, updated);
   }
 
   onToggleAdvanced() {
@@ -120,7 +122,7 @@ export class MultipleChoice
     // so they are valid in simple mode. Otherwise, we can leave the scores as-is
     if (advancedScoring && isComplexScoring(partModel)) {
       const updatedPartModel = resetAllScores(partModel);
-      onEdit(itemModel, updatedPartModel);
+      onEdit(itemModel, updatedPartModel, updatedPartModel);
     }
 
     onToggleAdvancedScoring(model.guid);
@@ -137,7 +139,7 @@ export class MultipleChoice
       ),
     });
 
-    onEdit(itemModel, updatedPartModel);
+    onEdit(itemModel, updatedPartModel, updatedPartModel);
   }
 
   onAddChoice() {
@@ -145,8 +147,8 @@ export class MultipleChoice
 
     const value = guid().replace('-', '');
     const match = value;
-    const choice = new contentTypes.Choice({ value });
-    const feedback = new contentTypes.Feedback();
+    const choice = contentTypes.Choice.fromText('', guid()).with({ value });
+    const feedback = contentTypes.Feedback.fromText('', guid());
     let response = new contentTypes.Response({ match });
     response = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
 
@@ -155,26 +157,28 @@ export class MultipleChoice
     const updatedPartModel = partModel.with(
       { responses: partModel.responses.set(response.guid, response) });
 
-    onEdit(updatedItemModel, updatedPartModel);
+    onEdit(updatedItemModel, updatedPartModel, null);
   }
 
-  onChoiceEdit(choice: contentTypes.Choice) {
+  onChoiceEdit(choice: contentTypes.Choice, src) {
     const { partModel, itemModel, onEdit } = this.props;
 
+    const updated = itemModel.with({
+      choices: itemModel.choices.set(choice.guid, choice),
+    });
     onEdit(
-      itemModel.with({
-        choices: itemModel.choices.set(choice.guid, choice),
-      }),
-      partModel);
+      updated,
+      partModel,
+      src);
   }
 
-  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback) {
+  onFeedbackEdit(response : contentTypes.Response, feedback: contentTypes.Feedback, src) {
     const { partModel, itemModel, onEdit } = this.props;
 
     const updated = response.with({ feedback: response.feedback.set(feedback.guid, feedback) });
     const part = partModel.with(
       { responses: partModel.responses.set(updated.guid, updated) });
-    onEdit(itemModel, part);
+    onEdit(itemModel, part, src);
   }
 
   onScoreEdit(response: contentTypes.Response, score: string) {
@@ -185,7 +189,7 @@ export class MultipleChoice
       { responses: partModel.responses.set(updatedScore.guid, updatedScore) },
     );
 
-    onEdit(itemModel, updatedPartModel);
+    onEdit(itemModel, updatedPartModel, updatedPartModel);
   }
 
   onRemoveChoice(choiceId: string, response: contentTypes.Response) {
@@ -200,7 +204,7 @@ export class MultipleChoice
         { responses: partModel.responses.delete(response.guid) });
     }
 
-    onEdit(updatedItemModel, updatePartModel);
+    onEdit(updatedItemModel, updatePartModel, updatedItemModel);
   }
 
   onReorderChoices(originalIndex: number, newIndex: number) {
@@ -234,6 +238,7 @@ export class MultipleChoice
     onEdit(
       newModels.itemModel,
       newModels.partModel,
+      newModels.itemModel,
     );
   }
 
@@ -247,6 +252,10 @@ export class MultipleChoice
       const response = responses[i];
       return (
         <Choice
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
           key={choice.guid}
           index={i}
           choice={choice}

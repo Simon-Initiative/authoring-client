@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as persistence from '../../../data/persistence';
-import { Xref } from '../../../data/content/html/xref';
+import { Xref } from '../../../data/content/workbook/xref';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { Select } from '../common/Select';
 import { InputLabel } from '../common/InputLabel';
@@ -42,16 +42,6 @@ export class XrefEditor
     .then(resources => this.setState({ resources }));
   }
 
-  shouldComponentUpdate(nextProps, nextState: XrefEditorState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    if (nextState.resources !== this.state.resources) {
-      return true;
-    }
-    return false;
-  }
-
   onTargetEdit(target) {
     this.props.onEdit(this.props.model.with({ target }));
   }
@@ -65,7 +55,14 @@ export class XrefEditor
     this.props.onEdit(this.props.model.with({ idref }));
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     const { target } = this.props.model;
 

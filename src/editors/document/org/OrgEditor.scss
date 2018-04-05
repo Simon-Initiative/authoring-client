@@ -2,6 +2,11 @@
 @import 'oli/typography';
 
 .org-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 30px;
 
   .org-tab {
     margin-left: 40px;
@@ -9,6 +14,9 @@
   }
 
 	.doc-head {
+    flex: 1;
+    overflow: auto;
+
     .action-bar {
       .btn {
         padding: 5px 20px;
@@ -25,6 +33,10 @@
 
     .active-tab-content {
       margin-top: 30px;
+
+      .dragHandleGrab .grip {
+        margin-top: 8px;
+      }
     }
 
     .nav-link {

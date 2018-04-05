@@ -1,24 +1,25 @@
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
+import { Document } from 'data/persistence';
 import EditorManager from './EditorManager';
-import { courseChanged } from 'actions/course';
-import * as lockActions from 'actions/locks';
-import { CourseModel } from 'data/models';
+import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
-import { AcquiredLock, RegisterLocks, UnregisterLocks } from 'types/locks';
+import { save } from 'actions/document';
 
 interface StateProps {
   expanded: any;
   skills: Map<string, Skill>;
   objectives: Map<string, LearningObjective>;
+  document: Document;
+  undoRedoGuid: string;
+  editingAllowed: boolean;
+  hasFailed: boolean;
 }
 
 interface DispatchProps {
-  onCourseChanged: (model: CourseModel) => any;
+  onSave: (documentId: string, model: ContentModel) => any;
   onDispatch: (...args: any[]) => any;
-  registerLocks: RegisterLocks;
-  unregisterLocks: UnregisterLocks;
 }
 
 interface OwnProps {
@@ -27,30 +28,44 @@ interface OwnProps {
   userName: string;
   profile: UserProfile;
   course: any;
+
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { expanded, skills, objectives } = state;
+
+  const { expanded, skills, objectives, documents } = state;
+  const ed = documents.get(ownProps.documentId);
+
+  let document = null;
+  let undoRedoGuid = 'Loading';
+  let editingAllowed = false;
+  let hasFailed = false;
+
+  if (ed !== undefined) {
+    document = ed.document;
+    undoRedoGuid = ed.undoRedoGuid;
+    editingAllowed = ed.editingAllowed;
+    hasFailed = ed.hasFailed;
+  }
 
   return {
     expanded,
     skills,
     objectives,
+    document,
+    undoRedoGuid,
+    editingAllowed,
+    hasFailed,
   };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onCourseChanged: (model: CourseModel) => {
-      dispatch(courseChanged(model));
+    onSave: (documentId: string, model: ContentModel) => {
+      dispatch(save(documentId, model));
     },
     onDispatch: dispatch,
-    registerLocks: (locks: AcquiredLock[]) => {
-      dispatch(lockActions.registerLocks(locks));
-    },
-    unregisterLocks: (locks: AcquiredLock[]) => {
-      dispatch(lockActions.unregisterLocks(locks));
-    },
+
   };
 };
 

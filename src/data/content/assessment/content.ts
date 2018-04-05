@@ -1,18 +1,18 @@
 import * as Immutable from 'immutable';
 
-import { Html } from '../html';
+import { ContentElements, BODY_ELEMENTS, BOX_ELEMENTS } from 'data/content/common//elements';
 import { augment } from '../common';
 
 export type ContentParams = {
   availability?: string,
-  body?: Html,
+  body?: ContentElements,
   guid?: string,
 };
 
 const defaultContent = {
   contentType: 'Content',
   availability: 'always',
-  body: new Html(),
+  body: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
   guid: '',
 };
 
@@ -20,7 +20,7 @@ export class Content extends Immutable.Record(defaultContent) {
 
   contentType: 'Content';
   availability: string;
-  body: Html;
+  body: ContentElements;
   guid: string;
 
   constructor(params?: ContentParams) {
@@ -31,12 +31,19 @@ export class Content extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  static fromText(text: string, guid: string) : Content {
+    return new Content().with({
+      guid,
+      body: ContentElements.fromText(text, '', Immutable.List(BOX_ELEMENTS).toArray()),
+    });
+  }
+
   static fromPersistence(root: Object, guid: string) : Content {
 
     const content = (root as any).content;
 
     let model = new Content({ guid });
-    model = model.with({ body: Html.fromPersistence(content, '') });
+    model = model.with({ body: ContentElements.fromPersistence(content, '', BODY_ELEMENTS) });
 
     if (content['@available'] !== undefined) {
       model = model.with({ availability: content['@available'] });
@@ -48,7 +55,7 @@ export class Content extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const body = this.body.toPersistence();
-    const content = { content: (body as any) };
+    const content = { content: { '#array': (body as any) } };
 
     content.content['@available'] = this.availability;
 

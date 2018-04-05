@@ -2,10 +2,9 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Content, Node as AssessmentNode, Question, Selection,
+  Node as AssessmentNode, Question, Selection,
 } from 'data/contentTypes';
-import { getHtmlDetails } from '../../content/common/details';
-import { DragHandle } from './DragHandle';
+import { DragHandle } from 'components/common/DragHandle.tsx';
 
 import './tabs.scss';
 
@@ -44,9 +43,7 @@ export function renderTab(
 }
 
 const countSkills = (q: Question) : number =>
-  q.concepts.size + q.parts.toArray().reduce((total, p) => total + p.concepts.size, 0);
-
-const preview = (html) : string => getHtmlDetails(html, 20);
+  q.skills.size + q.parts.toArray().reduce((total, p) => total + p.skills.size, 0);
 
 const strategy = (s : string) : string => {
   switch (s) {
@@ -114,7 +111,7 @@ const Label = (props) => {
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
   return (
-    <Tab {...props} tooltip={preview(q.body)}>
+    <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">
         <div>
           <DragHandle connectDragSource={props.connectDragSource}/>
@@ -128,9 +125,8 @@ const QuestionTab = (props: TabProps) => {
 };
 
 const ContentTab = (props: TabProps) => {
-  const c = props.node as Content;
   return (
-    <Tab {...props} tooltip={preview(c.body)}>
+    <Tab {...props}>
       <div className="d-flex w-100 justify-content-between">
         <div>
           <DragHandle connectDragSource={props.connectDragSource}/>
@@ -189,7 +185,7 @@ interface TabProperties {
   node: AssessmentNode;
   nodeState: Tree.NodeState<AssessmentNode>;
   handlers: Tree.Handlers;
-  tooltip: string;
+  tooltip?: string;
 }
 
 class Tab extends React.PureComponent<TabProperties, {}> {

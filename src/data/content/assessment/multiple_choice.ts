@@ -28,7 +28,7 @@ const defaultContent = {
 };
 
 export class MultipleChoice extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'MultipleChoice';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
@@ -37,7 +37,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
   select : string;
   shuffle : boolean;
   guid: string;
-  
+
   constructor(params?: MultipleChoiceParams) {
     super(augment(params));
   }
@@ -47,7 +47,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : MultipleChoice {
-    
+
     const q = (json as any).multiple_choice;
     let model = new MultipleChoice({ guid });
 
@@ -68,7 +68,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
     }
 
     getChildren(q).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -90,7 +90,7 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
 
     const choices = arr.length > 0
       ? this.choices.toArray().map(c => c.toPersistence())
-      : [new Choice().toPersistence()];
+      : [Choice.fromText('', '').toPersistence()];
 
     return {
       multiple_choice: {

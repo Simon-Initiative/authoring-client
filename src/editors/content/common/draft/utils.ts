@@ -1,6 +1,6 @@
 import { ContentState, Modifier, SelectionState } from 'draft-js';
 import guid from 'utils/guid';
-import { getAllEntities } from 'data/content/html/changes';
+import { getAllEntities } from 'data/content/learning/draft/changes';
 
 export enum SelectionChangeType {
   Initial,

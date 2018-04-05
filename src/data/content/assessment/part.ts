@@ -1,6 +1,7 @@
 import * as Immutable from 'immutable';
-import { Html } from '../html';
-import { Title } from '../title';
+import { ContentElements } from 'data/content/common//elements';
+import { ALT_FLOW_ELEMENTS } from './types';
+import { Title } from '../learning/title';
 import { Response } from './response';
 import { ResponseMult } from './response_mult';
 import { GradingCriteria } from './criteria';
@@ -17,11 +18,12 @@ export type PartParams = {
   targets?: string;
   title?: Title;
   concepts?: Immutable.List<string>;
+  skills?: Immutable.Set<string>;
   responses?: Immutable.OrderedMap<string, Response>;
   responseMult?: Immutable.OrderedMap<string, ResponseMult>;
   criteria?: Immutable.OrderedMap<string, GradingCriteria>;
   hints?: Immutable.OrderedMap<string, Hint>;
-  explanation?: Html;
+  explanation?: ContentElements;
   guid?: string;
 };
 
@@ -33,11 +35,12 @@ const defaultPartParams = {
   targets: '',
   title: new Title(),
   concepts: Immutable.List<string>(),
+  skills: Immutable.Set<string>(),
   criteria: Immutable.OrderedMap<string, GradingCriteria>(),
   responses: Immutable.OrderedMap<string, Response>(),
   responseMult: Immutable.OrderedMap<string, ResponseMult>(),
   hints: Immutable.OrderedMap<string, Hint>(),
-  explanation: new Html(),
+  explanation: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
 };
 
@@ -50,11 +53,12 @@ export class Part extends Immutable.Record(defaultPartParams) {
   targets: string;
   title: Title;
   concepts: Immutable.List<string>;
+  skills: Immutable.Set<string>;
   criteria: Immutable.OrderedMap<string, GradingCriteria>;
   responses: Immutable.OrderedMap<string, Response>;
   responseMult: Immutable.OrderedMap<string, ResponseMult>;
   hints: Immutable.OrderedMap<string, Hint>;
-  explanation: Html;
+  explanation: ContentElements;
   guid: string;
 
   constructor(params?: PartParams) {
@@ -90,17 +94,16 @@ export class Part extends Immutable.Record(defaultPartParams) {
       const id = createGuid();
 
       switch (key) {
+        case 'cmd:concept':
+          model = model.with({ concepts: model.concepts.push((item as any)
+            ['cmd:concept']['#text']) });
+          break;
         case 'grading_criteria':
           model = model.with(
             { criteria: model.criteria.set(id, GradingCriteria.fromPersistence(item, id)) });
           break;
-
-        case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
-          break;
-        case 'cmd:concept':
-          model = model.with({ concepts: model.concepts.push((item as any)
-            ['cmd:concept']['#text']) });
+        case 'hint':
+          model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
           break;
         case 'response':
           model = model.with(
@@ -110,11 +113,16 @@ export class Part extends Immutable.Record(defaultPartParams) {
           model = model.with(
             { responseMult: model.responseMult.set(id, ResponseMult.fromPersistence(item, id)) });
           break;
-        case 'hint':
-          model = model.with({ hints: model.hints.set(id, Hint.fromPersistence(item, id)) });
+        case 'skillref':
+          model = model.with({ skills: model.skills.add((item as any)
+            ['skillref']['@idref']) });
           break;
         case 'explanation':
-          model = model.with({ explanation: Html.fromPersistence((item as any).explanation, id) });
+          model = model.with({ explanation:
+            ContentElements.fromPersistence((item as any).explanation, id, ALT_FLOW_ELEMENTS) });
+          break;
+        case 'title':
+          model = model.with({ title: Title.fromPersistence(item, id) });
           break;
         default:
 
@@ -126,11 +134,13 @@ export class Part extends Immutable.Record(defaultPartParams) {
 
   toPersistence() : Object {
 
-    const explanation = this.explanation.toPersistence();
-
     const children = [
 
       this.title.toPersistence(),
+
+      ...this.skills
+        .toArray()
+        .map(skill => ({ skillref: { '@idref': skill } })),
 
       ...this.concepts
         .toArray()
@@ -142,19 +152,19 @@ export class Part extends Immutable.Record(defaultPartParams) {
         .toArray()
         .map(response => response.toPersistence()),
 
-      ...this.criteria
-        .toArray()
-        .map(item => item.toPersistence()),
-
       ...this.responseMult
         .toArray()
         .map(response => response.toPersistence()),
+
+      ...this.criteria
+        .toArray()
+        .map(item => item.toPersistence()),
 
       ...this.hints
         .toArray()
         .map(hint => hint.toPersistence()),
 
-      { explanation },
+        { explanation: { '#array': this.explanation.toPersistence() } },
     ];
 
     const part = {

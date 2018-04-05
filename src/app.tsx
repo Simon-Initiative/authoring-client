@@ -14,8 +14,9 @@ import history from './utils/history';
 import rootReducer from './reducers';
 import { loadCourse } from 'actions/course';
 import { AppContainer } from 'react-hot-loader';
-import initRegistry from './editors/content/common/draft/renderers/registrar';
 import initEditorRegistry from './editors/manager/registrar';
+import { registerContentTypes } from 'data/registrar';
+
 import { ApplicationRoot } from './ApplicationRoot';
 
 // import application styles
@@ -78,8 +79,8 @@ let CurrentApplicationRoot = ApplicationRoot;
 
 function main() {
   // Application specific initialization
-  initRegistry();
   initEditorRegistry();
+  registerContentTypes();
 
   let userInfo = null;
 

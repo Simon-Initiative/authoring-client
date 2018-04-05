@@ -24,6 +24,9 @@ import { UserState } from 'reducers/user';
 import { Row } from './Row';
 
 import { RegisterLocks, UnregisterLocks } from 'types/locks';
+import { LearningObjectivesModel } from 'data/models/objective';
+import { SkillsModel } from 'data/models/skill';
+import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './ObjectiveSkillView.scss';
 
@@ -143,6 +146,9 @@ export class ObjectiveSkillView
           this.releaseAllLocks([...aggregateModel.objectives, ...aggregateModel.skills]);
 
         } else {
+          
+          // Log objectives and skills
+          this.logObjectivesAndSkills(aggregateModel);
 
           if (aggregateModel.isLocked) {
 
@@ -172,6 +178,51 @@ export class ObjectiveSkillView
         }
 
       });
+  }
+
+  logObjectivesAndSkills(aggregateModel: AggregateModel) {
+    const { objectives, skills } = aggregateModel;
+
+    const objectiveObjects = objectives.map(objective => 
+      (objective.model as LearningObjectivesModel)
+        .objectives
+        .toArray()
+        .map(o => ({ title: o.title, id: o.id })));
+
+    const skillObjects = skills.map(skill => (skill.model as SkillsModel)
+        .skills
+        .toArray()
+        .map(s => ({ title: s.title, id: s.id })));
+
+    logger.group(
+      LogLevel.INFO,
+      LogTag.DEFAULT,
+      `Objective Details:`,
+      (logger) => {
+        objectiveObjects[0].forEach((objective) => {
+          logger
+          .setVisibility(LogAttribute.TAG, false)
+          .setVisibility(LogAttribute.DATE, false)
+          .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id})`);
+        });
+      },
+      LogStyle.HEADER + LogStyle.BLUE,
+    );
+
+    logger.group(
+      LogLevel.INFO,
+      LogTag.DEFAULT,
+      `Skill Details:`,
+      (logger) => {
+        skillObjects[0].forEach((skill) => {
+          logger
+          .setVisibility(LogAttribute.TAG, false)
+          .setVisibility(LogAttribute.DATE, false)
+          .info(LogTag.DEFAULT, `${skill.title} (${skill.id})`);
+        });
+      },
+      LogStyle.HEADER + LogStyle.BLUE,
+    );
   }
 
   saveCompleted() {

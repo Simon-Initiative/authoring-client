@@ -10,6 +10,7 @@ import { QuestionEditor } from '../../content/question/QuestionEditor';
 import { ContentEditor } from '../../content/content/ContentEditor';
 import { SelectionEditor } from '../../content/selection/SelectionEditor';
 import { LegacyTypes } from '../../../data/types';
+import { ParentContainer } from 'types/active';
 
 export type Props = {
   model: models.AssessmentModel | models.PoolModel,
@@ -17,27 +18,39 @@ export type Props = {
   context: AppContext,
   services: AppServices,
   skills: Immutable.OrderedMap<string, Skill>,
+  activeContentGuid: string;
+  hover: string;
+  onUpdateHover: (hover: string) => void;
 };
 
-export type EditHandler = (guid: string, node: contentTypes.Node) => void;
+export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
 
 export type RemoveHandler = (guid: string) => void;
 
+export type FocusHandler = (child: Object, parent: any, textSelection) => void;
+
 export function renderAssessmentNode(
-  n : models.Node, props: Props, onEdit: EditHandler, onRemove: RemoveHandler, canRemove: boolean) {
+  n : models.Node, props: Props, onEdit: EditHandler,
+  onRemove: RemoveHandler, onFocus: FocusHandler,
+  canRemove: boolean, parent: ParentContainer) {
 
   const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
 
   if (n.contentType === 'Question') {
     return <QuestionEditor
             key={n.guid}
+            parent={parent}
+            onFocus={onFocus}
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}
             allSkills={props.skills}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             canRemove={canRemove}
             onRemove={() => onRemove(n.guid)}
             />;
@@ -45,25 +58,35 @@ export function renderAssessmentNode(
   }
   if (n.contentType === 'Content') {
     return <ContentEditor
+            parent={parent}
             key={n.guid}
+            onFocus={onFocus}
             editMode={props.editMode}
             services={props.services}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
             />;
   }
   if (n.contentType === 'Selection') {
     return <SelectionEditor
+            parent={parent}
             key={n.guid}
+            onFocus={onFocus}
             isParentAssessmentGraded={isParentAssessmentGraded}
             editMode={props.editMode}
             services={props.services}
             context={props.context}
+            activeContentGuid={props.activeContentGuid}
+            hover={props.hover}
+            onUpdateHover={props.onUpdateHover}
             allSkills={props.skills}
             model={n}
-            onEdit={c => onEdit(n.guid, c)}
+            onEdit={(c, src) => onEdit(n.guid, c, src)}
             onRemove={() => onRemove(n.guid)}
             />;
   }

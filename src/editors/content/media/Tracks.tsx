@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import { Track } from '../../../data/content/html/track';
+import { Track } from 'data/content/learning/track';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TrackEditor } from './TrackEditor';
 
@@ -25,13 +25,6 @@ export class Tracks
     this.onAddClick = this.onAddClick.bind(this);
     this.onRemove = this.onRemove.bind(this);
     this.onEdit = this.onEdit.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.model !== this.props.model) {
-      return true;
-    }
-    return false;
   }
 
   onAddClick() {
@@ -58,28 +51,36 @@ export class Tracks
       />);
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+  renderMain() : JSX.Element {
 
     return (
       <div>
         <button onClick={this.onAddClick} type="button"
           className="btn btn-link btn-sm">Add Track</button>
-        <table className="table table-sm">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Source</th>
-              <th>Kind</th>
-              <th>Label</th>
-              <th>Language</th>
-              <th>Default</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.renderRows()}
-          </tbody>
-        </table>
+        {this.props.model.size > 0
+          ? <table className="table table-sm">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Source</th>
+                  <th>Kind</th>
+                  <th>Label</th>
+                  <th>Language</th>
+                  <th>Default</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.renderRows()}
+              </tbody>
+            </table>
+          : null}
       </div>
     );
   }

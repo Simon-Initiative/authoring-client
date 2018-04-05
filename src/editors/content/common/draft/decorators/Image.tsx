@@ -1,64 +1,40 @@
 import * as React from 'react';
 import { byType, Decorator } from './common';
-import { EntityTypes } from '../../../../../data/content/html/common';
-import ModalMediaEditor from '../../../media/ModalMediaEditor';
-import { ImageEditor } from '../../../media/ImageEditor';
+import { EntityTypes } from '../../../../../data/content/learning/common';
 import { buildUrl } from '../../../../../utils/path';
+import { ContentState } from 'draft-js';
+import { AppServices } from '../../../../common/AppServices';
+import { AppContext } from '../../../../common/AppContext';
+
 
 const IMAGE = require('../../../../../../assets/400x300.png');
 
-class Image extends React.PureComponent<any, any> {
 
-  a: any;
+interface ImageProps {
+  context: AppContext;
+  services: AppServices;
+  offsetKey: string;
+  contentState: ContentState;
+  entityKey: string;
+  onEdit: (c: ContentState) => void;
+  onDecoratorClick: (offsetKey) => void;
+}
+
+
+class Image extends React.PureComponent<ImageProps, any> {
 
   constructor(props) {
     super(props);
 
-    this.onClick = this.onClick.bind(this);
-
-  }
-
-  onClick() {
-    const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-
-    const b = this.props;
-    this.props.services.displayModal(
-      <ModalMediaEditor
-        editMode={true}
-        context={b.context}
-        services={b.services}
-
-        model={data.image}
-        onCancel={() => this.props.services.dismissModal()}
-        onInsert={(image) => {
-          this.props.services.dismissModal();
-
-          const updatedData = {
-            image,
-          };
-          const contentState = this.props.contentState.replaceEntityData(
-            this.props.entityKey, updatedData);
-
-          this.props.onEdit(contentState);
-        }
-      }>
-        <ImageEditor
-          model={data.image}
-          context={b.context}
-          services={b.services}
-          editMode={true}
-          onEdit={c => true}/>
-      </ModalMediaEditor>,
-    );
   }
 
   render() : JSX.Element {
 
     const data = this.props.contentState.getEntity(this.props.entityKey).getData();
-    const src = data.image.src;
+    const src = data.src;
 
     let fullSrc;
-    if (src === '') {
+    if (src === undefined || src === null || src === '') {
       fullSrc = IMAGE;
     } else {
       fullSrc = buildUrl(
@@ -71,10 +47,13 @@ class Image extends React.PureComponent<any, any> {
     return (
       <span data-offset-key={this.props.offsetKey}>
         <img
-          onClick={this.onClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            this.props.onDecoratorClick(this.props.entityKey);
+          }}
           src={fullSrc}
-          height={data.image.height}
-          width={data.image.width}
+          height={data.height}
+          width={data.width}
           />
       </span>
     );

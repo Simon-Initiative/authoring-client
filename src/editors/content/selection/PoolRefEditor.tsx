@@ -53,7 +53,19 @@ export class PoolRefEditor
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (nextProps.model !== this.props.model || nextState.title !== this.state.title);
+    if (nextProps.activeContentGuid !== this.props.activeContentGuid) {
+      return true;
+    }
+    if (nextProps.model !== this.props.model) {
+      return true;
+    }
+    if (nextProps.context !== this.props.context) {
+      return true;
+    }
+    if (nextState.title !== this.state.title) {
+      return true;
+    }
+    return false;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -98,7 +110,14 @@ export class PoolRefEditor
           onCancel={this.onCancel}/>);
   }
 
-  render() : JSX.Element {
+  renderSidebar() {
+    return null;
+  }
+  renderToolbar() {
+    return null;
+  }
+
+  renderMain() : JSX.Element {
 
     let details;
     if (this.props.model.idref === '') {
