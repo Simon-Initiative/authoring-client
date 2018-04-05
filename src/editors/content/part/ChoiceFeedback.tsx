@@ -199,17 +199,21 @@ export abstract class ChoiceFeedback
                       multiple
                       bsSize="small"
                       onChange={(selected) => {
-                        if (selected.length > 0) {
-                          this.onEditMatchSelections(response.guid, choices, selected);
 
-                          this.setState({
-                            invalidFeedback: invalidFeedback.set(response.guid, false),
-                          });
-                        } else {
-                          this.setState({
-                            invalidFeedback: invalidFeedback.set(response.guid, true),
-                          });
+                        if (this.getSelectedMatches(response, choices).length !== selected.length) {
+                          if (selected.length > 0) {
+                            this.onEditMatchSelections(response.guid, choices, selected);
+
+                            this.setState({
+                              invalidFeedback: invalidFeedback.set(response.guid, false),
+                            });
+                          } else {
+                            this.setState({
+                              invalidFeedback: invalidFeedback.set(response.guid, true),
+                            });
+                          }
                         }
+
                       }}
                       options={choices.map(c => c.guid)}
                       labelKey={id => choices.find(c => c.guid === id).value}

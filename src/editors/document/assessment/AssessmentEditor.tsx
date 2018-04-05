@@ -7,7 +7,7 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
-import { locateNextOfKin } from './utils';
+import { locateNextOfKin, findNodeByGuid } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
@@ -89,6 +89,32 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         || this.state.redoStackSize !== nextState.redoStackSize;
 
     return shouldUpdate;
+  }
+
+  componentWillReceiveProps(nextProps: AssessmentEditorProps) {
+
+
+    if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
+
+      const currentPage = this.getCurrentPage(nextProps);
+      const { activeContext, onSetCurrentNode } = this.props;
+
+      // Handle the case that the current node has changed externally,
+      // for instance, from an undo/redo
+      findNodeByGuid(currentPage.nodes, this.props.currentNode.guid)
+        .caseOf({
+
+          just: (currentNode) => {
+            onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+          },
+          nothing: () => {
+            locateNextOfKin(
+              this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
+              onSetCurrentNode(
+                activeContext.documentId.valueOr(null), node));
+          },
+        });
+    }
   }
 
   getCurrentPage(props) {
