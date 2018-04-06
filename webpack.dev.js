@@ -3,8 +3,9 @@ var webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+    mode: 'development',
     entry: {
-        app: ['react-hot-loader/patch', './src/app.tsx'],
+        app: ['./src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
@@ -99,6 +100,14 @@ module.exports = {
         ]
 
     },
+    optimization: {
+        namedModules: true,
+        splitChunks: {
+            name: 'vendor',
+        },
+        noEmitOnErrors: true,
+        concatenateModules: true,
+    },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
@@ -106,12 +115,5 @@ module.exports = {
             inject: false
         }),
         new webpack.HashedModuleIdsPlugin(),
-        new webpack.NamedModulesPlugin(),
-        new webpack.optimize.CommonsChunkPlugin({
-          name: 'vendor'
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-          name: 'manifest'
-        })
     ]
 };
