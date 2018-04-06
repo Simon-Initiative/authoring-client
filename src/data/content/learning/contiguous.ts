@@ -40,7 +40,7 @@ export enum InlineStyles {
   Italic = 'ITALIC',
   Strikethrough = 'STRIKETHROUGH',
   Highlight = 'HIGHLIGHT',
-  Code = 'CODE',
+  Var = 'VAR',
   Term = 'TERM',
   Foreign = 'FOREIGN',
   Subscript = 'SUBSCRIPT',
