@@ -66,8 +66,9 @@ export default {
     color: darkGray,
   },
   cornerHeader: {
-    height: '30px',
-    backgroundColor: 'transparent',
+    border: '1px solid ' + darkGray,
+    backgroundColor: lightGray,
+    height: '25px',
   },
   menuIcon: {
     color: darkGray,

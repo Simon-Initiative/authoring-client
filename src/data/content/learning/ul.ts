@@ -50,7 +50,7 @@ export class Ul extends Immutable.Record(defaultContent) {
 
   clone() : Ul {
     return this.with({
-      listItems: this.listItems.map(d => d.clone()).toOrderedMap(),
+      listItems: this.listItems.map(d => d.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 

@@ -54,7 +54,7 @@ export class Table extends Immutable.Record(defaultContent) {
   clone() : Table {
     return this.with({
       id: createGuid(),
-      rows: this.rows.map(r => r.clone()).toOrderedMap(),
+      rows: this.rows.map(r => r.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 

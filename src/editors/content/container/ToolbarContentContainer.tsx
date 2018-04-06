@@ -128,7 +128,7 @@ export class ToolbarContentContainer
             label={<i className={classNames(['fa fa-ellipsis-v', classes.moreLabel])}/>} >
           <button className="dropdown-item"
             onClick={() => {
-              this.onFormatEdit(text.toggleStyle(InlineStyles.Code, selection));
+              this.onFormatEdit(text.toggleStyle(InlineStyles.Var, selection));
             }}
             disabled={!formatEnabled}>
             <i className="fa fa-code"/> Code

@@ -7,7 +7,7 @@ import * as models from '../../../data/models';
 import * as contentTypes from '../../../data/contentTypes';
 import { LegacyTypes } from '../../../data/types';
 import guid from '../../../utils/guid';
-import { locateNextOfKin } from './utils';
+import { locateNextOfKin, findNodeByGuid } from './utils';
 import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
@@ -47,7 +47,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState>  {
 
-  pendingCurrentNode: Maybe<contentTypes.Node>;
   supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
@@ -68,7 +67,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.onFocus = this.onFocus.bind(this);
 
-    this.pendingCurrentNode = Maybe.nothing<contentTypes.Node>();
+    this.supportedElements = Immutable.List<string>();
 
     this.supportedElements = Immutable.List<string>();
 
@@ -92,6 +91,32 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         || this.state.redoStackSize !== nextState.redoStackSize;
 
     return shouldUpdate;
+  }
+
+  componentWillReceiveProps(nextProps: AssessmentEditorProps) {
+
+
+    if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
+
+      const currentPage = this.getCurrentPage(nextProps);
+      const { activeContext, onSetCurrentNode } = this.props;
+
+      // Handle the case that the current node has changed externally,
+      // for instance, from an undo/redo
+      findNodeByGuid(currentPage.nodes, this.props.currentNode.guid)
+        .caseOf({
+
+          just: (currentNode) => {
+            onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+          },
+          nothing: () => {
+            locateNextOfKin(
+              this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
+              onSetCurrentNode(
+                activeContext.documentId.valueOr(null), node));
+          },
+        });
+    }
   }
 
   getCurrentPage(props) {
@@ -129,7 +154,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
           // We detected an addition of a question to an embedded pool
           if (questions.size > prevQuestions.size) {
-            this.pendingCurrentNode = Maybe.just(questions.last());
+            this.props.onSetCurrentNode(
+              this.props.activeContext.documentId.valueOr(null), questions.last());
           }
 
         }
@@ -184,12 +210,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
 
     if (removed.size > 0) {
-
-      this.pendingCurrentNode = locateNextOfKin(page.nodes, guid);
+      locateNextOfKin(page.nodes, guid).lift(node =>
+        this.props.onSetCurrentNode(
+          this.props.activeContext.documentId.valueOr(null), node));
 
       page = page.with({ nodes: removed });
-
       const pages = this.props.model.pages.set(page.guid, page);
+
       this.handleEdit(this.props.model.with({ pages }));
     }
 
@@ -198,19 +225,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onAddContent() {
     let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
-    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   addQuestion(question: contentTypes.Question) {
     const content = question.with({ guid: guid() });
-    this.pendingCurrentNode = Maybe.just(content);
     this.addNode(content);
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
-    this.pendingCurrentNode = Maybe.just(pool);
     this.addNode(pool);
   }
 
@@ -220,6 +244,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const pages = this.props.model.pages.set(page.guid, page);
 
+    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), node);
     this.handleEdit(this.props.model.with({ pages }));
   }
 

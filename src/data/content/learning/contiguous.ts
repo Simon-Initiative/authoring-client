@@ -5,7 +5,7 @@ import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 import { TextSelection } from 'types/active';
-import { getEntities, removeInputRef as removeInputRefDraft,
+import { getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
   Changes, detectChanges, removeEntity as internalRemoveEntity} from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
@@ -40,7 +40,7 @@ export enum InlineStyles {
   Italic = 'ITALIC',
   Strikethrough = 'STRIKETHROUGH',
   Highlight = 'HIGHLIGHT',
-  Code = 'CODE',
+  Var = 'VAR',
   Term = 'TERM',
   Foreign = 'FOREIGN',
   Subscript = 'SUBSCRIPT',
@@ -86,8 +86,13 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   clone() : ContiguousText {
-    return this.with({
-      content: cloneContent(this.content),
+
+    const entities = getAllEntities(this.content);
+
+    const updated = entities.reduce((ct : ContiguousText, e) => ct.cloneEntity(e), this);
+
+    return updated.with({
+      content: cloneContent(updated.content),
     });
   }
 
@@ -167,6 +172,26 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       content: this.content.replaceEntityData(key, data),
       entityEditCount: this.entityEditCount + 1,
     });
+  }
+
+  cloneEntity(info: EntityInfo) {
+
+    // 'Cloning' the entity must involve removing it, and re-adding it so
+    // that it receives a unique key and is treated as a new entity by Draft.
+
+    const removed = this.removeEntity(info.entityKey);
+
+    const rawSelection = new SelectionState({
+      anchorKey: info.range.contentBlock.key,
+      focusKey: info.range.contentBlock.key,
+      anchorOffset: info.range.start,
+      focusOffset: info.range.end,
+    });
+    const selection = new TextSelection(rawSelection);
+
+    return removed.addEntity(
+      info.entity.type, info.entity.mutability === 'MUTABLE', info.entity.data.clone(), selection);
+
   }
 
   removeEntity(key: string) : ContiguousText {

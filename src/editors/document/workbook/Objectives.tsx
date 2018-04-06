@@ -90,8 +90,11 @@ export class Objectives
           multiple
           onChange={(selected: ObjTitle[]) => {
 
-            const model = Immutable.List(selected.map(s => s.id));
-            this.setState({ selected }, () => this.props.onEdit(model));
+            if (selected.length !== this.state.selected.length) {
+              const model = Immutable.List(selected.map(s => s.id));
+              this.setState({ selected }, () => this.props.onEdit(model));
+            }
+
           }}
           options={options}
           labelKey="title"

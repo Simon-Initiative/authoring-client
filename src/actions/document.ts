@@ -213,10 +213,10 @@ export function load(courseId: string, documentId: string) {
 
 export function release(documentId: string) {
   return function (dispatch, getState) {
-
     const editedDocument: EditedDocument = getState().documents.get(documentId);
-    editedDocument.persistence.destroy()
-      .then(result => dispatch(documentReleased(documentId)));
+    dispatch(documentReleased(documentId));
+
+    editedDocument.persistence.destroy();
   };
 }
 

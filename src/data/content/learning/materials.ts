@@ -42,7 +42,7 @@ export class Materials extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
-      content: this.content.map(c => this.clone()).toOrderedMap(),
+      content: this.content.map(c => c.clone().with({ guid: createGuid() })).toOrderedMap(),
     });
   }
 
