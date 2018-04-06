@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        app: ['./src/app.tsx'],
+        app: ['react-hot-loader/patch', './src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
@@ -80,7 +80,6 @@ module.exports = {
                     }
                 }]
             },
-            { test: /\.json$/, use: 'json-loader' },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
             { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
             { test: /\.tsx$/, use: [
