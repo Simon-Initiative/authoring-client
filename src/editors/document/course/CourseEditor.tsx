@@ -131,7 +131,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const adminRow = isAdmin
       ? <div className="row">
-        <div className="col-3">Administer</div>
+        <div className="col-3">Administrator</div>
         <div className="col-3">
           <Button
             editMode
@@ -148,8 +148,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
             Remove Package
           </Button>
         </div>
-        <div className="col-3">
-        </div>
+        <div className="col-3"></div>
       </div>
       : null;
 

@@ -1,13 +1,20 @@
-import { authenticatedFetch } from './common';
 import { configuration } from '../../actions/utils/config';
 import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 
-export function skillsDownload(courseId: string): Promise<File> {
+export function skillsDownload(courseId: string): Promise<void> {
   const method = 'GET';
-  // This URL throws a 404. What am I doing wrong
-  const url = `${configuration.baseUrl}/${courseId}/Idmodel/export`;
+  const url = `${configuration.baseUrl}/${courseId}/ldmodel/export`;
   const headers = getFormHeaders(credentials);
 
-  return authenticatedFetch({ method, url, headers }).then(res =>
-    (res as Promise<File>));
+  // tslint:disable-next-line:max-line-length
+  // from https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch/42274086#42274086
+  return fetch(url, { method, headers })
+    .then(res => res.blob())
+    .then((blob) => {
+      const dlUrl = (window as any).URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl;
+      a.download = 'Skills.zip';
+      a.click();
+    });
 }

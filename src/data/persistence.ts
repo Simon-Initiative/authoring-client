@@ -1,7 +1,7 @@
 export { Document } from './persistence/common';
 export { acquireLock, statusLock, releaseLock } from './persistence/lock';
 
-export { skillsUpload, skillsDownload } from './persistence/skills';
+export { skillsDownload } from './persistence/skills';
 
 export {
   fetchCourseResources,
