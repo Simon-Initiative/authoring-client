@@ -64,7 +64,15 @@ const styleMap = {
     textDecoration: 'underline',
   },
   TERM: {
-    textDecoration: 'underline',
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: 'green',
+  },
+  VAR: {
+    fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New',
+    fontSize: '14px',
+    backgroundColor: '#f8f9fa',
+    padding: '.2rem .4rem',
   },
   QUOTE: {
     fontStyle: 'italic',

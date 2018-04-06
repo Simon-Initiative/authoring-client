@@ -150,7 +150,7 @@ export default class BlockQuoteToolbar
           <ToolbarButton
               onClick={
                 () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Code, selection),
+                  text: model.text.toggleStyle(InlineStyles.Var, selection),
                 }))
               }
               disabled={noTextSelected || !editMode}
