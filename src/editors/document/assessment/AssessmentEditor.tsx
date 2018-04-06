@@ -69,8 +69,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     this.supportedElements = Immutable.List<string>();
 
-    this.supportedElements = Immutable.List<string>();
-
     if (hasUnknownSkill(props.model, props.context.skills)) {
       props.onFetchSkills(props.context.courseId);
     }

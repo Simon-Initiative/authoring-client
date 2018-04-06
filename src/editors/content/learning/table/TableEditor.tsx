@@ -176,6 +176,10 @@ export default class TableEditor
       style['height'] = '1px';
     }
 
+    const cellEditor = <CellEditor
+      {...this.props}
+      model={cell}
+      parent={noManualControl}
       onEdit={this.onCellEdit.bind(this, row)}
     />;
 
@@ -197,6 +201,7 @@ export default class TableEditor
         style={style}
         className={classNames([classes.cell, className])}
         colSpan={parseInt(cell.colspan, 10)}
+        rowSpan={parseInt(cell.rowspan, 10)}>
         {cellEditor}
       </th>
     );
