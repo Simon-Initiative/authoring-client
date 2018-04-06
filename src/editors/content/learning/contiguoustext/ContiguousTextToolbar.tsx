@@ -150,7 +150,7 @@ export default class ContiguousTextToolbar
           </ToolbarButton>
           <ToolbarButton
               onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Code, selection))
+                () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
               }
               disabled={noTextSelected || !editMode}
               tooltip="Code">

@@ -21,7 +21,7 @@ const styleContainers = {
   HIGHLIGHT: () => ({ em: { '@style': 'highlight' } }),
   STRIKETHROUGH: () => ({ em: { '@style': 'line-through' } }),
   OBLIQUE: () => ({ em: { '@style': 'oblique' } }),
-  CODE: () => ({ var: { } }),
+  VAR: () => ({ var: { } }),
   TERM: () => ({ term: { } }),
   IPA: () => ({ ipa: { } }),
   FOREIGN: () => ({ foreign: { } }),
@@ -58,6 +58,7 @@ const entityHandlers = {
   input_ref,
   cite,
   quote,
+  code,
   formula_begin,
   formula_end,
 };
@@ -644,6 +645,14 @@ function quote(s : common.RawEntityRange, text : string, entityMap : common.RawE
   const { data } = entityMap[s.key];
   return data.toPersistence();
 }
+
+
+function code(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
+}
+
 
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
