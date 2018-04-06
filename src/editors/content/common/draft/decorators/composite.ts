@@ -9,6 +9,7 @@ import activityLink from './ActivityLink';
 import xref from './Xref';
 import quote from './Quote';
 import image from './Image';
+import code from './Code';
 
 const decorators = [
   unsupported,
@@ -20,6 +21,7 @@ const decorators = [
   xref,
   quote,
   image,
+  code,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

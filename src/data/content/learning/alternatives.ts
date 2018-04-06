@@ -92,7 +92,7 @@ export class Alternatives extends Immutable.Record(defaultContent) {
     const children = [];
     this.title.lift(title => children.push(title.toPersistence()));
     this.default.lift(def => children.push(def.toPersistence()));
-    this.content.forEach(alt => children.push(alt.toPersistence));
+    this.content.forEach(alt => children.push(alt.toPersistence()));
 
     const s = {
       alternatives: {
