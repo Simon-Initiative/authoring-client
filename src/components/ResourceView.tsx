@@ -109,12 +109,13 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         key: r.guid,
         data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
       }));
-    
+
     const resources = rows.map(row => row.data as Resource);
     this.logResourceDetails(resources);
 
     const labels = [
       'Title',
+      'Unique ID',
       'Created',
       'Last Updated',
     ];
@@ -136,6 +137,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const comparators = [
       safeCompare,
+      // Add compariator for unique ID
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
@@ -146,6 +148,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const renderers = [
       r => link(r),
+      r => <span>{r.id}</span>,
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
       r => <span>{relativeToNow(
