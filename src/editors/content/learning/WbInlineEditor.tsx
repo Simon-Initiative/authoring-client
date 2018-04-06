@@ -105,9 +105,11 @@ export default class WbInlineEditor
   }
 
   renderMain() {
+    const resource = this.props.context.courseModel.resourcesById.get(this.props.model.idref);
+    const title = resource === undefined ? 'Loading...' : resource.title;
     return (
       <div className="wbinline">
-        <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
+        <h5>{title}</h5>
         <button
           onClick={this.onClick}
           type="button"

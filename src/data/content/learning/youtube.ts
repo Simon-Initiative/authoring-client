@@ -15,6 +15,7 @@ export type YouTubeParams = {
   src?: string,
   width?: string,
   height?: string,
+  controls?: boolean,
   popout?: Popout,
   alternate?: Alternate,
   titleContent?: Title,
@@ -30,6 +31,7 @@ const defaultContent = {
   src: 'C0DPdy98e4c',
   width: '500',
   height: '300',
+  controls: true,
   popout: new Popout(),
   alternate: new Alternate(),
   titleContent: new Title(),
@@ -46,6 +48,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
   src: string;
   width: string;
   height: string;
+  controls: boolean;
   popout: Popout;
   alternate: Alternate;
   titleContent: Title;
@@ -94,6 +97,9 @@ export class YouTube extends Immutable.Record(defaultContent) {
     }
     if (t['@width'] !== undefined) {
       model = model.with({ width: t['@width'] });
+    }
+    if (t['@controls'] !== undefined) {
+      model = model.with({ controls: t['@controls'] === 'true' });
     }
 
     getChildren(t).forEach((item) => {
@@ -144,6 +150,7 @@ export class YouTube extends Immutable.Record(defaultContent) {
         '@src': this.src === '' ? 'C0DPdy98e4c' : this.src,
         '@height': this.height,
         '@width': this.width,
+        '@controls': this.controls ? 'true' : 'false',
         '#array': children,
       },
     };

@@ -9,7 +9,7 @@ export type PopoutParams = {
 
 const defaultContent = {
   contentType: 'Popout',
-  enable: true,
+  enable: false,
   content: '',
   guid: '',
 };

@@ -74,12 +74,12 @@ function getInlineHandlers() {
       undefined, 'MUTABLE',
       common.EntityTypes.cite, 'cite', registeredTypes['cite']),
     em,
-    foreign: applyStyle.bind(undefined, 'UNDERLINE'),
-    ipa: applyStyle.bind(undefined, 'UNDERLINE'),
+    foreign: applyStyle.bind(undefined, 'FOREIGN'),
+    ipa: applyStyle.bind(undefined, 'IPA'),
     sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
     sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
-    term: applyStyle.bind(undefined, 'BOLD'),
-    var: applyStyle.bind(undefined, 'ITALIC'),
+    term: applyStyle.bind(undefined, 'TERM'),
+    var: applyStyle.bind(undefined, 'VAR'),
     image: imageInline,
     formula: formulaInline,
     '#math': hashMath,
@@ -89,7 +89,9 @@ function getInlineHandlers() {
     quote: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.quote, 'quote', registeredTypes['quote']),
-    code: insertEntity.bind(undefined, 'MUTABLE', common.EntityTypes.code),
+    code: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.code, 'code', registeredTypes['code']),
   };
   return inlineHandlers;
 }
