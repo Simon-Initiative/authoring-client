@@ -1,16 +1,15 @@
-import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as persistence from 'data/persistence';
-import * as models from 'data/models';
-import * as viewActions from 'actions/view';
-import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
-import { Resource } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
-import { SortableTable, SortDirection } from './common/SortableTable';
+import * as viewActions from 'actions/view';
+import { Resource } from 'data/content/resource';
+import * as models from 'data/models';
+import * as persistence from 'data/persistence';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 import { isNullOrUndefined } from 'util';
-import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
-
+import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
+import { LogAttribute, LogLevel, LogStyle, LogTag, logger } from 'utils/logger';
 import './ResourceView.scss';
+import { SortDirection, SortableTable } from './common/SortableTable';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
