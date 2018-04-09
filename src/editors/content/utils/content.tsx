@@ -34,6 +34,8 @@ export const CONTENT_COLORS = {
   Pronunciation: flatui.alizarin,
   Materials: distinct.distinctBrown,
   Hint: flatui.alizarin,
+  Alternatives: flatui.sunflower,
+  Alternative: flatui.pumpkin,
 };
 
 export const CONTENT_ICONS = {
@@ -64,6 +66,8 @@ export const CONTENT_ICONS = {
   Pronunciation: <i className={'fa fa-headphones'}/>,
   Materials: <i className={'fa fa-columns'}/>,
   Hint: <i className={'fa fa-hand-o-left'}/>,
+  Alternatives: <i className={'fa fa-cogs'}/>,
+  Alternative: <i className={'fa fa-cog'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
