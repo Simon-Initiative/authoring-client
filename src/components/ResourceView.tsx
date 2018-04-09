@@ -169,7 +169,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   renderCreation() {
     return (
-      <div style={{ display: 'inlineBlock' }} className="table-toolbar input-group">
+      <div className="table-toolbar input-group">
         <div className="flex-spacer"/>
         <form className="form-inline">
           <input type="text" ref="title"
