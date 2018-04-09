@@ -48,6 +48,7 @@ export class SortableTable
         0, SortDirection.Ascending),
     };
 
+    this.onSortChange = this.onSortChange.bind(this);
   }
 
 
@@ -69,7 +70,7 @@ export class SortableTable
     }
   }
 
-  onSortChange(sortColumnIndex) {
+  onSortChange(sortColumnIndex: number) {
 
     if (sortColumnIndex === this.state.sortColumnIndex) {
 
@@ -89,7 +90,7 @@ export class SortableTable
     }
   }
 
-  renderSortIndicator(isSorted) {
+  renderSortIndicator(isSorted: boolean) {
 
     let classes = 'fa fa-sort';
     if (isSorted) {
@@ -98,9 +99,9 @@ export class SortableTable
 
     return (
       <span>&nbsp;&nbsp;
-        <a onClick={this.onSortChange.bind(this, this.state.sortColumnIndex)}>
+        <a onClick={_ => this.onSortChange(this.state.sortColumnIndex)}>
           <span>
-          <i style={{ verticalAlign: 'center' }} className={classes}></i>
+          <i className={classes}></i>
           </span>
         </a>
       </span>
@@ -111,7 +112,7 @@ export class SortableTable
     return this.props.columnLabels
       .map((label, index) => {
         return (
-          <th key={label} onClick={this.onSortChange.bind(this, index)}>
+          <th key={label} onClick={_ => this.onSortChange(index)}>
             <a>{label}</a>
             {index === this.state.sortColumnIndex
               ? this.renderSortIndicator(true)
