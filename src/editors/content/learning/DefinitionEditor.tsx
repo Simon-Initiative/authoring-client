@@ -18,7 +18,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
 
-import styles from './Definition.styles';
+import { styles } from './Definition.styles';
 
 export interface DefinitionEditorProps
   extends AbstractContentEditorProps<contentTypes.Definition> {

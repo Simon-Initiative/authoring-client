@@ -14,7 +14,8 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { Maybe } from 'tsmonad';
-import styles from './Table.styles';
+
+import { styles } from './Table.styles';
 
 export interface CellEditorProps
   extends AbstractContentEditorProps<contentTypes.CellData | contentTypes.CellHeader> {

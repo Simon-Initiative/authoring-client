@@ -11,7 +11,6 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import styles from './Entity.style';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -25,7 +24,6 @@ export interface XrefEditorState {
 /**
  * React Component
  */
-@injectSheet(styles)
 export default class XrefEditor
   extends AbstractContentEditor
   <contentTypes.Xref, XrefEditorProps & JSSProps, XrefEditorState> {

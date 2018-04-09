@@ -7,7 +7,7 @@ import ContiguousTextEditor from 'editors/content/learning/contiguoustext/Contig
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockFormulaToolbar from './BlockFormulaToolbar.controller';
 
-import styles from './BlockFormula.style';
+import { styles } from './BlockFormula.styles';
 
 export interface BlockFormulaEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {

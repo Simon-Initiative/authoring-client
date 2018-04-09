@@ -25,7 +25,7 @@ import { AppServices } from 'editors/common/AppServices';
 
 const IMAGE = require('../../../../assets/400x300.png');
 
-import styles from './MediaElement.style';
+import { styles } from './MediaElement.styles';
 
 interface Size {
   width: number;

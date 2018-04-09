@@ -13,7 +13,7 @@ import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-import styles from './BlockQuote.style';
+import { styles } from './BlockQuote.styles';
 
 export interface BlockQuoteToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {

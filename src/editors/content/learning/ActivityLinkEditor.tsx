@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { injectSheet, JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { LinkTarget, PurposeTypes } from 'data/content/learning/common';
 import { Select } from '../common/controls';
@@ -10,7 +9,6 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import styles from './Entity.style';
 import { LegacyTypes } from 'data/types';
 
 export interface ActivityLinkEditorProps
@@ -25,7 +23,6 @@ export interface ActivityLinkEditorState {
 /**
  * React Component
  */
-@injectSheet(styles)
 export default class ActivityLinkEditor
     extends AbstractContentEditor
     <contentTypes.ActivityLink, ActivityLinkEditorProps & JSSProps, ActivityLinkEditorState> {

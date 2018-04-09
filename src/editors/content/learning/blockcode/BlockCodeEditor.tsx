@@ -10,7 +10,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
-import styles from './BlockCode.style';
+import { styles } from './BlockCode.styles';
 
 export interface BlockCodeEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {

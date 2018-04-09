@@ -1,7 +1,8 @@
+import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
-import chroma from 'chroma-js';
+import * as chroma from 'chroma-js';
 
-export default {
+export const styles: JSSStyles = {
   toolbarDropdown: {
     '& button': {
       cursor: 'pointer',

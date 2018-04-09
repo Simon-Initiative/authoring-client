@@ -14,7 +14,7 @@ import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
-import styles from './InsertToolbar.style';
+import { styles } from './InsertToolbar.style';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
@@ -32,7 +32,7 @@ export interface InsertToolbarProps {
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
   classes, onInsert, parentSupportsElementType, resourcePath, context,
   courseModel, onDisplayModal, onDismissModal,
-}: StyledComponentProps<InsertToolbarProps>) => {
+}) => {
   return (
     <React.Fragment>
       <ToolbarLayout.Inline>

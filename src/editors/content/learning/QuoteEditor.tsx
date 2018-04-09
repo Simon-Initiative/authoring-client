@@ -11,8 +11,6 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-import styles from './Entity.style';
-
 export interface QuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.Quote> {
   onShowSidebar: () => void;
@@ -25,7 +23,6 @@ export interface QuoteEditorState {
 /**
  * React Component
  */
-@injectSheet(styles)
 export default class QuoteEditor
     extends AbstractContentEditor
     <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
