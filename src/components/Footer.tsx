@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
+import { getVersion } from 'utils/buildinfo';
 
 import './Footer.scss';
 
@@ -46,6 +47,7 @@ class Footer extends React.PureComponent<FooterProps, {}> {
           </div>
         </div>
         <div className="footer-section right">
+          Course Editor v{getVersion()}
         </div>
       </footer>
     );

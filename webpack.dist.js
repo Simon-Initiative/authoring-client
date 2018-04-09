@@ -8,6 +8,7 @@ const pathsToClean = ['dist'];
 const cleanOptions = {};
 
 module.exports = {
+    mode: 'production',
     entry: {
         app: './src/app.tsx',
         vendor: [
@@ -54,6 +55,14 @@ module.exports = {
             utils: path.resolve(__dirname, 'src/utils'),
         },
     },
+    optimization: {
+        namedModules: true,
+        splitChunks: {
+            name: 'vendor',
+        },
+        noEmitOnErrors: true,
+        concatenateModules: true,
+    },
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
@@ -66,13 +75,6 @@ module.exports = {
          inject: false
       }),
       new webpack.HashedModuleIdsPlugin(),
-      new webpack.NamedModulesPlugin(),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor'
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'manifest'
-      }),
       new UglifyJsPlugin()
     ],
     module: {
@@ -93,7 +95,6 @@ module.exports = {
                     }
                 }]
             },
-            { test: /\.json$/, use: 'json-loader' },
             { test: /\.(png|gif|jpg|jpeg|svg)$/, use: 'file-loader' },
             { test: /\.ts$/, use: [ 'babel-loader', 'ts-loader'], exclude: /node_modules/ },
             { test: /\.tsx$/, use: ['babel-loader','ts-loader'], exclude: /node_modules/ }
