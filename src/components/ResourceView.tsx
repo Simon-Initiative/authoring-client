@@ -136,7 +136,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const comparators = [
       safeCompare,
-      // Add compariator for unique ID
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? a.id.localeCompare(b.id)
+        : b.id.localeCompare(a.id),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
