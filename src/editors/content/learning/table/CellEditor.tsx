@@ -22,7 +22,7 @@ export interface CellEditorProps
 }
 
 export interface CellEditorState {
-
+  hovering: boolean;
 }
 
 /**
@@ -35,6 +35,10 @@ export default class CellEditor
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      hovering: false,
+    };
   }
 
   onAlignmentChange(align) {
@@ -160,6 +164,7 @@ export default class CellEditor
 
   renderMain() : JSX.Element {
     const { className, classes, model, parent, activeContentGuid } = this.props;
+    const { hovering } = this.state;
 
     const cellClass =
       activeContentGuid === model.guid
@@ -179,15 +184,19 @@ export default class CellEditor
 
 
     return (
-      <div className={classNames([cellClass, className])}
+      <div className={classNames([cellClass, className, hovering && 'hovering'])}
+        onMouseOver={() => this.setState({ hovering: true })}
+        onMouseOut={() => this.setState({ hovering: false })}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
-        <ContentContainer
-          {...this.props}
-          hideSingleDecorator={hideDecorator}
-          bindProperties={bindProps}
-          model={this.props.model.content}
-          onEdit={this.onCellEdit.bind(this)}
-        />
+        <div onMouseOver={e => e.stopPropagation()} >
+          <ContentContainer
+            {...this.props}
+            hideSingleDecorator={hideDecorator}
+            bindProperties={bindProps}
+            model={this.props.model.content}
+            onEdit={this.onCellEdit.bind(this)}
+          />
+        </div>
       </div>
     );
   }

@@ -1,5 +1,9 @@
+import * as chroma from 'chroma-js';
 const darkGray = '#aaaaaa';
 const lightGray = '#eeeeee';
+
+const CELL_SELECTION_COLOR = '#b30000';
+const CELL_SELECTION_PADDING = 3;
 
 export default {
   table: {
@@ -26,14 +30,17 @@ export default {
     height: '100%',
     width: '100%',
     border: '2px solid transparent',
-    '&:hover': {
-      border: '2px solid #ff9999',
+    padding: CELL_SELECTION_PADDING,
+
+    '&.hovering': {
+      border: [2, 'solid ', chroma(CELL_SELECTION_COLOR).brighten(1).hex()],
     },
   },
   innerCellSelected: {
     height: '100%',
     width: '100%',
-    border: '2px solid #b30000',
+    border: [2, 'solid', CELL_SELECTION_COLOR],
+    padding: CELL_SELECTION_PADDING,
   },
   rowHeader: {
     width: '30px',
