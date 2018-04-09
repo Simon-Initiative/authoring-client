@@ -1,4 +1,7 @@
-FROM darrensiegel/frontend-base:latest
+FROM node:carbon
+
+# Install global dependencies that we need
+RUN npm install -g yarn jest
 
 EXPOSE 9000
 

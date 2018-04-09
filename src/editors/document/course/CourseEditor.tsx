@@ -5,7 +5,7 @@ import * as models from 'data/models';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
-
+import { Button } from 'editors/content/common/Button';
 
 import './CourseEditor.scss';
 
@@ -17,7 +17,6 @@ export interface CourseEditorProps {
   viewAllCourses: () => any;
   editMode: boolean;
 }
-
 
 interface CourseEditorState {
   selectedDevelopers: UserInfo[];
@@ -42,7 +41,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   onEditDevelopers(developers: UserInfo[]) {
-
     // For some reason the onChange callback for the Typeahead executes
     // twice for each UI-driven edit.  This check short-circuits the
     // second call.
@@ -101,7 +99,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     ];
   }
 
-
   renderDevelopers() {
 
     const developers = this.props.model.developers.toArray();
@@ -121,10 +118,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   removePackage() {
     persistence.deleteCoursePackage(this.props.model.guid)
-    .then((document) => {
-      this.props.viewAllCourses();
-    })
-    .catch(err => console.log(err));
+      .then((document) => {
+        this.props.viewAllCourses();
+      })
+      .catch(err => console.log(err));
   }
 
   render() {
@@ -134,15 +131,25 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     const adminRow = isAdmin
       ? <div className="row">
-          <div className="col-3">Administer</div>
-          <div className="col-9">
-          <button type="button"
-            className="btn btn-danger"
+        <div className="col-3">Administrator</div>
+        <div className="col-3">
+          <Button
+            editMode
+            type="outline-primary"
+            onClick={() => persistence.skillsDownload(this.props.model.guid)}>
+            <i className="fa fa-download" />&nbsp;Download Skill Files
+          </Button>
+        </div>
+        <div className="col-3">
+          <Button
+            editMode
+            type="outline-danger"
             onClick={this.removePackage.bind(this)}>
             Remove Package
-            </button>
-          </div>
+          </Button>
         </div>
+        <div className="col-3"></div>
+      </div>
       : null;
 
     return (
@@ -172,7 +179,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-9">{model.version}</div>
               </div>
               <div className="row">
-                <div className="col-3">Thumbnail<br/><br/>
+                <div className="col-3">Thumbnail<br /><br />
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
