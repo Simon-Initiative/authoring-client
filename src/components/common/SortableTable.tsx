@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './SortableTable.scss';
 
 // A reusable, sortable table component
 
@@ -88,16 +89,18 @@ export class SortableTable
     }
   }
 
-  renderSortIndicator() {
+  renderSortIndicator(isSorted) {
 
-    const classes = 'fa fa-sort-'
-      + (this.state.sortDirection === SortDirection.Ascending ? 'up' : 'down');
+    let classes = 'fa fa-sort';
+    if (isSorted) {
+      classes += this.state.sortDirection === SortDirection.Ascending ? '-up' : '-down';
+    }
 
     return (
-      <span>&nbsp;
+      <span>&nbsp;&nbsp;
         <a onClick={this.onSortChange.bind(this, this.state.sortColumnIndex)}>
           <span>
-          <i className={classes}></i>
+          <i style={{ verticalAlign: 'center' }} className={classes}></i>
           </span>
         </a>
       </span>
@@ -108,11 +111,11 @@ export class SortableTable
     return this.props.columnLabels
       .map((label, index) => {
         return (
-          <th key={label}>
-            <a onClick={this.onSortChange.bind(this, index)}>{label}</a>
+          <th key={label} onClick={this.onSortChange.bind(this, index)}>
+            <a>{label}</a>
             {index === this.state.sortColumnIndex
-              ? this.renderSortIndicator()
-              : null }
+              ? this.renderSortIndicator(true)
+              : this.renderSortIndicator(false) }
           </th>
         );
       });
@@ -131,7 +134,7 @@ export class SortableTable
 
   render() {
     return (
-      <table className="table table-sm table-striped table-hover">
+      <table className="table table-sm table-hover customTable">
         <thead>
         <tr>
           {this.renderColumnHeaders()}
