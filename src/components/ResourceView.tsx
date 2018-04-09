@@ -1,16 +1,15 @@
-import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as persistence from 'data/persistence';
-import * as models from 'data/models';
-import * as viewActions from 'actions/view';
-import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
-import { Resource } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';
-import { SortableTable, SortDirection } from './common/SortableTable';
+import * as viewActions from 'actions/view';
+import { Resource } from 'data/content/resource';
+import * as models from 'data/models';
+import * as persistence from 'data/persistence';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 import { isNullOrUndefined } from 'util';
-import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
-
+import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
+import { LogAttribute, LogLevel, LogStyle, LogTag, logger } from 'utils/logger';
 import './ResourceView.scss';
+import { SortDirection, SortableTable } from './common/SortableTable';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
@@ -109,33 +108,35 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         key: r.guid,
         data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
       }));
-    
+
     const resources = rows.map(row => row.data as Resource);
     this.logResourceDetails(resources);
 
     const labels = [
       'Title',
+      'Unique ID',
       'Created',
       'Last Updated',
     ];
 
-    const safeCompare = (direction, a, b) => {
-      if (a.title === null && b.title === null) {
+    const safeCompare = (property: string, direction: SortDirection, a: Resource, b: Resource) => {
+      if (a[property] === null && b[property] === null) {
         return 0;
       }
-      if (a.title === null) {
+      if (a[property] === null) {
         return direction === SortDirection.Ascending ? 1 : -1;
       }
-      if (b.title === null) {
+      if (b[property] === null) {
         return direction === SortDirection.Ascending ? -1 : 1;
       }
       return direction === SortDirection.Ascending
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title);
+        ? a[property].localeCompare(b[property])
+        : b[property].localeCompare(a[property]);
     };
 
     const comparators = [
-      safeCompare,
+      safeCompare.bind(undefined, 'title'),
+      safeCompare.bind(undefined, 'id'),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
@@ -146,6 +147,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
     const renderers = [
       r => link(r),
+      r => <span>{r.id}</span>,
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
       r => <span>{relativeToNow(
