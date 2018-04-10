@@ -1,6 +1,7 @@
+import { JSSStyles } from 'styles/jss';
 import distinct from 'styles/palettes/distinct';
 
-export default {
+export const styles: JSSStyles = {
   quoteWrapper: {
     borderLeft: '5px solid ' + distinct.distinctLavender,
   },

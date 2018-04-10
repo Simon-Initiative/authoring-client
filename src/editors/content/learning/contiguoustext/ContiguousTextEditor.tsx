@@ -6,13 +6,12 @@ import DraftWrapper from 'editors/content/common/draft/DraftWrapper';
 import {
   AbstractContentEditor, AbstractContentEditorProps, RenderContext,
 } from 'editors/content/common/AbstractContentEditor';
-
 import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
-import styles from './ContiguousText.styles';
+import { styles } from './ContiguousText.styles';
 
 export interface ContiguousTextEditorProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {

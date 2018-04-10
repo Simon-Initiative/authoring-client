@@ -10,8 +10,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-
-import styles from './Definition.styles';
+import { styles } from './Definition.styles';
 
 export interface MeaningEditorProps
   extends AbstractContentEditorProps<contentTypes.Meaning> {

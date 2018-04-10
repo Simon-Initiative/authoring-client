@@ -3,7 +3,7 @@ import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames as jssClassNames } from 'styles/jss';
 import { getContentIcon } from 'editors/content/utils/content';
 
-import styles from './ContentDecorator.style';
+import { styles } from './ContentDecorator.styles';
 
 export interface ContentDecoratorProps {
   onRemove: () => void;

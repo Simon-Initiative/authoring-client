@@ -24,8 +24,7 @@ import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuesti
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
 
-
-import styles, { SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.style';
+import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
 
 interface SidebarRowProps {
   label?: string;

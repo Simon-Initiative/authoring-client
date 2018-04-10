@@ -15,7 +15,8 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
-import styles from './Table.styles';
+
+import { styles } from './Table.styles';
 
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
