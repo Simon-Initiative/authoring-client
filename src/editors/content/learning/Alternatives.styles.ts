@@ -1,6 +1,10 @@
-const darkGray = '#aaaaaa';
-const lightGray = '#eeeeee';
+import { JSSStyles } from 'styles/jss';
 
-export default {
+export const styles: JSSStyles = {
+  alternatives: {
 
+  },
+  alternative: {
+    paddingLeft: '20px',
+  },
 };

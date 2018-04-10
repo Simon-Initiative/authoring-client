@@ -13,7 +13,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
-import styles from './Alternatives.styles';
+import { styles } from './Alternatives.styles';
 
 export interface AlternativeEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternative> {
@@ -51,8 +51,8 @@ export default class AlternativeEditor
     const { model, editMode } = this.props;
 
     return (
-      <SidebarContent title="Variant">
-        <SidebarGroup label="Key">
+      <SidebarContent title={model.value}>
+        <SidebarGroup label="Label">
           <TextInput
             editMode={editMode}
             value={model.value}
@@ -67,10 +67,10 @@ export default class AlternativeEditor
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, model } = this.props;
 
     return (
-      <ToolbarGroup label="Variant" columns={4} highlightColor={CONTENT_COLORS.CellData}>
+      <ToolbarGroup label={model.value} columns={4} highlightColor={CONTENT_COLORS.CellData}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-align-left"></i></div>
           <div>Key</div>

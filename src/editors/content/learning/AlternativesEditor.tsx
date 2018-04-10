@@ -13,11 +13,14 @@ import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/Toolbar
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../common/controls';
+import {
+  TabContainer, Tab,
+} from 'editors/content/common/TabContainer';
 import AlternativeEditor from './AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
-import styles from './Alternatives.styles';
+import { styles } from './Alternatives.styles';
 
 export interface AlternativesEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternatives> {
@@ -25,14 +28,15 @@ export interface AlternativesEditorProps
 }
 
 export interface AlternativesEditorState {
-  displayedAlternative: Maybe<string>;
+
 }
 
 @injectSheet(styles)
 export default class AlternativesEditor
     extends AbstractContentEditor<contentTypes.Alternatives,
     StyledComponentProps<AlternativesEditorProps>, AlternativesEditorState> {
-  selectionState: any;
+
+  defaultTabIndex: number;
 
   constructor(props : AlternativesEditorProps) {
     super(props);
@@ -40,35 +44,27 @@ export default class AlternativesEditor
     this.onGroupEdit = this.onGroupEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
 
-    const findMatchingAlt = (d: string) => {
-      const alt = props.model.content.find(alt => alt.value === d);
-      return alt === undefined || alt === null
-        ? props.model.content.first().guid
-        : alt.guid;
+    const findIndexOfValue = (value: string) => {
+      const arr = props.model.content.toArray();
+      for (let i = 0; i < arr.length; i += 1) {
+        if (arr[i].value === value) {
+          return i;
+        }
+      }
+      return 0;
     };
 
     // Initially display the default alternative as the selected
     // tab.  If no matching default, display first tab.
-    const displayedAlternative = props.model.default.caseOf({
-      just: (d) => {
-        return props.model.content.size > 0
-          ? Maybe.just(findMatchingAlt(d.content))
-          : Maybe.nothing<string>();
-      },
-      nothing: () => {
-        return props.model.content.size > 0
-          ? Maybe.just(props.model.content.first().guid)
-          : Maybe.nothing<string>();
-      },
+    this.defaultTabIndex = props.model.default.caseOf({
+      just: d => findIndexOfValue(d.content),
+      nothing: () => 0,
     });
 
-    this.state = {
-      displayedAlternative,
-    };
   }
 
   onGroupEdit(group) {
-    const model = this.props.model.with({ group });
+    const model = this.props.model.with({ group: Maybe.just(group) });
     this.props.onEdit(model, model);
   }
 
@@ -127,26 +123,36 @@ export default class AlternativesEditor
           <div><i className="fa fa-group"></i></div>
           <div>Group</div>
         </ToolbarButton>
+        <ToolbarButton onClick={this.onAlternativeAdd.bind(this)} size={ToolbarButtonSize.Large}>
+          <div><i className="fa fa-plus-square-o"></i></div>
+          <div>Add New</div>
+        </ToolbarButton>
       </ToolbarGroup>
     );
   }
 
-  onAlternativeEdit(a, src) {
+  onAlternativeEdit(a: contentTypes.Alternative, src) {
+
+    // If the value has been edited, sync that content into the title
+    const previous = this.props.model.content.get(a.guid);
+    const updated = a.value === previous.value
+      ? a
+      : a.with({ title: contentTypes.Title.fromText(a.value) });
 
     // Ignore the edit if it would result in multiple alternatives
     // having the same value
     if (this.props.model.content.find(
-      alt => a.guid !== alt.guid && a.value === alt.value)) {
+      alt => updated.guid !== alt.guid && updated.value === alt.value)) {
       return;
     }
 
     // Make sure if we have edited the value of the default that
     // we also change the default
-    const original = this.props.model.content.get(a.guid);
+    const original = this.props.model.content.get(updated.guid);
     const def = this.props.model.default.caseOf({
       just: (d) => {
         return d.content === original.value
-          ? Maybe.just(d.with({ content: a.value }))
+          ? Maybe.just(d.with({ content: updated.value }))
           : this.props.model.default;
       },
       nothing: () => this.props.model.default,
@@ -154,7 +160,7 @@ export default class AlternativesEditor
 
     const model = this.props.model
       .with({
-        content: this.props.model.content.set(a.guid, a),
+        content: this.props.model.content.set(updated.guid, updated),
         default: def,
       });
 
@@ -163,8 +169,9 @@ export default class AlternativesEditor
 
   onAlternativeRemove(a) {
 
-    // Do not allow removal of last alt
-    if (this.props.model.content.size === 1) {
+    // Do not allow removal of last two alts, this enforces
+    // a DTD constraint
+    if (this.props.model.content.size <= 2) {
       return;
     }
 
@@ -194,10 +201,10 @@ export default class AlternativesEditor
     // Generate a default value for the variant, ensuring we can
     // never have duplicates.
     let ordinal = this.props.model.content.size + 1;
-    let value = 'Variant-' + ordinal;
+    let value = 'Item-' + ordinal;
     while (this.props.model.content.find(c => c.value === value) !== undefined) {
       ordinal += 1;
-      value = 'Variant-' + ordinal;
+      value = 'Item-' + ordinal;
     }
 
     const a = new contentTypes.Alternative().with({
@@ -281,31 +288,18 @@ export default class AlternativesEditor
     );
   }
 
-  renderAlternativeTab(alternative: contentTypes.Alternative, active: string) {
+  onTabSelect(index: number) {
 
-    const value = alternative.value;
-    const classes = 'nav-link ' + (active === alternative.guid ? 'active' : '');
+    this.props.onFocus(
+      this.props.model.content.toArray()[index],
+      this.getSubstituteParent(), Maybe.nothing());
 
-    return (
-      <li className="nav-item" key={alternative.guid}>
-        <a className={classes}
-          onClick={this.onNavigate.bind(this, alternative.guid)}>{value}</a>
-      </li>
-    );
-  }
-
-  onNavigate(destination: string) {
-    this.setState({ displayedAlternative: Maybe.just(destination) }, () => {
-      this.props.onFocus(
-        this.props.model.content.get(destination),
-        this.getSubstituteParent(), Maybe.nothing());
-    });
   }
 
   renderEmpty() {
     return (
       <div>
-        Click 'Add new...' to insert variable content
+        Click 'Add new' to insert content
       </div>
     );
   }
@@ -314,31 +308,21 @@ export default class AlternativesEditor
 
     const { className, classes, model, editMode } = this.props;
 
-    const tabs = model.content.toArray().map((alt) => {
-      return this.renderAlternativeTab(
-        alt,
-        this.state.displayedAlternative.valueOr(''));
-    });
+    if (model.content.size === 0) {
+      return this.renderEmpty();
+    }
 
-    const current = this.state.displayedAlternative.caseOf({
-      just: (key) => {
-        return this.renderAlternative(
-          this.props.model.content.get(key),
-          this.props.model.default);
-      },
-      nothing: () => this.renderEmpty(),
-    });
+    const tabLabels = model.content.toArray().map(a => a.value);
 
     return (
       <div className={classNames([classes.alternatives, className])}>
-        <ul className="nav nav-tabs">
-          {tabs}
-          <li className="nav-item" key="addnew">
-            <a className="nav-link"
-              onClick={this.onAlternativeAdd.bind(this)}>+ Add Variant</a>
-          </li>
-        </ul>
-        {current}
+        <TabContainer
+          labels={tabLabels}
+          onTabSelect={this.onTabSelect.bind(this)}
+          defaultTabIndex={this.defaultTabIndex}>
+          {this.props.model.content.toArray().map(
+            a => this.renderAlternative(a, this.props.model.default))}
+        </TabContainer>
       </div>
     );
   }
