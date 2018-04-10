@@ -24,9 +24,6 @@ export interface AlternativeEditorState {
 
 }
 
-/**
- * The content editor for table cells.
- */
 @injectSheet(styles)
 export default class AlternativeEditor
     extends AbstractContentEditor<contentTypes.Alternative,
