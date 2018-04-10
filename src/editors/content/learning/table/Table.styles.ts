@@ -1,5 +1,5 @@
-import * as chroma from 'chroma-js';
 import { JSSStyles } from 'styles/jss';
+import colors from 'styles/colors';
 
 const darkGray = '#aaaaaa';
 const lightGray = '#eeeeee';
@@ -29,20 +29,35 @@ export const styles: JSSStyles = {
 
   },
   innerCell: {
+    position: 'relative',
     height: '100%',
     width: '100%',
     border: '2px solid transparent',
     padding: CELL_SELECTION_PADDING,
-
-    '&.hovering': {
-      border: [2, 'solid ', chroma(CELL_SELECTION_COLOR).brighten(1).hex()],
-    },
   },
   innerCellSelected: {
+    position: 'relative',
     height: '100%',
     width: '100%',
     border: [2, 'solid', CELL_SELECTION_COLOR],
     padding: CELL_SELECTION_PADDING,
+  },
+  innerCellChildSelected: {
+    '& $selectCell': {
+      display: 'initial',
+    },
+  },
+  selectCell: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    display: 'none',
+    color: colors.gray,
+    backgroundColor: colors.white,
+
+    '&:hover': {
+      color: colors.grayDarker,
+    },
   },
   rowHeader: {
     width: '30px',
