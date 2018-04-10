@@ -17,7 +17,7 @@ import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
 
-import styles from './ContiguousText.styles';
+import { styles } from './ContiguousText.styles';
 
 export interface ContiguousTextToolbarProps
   extends AbstractContentEditorProps<contentTypes.ContiguousText> {

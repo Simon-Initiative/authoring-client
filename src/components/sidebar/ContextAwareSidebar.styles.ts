@@ -1,3 +1,4 @@
+import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
@@ -6,7 +7,7 @@ export const SIDEBAR_CLOSE_ANIMATION_DURATION_MS = 200;
 
 const SIDEBAR_CLOSE_ANIMATION_DURATION_S = SIDEBAR_CLOSE_ANIMATION_DURATION_MS / 1000;
 
-export default {
+export const styles: JSSStyles = {
   contextAwareSidebar: {
     display: 'flex',
     flexDirection: 'column',

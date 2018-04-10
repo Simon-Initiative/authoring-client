@@ -1,6 +1,7 @@
+import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 
-export default {
+export const styles: JSSStyles = {
   materials: {
     paddingLeft: '25px',
     display: 'flex',

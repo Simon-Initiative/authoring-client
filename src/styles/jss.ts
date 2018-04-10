@@ -1,8 +1,13 @@
+import { CSSProperties } from 'react';
 import injectSheetJSS from 'react-jss';
 import { StyledComponentProps } from 'types/component';
 
 export interface JSSProps {
   classes?: any;
+}
+
+export interface JSSStyles {
+  [key: string]: CSSProperties | JSSStyles;
 }
 
 export const classNames = (names: string | string[]) => {

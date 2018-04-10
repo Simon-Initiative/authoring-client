@@ -1,3 +1,4 @@
+import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 
@@ -9,7 +10,7 @@ const TOOLBAR_COL_WIDTH = 36;
 const TOOLBAR_COL_HEIGHT = 32;
 const TOOLBAR_LABEL_HEIGHT = 22;
 
-export default {
+export const styles: JSSStyles = {
   toolbar: {
     extend: [disableSelect],
     display: 'flex',

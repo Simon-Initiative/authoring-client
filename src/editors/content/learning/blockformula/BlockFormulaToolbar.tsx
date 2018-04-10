@@ -13,7 +13,7 @@ import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-import styles from './BlockFormula.style';
+import { styles } from './BlockFormula.styles';
 
 export interface BlockFormulaToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockFormula> {

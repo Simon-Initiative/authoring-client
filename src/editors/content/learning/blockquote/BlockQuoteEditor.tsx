@@ -7,7 +7,7 @@ import ContiguousTextEditor from 'editors/content/learning/contiguoustext/Contig
 import { ContiguousText } from 'data/content/learning/contiguous';
 import BlockQuoteToolbar from './BlockQuoteToolbar.controller';
 
-import styles from './BlockQuote.style';
+import { styles } from './BlockQuote.styles';
 
 export interface BlockQuoteEditorProps
   extends AbstractContentEditorProps<contentTypes.BlockQuote> {

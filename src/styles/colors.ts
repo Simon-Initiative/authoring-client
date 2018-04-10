@@ -1,4 +1,4 @@
-import chroma from 'chroma-js';
+import * as chroma from 'chroma-js';
 import flatui from 'styles/palettes/flatui';
 
 // Base Colors

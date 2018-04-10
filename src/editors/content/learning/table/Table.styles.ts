@@ -1,11 +1,13 @@
 import * as chroma from 'chroma-js';
+import { JSSStyles } from 'styles/jss';
+
 const darkGray = '#aaaaaa';
 const lightGray = '#eeeeee';
 
 const CELL_SELECTION_COLOR = '#b30000';
 const CELL_SELECTION_PADDING = 3;
 
-export default {
+export const styles: JSSStyles = {
   table: {
     borderCollapse: 'collapse',
     backgroundColor: 'transparent',

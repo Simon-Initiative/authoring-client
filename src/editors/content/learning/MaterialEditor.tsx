@@ -9,7 +9,8 @@ import { ContentContainer, Layout } from 'editors/content/container/ContentConta
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import styles from './MaterialsEditor.styles';
+
+import { styles } from './MaterialsEditor.styles';
 
 export interface MaterialEditorProps
   extends AbstractContentEditorProps<contentTypes.Material> {

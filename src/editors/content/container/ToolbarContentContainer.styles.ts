@@ -1,6 +1,7 @@
 const BORDER_STYLE = '1px solid #ced4da';
+import { JSSStyles } from 'styles/jss';
 
-export default {
+export const styles: JSSStyles = {
   toolbarContentContainer: {
     display: 'flex',
     flexDirection: 'column',
