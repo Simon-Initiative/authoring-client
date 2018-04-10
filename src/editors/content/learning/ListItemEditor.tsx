@@ -10,7 +10,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 
-import styles from './List.styles';
+import { styles } from './List.styles';
 
 export interface ListItemEditorProps
   extends AbstractContentEditorProps<contentTypes.Li> {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { injectSheet, JSSProps, classNames } from 'styles/jss';
 
-import styles from './ToolbarDropdown.style';
+import { styles } from './ToolbarDropdown.styles';
 
 export enum ToolbarDropdownSize {
   Large = 'large',

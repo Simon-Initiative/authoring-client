@@ -1,7 +1,8 @@
+import { JSSStyles } from 'styles/jss';
 const darkGray = '#aaaaaa';
 const lightGray = '#eeeeee';
 
-export default {
+export const styles: JSSStyles = {
   table: {
     borderCollapse: 'collapse',
     backgroundColor: 'transparent',

@@ -1,4 +1,6 @@
-export default {
+import { JSSStyles } from 'styles/jss';
+
+export const styles: JSSStyles = {
   contiguousText: {
     padding: 5,
     backgroundColor: 'white',

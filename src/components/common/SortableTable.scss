@@ -1,0 +1,15 @@
+.customTable {
+  i {
+    color: #222;
+  }
+  th {
+    border-top: 0;
+    cursor: default;
+  }
+  th:first-child {
+    padding-left: 1.05rem;
+  }
+  td {
+    border-top: 0;
+  }
+}

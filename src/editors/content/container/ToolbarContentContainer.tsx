@@ -10,7 +10,7 @@ import { InlineStyles } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { TextSelection } from 'types/active';
 
-import styles from './ToolbarContentContainer.style';
+import { styles } from './ToolbarContentContainer.styles';
 
 export interface ToolbarContentContainerProps extends ContentContainerProps {
   className?: string;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
@@ -9,8 +9,6 @@ import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-
-import styles from './Entity.style';
 
 export interface MathEditorProps
   extends AbstractContentEditorProps<contentTypes.Math> {
@@ -24,7 +22,6 @@ export interface MathEditorState {
 /**
  * React Component
  */
-@injectSheet(styles)
 export default class MathEditor
     extends AbstractContentEditor
     <contentTypes.Math, MathEditorProps & JSSProps, MathEditorState> {

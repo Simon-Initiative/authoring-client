@@ -167,7 +167,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-9">{model.description}</div>
               </div>
               <div className="row">
-                <div className="col-3">Id</div>
+                <div className="col-3">Unique ID</div>
                 <div className="col-9">{model.id}</div>
               </div>
               <div className="row">
