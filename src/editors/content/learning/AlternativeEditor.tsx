@@ -3,7 +3,7 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import {
-  AbstractContentEditor, AbstractContentEditorProps, RenderContext,
+  AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';

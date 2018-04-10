@@ -9,13 +9,10 @@ import {
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../common/controls';
-import {
-  TabContainer, Tab,
-} from 'editors/content/common/TabContainer';
+import { TabContainer } from 'editors/content/common/TabContainer';
 import AlternativeEditor from './AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import guid from 'utils/guid';
@@ -75,8 +72,6 @@ export default class AlternativesEditor
   renderSidebar() {
     const { model } = this.props;
 
-    const title = model.title.caseOf({ just: t => t,
-      nothing: () => contentTypes.Title.fromText('') });
     const groupText = model.group.caseOf({ just: t => t, nothing: () => '' });
 
     const def = model.default.caseOf({
@@ -273,11 +268,6 @@ export default class AlternativesEditor
     alternative: contentTypes.Alternative,
     maybeDefault: Maybe<contentTypes.Default>) {
 
-    const isDefault = maybeDefault.caseOf({
-      just: d => d.content === alternative.value,
-      nothing: () => false,
-    });
-
     return (
       <AlternativeEditor
         {...this.props}
@@ -306,7 +296,7 @@ export default class AlternativesEditor
 
   renderMain() : JSX.Element {
 
-    const { className, classes, model, editMode } = this.props;
+    const { className, classes, model } = this.props;
 
     if (model.content.size === 0) {
       return this.renderEmpty();
