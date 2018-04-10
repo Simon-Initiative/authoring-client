@@ -11,7 +11,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../common/controls';
+import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
 import styles from './Alternatives.styles';
 
@@ -36,13 +36,14 @@ export default class AlternativeEditor
     super(props);
   }
 
-  onCellEdit(content, src) {
+  onAltEdit(content, src) {
     const model = this.props.model.with({ content });
     this.props.onEdit(model, src);
   }
 
-  onValueEdit(value) {
-    const model = this.props.model.with({ value });
+  onValueEdit(value: string) {
+    const spacesStripped = value.replace(' ', '');
+    const model = this.props.model.with({ value: spacesStripped });
     this.props.onEdit(model, model);
   }
 
@@ -51,11 +52,11 @@ export default class AlternativeEditor
 
     return (
       <SidebarContent title="Variant">
-        <SidebarGroup label="Label">
+        <SidebarGroup label="Key">
           <TextInput
             editMode={editMode}
             value={model.value}
-            type="number"
+            type="text"
             width="100%"
             label=""
             onEdit={this.onValueEdit.bind(this)}
@@ -74,14 +75,12 @@ export default class AlternativeEditor
           <div><i className="fa fa-align-left"></i></div>
           <div>Key</div>
         </ToolbarButton>
-
-
       </ToolbarGroup>
     );
   }
 
   renderMain() : JSX.Element {
-    const { className, classes, model, parent, activeContentGuid } = this.props;
+    const { className, classes, model, parent } = this.props;
 
     return (
       <div className={classNames([classes.alternative, className])}
@@ -89,7 +88,7 @@ export default class AlternativeEditor
         <ContentContainer
           {...this.props}
           model={this.props.model.content}
-          onEdit={this.onCellEdit.bind(this)}
+          onEdit={this.onAltEdit.bind(this)}
         />
       </div>
     );

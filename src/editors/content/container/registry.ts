@@ -33,6 +33,9 @@ import HintEditor from '../part/HintEditor';
 import QuoteEditor from '../learning/QuoteEditor';
 import MaterialsEditor from '../learning/MaterialsEditor';
 import MaterialEditor from '../learning/MaterialEditor';
+import AlternativesEditor from '../learning/AlternativesEditor';
+import AlternativeEditor from '../learning/AlternativeEditor';
+
 
 let registry = null;
 
@@ -82,4 +85,6 @@ function init() {
   registry['Pronunciation'] = connectSidebarActions()(PronunciationEditor);
   registry['Materials'] = connectSidebarActions()(MaterialsEditor);
   registry['Material'] = connectSidebarActions()(MaterialEditor);
+  registry['Alternatives'] = connectSidebarActions()(AlternativesEditor);
+  registry['Alternative'] = connectSidebarActions()(AlternativeEditor);
 }

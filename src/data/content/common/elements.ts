@@ -22,7 +22,7 @@ export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS];
 export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives', 'wb:inline'];
-export const BODY_ELEMENTS = [...MATERIAL_ELEMENTS, ...ELEMENTS_SEMANTIC];
+export const BODY_ELEMENTS = [...BOX_ELEMENTS, ...ELEMENTS_SEMANTIC];
 
 export type ContentElementsParams = {
   content?: Immutable.OrderedMap<string, ContentElement>,
