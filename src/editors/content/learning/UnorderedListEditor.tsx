@@ -16,7 +16,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select } from '../common/controls';
 import { Maybe } from 'tsmonad';
-import styles from './List.styles';
+import { styles } from './List.styles';
 
 export interface UnorderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ul> {

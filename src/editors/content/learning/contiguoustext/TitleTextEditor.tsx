@@ -8,7 +8,7 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Maybe } from 'tsmonad';
 import { ParentContainer, TextSelection } from 'types/active';
 
-import styles from './TitleTextEditor.style';
+import { styles } from './TitleTextEditor.styles';
 
 export interface TitleTextEditorProps {
   editorStyles?: any;

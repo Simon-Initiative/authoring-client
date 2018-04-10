@@ -12,7 +12,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { injectSheet } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 
-import styles from './Activity.style';
+import { styles } from './Activity.styles';
 
 export interface ActivityEditorProps extends AbstractContentEditorProps<contentTypes.Activity> {
   onShowSidebar: () => void;

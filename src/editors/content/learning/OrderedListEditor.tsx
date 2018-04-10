@@ -18,7 +18,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
 
-import styles from './List.styles';
+import { styles } from './List.styles';
 
 export interface OrderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ol> {
