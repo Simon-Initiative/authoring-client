@@ -1,22 +1,14 @@
 import * as React from 'react';
 
-import * as types from '../../data/types';
-import * as persistence from '../../data/persistence';
 import { Resource } from 'data/content/resource';
 import ModalSelection from './ModalSelection';
 import './ResourceSelection.scss';
-import { SortDirection, SortableTable } from 'components/common/SortableTable';
-import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
+import { SortDirection, SortableTable, DataRow } from 'components/common/SortableTable';
+import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 
-// export type SelectableResource = {
-//   id: types.DocumentId,
-//   type: string,
-//   title: string,
-// };
-
 export interface ResourceSelectionProps {
-  serverTimeSkewInMs: number;
+  timeSkewInMs: number;
   course: models.CourseModel;
   onInsert: (item: Resource) => void;
   onCancel: () => void;
@@ -25,7 +17,6 @@ export interface ResourceSelectionProps {
 }
 
 export interface ResourceSelectionState {
-  // resources: Resource[];
   selected: Resource;
 }
 
@@ -36,27 +27,14 @@ export default class ResourceSelection
     super(props);
 
     this.state = {
-      // resources: [],
       selected: undefined,
-      // { id: '', type: '', title: '' },
     };
   }
 
   render() {
 
     const link = (r: Resource) =>
-      <button onClick={_ => this.setState({ selected: r })}
-        className={this.state.selected &&
-          // how to inject this into the TR instead of the link?
-          r.guid === this.state.selected.guid
-            ? 'table-active'
-            : ''
-          + ' btn btn-link'}>{r.title}</button>;
-
-    // const active = r.guid === this.state.selected.id ? 'table-active' : '';
-    // return <tr key={r.guid} className={active}>
-    //   <td>{link(r)}</td>
-    // </tr>;
+      <button className={'btn btn-link'}>{r.title}</button>;
 
     const rows = this.props.course.resources
       .toArray()
@@ -92,12 +70,30 @@ export default class ResourceSelection
         : compareDates(b.dateCreated, a.dateCreated),
     ];
 
-    const renderers = [
-      r => link(r),
+    // r : Resource
+    const columnRenderers = [
+      r => <span style={{ fontWeight: 600 }}>{r.title}</span>,
       r => <span>{r.id}</span>,
       r => <span>{relativeToNow(
-        adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
+        adjustForSkew(r.dateCreated, this.props.timeSkewInMs))}</span>,
     ];
+
+
+    const rowRenderer = (item: DataRow, index: number, children: any) => {
+      const resource = item.data as Resource;
+      const active = resource.id === (this.state.selected && this.state.selected.id)
+        ? 'table-active'
+        : '';
+
+      return (
+        <tr
+          onClick={_ => this.setState({ selected: resource })}
+          key={item.key}
+          className={active}>
+          {children}
+        </tr>
+      );
+    };
 
     return (
       <ModalSelection
@@ -106,11 +102,10 @@ export default class ResourceSelection
         onInsert={() => this.props.onInsert(this.state.selected)}
         disableInsert={this.state.selected === undefined}>
         <SortableTable
-          // Create tr element function
-          // rowRenderer={() => {}}
+          rowRenderer={rowRenderer}
           model={rows}
           columnComparators={comparators}
-          columnRenderers={renderers}
+          columnRenderers={columnRenderers}
           columnLabels={labels}/>
       </ModalSelection>
     );

@@ -23,7 +23,7 @@ export interface SortableTable {
 
 }
 
-const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children) => {
+const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children: any) => {
   return (
     <tr key={item.key}>{children}</tr>
   );

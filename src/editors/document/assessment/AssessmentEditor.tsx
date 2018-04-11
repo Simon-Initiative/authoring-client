@@ -14,7 +14,6 @@ import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
 import { hasUnknownSkill } from 'utils/skills';
-import * as persistence from 'data/persistence';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
@@ -300,7 +299,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return;
     }
 
-    this.props.services.fetchIdByGuid(resource.id)
+    this.props.services.fetchIdByGuid(resource.guid)
     .then((idref) => {
       const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
       this.addNode(pool);

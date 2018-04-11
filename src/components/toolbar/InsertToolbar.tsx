@@ -7,7 +7,6 @@ import { ToolbarButton } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
-import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
@@ -206,7 +205,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 onInsert={(resource) => {
                   onDismissModal();
                   const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.guid === resource.id);
+                  const found = resources.find(r => r.id === resource.id);
                   if (found !== undefined) {
                     onInsert(new contentTypes.WbInline().with({ idref: found.id }));
                   }

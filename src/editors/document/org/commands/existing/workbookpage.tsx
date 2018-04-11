@@ -4,7 +4,6 @@ import { AbstractCommand } from '../command';
 import * as models from 'data/models';
 import * as t from 'data/contentTypes';
 import { LegacyTypes } from 'data/types';
-import * as persistence from 'data/persistence';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import createGuid from 'utils/guid';
 import { AppContext } from 'editors/common/AppContext';
@@ -14,12 +13,12 @@ import { Resource } from 'data/content/resource';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, reject, page) {
+  onInsert(org, parent, context, services, resolve, reject, page: Resource) {
 
     services.dismissModal();
 
     const resources = context.courseModel.resources.toArray();
-    const found = resources.find(r => r.guid === page.id);
+    const found = resources.find(r => r.id === page.id);
 
     const id = createGuid();
     const resourceref = new t.ResourceRef().with({ idref: found.id });

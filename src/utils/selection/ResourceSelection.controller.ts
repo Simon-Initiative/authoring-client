@@ -1,12 +1,10 @@
 import { connect } from 'react-redux';
-import { ServerState } from 'reducers/server';
 import ResourceSelection from './ResourceSelection';
 import * as models from 'data/models';
-import * as persistence from '../../data/persistence';
 import { Resource } from 'data/content/resource';
 
 interface StateProps {
-  serverTimeSkewInMs: number;
+  timeSkewInMs: number;
   course: models.CourseModel;
 }
 
@@ -23,12 +21,12 @@ interface OwnProps {
 
 const mapStateToProps = (state): StateProps => {
   const {
-    server: { serverTimeSkewInMs },
+    server: { timeSkewInMs },
     course,
   } = state;
 
   return {
-    serverTimeSkewInMs,
+    timeSkewInMs,
     course,
   };
 };
