@@ -8,6 +8,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import guid from 'utils/guid';
+import { Discoverable } from 'components/common/Discoverable.controller';
+import { DiscoverableId } from 'types/discoverable';
 
 import AceEditor from 'react-ace';
 
@@ -28,6 +30,7 @@ import './markers.scss';
 export interface CodeBlockProps
   extends AbstractContentEditorProps<CodeBlockType> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface CodeBlockState {
@@ -117,20 +120,22 @@ export default class CodeBlock
             onEdit={this.onStartEdit} />
         </SidebarGroup>
         <SidebarGroup label="Highlighting">
-          <TextInput
-            editMode={this.props.editMode}
-            width="100%"
-            type="text"
-            label=""
-            value={this.props.model.highlight}
-            onEdit={this.onHighlightEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockHighlighting}>
+            <TextInput
+              editMode={this.props.editMode}
+              width="100%"
+              type="text"
+              label=""
+              value={this.props.model.highlight}
+              onEdit={this.onHighlightEdit} />
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={6}>
@@ -143,7 +148,12 @@ export default class CodeBlock
           <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
             <i className="fa fa-sort-numeric-asc"/> Line Numbers
           </ToolbarButton>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.CodeBlockHighlighting);
+            }}
+            size={ToolbarButtonSize.Wide}>
             <i className="fa fa-eraser"/> Highlighting
           </ToolbarButton>
         </ToolbarLayout.Column>

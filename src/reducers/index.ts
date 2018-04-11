@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 
 import { choices, ChoicesState } from './choices';
 import { course, CourseState } from './course';
+import { discoverable, DiscoverableState } from './discoverable';
 import { editorSidebar, EditorSidebarState } from './editorSidebar';
 import { expanded, ExpandedState } from './expanded';
 import { hover, HoverState } from './hover';
@@ -23,6 +24,7 @@ export interface State {
   documents: DocumentsState;
   choices: ChoicesState;
   course: CourseState;
+  discoverable: DiscoverableState;
   editorSidebar: EditorSidebarState;
   expanded: ExpandedState;
   hover: HoverState;
@@ -43,6 +45,7 @@ const reducers = combineReducers({
   documents,      // The current state and models of documents under edit
   choices,        // Supporting data for choices
   course,         // Information about current course
+  discoverable,   // Global discoverable events
   editorSidebar,  // Editor sidebar state
   expanded,       // preserves expaned state of tree UIs
   hover,          // content hover state

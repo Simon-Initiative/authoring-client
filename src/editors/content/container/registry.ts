@@ -1,5 +1,5 @@
 import { connectSidebarActions } from './connectSidebarActions';
-import CodeBlockEditor from '../learning/CodeBlockEditor';
+import { CodeBlockEditor } from '../learning/CodeBlockEditor.controller';
 import ExampleEditor from '../learning/ExampleEditor';
 import PulloutEditor from '../learning/PulloutEditor';
 import SectionEditor from '../learning/SectionEditor';
