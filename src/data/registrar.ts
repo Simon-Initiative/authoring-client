@@ -9,6 +9,7 @@ export function registerContentTypes() {
   registerType('alternatives', ct.Alternatives.fromPersistence);
   registerType('audio', ct.Audio.fromPersistence);
   registerType('caption', ct.Caption.fromPersistence);
+  registerType('composite_activity', ct.Composite.fromPersistence);
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);
@@ -22,6 +23,7 @@ export function registerContentTypes() {
   registerType('example', ct.Example.fromPersistence);
   registerType('formula', ct.BlockFormula.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
+  registerType('instructions', ct.Instructions.fromPersistence);
   registerType('image', ct.Image.fromPersistence);
   registerType('li', ct.Li.fromPersistence);
   registerType('link', ct.Link.fromPersistence);

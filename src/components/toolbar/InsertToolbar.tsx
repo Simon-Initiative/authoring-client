@@ -196,6 +196,16 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-columns'}/>
         </ToolbarButton>
         <ToolbarButton
+            onClick={() => {
+
+              const composite = new contentTypes.Composite();
+              onInsert(composite);
+            }}
+            tooltip="Insert Composite Activity"
+            disabled={!parentSupportsElementType('composite_activity')}>
+          <i className={'fa fa-clone'}/>
+        </ToolbarButton>
+        <ToolbarButton
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(
