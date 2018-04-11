@@ -35,6 +35,9 @@ import MaterialsEditor from '../learning/MaterialsEditor';
 import MaterialEditor from '../learning/MaterialEditor';
 import CompositeEditor from '../learning/CompositeEditor';
 import InstructionsEditor from '../learning/InstructionsEditor';
+import AlternativesEditor from '../learning/AlternativesEditor';
+import AlternativeEditor from '../learning/AlternativeEditor';
+
 
 let registry = null;
 
@@ -86,4 +89,6 @@ function init() {
   registry['Material'] = connectSidebarActions()(MaterialEditor);
   registry['Composite'] = connectSidebarActions()(CompositeEditor);
   registry['Instructions'] = connectSidebarActions()(InstructionsEditor);
+  registry['Alternatives'] = connectSidebarActions()(AlternativesEditor);
+  registry['Alternative'] = connectSidebarActions()(AlternativeEditor);
 }

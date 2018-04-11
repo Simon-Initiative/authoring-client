@@ -197,13 +197,35 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {
-
               const composite = new contentTypes.Composite();
               onInsert(composite);
             }}
             tooltip="Insert Composite Activity"
             disabled={!parentSupportsElementType('composite_activity')}>
           <i className={'fa fa-clone'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => {
+              const alt1 = new contentTypes.Alternative().with({
+                value: 'Item-1',
+                title: contentTypes.Title.fromText('Item-1'),
+              });
+              const alt2 = new contentTypes.Alternative().with({
+                value: 'Item-2',
+                title: contentTypes.Title.fromText('Item-2'),
+              });
+
+              const alts = new contentTypes.Alternatives().with({
+                content: Immutable.OrderedMap<string, contentTypes.Alternative>()
+                  .set(alt1.guid, alt1)
+                  .set(alt2.guid, alt2),
+              });
+
+              onInsert(alts);
+            }}
+            tooltip="Insert Variable Content"
+            disabled={!parentSupportsElementType('alternatives')}>
+          <i className={'fa fa-cogs'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onDisplayModal(

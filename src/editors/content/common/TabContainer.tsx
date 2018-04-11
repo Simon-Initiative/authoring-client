@@ -12,6 +12,8 @@ export interface TabContainerProps {
   className?: string;
   labels: string[];
   controls?: JSX.Element[];
+  defaultTabIndex?: number;
+  onTabSelect?: (index: number) => void;
 }
 
 export interface TabContainerState {
@@ -21,18 +23,25 @@ export interface TabContainerState {
 export class TabContainer
   extends React.PureComponent<TabContainerProps, TabContainerState> {
 
-  constructor(props) {
+  constructor(props : TabContainerProps) {
     super(props);
 
+    const { defaultTabIndex = 0 } = props;
+
     this.state = {
-      currentTabIndex: 0,
+      currentTabIndex: defaultTabIndex,
     };
 
     this.onTabClick = this.onTabClick.bind(this);
   }
 
   onTabClick(index: number) {
-    this.setState({ currentTabIndex: index });
+    this.setState({ currentTabIndex: index }, () => {
+      const { onTabSelect } = this.props;
+      if (onTabSelect !== undefined) {
+        onTabSelect(index);
+      }
+    });
   }
 
   renderTabs() {
@@ -72,7 +81,7 @@ export class TabContainer
       <div className={`tab-container ${className || ''}`}>
         <div className="tab-header">
           {this.renderTabs()}
-          <div className="flex-spacer" />
+          <div className="tab-spacer flex-spacer" />
           {this.renderTabControls()}
         </div>
         <div className="tab-content">
