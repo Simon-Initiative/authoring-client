@@ -96,6 +96,12 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
 
   toPersistence() : Object {
 
+    const questions = this.questions.size > 0
+      ? this.questions
+      .toArray()
+      .map(item => item.toPersistence())
+      : [new Question().with({ id: createGuid() }).toPersistence()];
+
     const children = [
 
       this.title.toPersistence(),
@@ -110,9 +116,7 @@ export class Pool extends Immutable.Record(defaultPoolParams) {
         .toArray()
         .map(item => item.toPersistence()),
 
-      ...this.questions
-        .toArray()
-        .map(item => item.toPersistence()),
+      ...questions,
     ];
 
     return {
