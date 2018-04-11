@@ -52,7 +52,7 @@ export default class ListItemEditor
     const { className, classes, label } = this.props;
 
     return (
-      <div className={classNames([classes.listItem, className])}>
+      <div className={classNames(['ListItemEditor', classes.listItem, className])}>
         <div className={classNames([classes.listItemLabel, className])}>{label}</div>
         <div className={classNames([classes.listItemContent, className])}>
           <ContentContainer

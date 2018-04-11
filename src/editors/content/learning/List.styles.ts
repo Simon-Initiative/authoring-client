@@ -6,12 +6,16 @@ export const styles: JSSStyles = {
   },
   listItem: {
     display: 'flex',
+    marginLeft: 4,
   },
   listItemContent: {
     flexGrow: 1,
-    paddingLeft: 20,
+    paddingLeft: 26,
   },
   listItemLabel: {
-
+    paddingTop: 4,
+    fontSize: 18,
+    fontWeight: 600,
+    cursor: 'default',
   },
 };
