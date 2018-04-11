@@ -10,14 +10,12 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, WorkbookPageModel, AssessmentModel, PoolModel,
+  ModelTypes, ContentModel, AssessmentModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-import { ContentElements } from 'data/content/common/elements';
 import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
 import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
@@ -196,7 +194,7 @@ export class ContextAwareSidebar
 
   renderPageDetails() {
     const {
-      model, resource, context, services, editMode, currentPage, onSetCurrentPage,
+      model, resource, editMode, currentPage, onSetCurrentPage,
       onEditModel,
     } = this.props;
 
