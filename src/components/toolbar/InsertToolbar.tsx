@@ -5,7 +5,7 @@ import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
-import ResourceSelection from 'utils/selection/ResourceSelection';
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
 import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
@@ -14,6 +14,7 @@ import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
+import { Resource } from 'data/content/resource';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
@@ -199,7 +200,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(
-                  res: persistence.CourseResource): boolean =>
+                  res: Resource): boolean =>
                     res.type === LegacyTypes.inline}
                 courseId={context.courseId}
                 onInsert={(resource) => {
@@ -221,7 +222,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(
-                  res: persistence.CourseResource): boolean =>
+                  res: Resource): boolean =>
                     res.type === LegacyTypes.assessment2}
                 courseId={context.courseId}
                 onInsert={(resource) => {

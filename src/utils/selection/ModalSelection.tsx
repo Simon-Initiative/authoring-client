@@ -45,8 +45,8 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
               {this.props.children}
             </div>
             <div className="modal-footer">
-              <button 
-                disabled={disableInsert} 
+              <button
+                disabled={disableInsert}
                 type="button"
                 onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }
                 className="btn btn-primary">{okLabel}</button>

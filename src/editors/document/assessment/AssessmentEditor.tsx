@@ -20,8 +20,8 @@ import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.cont
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import ResourceSelection from 'utils/selection/ResourceSelection';
-
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { Resource } from 'data/content/resource';
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
@@ -276,7 +276,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onSelectPool() {
 
     const predicate =
-      (res: persistence.CourseResource) : boolean => {
+      (res: Resource) : boolean => {
         return res.type === LegacyTypes.assessment2_pool;
       };
 

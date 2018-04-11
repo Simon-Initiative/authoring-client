@@ -12,6 +12,8 @@ export type ColumnComparator = (direction: SortDirection, a: any, b: any) => num
 
 export type ColumnRenderer = (item: Object) => JSX.Element;
 
+export type RowRenderer = (item: DataRow, index: number, children: any) => JSX.Element;
+
 export type DataRow = {
   key: string;
   data: Object;
@@ -21,9 +23,16 @@ export interface SortableTable {
 
 }
 
+const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children) => {
+  return (
+    <tr key={item.key}>{children}</tr>
+  );
+};
+
 export interface SortableTableProps {
   columnLabels: string[];
   columnComparators: ColumnComparator[];
+  rowRenderer?: RowRenderer;
   columnRenderers: ColumnRenderer[];
   model: DataRow[];
 }
@@ -122,13 +131,18 @@ export class SortableTable
       });
   }
 
+
   renderRows() {
+    const rowRenderer = this.props.rowRenderer
+      ? this.props.rowRenderer
+      : defaultRowRenderer;
+
     return this.state.sortedModel
-      .map((row) => {
-        return (
-          <tr key={row.key}>
-            {this.props.columnRenderers.map((renderer, i) => <td key={i}>{renderer(row.data)}</td>)}
-          </tr>
+      .map((row, index) => {
+        return rowRenderer(
+          row,
+          index,
+          this.props.columnRenderers.map((renderer, i) => <td key={i}>{renderer(row.data)}</td>),
         );
       });
   }

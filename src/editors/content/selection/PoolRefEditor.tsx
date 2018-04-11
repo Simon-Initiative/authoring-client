@@ -1,9 +1,10 @@
 import * as React from 'react';
-import * as contentTypes from '../../../data/contentTypes';
-import * as persistence from '../../../data/persistence';
+import * as contentTypes from 'data/contentTypes';
+import * as persistence from 'data/persistence';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import ResourceSelection from '../../../utils/selection/ResourceSelection';
-import { LegacyTypes } from '../../../data/types';
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { LegacyTypes } from 'data/types';
+import { Resource } from 'data/content/resource';
 
 export interface PoolRefEditor {
   guid: string;
@@ -98,7 +99,7 @@ export class PoolRefEditor
   onClick() {
 
     const predicate =
-      (res: persistence.CourseResource) : boolean => {
+      (res: Resource) : boolean => {
         return res.type === LegacyTypes.assessment2_pool;
       };
 
