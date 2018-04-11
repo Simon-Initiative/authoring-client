@@ -23,7 +23,7 @@ export interface CellEditorProps
 }
 
 export interface CellEditorState {
-
+  activeChildGuid: string;
 }
 
 /**
@@ -36,6 +36,22 @@ export default class CellEditor
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      activeChildGuid: null,
+    };
+
+    this.onFocus = this.onFocus.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps: CellEditorProps) {
+    const { activeChildGuid } = this.state;
+
+    if (nextProps.activeContentGuid !== activeChildGuid) {
+      this.setState({
+        activeChildGuid: null,
+      });
+    }
   }
 
   onAlignmentChange(align) {
@@ -55,6 +71,14 @@ export default class CellEditor
     this.props.onEdit(model, src);
   }
 
+  onFocus(model: Object, parent, textSelection) {
+    const { onFocus } = this.props;
+
+    this.setState(
+      { activeChildGuid: (model as any).guid },
+      () => onFocus(model, parent, textSelection),
+    );
+  }
 
   render() : JSX.Element {
 
@@ -161,6 +185,7 @@ export default class CellEditor
 
   renderMain() : JSX.Element {
     const { className, classes, model, parent, activeContentGuid } = this.props;
+    const { activeChildGuid } = this.state;
 
     const cellClass =
       activeContentGuid === model.guid
@@ -178,17 +203,21 @@ export default class CellEditor
      (model.content.content.size === 1
       && model.content.content.first().contentType === 'ContiguousText');
 
-
     return (
-      <div className={classNames([cellClass, className])}
+      <div className={classNames([
+        cellClass, className, activeChildGuid && classes.innerCellChildSelected])}
         onClick={() => this.props.onFocus(model, parent, Maybe.nothing())}>
-        <ContentContainer
-          {...this.props}
-          hideSingleDecorator={hideDecorator}
-          bindProperties={bindProps}
-          model={this.props.model.content}
-          onEdit={this.onCellEdit.bind(this)}
-        />
+        <div>
+          <ContentContainer
+            {...this.props}
+            onFocus={this.onFocus}
+            hideSingleDecorator={hideDecorator}
+            bindProperties={bindProps}
+            model={this.props.model.content}
+            onEdit={this.onCellEdit.bind(this)}
+          />
+        </div>
+        <i className={classNames(['fa fa-caret-square-o-down', classes.selectCell])} />
       </div>
     );
   }

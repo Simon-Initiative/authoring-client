@@ -383,7 +383,7 @@ export default class TableEditor
     const headerRow = this.renderHeaderRow(maxColumns);
 
     return (
-      <div className={classNames([classes.tableEditor, className])}>
+      <div className={classNames(['TableEditor', classes.tableEditor, className])}>
         <table className={classNames([classes.table, className])}>
           <tbody>
           {headerRow}
