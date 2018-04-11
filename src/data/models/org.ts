@@ -75,7 +75,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     let model = new OrganizationModel();
 
     const a = (json as any);
-    model = model.with({ 
+    model = model.with({
       resource: contentTypes.Resource.fromPersistence(a),
       guid: a.guid,
       type: a.type,
@@ -120,7 +120,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           model = model.with(
             { audience: item['audience']['#text'] });
           break;
-        case 'preferences:preference_values':
+        case 'pref:preference_values':
           model = model.with(
             { preferenceValues: Maybe.just(item) });
           break;
@@ -134,7 +134,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
           model = model.with({ sequences: contentTypes.Sequences.fromPersistence(item, id) });
           break;
         default:
-          
+
       }
     });
 
@@ -145,7 +145,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
     const children : Object[] = [
       { title: { '#text': this.title } },
       { description: { '#text': this.description } }];
-    
+
     this.metadata.lift(m => children.push(m as any));
     children.push(({ audience: { '#text': this.audience } } as any));
     this.icon.lift(i => children.push(i.toPersistence()));
@@ -161,7 +161,7 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         '#array': children,
       },
     }];
-    
+
     this.product.lift(p => doc[0].organization['@product'] = p);
 
     const root = {
