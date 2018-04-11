@@ -6,6 +6,7 @@ import flatui from 'styles/palettes/flatui';
 export const CONTENT_COLORS = {
   ContiguousText: flatui.orange,
   CodeBlock: flatui.wetAsphalt,
+  Composite: flatui.belizeHole,
   Math: distinct.distinctLime,
   Cite: distinct.distinctMagenta,
   Xref: distinct.distinctMaroon,
@@ -19,6 +20,7 @@ export const CONTENT_COLORS = {
   Audio: flatui.pumpkin,
   Video: flatui.midnightBlue,
   IFrame: flatui.carrot,
+  Instructions: flatui.emerald,
   Ul: distinct.distinctOlive,
   Ol: distinct.distinctOlive,
   Li: distinct.distinctMint,
@@ -34,11 +36,14 @@ export const CONTENT_COLORS = {
   Pronunciation: flatui.alizarin,
   Materials: distinct.distinctBrown,
   Hint: flatui.alizarin,
+  Alternatives: flatui.sunflower,
+  Alternative: flatui.pumpkin,
 };
 
 export const CONTENT_ICONS = {
   ContiguousText: <i className="unicode-icon">T</i>,
   CodeBlock: <i className={'fa fa-code'}/>,
+  Composite: <i className={'fa fa-clone'}/>,
   BlockCode: <i className={'fa fa-code'}/>,
   Example: <i className={'fa fa-bar-chart'}/>,
   Pullout: <i className={'fa fa-external-link-square'}/>,
@@ -50,6 +55,7 @@ export const CONTENT_ICONS = {
   Activity: <i className={'fa fa-check'}/>,
   Video: <i className={'fa fa-film'}/>,
   IFrame: <i className={'fa fa-window-maximize'}/>,
+  Instructions: <i className={'fa fa-file-text'}/>,
   Ul: <i className={'fa fa-list-ul'}/>,
   Ol: <i className={'fa fa-list-ol'}/>,
   Li: <i className={'fa fa-list'}/>,
@@ -64,6 +70,8 @@ export const CONTENT_ICONS = {
   Pronunciation: <i className={'fa fa-headphones'}/>,
   Materials: <i className={'fa fa-columns'}/>,
   Hint: <i className={'fa fa-hand-o-left'}/>,
+  Alternatives: <i className={'fa fa-cogs'}/>,
+  Alternative: <i className={'fa fa-cog'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;
