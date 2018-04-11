@@ -14,6 +14,8 @@ import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
+import { Title } from 'data/content/learning/title';
+import { Maybe } from 'tsmonad';
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
@@ -194,6 +196,40 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             tooltip="Insert Horizontal Layout"
             disabled={!parentSupportsElementType('materials')}>
           <i className={'fa fa-columns'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => {
+              const composite = new contentTypes.Composite({
+                title: Maybe.just(Title.fromText('Title')),
+              });
+              onInsert(composite);
+            }}
+            tooltip="Insert Composite Activity"
+            disabled={!parentSupportsElementType('composite_activity')}>
+          <i className={'fa fa-clone'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => {
+              const alt1 = new contentTypes.Alternative().with({
+                value: 'Item-1',
+                title: contentTypes.Title.fromText('Item-1'),
+              });
+              const alt2 = new contentTypes.Alternative().with({
+                value: 'Item-2',
+                title: contentTypes.Title.fromText('Item-2'),
+              });
+
+              const alts = new contentTypes.Alternatives().with({
+                content: Immutable.OrderedMap<string, contentTypes.Alternative>()
+                  .set(alt1.guid, alt1)
+                  .set(alt2.guid, alt2),
+              });
+
+              onInsert(alts);
+            }}
+            tooltip="Insert Variable Content"
+            disabled={!parentSupportsElementType('alternatives')}>
+          <i className={'fa fa-cogs'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onDisplayModal(

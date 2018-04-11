@@ -73,12 +73,16 @@ export class Alternative extends Immutable.Record(defaultContent) {
   }
 
   toPersistence() : Object {
+    const content = this.content.content.size === 0
+      ? [{ p: { '#text': 'Placeholder' } }]
+      : this.content.toPersistence();
+
     const s = {
       alternative: {
         '@value': this.value,
         '#array': [
           this.title.toPersistence(),
-          ...this.content.toPersistence(),
+          ...content,
         ],
       },
     };
