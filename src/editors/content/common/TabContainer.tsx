@@ -81,7 +81,7 @@ export class TabContainer
       <div className={`tab-container ${className || ''}`}>
         <div className="tab-header">
           {this.renderTabs()}
-          <div className="flex-spacer" />
+          <div className="tab-spacer flex-spacer" />
           {this.renderTabControls()}
         </div>
         <div className="tab-content">
