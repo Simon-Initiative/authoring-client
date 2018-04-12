@@ -1,7 +1,6 @@
 import { AbstractCommand } from '../command';
 import * as models from 'data/models';
 import * as t from 'data/contentTypes';
-import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
 import createGuid from 'utils/guid';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource } from 'data/content/resource';

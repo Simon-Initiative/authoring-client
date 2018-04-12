@@ -1,7 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 
 import styles from './SearchBar.style';
 
