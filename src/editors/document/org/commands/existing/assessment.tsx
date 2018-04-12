@@ -3,8 +3,10 @@ import * as models from 'data/models';
 import * as t from 'data/contentTypes';
 import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
 import createGuid from 'utils/guid';
-
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { Resource } from 'data/content/resource';
 import { insertNode } from '../../utils';
+import { LegacyTypes } from 'data/types';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
@@ -32,13 +34,22 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
 
+    const predicate = (res: Resource) : boolean => {
+      return res.type === LegacyTypes.assessment2;
+    };
+
     return new Promise((resolve, reject) => {
       services.displayModal(
-        <AssessmentSelection
-          toDisplay={AssessmentsToDisplay.Summative}
+        <ResourceSelection
+          filterPredicate={predicate}
           courseId={context.courseId}
           onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
+        // <AssessmentSelection
+        //   toDisplay={AssessmentsToDisplay.Summative}
+        //   courseId={context.courseId}
+        //   onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
+        //   onCancel={this.onCancel.bind(this, services)}/>);
     });
   }
 }

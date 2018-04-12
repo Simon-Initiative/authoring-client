@@ -131,7 +131,6 @@ export class SortableTable
       });
   }
 
-
   renderRows() {
     const rowRenderer = this.props.rowRenderer
       ? this.props.rowRenderer
@@ -151,16 +150,14 @@ export class SortableTable
     return (
       <table className="table table-sm table-hover customTable">
         <thead>
-        <tr>
-          {this.renderColumnHeaders()}
-        </tr>
+          <tr>
+            {this.renderColumnHeaders()}
+          </tr>
         </thead>
         <tbody>
-        {this.renderRows()}
+          {this.renderRows()}
         </tbody>
       </table>
     );
   }
-
 }
-

@@ -5,11 +5,10 @@
   th {
     border-top: 0;
     cursor: default;
-  }
-  th:first-child {
-    padding-left: 1.05rem;
+    min-width: 130px;
   }
   td {
     border-top: 0;
+    text-overflow: ellipsis;
   }
 }

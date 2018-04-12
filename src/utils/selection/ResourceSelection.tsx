@@ -6,6 +6,7 @@ import './ResourceSelection.scss';
 import { SortDirection, SortableTable, DataRow } from 'components/common/SortableTable';
 import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
+import SearchBar from 'components/common/SearchBar';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
@@ -18,6 +19,8 @@ export interface ResourceSelectionProps {
 
 export interface ResourceSelectionState {
   selected: Resource;
+  searchText: string;
+  resources: Resource[];
 }
 
 export default class ResourceSelection
@@ -28,19 +31,40 @@ export default class ResourceSelection
 
     this.state = {
       selected: undefined,
+      searchText: '',
+      resources: this.getFilteredRows(),
     };
   }
 
-  render() {
-
-    const link = (r: Resource) =>
-      <button className={'btn btn-link'}>{r.title}</button>;
-
-    const rows = this.props.course.resources
+  getFilteredRows(): Resource[] {
+    return this.props.course.resources
       .toArray()
-      .filter(this.props.filterPredicate)
-      .map(r => ({ key: r.guid, data: r }));
+      .filter(this.props.filterPredicate);
+  }
 
+  // Filter resources shown based on title and id
+  filterBySearchText(searchText: string): void {
+    // searchText state used for highlighting matches
+    this.setState({ searchText });
+
+    const text = searchText.trim().toLowerCase();
+    const filterFn = (r) => {
+      const { title, id } = r;
+      const titleLower = title.toLowerCase();
+      const idLower = id.toLowerCase();
+
+      return text === '' ||
+             titleLower.indexOf(text) > -1 ||
+             idLower.indexOf(text) > -1;
+    };
+
+    // one row in table for each resource in state
+    this.setState({
+      resources: this.getFilteredRows().filter(filterFn),
+    });
+  }
+
+  render() {
     const labels = [
       'Title',
       'Unique ID',
@@ -63,8 +87,8 @@ export default class ResourceSelection
     };
 
     const comparators = [
-      safeCompare.bind(undefined, 'title'),
-      safeCompare.bind(undefined, 'id'),
+      (direction, a, b) => safeCompare('title', direction, a, b),
+      (direction, a, b) => safeCompare('id', direction, a, b),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
@@ -72,12 +96,43 @@ export default class ResourceSelection
 
     // r : Resource
     const columnRenderers = [
-      r => <span style={{ fontWeight: 600 }}>{r.title}</span>,
-      r => <span>{r.id}</span>,
+      r => highlightMatches('title', r),
+      r => highlightMatches('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.timeSkewInMs))}</span>,
     ];
 
+
+    // This is extremely slow - how to fix?
+
+    // Split the text into matched/unmatched segments to
+    // allow each matched segment to be highlighted
+    const highlightMatches = (prop: string, r: Resource) => {
+      const textToSearchIn = r[prop].trim().toLowerCase();
+      const { searchText } = this.state;
+      const splitText = textToSearchIn.split(searchText);
+
+      return (
+        <span>
+          {splitText.map(
+            (part, i) => highlightMatch(part, searchText, i, splitText.length))}
+        </span>
+      );
+    };
+
+    // Highlight the matched segment. Splitting text on a delimiter
+    // removes the delimiter from the resulting array, so we need to add
+    // it back in after each segment.
+    const highlightMatch = (unmatchedText, matchedText, i, length) => {
+      return (
+        <span key={i}>{unmatchedText}
+          {/* Don't insert an extra match at the end */}
+          { i !== length - 1
+              ? <span className={'searchMatch'}>{matchedText}</span>
+              : null }
+        </span>
+      );
+    };
 
     const rowRenderer = (item: DataRow, index: number, children: any) => {
       const resource = item.data as Resource;
@@ -95,12 +150,18 @@ export default class ResourceSelection
       );
     };
 
+    const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
+
     return (
       <ModalSelection
         title="Select Resource"
         onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}
         disableInsert={this.state.selected === undefined}>
+        <SearchBar
+          placeholder="Search by Title or Unique ID"
+          onChange={searchText => this.filterBySearchText(searchText)}
+        />
         <SortableTable
           rowRenderer={rowRenderer}
           model={rows}
