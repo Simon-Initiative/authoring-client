@@ -16,6 +16,7 @@ export const styles: JSSStyles = {
     display: 'flex',
     flexDirection: 'row',
     overflowX: 'auto',
+    overflowY: 'hidden',
     padding: 5,
     paddingBottom: 8,
     height: 100,
@@ -29,6 +30,7 @@ export const styles: JSSStyles = {
   },
   toolbarGroupContainer: {
     overflowX: 'hidden',
+    overflowY: 'hidden',
     height: (TOOLBAR_COL_HEIGHT * 2) + TOOLBAR_LABEL_HEIGHT,
     flexShrink: 0,
     maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
