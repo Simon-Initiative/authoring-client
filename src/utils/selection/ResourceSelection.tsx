@@ -71,24 +71,31 @@ export default class ResourceSelection
       'Last Updated',
     ];
 
-    const safeCompare = (property: string, direction: SortDirection, a, b) => {
-      if (a[property] === null && b[property] === null) {
+    const safeCompare =
+    (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
+      if (a[primaryKey] === null && b[primaryKey] === null) {
         return 0;
       }
-      if (a[property] === null) {
+      if (a[primaryKey] === null) {
         return direction === SortDirection.Ascending ? 1 : -1;
       }
-      if (b[property] === null) {
+      if (b[primaryKey] === null) {
         return direction === SortDirection.Ascending ? -1 : 1;
       }
+      if (a[primaryKey] === b[primaryKey]) {
+        if (a[secondaryKey] === b[secondaryKey]) {
+          return 0;
+        }
+        return safeCompare(secondaryKey, primaryKey, direction, a, b);
+      }
       return direction === SortDirection.Ascending
-        ? a[property].localeCompare(b[property])
-        : b[property].localeCompare(a[property]);
+        ? a[primaryKey].localeCompare(b[primaryKey])
+        : b[primaryKey].localeCompare(a[primaryKey]);
     };
 
     const comparators = [
-      (direction, a, b) => safeCompare('title', direction, a, b),
-      (direction, a, b) => safeCompare('id', direction, a, b),
+      (direction, a, b) => safeCompare('title', 'id', direction, a, b),
+      (direction, a, b) => safeCompare('id', 'title', direction, a, b),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
@@ -96,41 +103,64 @@ export default class ResourceSelection
 
     // r : Resource
     const columnRenderers = [
-      r => highlightMatches('title', r),
-      r => highlightMatches('id', r),
+      r => this.state.searchText.length < 3 ? <span>{r.title}</span> : highlightMatches('title', r),
+      r => this.state.searchText.length < 3 ? <span>{r.id}</span> : highlightMatches('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.timeSkewInMs))}</span>,
     ];
 
 
-    // This is extremely slow - how to fix?
+    const cache = {};
 
     // Split the text into matched/unmatched segments to
     // allow each matched segment to be highlighted
-    const highlightMatches = (prop: string, r: Resource) => {
+    const highlightMatches = (prop: string, r: Resource): JSX.Element => {
       const textToSearchIn = r[prop].trim().toLowerCase();
       const { searchText } = this.state;
-      const splitText = textToSearchIn.split(searchText);
+      const key = searchText + '|' + textToSearchIn;
+      if (cache[key]) {
+        return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
+      }
 
-      return (
-        <span>
-          {splitText.map(
-            (part, i) => highlightMatch(part, searchText, i, splitText.length))}
-        </span>
-      );
+      // const splitText = textToSearchIn.split(searchText);
+      const regExp = new RegExp(searchText);
+      const value =
+        // <span>
+        //   {splitText.map(
+        //     (part, i) => highlightMatch(part, searchText, i, splitText.length, textToSearchIn))}
+        // </span>;
+        '<span>' +
+          textToSearchIn.replace(regExp, '<span class="searchMatch">' + searchText + '</span>') +
+        '</span>';
+
+      cache[key] = value;
+      return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
     };
 
     // Highlight the matched segment. Splitting text on a delimiter
     // removes the delimiter from the resulting array, so we need to add
     // it back in after each segment.
-    const highlightMatch = (unmatchedText, matchedText, i, length) => {
+    const highlightMatch = (unmatchedText, matchedText, i, length, wholeText) => {
       return (
-        <span key={i}>{unmatchedText}
-          {/* Don't insert an extra match at the end */}
-          { i !== length - 1
-              ? <span className={'searchMatch'}>{matchedText}</span>
-              : null }
-        </span>
+
+        // function createMarkup() {
+        //   return {__html: 'First &middot; Second'};
+        // }
+
+        // function MyComponent() {
+        //   return <div dangerouslySetInnerHTML={createMarkup()} />;
+        // }
+        '<span>' + unmatchedText +
+        (i !== length - 1
+              ? ('<span class="searchMatch">' + matchedText + '</span>')
+              : '') +
+        '</span>'
+        // <span key={wholeText + i}>{unmatchedText}
+        //   {/* Don't insert an extra match at the end */}
+        //   { i !== length - 1
+        //       ? <span className={'searchMatch'}>{matchedText}</span>
+        //       : null }
+        // </span>
       );
     };
 
