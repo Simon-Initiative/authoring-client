@@ -2,12 +2,13 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { PoolTitleEditor } from './PoolTitleEditor';
 import { Select, TextInput } from '../common/controls';
 import { AddQuestion } from '../question/AddQuestion';
 import { PoolRefEditor } from './PoolRefEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
+import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
+import { ContiguousText } from 'data/content/learning/contiguous';
 
 import './SelectionEditor.scss';
 
@@ -81,10 +82,16 @@ export class SelectionEditor
     }
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(ct: ContiguousText, sourceObject) {
+
     if (this.props.model.source.contentType === 'Pool') {
+      const content = this.props.model.source.title.text.content.set(ct.guid, ct);
+      const text = this.props.model.source.title.text.with({ content });
+      const title = this.props.model.source.title.with({ text });
       const source = this.props.model.source.with({ title });
-      this.props.onEdit(this.props.model.with({ source }));
+      const model = this.props.model.with({ source });
+
+      this.props.onEdit(model, sourceObject);
     }
   }
 
@@ -107,6 +114,7 @@ export class SelectionEditor
   }
 
   renderMain() : JSX.Element {
+
     const controls = (
       <div className="controls">
         {
@@ -157,14 +165,12 @@ export class SelectionEditor
     let titleEditor = null;
     if (this.props.model.source.contentType === 'Pool') {
       titleEditor =
-            <PoolTitleEditor
-              {...this.props}
-              services={this.props.services}
-              context={this.props.context}
-              editMode={this.props.editMode}
-              model={this.props.model.source.title}
-              onEdit={this.onTitleEdit}
-            />;
+        <TitleTextEditor
+          {...this.props}
+          model={(this.props.model.source
+            .title.text.content.first() as ContiguousText)}
+          onEdit={this.onTitleEdit}
+          editorStyles={{ fontSize: 20 }} />;
 
     }
 

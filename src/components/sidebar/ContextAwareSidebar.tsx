@@ -10,14 +10,12 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
-import { ToolbarContentContainer } from 'editors/content/container/ToolbarContentContainer';
 import { Resource } from 'data/content/resource';
 import {
-  ModelTypes, ContentModel, WorkbookPageModel, AssessmentModel, PoolModel,
+  ModelTypes, ContentModel, AssessmentModel,
 } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
-import { ContentElements } from 'data/content/common/elements';
 import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
 import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
@@ -92,7 +90,7 @@ export const SidebarContent = injectSheetSFC<SidebarContentProps>(styles)(({
 
 interface SidebarGroupProps {
   className?: string;
-  label: string;
+  label?: string;
 }
 
 /**
@@ -142,47 +140,9 @@ export class ContextAwareSidebar
   constructor(props) {
     super(props);
 
-    this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onRemovePage = this.onRemovePage.bind(this);
     this.onPageEdit = this.onPageEdit.bind(this);
     this.onAddPage = this.onAddPage.bind(this);
-  }
-
-  onTitleEdit(text: ContentElements) {
-    const { model, onEditModel } = this.props;
-
-    const t = text.extractPlainText().caseOf({ just: s => s, nothing: () => '' });
-
-    let updatedModel;
-    let resource;
-    let title;
-    switch (model.modelType) {
-      case ModelTypes.WorkbookPageModel:
-        updatedModel = (model as WorkbookPageModel);
-        resource = updatedModel.resource.with({ title: t });
-        title = updatedModel.head.title.with({ text });
-        const head = updatedModel.head.with({ title });
-
-        onEditModel(updatedModel.with({ head, resource }));
-        return;
-      case ModelTypes.AssessmentModel:
-        updatedModel = (model as AssessmentModel);
-        resource = updatedModel.resource.with({ title: t });
-        title = updatedModel.title.with({ text });
-
-        onEditModel(updatedModel.with({ title, resource }));
-        return;
-      case ModelTypes.PoolModel:
-        updatedModel = (model as PoolModel);
-        resource = updatedModel.resource.with({ title: t });
-        title = updatedModel.pool.title.with({ text });
-        const pool = updatedModel.pool.with({ title });
-
-        onEditModel(updatedModel.with({ pool, resource }));
-        return;
-      default:
-        return;
-    }
   }
 
   onRemovePage(page: contentTypes.Page) {
@@ -234,7 +194,7 @@ export class ContextAwareSidebar
 
   renderPageDetails() {
     const {
-      model, resource, context, services, editMode, currentPage, onSetCurrentPage,
+      model, resource, editMode, currentPage, onSetCurrentPage,
       onEditModel,
     } = this.props;
 
@@ -242,19 +202,7 @@ export class ContextAwareSidebar
       case ModelTypes.WorkbookPageModel:
         return (
           <SidebarContent title="Page Details" onHide={this.props.onHide}>
-            <SidebarGroup label="">
-              <SidebarRow label="Title">
-                <ToolbarContentContainer
-                  activeContentGuid={null}
-                  hover={null}
-                  onUpdateHover={() => {}}
-                  onFocus={() => {}}
-                  model={model.head.title.text}
-                  context={context}
-                  services={services}
-                  editMode={editMode}
-                  onEdit={text => this.onTitleEdit(text)} />
-              </SidebarRow>
+            <SidebarGroup>
               <SidebarRow label="Created">
                 {`${resource.dateCreated.toLocaleDateString()}, \
                 ${resource.dateCreated.toLocaleTimeString()}`}
@@ -269,19 +217,7 @@ export class ContextAwareSidebar
       case ModelTypes.AssessmentModel:
         return (
           <SidebarContent title="Assessment Details" onHide={this.props.onHide}>
-            <SidebarGroup label="General">
-              <SidebarRow label="Title">
-                <ToolbarContentContainer
-                  activeContentGuid={null}
-                  hover={null}
-                  onUpdateHover={() => {}}
-                  onFocus={() => {}}
-                  model={model.title.text}
-                  context={context}
-                  services={services}
-                  editMode={editMode}
-                  onEdit={text => this.onTitleEdit(text)} />
-              </SidebarRow>
+            <SidebarGroup>
               <SidebarRow label="Created">
                 {`${resource.dateCreated.toLocaleDateString()}, \
                 ${resource.dateCreated.toLocaleTimeString()}`}
@@ -341,19 +277,7 @@ export class ContextAwareSidebar
       case ModelTypes.PoolModel:
         return (
           <SidebarContent title="Question Pool Details" onHide={this.props.onHide}>
-            <SidebarGroup label="">
-              <SidebarRow label="Title">
-                <ToolbarContentContainer
-                  activeContentGuid={null}
-                  hover={null}
-                  onUpdateHover={() => {}}
-                  onFocus={() => {}}
-                  model={model.pool.title.text}
-                  context={context}
-                  services={services}
-                  editMode={editMode}
-                  onEdit={text => this.onTitleEdit(text)} />
-              </SidebarRow>
+            <SidebarGroup>
               <SidebarRow label="Created">
                 {`${resource.dateCreated.toLocaleDateString()}, \
                 ${resource.dateCreated.toLocaleTimeString()}`}
