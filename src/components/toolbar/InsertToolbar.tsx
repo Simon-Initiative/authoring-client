@@ -4,6 +4,7 @@ import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
+import { ToolbarButtonDropdown } from './ToolbarButtonDropdown';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection';
 import { LegacyTypes } from 'data/types';
@@ -14,6 +15,8 @@ import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
+
+const TableCreation = require('editors/content/learning/table/TableCreation.bs').jsComponent;
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
@@ -32,6 +35,28 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
   classes, onInsert, parentSupportsElementType, resourcePath, context,
   courseModel, onDisplayModal, onDismissModal,
 }) => {
+
+  const onTableCreate = (onInsert, numRows, numCols) => {
+
+    const rows = [];
+    for (let i = 0; i < numRows; i += 1) {
+      const cells = [];
+      for (let j = 0; j < numCols; j += 1) {
+        const cell = new contentTypes.CellData();
+        cells.push([cell.guid, cell]);
+      }
+      const row = new contentTypes.Row().with({
+        cells: Immutable.OrderedMap
+          <string, contentTypes.CellData | contentTypes.CellHeader>(cells),
+      });
+      rows.push([row.guid, row]);
+    }
+
+    onInsert(new contentTypes.Table()
+    .with({ rows: Immutable.OrderedMap<string, contentTypes.Row>(rows),
+    }));
+  };
+
   return (
     <React.Fragment>
       <ToolbarLayout.Inline>
@@ -71,24 +96,12 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('section')}>
           <i className={'fa fa-list-alt'}/>
         </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
-              const cell1 = new contentTypes.CellData();
-              const cell2 = new contentTypes.CellData();
-              const row = new contentTypes.Row().with({
-                cells: Immutable.OrderedMap
-                <string, contentTypes.CellData | contentTypes.CellHeader>(
-                  [[cell1.guid, cell1], [cell2.guid, cell2]]),
-              });
-              onInsert(new contentTypes.Table()
-              .with({ rows: Immutable.OrderedMap<string, contentTypes.Row>().set(row.guid, row),
-              }));
-            }
-          }
+        <ToolbarButtonDropdown
             tooltip="Insert Table"
+            label={<i className={'fa fa-table'}/>}
             disabled={!parentSupportsElementType('table')}>
-          <i className={'fa fa-table'}/>
-        </ToolbarButton>
+          <TableCreation onTableCreate={onTableCreate.bind(this, onInsert)}/>
+        </ToolbarButtonDropdown>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.BlockQuote()
               .with({ text: contentTypes.ContiguousText.fromText('Quote', '')
