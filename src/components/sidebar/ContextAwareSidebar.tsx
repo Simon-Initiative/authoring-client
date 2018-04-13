@@ -21,7 +21,6 @@ import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
-import { Tooltip } from 'utils/tooltip';
 
 import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
 
