@@ -250,7 +250,7 @@ export class ContextAwareSidebar
             <SidebarGroup label="Settings">
               <SidebarRow label="Recommended Attempts">
               <TextInput
-                editMode={this.props.editMode}
+                editMode={editMode}
                 width="50px"
                 label=""
                 type="number"
