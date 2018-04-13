@@ -74,6 +74,9 @@ export const modelWithDefaultFeedback =
       generatedResponses = getFeedbackCombinations(userResponses, choices, allCombinations)
         .map((combo, i) => {
           const feedback = new contentTypes.Feedback({
+            // We only want to clone elements other than the first one, otherwise
+            // we will be replacing the model out from underneath the UI,
+            // which results in loss of focus
             body: i === 0 ? body : body.clone(),
           });
           const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
