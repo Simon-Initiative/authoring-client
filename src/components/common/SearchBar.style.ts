@@ -12,4 +12,7 @@ export default {
       color: '#333',
     },
   },
+  smallWidth: {
+    width: 500,
+  },
 };

@@ -105,7 +105,7 @@ export default class ResourceSelection
     const highlightedColumnRenderer = (prop: string, r: Resource) =>
       this.state.searchText.length < 3
         ? <span>{r[prop]}</span>
-        : highlightMatches(prop, r);
+        : highlightMatches(prop, r, this.state.searchText);
 
     // r : Resource
     const columnRenderers = [

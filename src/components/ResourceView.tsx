@@ -44,6 +44,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     };
   }
 
+  componentDidMount() {
+    this.logResourceDetails(this.state.resources);
+  }
+
   getFilteredRows(): Resource[] {
     return this.props.course.resources
       .toArray()
@@ -58,23 +62,23 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       (logger) => {
         resources.forEach((resource) => {
           logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
-          .groupCollapsed(
-            LogLevel.INFO,
-            LogTag.DEFAULT,
-            'Details',
-            (logger) => {
-              logger
-                .setVisibility(LogAttribute.TAG, false)
-                .setVisibility(LogAttribute.DATE, false)
-                .info(LogTag.DEFAULT, `Type: ${resource.type}`)
-                .info(LogTag.DEFAULT, `FilePath: ${resource
-                  .fileNode
-                  .pathTo
-                  .replace(/\.json/, '.xml')}`);
-            });
+            .setVisibility(LogAttribute.TAG, false)
+            .setVisibility(LogAttribute.DATE, false)
+            .info(LogTag.DEFAULT, `${resource.title} (id: ${resource.id})`)
+            .groupCollapsed(
+              LogLevel.INFO,
+              LogTag.DEFAULT,
+              'Details',
+              (logger) => {
+                logger
+                  .setVisibility(LogAttribute.TAG, false)
+                  .setVisibility(LogAttribute.DATE, false)
+                  .info(LogTag.DEFAULT, `Type: ${resource.type}`)
+                  .info(LogTag.DEFAULT, `FilePath: ${resource
+                    .fileNode
+                    .pathTo
+                    .replace(/\.json/, '.xml')}`);
+              });
         });
       },
       LogStyle.HEADER + LogStyle.BLUE,
@@ -120,8 +124,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       const idLower = id.toLowerCase();
 
       return text === '' ||
-             titleLower.indexOf(text) > -1 ||
-             idLower.indexOf(text) > -1;
+        titleLower.indexOf(text) > -1 ||
+        idLower.indexOf(text) > -1;
     };
 
     // one row in table for each resource in state
@@ -132,25 +136,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   renderResources() {
     const { course } = this.props;
-
     const creationTitle = <h2>{this.props.title}</h2>;
-
-    const link = resource =>
-      <button onClick={this.clickResource.bind(this, resource.guid)}
-              className="btn btn-link">{resource.title}</button>;
-
-    // const rows = course.resources
-    //   .toArray()
-    //   .filter(this.props.filterFn)
-    //   .map(r => ({
-    //     key: r.guid,
-    //     data: course.resources.has(r.guid)
-    // ? course.resources.get(r.guid) : { title: 'Loading...' },
-    //   }));
-
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
     const resources = rows.map(row => row.data as Resource);
-    this.logResourceDetails(resources);
 
     const labels = [
       'Title',
@@ -160,26 +148,26 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     ];
 
     const safeCompare =
-    (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
-      if (a[primaryKey] === null && b[primaryKey] === null) {
-        return 0;
-      }
-      if (a[primaryKey] === null) {
-        return direction === SortDirection.Ascending ? 1 : -1;
-      }
-      if (b[primaryKey] === null) {
-        return direction === SortDirection.Ascending ? -1 : 1;
-      }
-      if (a[primaryKey] === b[primaryKey]) {
-        if (a[secondaryKey] === b[secondaryKey]) {
+      (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
+        if (a[primaryKey] === null && b[primaryKey] === null) {
           return 0;
         }
-        return safeCompare(secondaryKey, primaryKey, direction, a, b);
-      }
-      return direction === SortDirection.Ascending
-        ? a[primaryKey].localeCompare(b[primaryKey])
-        : b[primaryKey].localeCompare(a[primaryKey]);
-    };
+        if (a[primaryKey] === null) {
+          return direction === SortDirection.Ascending ? 1 : -1;
+        }
+        if (b[primaryKey] === null) {
+          return direction === SortDirection.Ascending ? -1 : 1;
+        }
+        if (a[primaryKey] === b[primaryKey]) {
+          if (a[secondaryKey] === b[secondaryKey]) {
+            return 0;
+          }
+          return safeCompare(secondaryKey, primaryKey, direction, a, b);
+        }
+        return direction === SortDirection.Ascending
+          ? a[primaryKey].localeCompare(b[primaryKey])
+          : b[primaryKey].localeCompare(a[primaryKey]);
+      };
 
     const comparators = [
       (direction, a, b) => safeCompare('title', 'id', direction, a, b),
@@ -195,11 +183,14 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     const highlightedColumnRenderer = (prop: string, r: Resource) =>
       this.state.searchText.length < 3
         ? <span>{r[prop]}</span>
-        : highlightMatches(prop, r);
+        : highlightMatches(prop, r, this.state.searchText);
 
-        // link(r) // title
+    const link = resource => span =>
+      <button onClick={this.clickResource.bind(this, resource.guid)}
+        className="btn btn-link">{span}</button>;
+
     const columnRenderers = [
-      r => highlightedColumnRenderer('title', r),
+      r => link(r)(highlightedColumnRenderer('title', r)),
       r => highlightedColumnRenderer('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
@@ -211,27 +202,34 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       <div className="">
         {creationTitle}
         {this.renderCreation()}
+
         <SortableTable
           model={rows}
           columnComparators={comparators}
           columnRenderers={columnRenderers}
-          columnLabels={labels}/>
+          columnLabels={labels} />
       </div>
     );
   }
 
   renderCreation() {
     return (
-      <div className="table-toolbar input-group">
-        <div className="flex-spacer"/>
-        <form className="form-inline">
-          <input type="text" ref="title"
-                 className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
-                 placeholder="New Title"></input>
-          <button onClick={this.createResource.bind(this)}
-                  className="btn btn-primary">Create
+      <div className="table-toolbar">
+        <SearchBar
+          placeholder="Search by Title or Unique ID"
+          onChange={searchText => this.filterBySearchText(searchText)}
+        />
+        <div className="input-group">
+          <div className="flex-spacer" />
+          <form className="form-inline">
+            <input type="text" ref="title"
+              className="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput"
+              placeholder="New Title"></input>
+            <button onClick={this.createResource.bind(this)}
+              className="btn btn-primary">Create
           </button>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }
@@ -244,10 +242,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
-                <SearchBar
-                  placeholder="Search by Title or Unique ID"
-                  onChange={searchText => this.filterBySearchText(searchText)}
-                />
                   {this.renderResources()}
                 </div>
               </div>

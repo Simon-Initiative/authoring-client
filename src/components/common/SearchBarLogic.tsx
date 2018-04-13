@@ -1,36 +1,31 @@
 import * as React from 'react';
 import { Resource } from 'data/content/resource';
 
-// Split the text into matched/unmatched segments to
-// allow each matched segment to be highlighted
+/** Split the text into matched/unmatched segments to allow each matched segment to be highlighted.
+ *  Fn is memoized because we noticed performance issues when searching in larger courses.
+ *  Raw strings are used to prevent performance issues seen with React.cloneElement
+ */
 const cache = {};
-export const highlightMatches = (prop: string, r: Resource): JSX.Element => {
-  const textToSearchIn = r[prop].trim().toLowerCase();
-  const { searchText } = this.state;
-  const key = searchText + '|' + textToSearchIn;
+export const highlightMatches = (prop: string, r: Resource, searchText): JSX.Element => {
+  const textToSearchIn = r[prop];
+  const lowercasedTextToSearchIn = textToSearchIn.trim().toLowerCase();
+  const key = searchText + '|' + lowercasedTextToSearchIn;
+  const divWith = value => <div dangerouslySetInnerHTML={ { __html: value } } />;
+
   if (cache[key]) {
-    return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
+    return divWith(cache[key]);
   }
 
-  const regExp = new RegExp(searchText);
-  const value =
+  const searchTextExpression = new RegExp(searchText, 'i');
+  const highlightedText =
     '<span>' +
-    textToSearchIn.replace(regExp, '<span class="searchMatch">' + searchText + '</span>') +
+      textToSearchIn.replace(searchTextExpression,
+                             '<span class="searchMatch">' +
+                               // Necessary to preserve case of matched text
+                               textToSearchIn.match(searchTextExpression) +
+                             '</span>') +
     '</span>';
 
-  cache[key] = value;
-  return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
-};
-
-// Highlight the matched segment. Splitting text on a delimiter
-// removes the delimiter from the resulting array, so we need to add
-// it back in after each segment.
-export const highlightMatch = (unmatchedText, matchedText, i, length, wholeText) => {
-  return (
-    '<span>' + unmatchedText +
-    (i !== length - 1
-      ? ('<span class="searchMatch">' + matchedText + '</span>')
-      : '') +
-    '</span>'
-  );
+  cache[key] = highlightedText;
+  return divWith(cache[key]);
 };
