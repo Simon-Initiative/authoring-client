@@ -258,8 +258,11 @@ export class ContextAwareSidebar
                 onEdit={(recommendedAttempts) => {
                   const recommended = parseInt(recommendedAttempts, 10);
                   const max = parseInt(model.maxAttempts, 10);
-                  if (recommended < 0) {
-                    return onEditModel(model.with({ recommendedAttempts: '0' }));
+                  if (recommended < 1) {
+                    return onEditModel(model.with({
+                      recommendedAttempts: '1',
+                      maxAttempts: '1',
+                    }));
                   }
                   if (recommended > max) {
                     return onEditModel(model.with({
@@ -281,8 +284,11 @@ export class ContextAwareSidebar
                   onEdit={(maxAttempts) => {
                     const recommended = parseInt(model.recommendedAttempts, 10);
                     const max = parseInt(maxAttempts, 10);
-                    if (max < 0) {
-                      return onEditModel(model.with({ maxAttempts: '0' }));
+                    if (max < 1) {
+                      return onEditModel(model.with({
+                        recommendedAttempts: '1',
+                        maxAttempts: '1',
+                      }));
                     }
                     if (max < recommended) {
                       return onEditModel(model.with({
