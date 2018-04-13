@@ -72,9 +72,9 @@ export const modelWithDefaultFeedback =
 
       // generate new default responses
       generatedResponses = getFeedbackCombinations(userResponses, choices, allCombinations)
-        .map((combo) => {
+        .map((combo, i) => {
           const feedback = new contentTypes.Feedback({
-            body: body.clone(),
+            body: i === 0 ? body : body.clone(),
           });
           const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
           const match = combo;
@@ -87,6 +87,8 @@ export const modelWithDefaultFeedback =
           });
         });
     }
+
+
 
     const updatedModel = model.with({
       responses: Immutable.OrderedMap(
