@@ -7,6 +7,7 @@ import { SortDirection, SortableTable, DataRow } from 'components/common/Sortabl
 import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
 import * as models from 'data/models';
 import SearchBar from 'components/common/SearchBar';
+import { highlightMatches } from 'components/common/SearchBarLogic';
 
 export interface ResourceSelectionProps {
   timeSkewInMs: number;
@@ -101,68 +102,18 @@ export default class ResourceSelection
         : compareDates(b.dateCreated, a.dateCreated),
     ];
 
+    const highlightedColumnRenderer = (prop: string, r: Resource) =>
+      this.state.searchText.length < 3
+        ? <span>{r[prop]}</span>
+        : highlightMatches(prop, r);
+
     // r : Resource
     const columnRenderers = [
-      r => this.state.searchText.length < 3 ? <span>{r.title}</span> : highlightMatches('title', r),
-      r => this.state.searchText.length < 3 ? <span>{r.id}</span> : highlightMatches('id', r),
+      r => highlightedColumnRenderer('title', r),
+      r => highlightedColumnRenderer('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.timeSkewInMs))}</span>,
     ];
-
-
-    const cache = {};
-
-    // Split the text into matched/unmatched segments to
-    // allow each matched segment to be highlighted
-    const highlightMatches = (prop: string, r: Resource): JSX.Element => {
-      const textToSearchIn = r[prop].trim().toLowerCase();
-      const { searchText } = this.state;
-      const key = searchText + '|' + textToSearchIn;
-      if (cache[key]) {
-        return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
-      }
-
-      // const splitText = textToSearchIn.split(searchText);
-      const regExp = new RegExp(searchText);
-      const value =
-        // <span>
-        //   {splitText.map(
-        //     (part, i) => highlightMatch(part, searchText, i, splitText.length, textToSearchIn))}
-        // </span>;
-        '<span>' +
-          textToSearchIn.replace(regExp, '<span class="searchMatch">' + searchText + '</span>') +
-        '</span>';
-
-      cache[key] = value;
-      return <div dangerouslySetInnerHTML={ { __html: cache[key] } } />;
-    };
-
-    // Highlight the matched segment. Splitting text on a delimiter
-    // removes the delimiter from the resulting array, so we need to add
-    // it back in after each segment.
-    const highlightMatch = (unmatchedText, matchedText, i, length, wholeText) => {
-      return (
-
-        // function createMarkup() {
-        //   return {__html: 'First &middot; Second'};
-        // }
-
-        // function MyComponent() {
-        //   return <div dangerouslySetInnerHTML={createMarkup()} />;
-        // }
-        '<span>' + unmatchedText +
-        (i !== length - 1
-              ? ('<span class="searchMatch">' + matchedText + '</span>')
-              : '') +
-        '</span>'
-        // <span key={wholeText + i}>{unmatchedText}
-        //   {/* Don't insert an extra match at the end */}
-        //   { i !== length - 1
-        //       ? <span className={'searchMatch'}>{matchedText}</span>
-        //       : null }
-        // </span>
-      );
-    };
 
     const rowRenderer = (item: DataRow, index: number, children: any) => {
       const resource = item.data as Resource;

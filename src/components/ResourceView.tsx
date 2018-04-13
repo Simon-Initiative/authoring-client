@@ -10,6 +10,8 @@ import { adjustForSkew, compareDates, relativeToNow } from 'utils/date';
 import { LogAttribute, LogLevel, LogStyle, LogTag, logger } from 'utils/logger';
 import './ResourceView.scss';
 import { SortDirection, SortableTable } from './common/SortableTable';
+import SearchBar from 'components/common/SearchBar';
+import { highlightMatches } from 'components/common/SearchBarLogic';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
@@ -24,6 +26,8 @@ export interface ResourceViewProps {
 }
 
 interface ResourceViewState {
+  selected: Resource;
+  searchText: string;
   resources: Resource[];
 }
 
@@ -32,6 +36,18 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      selected: undefined,
+      searchText: '',
+      resources: this.getFilteredRows(),
+    };
+  }
+
+  getFilteredRows(): Resource[] {
+    return this.props.course.resources
+      .toArray()
+      .filter(this.props.filterFn);
   }
 
   logResourceDetails(resources: Resource[]) {
@@ -92,6 +108,28 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       });
   }
 
+  // Filter resources shown based on title and id
+  filterBySearchText(searchText: string): void {
+    // searchText state used for highlighting matches
+    this.setState({ searchText });
+
+    const text = searchText.trim().toLowerCase();
+    const filterFn = (r) => {
+      const { title, id } = r;
+      const titleLower = title.toLowerCase();
+      const idLower = id.toLowerCase();
+
+      return text === '' ||
+             titleLower.indexOf(text) > -1 ||
+             idLower.indexOf(text) > -1;
+    };
+
+    // one row in table for each resource in state
+    this.setState({
+      resources: this.getFilteredRows().filter(filterFn),
+    });
+  }
+
   renderResources() {
     const { course } = this.props;
 
@@ -101,14 +139,16 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       <button onClick={this.clickResource.bind(this, resource.guid)}
               className="btn btn-link">{resource.title}</button>;
 
-    const rows = course.resources
-      .toArray()
-      .filter(this.props.filterFn)
-      .map(r => ({
-        key: r.guid,
-        data: course.resources.has(r.guid) ? course.resources.get(r.guid) : { title: 'Loading...' },
-      }));
+    // const rows = course.resources
+    //   .toArray()
+    //   .filter(this.props.filterFn)
+    //   .map(r => ({
+    //     key: r.guid,
+    //     data: course.resources.has(r.guid)
+    // ? course.resources.get(r.guid) : { title: 'Loading...' },
+    //   }));
 
+    const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
     const resources = rows.map(row => row.data as Resource);
     this.logResourceDetails(resources);
 
@@ -119,24 +159,31 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
       'Last Updated',
     ];
 
-    const safeCompare = (property: string, direction: SortDirection, a: Resource, b: Resource) => {
-      if (a[property] === null && b[property] === null) {
+    const safeCompare =
+    (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
+      if (a[primaryKey] === null && b[primaryKey] === null) {
         return 0;
       }
-      if (a[property] === null) {
+      if (a[primaryKey] === null) {
         return direction === SortDirection.Ascending ? 1 : -1;
       }
-      if (b[property] === null) {
+      if (b[primaryKey] === null) {
         return direction === SortDirection.Ascending ? -1 : 1;
       }
+      if (a[primaryKey] === b[primaryKey]) {
+        if (a[secondaryKey] === b[secondaryKey]) {
+          return 0;
+        }
+        return safeCompare(secondaryKey, primaryKey, direction, a, b);
+      }
       return direction === SortDirection.Ascending
-        ? a[property].localeCompare(b[property])
-        : b[property].localeCompare(a[property]);
+        ? a[primaryKey].localeCompare(b[primaryKey])
+        : b[primaryKey].localeCompare(a[primaryKey]);
     };
 
     const comparators = [
-      safeCompare.bind(undefined, 'title'),
-      safeCompare.bind(undefined, 'id'),
+      (direction, a, b) => safeCompare('title', 'id', direction, a, b),
+      (direction, a, b) => safeCompare('id', 'title', direction, a, b),
       (direction, a, b) => direction === SortDirection.Ascending
         ? compareDates(a.dateCreated, b.dateCreated)
         : compareDates(b.dateCreated, a.dateCreated),
@@ -145,9 +192,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         : compareDates(b.dateUpdated, a.dateUpdated),
     ];
 
-    const renderers = [
-      r => link(r),
-      r => <span>{r.id}</span>,
+    const highlightedColumnRenderer = (prop: string, r: Resource) =>
+      this.state.searchText.length < 3
+        ? <span>{r[prop]}</span>
+        : highlightMatches(prop, r);
+
+        // link(r) // title
+    const columnRenderers = [
+      r => highlightedColumnRenderer('title', r),
+      r => highlightedColumnRenderer('id', r),
       r => <span>{relativeToNow(
         adjustForSkew(r.dateCreated, this.props.serverTimeSkewInMs))}</span>,
       r => <span>{relativeToNow(
@@ -161,7 +214,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         <SortableTable
           model={rows}
           columnComparators={comparators}
-          columnRenderers={renderers}
+          columnRenderers={columnRenderers}
           columnLabels={labels}/>
       </div>
     );
@@ -191,6 +244,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
             <div className="container-fluid editor">
               <div className="row">
                 <div className="col-12">
+                <SearchBar
+                  placeholder="Search by Title or Unique ID"
+                  onChange={searchText => this.filterBySearchText(searchText)}
+                />
                   {this.renderResources()}
                 </div>
               </div>
