@@ -21,6 +21,7 @@ import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
+import { Tooltip } from 'utils/tooltip';
 
 import { styles, SIDEBAR_CLOSE_ANIMATION_DURATION_MS } from './ContextAwareSidebar.styles';
 
@@ -250,14 +251,26 @@ export class ContextAwareSidebar
             <SidebarGroup label="Settings">
               <SidebarRow label="Recommended Attempts">
               <TextInput
-                editMode={editMode}
+                editMode={this.props.editMode}
                 width="50px"
                 label=""
                 type="number"
                 value={model.recommendedAttempts}
-                onEdit={
-                  recommendedAttempts => onEditModel(
-                    model.with({ recommendedAttempts }))} />
+                onEdit={(recommendedAttempts) => {
+                  const recommended = Number(recommendedAttempts);
+                  const max = Number(model.maxAttempts);
+                  if (recommended < 0) {
+                    return onEditModel(model.with({ recommendedAttempts: '0' }));
+                  }
+                  if (recommended > max) {
+                    return onEditModel(model.with({
+                      recommendedAttempts,
+                      maxAttempts: recommendedAttempts,
+                    }));
+                  }
+                  return onEditModel(model.with({ recommendedAttempts }));
+                }}
+              />
               </SidebarRow>
               <SidebarRow label="Maximum Attempts">
                 <TextInput
@@ -266,9 +279,20 @@ export class ContextAwareSidebar
                   label=""
                   type="number"
                   value={model.maxAttempts}
-                  onEdit={
-                    maxAttempts => onEditModel(
-                      model.with({ maxAttempts }))} />
+                  onEdit={(maxAttempts) => {
+                    const recommended = Number(model.recommendedAttempts);
+                    const max = Number(maxAttempts);
+                    if (max < 0) {
+                      return onEditModel(model.with({ maxAttempts: '0' }));
+                    }
+                    if (max < recommended) {
+                      return onEditModel(model.with({
+                        recommendedAttempts: maxAttempts,
+                        maxAttempts,
+                      }));
+                    }
+                    return onEditModel(model.with({ maxAttempts }));
+                  }} />
               </SidebarRow>
             </SidebarGroup>
             }
