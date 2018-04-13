@@ -255,9 +255,24 @@ export class ContextAwareSidebar
                 label=""
                 type="number"
                 value={model.recommendedAttempts}
-                onEdit={
-                  recommendedAttempts => onEditModel(
-                    model.with({ recommendedAttempts }))} />
+                onEdit={(recommendedAttempts) => {
+                  const recommended = parseInt(recommendedAttempts, 10);
+                  const max = parseInt(model.maxAttempts, 10);
+                  if (recommended < 1) {
+                    return onEditModel(model.with({
+                      recommendedAttempts: '1',
+                      maxAttempts: '1',
+                    }));
+                  }
+                  if (recommended > max) {
+                    return onEditModel(model.with({
+                      recommendedAttempts,
+                      maxAttempts: recommendedAttempts,
+                    }));
+                  }
+                  return onEditModel(model.with({ recommendedAttempts }));
+                }}
+              />
               </SidebarRow>
               <SidebarRow label="Maximum Attempts">
                 <TextInput
@@ -266,9 +281,23 @@ export class ContextAwareSidebar
                   label=""
                   type="number"
                   value={model.maxAttempts}
-                  onEdit={
-                    maxAttempts => onEditModel(
-                      model.with({ maxAttempts }))} />
+                  onEdit={(maxAttempts) => {
+                    const recommended = parseInt(model.recommendedAttempts, 10);
+                    const max = parseInt(maxAttempts, 10);
+                    if (max < 1) {
+                      return onEditModel(model.with({
+                        recommendedAttempts: '1',
+                        maxAttempts: '1',
+                      }));
+                    }
+                    if (max < recommended) {
+                      return onEditModel(model.with({
+                        recommendedAttempts: maxAttempts,
+                        maxAttempts,
+                      }));
+                    }
+                    return onEditModel(model.with({ maxAttempts }));
+                  }} />
               </SidebarRow>
             </SidebarGroup>
             }
