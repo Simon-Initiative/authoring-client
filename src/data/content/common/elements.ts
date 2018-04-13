@@ -57,7 +57,6 @@ export class ContentElements extends Immutable.Record(defaultContent) {
     // as updating their keys in the cloned content OrderedMap
     return this.with({
       content: this.content.mapEntries((entry) => {
-        const key = entry[0];
         const value = entry[1];
         const clonedValue = value.clone().with({ guid: createGuid() });
         return [clonedValue.guid, clonedValue];
