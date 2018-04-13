@@ -87,9 +87,6 @@ export default class ContiguousTextEditor
   }
 
   draftDrivenFocus(model, parent, selection) {
-
-    console.log('draftDrivenFocus ' + selection.getAnchorOffset());
-
     this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
     this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
   }
