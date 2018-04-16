@@ -9,12 +9,12 @@ import { LegacyTypes } from 'data/types';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, reject, assessment) {
+  onInsert(org, parent, context, services, resolve, reject, assessment: Resource) {
 
     services.dismissModal();
 
     const id = createGuid();
-    const resourceref = new t.ResourceRef().with({ idref: assessment.resource.id });
+    const resourceref = new t.ResourceRef().with({ idref: assessment.id });
     const item = new t.Item().with({ resourceref, id });
 
     resolve(insertNode(org, parent.guid, item, parent.children.size));
