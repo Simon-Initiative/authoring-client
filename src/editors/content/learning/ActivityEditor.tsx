@@ -109,14 +109,16 @@ export default class ActivityEditor
   }
 
   renderMain() {
+    const { classes } = this.props;
+
     return (
-      <div className="activity">
+      <div className={classes.activity}>
         <h5>{this.props.context.courseModel.resourcesById.get(this.props.model.idref).title}</h5>
         <button
           onClick={this.onClick}
           type="button"
           className="btn btn-link">
-          Edit activity
+          Edit Activity
         </button>
       </div>
     );

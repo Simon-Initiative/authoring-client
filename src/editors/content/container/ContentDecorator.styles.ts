@@ -12,6 +12,7 @@ export const styles: JSSStyles = {
     position: 'relative',
     display: 'flex',
     flexDirection: 'row',
+    width: '100%',
   },
   hover: {
     '& > $handle': {
