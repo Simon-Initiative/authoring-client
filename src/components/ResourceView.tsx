@@ -40,15 +40,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     this.state = {
       selected: undefined,
       searchText: '',
-      resources: this.getFilteredRows(),
+      resources: this.getFilteredRows(props),
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: ResourceViewProps): void {
     if (nextProps.resourceType !== this.props.resourceType &&
         nextProps.title !== this.props.title) {
       this.setState({
-        resources: this.getFilteredRows(),
+        resources: this.getFilteredRows(nextProps),
       });
     }
   }
@@ -57,10 +57,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     this.logResourceDetails(this.state.resources);
   }
 
-  getFilteredRows(): Resource[] {
-    return this.props.course.resources
+  getFilteredRows(props: ResourceViewProps): Resource[] {
+    return props.course.resources
       .toArray()
-      .filter(this.props.filterFn);
+      .filter(props.filterFn);
   }
 
   logResourceDetails(resources: Resource[]) {
@@ -138,7 +138,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     // one row in the table for each resource present
     this.setState({
       searchText,
-      resources: this.getFilteredRows().filter(filterFn),
+      resources: this.getFilteredRows(this.props).filter(filterFn),
     });
   }
 
