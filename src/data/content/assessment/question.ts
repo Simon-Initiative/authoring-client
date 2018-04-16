@@ -150,14 +150,16 @@ function migrateSkillsToParts(model: Question) : Question {
   let updated = model;
 
   const noSkillsAtParts : boolean = partsArray.every(p => p.skills.size === 0);
-  const skillsAtQuestion : boolean = model.skills.size > 0;
+  const skillsAtQuestion : boolean = model.skills.size > 0 || model.concepts.size > 0;
 
   if (skillsAtQuestion && noSkillsAtParts) {
 
-    const { skills } = model;
+    // Handle migrating from either skills or concepts
+    const { skills, concepts } = model;
+    const from = skills.size > 0 ? skills : Immutable.Set<string>(concepts);
 
     updated = model.with({
-      parts: model.parts.map(p => p.with({ skills })).toOrderedMap(),
+      parts: model.parts.map(p => p.with({ skills: from })).toOrderedMap(),
       skills: Immutable.Set<string>(),
     });
   }
