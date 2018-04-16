@@ -150,7 +150,7 @@ function migrateSkillsToParts(model: Question) : Question {
   let updated = model;
 
   const noSkillsAtParts : boolean = partsArray.every(p => p.skills.size === 0);
-  const skillsAtQuestion : boolean = model.concepts.size > 0;
+  const skillsAtQuestion : boolean = model.skills.size > 0;
 
   if (skillsAtQuestion && noSkillsAtParts) {
 
