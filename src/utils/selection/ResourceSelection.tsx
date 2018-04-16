@@ -33,14 +33,14 @@ export default class ResourceSelection
     this.state = {
       selected: undefined,
       searchText: '',
-      resources: this.getFilteredRows(),
+      resources: this.getFilteredRows(props),
     };
   }
 
-  getFilteredRows(): Resource[] {
-    return this.props.course.resources
+  getFilteredRows(props: ResourceSelectionProps): Resource[] {
+    return props.course.resources
       .toArray()
-      .filter(this.props.filterPredicate);
+      .filter(props.filterPredicate);
   }
 
   // Filter resources shown based on title and id
@@ -61,7 +61,7 @@ export default class ResourceSelection
 
     // one row in table for each resource in state
     this.setState({
-      resources: this.getFilteredRows().filter(filterFn),
+      resources: this.getFilteredRows(this.props).filter(filterFn),
     });
   }
 
