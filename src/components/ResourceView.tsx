@@ -44,6 +44,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.resourceType !== this.props.resourceType &&
+        nextProps.title !== this.props.title) {
+      this.setState({
+        resources: this.getFilteredRows(),
+      });
+    }
+  }
+
   componentDidMount() {
     this.logResourceDetails(this.state.resources);
   }
