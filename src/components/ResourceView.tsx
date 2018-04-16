@@ -216,6 +216,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
     return (
       <div className="table-toolbar">
         <SearchBar
+          className="inlineSearch"
           placeholder="Search by Title or Unique ID"
           onChange={searchText => this.filterBySearchText(searchText)}
         />

@@ -139,10 +139,12 @@ export default class ResourceSelection
         onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}
         disableInsert={this.state.selected === undefined}>
-        <SearchBar
-          placeholder="Search by Title or Unique ID"
-          onChange={searchText => this.filterBySearchText(searchText)}
-        />
+        <div className="searchBarContainer">
+          <SearchBar
+            placeholder="Search by Title or Unique ID"
+            onChange={searchText => this.filterBySearchText(searchText)}
+          />
+        </div>
         <SortableTable
           rowRenderer={rowRenderer}
           model={rows}

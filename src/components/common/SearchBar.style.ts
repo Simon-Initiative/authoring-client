@@ -2,7 +2,6 @@ export default {
   searchBar: {
     '& input': {
       paddingLeft: '35px',
-      marginBottom: '15px',
     },
     '& i': {
       pointerEvents: 'none',

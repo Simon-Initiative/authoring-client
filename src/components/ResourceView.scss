@@ -7,9 +7,15 @@
   .table-toolbar {
     display: flex;
     flex-direction: row;
+    justify-items: center;
+    margin: 10px 0 20px 0;
   }
 
   .document {
     padding-top: 30px;
   }
+}
+
+.inlineSearch {
+  width: 500px;
 }
