@@ -123,9 +123,6 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   // Filter resources shown based on title and id
   filterBySearchText(searchText: string): void {
-    // searchText state used for highlighting matches
-    this.setState({ searchText });
-
     const text = searchText.trim().toLowerCase();
     const filterFn = (r) => {
       const { title, id } = r;
@@ -137,8 +134,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
         idLower.indexOf(text) > -1;
     };
 
-    // one row in table for each resource in state
+    // searchText state is used for highlighting matches, and resources state creates
+    // one row in the table for each resource present
     this.setState({
+      searchText,
       resources: this.getFilteredRows().filter(filterFn),
     });
   }

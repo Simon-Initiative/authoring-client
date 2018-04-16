@@ -34,8 +34,7 @@ export default class SearchBar
 
   onChange(e) {
     const text = e.target.value;
-    this.setState({ text });
-    this.props.onChange(text);
+    this.setState({ text }, () => this.props.onChange(text));
   }
 
   render() {
