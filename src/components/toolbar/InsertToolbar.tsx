@@ -276,7 +276,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 onInsert={(resource) => {
                   onDismissModal();
                   const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.guid === resource.id);
+                  const found = resources.find(r => r.id === resource.id);
                   if (found !== undefined) {
                     onInsert(new contentTypes.Activity().with({ idref: found.id }));
                   }
