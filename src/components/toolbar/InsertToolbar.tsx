@@ -6,15 +6,15 @@ import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 import { ToolbarButtonDropdown } from './ToolbarButtonDropdown';
 import { AppContext } from 'editors/common/AppContext';
-import ResourceSelection from 'utils/selection/ResourceSelection';
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
-import * as persistence from 'data/persistence';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
+import { Resource } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
 
@@ -248,13 +248,13 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(
-                  res: persistence.CourseResource): boolean =>
+                  res: Resource): boolean =>
                     res.type === LegacyTypes.inline}
                 courseId={context.courseId}
                 onInsert={(resource) => {
                   onDismissModal();
                   const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.guid === resource.id);
+                  const found = resources.find(r => r.id === resource.id);
                   if (found !== undefined) {
                     onInsert(new contentTypes.WbInline().with({ idref: found.id }));
                   }
@@ -270,13 +270,13 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             onClick={() => onDisplayModal(
               <ResourceSelection
                 filterPredicate={(
-                  res: persistence.CourseResource): boolean =>
+                  res: Resource): boolean =>
                     res.type === LegacyTypes.assessment2}
                 courseId={context.courseId}
                 onInsert={(resource) => {
                   onDismissModal();
                   const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.guid === resource.id);
+                  const found = resources.find(r => r.id === resource.id);
                   if (found !== undefined) {
                     onInsert(new contentTypes.Activity().with({ idref: found.id }));
                   }

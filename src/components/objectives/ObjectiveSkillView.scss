@@ -5,6 +5,10 @@
   flex: 1;
   overflow: auto;
 
+  td {
+    border-top: 0;
+  }
+
   .document {
     padding-top: 30px;
   }

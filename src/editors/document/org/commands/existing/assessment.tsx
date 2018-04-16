@@ -1,19 +1,20 @@
 import { AbstractCommand } from '../command';
 import * as models from 'data/models';
 import * as t from 'data/contentTypes';
-import { AssessmentSelection, AssessmentsToDisplay } from 'utils/selection/AssessmentSelection';
 import createGuid from 'utils/guid';
-
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { Resource } from 'data/content/resource';
 import { insertNode } from '../../utils';
+import { LegacyTypes } from 'data/types';
 
 export class AddExistingAssessmentCommand extends AbstractCommand {
 
-  onInsert(org, parent, context, services, resolve, reject, assessment) {
+  onInsert(org, parent, context, services, resolve, reject, assessment: Resource) {
 
     services.dismissModal();
 
     const id = createGuid();
-    const resourceref = new t.ResourceRef().with({ idref: assessment.resource.id });
+    const resourceref = new t.ResourceRef().with({ idref: assessment.id });
     const item = new t.Item().with({ resourceref, id });
 
     resolve(insertNode(org, parent.guid, item, parent.children.size));
@@ -32,10 +33,14 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
 
+    const predicate = (res: Resource) : boolean => {
+      return res.type === LegacyTypes.assessment2;
+    };
+
     return new Promise((resolve, reject) => {
       services.displayModal(
-        <AssessmentSelection
-          toDisplay={AssessmentsToDisplay.Summative}
+        <ResourceSelection
+          filterPredicate={predicate}
           courseId={context.courseId}
           onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);

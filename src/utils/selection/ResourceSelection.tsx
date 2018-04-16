@@ -1,99 +1,157 @@
 import * as React from 'react';
 
-import * as types from '../../data/types';
-import * as persistence from '../../data/persistence';
-
+import { Resource } from 'data/content/resource';
 import ModalSelection from './ModalSelection';
-
-
-interface ResourceSelection {
-
-}
+import './ResourceSelection.scss';
+import { SortDirection, SortableTable, DataRow } from 'components/common/SortableTable';
+import { compareDates, relativeToNow, adjustForSkew } from 'utils/date';
+import * as models from 'data/models';
+import SearchBar from 'components/common/SearchBar';
+import { highlightMatches } from 'components/common/SearchBarLogic';
 
 export interface ResourceSelectionProps {
-  onInsert: (item: SelectableResource) => void;
+  timeSkewInMs: number;
+  course: models.CourseModel;
+  onInsert: (item: Resource) => void;
   onCancel: () => void;
   courseId: string;
-  filterPredicate: (res: persistence.CourseResource) => boolean;
+  filterPredicate: (res: Resource) => boolean;
 }
-
-export type SelectableResource = {
-  id: types.DocumentId,
-  type: string,
-  title: string,
-};
 
 export interface ResourceSelectionState {
-  resources: SelectableResource[];
-  selected: SelectableResource; 
+  selected: Resource;
+  searchText: string;
+  resources: Resource[];
 }
 
-class ResourceSelection 
-  extends React.PureComponent<ResourceSelectionProps, ResourceSelectionState> {
+export default class ResourceSelection
+  extends React.Component<ResourceSelectionProps, ResourceSelectionState> {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      resources: [],
-      selected: { id: '', type: '', title: '' },
+      selected: undefined,
+      searchText: '',
+      resources: this.getFilteredRows(),
     };
   }
 
-  componentDidMount() {
-    this.fetchResources();
+  getFilteredRows(): Resource[] {
+    return this.props.course.resources
+      .toArray()
+      .filter(this.props.filterPredicate);
   }
 
-  fetchResources() {
-    persistence.fetchCourseResources(this.props.courseId)
-    .then(resources => resources.filter(this.props.filterPredicate))
-    .then((filtered) => {
-      this.setState({
-        resources: filtered.map(
-          d => ({ id: d._id, title: d.title, type: d.type })),
-      });
-    });
-  }
+  // Filter resources shown based on title and id
+  filterBySearchText(searchText: string): void {
+    // searchText state used for highlighting matches
+    this.setState({ searchText });
 
-  clickResource(selected) {
-    this.setState({ selected });
-  }
+    const text = searchText.trim().toLowerCase();
+    const filterFn = (r) => {
+      const { title, id } = r;
+      const titleLower = title.toLowerCase();
+      const idLower = id.toLowerCase();
 
-  renderRows() {
-    const link = (r: SelectableResource) => 
-      <button onClick={this.clickResource.bind(this, r)} 
-        className="btn btn-link">{r.title}</button>;
+      return text === '' ||
+             titleLower.indexOf(text) > -1 ||
+             idLower.indexOf(text) > -1;
+    };
 
-    return this.state.resources.map((r) => {
-      const active = r.id === this.state.selected.id ? 'table-active' : '';
-      return <tr key={r.id} className={active}>
-        <td>{link(r)}</td>
-      </tr>;
+    // one row in table for each resource in state
+    this.setState({
+      resources: this.getFilteredRows().filter(filterFn),
     });
   }
 
   render() {
+    const labels = [
+      'Title',
+      'Unique ID',
+      'Last Updated',
+    ];
+
+    const safeCompare =
+    (primaryKey: string, secondaryKey: string, direction: SortDirection, a, b) => {
+      if (a[primaryKey] === null && b[primaryKey] === null) {
+        return 0;
+      }
+      if (a[primaryKey] === null) {
+        return direction === SortDirection.Ascending ? 1 : -1;
+      }
+      if (b[primaryKey] === null) {
+        return direction === SortDirection.Ascending ? -1 : 1;
+      }
+      if (a[primaryKey] === b[primaryKey]) {
+        if (a[secondaryKey] === b[secondaryKey]) {
+          return 0;
+        }
+        return safeCompare(secondaryKey, primaryKey, direction, a, b);
+      }
+      return direction === SortDirection.Ascending
+        ? a[primaryKey].localeCompare(b[primaryKey])
+        : b[primaryKey].localeCompare(a[primaryKey]);
+    };
+
+    const comparators = [
+      (direction, a, b) => safeCompare('title', 'id', direction, a, b),
+      (direction, a, b) => safeCompare('id', 'title', direction, a, b),
+      (direction, a, b) => direction === SortDirection.Ascending
+        ? compareDates(a.dateCreated, b.dateCreated)
+        : compareDates(b.dateCreated, a.dateCreated),
+    ];
+
+    const highlightedColumnRenderer = (prop: string, r: Resource) =>
+      this.state.searchText.length < 3
+        ? <span>{r[prop]}</span>
+        : highlightMatches(prop, r, this.state.searchText);
+
+    // r : Resource
+    const columnRenderers = [
+      r => highlightedColumnRenderer('title', r),
+      r => highlightedColumnRenderer('id', r),
+      r => <span>{relativeToNow(
+        adjustForSkew(r.dateCreated, this.props.timeSkewInMs))}</span>,
+    ];
+
+    const rowRenderer = (item: DataRow, index: number, children: any) => {
+      const resource = item.data as Resource;
+      const active = resource.id === (this.state.selected && this.state.selected.id)
+        ? 'table-active'
+        : '';
+
+      return (
+        <tr
+          onClick={_ => this.setState({ selected: resource })}
+          key={item.key}
+          className={active}>
+          {children}
+        </tr>
+      );
+    };
+
+    const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
+
     return (
-      <ModalSelection 
-        title="Select Resource" 
-        onCancel={this.props.onCancel} 
+      <ModalSelection
+        title="Select Resource"
+        onCancel={this.props.onCancel}
         onInsert={() => this.props.onInsert(this.state.selected)}
-        disableInsert={this.state.selected.id === ''}>
-        <table className="table table-hover table-sm">
-          <thead>
-              <tr>
-                  <th>Title</th>
-              </tr>
-          </thead>
-          <tbody>
-            {this.renderRows()}
-          </tbody>
-        </table>
-      </ModalSelection>    
+        disableInsert={this.state.selected === undefined}>
+        <div className="searchBarContainer">
+          <SearchBar
+            placeholder="Search by Title or Unique ID"
+            onChange={searchText => this.filterBySearchText(searchText)}
+          />
+        </div>
+        <SortableTable
+          rowRenderer={rowRenderer}
+          model={rows}
+          columnComparators={comparators}
+          columnRenderers={columnRenderers}
+          columnLabels={labels}/>
+      </ModalSelection>
     );
   }
-
 }
-
-export default ResourceSelection;
-
