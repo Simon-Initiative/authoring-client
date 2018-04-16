@@ -44,11 +44,6 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
           courseId={context.courseId}
           onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
           onCancel={this.onCancel.bind(this, services)}/>);
-        // <AssessmentSelection
-        //   toDisplay={AssessmentsToDisplay.Summative}
-        //   courseId={context.courseId}
-        //   onInsert={this.onInsert.bind(this, org, parent, context, services, resolve, reject)}
-        //   onCancel={this.onCancel.bind(this, services)}/>);
     });
   }
 }

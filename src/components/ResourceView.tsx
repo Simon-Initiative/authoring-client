@@ -135,10 +135,8 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const { course } = this.props;
     const creationTitle = <h2>{this.props.title}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
-    const resources = rows.map(row => row.data as Resource);
 
     const labels = [
       'Title',
