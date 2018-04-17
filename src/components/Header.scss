@@ -2,22 +2,22 @@
 @import 'oli/typography';
 
 .header {
-
   display: flex;
   align-items: center;
   flex-direction: row;
   width: 100%;
-  padding: 5px;
-  border-bottom: '1px solid grey';
-  background-color: $blue;
-  color: $white;
-  font-size: 16px;
-  font-weight: 600;
+  height: 46px;
+  padding: 5px 30px;
+  border-bottom: 1px solid rgba(0,0,0,0.35);
+  background-color: white;
+  color: #66757f;
+  font-size: 13px;
+  font-weight: 700;
 
   .header-link {
     cursor: pointer;
-    margin-right: 10px;
-    color: $white;
+    margin-right: 30px;
+    color: #66757f;
 
     &:hover {
       text-decoration: underline !important;
@@ -25,7 +25,7 @@
   }
 
   .course-link {
-    color: $gray-lighter;
+    color: #222;
   }
 
   .header-dropdown {

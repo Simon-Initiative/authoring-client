@@ -74,7 +74,7 @@ class Header extends React.PureComponent<HeaderProps, {}> {
           onClick={(e) => {
             e.preventDefault();
             v.viewDocument(id, id);
-          }}>{this.props.course.title}:</a>
+          }}>{this.props.course.title}</a>
 
         <Link action={v.viewObjectives.bind(undefined, id)}>Objectives</Link>
         <Link action={v.viewOrganizations.bind(undefined, id)}>Organizations</Link>

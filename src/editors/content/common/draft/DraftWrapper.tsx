@@ -176,12 +176,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   focus: () => any;
   lastSelectionState: SelectionState;
   lastContent: ContentState;
-  container: any;
+  editor: any;
 
   constructor(props) {
     super(props);
 
-    this.focus = () => (this.refs as any).editor.focus();
+    this.focus = () => this.editor.focus();
     this.lastSelectionState = null;
 
     const contentState = props.content.content;
@@ -228,9 +228,12 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           this.props.onSelectionChange(ss);
 
-          this.setState(
-            { editorState },
-            () => this.props.onEdit(this.props.content.with({ content: contentState })));
+          const edit = () => {
+            this.props.onEdit(this.props.content.with({ content: contentState }));
+          };
+
+          this.setState({ editorState }, edit);
+
         } else {
 
           if (changeType === SelectionChangeType.Selection
@@ -259,10 +262,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
-    if (this.props.activeItemId !== nextProps.activeItemId) {
-      setTimeout(() => this.forceRender(), 100);
-
-    } else if (this.props.content.content !== nextProps.content.content) {
+    if (this.props.content.content !== nextProps.content.content) {
 
       const current = this.state.editorState.getCurrentContent();
 
@@ -376,11 +376,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     return (
         <div
           className="draft-wrapper"
-          ref={(container => this.container = container)}
           style={editorStyle}
           onClick={this.focus}>
 
-          <Editor ref="editor"
+          <Editor ref={e => this.editor = e}
             onFocus={this.onGainFocus.bind(this)}
             spellCheck={true}
             stripPastedStyles={false}

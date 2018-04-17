@@ -97,15 +97,6 @@ module.exports = {
                 { loader: 'ts-loader'}
             ], exclude: /node_modules/ }
         ]
-
-    },
-    optimization: {
-        namedModules: true,
-        splitChunks: {
-            name: 'vendor',
-        },
-        noEmitOnErrors: true,
-        concatenateModules: true,
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
