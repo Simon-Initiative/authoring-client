@@ -15,6 +15,7 @@ interface DispatchProps {
 interface OwnProps {
   id: DiscoverableId;
   onDiscover?: () => void;
+  focusChild?: boolean | string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

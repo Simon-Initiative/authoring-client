@@ -3,21 +3,17 @@ import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { DiscoverableId } from 'types/discoverable';
 import { DiscoverableState as DiscoverableReducerState } from 'reducers/discoverable';
-import createGuid from 'utils/guid';
 
 import { styles } from './Discoverable.styles';
-
-const SPOTLIGHT_DURATION = 2000;
 
 export interface DiscoverableProps {
   id: DiscoverableId;
   discoverables: DiscoverableReducerState;
-  onDiscover?: () => void;
+  focusChild?: boolean | string;
 }
 
 export interface DiscoverableState {
-  lastDiscovery: string;
-  spotlight: boolean;
+
 }
 
 /**
@@ -27,56 +23,41 @@ export interface DiscoverableState {
 export class Discoverable
     extends React.PureComponent<StyledComponentProps<DiscoverableProps>,
     DiscoverableState> {
-  id: string;
 
   constructor(props) {
     super(props);
 
-    this.state = {
-      lastDiscovery: undefined,
-      spotlight: false,
-    };
+    this.focusChild = this.focusChild.bind(this);
+  }
 
-    this.id = `discoverable-${createGuid()}`;
-
-    this.discover = this.discover.bind(this);
+  componentDidMount() {
+    this.focusChild();
   }
 
   componentWillReceiveProps(nextProps: DiscoverableProps) {
-    const { id } = this.props;
-    const { lastDiscovery } = this.state;
+    this.focusChild();
+  }
 
-    const discovery = nextProps.discoverables.get(id);
-    if (discovery !== lastDiscovery) {
-      this.discover();
+  focusChild() {
+    const { id, discoverables, focusChild } = this.props;
+    if (focusChild && discoverables.get(id)) {
+      const jQ = (window as any).jQuery;
+
+      if (focusChild === true) {
+        jQ(`#discoverable-${id} > *`).focus();
+      } else {
+        jQ(`#discoverable-${id} ${focusChild}`).focus();
+      }
     }
   }
 
-  discover() {
-    const { onDiscover } = this.props;
-
-    this.setState(
-      {
-        spotlight: true,
-      });
-
-    setTimeout(
-      () => this.setState({
-        spotlight: false,
-      }),
-      SPOTLIGHT_DURATION,
-    );
-
-    onDiscover && onDiscover();
-  }
-
   render() {
-    const { className, children, classes, id } = this.props;
-    const { spotlight } = this.state;
+    const { className, children, classes, id, discoverables } = this.props;
+    const spotlight = discoverables.get(id);
 
     return (
       <div
-        id={this.id}
+        id={`discoverable-${id}`}
         className={classNames([classes.discoverable ,className, spotlight && classes.spotlight])}>
         {children}
       </div>

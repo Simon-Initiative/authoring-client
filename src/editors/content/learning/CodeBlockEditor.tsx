@@ -120,7 +120,7 @@ export default class CodeBlock
             onEdit={this.onStartEdit} />
         </SidebarGroup>
         <SidebarGroup label="Highlighting">
-          <Discoverable id={DiscoverableId.CodeBlockHighlighting}>
+          <Discoverable id={DiscoverableId.CodeBlockHighlighting} focusChild>
             <TextInput
               editMode={this.props.editMode}
               width="100%"

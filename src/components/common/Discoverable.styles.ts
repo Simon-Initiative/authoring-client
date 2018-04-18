@@ -6,6 +6,8 @@ export const styles: JSSStyles = {
     display: 'inilne',
   },
   spotlight: {
-    outline: [3, 'solid', colors.selection],
+    animationName: 'discover',
+    animationDuration: '.75s',
+    animationFillMode: 'both',
   },
 };
