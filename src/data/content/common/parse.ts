@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 import { Unsupported } from '../unsupported';
 import guid from 'utils/guid';
 import { ContentElement } from './interfaces';
-import { ContiguousText } from '../learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from '../learning/contiguous';
 
 export const ARRAY = '#array';
 export const TITLE = '@title';
@@ -14,7 +14,7 @@ export const CDATA = '#cdata';
 export const CONTIGUOUS_TEXT_ELEMENTS = [
   'p', '#cdata', '#text', 'em', 'sub',
   'sup', 'ipa', 'foreign',
-  'cite', 'term', 'var', 'link', 'input_ref', 'm:math', 'activity_link', 'xref'];
+  'cite', 'term', 'var', 'link', 'input_ref', 'm:math', '#math', 'activity_link', 'xref'];
 
 export const registeredTypes = {};
 
@@ -114,6 +114,16 @@ function parseElements(elements: Object[], factories, textElements) : ContentEle
   return parsedObjects;
 }
 
+function isAllContiguous(arr, textElements) : boolean {
+  return arr
+    .reduce(
+      (acc: boolean, e) => {
+        return acc && getKey(e).caseOf(
+          { just: k => textElements[k] !== undefined, nothing: () => false });
+      },
+      true);
+}
+
 export function parseContent(obj: Object, supportedElementKeys: string[])
   : Immutable.OrderedMap<string, ContentElement> {
 
@@ -132,10 +142,25 @@ export function parseContent(obj: Object, supportedElementKeys: string[])
   // Normalize the input param shape into an array
   const inputAsArray = normalizeInput(obj, textElements);
 
+  // If the input is an array of all contiguous text elements, we do not want to
+  // parse them each as a separate ContiguousText as that would effectively render
+  // them as paragraphs - rather we want them all contained
+  // inline in one ContiguousText instance.
+  if (inputAsArray.length > 1 && isAllContiguous(inputAsArray, textElements)) {
+
+    // Parse these elements in simple mode (to get the effect of one ContentBlock),
+    // but be sure to reset to Regular mode.
+    const text = ContiguousText.fromPersistence(
+      inputAsArray, guid(), ContiguousTextMode.SimpleText)
+      .with({ mode: ContiguousTextMode.Regular });
+    return Immutable.OrderedMap<string, ContentElement>([[text.guid, text]]);
+  }
+
   // Parse the elements and collect the deserialized content here
   const parsedObjects : ContentElement[] = parseElements(inputAsArray, factories, textElements);
 
   // Convert to the Immutable representation and return
   const keyValuePairs = parsedObjects.map(h => [h.guid, h]);
   return Immutable.OrderedMap<string, ContentElement>(keyValuePairs);
+
 }
