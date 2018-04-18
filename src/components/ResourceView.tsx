@@ -118,6 +118,9 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
         const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
         dispatch(updateCourseResources(updated));
+
+        // update component state and keep current search
+        this.filterBySearchText(this.state.searchText);
       });
   }
 
