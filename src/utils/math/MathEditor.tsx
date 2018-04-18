@@ -1,6 +1,7 @@
 import * as React from 'react';
 import beautifyXml from 'xml-beautifier';
 import guid from '../../utils/guid';
+import { throttle } from 'utils/timing';
 
 import AceEditor from 'react-ace';
 
@@ -35,7 +36,7 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
       mathEditor: guid(),
     };
 
-    this.onChange = this.onChange.bind(this);
+    this.onChange = throttle(this.onChange.bind(this), 200);
 
     this.state = {
       beautified: props.content.indexOf('\n') === -1
@@ -45,7 +46,9 @@ export class MathEditor extends React.Component<MathEditorProps, MathEditorState
   }
 
   onChange(content) {
-    this.props.onChange(content);
+    const { onChange } = this.props;
+
+    onChange(content);
   }
 
   componentWillReceiveProps(nextProps) {
