@@ -6,10 +6,16 @@ import { DiscoverableState as DiscoverableReducerState } from 'reducers/discover
 
 import { styles } from './Discoverable.styles';
 
+export enum FocusAction {
+  Focus,
+  Click,
+}
+
 export interface DiscoverableProps {
   id: DiscoverableId;
   discoverables: DiscoverableReducerState;
   focusChild?: boolean | string;
+  focusAction?: FocusAction;
 }
 
 export interface DiscoverableState {
@@ -34,19 +40,27 @@ export class Discoverable
     this.focusChild();
   }
 
-  componentWillReceiveProps(nextProps: DiscoverableProps) {
+  componentDidUpdate() {
     this.focusChild();
   }
 
   focusChild() {
-    const { id, discoverables, focusChild } = this.props;
+    const { id, discoverables, focusChild, focusAction } = this.props;
+
     if (focusChild && discoverables.get(id)) {
       const jQ = (window as any).jQuery;
+      const child = (typeof focusChild === 'boolean')
+        ? jQ(`#discoverable-${id} > *:first-child`)
+        : jQ(`#discoverable-${id} ${focusChild}`);
 
-      if (focusChild === true) {
-        jQ(`#discoverable-${id} > *`).focus();
-      } else {
-        jQ(`#discoverable-${id} ${focusChild}`).focus();
+      switch (focusAction) {
+        case FocusAction.Click:
+          child.trigger('click');
+          return;
+        case FocusAction.Focus:
+        default:
+          child.focus();
+          return;
       }
     }
   }

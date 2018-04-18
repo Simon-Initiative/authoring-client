@@ -13,11 +13,16 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
 import { styles } from './Alternatives.styles';
 
 export interface AlternativeEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternative> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface AlternativeEditorState {
@@ -50,25 +55,31 @@ export default class AlternativeEditor
     return (
       <SidebarContent title={model.value}>
         <SidebarGroup label="Label">
-          <TextInput
-            editMode={editMode}
-            value={model.value}
-            type="text"
-            width="100%"
-            label=""
-            onEdit={this.onValueEdit.bind(this)}
-          />
+          <Discoverable id={DiscoverableId.AlternativeEditorKey} focusChild>
+            <TextInput
+              editMode={editMode}
+              value={model.value}
+              type="text"
+              width="100%"
+              label=""
+              onEdit={this.onValueEdit.bind(this)}
+            />
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar, model } = this.props;
+    const { onShowSidebar, onDiscover, model } = this.props;
 
     return (
       <ToolbarGroup label={model.value} columns={4} highlightColor={CONTENT_COLORS.CellData}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.AlternativeEditorKey);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-align-left"></i></div>
           <div>Key</div>
         </ToolbarButton>

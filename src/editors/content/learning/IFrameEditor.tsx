@@ -9,10 +9,14 @@ import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/lea
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { buildUrl } from 'utils/path';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
 
 
 export interface IFrameEditorProps extends AbstractContentEditorProps<IFrame> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface IFrameEditorState {
@@ -38,13 +42,15 @@ export default class IFrameEditor
       <SidebarContent title="Web Page">
 
         <SidebarGroup label="URL">
-          <TextInput
-            {...this.props}
-            width="100%"
-            type="text"
-            label=""
-            value={this.props.model.src}
-            onEdit={this.onSrcEdit} />
+          <Discoverable id={DiscoverableId.IFrameEditorWebpageURL} focusChild>
+            <TextInput
+              {...this.props}
+              width="100%"
+              type="text"
+              label=""
+              value={this.props.model.src}
+              onEdit={this.onSrcEdit} />
+          </Discoverable>
         </SidebarGroup>
 
         <MediaWidthHeightEditor
@@ -70,17 +76,23 @@ export default class IFrameEditor
   }
 
   renderToolbar() {
+    const { onShowSidebar, onDiscover } = this.props;
+
     return (
       <ToolbarGroup
         label="Web Page"
         highlightColor={CONTENT_COLORS.IFrame}
         columns={4}>
-        <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.IFrameEditorWebpageURL);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-window-maximize"/></div>
           <div>Web Page URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
+          <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders"/></div>
             <div>Details</div>
           </ToolbarButton>

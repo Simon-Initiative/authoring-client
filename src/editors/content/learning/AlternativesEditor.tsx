@@ -8,7 +8,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
+import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../common/controls';
@@ -17,11 +17,16 @@ import AlternativeEditor from './AlternativeEditor';
 import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
 import { styles } from './Alternatives.styles';
 
 export interface AlternativesEditorProps
   extends AbstractContentEditorProps<contentTypes.Alternatives> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface AlternativesEditorState {
@@ -86,42 +91,58 @@ export default class AlternativesEditor
     return (
       <SidebarContent title="Variable Content">
         <SidebarGroup label="Group">
-          <TextInput
-            width="100%"
-            editMode={this.props.editMode}
-            value={groupText}
-            label=""
-            type="text"
-            onEdit={this.onGroupEdit.bind(this)} />
+          <Discoverable id={DiscoverableId.AlternativesEditorGroup} focusChild>
+            <TextInput
+              width="100%"
+              editMode={this.props.editMode}
+              value={groupText}
+              label=""
+              type="text"
+              onEdit={this.onGroupEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Default">
-          <Select
-            editMode={this.props.editMode}
-            value={def}
-            label=""
-            onChange={this.onDefaultChange.bind(this)}>
-            <option value=""></option>
-            {options}
-          </Select>
+          <Discoverable id={DiscoverableId.AlternativesEditorDefault} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              value={def}
+              label=""
+              onChange={this.onDefaultChange.bind(this)}>
+              <option value=""></option>
+              {options}
+            </Select>
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Variable Content" columns={4}
+      <ToolbarGroup label="Variable Content" columns={5}
         highlightColor={CONTENT_COLORS.Alternatives}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-group"></i></div>
-          <div>Group</div>
-        </ToolbarButton>
         <ToolbarButton onClick={this.onAlternativeAdd.bind(this)} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-plus-square-o"></i></div>
           <div>Add New</div>
         </ToolbarButton>
+        <ToolbarLayout.Column>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.AlternativesEditorGroup);
+            }} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-group"/> Group
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.AlternativesEditorDefault);
+            }} size={ToolbarButtonSize.Wide}>
+            <i className="fa fa-check-square-o"/> Default
+          </ToolbarButton>
+        </ToolbarLayout.Column>
       </ToolbarGroup>
     );
   }

@@ -1,8 +1,10 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { Discoverable } from './Discoverable';
+import { Discoverable, FocusAction } from './Discoverable';
 import { DiscoverableId } from 'types/discoverable';
 import { DiscoverableState } from 'reducers/discoverable';
+
+export { FocusAction, DiscoverableId };
 
 interface StateProps {
   discoverables: DiscoverableState;
@@ -16,6 +18,7 @@ interface OwnProps {
   id: DiscoverableId;
   onDiscover?: () => void;
   focusChild?: boolean | string;
+  focusAction?: FocusAction;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

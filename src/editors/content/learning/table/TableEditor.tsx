@@ -15,12 +15,16 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
 
 import { styles } from './Table.styles';
 
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface TableEditorState {
@@ -67,23 +71,27 @@ export default class TableEditor
     return (
       <SidebarContent title="Table">
         <SidebarGroup label="Title">
-          <TextInput
-            width="100%"
-            editMode={this.props.editMode}
-            value={title}
-            label=""
-            type="text"
-            onEdit={this.onTitleEdit.bind(this)} />
+          <Discoverable id={DiscoverableId.TableEditorTitle} focusChild>
+            <TextInput
+              width="100%"
+              editMode={this.props.editMode}
+              value={title}
+              label=""
+              type="text"
+              onEdit={this.onTitleEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Row Style">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={rowStyle}
-            onChange={this.onStyleChange.bind(this)}>
-            <option value="plain">Plain</option>
-            <option value="alternating">Alternating</option>
-          </Select>
+          <Discoverable id={DiscoverableId.TableEditorRowStyle} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={rowStyle}
+              onChange={this.onStyleChange.bind(this)}>
+              <option value="plain">Plain</option>
+              <option value="alternating">Alternating</option>
+            </Select>
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -94,15 +102,23 @@ export default class TableEditor
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.TableEditorTitle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.TableEditorRowStyle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-th-list"></i></div>
           <div>Row Style</div>
         </ToolbarButton>

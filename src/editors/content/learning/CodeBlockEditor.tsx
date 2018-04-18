@@ -89,38 +89,42 @@ export default class CodeBlock
     return (
       <SidebarContent title="Code Block">
         <SidebarGroup label="Language / Syntax">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={syntax}
-            onChange={this.onSyntaxChange}>
-            <option value="actionscript3">ActionScript</option>
-            <option value="bash">Bash</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="html">HTML</option>
-            <option value="java">Java</option>
-            <option value="python">Python</option>
-            <option value="text">Text</option>
-            <option value="xml">XML</option>
-          </Select>
-          <Checkbox
-            editMode={this.props.editMode}
-            label="Show line numbers"
-            value={this.props.model.number}
-            onEdit={this.onNumberEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockEditorLanguage} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={syntax}
+              onChange={this.onSyntaxChange}>
+              <option value="actionscript3">ActionScript</option>
+              <option value="bash">Bash</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="html">HTML</option>
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+              <option value="text">Text</option>
+              <option value="xml">XML</option>
+            </Select>
+            <Checkbox
+              editMode={this.props.editMode}
+              label="Show line numbers"
+              value={this.props.model.number}
+              onEdit={this.onNumberEdit} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="First line number">
-          <TextInput
-            editMode={this.props.editMode}
-            width="100%"
-            type="number"
-            label=""
-            value={this.props.model.start}
-            onEdit={this.onStartEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockEditorLineNumbers} focusChild>
+            <TextInput
+              editMode={this.props.editMode}
+              width="100%"
+              type="number"
+              label=""
+              value={this.props.model.start}
+              onEdit={this.onStartEdit} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Highlighting">
-          <Discoverable id={DiscoverableId.CodeBlockHighlighting} focusChild>
+          <Discoverable id={DiscoverableId.CodeBlockEditorHighlighting} focusChild>
             <TextInput
               editMode={this.props.editMode}
               width="100%"
@@ -139,19 +143,27 @@ export default class CodeBlock
 
     return (
       <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={6}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.CodeBlockEditorLanguage);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-file-code-o"/></div>
           <div>Language</div>
         </ToolbarButton>
 
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.CodeBlockEditorLineNumbers);
+            }} size={ToolbarButtonSize.Wide}>
             <i className="fa fa-sort-numeric-asc"/> Line Numbers
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
               onShowSidebar();
-              onDiscover(DiscoverableId.CodeBlockHighlighting);
+              onDiscover(DiscoverableId.CodeBlockEditorHighlighting);
             }}
             size={ToolbarButtonSize.Wide}>
             <i className="fa fa-eraser"/> Highlighting
