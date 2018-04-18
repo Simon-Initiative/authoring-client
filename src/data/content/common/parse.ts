@@ -139,6 +139,9 @@ export function parseContent(obj: Object, supportedElementKeys: string[])
     (m, c) => { m[c] = true; return m; },
     {});
 
+  const withoutParagraphs = Object.assign({}, textElements);
+  delete withoutParagraphs['p'];
+
   // Normalize the input param shape into an array
   const inputAsArray = normalizeInput(obj, textElements);
 
@@ -146,7 +149,7 @@ export function parseContent(obj: Object, supportedElementKeys: string[])
   // parse them each as a separate ContiguousText as that would effectively render
   // them as paragraphs - rather we want them all contained
   // inline in one ContiguousText instance.
-  if (inputAsArray.length > 1 && isAllContiguous(inputAsArray, textElements)) {
+  if (inputAsArray.length > 1 && isAllContiguous(inputAsArray, withoutParagraphs)) {
 
     // Parse these elements in simple mode (to get the effect of one ContentBlock),
     // but be sure to reset to Regular mode.
