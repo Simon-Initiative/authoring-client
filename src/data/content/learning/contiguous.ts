@@ -171,6 +171,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
       guid: this.guid,
       content: this.content.replaceEntityData(key, data),
       entityEditCount: this.entityEditCount + 1,
+      mode: this.mode,
     });
   }
 
