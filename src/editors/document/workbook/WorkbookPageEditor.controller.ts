@@ -8,6 +8,8 @@ import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
+import * as Messages from 'types/messages';
+import { showMessage } from 'actions/messages';
 
 interface StateProps {
   activeContext: any;
@@ -21,6 +23,7 @@ interface DispatchProps {
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
+  showMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
@@ -51,6 +54,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     },
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
+    },
+    showMessage: (message: Messages.Message) => {
+      return dispatch(showMessage(message));
     },
   };
 };

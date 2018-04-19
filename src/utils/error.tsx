@@ -2,6 +2,8 @@ import * as Messages from 'types/messages';
 import * as Immutable from 'immutable';
 import { UserProfile } from 'types/user';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
+import { ModalMessage } from 'utils//ModalMessage';
+import { modalActions } from 'actions/modal';
 
 export function buildReportProblemAction(
   failure: string, name: string, email: string) : Messages.MessageAction {
@@ -52,3 +54,34 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
 
 
 }
+
+function buildModalMessageAction(label, text) : Messages.MessageAction {
+  return {
+    label,
+    execute: (message: Messages.Message, dispatch) => {
+      dispatch(modalActions.display(<ModalMessage text={text}/>));
+    },
+  };
+}
+
+export function buildMissingObjectivesMessage() {
+
+  const actions = [buildModalMessageAction('Learn more', missingObjectivesDetails)];
+
+  const content = new Messages.TitledContent().with({
+    title: 'Missing Objectives',
+    message: 'You should add some objectives first',
+
+  });
+  return new Messages.Message().with({
+    scope: Messages.Scope.Resource,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: Immutable.List(actions),
+    content,
+  });
+
+}
+
+const missingObjectivesDetails =
+  'yo, build some objectives first';
