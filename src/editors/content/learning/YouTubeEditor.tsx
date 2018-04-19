@@ -47,7 +47,7 @@ export default class YouTubeEditor
       videoSrc = getQueryVariableFromString('v', queryString);
     }
     const model = this.props.model.with({
-      src: hasParams ? videoSrc : src,
+      src: videoSrc ? videoSrc : src,
     });
     this.props.onEdit(model, model);
   }
