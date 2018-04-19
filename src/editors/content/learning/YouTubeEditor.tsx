@@ -11,10 +11,15 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
+import {
+  Discoverable, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface YouTubeState {
@@ -59,16 +64,18 @@ export default class YouTubeEditor
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="Video URL">
-          <div className="input-group">
-            <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
-              <TextInput
-                {...this.props}
-                width="100%"
-                type="text"
-                label=""
-                value={src}
-                onEdit={this.onSrcEdit} />
-          </div>
+          <Discoverable id={DiscoverableId.YouTubeEditorSourceURL} focusChild="input">
+            <div className="input-group">
+              <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+                <TextInput
+                  {...this.props}
+                  width="100%"
+                  type="text"
+                  label=""
+                  value={src}
+                  onEdit={this.onSrcEdit} />
+            </div>
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Controls">
           <ToggleSwitch
@@ -97,12 +104,18 @@ export default class YouTubeEditor
     );
   }
   renderToolbar(): JSX.Element {
+    const { onShowSidebar, onDiscover } = this.props;
+
     return (
       <ToolbarGroup
         label="YouTube"
         columns={5}
         highlightColor={CONTENT_COLORS.YouTube}>
-        <ToolbarButton onClick={() => this.props.onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.YouTubeEditorSourceURL);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-youtube-play"/></div>
           <div>Source URL</div>
         </ToolbarButton>

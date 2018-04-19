@@ -1,0 +1,18 @@
+export enum DiscoverableId {
+  CodeBlockEditorHighlighting,
+  CodeBlockEditorLineNumbers,
+  CodeBlockEditorLanguage,
+  OrderedListEditorTitle,
+  OrderedListEditorStyle,
+  OrderedListEditorStart,
+  UnorderedListEditorTitle,
+  UnorderedListEditorStyle,
+  TableEditorTitle,
+  TableEditorRowStyle,
+  YouTubeEditorSourceURL,
+  IFrameEditorWebpageURL,
+  DefinitionEditorTitle,
+  AlternativeEditorKey,
+  AlternativesEditorGroup,
+  AlternativesEditorDefault,
+}
