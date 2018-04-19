@@ -28,6 +28,7 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
   hover: string;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -40,6 +41,9 @@ function hasMissingResource() : boolean {
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
+
+  noObjectivesMessage: Messages.Message;
+
   constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
@@ -66,15 +70,20 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentDidMount() {
-    this.props.showMessage(buildMissingObjectivesMessage());
+    if (this.props.context.objectives.size <= 1) {
+      this.noObjectivesMessage = buildMissingObjectivesMessage(this.props.context.courseId);
+      this.props.showMessage(this.noObjectivesMessage);
+    }
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
+    if (this.props.context.objectives.size <= 1 && nextProps.context.objectives.size > 1) {
+      this.props.dismissMessage(this.noObjectivesMessage);
+    }
 
     if (nextProps.model !== this.props.model) {
       if (this.hasMissingObjective(
           nextProps.model.head.objrefs, nextProps.context.objectives)) {
-
         nextProps.services.refreshObjectives(nextProps.context.courseId);
       }
     }

@@ -9,7 +9,7 @@ import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
 import * as Messages from 'types/messages';
-import { showMessage } from 'actions/messages';
+import { dismissSpecificMessage, showMessage } from 'actions/messages';
 
 interface StateProps {
   activeContext: any;
@@ -24,6 +24,7 @@ interface DispatchProps {
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<WorkbookPageModel> {}
@@ -57,6 +58,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     },
     showMessage: (message: Messages.Message) => {
       return dispatch(showMessage(message));
+    },
+    dismissMessage: (message: Messages.Message) => {
+      dispatch(dismissSpecificMessage(message));
     },
   };
 };

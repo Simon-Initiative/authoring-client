@@ -10,6 +10,8 @@ import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
+import * as Messages from 'types/messages';
+import { dismissSpecificMessage, showMessage } from 'actions/messages';
 
 interface StateProps {
   activeContext: any;
@@ -26,6 +28,8 @@ interface DispatchProps {
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<AssessmentModel> {}
@@ -66,6 +70,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onSetCurrentNode: (documentId: string, node: contentTypes.Node) => {
       return dispatch(setCurrentNode(documentId, node));
+    },
+    showMessage: (message: Messages.Message) => {
+      return dispatch(showMessage(message));
+    },
+    dismissMessage: (message: Messages.Message) => {
+      dispatch(dismissSpecificMessage(message));
     },
   };
 };

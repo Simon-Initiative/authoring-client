@@ -21,6 +21,9 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource } from 'data/content/resource';
+import * as Messages from 'types/messages';
+import { buildMissingSkillsMessage } from 'utils/error';
+
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
@@ -35,6 +38,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   currentPage: string;
   currentNode: contentTypes.Node;
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -46,6 +51,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState>  {
 
+  noSkillsMessage: Messages.Message;
   supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
@@ -73,6 +79,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
+  componentDidMount() {
+    if (this.props.context.skills.size <= 0) {
+      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.props.showMessage(this.noSkillsMessage);
+    }
+  }
+
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState) : boolean {
@@ -92,6 +105,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
+    if (this.props.context.skills.size <= 0 && nextProps.context.skills.size > 0) {
+      this.props.dismissMessage(this.noSkillsMessage);
+    }
 
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 

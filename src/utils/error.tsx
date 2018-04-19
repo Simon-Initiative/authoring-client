@@ -4,6 +4,7 @@ import { UserProfile } from 'types/user';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { ModalMessage } from 'utils//ModalMessage';
 import { modalActions } from 'actions/modal';
+import { viewObjectives } from 'actions/view';
 
 export function buildReportProblemAction(
   failure: string, name: string, email: string) : Messages.MessageAction {
@@ -64,15 +65,30 @@ function buildModalMessageAction(label, text) : Messages.MessageAction {
   };
 }
 
-export function buildMissingObjectivesMessage() {
+function goToObjectivesPage(label: string, courseId: string) : Messages.MessageAction {
+  return {
+    label,
+    execute: (message: Messages.Message, dispatch) => {
+      dispatch(viewObjectives(courseId));
+    },
+  };
+}
 
-  const actions = [buildModalMessageAction('Learn more', missingObjectivesDetails)];
+const missingObjectivesDetails =
+  'This is the reason why objectives are so great and why we\'re pestering you about making them.';
+
+export function buildMissingObjectivesMessage(courseId: string) {
+
+  const actions = [
+    buildModalMessageAction('Learn more', missingObjectivesDetails),
+    goToObjectivesPage('Create Objectives', courseId),
+  ];
 
   const content = new Messages.TitledContent().with({
-    title: 'Missing Objectives',
-    message: 'You should add some objectives first',
-
+    title: 'No Course Objectives',
+    message: 'Learning objectives are key to the success of a course. Please create some first.',
   });
+
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Warning,
@@ -80,8 +96,28 @@ export function buildMissingObjectivesMessage() {
     actions: Immutable.List(actions),
     content,
   });
-
 }
 
-const missingObjectivesDetails =
-  'yo, build some objectives first';
+const missingSkillsDetails =
+  'This is the reason why skills are so great and why we\'re pestering you about making them.';
+
+export function buildMissingSkillsMessage(courseId: string) {
+
+  const actions = [
+    buildModalMessageAction('Learn more', missingSkillsDetails),
+    goToObjectivesPage('Create Skills', courseId),
+  ];
+
+  const content = new Messages.TitledContent().with({
+    title: 'No Course Skills',
+    message: 'Learning skills are key to the success of a course. Please create some first.',
+  });
+
+  return new Messages.Message().with({
+    scope: Messages.Scope.Resource,
+    severity: Messages.Severity.Warning,
+    canUserDismiss: false,
+    actions: Immutable.List(actions),
+    content,
+  });
+}
