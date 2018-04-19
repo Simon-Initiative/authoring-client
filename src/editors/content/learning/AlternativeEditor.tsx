@@ -39,7 +39,7 @@ export default class AlternativeEditor
   }
 
   onValueEdit(value: string) {
-    const spacesStripped = value.replace(' ', '');
+    const spacesStripped = value.replace(/\s+/g, '');
     const model = this.props.model.with({ value: spacesStripped });
     this.props.onEdit(model, model);
   }
