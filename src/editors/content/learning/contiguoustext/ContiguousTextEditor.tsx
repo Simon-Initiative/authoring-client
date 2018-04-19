@@ -98,8 +98,6 @@ export default class ContiguousTextEditor
 
     const showBorder = !viewOnly && !hideBorder;
 
-    if (!model) return;
-
     return (
       <div
         className={classNames([
