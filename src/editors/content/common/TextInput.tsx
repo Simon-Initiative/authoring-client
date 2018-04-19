@@ -26,7 +26,9 @@ export class TextInput extends React.PureComponent<TextInputProps, TextInputStat
   componentDidUpdate(nextProps) {
     // set cursor to correct position. Fixes an issue with react controlled inputs
     // https://searler.github.io/react.js/2014/04/11/React-controlled-text.html
-    this.ref.setSelectionRange(this.caret, this.caret);
+    if (this.ref.type === 'text') {
+      this.ref.setSelectionRange(this.caret, this.caret);
+    }
   }
 
   onChange(e) {
