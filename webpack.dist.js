@@ -10,7 +10,7 @@ const cleanOptions = {};
 module.exports = {
     mode: 'production',
     entry: {
-        app: './src/app.tsx',
+        app: ['whatwg-fetch', './src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
