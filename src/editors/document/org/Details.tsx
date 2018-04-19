@@ -30,28 +30,27 @@ export class Details
     this.onProductEdit = this.onProductEdit.bind(this);
   }
 
-  onTitleEdit(title) {
+  onTitleEdit(title: string) {
     const resource = this.props.model.resource.with({ title });
     this.props.onEdit(this.props.model.with({ title, resource }));
   }
 
-  onAudienceEdit(audience) {
+  onAudienceEdit(audience: string) {
     this.props.onEdit(this.props.model.with({ audience }));
   }
 
-  onDescEdit(description) {
+  onDescEdit(description: string) {
     this.props.onEdit(this.props.model.with({ description }));
   }
 
-  onVersionEdit(version) {
+  onVersionEdit(version: string) {
     this.props.onEdit(this.props.model.with({ version }));
   }
 
-  onProductEdit(product) {
-    this.props.onEdit(this.props.model.with({ product: Maybe.just<string>(product) }));
+  onProductEdit(product: string) {
+    const spacesStripped = product.replace(/\s+/g, '');
+    this.props.onEdit(this.props.model.with({ product: Maybe.just<string>(spacesStripped) }));
   }
-
-
 
   render() {
 
