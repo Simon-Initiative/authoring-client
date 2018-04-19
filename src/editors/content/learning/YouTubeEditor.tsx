@@ -38,12 +38,11 @@ export default class YouTubeEditor
   }
 
   onSrcEdit(src: string) {
-    let queryString;
     let videoSrc;
 
     const hasParams = src.includes('?');
     if (hasParams) {
-      queryString = src.substr(src.indexOf('?') + 1);
+      const queryString = src.substr(src.indexOf('?') + 1);
       videoSrc = getQueryVariableFromString('v', queryString);
     }
     const model = this.props.model.with({
