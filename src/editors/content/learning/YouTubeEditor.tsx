@@ -12,7 +12,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
 import {
-  Discoverable, FocusAction, DiscoverableId,
+  Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import './YouTube.scss';

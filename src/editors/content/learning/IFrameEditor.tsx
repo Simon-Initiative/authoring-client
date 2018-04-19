@@ -10,7 +10,7 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { buildUrl } from 'utils/path';
 import {
-  Discoverable, FocusAction, DiscoverableId,
+  Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 

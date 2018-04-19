@@ -18,7 +18,7 @@ import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
 import {
-  Discoverable, FocusAction, DiscoverableId,
+  Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import { styles } from './Alternatives.styles';

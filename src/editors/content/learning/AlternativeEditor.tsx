@@ -14,7 +14,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
 import {
-  Discoverable, FocusAction, DiscoverableId,
+  Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import { styles } from './Alternatives.styles';

@@ -16,7 +16,7 @@ import { Select, TextInput } from '../../common/controls';
 import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import {
-  Discoverable, FocusAction, DiscoverableId,
+  Discoverable, DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import { styles } from './Table.styles';
