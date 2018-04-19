@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        app: ['react-hot-loader/patch', './src/app.tsx'],
+        app: ['whatwg-fetch', 'react-hot-loader/patch', './src/app.tsx'],
         vendor: [
             'draft-js',
             'history',
