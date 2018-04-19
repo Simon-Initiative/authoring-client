@@ -11,6 +11,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
+import { getQueryVariableFromString } from 'utils/params';
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
@@ -37,7 +38,16 @@ export default class YouTubeEditor
   }
 
   onSrcEdit(src: string) {
-    const model = this.props.model.with({ src });
+    let videoSrc;
+
+    const hasParams = src.includes('?');
+    if (hasParams) {
+      const queryString = src.substr(src.indexOf('?') + 1);
+      videoSrc = getQueryVariableFromString('v', queryString);
+    }
+    const model = this.props.model.with({
+      src: videoSrc ? videoSrc : src,
+    });
     this.props.onEdit(model, model);
   }
 
