@@ -86,7 +86,8 @@ export function buildMissingObjectivesMessage(courseId: string) {
 
   const content = new Messages.TitledContent().with({
     title: 'No Course Objectives',
-    message: 'Learning objectives are key to the success of a course. Please create some first.',
+    message: 'Learning objectives are key to the success of a course. You should \
+    create some first.',
   });
 
   return new Messages.Message().with({
@@ -110,7 +111,7 @@ export function buildMissingSkillsMessage(courseId: string) {
 
   const content = new Messages.TitledContent().with({
     title: 'No Course Skills',
-    message: 'Learning skills are key to the success of a course. Please create some first.',
+    message: 'Learning skills are key to the success of a course. You should create some first.',
   });
 
   return new Messages.Message().with({

@@ -80,7 +80,15 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   componentDidMount() {
-    if (this.props.context.skills.size <= 0) {
+    // We have no direct access to a skills list through props.context since
+    // skills cannot be deleted. Looking at skills attached to objectives
+    // will show the banner if skills are present in the course but 'deleted',
+    // aka removed from an associated objective.
+    const hasNoskills = this.props.context.objectives.reduce(
+      (bool, obj) => bool && obj.skills.size === 0,
+      true);
+
+    if (hasNoskills) {
       this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
       this.props.showMessage(this.noSkillsMessage);
     }
