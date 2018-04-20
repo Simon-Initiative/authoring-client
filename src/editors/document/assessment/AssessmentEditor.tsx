@@ -113,7 +113,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
-    if (this.props.context.skills.size <= 0 && nextProps.context.skills.size > 0) {
+    if (this.props.context.skills.size <= 0 &&
+        nextProps.context.skills.size > 0) {
       this.props.dismissMessage(this.noSkillsMessage);
     }
 

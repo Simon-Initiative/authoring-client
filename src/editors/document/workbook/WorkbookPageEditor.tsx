@@ -14,6 +14,7 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingObjectivesMessage } from 'utils/error';
+import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
 
 import './WorkbookPageEditor.scss';
 
@@ -70,9 +71,13 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentDidMount() {
-    if (this.props.context.objectives.size <= 1) {
-      this.noObjectivesMessage = buildMissingObjectivesMessage(this.props.context.courseId);
-      this.props.showMessage(this.noObjectivesMessage);
+    const { context, showMessage } = this.props;
+    const { objectives, courseId } = context;
+
+    if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
+        objectives.size < 1) {
+      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
+      showMessage(this.noObjectivesMessage);
     }
   }
 
