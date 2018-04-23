@@ -12,7 +12,7 @@ import { TextSelection } from 'types/active';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
-import styles from './BlockCode.style';
+import { styles } from './BlockCode.styles';
 
 export interface BlockCodeToolbarProps
   extends AbstractContentEditorProps<contentTypes.BlockCode> {

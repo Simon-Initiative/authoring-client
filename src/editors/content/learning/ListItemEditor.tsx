@@ -10,7 +10,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 
-import styles from './List.styles';
+import { styles } from './List.styles';
 
 export interface ListItemEditorProps
   extends AbstractContentEditorProps<contentTypes.Li> {
@@ -52,7 +52,7 @@ export default class ListItemEditor
     const { className, classes, label } = this.props;
 
     return (
-      <div className={classNames([classes.listItem, className])}>
+      <div className={classNames(['ListItemEditor', classes.listItem, className])}>
         <div className={classNames([classes.listItemLabel, className])}>{label}</div>
         <div className={classNames([classes.listItemContent, className])}>
           <ContentContainer

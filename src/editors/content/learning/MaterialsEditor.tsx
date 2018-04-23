@@ -13,9 +13,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 
-
-import styles from './MaterialsEditor.styles';
-
+import { styles } from './MaterialsEditor.styles';
 
 export interface MaterialsEditorProps
   extends AbstractContentEditorProps<contentTypes.Materials> {

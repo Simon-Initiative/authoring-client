@@ -1,7 +1,13 @@
+import { JSSStyles } from 'styles/jss';
+import colors from 'styles/colors';
+
 const darkGray = '#aaaaaa';
 const lightGray = '#eeeeee';
 
-export default {
+const CELL_SELECTION_COLOR = '#b30000';
+const CELL_SELECTION_PADDING = 3;
+
+export const styles: JSSStyles = {
   table: {
     borderCollapse: 'collapse',
     backgroundColor: 'transparent',
@@ -23,17 +29,35 @@ export default {
 
   },
   innerCell: {
+    position: 'relative',
     height: '100%',
     width: '100%',
     border: '2px solid transparent',
-    '&:hover': {
-      border: '2px solid #ff9999',
-    },
+    padding: CELL_SELECTION_PADDING,
   },
   innerCellSelected: {
+    position: 'relative',
     height: '100%',
     width: '100%',
-    border: '2px solid #b30000',
+    border: [2, 'solid', CELL_SELECTION_COLOR],
+    padding: CELL_SELECTION_PADDING,
+  },
+  innerCellChildSelected: {
+    '& $selectCell': {
+      display: 'initial',
+    },
+  },
+  selectCell: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    display: 'none',
+    color: colors.gray,
+    backgroundColor: colors.white,
+
+    '&:hover': {
+      color: colors.grayDarker,
+    },
   },
   rowHeader: {
     width: '30px',
@@ -66,8 +90,9 @@ export default {
     color: darkGray,
   },
   cornerHeader: {
-    height: '30px',
-    backgroundColor: 'transparent',
+    border: '1px solid ' + darkGray,
+    backgroundColor: lightGray,
+    height: '25px',
   },
   menuIcon: {
     color: darkGray,

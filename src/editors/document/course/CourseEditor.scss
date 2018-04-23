@@ -1,19 +1,30 @@
 @import 'oli/colors';
+@import 'oli/typography';
 
 .course-editor {
   flex: 1;
   overflow: auto;
+  padding: 30px 15px 0 15px;
 
-  margin-left: 20px;
-  margin-right: 20px;
+  margin: 0 20px;
+
+  h2 {
+    font-size: 20px;
+    font-family: $serif-font;
+    padding-bottom: 20px;
+  }
 
   .info {
     .row {
+      padding-left: 1rem;
+      .col-3 {
+        text-align: right;
+        font-weight: 600;
+      }
       [class*="col-"] {
           padding-top: 1rem;
           padding-bottom: 1rem;
           background-color: white;
-          border-bottom: 1px solid rgba(86,61,124,.2);
 
           .btn-primary {
             padding-left: 15px;

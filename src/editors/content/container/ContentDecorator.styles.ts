@@ -1,4 +1,5 @@
-import chroma from 'chroma-js';
+import { JSSStyles } from 'styles/jss';
+import * as chroma from 'chroma-js';
 import colors from 'styles/colors';
 import { disableSelect } from 'styles/mixins';
 import { getContentColor } from 'editors/content/utils/content';
@@ -6,11 +7,12 @@ import { getContentColor } from 'editors/content/utils/content';
 const gripBGTemplate = (color: string) => `-webkit-repeating-radial-gradient(\
   center center, ${color}, ${color} 1px, transparent 1px, transparent 100%)`;
 
-export default {
+export const styles: JSSStyles = {
   contentDecorator: {
     position: 'relative',
     display: 'flex',
     flexDirection: 'row',
+    width: '100%',
   },
   hover: {
     '& > $handle': {

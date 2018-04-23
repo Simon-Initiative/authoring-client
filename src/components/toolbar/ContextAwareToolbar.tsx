@@ -15,7 +15,7 @@ import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
 
-import styles, { TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.style';
+import { styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.styles';
 
 interface ToolbarGroupProps {
   className?: string;
@@ -186,7 +186,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={9}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={10}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}

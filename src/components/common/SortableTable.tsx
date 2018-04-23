@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './SortableTable.scss';
 
 // A reusable, sortable table component
 
@@ -11,6 +12,8 @@ export type ColumnComparator = (direction: SortDirection, a: any, b: any) => num
 
 export type ColumnRenderer = (item: Object) => JSX.Element;
 
+export type RowRenderer = (item: DataRow, index: number, children: any) => JSX.Element;
+
 export type DataRow = {
   key: string;
   data: Object;
@@ -20,9 +23,16 @@ export interface SortableTable {
 
 }
 
+const defaultRowRenderer: RowRenderer = (item: DataRow, index: number, children: any) => {
+  return (
+    <tr key={item.key}>{children}</tr>
+  );
+};
+
 export interface SortableTableProps {
   columnLabels: string[];
   columnComparators: ColumnComparator[];
+  rowRenderer?: RowRenderer;
   columnRenderers: ColumnRenderer[];
   model: DataRow[];
 }
@@ -47,6 +57,7 @@ export class SortableTable
         0, SortDirection.Ascending),
     };
 
+    this.onSortChange = this.onSortChange.bind(this);
   }
 
 
@@ -68,7 +79,7 @@ export class SortableTable
     }
   }
 
-  onSortChange(sortColumnIndex) {
+  onSortChange(sortColumnIndex: number) {
 
     if (sortColumnIndex === this.state.sortColumnIndex) {
 
@@ -88,14 +99,16 @@ export class SortableTable
     }
   }
 
-  renderSortIndicator() {
+  renderSortIndicator(isSorted: boolean) {
 
-    const classes = 'fa fa-sort-'
-      + (this.state.sortDirection === SortDirection.Ascending ? 'up' : 'down');
+    let classes = 'fa fa-sort';
+    if (isSorted) {
+      classes += this.state.sortDirection === SortDirection.Ascending ? '-up' : '-down';
+    }
 
     return (
-      <span>&nbsp;
-        <a onClick={this.onSortChange.bind(this, this.state.sortColumnIndex)}>
+      <span>&nbsp;&nbsp;
+        <a onClick={_ => this.onSortChange(this.state.sortColumnIndex)}>
           <span>
           <i className={classes}></i>
           </span>
@@ -108,41 +121,43 @@ export class SortableTable
     return this.props.columnLabels
       .map((label, index) => {
         return (
-          <th key={label}>
-            <a onClick={this.onSortChange.bind(this, index)}>{label}</a>
+          <th key={label} onClick={_ => this.onSortChange(index)}>
+            <a>{label}</a>
             {index === this.state.sortColumnIndex
-              ? this.renderSortIndicator()
-              : null }
+              ? this.renderSortIndicator(true)
+              : this.renderSortIndicator(false) }
           </th>
         );
       });
   }
 
   renderRows() {
+    const rowRenderer = this.props.rowRenderer
+      ? this.props.rowRenderer
+      : defaultRowRenderer;
+
     return this.state.sortedModel
-      .map((row) => {
-        return (
-          <tr key={row.key}>
-            {this.props.columnRenderers.map((renderer, i) => <td key={i}>{renderer(row.data)}</td>)}
-          </tr>
+      .map((row, index) => {
+        return rowRenderer(
+          row,
+          index,
+          this.props.columnRenderers.map((renderer, i) => <td key={i}>{renderer(row.data)}</td>),
         );
       });
   }
 
   render() {
     return (
-      <table className="table table-sm table-striped table-hover">
+      <table className="table table-sm table-hover customTable">
         <thead>
-        <tr>
-          {this.renderColumnHeaders()}
-        </tr>
+          <tr>
+            {this.renderColumnHeaders()}
+          </tr>
         </thead>
         <tbody>
-        {this.renderRows()}
+          {this.renderRows()}
         </tbody>
       </table>
     );
   }
-
 }
-

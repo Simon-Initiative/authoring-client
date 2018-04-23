@@ -15,11 +15,16 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../../common/controls';
 import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
-import styles from './Table.styles';
+import {
+  Discoverable, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
+import { styles } from './Table.styles';
 
 export interface TableEditorProps
   extends AbstractContentEditorProps<contentTypes.Table> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface TableEditorState {
@@ -66,23 +71,27 @@ export default class TableEditor
     return (
       <SidebarContent title="Table">
         <SidebarGroup label="Title">
-          <TextInput
-            width="100%"
-            editMode={this.props.editMode}
-            value={title}
-            label=""
-            type="text"
-            onEdit={this.onTitleEdit.bind(this)} />
+          <Discoverable id={DiscoverableId.TableEditorTitle} focusChild>
+            <TextInput
+              width="100%"
+              editMode={this.props.editMode}
+              value={title}
+              label=""
+              type="text"
+              onEdit={this.onTitleEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Row Style">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={rowStyle}
-            onChange={this.onStyleChange.bind(this)}>
-            <option value="plain">Plain</option>
-            <option value="alternating">Alternating</option>
-          </Select>
+          <Discoverable id={DiscoverableId.TableEditorRowStyle} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={rowStyle}
+              onChange={this.onStyleChange.bind(this)}>
+              <option value="plain">Plain</option>
+              <option value="alternating">Alternating</option>
+            </Select>
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -93,15 +102,23 @@ export default class TableEditor
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.TableEditorTitle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.TableEditorRowStyle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-th-list"></i></div>
           <div>Row Style</div>
         </ToolbarButton>
@@ -132,6 +149,17 @@ export default class TableEditor
     this.props.onEdit(model, src);
   }
 
+
+  onCellRemove(row, cell, src) {
+
+    const updatedRow = row.with({ cells: row.cells.delete(cell.guid) });
+    const model = this.props.model
+      .with({ rows: this.props.model.rows.set(updatedRow.guid, updatedRow) });
+
+    this.props.onEdit(model, src);
+  }
+
+
   renderCell(row: contentTypes.Row, cell: contentTypes.CellData | contentTypes.CellHeader) {
 
     const { className, classes } = this.props;
@@ -150,37 +178,52 @@ export default class TableEditor
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
-      onRemove: (e) => {},
+      onRemove: (e) => {
+        this.onCellRemove(row, e, null);
+      },
       onDuplicate: (e) => {},
       onMoveUp: (e) => {},
       onMoveDown: (e) => {},
       props: this.props,
     };
 
-
-
     const style = { textAlign };
 
     if (!isFirefox && !isIE && !isEdge) {
       style['height'] = '1px';
     }
+
+    const cellEditor = <CellEditor
+      {...this.props}
+      model={cell}
+      parent={noManualControl}
+      onEdit={this.onCellEdit.bind(this, row)}
+    />;
+
+    if (cell.contentType === 'CellData') {
+      return (
+        <td
+          key={cell.guid}
+          style={style}
+          className={classNames([classes.cell, className])}
+          colSpan={parseInt(cell.colspan, 10)}
+          rowSpan={parseInt(cell.rowspan, 10)}>
+          {cellEditor}
+        </td>
+      );
+    }
     return (
-      <td
+      <th
         key={cell.guid}
         style={style}
         className={classNames([classes.cell, className])}
         colSpan={parseInt(cell.colspan, 10)}
         rowSpan={parseInt(cell.rowspan, 10)}>
-
-        <CellEditor
-          {...this.props}
-          model={cell}
-          parent={noManualControl}
-          onEdit={this.onCellEdit.bind(this, row)}
-        />
-
-      </td>
+        {cellEditor}
+      </th>
     );
+
+
   }
 
   renderHeaderRow(columns: number) {
@@ -356,7 +399,7 @@ export default class TableEditor
     const headerRow = this.renderHeaderRow(maxColumns);
 
     return (
-      <div className={classNames([classes.tableEditor, className])}>
+      <div className={classNames(['TableEditor', classes.tableEditor, className])}>
         <table className={classNames([classes.table, className])}>
           <tbody>
           {headerRow}

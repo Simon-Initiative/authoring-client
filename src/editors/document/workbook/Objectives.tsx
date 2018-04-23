@@ -43,7 +43,9 @@ export class Objectives
   }
 
   componentWillReceiveProps(nextProps: ObjectivesProps) {
-    if (nextProps.model !== this.props.model) {
+    if (nextProps.model !== this.props.model
+      || nextProps.context.objectives !== this.props.context.objectives) {
+
       this.setState({ selected: toObjArray(nextProps.model, nextProps.context.objectives) });
     }
 

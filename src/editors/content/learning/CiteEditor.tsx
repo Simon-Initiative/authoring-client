@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { TextInput } from '../common/controls';
@@ -8,8 +8,6 @@ import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-
-import styles from './Entity.style';
 
 export interface CiteEditorProps
   extends AbstractContentEditorProps<contentTypes.Cite> {
@@ -23,7 +21,6 @@ export interface CiteEditorState {
 /**
  * React Component
  */
-@injectSheet(styles)
 export default class CiteEditor
     extends AbstractContentEditor
     <contentTypes.Cite, CiteEditorProps & JSSProps, CiteEditorState> {

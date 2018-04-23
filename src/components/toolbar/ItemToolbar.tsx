@@ -9,7 +9,7 @@ import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
 import { ParentContainer } from 'types/active';
 
-import styles from './ItemToolbar.style';
+import { styles } from './ItemToolbar.styles';
 
 export interface ItemToolbarProps {
   context: AppContext;

@@ -14,14 +14,13 @@ import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
 import * as Tree from '../../common/tree';
 import { hasUnknownSkill } from 'utils/skills';
-import * as persistence from 'data/persistence';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
-import ResourceSelection from 'utils/selection/ResourceSelection';
-
+import ResourceSelection from 'utils/selection/ResourceSelection.controller';
+import { Resource } from 'data/content/resource';
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
@@ -276,7 +275,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   onSelectPool() {
 
     const predicate =
-      (res: persistence.CourseResource) : boolean => {
+      (res: Resource) : boolean => {
         return res.type === LegacyTypes.assessment2_pool;
       };
 
@@ -300,7 +299,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       return;
     }
 
-    this.props.services.fetchIdByGuid(resource.id)
+    this.props.services.fetchIdByGuid(resource.guid)
     .then((idref) => {
       const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
       this.addNode(pool);
@@ -371,6 +370,13 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           disabled={!this.props.editMode || isInline}
           type="button" className="btn btn-link btn-sm"
           onClick={this.onSelectPool}>Question Pool</button>
+
+        <span className="slash">/</span>
+
+        <button
+          disabled={!this.props.editMode || isInline}
+          type="button" className="btn btn-link btn-sm"
+          onClick={this.onAddPool}>Embedded Pool</button>
 
       </div>
     );

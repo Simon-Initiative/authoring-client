@@ -17,12 +17,16 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
 
-import styles from './Definition.styles';
+import { styles } from './Definition.styles';
 
 export interface DefinitionEditorProps
   extends AbstractContentEditorProps<contentTypes.Definition> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface DefinitionEditorState {
@@ -63,27 +67,36 @@ export default class DefinitionEditor
     return (
       <SidebarContent title="Definition">
         <SidebarGroup label="Title">
-          <ToolbarContentContainer
-            onFocus={() => {}}
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
-            model={title.text}
-            onEdit={this.onTitleEdit.bind(this)} />
+          <Discoverable
+            id={DiscoverableId.DefinitionEditorTitle}
+            focusChild=".DraftEditor-editorContainer"
+            focusAction={FocusAction.Click}>
+            <ToolbarContentContainer
+              onFocus={() => {}}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
+              model={title.text}
+              onEdit={this.onTitleEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Definition" columns={2} highlightColor={CONTENT_COLORS.Definition}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.DefinitionEditorTitle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>

@@ -26,6 +26,8 @@ export class Details
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAudienceEdit = this.onAudienceEdit.bind(this);
     this.onDescEdit = this.onDescEdit.bind(this);
+    this.onVersionEdit = this.onVersionEdit.bind(this);
+    this.onProductEdit = this.onProductEdit.bind(this);
   }
 
   onTitleEdit(title) {

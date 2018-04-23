@@ -146,7 +146,7 @@ export class ObjectiveSkillView
           this.releaseAllLocks([...aggregateModel.objectives, ...aggregateModel.skills]);
 
         } else {
-          
+
           // Log objectives and skills
           this.logObjectivesAndSkills(aggregateModel);
 
@@ -183,7 +183,7 @@ export class ObjectiveSkillView
   logObjectivesAndSkills(aggregateModel: AggregateModel) {
     const { objectives, skills } = aggregateModel;
 
-    const objectiveObjects = objectives.map(objective => 
+    const objectiveObjects = objectives.map(objective =>
       (objective.model as LearningObjectivesModel)
         .objectives
         .toArray()
@@ -609,9 +609,8 @@ export class ObjectiveSkillView
 
   renderContent() {
     return (
-      <table className="table table-sm table-striped">
+      <table className="table table-sm">
         <tbody>
-
 
           {this.renderObjectives()}
 

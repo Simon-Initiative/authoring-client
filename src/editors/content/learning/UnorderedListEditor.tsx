@@ -16,11 +16,16 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select } from '../common/controls';
 import { Maybe } from 'tsmonad';
-import styles from './List.styles';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
+import { styles } from './List.styles';
 
 export interface UnorderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ul> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface UnorderedListEditorState {
@@ -65,29 +70,36 @@ export default class UnorderedList
     return (
       <SidebarContent title="Unordered List">
         <SidebarGroup label="Title">
-          <ToolbarContentContainer
-            onFocus={() => {}}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            model={title.text}
-            onEdit={this.onTitleEdit.bind(this)} />
+          <Discoverable
+            id={DiscoverableId.UnorderedListEditorTitle}
+            focusChild=".DraftEditor-editorContainer"
+            focusAction={FocusAction.Click}>
+            <ToolbarContentContainer
+              onFocus={() => {}}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              model={title.text}
+              onEdit={this.onTitleEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Style">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={style}
-            onChange={this.onStyleChange.bind(this)}>
-            <option value=""></option>
-            <option value="none">None</option>
-            <option value="disc">Disc</option>
-            <option value="circle">Circle</option>
-            <option value="square">Square</option>
-          </Select>
+          <Discoverable id={DiscoverableId.UnorderedListEditorStyle} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={style}
+              onChange={this.onStyleChange.bind(this)}>
+              <option value=""></option>
+              <option value="none">None</option>
+              <option value="disc">Disc</option>
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+            </Select>
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -110,15 +122,23 @@ export default class UnorderedList
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Unordered List" columns={4} highlightColor={CONTENT_COLORS.Ul}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.UnorderedListEditorTitle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.UnorderedListEditorStyle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-list-ul"></i></div>
           <div>Style</div>
         </ToolbarButton>

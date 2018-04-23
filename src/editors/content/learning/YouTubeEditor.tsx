@@ -9,11 +9,17 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { MediaMetadataEditor, MediaWidthHeightEditor } from 'editors/content/learning/MediaItems';
+import {
+  Discoverable, DiscoverableId,
+} from 'components/common/Discoverable.controller';
+
 import './YouTube.scss';
 
 export interface YouTubeProps extends AbstractContentEditorProps<YouTubeType> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface YouTubeState {
@@ -28,6 +34,7 @@ export default class YouTubeEditor
 
     this.onSrcEdit = this.onSrcEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
+    this.onControlEdit = this.onControlEdit.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -44,24 +51,38 @@ export default class YouTubeEditor
     this.props.onEdit(this.props.model.with({ caption }), src);
   }
 
+
+  onControlEdit() {
+    const controls = !this.props.model.controls;
+    const model = this.props.model.with({ controls });
+    this.props.onEdit(model, model);
+  }
+
   renderSidebar(): JSX.Element {
     const { src } = this.props.model;
 
     return (
       <SidebarContent title="YouTube">
         <SidebarGroup label="Video URL">
-          <div className="input-group">
-            <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
-              <TextInput
-                {...this.props}
-                width="100%"
-                type="text"
-                label=""
-                value={src}
-                onEdit={this.onSrcEdit} />
-          </div>
+          <Discoverable id={DiscoverableId.YouTubeEditorSourceURL} focusChild="input">
+            <div className="input-group">
+              <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
+                <TextInput
+                  {...this.props}
+                  width="100%"
+                  type="text"
+                  label=""
+                  value={src}
+                  onEdit={this.onSrcEdit} />
+            </div>
+          </Discoverable>
         </SidebarGroup>
-
+        <SidebarGroup label="Controls">
+          <ToggleSwitch
+            checked={this.props.model.controls}
+            onClick={this.onControlEdit}
+            labelBefore="Display YouTube controls" />
+        </SidebarGroup>
         <MediaWidthHeightEditor
           width={this.props.model.width}
           height={this.props.model.height}
@@ -83,12 +104,18 @@ export default class YouTubeEditor
     );
   }
   renderToolbar(): JSX.Element {
+    const { onShowSidebar, onDiscover } = this.props;
+
     return (
       <ToolbarGroup
         label="YouTube"
         columns={5}
         highlightColor={CONTENT_COLORS.YouTube}>
-        <ToolbarButton onClick={() => this.props.onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.YouTubeEditorSourceURL);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-youtube-play"/></div>
           <div>Source URL</div>
         </ToolbarButton>

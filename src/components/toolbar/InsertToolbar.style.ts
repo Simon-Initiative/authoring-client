@@ -1,4 +1,6 @@
-export default {
+import { JSSStyles } from 'styles/jss';
+
+export const styles: JSSStyles = {
   unicodeIcon: {
     font: {
       style: 'normal',
