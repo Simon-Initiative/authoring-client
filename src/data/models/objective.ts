@@ -26,7 +26,6 @@ const defaultLearningObjectivesModelParams = {
 
 export const DEFAULT_OBJECTIVE_TITLE = 'Default objective';
 
-
 export class LearningObjectivesModel
   extends Immutable.Record(defaultLearningObjectivesModelParams) {
 
