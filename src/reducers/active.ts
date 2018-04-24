@@ -12,6 +12,8 @@ export type ActionTypes =
   actions.UpdateContextAction |
   actions.ResetActiveAction;
 
+// Add onRemove here
+
 export type ActiveContextState = ActiveContext;
 
 const initialState = new ActiveContext();

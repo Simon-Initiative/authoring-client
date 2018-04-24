@@ -16,6 +16,9 @@ export interface ItemToolbarProps {
   courseModel: CourseModel;
   activeContext: ActiveContextState;
   onClearSelection: () => void;
+  onCut: (item) => void;
+  onCopy: (item) => void;
+  onRemove: (item) => void;
 }
 
 /**
@@ -32,7 +35,6 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
       nothing: () => undefined,
     });
 
-
     const container: ParentContainer = activeContext.container.caseOf({
       just: container => container,
       nothing: () => undefined,
@@ -45,6 +47,39 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
 
     const canMoveUp = true;
     const canMoveDown = true;
+
+    // const onCut = (item) => {
+    //   onCopy(item);
+    //   container.onRemove(item);
+    // };
+
+    // const onCopy = (item) => {
+    //   // Add contents to clipboard:
+    //   // Input element must be selected to copy to clipboard.
+    //     // Create html input element with contents
+    //     // inputElement.select()
+    //     // document.execCommand('copy')
+    //     // Remove html input
+    // };
+
+    // const onPaste = () => {
+    //   const { model } = this.props;
+
+    //   // How to create element from clipboard contents?
+    //   const active = { clone : () => {} };
+
+    //   // How to get guid of actively selected element?
+    //   const activeContentGuid = undefined;
+    //   const index = indexOf(activeContentGuid, model);
+
+    //   const duplicate = (active.clone() as any).with({
+    //     guid: guid(),
+    //   });
+    //   container.onEdit(this.insertAfter(model, duplicate, index), duplicate);
+
+    //   // Should onSelect be added to the interface?
+    //   // container.onSelect(duplicate);
+    // };
 
     const onRemove = () => {
       onClearSelection();
@@ -75,12 +110,35 @@ export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
       <React.Fragment>
         <ToolbarLayout.Column>
           <ToolbarButton
+              onClick={() => this.props.onCut(item)}
+              tooltip="Cut Item"
+              size={ToolbarButtonSize.Wide}
+              disabled={!(hasSelection && canDuplicate)}>
+            <i className="fa fa-cut"/> Cut
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={() => this.props.onCopy(item)}
+              tooltip="Copy Item"
+              size={ToolbarButtonSize.Wide}
+              disabled={!(hasSelection && canDuplicate)}>
+            <i className="fa fa-copy"/> Copy
+          </ToolbarButton>
+        </ToolbarLayout.Column>
+        <ToolbarLayout.Column>
+        <ToolbarButton
+              onClick={() => this.props.onPaste(item)}
+              tooltip="Paste Item"
+              size={ToolbarButtonSize.Wide}
+              disabled={!(hasSelection && canDuplicate)}>
+            <i className="fa fa-paste"/> Paste
+          </ToolbarButton>
+          {/* <ToolbarButton
               onClick={() => container.onDuplicate(item)}
               tooltip="Duplicate Item"
               size={ToolbarButtonSize.Wide}
               disabled={!(hasSelection && canDuplicate)}>
             <i className="fa fa-files-o"/> Duplicate
-          </ToolbarButton>
+          </ToolbarButton> */}
           <ToolbarButton
               className={classes.removeButton}
               onClick={onRemove}

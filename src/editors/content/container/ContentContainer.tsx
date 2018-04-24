@@ -35,7 +35,7 @@ export interface ContentContainerState {
 
 }
 
-function indexOf(guid: string, model: ContentElements) : number {
+export function indexOf(guid: string, model: ContentElements) : number {
   let index = -1;
   const arr = model.content.toArray();
   for (let i = 0; i < arr.length; i += 1) {

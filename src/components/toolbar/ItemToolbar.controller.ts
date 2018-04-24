@@ -4,7 +4,7 @@ import { ActiveContextState } from 'reducers/active';
 import { ItemToolbar } from './ItemToolbar';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
-import { resetActive } from 'actions/active';
+import { resetActive, cut, copy, remove } from 'actions/active';
 
 interface StateProps {
   activeContext: ActiveContextState;
@@ -12,6 +12,9 @@ interface StateProps {
 
 interface DispatchProps {
   onClearSelection: () => void;
+  onCut: (item: Object) => void;
+  onCopy: (item: Object) => void;
+  onRemove: (item: Object) => void;
 }
 
 interface OwnProps {
@@ -27,9 +30,10 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onClearSelection: () => {
-      dispatch(resetActive());
-    },
+    onClearSelection: () => dispatch(resetActive()),
+    onCut: item => dispatch(cut(item)),
+    onCopy: item => dispatch(copy(item)),
+    onRemove: item => dispatch(remove(item)),
   };
 };
 

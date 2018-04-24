@@ -1,5 +1,6 @@
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
+import { ActiveContextState, activeContext } from 'reducers/active';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -52,6 +53,14 @@ export type ResetActiveAction = {
 export const resetActive = (): ResetActiveAction => ({
   type: RESET_ACTIVE,
 });
+
+// add onRemove
+// add paste
+
+export function remove(item: Object) {
+  return function (dispatch, getState) {
+  };
+}
 
 
 export function insert(content: Object, textSelection: Maybe<TextSelection>) {
