@@ -1,8 +1,5 @@
-import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import { ActiveContextState } from 'reducers/active';
-import { insert } from 'actions/active';
-import { Clipboard } from 'types/clipboard';
 
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';

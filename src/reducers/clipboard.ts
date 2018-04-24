@@ -3,7 +3,6 @@ import {
   SET_ITEM,
   SetItemAction,
 } from 'actions/clipboard';
-import { OtherAction } from './utils';
 
 export type ActionTypes = SetItemAction;
 export type ClipboardState = Clipboard;

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC } from 'styles/jss';
-import * as contentTypes from 'data/contentTypes';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
