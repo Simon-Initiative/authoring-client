@@ -17,6 +17,7 @@ import { user, UserState } from './user';
 import { questionEditor, QuestionEditorState } from './questionEditor';
 import { documents, DocumentsState } from './documents';
 import { activeContext, ActiveContextState } from './active';
+import { clipboard, ClipboardState } from './clipboard';
 
 export interface State {
   activeContext: ActiveContextState;
@@ -36,6 +37,7 @@ export interface State {
   skills: SkillsState;
   user: UserState;
   questionEditor: QuestionEditorState;
+  clipboard: ClipboardState;
 }
 
 const reducers = combineReducers({
@@ -56,6 +58,7 @@ const reducers = combineReducers({
   skills,         // all known skills for the current course
   user,           // Information about current user, null if not logged in
   questionEditor,
+  clipboard,      // Native clipboard state and cut/copy/paste actions
 });
 
 export default reducers;

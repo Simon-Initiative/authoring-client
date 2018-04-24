@@ -1,6 +1,8 @@
 import { ParentContainer, TextSelection } from 'types/active';
+import { Clipboard } from 'types/clipboard';
 import { Maybe } from 'tsmonad';
-import { ActiveContextState, activeContext } from 'reducers/active';
+import { ActiveContextState } from 'reducers/active';
+import * as contentTypes from 'data/contentTypes';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -10,7 +12,6 @@ export type UpdateContentAction = {
   documentId: string,
   content: Object,
 };
-
 
 export const updateContent = (
   documentId: string,
@@ -43,6 +44,7 @@ export const updateContext = (
     textSelection,
   });
 
+
 export type RESET_ACTIVE = 'active/RESET_ACTIVE';
 export const RESET_ACTIVE: RESET_ACTIVE = 'active/RESET_ACTIVE';
 
@@ -53,14 +55,6 @@ export type ResetActiveAction = {
 export const resetActive = (): ResetActiveAction => ({
   type: RESET_ACTIVE,
 });
-
-// add onRemove
-// add paste
-
-export function remove(item: Object) {
-  return function (dispatch, getState) {
-  };
-}
 
 
 export function insert(content: Object, textSelection: Maybe<TextSelection>) {
@@ -78,6 +72,57 @@ export function edit(content: Object) {
     const { activeContext } = getState();
     activeContext.container.lift((parent : ParentContainer) => {
       parent.onEdit(content, content);
+    });
+  };
+}
+
+export function paste() {
+  return function (dispatch, getState) {
+    const { activeContext }: { activeContext: ActiveContextState } = getState();
+    const { clipboard }: { clipboard: Clipboard } = getState();
+    clipboard.item.caseOf({
+      // just: item => dispatch(insert(item, Maybe.nothing())),
+      just: item => activeContext.container.caseOf({
+        // paste in parent after selected item
+        just: parent => parent.onDuplicate(item),
+        // paste at end
+        nothing: () => {},
+      }),
+      nothing: () => {},
+    });
+  };
+}
+
+export function remove(item: Object) {
+  return function (dispatch, getState) {
+    const { activeContext }: { activeContext: ActiveContextState } = getState();
+
+    const container: ParentContainer = activeContext.container.caseOf({
+      just: container => container,
+      nothing: () => undefined,
+    });
+
+    dispatch(resetActive());
+
+    activeContext.textSelection.caseOf({
+      just: (textSelection) => {
+        if (item instanceof contentTypes.ContiguousText) {
+          const text = item as contentTypes.ContiguousText;
+          const entity = text.getEntityAtCursor(textSelection);
+          entity.caseOf({
+            just: (e) => {
+              const updated = text.removeEntity(e.key);
+              container.onEdit(updated, updated);
+            },
+            nothing: () => container.onRemove(item),
+          });
+        } else {
+          container.onRemove(item);
+        }
+      },
+      nothing: () => {
+        container.onRemove(item);
+      },
     });
   };
 }

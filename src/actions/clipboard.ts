@@ -1,17 +1,22 @@
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
-import { ActiveContextState, activeContext } from 'reducers/active';
+import { ActiveContextState } from 'reducers/active';
+import { insert } from 'actions/active';
+import { Clipboard } from 'types/clipboard';
 
 export type SET_ITEM = 'clipboard/SET_ITEM';
 export const SET_ITEM: SET_ITEM = 'clipboard/SET_ITEM';
+
+export type SetItemAction = {
+  type: SET_ITEM;
+  item: Maybe<Object>;
+};
 
 export const setItem = item => ({
   type: SET_ITEM,
   item,
 });
 
-// create clipboard reducer
-// store item in clipboard reducer, on paste it will insert the item
 export function cut(item: Object) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
@@ -25,6 +30,3 @@ export function copy(item: Object) {
     dispatch(setItem(item));
   };
 }
-
-// paste uses getstate as a thunk, get current item, use currently
-// active parent and call .onInsert(item, parent)
