@@ -178,9 +178,19 @@ export class ContentContainer
     }
   }
 
+  onPaste(item) {
+    const { onEdit, model, activeContentGuid } = this.props;
+    const index = indexOf(activeContentGuid, model);
+    const duplicate = (item.clone() as any).with({
+      guid: guid(),
+    });
+    onEdit(this.insertAfter(model, duplicate, index), duplicate);
+
+    this.onSelect(duplicate);
+  }
+
   onDuplicate(childModel) {
     const { onEdit, model, activeContentGuid } = this.props;
-
     if (model.content.has(childModel.guid)) {
       const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);

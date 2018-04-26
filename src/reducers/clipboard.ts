@@ -1,3 +1,4 @@
+import { Maybe } from 'tsmonad';
 import { Clipboard } from 'types/clipboard';
 import {
   SET_ITEM,
@@ -15,7 +16,11 @@ export const clipboard = (
 ): ClipboardState => {
   switch (action.type) {
     case SET_ITEM:
-      return state.with({ item: state.item });
+      return state.with({
+        item: action.item === null || action.item === undefined
+          ? Maybe.nothing()
+          : Maybe.just(action.item),
+      });
     default:
       return state;
   }

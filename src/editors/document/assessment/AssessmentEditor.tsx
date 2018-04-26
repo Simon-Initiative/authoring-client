@@ -250,6 +250,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     // do nothing
   }
 
+  onPaste(childModel) {
+    // this method is never used, but is required by ParentContainer
+    // do nothing
+  }
+
   onDuplicate(childModel) {
     // this method is never used, but is required by ParentContainer
     // do nothing

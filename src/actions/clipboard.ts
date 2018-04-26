@@ -9,7 +9,7 @@ export type SetItemAction = {
   item: Maybe<Object>;
 };
 
-export const setItem = item => ({
+export const setItem = (item: Object) => ({
   type: SET_ITEM,
   item,
 });
@@ -24,6 +24,7 @@ export function cut(item: Object) {
 
 export function copy(item: Object) {
   return function (dispatch, getState) {
+    const { activeContext }: { activeContext: ActiveContextState } = getState();
     dispatch(setItem(item));
   };
 }

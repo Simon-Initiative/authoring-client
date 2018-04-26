@@ -81,11 +81,8 @@ export function paste() {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
     const { clipboard }: { clipboard: Clipboard } = getState();
     clipboard.item.caseOf({
-      // just: item => dispatch(insert(item, Maybe.nothing())),
       just: item => activeContext.container.caseOf({
-        // paste in parent after selected item
-        just: parent => parent.onDuplicate(item),
-        // paste at end
+        just: parent => parent.onPaste(item),
         nothing: () => {},
       }),
       nothing: () => {},

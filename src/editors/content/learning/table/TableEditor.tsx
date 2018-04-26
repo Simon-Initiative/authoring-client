@@ -165,6 +165,7 @@ export default class TableEditor
       onRemove: (e) => {
         this.onCellRemove(row, e, null);
       },
+      onPaste: (e) => {},
       onDuplicate: (e) => {},
       onMoveUp: (e) => {},
       onMoveDown: (e) => {},

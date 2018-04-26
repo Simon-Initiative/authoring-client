@@ -229,6 +229,16 @@ export default class AlternativesEditor
       onRemove: (e) => {
         this.onAlternativeRemove(e);
       },
+      onPaste: (e) => {
+        const clone = e.clone().with({
+          value: 'Duplicate of ' + e.value,
+          guid: guid(),
+        });
+        const model = this.props.model.with({
+          content: this.props.model.content.set(clone.guid, clone),
+        });
+        this.props.onEdit(model, model);
+      },
       onDuplicate: (e) => {
         const clone = e.clone().with({
           value: 'Duplicate of ' + e.value,
