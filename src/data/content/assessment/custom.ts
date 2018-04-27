@@ -1,9 +1,7 @@
 import * as Immutable from 'immutable';
 
-import { Choice } from './choice';
 import createGuid from '../../../utils/guid';
-import { augment, getChildren } from '../common';
-import { getKey } from '../../common';
+import { augment } from '../common';
 import { DndLayout } from './dragdrop/dnd_layout';
 
 export type CustomParams = {

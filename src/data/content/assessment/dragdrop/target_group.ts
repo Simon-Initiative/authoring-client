@@ -1,12 +1,10 @@
 import * as Immutable from 'immutable';
 
-import { Choice } from '../choice';
 import createGuid from '../../../../utils/guid';
 import { augment, getChildren } from '../../common';
 import { getKey } from '../../../common';
 import { ContentRow } from './content_row';
 import { HeaderRow } from './header_row';
-import Header from 'components/Header';
 
 export type TargetGroupParams = {
   guid?: string;
