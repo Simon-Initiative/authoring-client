@@ -8,12 +8,13 @@ import { remove } from 'actions/active';
 import { cut, copy, paste } from 'actions/clipboard';
 
 interface StateProps {
+  // activeContext: ActiveContextState;
 }
 
 interface DispatchProps {
-  onCut: (item: Object) => void;
-  onCopy: (item: Object) => void;
-  onPaste: () => void;
+  // onCut: (item: Object) => void;
+  // onCopy: (item: Object) => void;
+  // onPaste: () => void;
 }
 
 interface OwnProps {
@@ -29,15 +30,15 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-
+    // activeContext: state.activeContext,
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onCut: item => dispatch(cut(item)),
-    onCopy: item => dispatch(copy(item)),
-    onPaste: () => dispatch(paste()),
+    // onCut: item => dispatch(cut(item)),
+    // onCopy: item => dispatch(copy(item)),
+    // onPaste: () => dispatch(paste()),
   };
 };
 

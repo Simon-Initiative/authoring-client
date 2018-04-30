@@ -6,6 +6,8 @@ import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
+import { cut, copy, paste } from 'actions/clipboard';
+import { ActiveContextState } from 'reducers/active';
 
 interface StateProps {
   expanded: any;
@@ -15,11 +17,17 @@ interface StateProps {
   undoRedoGuid: string;
   editingAllowed: boolean;
   hasFailed: boolean;
+
+  activeContext: ActiveContextState;
 }
 
 interface DispatchProps {
   onSave: (documentId: string, model: ContentModel) => any;
   onDispatch: (...args: any[]) => any;
+
+  onCut: (item: Object) => void;
+  onCopy: (item: Object) => void;
+  onPaste: () => void;
 }
 
 interface OwnProps {
@@ -33,7 +41,7 @@ interface OwnProps {
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents } = state;
+  const { expanded, skills, objectives, documents, activeContext } = state;
   const ed = documents.get(ownProps.documentId);
 
   let document = null;
@@ -49,6 +57,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   }
 
   return {
+    activeContext,
     expanded,
     skills,
     objectives,
@@ -65,7 +74,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(save(documentId, model));
     },
     onDispatch: dispatch,
-
+    onCut: item => dispatch(cut(item)),
+    onCopy: item => dispatch(copy(item)),
+    onPaste: () => dispatch(paste()),
   };
 };
 

@@ -10,6 +10,7 @@ import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { lookUpByName } from 'editors/manager/registry';
 import { LearningObjective, Skill } from 'data//contentTypes';
+import { ActiveContextState } from 'reducers/active';
 
 import './EditorManager.scss';
 
@@ -28,6 +29,11 @@ export interface EditorManagerProps {
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
   onSave: (documentId: string, model: models.ContentModel) => any;
+
+  activeContext: ActiveContextState;
+  onCut: (item: Object) => void;
+  onCopy: (item: Object) => void;
+  onPaste: () => void;
 }
 
 export interface EditorManagerState {
@@ -53,6 +59,40 @@ export default class EditorManager
         this.setState({ waitBufferElapsed: true });
       },
       200);
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'c' && (event.ctrlKey || event.metaKey)) {
+        console.log('copy');
+        if (!(event.target as any).contenteditable) {
+          console.log('content not editable');
+          event.preventDefault();
+          event.stopPropagation();
+          this.props.onCopy(this.getItem());
+        }
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+        console.log('paste', event, (event.target as any).isContentEditable);
+        // this doesn't work. how to restrict pasting when text is selected?
+        if (!(event.target as any).contenteditable) {
+          console.log('content not editable');
+          event.preventDefault();
+          event.stopPropagation();
+          this.props.onPaste();
+        }
+      }
+    });
+  }
+
+  getItem() {
+    const { activeContext } = this.props;
+    return activeContext.activeChild.caseOf({
+      just: activeChild => activeChild,
+      nothing: () => undefined,
+    });
   }
 
   onEdit(model: models.ContentModel) {

@@ -178,15 +178,16 @@ export class ContentContainer
     }
   }
 
-  onPaste(item, textSelection) {
+  onPaste(item, textSelection: Maybe<TextSelection>) {
     const { onEdit, model, activeContentGuid } = this.props;
-    // const index = indexOf(activeContentGuid, model);
     const duplicate = (item.clone() as any).with({
       guid: guid(),
     });
-
-    this.onAddNew(duplicate, textSelection);
+    const index = indexOf(activeContentGuid, model);
+    onEdit(this.insertAfter(model, duplicate, index), duplicate);
     this.onSelect(duplicate);
+    // Ask Darren - do we want to keep this logic to split CTEs?
+    // this.onAddNew(duplicate, textSelection);
   }
 
   onDuplicate(childModel) {

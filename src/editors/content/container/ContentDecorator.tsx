@@ -2,8 +2,9 @@ import * as React from 'react';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames as jssClassNames } from 'styles/jss';
 import { getContentIcon } from 'editors/content/utils/content';
-
+// import { ActiveContextState } from 'reducers/active';
 import { styles } from './ContentDecorator.styles';
+// import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 
 export interface ContentDecoratorProps {
   onRemove: () => void;
@@ -17,6 +18,7 @@ export interface ContentDecoratorProps {
   onCut: (item: Object) => void;
   onCopy: (item: Object) => void;
   onPaste: () => void;
+  // activeContext: ActiveContextState;
 }
 
 export interface ContentDecoratorState {
@@ -30,15 +32,7 @@ export class ContentDecorator
 
   constructor(props, childState) {
     super(props);
-  }
 
-  onPaste(e) {
-    const data = e.clipboardData.getData('text');
-    if (data === ' ') {
-      e.preventDefault();
-      e.stopPropagation();
-      this.props.onPaste();
-    }
   }
 
   render() {
@@ -74,7 +68,6 @@ export class ContentDecorator
           )
         }
         <div
-          onPaste={this.onPaste}
           className={jssClassNames([
             classes.content,
             isActiveContent && 'active-content',

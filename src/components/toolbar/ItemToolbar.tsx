@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { injectSheet, JSSProps } from 'styles/jss';
+import { StyledComponentProps } from 'types/component';
+import { injectSheetSFC } from 'styles/jss';
+import * as contentTypes from 'data/contentTypes';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
-import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
+import { ParentContainer } from 'types/active';
 
 import { styles } from './ItemToolbar.styles';
 
@@ -13,136 +15,97 @@ export interface ItemToolbarProps {
   context: AppContext;
   courseModel: CourseModel;
   activeContext: ActiveContextState;
-  onCut: (item) => void;
-  onCopy: (item) => void;
-  onPaste: () => void;
-  onRemove: (item) => void;
+  onClearSelection: () => void;
 }
 
 /**
  * InsertToolbar React Stateless Component
  */
-@injectSheet(styles)
-export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps> {
+export const ItemToolbar: React.StatelessComponent<ItemToolbarProps>
+  = injectSheetSFC<ItemToolbarProps>(styles)(({
+    classes, activeContext, courseModel, onClearSelection,
+  }: StyledComponentProps<ItemToolbarProps>) => {
+    const hasSelection = !!activeContext.activeChild.valueOr(false);
 
-  constructor(props) {
-    super(props);
-  }
-
-  // componentDidMount() {
-  //   // These will always overwrite
-  //   handleKey(
-  //     '⌘+x, ctrl+x',
-  //     () => true,
-  //     () => this.props.onCut(this.getItem()),
-  //   );
-  //   handleKey(
-  //     '⌘+c, ctrl+c',
-  //     () => true,
-  //     () => this.props.onCopy(this.getItem()),
-  //   );
-  //   handleKey(
-  //     '⌘+v, ctrl+v',
-  //     () => true,
-  //     () => this.props.onPaste(),
-  //   );
-  // }
-
-  // componentWillUnmount() {
-  //   unhandleKey('⌘+x, ctrl+x');
-  //   unhandleKey('⌘+c, ctrl+c');
-  //   unhandleKey('⌘+v, ctrl+v');
-  // }
-
-  hasSelection() {
-    const { activeContext } = this.props;
-    return !!activeContext.activeChild.valueOr(false);
-  }
-
-  canDuplicate() {
-    const { activeContext } = this.props;
-    return activeContext.activeChild.caseOf({
-      just: activeChild => activeChild && ((activeChild as any).contentType !== 'WbInline'),
-      nothing: () => false,
-    });
-  }
-
-  getItem() {
-    const { activeContext } = this.props;
-    return activeContext.activeChild.caseOf({
+    const item: ParentContainer = activeContext.activeChild.caseOf({
       just: activeChild => activeChild,
       nothing: () => undefined,
     });
-  }
 
-  getContainer() {
-    const { activeContext } = this.props;
-    return activeContext.container.caseOf({
+
+    const container: ParentContainer = activeContext.container.caseOf({
       just: container => container,
       nothing: () => undefined,
     });
-  }
 
-  render() {
-    const {
-      classes, onCut, onCopy, onPaste, onRemove,
-    } = this.props;
+    const canDuplicate = activeContext.activeChild.caseOf({
+      just: activeChild => activeChild && ((activeChild as any).contentType !== 'WbInline'),
+      nothing: () => false,
+    });
 
     const canMoveUp = true;
     const canMoveDown = true;
+
+    const onRemove = () => {
+      onClearSelection();
+
+      activeContext.textSelection.caseOf({
+        just: (textSelection) => {
+          if (item instanceof contentTypes.ContiguousText) {
+            const text = item as contentTypes.ContiguousText;
+            const entity = text.getEntityAtCursor(textSelection);
+            entity.caseOf({
+              just: (e) => {
+                const updated = text.removeEntity(e.key);
+                container.onEdit(updated, updated);
+              },
+              nothing: () => container.onRemove(item),
+            });
+          } else {
+            container.onRemove(item);
+          }
+        },
+        nothing: () => {
+          container.onRemove(item);
+        },
+      });
+    };
 
     return (
       <React.Fragment>
         <ToolbarLayout.Column>
           <ToolbarButton
-            onClick={() => onCut(this.getItem())}
-            tooltip="Cut Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection && this.canDuplicate)}>
-            <i className="fa fa-cut" /> Cut
+              onClick={() => container.onDuplicate(item)}
+              tooltip="Duplicate Item"
+              size={ToolbarButtonSize.Wide}
+              disabled={!(hasSelection && canDuplicate)}>
+            <i className="fa fa-files-o"/> Duplicate
           </ToolbarButton>
           <ToolbarButton
-            onClick={() => onCopy(this.getItem())}
-            tooltip="Copy Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection && this.canDuplicate)}>
-            <i className="fa fa-copy" /> Copy
+              className={classes.removeButton}
+              onClick={onRemove}
+              tooltip="Remove Item"
+              size={ToolbarButtonSize.Wide}
+              disabled={!(hasSelection)}>
+              <i className="fa fa-close"/> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>
-        <ToolbarLayout.Column>
-          <ToolbarButton
-            onClick={() => onPaste()}
-            tooltip="Paste Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection)}>
-            <i className="fa fa-paste" /> Paste
-          </ToolbarButton>
-          <ToolbarButton
-            className={classes.removeButton}
-            onClick={() => onRemove(this.getItem())}
-            tooltip="Remove Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection)}>
-            <i className="fa fa-close" /> Remove
-          </ToolbarButton>
-        </ToolbarLayout.Column>
-        <ToolbarLayout.Column>
-          <ToolbarButton
-            onClick={() => this.getContainer().onMoveUp(this.getItem())}
-            tooltip="Move Item Up"
-            size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection && canMoveUp)}>
-            <i className="fa fa-long-arrow-up" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => this.getContainer().onMoveDown(this.getItem())}
-            tooltip="Move Item Down"
-            size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection && canMoveDown)}>
-            <i className="fa fa-long-arrow-down" />
-          </ToolbarButton>
-        </ToolbarLayout.Column>
+          <ToolbarLayout.Column>
+            <ToolbarButton
+                onClick={() => container.onMoveUp(item)}
+                tooltip="Move Item Up"
+                size={ToolbarButtonSize.Small}
+                disabled={!(hasSelection && canMoveUp)}>
+                <i className="fa fa-long-arrow-up"/>
+            </ToolbarButton>
+            <ToolbarButton
+                onClick={() => container.onMoveDown(item)}
+                tooltip="Move Item Down"
+                size={ToolbarButtonSize.Small}
+                disabled={!(hasSelection && canMoveDown)}>
+                <i className="fa fa-long-arrow-down"/>
+            </ToolbarButton>
+          </ToolbarLayout.Column>
       </React.Fragment>
     );
-  }
-}
+  });
