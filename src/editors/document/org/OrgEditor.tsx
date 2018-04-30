@@ -295,7 +295,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       <div className="organization-content">
         {this.renderActionBar()}
 
-        <table className="table table-sm table-striped">
+        <table className="table table-sm">
         <tbody>
 
           {render(
@@ -363,10 +363,15 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
       <div className="action-bar">
         <button key="add" className="btn btn-link"
           disabled={!this.props.editMode} onClick={this.onAddSequence}>
-          Add {this.props.model.labels.sequence}</button>
-        <button key="expand" className="btn btn-link" onClick={this.onExpand}>Expand all</button>
+          <i className="fa fa-plus" />Add {this.props.model.labels.sequence}
+        </button>
+        <button key="expand" className="btn btn-link" onClick={this.onExpand}>
+          <i className="fa fa-chevron-down" />Expand All
+        </button>
         <button key="collapse" className="btn btn-link"
-          onClick={this.onCollapse}>Collapse all</button>
+          onClick={this.onCollapse}>
+          <i className="fa fa-chevron-up" />Collapse All
+        </button>
       </div>
     );
   }

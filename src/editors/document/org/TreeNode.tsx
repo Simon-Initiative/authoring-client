@@ -158,7 +158,7 @@ export class TreeNode
           model={this.props.model}
           toggleExpanded={() => this.props.toggleExpanded(getExpandId(model))}>
 
-          {icon} {contentType} {number}: {this.props.model.title}
+          {icon}{contentType} {number}: {this.props.model.title}
         </EditableCaption>
       );
     }
