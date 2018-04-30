@@ -61,10 +61,10 @@ export class DndLayout extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       dragdrop: {
-        '#array': [{
-          targetGroup: this.targetGroup.toPersistence(),
-          initiatorGroup: this.initiatorGroup.toPersistence(),
-        }],
+        '#array': [
+          this.targetGroup.toPersistence(),
+          this.initiatorGroup.toPersistence(),
+        ],
       },
     };
   }

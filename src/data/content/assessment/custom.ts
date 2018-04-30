@@ -1,24 +1,21 @@
 import * as Immutable from 'immutable';
-
+import { Maybe } from 'tsmonad';
 import createGuid from '../../../utils/guid';
 import { augment } from '../common';
 import { DndLayout } from './dragdrop/dnd_layout';
 
 export type CustomParams = {
-  id?: string,
-  guid?: string,
-
-  type?: string,
-  layout?: string,
-  layoutData?: DndLayout,
-  src?: string,
-  width?: number,
-  height?: number,
-  logging?: boolean,
-  param?: {
-    name: string,
-    text: string,
-  },
+  id?: string;
+  guid?: string;
+  type?: string;
+  layout?: string;
+  layoutData?: Maybe<DndLayout>;
+  src?: string;
+  width?: number;
+  height?: number;
+  logging?: boolean;
+  paramName?: string;
+  paramText?: string;
 };
 
 const defaultContent = {
@@ -27,15 +24,13 @@ const defaultContent = {
   guid: '',
   type: '',
   layout: '',
-  layoutData: new DndLayout(),
+  layoutData: Maybe.nothing(),
   src: '',
   width: 0,
   height: 0,
   logging: false,
-  param: {
-    name: '',
-    text: '',
-  },
+  paramName: '',
+  paramText: '',
 };
 
 export class Custom extends Immutable.Record(defaultContent) {
@@ -45,15 +40,13 @@ export class Custom extends Immutable.Record(defaultContent) {
   guid: string;
   type: string;
   layout: string;
-  layoutData: DndLayout;
+  layoutData: Maybe<DndLayout>;
   src: string;
   width: number;
   height: number;
   logging: boolean;
-  param: {
-    name: string;
-    text: string;
-  };
+  paramName: string;
+  paramText: string;
 
   constructor(params?: CustomParams) {
     super(augment(params));
@@ -94,11 +87,15 @@ export class Custom extends Immutable.Record(defaultContent) {
       model = model.with({ layout: q['@layout'] });
     }
     if (q['param'] !== undefined) {
-      model = model.with({ param: q['param'] });
+      model = model.with({
+        paramName: q['param']['@name'],
+        paramText: q['param']['#text'],
+      });
     }
 
     if (q['layoutData'] !== undefined) {
-      model = model.with({ layoutData: DndLayout.fromPersistence(q['layoutData'], createGuid()) });
+      model = model.with({
+        layoutData: Maybe.just(DndLayout.fromPersistence(q['layoutData'], createGuid())) });
     }
 
     return model;
@@ -109,17 +106,20 @@ export class Custom extends Immutable.Record(defaultContent) {
     return {
       custom: {
         '@id': this.id,
-        '@type': this.id,
-        '@logging': this.id,
-        '@src': this.id,
-        '@width': this.id,
-        '@height': this.id,
+        '@type': this.type,
+        '@logging': this.logging,
+        '@src': this.src,
+        '@width': this.width,
+        '@height': this.height,
         '@layout': this.layout,
         param: {
-          '@name': this.param.name,
-          '#text': this.param.text,
+          '@name': this.paramName,
+          '#text': this.paramText,
         },
-        layoutData: this.layoutData.toPersistence(),
+        layoutData: this.layoutData.caseOf({
+          just: ld => ld.toPersistence(),
+          nothing: () => undefined,
+        }),
       },
     };
   }
