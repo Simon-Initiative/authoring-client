@@ -75,7 +75,9 @@ function goToObjectivesPage(label: string, courseId: string) : Messages.MessageA
 }
 
 const missingObjectivesDetails =
-  'This is the reason why objectives are so great and why we\'re pestering you about making them.';
+  'Learning objectives are necessary to create skills, which are used by the \
+  learning engine to analyze question effectiveness and \
+  assess student improvement over time.';
 
 export function buildMissingObjectivesMessage(courseId: string) {
 
@@ -100,7 +102,8 @@ export function buildMissingObjectivesMessage(courseId: string) {
 }
 
 const missingSkillsDetails =
-  'This is the reason why skills are so great and why we\'re pestering you about making them.';
+  'Skills are used by the learning engine to analyze question effectiveness and \
+  assess student improvement over time.';
 
 export function buildMissingSkillsMessage(courseId: string) {
 
