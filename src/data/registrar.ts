@@ -3,6 +3,7 @@ import * as ct from './contentTypes';
 import { registerType } from './content/common/parse';
 
 export function registerContentTypes() {
+  registerType('contiguous', ct.ContiguousText.fromPersistence);
   registerType('activity_link', ct.ActivityLink.fromPersistence);
   registerType('alternate', ct.Alternate.fromPersistence);
   registerType('alternative', ct.Alternative.fromPersistence);

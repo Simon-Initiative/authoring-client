@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { StyledComponentProps } from 'types/component';
-import { injectSheetSFC, injectSheet, JSSProps } from 'styles/jss';
+import { injectSheet, JSSProps } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
-import { ParentContainer } from 'types/active';
 import { handleKey, unhandleKey } from 'editors/document/common/keyhandlers';
 
 import { styles } from './ItemToolbar.styles';
@@ -31,29 +29,30 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     super(props);
   }
 
-  componentDidMount() {
-    handleKey(
-      '⌘+x, ctrl+x',
-      () => this.hasSelection() && this.canDuplicate(),
-      () => this.props.onCut(this.getItem()),
-    );
-    handleKey(
-      '⌘+c, ctrl+c',
-      () => this.hasSelection() && this.canDuplicate(),
-      () => this.props.onCopy(this.getItem()),
-    );
-    handleKey(
-      '⌘+v, ctrl+v',
-      () => this.hasSelection(),
-      () => this.props.onPaste(),
-    );
-  }
+  // componentDidMount() {
+  //   // These will always overwrite
+  //   handleKey(
+  //     '⌘+x, ctrl+x',
+  //     () => true,
+  //     () => this.props.onCut(this.getItem()),
+  //   );
+  //   handleKey(
+  //     '⌘+c, ctrl+c',
+  //     () => true,
+  //     () => this.props.onCopy(this.getItem()),
+  //   );
+  //   handleKey(
+  //     '⌘+v, ctrl+v',
+  //     () => true,
+  //     () => this.props.onPaste(),
+  //   );
+  // }
 
-  componentWillUnmount() {
-    unhandleKey('⌘+x, ctrl+x');
-    unhandleKey('⌘+c, ctrl+c');
-    unhandleKey('⌘+v, ctrl+v');
-  }
+  // componentWillUnmount() {
+  //   unhandleKey('⌘+x, ctrl+x');
+  //   unhandleKey('⌘+c, ctrl+c');
+  //   unhandleKey('⌘+v, ctrl+v');
+  // }
 
   hasSelection() {
     const { activeContext } = this.props;
@@ -86,7 +85,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
   render() {
     const {
-      classes, activeContext, courseModel, onCut, onCopy, onPaste, onRemove,
+      classes, onCut, onCopy, onPaste, onRemove,
     } = this.props;
 
     const canMoveUp = true;

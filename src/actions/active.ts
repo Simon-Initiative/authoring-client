@@ -1,5 +1,4 @@
 import { ParentContainer, TextSelection } from 'types/active';
-import { Clipboard } from 'types/clipboard';
 import { Maybe } from 'tsmonad';
 import { ActiveContextState } from 'reducers/active';
 import * as contentTypes from 'data/contentTypes';
@@ -72,20 +71,6 @@ export function edit(content: Object) {
     const { activeContext } = getState();
     activeContext.container.lift((parent : ParentContainer) => {
       parent.onEdit(content, content);
-    });
-  };
-}
-
-export function paste() {
-  return function (dispatch, getState) {
-    const { activeContext }: { activeContext: ActiveContextState } = getState();
-    const { clipboard }: { clipboard: Clipboard } = getState();
-    clipboard.item.caseOf({
-      just: item => activeContext.container.caseOf({
-        just: parent => parent.onPaste(item),
-        nothing: () => {},
-      }),
-      nothing: () => {},
     });
   };
 }

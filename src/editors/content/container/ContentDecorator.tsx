@@ -13,6 +13,10 @@ export interface ContentDecoratorProps {
   hideContentLabel?: boolean;
   isHoveringContent: boolean;
   onMouseOver: () => void;
+  className?: string;
+  onCut: (item: Object) => void;
+  onCopy: (item: Object) => void;
+  onPaste: () => void;
 }
 
 export interface ContentDecoratorState {
@@ -22,10 +26,19 @@ export interface ContentDecoratorState {
 @injectSheet(styles)
 export class ContentDecorator
   extends React.Component<StyledComponentProps<ContentDecoratorProps>,
-    ContentDecoratorState> {
+  ContentDecoratorState> {
 
   constructor(props, childState) {
     super(props);
+  }
+
+  onPaste(e) {
+    const data = e.clipboardData.getData('text');
+    if (data === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      this.props.onPaste();
+    }
   }
 
   render() {
@@ -43,7 +56,7 @@ export class ContentDecorator
           isHoveringContent && classes.hover,
           className,
         ])}
-      onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
+        onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
         {hideContentLabel
           ? null
           : (
@@ -60,11 +73,13 @@ export class ContentDecorator
             </div>
           )
         }
-        <div className={jssClassNames([
-          classes.content,
-          isActiveContent && 'active-content',
-        ])}>
-        {children}
+        <div
+          onPaste={this.onPaste}
+          className={jssClassNames([
+            classes.content,
+            isActiveContent && 'active-content',
+          ])}>
+          {children}
         </div>
       </div>
     );

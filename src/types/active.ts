@@ -60,7 +60,7 @@ export interface ParentContainer {
   onAddNew: (content: Object, textSelection: Maybe<TextSelection>) => void;
   onEdit: (content: Object, source: Object) => void;
   onRemove: (content: Object) => void;
-  onPaste: (content: Object) => void;
+  onPaste: (content: Object, textSelection: TextSelection) => void;
   onDuplicate: (content: Object) => void;
   onMoveUp: (content: Object) => void;
   onMoveDown: (content: Object) => void;

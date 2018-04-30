@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { getEditorByContentType } from './registry';
 import { ContentElements } from 'data/content/common/elements';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentDecorator } from './ContentDecorator';
+import { ContentDecorator } from './ContentDecorator.controller';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';
@@ -178,14 +178,14 @@ export class ContentContainer
     }
   }
 
-  onPaste(item) {
+  onPaste(item, textSelection) {
     const { onEdit, model, activeContentGuid } = this.props;
-    const index = indexOf(activeContentGuid, model);
+    // const index = indexOf(activeContentGuid, model);
     const duplicate = (item.clone() as any).with({
       guid: guid(),
     });
-    onEdit(this.insertAfter(model, duplicate, index), duplicate);
 
+    this.onAddNew(duplicate, textSelection);
     this.onSelect(duplicate);
   }
 

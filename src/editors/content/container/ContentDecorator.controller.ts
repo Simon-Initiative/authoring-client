@@ -1,31 +1,35 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { ActiveContextState } from 'reducers/active';
-import { ItemToolbar } from './ItemToolbar';
+import { ContentDecorator } from './ContentDecorator';
 import { AppContext } from 'editors/common/AppContext';
 import { CourseModel } from 'data/models/course';
 import { remove } from 'actions/active';
 import { cut, copy, paste } from 'actions/clipboard';
 
 interface StateProps {
-  activeContext: ActiveContextState;
 }
 
 interface DispatchProps {
   onCut: (item: Object) => void;
   onCopy: (item: Object) => void;
   onPaste: () => void;
-  onRemove: (item: Object) => void;
 }
 
 interface OwnProps {
-  context: AppContext;
-  courseModel: CourseModel;
+  onRemove: () => void;
+  onSelect: () => void;
+  isActiveContent: boolean;
+  contentType: string;
+  hideContentLabel?: boolean;
+  isHoveringContent: boolean;
+  onMouseOver: () => void;
+  className?: string;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    activeContext: state.activeContext,
+
   };
 };
 
@@ -34,11 +38,10 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onCut: item => dispatch(cut(item)),
     onCopy: item => dispatch(copy(item)),
     onPaste: () => dispatch(paste()),
-    onRemove: item => dispatch(remove(item)),
   };
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(ItemToolbar);
+    (mapStateToProps, mapDispatchToProps)(ContentDecorator);
 
-export { controller as ItemToolbar };
+export { controller as ContentDecorator };
