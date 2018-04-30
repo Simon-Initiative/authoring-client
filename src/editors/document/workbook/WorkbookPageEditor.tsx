@@ -82,7 +82,9 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-    if (this.props.context.objectives.size <= 1 && nextProps.context.objectives.size > 1) {
+    if (this.props.context.objectives.size <= 1 &&
+        nextProps.context.objectives.size > 1 &&
+        this.noObjectivesMessage !== undefined) {
       this.props.dismissMessage(this.noObjectivesMessage);
     }
 
