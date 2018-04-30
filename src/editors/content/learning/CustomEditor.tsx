@@ -1,12 +1,8 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { Custom } from 'data/content/assessment/custom';
-import { Button } from 'editors/content/common/Button';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
-import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
@@ -31,8 +27,6 @@ export default class CustomEditor
   }
 
   renderToolbar(): JSX.Element {
-    const { onShowSidebar } = this.props;
-
     return (
       <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Audio} columns={4}>
       </ToolbarGroup>
@@ -40,7 +34,7 @@ export default class CustomEditor
   }
 
   renderMain() : JSX.Element {
-    const { model, onEdit } = this.props;
+    const { model } = this.props;
 
     return (
       <div className="customEditor">
