@@ -6,8 +6,6 @@ import { ContentModel } from 'data/models';
 import { UserProfile } from 'types/user';
 import { LearningObjective, Skill } from 'data/contentTypes';
 import { save } from 'actions/document';
-import { cut, copy, paste } from 'actions/clipboard';
-import { ActiveContextState } from 'reducers/active';
 
 interface StateProps {
   expanded: any;
@@ -34,7 +32,7 @@ interface OwnProps {
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
-  const { expanded, skills, objectives, documents, activeContext } = state;
+  const { expanded, skills, objectives, documents } = state;
   const ed = documents.get(ownProps.documentId);
 
   let document = null;
