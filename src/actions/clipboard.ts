@@ -42,15 +42,9 @@ export function copy(item) {
 export function paste() {
   return function (dispatch, getState) {
 
-    console.log('In paste action');
-
     const { activeContext }: { activeContext: ActiveContextState } = getState();
 
-    // How to cancel paste action if cursor is inside text selection?
-    activeContext.container.caseOf({
-      just: parent => pasteInside(parent),
-      nothing: () => console.log('no container'),
-    });
+    activeContext.container.lift(parent => pasteInside(parent));
 
     function pasteInside(parent) {
       const savedData: any = loadFromLocalStorage('clipboard');
@@ -80,12 +74,5 @@ export function paste() {
         parent.onPaste(elementToPaste, textSelection);
       }
     }
-    // implement paste validation by element type. e.g. dtd validation
-    // grab parent's supported elements and don't paste if element is
-    // not in supported elements list (list does not contain item)
-
-    // Only paste if a component is selected and cursor is not inside a contiguous text editor
-    // This doesn't work if a CTE is selected, even if the cursor isn't inside the text. How
-    // do we change it so that it detects whether cursor is in or out of the text?
   };
 }

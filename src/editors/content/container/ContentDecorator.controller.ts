@@ -1,11 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { ActiveContextState } from 'reducers/active';
 import { ContentDecorator } from './ContentDecorator';
-import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
-import { remove } from 'actions/active';
-import { cut, copy, paste } from 'actions/clipboard';
 
 interface StateProps {
   // activeContext: ActiveContextState;

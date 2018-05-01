@@ -61,40 +61,6 @@ export default class EditorManager
       200);
   }
 
-  componentDidMount() {
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'c' && (event.ctrlKey || event.metaKey)) {
-        console.log('copy');
-        if (!(event.target as any).contenteditable) {
-          console.log('content not editable');
-          event.preventDefault();
-          event.stopPropagation();
-          this.props.onCopy(this.getItem());
-        }
-      }
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
-        console.log('paste', event, (event.target as any).isContentEditable);
-        // this doesn't work. how to restrict pasting when text is selected?
-        if (!(event.target as any).contenteditable) {
-          console.log('content not editable');
-          event.preventDefault();
-          event.stopPropagation();
-          this.props.onPaste();
-        }
-      }
-    });
-  }
-
-  getItem() {
-    const { activeContext } = this.props;
-    return activeContext.activeChild.caseOf({
-      just: activeChild => activeChild,
-      nothing: () => undefined,
-    });
-  }
-
   onEdit(model: models.ContentModel) {
 
     const { onSave, documentId } = this.props;
