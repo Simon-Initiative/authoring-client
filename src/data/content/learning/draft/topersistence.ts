@@ -249,7 +249,13 @@ function translateOverlappingGroup(
     const root = { root: {} };
     let last = root;
 
-    set.toArray().forEach((s) => {
+    // We must serialize bdo elements first, since other styles
+    // cannot contain bdo, but bdo can contain other styels
+    const bdoFirst = set.contains('BDO')
+      ? Immutable.OrderedSet<string>(['BDO', ...set.toArray()])
+      : set;
+
+    bdoFirst.toArray().forEach((s) => {
 
       // For each style, create the object representation for that style
       if (s !== undefined) {
