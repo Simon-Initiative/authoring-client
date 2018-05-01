@@ -58,13 +58,13 @@ export function paste() {
       // ContiguousText components serialize to lists of inline elements (e.g. 'p' tags),
       // so we handle that case separately
       if (savedData.isContiguousText) {
-        elementToPaste = ContiguousText.fromPersistence(savedData.data, guid());
         elementType = '#text';
-        // Otherwise, we look up the fromPersistence method from the data wrapper registry
+        elementToPaste = ContiguousText.fromPersistence(savedData.data, guid());
       } else {
+        // Otherwise, we look up the fromPersistence method from the data wrapper registry
+        elementType = Object.keys(savedData)[0];
         const factoryFn = registeredTypes[elementType];
         elementToPaste = factoryFn(savedData, guid());
-        elementType = Object.keys(savedData)[0];
       }
 
       const isSupported = activeContext.container.caseOf({
