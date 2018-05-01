@@ -110,18 +110,28 @@ export function paste() {
 
       let elementToPaste;
       const { textSelection } = activeContext;
+      let elementType = Object.keys(savedData)[0];
       // ContiguousText components serialize to lists of inline elements (e.g. 'p' tags),
       // so we handle that case separately
       if (savedData.isContiguousText) {
         elementToPaste = ContiguousText.fromPersistence(savedData.data, guid());
-
+        elementType = '#text';
         // Otherwise, we look up the fromPersistence method from the data wrapper registry
       } else {
-        const factoryFn = registeredTypes[Object.keys(savedData)[0]];
+        const factoryFn = registeredTypes[elementType];
         elementToPaste = factoryFn(savedData, guid());
       }
 
-      parent.onPaste(elementToPaste, textSelection);
+      const isSupported = activeContext.container.caseOf({
+        just: parent => console.log('supported elements', parent.supportedElements)
+           || parent.supportedElements.contains(elementType),
+        nothing: () => false,
+      });
+      console.log('element type', elementType);
+      console.log('isSupported', isSupported);
+      if (isSupported) {
+        parent.onPaste(elementToPaste, textSelection);
+      }
     }
     // implement paste validation by element type. e.g. dtd validation
     // grab parent's supported elements and don't paste if element is
