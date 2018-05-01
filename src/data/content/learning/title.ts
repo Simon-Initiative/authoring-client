@@ -41,7 +41,10 @@ export class Title extends Immutable.Record(defaultContent) {
 
   static fromPersistence(root: Object, guid: string) : Title {
 
-    const t = (root as any).title;
+    // Handle the case where there is a completely empty title object
+    const t = Object.keys((root as any).title).length > 0
+      ? (root as any).title
+      : { '#text': '' };
 
     const text = ContentElements.fromPersistence(getChildren(t), '', TEXT_ELEMENTS);
     return new Title({ guid, text });

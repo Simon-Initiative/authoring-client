@@ -8,6 +8,8 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import guid from 'utils/guid';
+import { Discoverable } from 'components/common/Discoverable.controller';
+import { DiscoverableId } from 'types/discoverable';
 
 import AceEditor from 'react-ace';
 
@@ -28,6 +30,7 @@ import './markers.scss';
 export interface CodeBlockProps
   extends AbstractContentEditorProps<CodeBlockType> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface CodeBlockState {
@@ -86,64 +89,83 @@ export default class CodeBlock
     return (
       <SidebarContent title="Code Block">
         <SidebarGroup label="Language / Syntax">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={syntax}
-            onChange={this.onSyntaxChange}>
-            <option value="actionscript3">ActionScript</option>
-            <option value="bash">Bash</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="html">HTML</option>
-            <option value="java">Java</option>
-            <option value="python">Python</option>
-            <option value="text">Text</option>
-            <option value="xml">XML</option>
-          </Select>
-          <Checkbox
-            editMode={this.props.editMode}
-            label="Show line numbers"
-            value={this.props.model.number}
-            onEdit={this.onNumberEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockEditorLanguage} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={syntax}
+              onChange={this.onSyntaxChange}>
+              <option value="actionscript3">ActionScript</option>
+              <option value="bash">Bash</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="html">HTML</option>
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+              <option value="text">Text</option>
+              <option value="xml">XML</option>
+            </Select>
+            <Checkbox
+              editMode={this.props.editMode}
+              label="Show line numbers"
+              value={this.props.model.number}
+              onEdit={this.onNumberEdit} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="First line number">
-          <TextInput
-            editMode={this.props.editMode}
-            width="100%"
-            type="number"
-            label=""
-            value={this.props.model.start}
-            onEdit={this.onStartEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockEditorLineNumbers} focusChild>
+            <TextInput
+              editMode={this.props.editMode}
+              width="100%"
+              type="number"
+              label=""
+              value={this.props.model.start}
+              onEdit={this.onStartEdit} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Highlighting">
-          <TextInput
-            editMode={this.props.editMode}
-            width="100%"
-            type="text"
-            label=""
-            value={this.props.model.highlight}
-            onEdit={this.onHighlightEdit} />
+          <Discoverable id={DiscoverableId.CodeBlockEditorHighlighting} focusChild>
+            <TextInput
+              editMode={this.props.editMode}
+              width="100%"
+              type="text"
+              label=""
+              value={this.props.model.highlight}
+              onEdit={this.onHighlightEdit} />
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={6}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.CodeBlockEditorLanguage);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-file-code-o"/></div>
           <div>Language</div>
         </ToolbarButton>
 
         <ToolbarLayout.Column>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.CodeBlockEditorLineNumbers);
+            }} size={ToolbarButtonSize.Wide}>
             <i className="fa fa-sort-numeric-asc"/> Line Numbers
           </ToolbarButton>
-          <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Wide}>
+          <ToolbarButton
+            onClick={() => {
+              onShowSidebar();
+              onDiscover(DiscoverableId.CodeBlockEditorHighlighting);
+            }}
+            size={ToolbarButtonSize.Wide}>
             <i className="fa fa-eraser"/> Highlighting
           </ToolbarButton>
         </ToolbarLayout.Column>

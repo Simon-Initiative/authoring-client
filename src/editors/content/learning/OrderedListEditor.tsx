@@ -17,12 +17,16 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Select, TextInput } from '../common/controls';
 import { Maybe } from 'tsmonad';
+import {
+  Discoverable, FocusAction, DiscoverableId,
+} from 'components/common/Discoverable.controller';
 
 import { styles } from './List.styles';
 
 export interface OrderedListEditorProps
   extends AbstractContentEditorProps<contentTypes.Ol> {
   onShowSidebar: () => void;
+  onDiscover: (id: DiscoverableId) => void;
 }
 
 export interface OrderedListEditorState {
@@ -72,45 +76,52 @@ export default class OrderedList
     return (
       <SidebarContent title="Ordered List">
         <SidebarGroup label="Title">
-          <ToolbarContentContainer
-            onFocus={() => {}}
-            context={this.props.context}
-            services={this.props.services}
-            editMode={this.props.editMode}
-            activeContentGuid={null}
-            hover={null}
-            onUpdateHover={() => {}}
-            model={title.text}
-            onEdit={this.onTitleEdit.bind(this)} />
+          <Discoverable
+            id={DiscoverableId.OrderedListEditorTitle}
+            focusChild=".DraftEditor-editorContainer"
+            focusAction={FocusAction.Click}>
+            <ToolbarContentContainer
+              onFocus={() => {}}
+              context={this.props.context}
+              services={this.props.services}
+              editMode={this.props.editMode}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => {}}
+              model={title.text}
+              onEdit={this.onTitleEdit.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Style">
-          <Select
-            editMode={this.props.editMode}
-            label=""
-            value={style}
-            onChange={this.onStyleChange.bind(this)}>
-            <option value=""></option>
-            <option value="none">None</option>
-            <option value="decimal">Decimal</option>
-            <option value="decimal-leading-zero">Decimal with leading zero</option>
-            <option value="lower-roman">Lowercase Roman numerals</option>
-            <option value="upper-roman">Uppercase Roman numerals</option>
-            <option value="lower-alpha">Lowercase alpha</option>
-            <option value="upper-alpha">Uppercase alpha</option>
-            <option value="lower-latin">Lowercase latin</option>
-            <option value="upper-latin">Uppercase latin</option>
-          </Select>
+          <Discoverable id={DiscoverableId.OrderedListEditorStyle} focusChild>
+            <Select
+              editMode={this.props.editMode}
+              label=""
+              value={style}
+              onChange={this.onStyleChange.bind(this)}>
+              <option value=""></option>
+              <option value="none">None</option>
+              <option value="decimal">Decimal</option>
+              <option value="decimal-leading-zero">Decimal with leading zero</option>
+              <option value="lower-roman">Lowercase Roman numerals</option>
+              <option value="upper-roman">Uppercase Roman numerals</option>
+              <option value="lower-alpha">Lowercase alpha</option>
+              <option value="upper-alpha">Uppercase alpha</option>
+              <option value="lower-latin">Lowercase latin</option>
+              <option value="upper-latin">Uppercase latin</option>
+            </Select>
+          </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Start">
+          <Discoverable id={DiscoverableId.OrderedListEditorStart} focusChild>
           <TextInput
             editMode={this.props.editMode}
             label=""
             value={start}
             type="number"
             width="100%"
-            onEdit={this.onStartChange.bind(this)}>
-
-          </TextInput>
+            onEdit={this.onStartChange.bind(this)} />
+          </Discoverable>
         </SidebarGroup>
       </SidebarContent>
     );
@@ -133,19 +144,31 @@ export default class OrderedList
   }
 
   renderToolbar() {
-    const { onShowSidebar } = this.props;
+    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Ordered List" columns={6} highlightColor={CONTENT_COLORS.Ol}>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.OrderedListEditorTitle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>Abc</i></div>
           <div>Title</div>
         </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.OrderedListEditorStyle);
+          }} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-list-ol"></i></div>
           <div>Style</div>
         </ToolbarButton>
-        <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
+        <ToolbarButton
+          onClick={() => {
+            onShowSidebar();
+            onDiscover(DiscoverableId.OrderedListEditorStart);
+          }} size={ToolbarButtonSize.Large}>
           <div><i style={{ textDecoration: 'underline' }}>1.</i></div>
           <div>Start</div>
         </ToolbarButton>
