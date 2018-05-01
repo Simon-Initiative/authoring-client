@@ -21,12 +21,7 @@ export const setItem = (item: Object) => ({
 export function cut(item: Object) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
-    activeContext.textSelection.caseOf({
-      just: sel => sel.isCollapsed
-        ? saveToLocalStorage('clipboard', JSON.stringify(item))
-        : undefined,
-      nothing: () => saveToLocalStorage('clipboard', JSON.stringify(item)),
-    });
+    dispatch(copy(item));
     activeContext.container.lift(parent => parent.onRemove(item));
   };
 }
@@ -34,58 +29,13 @@ export function copy(item) {
   return function (dispatch, getState) {
     const { activeContext }: { activeContext: ActiveContextState } = getState();
 
-    activeContext.textSelection.caseOf({
-      just: (selection) => {
-        if (selection.isCollapsed()) {
-          console.log('1');
-          clearClipboardContents();
-          saveToLocalStorage('clipboard', serialized());
-        } else {
-          console.log('2');
-          document.execCommand('copy');
-        }
-      },
-      nothing: () => {
-        console.log('3');
-        saveToLocalStorage('clipboard', serialized());
-      },
-    });
-
-    // Clear clipboard contents. Clipboard cannot be set to the empty string.
-    // tslint:disable-next-line:comment-format
-    // https://stackoverflow.com/questions/400212/how-do-i-copy-to-the-clipboard-in-javascript
-    function clearClipboardContents() {
-      const input = document.createElement('textarea');
-
-      input.style.position = 'fixed';
-      input.style.top = '0';
-      input.style.left = '0';
-      // Ensure it has a small width and height. Setting to 1px / 1em
-      // doesn't work as this gives a negative w/h on some browsers.
-      input.style.width = '1px';
-      input.style.height = '1px';
-      input.style.padding = '0';
-      input.style.border = 'none';
-      input.style.outline = 'none';
-      input.style.boxShadow = 'none';
-      input.style.background = 'transparent';
-
-      input.value = ' ';
-      document.body.appendChild(input);
-      input.focus();
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
+    let toSerialize = item.toPersistence();
+    if (item.contentType === 'ContiguousText') {
+      toSerialize = { isContiguousText: true, data: toSerialize };
     }
+    const serialized = JSON.stringify(toSerialize);
 
-    // Serialize active child selection
-    function serialized() {
-      let toSerialize = item.toPersistence();
-      if (item.contentType === 'ContiguousText') {
-        toSerialize = { isContiguousText: true, data: toSerialize };
-      }
-      return JSON.stringify(toSerialize);
-    }
+    activeContext.activeChild.lift(selection => saveToLocalStorage('clipboard', serialized));
   };
 }
 
@@ -123,12 +73,9 @@ export function paste() {
       }
 
       const isSupported = activeContext.container.caseOf({
-        just: parent => console.log('supported elements', parent.supportedElements)
-           || parent.supportedElements.contains(elementType),
+        just: parent => parent.supportedElements.contains(elementType),
         nothing: () => false,
       });
-      console.log('element type', elementType);
-      console.log('isSupported', isSupported);
       if (isSupported) {
         parent.onPaste(elementToPaste, textSelection);
       }
