@@ -111,7 +111,7 @@ export class ContentContainer
 
         const selection = textSelection.caseOf({
           just: s => s,
-          nothing: () => TextSelection.createEmpty(active.content.getFirstBlock().key),
+          nothing: () => undefined,
         });
 
         // We replace the text when it is effectively empty
@@ -120,7 +120,7 @@ export class ContentContainer
           onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), toAdd);
 
         // We insert after when the cursor is at the end
-        } else if (active.isCursorAtEffectiveEnd(selection)) {
+        } else if (selection === undefined || active.isCursorAtEffectiveEnd(selection)) {
           onEdit(this.insertAfter(model, toAdd, index), toAdd);
 
         // If it is at the beginning, insert the new item before the text
@@ -234,8 +234,9 @@ export class ContentContainer
     const { onFocus } = this.props;
 
     if (model.contentType === 'ContiguousText') {
-      const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
-        || new TextSelection(model.content.selectionAfter));
+      const currentTextSelection = this.textSelections.get(model.guid)
+        ? Maybe.just(this.textSelections.get(model.guid))
+        : Maybe.nothing();
       return onFocus(model, this, currentTextSelection);
     }
 
