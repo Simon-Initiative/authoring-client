@@ -23,6 +23,7 @@ const styleContainers = {
   OBLIQUE: () => ({ em: { '@style': 'oblique' } }),
   VAR: () => ({ var: { } }),
   TERM: () => ({ term: { } }),
+  BDO: () => ({ bdo: { } }),
   IPA: () => ({ ipa: { } }),
   FOREIGN: () => ({ foreign: { } }),
   SUBSCRIPT: () => ({ sub: { } }),
