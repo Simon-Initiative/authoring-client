@@ -11,6 +11,7 @@ import { LegacyTypes } from 'data/types';
 import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
+import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
@@ -152,6 +153,19 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             tooltip="Insert Audio Clip"
             disabled={!parentSupportsElementType('audio')}>
           <i className={'fa fa-volume-up'}/>
+        </ToolbarButton>
+        <ToolbarButton
+            onClick={() => {
+              selectVideo(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
+                .then((video) => {
+                  if (video !== null) {
+                    onInsert(video);
+                  }
+                });
+            }}
+            tooltip="Insert Video Clip"
+            disabled={!parentSupportsElementType('video')}>
+          <i className={'fa fa-film'}/>
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onInsert(new contentTypes.YouTube())}
