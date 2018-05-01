@@ -24,6 +24,7 @@ const defaultLearningObjectivesModelParams = {
   objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>(),
 };
 
+export const DEFAULT_OBJECTIVE_TITLE = 'Default objective';
 
 export class LearningObjectivesModel
   extends Immutable.Record(defaultLearningObjectivesModelParams) {
@@ -109,7 +110,7 @@ export class LearningObjectivesModel
     if (this.objectives.size === 0) {
       const id = guid();
       const o = new contentTypes.LearningObjective().with({
-        title: 'Default objective',
+        title: DEFAULT_OBJECTIVE_TITLE,
         id,
       });
       children.push(o.toPersistence());

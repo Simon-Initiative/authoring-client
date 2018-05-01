@@ -78,6 +78,7 @@ export { Essay } from './content/assessment/essay';
 export { GradingCriteria } from './content/assessment/criteria';
 export { ResponseMult } from './content/assessment/response_mult';
 export { Match } from './content/assessment/match';
+export { Custom } from './content/assessment/custom';
 
 // Workbook page
 export { Head } from './content/workbook/head';

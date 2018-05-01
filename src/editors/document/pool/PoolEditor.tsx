@@ -15,6 +15,8 @@ import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.cont
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import * as Messages from 'types/messages';
+import { buildMissingSkillsMessage } from 'utils/error';
 
 import './PoolEditor.scss';
 
@@ -32,6 +34,8 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -42,6 +46,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorProps,
   PoolEditorState>  {
 
+  noSkillsMessage: Messages.Message;
   pendingCurrentNode: Maybe<contentTypes.Question>;
 
   constructor(props) {
@@ -62,8 +67,25 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     }
   }
 
+  componentDidMount() {
+    // We have no direct access to a skills list through props.context since
+    // skills cannot be deleted. Looking at skills attached to objectives
+    // will show the banner if skills are present in the course but 'deleted',
+    // aka removed from an associated objective.
+    const hasNoskills = this.props.context.objectives.reduce(
+      (bool, obj) => bool && obj.skills.size === 0,
+      true);
+
+    if (hasNoskills) {
+      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.props.showMessage(this.noSkillsMessage);
+    }
+  }
 
   componentWillReceiveProps(nextProps: PoolEditorProps) {
+    if (this.props.context.skills.size <= 0 && nextProps.context.skills.size > 0) {
+      this.props.dismissMessage(this.noSkillsMessage);
+    }
 
     findNodeByGuid(nextProps.model.pool.questions, this.state.currentNode.guid)
       .lift(currentNode => this.setState({ currentNode }));

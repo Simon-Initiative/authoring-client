@@ -186,7 +186,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={10}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={11}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
