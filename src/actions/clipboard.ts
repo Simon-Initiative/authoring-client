@@ -52,9 +52,9 @@ export function paste() {
         return;
       }
 
-      let elementToPaste;
       const { textSelection } = activeContext;
-      let elementType = Object.keys(savedData)[0];
+      let elementToPaste;
+      let elementType;
       // ContiguousText components serialize to lists of inline elements (e.g. 'p' tags),
       // so we handle that case separately
       if (savedData.isContiguousText) {
@@ -64,6 +64,7 @@ export function paste() {
       } else {
         const factoryFn = registeredTypes[elementType];
         elementToPaste = factoryFn(savedData, guid());
+        elementType = Object.keys(savedData)[0];
       }
 
       const isSupported = activeContext.container.caseOf({

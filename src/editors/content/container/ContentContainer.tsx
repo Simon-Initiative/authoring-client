@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import { getEditorByContentType } from './registry';
 import { ContentElements } from 'data/content/common/elements';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { ContentDecorator } from './ContentDecorator.controller';
+import { ContentDecorator } from './ContentDecorator';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { ContentElement } from 'data/content/common/interfaces';
 import { Maybe } from 'tsmonad';

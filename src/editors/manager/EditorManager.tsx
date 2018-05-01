@@ -10,7 +10,6 @@ import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { lookUpByName } from 'editors/manager/registry';
 import { LearningObjective, Skill } from 'data//contentTypes';
-import { ActiveContextState } from 'reducers/active';
 
 import './EditorManager.scss';
 
@@ -29,11 +28,6 @@ export interface EditorManagerProps {
   objectives: Immutable.Map<string, LearningObjective>;
   onDispatch: (...args: any[]) => any;
   onSave: (documentId: string, model: models.ContentModel) => any;
-
-  activeContext: ActiveContextState;
-  onCut: (item: Object) => void;
-  onCopy: (item: Object) => void;
-  onPaste: () => void;
 }
 
 export interface EditorManagerState {

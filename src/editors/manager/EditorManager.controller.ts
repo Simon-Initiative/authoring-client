@@ -17,17 +17,11 @@ interface StateProps {
   undoRedoGuid: string;
   editingAllowed: boolean;
   hasFailed: boolean;
-
-  activeContext: ActiveContextState;
 }
 
 interface DispatchProps {
   onSave: (documentId: string, model: ContentModel) => any;
   onDispatch: (...args: any[]) => any;
-
-  onCut: (item: Object) => void;
-  onCopy: (item: Object) => void;
-  onPaste: () => void;
 }
 
 interface OwnProps {
@@ -36,7 +30,6 @@ interface OwnProps {
   userName: string;
   profile: UserProfile;
   course: any;
-
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
@@ -57,7 +50,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   }
 
   return {
-    activeContext,
     expanded,
     skills,
     objectives,
@@ -74,9 +66,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(save(documentId, model));
     },
     onDispatch: dispatch,
-    onCut: item => dispatch(cut(item)),
-    onCopy: item => dispatch(copy(item)),
-    onPaste: () => dispatch(paste()),
   };
 };
 
