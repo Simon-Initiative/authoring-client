@@ -13,8 +13,8 @@ export type FigureParams = {
   guid?: string,
   // core.attrs
   id?: Maybe<string>,
-  title?: Title,
   // labeled.content
+  title?: Maybe<Title>,
   caption?: Maybe<Caption>,
   cite?: Maybe<Cite>,
   // boxmodel
@@ -26,10 +26,9 @@ const defaultContent = {
 
   guid: '',
   id: Maybe.nothing(),
-  title: Title.fromText('Title'),
-  titleContent: new Title(),
-  caption: new Caption(),
-  cite: new Cite(),
+  title: Maybe.nothing(),
+  caption: Maybe.nothing(),
+  cite: Maybe.nothing(),
   content: ContentElements.fromText('Content', '', BOX_ELEMENTS),
 };
 
@@ -38,8 +37,7 @@ export class Figure extends Immutable.Record(defaultContent) {
 
   guid: string;
   id: Maybe<string>;
-  title: Title;
-  titleContent: Maybe<Title>;
+  title: Maybe<Title>;
   caption: Maybe<Caption>;
   cite: Maybe<Cite>;
   content: ContentElements;
@@ -54,26 +52,21 @@ export class Figure extends Immutable.Record(defaultContent) {
 
   clone(): Figure {
     return this.with({
-      // this doesn't seem right. don't we need to clone each data wrapper? e.g. below
+      guid: createGuid(),
+      id: Maybe.nothing(),
+      title: this.title.caseOf({
+        just: title => Maybe.just(title.clone()),
+        nothing: () => Maybe.nothing() as Maybe<Title>,
+      }),
+      caption: this.caption.caseOf({
+        just: caption => Maybe.just(caption.clone()),
+        nothing: () => Maybe.nothing() as Maybe<Caption>,
+      }),
+      cite: this.cite.caseOf({
+        just: cite => Maybe.just(cite.clone()),
+        nothing: () => Maybe.nothing()as Maybe<Cite>,
+      }),
       content: this.content.clone(),
-      // id: Maybe.just(createGuid()),
-      // title: this.title.caseOf({
-      //   just: title => Maybe.just(title.clone()),
-      //   nothing: () => Maybe.nothing(),
-      // }),
-      // titleContent: this.titleContent.caseOf({
-      //   just: titleContent => Maybe.just(titleContent.clone()),
-      //   nothing: () => Maybe.nothing(),
-      // }),
-      // caption: this.caption.caseOf({
-      //   just: caption => Maybe.just(caption.clone()),
-      //   nothing: () => Maybe.nothing(),
-      // }),
-      // cite: this.cite.caseOf({
-      //   just: cite => Maybe.just(cite.clone()),
-      //   nothing: () => Maybe.nothing(),
-      // }),
-      // content: this.content.clone(),
     });
   }
 
@@ -85,6 +78,9 @@ export class Figure extends Immutable.Record(defaultContent) {
     if (t['@id'] !== undefined) {
       model = model.with({ id: Maybe.just(t['@id']) });
     }
+    if (t['@title'] !== undefined) {
+      model = model.with({ title: Maybe.just(t['@title']) });
+    }
 
     getChildren(t).forEach((item) => {
 
@@ -93,7 +89,7 @@ export class Figure extends Immutable.Record(defaultContent) {
 
       switch (key) {
         case 'title':
-          model = model.with({ title: Title.fromPersistence(item, id) });
+          model = model.with({ title: Maybe.just(Title.fromPersistence(item, id)) });
           break;
         case 'caption':
           model = model.with({ caption: Maybe.just(Caption.fromPersistence(item, id)) });
@@ -115,11 +111,10 @@ export class Figure extends Immutable.Record(defaultContent) {
 
   toPersistence(): Object {
 
-    const children = [
-      this.title.toPersistence(),
-      this.caption.lift(caption => caption.toPersistence()),
-      this.cite.lift(cite => cite.toPersistence()),
-    ];
+    const children = [];
+    this.title.lift(title => children.push(title.toPersistence()));
+    this.caption.lift(caption => children.push(caption.toPersistence()));
+    this.cite.lift(cite => children.push(cite.toPersistence()));
 
     const content = this.content.content.size === 0
       ? [{ p: { '#text': ' ' } }]
