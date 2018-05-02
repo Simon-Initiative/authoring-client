@@ -11,6 +11,7 @@ export const CONTENT_COLORS = {
   Cite: distinct.distinctMagenta,
   Xref: distinct.distinctMaroon,
   Example: flatui.turquoise,
+  Figure: flatui.greenSea,
   Pullout: distinct.distinctNavy,
   Section: distinct.distinctBlue,
   Image: flatui.sunflower,
