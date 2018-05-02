@@ -89,6 +89,17 @@ export default class ContiguousTextToolbar
       ? false
       : !model.selectionOverlapsEntity(selection);
 
+    // We enable the bdo button only when there is a selection that
+    // doesn't overlap an entity, and that selection selects only
+    // bare text or just another bdo
+    const intersectingStyles = model.getOverlappingInlineStyles(selection);
+    const onlyBdoOrEmpty = intersectingStyles.size === 0
+      || (intersectingStyles.size === 1 && intersectingStyles.contains('BDO'));
+
+    const bdoDisabled = !selection || selection.isCollapsed()
+      || model.selectionOverlapsEntity(selection)
+      || !onlyBdoOrEmpty;
+
     const cursorInEntity = selection && selection.isCollapsed()
       ? model.getEntityAtCursor(selection).caseOf({ just: n => true, nothing: () => false })
       : false;
@@ -98,7 +109,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={8}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={9}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
@@ -171,6 +182,14 @@ export default class ContiguousTextToolbar
               disabled={noTextSelected || !editMode}
               tooltip="Foreign">
             <i className={'fa fa-globe'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={() => {
+                onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
+              }}
+              disabled={bdoDisabled || !editMode}
+              tooltip="Reverse Text Direction">
+            <i className={'fa fa-angle-left'}/>
           </ToolbarButton>
           <ToolbarButton
               onClick={
