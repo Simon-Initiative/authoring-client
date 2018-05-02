@@ -6,22 +6,24 @@ import { getKey } from '../../../common';
 import { ContentRow } from './content_row';
 import { HeaderRow } from './header_row';
 
+export type TG_COL = ContentRow | HeaderRow;
+
 export type TargetGroupParams = {
   guid?: string;
-  rows?: Immutable.List<ContentRow | HeaderRow>;
+  rows?: Immutable.List<TG_COL>;
 };
 
 const defaultContent = {
   contentType: 'TargetGroup',
   guid: '',
-  rows: Immutable.List<ContentRow | HeaderRow>(),
+  rows: Immutable.List<TG_COL>(),
 };
 
 export class TargetGroup extends Immutable.Record(defaultContent) {
 
   contentType: 'TargetGroup';
   guid: string;
-  rows: Immutable.List<ContentRow | HeaderRow>;
+  rows: Immutable.List<TG_COL>;
 
   constructor(params?: TargetGroupParams) {
     super(augment(params));
