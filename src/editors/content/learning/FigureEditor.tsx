@@ -7,6 +7,9 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
+import { Title } from 'data/content/learning/title';
+import { Maybe } from 'tsmonad';
+import { ContentElements } from 'data/content/common/elements';
 
 import './nested.scss';
 
@@ -28,14 +31,21 @@ export default class FigureEditor
   }
 
   onTitleEdit(ct: ContiguousText, sourceObject) {
-    const content = this.props.model.title.text.content.set(ct.guid, ct);
-    const text = this.props.model.title.text.with({ content });
-    const title = this.props.model.title.with({ text });
-    const model = this.props.model.with({ title });
+    const text = ct.extractPlainText().caseOf({
+      just: text => text,
+      nothing: () => '',
+    });
+
+    const model = this.props.model.with({
+      title: text !== ''
+        ? Maybe.just(Title.fromText(text))
+        : Maybe.nothing(),
+    });
+
     this.props.onEdit(model, sourceObject);
   }
 
-  onContentEdit(content, sourceObject) {
+  onContentEdit(content: ContentElements, sourceObject) {
     const model = this.props.model.with({ content });
     this.props.onEdit(model, sourceObject);
   }
@@ -60,7 +70,10 @@ export default class FigureEditor
           context={this.props.context}
           services={this.props.services}
           onFocus={this.props.onFocus}
-          model={(this.props.model.title.text.content.first() as ContiguousText)}
+          model={(this.props.model.title.caseOf({
+            just: t => t.text.content.first() as ContiguousText,
+            nothing: () => new ContiguousText(),
+          }))}
           editMode={this.props.editMode}
           onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20 }} />
