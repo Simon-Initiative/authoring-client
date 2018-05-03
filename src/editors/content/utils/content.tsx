@@ -47,6 +47,7 @@ export const CONTENT_ICONS = {
   Composite: <i className={'fa fa-clone'}/>,
   BlockCode: <i className={'fa fa-code'}/>,
   Example: <i className={'fa fa-bar-chart'}/>,
+  Figure: <i className={'fa fa-address-card'}/>,
   Pullout: <i className={'fa fa-external-link-square'}/>,
   Section: <i className={'fa fa-list-alt'}/>,
   YouTube: <i className={'fa fa-youtube'}/>,
