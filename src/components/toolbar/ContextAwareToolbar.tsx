@@ -186,7 +186,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={10}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={11}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -197,7 +197,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={3.5}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={5.5}>
           <ItemToolbar
             context={context}
             courseModel={this.props.courseModel} />
