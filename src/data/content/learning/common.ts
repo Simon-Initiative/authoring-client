@@ -133,6 +133,7 @@ addStyle('highlight', 'HIGHLIGHT');
 addStyle('line-through', 'STRIKETHROUGH');
 addStyle('oblique', 'OBLIQUE');
 addStyle('var', 'VAR');
+addStyle('bdo', 'BDO');
 addStyle('cite', 'CITE');
 addStyle('term', 'TERM');
 addStyle('ipa', 'IPA');
