@@ -8,8 +8,10 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TG_COL } from 'data/content/assessment/dragdrop/target_group';
+import { DragHandle } from 'components/common/DragHandle';
 
 import { styles } from './CustomEditor.styles';
+import { Initiator } from 'data/content/assessment/dragdrop/initiator';
 
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   onShowSidebar: () => void;
@@ -51,28 +53,38 @@ export default class CustomEditor
       nothing: () => Immutable.List<TG_COL>(),
     });
 
+    const initiators = model.layoutData.caseOf({
+      just: ld => ld.initiatorGroup.initiators,
+      nothing: () => Immutable.List<Initiator>(),
+    });
+
     return (
       <div className={classes.dynaDropTable}>
         <table>
-          <tbody>
-            {rows.map(row => row.contentType === 'HeaderRow'
-            ? (
-              <th>
-                {row.cols.map(col => (
-                  <td style={{
+          <thead>
+            {rows.filter(row => row.contentType === 'HeaderRow').map(row => (
+              <tr>
+                {row.cols.toArray().map(col => col.contentType === 'Target'
+                ? (
+                  <th className={classNames([classes.cell, classes.targetCell])} />
+                )
+                : (
+                  <th style={{
                     fontWeight: col.fontWeight as any,
                     fontSize: col.fontWeight,
                     fontStyle: col.fontStyle as any,
                     textDecoration: col.textDecoration,
                   }}>
                     {col.text}
-                  </td>
+                  </th>
                 ))}
-              </th>
-            )
-            : (
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {rows.filter(row => row.contentType === 'ContentRow').toArray().map(row => (
               <tr>
-                {row.cols.map(col => col.contentType === 'Target'
+                {row.cols.toArray().map(col => col.contentType === 'Target'
                   ? (
                     <td className={classNames([classes.cell, classes.targetCell])} />
                   )
@@ -92,6 +104,21 @@ export default class CustomEditor
             ))}
           </tbody>
         </table>
+        <div className={classes.initiators}>
+          {initiators.map(initiator => (
+            <div
+              className={classNames([classes.initiator])}
+              style={{
+                fontWeight: initiator.fontWeight as any,
+                fontSize: initiator.fontWeight,
+                fontStyle: initiator.fontStyle as any,
+                textDecoration: initiator.textDecoration,
+              }}>
+              <DragHandle />
+              {initiator.text}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
