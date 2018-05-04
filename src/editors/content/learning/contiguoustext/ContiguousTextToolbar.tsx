@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheet, JSSProps } from 'styles/jss';
 import {
@@ -16,7 +17,7 @@ import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Resource } from 'data/content/resource';
 import { CourseModel } from 'data/models/course';
-
+import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 import { styles } from './ContiguousText.styles';
 
 export interface ContiguousTextToolbarProps
@@ -98,7 +99,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={8}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={9}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
@@ -204,6 +205,38 @@ export default class ContiguousTextToolbar
               disabled={!supports('link') || !rangeEntitiesEnabled}
               tooltip="External Hyperlink">
             <i className={'fa fa-external-link'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={
+                () => {
+                  const material = contentTypes.Material.fromText('Sample definition', '');
+                  const m = new contentTypes.Meaning().with({ material });
+                  const extra = new contentTypes.Extra().with({
+                    meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
+                  });
+
+                  onEdit(model.addEntity(
+                    EntityTypes.extra, true, extra, selection));
+                }
+              }
+              disabled={!supports('extra') || !rangeEntitiesEnabled}
+              tooltip="Rollover Definition">
+            <i className={'fa fa-book'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={
+                () => {
+                  const extra = new contentTypes.Extra().with({
+                    content: ContentElements.fromText('Sample content', '', EXTRA_ELEMENTS),
+                  });
+
+                  onEdit(model.addEntity(
+                    EntityTypes.extra, true, extra, selection));
+                }
+              }
+              disabled={!supports('extra') || !rangeEntitiesEnabled}
+              tooltip="Rollover Content">
+            <i className={'fa fa-address-book-o'}/>
           </ToolbarButton>
           <ToolbarButton
               onClick={

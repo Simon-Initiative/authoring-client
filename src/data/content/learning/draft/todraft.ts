@@ -73,6 +73,9 @@ function getInlineHandlers() {
     cite: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.cite, 'cite', registeredTypes['cite']),
+    extra: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.extra, 'extra', registeredTypes['extra']),
     em,
     foreign: applyStyle.bind(undefined, 'FOREIGN'),
     ipa: applyStyle.bind(undefined, 'IPA'),
@@ -304,7 +307,21 @@ function processInline(
 
     } else {
 
-      const children = getChildren(item);
+      const extractFromExtra = (o) => {
+        const anchor = getChildren(item).find(o => common.getKey(o) === 'anchor');
+        if (anchor !== undefined && anchor !== null) {
+          return getChildren(anchor);
+        }
+        return [{ '#text': ' ' }];
+      };
+
+      // As soon we get another element with a non-standard need to access
+      // child content, we will want to create a generalized navigation system.
+      // But for now, when we encounter an 'extra' element we find its child 'anchor'
+      // element and parse that content, otherwise parse the immediate child content
+      const children = key === 'extra'
+        ? extractFromExtra(item)
+        : getChildren(item);
 
       children.forEach((subItem) => {
         const subKey = common.getKey(subItem);

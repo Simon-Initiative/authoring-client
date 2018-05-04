@@ -10,6 +10,7 @@ import xref from './Xref';
 import quote from './Quote';
 import image from './Image';
 import code from './Code';
+import extra from './Extra';
 
 const decorators = [
   unsupported,
@@ -22,6 +23,7 @@ const decorators = [
   quote,
   image,
   code,
+  extra,
 ];
 
 export function buildCompositeDecorator(props: Object) : CompositeDecorator {

@@ -108,6 +108,8 @@ export default class ContiguousTextEditor
           <DraftWrapper
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
             activeItemId=""
+            parentProps={this.props}
+            parent={this}
             editorStyles={Object.assign({}, editorStyles)}
             onSelectionChange={selection => this.draftDrivenFocus(model, parent, selection)}
             services={this.props.services}
