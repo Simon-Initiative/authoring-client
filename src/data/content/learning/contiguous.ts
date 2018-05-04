@@ -45,6 +45,7 @@ export enum InlineStyles {
   Foreign = 'FOREIGN',
   Subscript = 'SUBSCRIPT',
   Superscript = 'SUPERSCRIPT',
+  BidirectionTextOverride = 'BDO',
 }
 
 export type InlineEntity = {
@@ -127,6 +128,27 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           return overlaps;
         },
         false);
+  }
+
+  // Return a set of strings representing all the styles that are
+  // overlapped by the supplied text selection.
+  getOverlappingInlineStyles(selection: TextSelection) : Immutable.Set<string> {
+    return this.content.getBlocksAsArray()
+      .reduce(
+        (acc, block) => {
+          let overlaps : Immutable.Set<string> = acc;
+          let styles = Immutable.OrderedSet<string>();
+          block.findStyleRanges(
+            (c) => { styles = c.getStyle(); return c.style.size !== 0; },
+            (start: number, end: number) => {
+              if (selection.hasEdgeWithin(block.key, start, end)) {
+                overlaps = overlaps.union(styles);
+              }
+            },
+          );
+          return overlaps;
+        },
+        Immutable.Set<string>());
   }
 
   getEntityAtCursor(selection: TextSelection) : Maybe<InlineEntity> {

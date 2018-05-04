@@ -97,6 +97,10 @@ const styleMap = {
   DEEMPHASIS: {
     fontWeight: 'lighter',
   },
+  BDO: {
+    direction: 'rtl',
+    unicodeBidi: 'bidi-override',
+  },
   SYM: {
     // TODO
   },

@@ -82,6 +82,7 @@ function getInlineHandlers() {
     sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
     sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
     term: applyStyle.bind(undefined, 'TERM'),
+    bdo: applyStyle.bind(undefined, 'BDO'),
     var: applyStyle.bind(undefined, 'VAR'),
     image: imageInline,
     formula: formulaInline,
