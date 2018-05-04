@@ -47,7 +47,7 @@ export default class ExtraDefinitionEditor
   renderSidebar() {
 
     return (
-      <SidebarContent title="Rollover Definition">
+      <SidebarContent title="Rollover">
       </SidebarContent>
     );
   }
@@ -55,7 +55,7 @@ export default class ExtraDefinitionEditor
   renderToolbar() {
 
     return (
-      <ToolbarGroup label="Rollover Definition"
+      <ToolbarGroup label="Rollover"
         columns={2} highlightColor={CONTENT_COLORS.Definition}>
 
       </ToolbarGroup>
