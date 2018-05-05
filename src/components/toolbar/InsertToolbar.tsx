@@ -236,6 +236,12 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-clone'}/>
         </ToolbarButton>
         <ToolbarButton
+            onClick={() => onInsert(new contentTypes.Dialog())}
+            tooltip="Insert Dialog"
+            disabled={!parentSupportsElementType('dialog')}>
+          <i className={'fa fa-comments'}/>
+        </ToolbarButton>
+        <ToolbarButton
             onClick={() => {
               const alt1 = new contentTypes.Alternative().with({
                 value: 'Item-1',

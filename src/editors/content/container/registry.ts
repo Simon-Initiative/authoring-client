@@ -15,6 +15,7 @@ import ActivityLinkEditor from '../learning/ActivityLinkEditor';
 import BlockQuoteEditor from '../learning/blockquote/BlockQuoteEditor';
 import MathEditor from '../learning/MathEditor';
 import CiteEditor from '../learning/CiteEditor';
+import DialogEditor from '../learning/DialogEditor';
 import XrefEditor from '../learning/XrefEditor';
 import ImageEditor from '../learning/ImageEditor';
 import AudioEditor from '../learning/AudioEditor';
@@ -58,6 +59,7 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
+  registry['Dialog'] = connectEditor(DialogEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Image'] = connectEditor(ImageEditor);
   registry['ActivityLink'] = connectEditor(ActivityLinkEditor);

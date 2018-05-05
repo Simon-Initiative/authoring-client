@@ -19,6 +19,7 @@ export { Composite } from './content/learning/composite';
 export { Dd } from './content/learning/dd';
 export { Default } from './content/learning/default';
 export { Definition } from './content/learning/definition';
+export { Dialog } from './content/learning/dialog';
 export { Dl } from './content/learning/dl';
 export { Dt } from './content/learning/dt';
 export { Example } from './content/learning/example';
