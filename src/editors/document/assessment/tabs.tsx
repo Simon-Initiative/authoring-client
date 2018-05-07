@@ -5,6 +5,7 @@ import {
   Node as AssessmentNode, Question, Selection,
 } from 'data/contentTypes';
 import { DragHandle } from 'components/common/DragHandle.tsx';
+import { getLabelForQuestion } from 'editors/content/question/Question';
 
 import './tabs.scss';
 
@@ -63,38 +64,6 @@ const selection = (s : Selection) : string => {
     + strategy(s.strategy);
 };
 
-const label = (question: Question) : string => {
-
-  if (question.items.size === 0) {
-    return 'Input';
-  }
-
-  // Look at first item and base label off of that
-  const item = question.items.first();
-
-  switch (item.contentType) {
-
-    case 'MultipleChoice':
-      if (item.select === 'single') {
-        return 'Multiple Choice';
-      }
-      return 'Check All That Apply';
-    case 'Ordering':
-      return 'Ordering';
-    case 'Essay':
-      return 'Essay';
-    case 'ShortAnswer':
-      return 'Short Answer';
-    case 'Text':
-    case 'Numeric':
-    case 'FillInTheBlank':
-      return 'Input';
-    default:
-      return 'Question';
-  }
-
-};
-
 const Skills = (props) => {
   const skills = countSkills(props.question);
   return (
@@ -116,7 +85,7 @@ const QuestionTab = (props: TabProps) => {
         <div>
           <DragHandle connectDragSource={props.connectDragSource}/>
           &nbsp;
-          <Label {...props}>{label(q)}</Label>
+          <Label {...props}>{getLabelForQuestion(q)}</Label>
         </div>
         <Skills {...props} question={props.node}/>
       </div>

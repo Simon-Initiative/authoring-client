@@ -24,7 +24,8 @@ export enum Layout {
 
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
-  hideContentLabel?: boolean;
+  hideContentLabel?: boolean | string[];
+  disableContentSelection?: boolean | string[];
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
@@ -255,8 +256,16 @@ export class ContentContainer
     e.stopPropagation();
   }
 
+  disableContentSelection(model: ContentElement) {
+    const { disableContentSelection } = this.props;
+
+    return disableContentSelection === true
+      || (Array.isArray(disableContentSelection)
+        && disableContentSelection.find(type => type === model.contentType));
+  }
+
   renderMain() : JSX.Element {
-    const { hideContentLabel, hover,
+    const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
       onUpdateHover, layout = Layout.Vertical } = this.props;
 
@@ -281,6 +290,8 @@ export class ContentContainer
         const props = {
           ...this.props, model,
           onEdit: this.onChildEdit,
+          onFocus: this.disableContentSelection(model)
+            ? e => console.log(e) : this.props.onFocus,
           parent: this,
           key: model.guid,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
@@ -305,6 +316,7 @@ export class ContentContainer
               contentType={model.contentType}
               onSelect={() => this.onSelect(model)}
               hideContentLabel={hideContentLabel}
+              disableContentSelection={disableContentSelection}
               key={model.guid}
               onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
               isHoveringContent={isHoverContent}

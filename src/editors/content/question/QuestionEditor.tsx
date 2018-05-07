@@ -9,12 +9,22 @@ import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
+import { DynaDropInput } from './DynaDropInput.controller';
 import { MultipartInput } from './MultipartInput.controller';
 import { Skill } from 'types/course';
 import { InsertInputRefCommand } from './commands';
 import { detectInputRefChanges } from 'data/content/assessment/question';
 
 import './QuestionEditor.scss';
+
+export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
+  (acc, val) => {
+    return val.contentType === 'Custom'
+      && (console.log(val.src.substr(val.src.length - 11))
+      || val.src.substr(val.src.length - 11) === 'DynaDrop.js');
+  },
+  false,
+);
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
@@ -267,6 +277,14 @@ export class QuestionEditor
     };
 
     if (isMultipart) {
+      if (containsDynaDropCustom(this.props.model.body)) {
+        return (
+        <DynaDropInput
+          {...questionProps} itemModel={item}
+          onAddItemPart={this.onAddItemPart} />
+        );
+      }
+
       return (
         <MultipartInput
           {...questionProps} itemModel={item}
