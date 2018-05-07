@@ -15,7 +15,6 @@ import ActivityLinkEditor from '../learning/ActivityLinkEditor';
 import BlockQuoteEditor from '../learning/blockquote/BlockQuoteEditor';
 import MathEditor from '../learning/MathEditor';
 import CiteEditor from '../learning/CiteEditor';
-import DialogEditor from '../learning/DialogEditor';
 import XrefEditor from '../learning/XrefEditor';
 import ImageEditor from '../learning/ImageEditor';
 import AudioEditor from '../learning/AudioEditor';
@@ -39,6 +38,7 @@ import CompositeEditor from '../learning/CompositeEditor';
 import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
+import DialogEditor from 'editors/content/learning/DialogEditor';
 
 
 let registry = null;
