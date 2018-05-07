@@ -21,7 +21,7 @@ import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 
 export interface DraftWrapperProps {
-  onEdit: (text : ContiguousText) => void;
+  onEdit: (text : ContiguousText, src?) => void;
   onSelectionChange: (state: SelectionState) => void;
   content: ContiguousText;
   locked: boolean;
@@ -295,8 +295,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
-    const onContiguousTextEdit = (text: ContiguousText) => {
-      this.props.onEdit(text);
+    const onContiguousTextEdit = (text: ContiguousText, src) => {
+      this.props.onEdit(text, src);
     };
     const onSelect = (entityKey) => {
       // Force selection just before the entity

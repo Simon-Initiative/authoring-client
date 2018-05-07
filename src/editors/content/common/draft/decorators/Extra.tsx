@@ -20,7 +20,7 @@ interface ExtraProps {
   contentState: ContentState;
   parent: any;
   getContiguousText: () => ContiguousText;
-  onContiguousTextEdit: (text: ContiguousText) => void;
+  onContiguousTextEdit: (text: ContiguousText, src) => void;
 }
 
 interface ExtraState {
@@ -41,7 +41,7 @@ class Extra extends React.PureComponent<ExtraProps, ExtraState> {
 
     // Update the entity inside the contiguous text
     const text = getContiguousText().updateEntity(entityKey, e);
-    onContiguousTextEdit(text);
+    onContiguousTextEdit(text, src);
   }
 
   onClose() {

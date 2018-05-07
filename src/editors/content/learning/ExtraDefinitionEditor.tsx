@@ -7,11 +7,12 @@ import {
   AbstractContentEditor, AbstractContentEditorProps,
 } from 'editors/content/common/AbstractContentEditor';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
-import { ContentElements } from 'data/content/common/elements';
+import { ContentElements, TEXT_ELEMENTS } from 'data/content/common/elements';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { getEditorByContentType } from 'editors/content/container/registry';
+import { TextSelection } from 'types/active';
 
 import { Maybe } from 'tsmonad';
 import {
@@ -37,12 +38,10 @@ export interface ExtraDefinitionEditorState {
 export default class ExtraDefinitionEditor
     extends AbstractContentEditor<contentTypes.Extra,
     StyledComponentProps<ExtraDefinitionEditorProps>, ExtraDefinitionEditorState> {
-  selectionState: any;
 
   constructor(props) {
     super(props);
   }
-
 
   renderSidebar() {
 
@@ -75,19 +74,12 @@ export default class ExtraDefinitionEditor
 
   onPronunciationEdit(pronunciation, src) {
 
-    if (pronunciation.content.size === 0) {
-      const model = this.props.model.with({
-        pronunciation: Maybe.nothing(),
-      });
+    const model = this.props.model.with({
+      pronunciation,
+    });
 
-      this.props.onEdit(model, src);
-    } else {
-      const model = this.props.model.with({
-        pronunciation: Maybe.just(pronunciation),
-      });
+    this.props.onEdit(model, src);
 
-      this.props.onEdit(model, src);
-    }
   }
 
   onMeaningEdit(elements, src) {
@@ -103,24 +95,24 @@ export default class ExtraDefinitionEditor
       });
 
       this.props.onEdit(model, src);
+    } else if (elements.content.size === 0) {
+
+      const model = this.props.model.with({
+        meaning: Immutable.OrderedMap<string, contentTypes.Meaning>(),
+      });
+
+      this.props.onEdit(model, model);
     }
+
   }
 
   onTranslationEdit(translation, src) {
 
-    if (translation.content.size === 0) {
-      const model = this.props.model.with({
-        translation: Maybe.nothing(),
-      });
+    const model = this.props.model.with({
+      translation,
+    });
 
-      this.props.onEdit(model, src);
-    } else {
-      const model = this.props.model.with({
-        translation: Maybe.just(translation),
-      });
-
-      this.props.onEdit(model, src);
-    }
+    this.props.onEdit(model, src);
 
   }
 
@@ -173,15 +165,7 @@ export default class ExtraDefinitionEditor
 
     const getLabel = (e, i) => <span>{e.contentType + ' ' + (i + 1)}</span>;
 
-    const translation = model.translation.caseOf({
-      just: p => p,
-      nothing: () => new contentTypes.Translation(),
-    });
-
-    const pronunciation = model.pronunciation.caseOf({
-      just: p => p,
-      nothing: () => new contentTypes.Pronunciation(),
-    });
+    const { translation, pronunciation } = model;
 
     const meanings = new ContentElements().with({
       content: model.meaning,
@@ -192,23 +176,62 @@ export default class ExtraDefinitionEditor
 
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
 
+    const translationParent = {
+      supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
+      onEdit(content: Object, source: Object) {
+        this.props.onEdit(this.props.model.with({ translation: content }), source);
+      },
+      onAddNew(content: Object, textSelection: Maybe<TextSelection>) {},
+      onRemove(content: Object) {},
+      onDuplicate(content: Object) {},
+      onMoveUp(content: Object) {},
+      onMoveDown(content: Object) {},
+      props: this.props,
+    };
 
     const translationProps = Object.assign({}, this.props, {
       model: translation,
       label: 'Translation',
       onEdit: this.onTranslationEdit.bind(this),
+      parent: this,
+      onClick: () => {},
+      onFocus: (m, p, t) => this.props.onFocus(m, translationParent, t),
     });
 
+    const pronunciationParent = {
+      supportedElements: Immutable.List<string>(TEXT_ELEMENTS),
+      onEdit(content: Object, source: Object) {
+        this.props.onEdit(this.props.model.with({ pronunciation: content }), source);
+      },
+      onAddNew(content: Object, textSelection: Maybe<TextSelection>) {},
+      onRemove(content: Object) {},
+      onDuplicate(content: Object) {},
+      onMoveUp(content: Object) {},
+      onMoveDown(content: Object) {},
+      props: this.props,
+    };
+
     const translationEditor = React.createElement(
-      getEditorByContentType('Translation'), translationProps);
+      getEditorByContentType('ContiguousText'), translationProps);
 
     const pronunciationProps = Object.assign({}, this.props, {
       model: pronunciation,
       onEdit: this.onPronunciationEdit.bind(this),
+      onClick: () => {},
+      onFocus: (m, p, t) => this.props.onFocus(m, pronunciationParent, t),
     });
 
     const pronunciationEditor = React.createElement(
-      getEditorByContentType('Pronunciation'), pronunciationProps);
+      getEditorByContentType('ContiguousText'), pronunciationProps);
+
+    const meaningEditors = this.props.model.meaning.size > 0
+      ? <ContentContainer
+          {...this.props}
+          model={meanings}
+          bindProperties={bindLabel}
+          onEdit={this.onMeaningEdit.bind(this)}
+        />
+      : null;
 
     return (
       <div className={classNames([classes.definition, className])}>
@@ -218,15 +241,12 @@ export default class ExtraDefinitionEditor
           onClick={this.onAddMeaning.bind(this)}
           className="btn btn-link">+ Add meaning</button>
 
-        <ContentContainer
-          {...this.props}
-          model={meanings}
-          bindProperties={bindLabel}
-          onEdit={this.onMeaningEdit.bind(this)}
-        />
+        {meaningEditors}
 
+        <div>Translation</div>
         {translationEditor}
 
+        <div>Pronunciation</div>
         {pronunciationEditor}
 
       </div>

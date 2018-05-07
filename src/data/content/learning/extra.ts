@@ -1,7 +1,5 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { Pronunciation } from './pronunciation';
-import { Translation } from './translation';
 import { Meaning } from './meaning';
 import { Anchor } from './anchor';
 import { augment, getChildren, except } from '../common';
@@ -9,11 +7,13 @@ import { getKey } from '../../common';
 import { ContentElements, EXTRA_ELEMENTS } from 'data/content/common/elements';
 
 import createGuid from 'utils/guid';
+import { ContiguousText } from 'data/contentTypes';
+import { ContiguousTextMode } from 'data/content/learning/contiguous';
 
 export type ExtraParams = {
   anchor?: Anchor;
-  pronunciation?: Maybe<Pronunciation>;
-  translation?: Maybe<Translation>;
+  pronunciation?: ContiguousText;
+  translation?: ContiguousText;
   meaning?: Immutable.OrderedMap<string, Meaning>;
   content?: ContentElements,
   id?: Maybe<string>,
@@ -24,19 +24,20 @@ const defaultContent = {
   contentType: 'Extra',
   id: Maybe.nothing(),
   anchor: new Anchor(),
-  pronunciation: Maybe.nothing(),
-  translation: Maybe.nothing(),
+  pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
+  translation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
   meaning: Immutable.OrderedMap<string, Meaning>(),
   content: new ContentElements().with({ supportedElements: Immutable.List(EXTRA_ELEMENTS) }),
   guid: '',
 };
 
+
 export class Extra extends Immutable.Record(defaultContent) {
 
   contentType: 'Extra';
   anchor: Anchor;
-  pronunciation: Maybe<Pronunciation>;
-  translation: Maybe<Translation>;
+  pronunciation: ContiguousText;
+  translation: ContiguousText;
   meaning: Immutable.OrderedMap<string, Meaning>;
   content: ContentElements;
   id: Maybe<string>;
@@ -53,14 +54,6 @@ export class Extra extends Immutable.Record(defaultContent) {
   clone() {
     return this.with({
       anchor: this.anchor.clone(),
-      pronunciation: this.pronunciation.caseOf({
-        just: p => Maybe.just(p.clone().with({ guid: createGuid() })),
-        nothing: () => Maybe.nothing<Pronunciation>(),
-      }),
-      translation: this.translation.caseOf({
-        just: p => Maybe.just(p.clone().with({ guid: createGuid() })),
-        nothing: () => Maybe.nothing<Translation>(),
-      }),
       meaning: this.meaning.map(m => m.clone().with({ guid: createGuid() })).toOrderedMap(),
       content: this.content.clone(),
     });
@@ -85,11 +78,15 @@ export class Extra extends Immutable.Record(defaultContent) {
           break;
         case 'pronunciation':
           model = model.with({ pronunciation:
-            Maybe.just(Pronunciation.fromPersistence(item, id)) });
+            ContiguousText.fromPersistence(
+              (item as any).pronunciation, '', ContiguousTextMode.SimpleText),
+          });
           break;
         case 'translation':
           model = model.with({ translation:
-            Maybe.just(Translation.fromPersistence(item, id)) });
+            ContiguousText.fromPersistence(
+              (item as any).translation, '', ContiguousTextMode.SimpleText),
+          });
           break;
         case 'meaning':
           model = model.with({ meaning:
@@ -108,10 +105,16 @@ export class Extra extends Immutable.Record(defaultContent) {
     return model;
   }
 
+
+
   isDefinition() : boolean {
-    return this.translation.caseOf({ just: t => true, nothing: () => false })
-      || this.pronunciation.caseOf({ just: t => true, nothing: () => false })
-      || this.meaning.size > 0;
+
+    const hasPronunciation = this.pronunciation.extractPlainText().caseOf(
+      { just: p => p !== '', nothing: () => false });
+    const hasTranslation = this.translation.extractPlainText().caseOf(
+      { just: p => p !== '', nothing: () => false });
+
+    return hasPronunciation || hasTranslation || this.meaning.size > 0;
   }
 
   toPersistence() : Object {
@@ -127,9 +130,23 @@ export class Extra extends Immutable.Record(defaultContent) {
 
     (content as Object[]).forEach(c => children.push(c));
 
-    this.pronunciation.lift(p => children.push(p.toPersistence()));
-    this.translation.lift(p => children.push(p.toPersistence()));
-    this.meaning.toArray().forEach(t => children.push(t.toPersistence()));
+    const hasPronunciation = this.pronunciation.extractPlainText().caseOf(
+      { just: p => p !== '', nothing: () => false });
+    const hasTranslation = this.translation.extractPlainText().caseOf(
+      { just: p => p !== '', nothing: () => false });
+
+    if (hasPronunciation) {
+      const o = {};
+      o['#array'] = this.pronunciation.toPersistence();
+      children.push({ pronunciation: o });
+    }
+    if (hasTranslation) {
+      const o = {};
+      o['#array'] = this.translation.toPersistence();
+      children.push({ translation: o });
+    }
+
+    this.meaning.toArray().forEach(m => children.push(m.toPersistence()));
 
     const m = {
       extra: {

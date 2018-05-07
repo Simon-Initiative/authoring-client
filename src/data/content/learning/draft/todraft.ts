@@ -13,7 +13,14 @@ export function toDraft(toParse: Object[], isInlineText : boolean = false) : Con
   };
 
   if (isInlineText) {
-    parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+
+    if (toParse instanceof Array) {
+      parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+    } else if (toParse['#array'] !== undefined) {
+      parse({ p: { '#array': toParse['#array'] } }, { draft, depth: 0 });
+    } else {
+      parse({ p: { '#array': [toParse] } }, { draft, depth: 0 });
+    }
   } else {
     toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
   }

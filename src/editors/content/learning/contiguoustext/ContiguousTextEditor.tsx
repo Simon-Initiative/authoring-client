@@ -116,7 +116,7 @@ export default class ContiguousTextEditor
             context={this.props.context}
             content={this.props.model}
             locked={!editMode || viewOnly}
-            onEdit={c => this.props.onEdit(c, c)} />
+            onEdit={(c, s) => this.props.onEdit(c, s === undefined ? c : s)} />
 
       </div>
     );
