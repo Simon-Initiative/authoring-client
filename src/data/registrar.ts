@@ -24,6 +24,7 @@ export function registerContentTypes() {
   registerType('dl', ct.Dl.fromPersistence);
   registerType('dt', ct.Dt.fromPersistence);
   registerType('example', ct.Example.fromPersistence);
+  registerType('figure', ct.Figure.fromPersistence);
   registerType('formula', ct.BlockFormula.fromPersistence);
   registerType('iframe', ct.IFrame.fromPersistence);
   registerType('instructions', ct.Instructions.fromPersistence);

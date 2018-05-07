@@ -24,6 +24,7 @@ export { Dl } from './content/learning/dl';
 export { Dt } from './content/learning/dt';
 export { Example } from './content/learning/example';
 export { Extra } from './content/learning/extra';
+export { Figure } from './content/learning/figure';
 export { Formula } from './content/learning/formula';
 export { IFrame } from './content/learning/iframe';
 export { Instructions } from './content/learning/instructions';
