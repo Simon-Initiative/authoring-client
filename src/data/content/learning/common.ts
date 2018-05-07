@@ -35,6 +35,7 @@ export enum EntityTypes {
 
   // Inline entities
   activity_link = 'activity_link',
+  extra = 'extra',
   link = 'link',
   image_link = 'image_link',
   image_activity_link = 'image_activity_link',

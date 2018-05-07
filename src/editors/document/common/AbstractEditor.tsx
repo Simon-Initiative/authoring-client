@@ -64,18 +64,18 @@ export abstract class AbstractEditor<ModelType,
 
   componentDidMount() {
     handleKey(
-      'ctrl+z',
+      '⌘+z, ctrl+z',
       () => this.undoStack.size > 1,
       this.undo.bind(this));
     handleKey(
-      'ctrl+y',
+      '⌘+y, ctrl+y',
       () => this.redoStack.size > 0,
       this.redo.bind(this));
   }
 
   componentWillUnmount() {
-    unhandleKey('ctrl+z');
-    unhandleKey('ctrl+y');
+    unhandleKey('⌘+z, ctrl+z');
+    unhandleKey('⌘+y, ctrl+y');
   }
 
   undo() {

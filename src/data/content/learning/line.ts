@@ -4,16 +4,15 @@ import { Translation } from './translation';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
-import { ContentElements, MATERIAL_ELEMENTS } from 'data/content/common/elements';
 import { Speaker } from 'data/content/learning/speaker';
+import { Material } from 'data/contentTypes';
 
 export type LineParams = {
   guid?: string,
   id?: Maybe<string>,
   title?: Maybe<string>,
-  speaker?: Speaker,
-  material?: ContentElements,
-  // Is this right for translation? It looks like it can be 0 or more
+  speaker?: string,
+  material?: Material,
   translations?: Immutable.OrderedMap<string, Translation>,
 };
 
@@ -22,20 +21,20 @@ const defaultContent = {
   guid: '',
   id: Maybe.nothing<string>(),
   title: Maybe.nothing<string>(),
-  speaker: new Speaker(),
-  material: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
+  speaker: '',
+  material: new Material(),
   translations: Immutable.OrderedMap(),
 };
 
 export class Line extends Immutable.Record(defaultContent) {
 
   contentType: 'Line';
-  guid?: string;
-  id?: Maybe<string>;
-  title?: Maybe<string>;
-  speaker?: Speaker;
-  material?: ContentElements;
-  translations?: Immutable.OrderedMap<string, Translation>;
+  guid: string;
+  id: Maybe<string>;
+  title: Maybe<string>;
+  speaker: '';
+  material: Material;
+  translations: Immutable.OrderedMap<string, Translation>;
 
   constructor(params?: LineParams) {
     super(augment(params));
@@ -49,7 +48,7 @@ export class Line extends Immutable.Record(defaultContent) {
     return this.with({
       guid: createGuid(),
       material: this.material.clone(),
-      // does translation need to be cloned?
+      translations: this.translations.map(t => t.clone()).toOrderedMap(),
     });
   }
 
@@ -64,8 +63,7 @@ export class Line extends Immutable.Record(defaultContent) {
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
-    // Is this line right?
-    model = model.with({ speaker: Speaker.fromPersistence(m['@speaker'], '') });
+    model = model.with({ speaker: m['@speaker'] });
 
     getChildren(m).forEach((item) => {
 
@@ -74,13 +72,11 @@ export class Line extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'material':
           model = model.with({
-            material: ContentElements.fromPersistence(item, '', MATERIAL_ELEMENTS),
+            material: Material.fromPersistence(item, ''),
           });
           break;
         case 'translation':
           model = model.with({
-            // How to do fromPersistence with the map?
-            // Not sure what the translation object looks like from the server
             translations: model.translations.set(id, Translation.fromPersistence(item, '')),
           });
           break;
@@ -92,11 +88,16 @@ export class Line extends Immutable.Record(defaultContent) {
 
   toPersistence() : Object {
 
+    // Check with darren on this
+    const children = [
+      this.material.toPersistence(),
+      ...this.translations.toArray().map(t => t.toPersistence()),
+    ];
+
     const m = {
       line: {
-        '@speaker': this.speaker.toPersistence(),
-        material: this.material.toPersistence(),
-        translations: this.translations.toArray().map(t => t.toPersistence()),
+        '@speaker': this.speaker,
+        ...children,
       },
     };
 

@@ -8,9 +8,8 @@ import createGuid from 'utils//guid';
 export type SpeakerParams = {
   guid?: string,
   id?: string,
-  title?: Maybe<string>, // redundant with name?
-  name?: Maybe<string>;
-  image?: Maybe<Image>,
+  title?: Maybe<string>,
+  content?: Maybe<string | Image>;
 };
 
 const defaultContent = {
@@ -18,18 +17,16 @@ const defaultContent = {
   guid: '',
   id: '',
   title: Maybe.nothing<string>(),
-  name: Maybe.nothing<string>(),
-  image: Maybe.nothing<Image>(),
+  content: Maybe.nothing<string | Image>(),
 };
 
 export class Speaker extends Immutable.Record(defaultContent) {
 
   contentType: 'Speaker';
-  guid?: string;
-  id?: string;
-  title?: Maybe<string>;
-  name?: Maybe<string>;
-  image?: Maybe<Image>;
+  guid: string;
+  id: string;
+  title: Maybe<string>;
+  content: Maybe<string | Image>;
 
   constructor(params?: SpeakerParams) {
     super(augment(params));
@@ -63,12 +60,10 @@ export class Speaker extends Immutable.Record(defaultContent) {
       const id = createGuid();
       switch (key) {
         case '#text':
-          // What is the right way to do this? Switchong on '#text' doesn't seem right,
-          // and how to assign to { name } ?
-          model = model.with({ name: Maybe.just<string>(item.toString()) });
+          model = model.with({ content: Maybe.just(item.toString()) });
           break;
         case 'image':
-          model = model.with({ image: Maybe.just(Image.fromPersistence(item, id)) });
+          model = model.with({ content: Maybe.just(Image.fromPersistence(item, id)) });
           break;
         default:
       }
@@ -84,8 +79,14 @@ export class Speaker extends Immutable.Record(defaultContent) {
     };
 
     this.title.lift(title => m.speaker['@title'] = title);
-    this.name.lift(name => m.speaker['name'] = name);
-    this.image.lift(image => m.speaker['image'] = image.toPersistence);
+    this.content.lift((content) => {
+      if (content instanceof String) {
+        m.speaker['#text'] = content;
+      } else if (content instanceof Image) {
+        const image = (content.toPersistence() as any).image;
+        m.speaker['image'] = image;
+      }
+    });
 
     return m;
   }

@@ -62,6 +62,9 @@ export class Dialog extends Immutable.Record(defaultContent) {
     if (m['@id'] !== undefined) {
       model = model.with({ id: Maybe.just(m['@id']) });
     }
+    if (m['@title'] !== undefined) {
+      model = model.with({ title: Maybe.just(m['@title']) });
+    }
 
     getChildren(m).forEach((item) => {
 
@@ -113,38 +116,21 @@ export class Dialog extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
+    const children = [
+      ...this.speakers.toArray().map(s => s.toPersistence()),
+      ...this.lines.toArray().map(l => l.toPersistence()),
+    ];
+
+    this.media.lift(m => children.push(m.toPersistence()));
 
     const m = {
       dialog: {
-        speakers: this.speakers.toArray().map(s => s.toPersistence()),
-        lines: this.lines.toArray().map(l => l.toPersistence()),
+        '#array': children,
       },
     };
 
     this.id.lift(id => m.dialog['@id'] = id);
     this.title.lift(t => m.dialog['@title'] = t.toPersistence());
-
-    this.media.lift((media) => {
-      switch (media.contentType) {
-        case 'Audio':
-          m.dialog['audio'] = media.toPersistence();
-          break;
-        case 'Image':
-          m.dialog['image'] = media.toPersistence();
-          break;
-        case 'Video':
-          m.dialog['video'] = media.toPersistence();
-          break;
-        case 'YouTube':
-          m.dialog['youtube'] = media.toPersistence();
-          break;
-        case 'IFrame':
-          m.dialog['iframe'] = media.toPersistence();
-          break;
-        default:
-          return;
-      }
-    });
 
     return m;
   }

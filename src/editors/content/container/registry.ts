@@ -1,6 +1,7 @@
-import { connectEditor } from './connectEditor';
+import { connectEditor, connectPopupEditor } from './connectEditor';
 import CodeBlockEditor from '../learning/CodeBlockEditor';
 import ExampleEditor from '../learning/ExampleEditor';
+import FigureEditor from '../learning/FigureEditor';
 import PulloutEditor from '../learning/PulloutEditor';
 import SectionEditor from '../learning/SectionEditor';
 import WbInlineEditor from '../learning/WbInlineEditor';
@@ -39,6 +40,7 @@ import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
 import DialogEditor from 'editors/content/learning/DialogEditor';
+import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 
 
 let registry = null;
@@ -60,6 +62,7 @@ function init() {
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
   registry['Dialog'] = connectEditor(DialogEditor);
+  registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Image'] = connectEditor(ImageEditor);
   registry['ActivityLink'] = connectEditor(ActivityLinkEditor);
@@ -69,6 +72,7 @@ function init() {
   registry['Cite'] = connectEditor(CiteEditor);
   registry['Xref'] = connectEditor(XrefEditor);
   registry['Example'] = connectEditor(ExampleEditor);
+  registry['Figure'] = connectEditor(FigureEditor);
   registry['Pullout'] = connectEditor(PulloutEditor);
   registry['Section'] = connectEditor(SectionEditor);
   registry['WbInline'] = connectEditor(WbInlineEditor);

@@ -21,7 +21,7 @@ import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 
 export interface DraftWrapperProps {
-  onEdit: (text : ContiguousText) => void;
+  onEdit: (text : ContiguousText, src?) => void;
   onSelectionChange: (state: SelectionState) => void;
   content: ContiguousText;
   locked: boolean;
@@ -30,6 +30,8 @@ export interface DraftWrapperProps {
   activeItemId: string;
   editorStyles?: Object;
   singleBlockOnly: boolean;
+  parentProps: Object;
+  parent: any;
 }
 
 interface DraftWrapperState {
@@ -297,6 +299,9 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     const onDecoratorEdit = (contentState: ContentState) => {
       this.forceContentChange(contentState, 'apply-entity');
     };
+    const onContiguousTextEdit = (text: ContiguousText, src) => {
+      this.props.onEdit(text, src);
+    };
     const onSelect = (entityKey) => {
       // Force selection just before the entity
       const range : EntityRange = findEntity(
@@ -313,6 +318,10 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       activeItemId: this.props.activeItemId, services: this.props.services,
       context: this.props.context, onEdit: onDecoratorEdit,
       onDecoratorClick: onSelect,
+      parentProps: this.props.parentProps,
+      parent: this.props.parent,
+      getContiguousText: () => this.props.content,
+      onContiguousTextEdit,
     });
     return compositeDecorator;
   }

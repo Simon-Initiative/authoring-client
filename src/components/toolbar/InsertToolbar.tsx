@@ -99,6 +99,12 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('section')}>
           <i className={'fa fa-list-alt'}/>
         </ToolbarButton>
+        <ToolbarButton
+            onClick={() => onInsert(new contentTypes.Figure())}
+            tooltip="Insert Figure"
+            disabled={!parentSupportsElementType('figure')}>
+          <i className={'fa fa-address-card'}/>
+        </ToolbarButton>
         <ToolbarButtonDropdown
             tooltip="Insert Table"
             label={<i className={'fa fa-table'}/>}
