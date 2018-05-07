@@ -4,14 +4,25 @@ import { Title } from './title';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils/guid';
-import { MediaItem, IFrame, YouTube, Image, Video, Audio } from 'data/contentTypes';
+import { IFrame } from 'data/content/learning/iframe';
+import { YouTube } from 'data/content/learning/youtube';
+import { Image } from 'data/content/learning/image';
+import { Video } from 'data/content/learning/video';
+import { Audio } from 'data/content/learning/audio';
 import { Speaker } from 'data/content/learning/speaker';
 import { Line } from 'data/content/learning/line';
+
+type MediaItem =
+  Image |
+  Audio |
+  Video |
+  YouTube |
+  IFrame;
 
 export type DialogParams = {
   guid?: string,
   id?: Maybe<string>,
-  title?: Maybe<Title>,
+  title?: Title,
   media?: Maybe<MediaItem>,
   speakers?: Immutable.OrderedMap<string, Speaker>,
   lines?: Immutable.OrderedMap<string, Line>,
@@ -21,7 +32,7 @@ const defaultContent = {
   contentType: 'Dialog',
   guid: '',
   id: Maybe.nothing<string>(),
-  title: Maybe.nothing<Title>(),
+  title: new Title(),
   media: Maybe.nothing<MediaItem>(),
   speakers: Immutable.OrderedMap<string, Speaker>(),
   lines: Immutable.OrderedMap<string, Line>(),
@@ -32,7 +43,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
   contentType: 'Dialog';
   guid: string;
   id: Maybe<string>;
-  title: Maybe<Title>;
+  title: Title;
   media: Maybe<MediaItem>;
   speakers: Immutable.OrderedMap<string, Speaker>;
   lines: Immutable.OrderedMap<string, Line>;
@@ -47,7 +58,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
 
   clone() {
     return this.with({
-      title: this.title.lift(title => title.clone()),
+      title: this.title.clone(),
       media: this.media.lift(media => media.clone()),
       speakers: this.speakers.map(s => s.clone()).toOrderedMap(),
       lines: this.lines.map(l => l.clone()).toOrderedMap(),
@@ -63,7 +74,7 @@ export class Dialog extends Immutable.Record(defaultContent) {
       model = model.with({ id: Maybe.just(m['@id']) });
     }
     if (m['@title'] !== undefined) {
-      model = model.with({ title: Maybe.just(m['@title']) });
+      model = model.with({ title: m['@title'] });
     }
 
     getChildren(m).forEach((item) => {
@@ -126,11 +137,11 @@ export class Dialog extends Immutable.Record(defaultContent) {
     const m = {
       dialog: {
         '#array': children,
+        '@title': this.title.toPersistence(),
       },
     };
 
     this.id.lift(id => m.dialog['@id'] = id);
-    this.title.lift(t => m.dialog['@title'] = t.toPersistence());
 
     return m;
   }

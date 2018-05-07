@@ -4,8 +4,7 @@ import { Translation } from './translation';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils//guid';
-import { Speaker } from 'data/content/learning/speaker';
-import { Material } from 'data/contentTypes';
+import { Material } from 'data/content/learning/material';
 
 export type LineParams = {
   guid?: string,
