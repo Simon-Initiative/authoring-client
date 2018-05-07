@@ -5,4 +5,5 @@ export enum DragTypes {
     Choice = 'Choice',
     InputItem = 'InputItem',
     ListItem = 'ListItem',
+    DynaDropInitiator = 'DynaDropInitiator',
 }

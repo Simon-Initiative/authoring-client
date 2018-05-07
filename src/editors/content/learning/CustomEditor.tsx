@@ -8,10 +8,12 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TG_COL } from 'data/content/assessment/dragdrop/target_group';
-import { DragHandle } from 'components/common/DragHandle';
 
 import { styles } from './CustomEditor.styles';
-import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
+import { Initiator } from './dynadragdrop/Initiator';
+import { DynaDropTarget } from './dynadragdrop/DynaDropTarget';
+import { Button } from 'editors/content/common/Button';
 
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   onShowSidebar: () => void;
@@ -40,13 +42,17 @@ export default class CustomEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Audio} columns={4}>
+      <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Custom} columns={4}>
       </ToolbarGroup>
     );
   }
 
+  removeInitiator(guid: string) {
+    console.log('NOT IMPLEMENTED');
+  }
+
   renderDynaDrop() {
-    const { classes, model } = this.props;
+    const { classes, model, editMode } = this.props;
 
     const rows = model.layoutData.caseOf({
       just: ld => ld.targetGroup.rows,
@@ -55,26 +61,34 @@ export default class CustomEditor
 
     const initiators = model.layoutData.caseOf({
       just: ld => ld.initiatorGroup.initiators,
-      nothing: () => Immutable.List<Initiator>(),
+      nothing: () => Immutable.List<InitiatorModel>(),
     });
 
     return (
       <div className={classes.dynaDropTable}>
+        <p className={classes.instructions}>
+          Each cell could either be a label or a drop target. Hover over a cell to specify its type.
+          To assign matching, select each drop target cell and provide feedback
+          (both correct and incorrect) for each option for the target cells.
+        </p>
         <table>
           <thead>
             {rows.filter(row => row.contentType === 'HeaderRow').map(row => (
               <tr>
                 {row.cols.toArray().map(col => col.contentType === 'Target'
                 ? (
-                  <th className={classNames([classes.cell, classes.targetCell])} />
+                  <DynaDropTarget
+                    header className={classNames([classes.targetCell])} />
                 )
                 : (
-                  <th style={{
-                    fontWeight: col.fontWeight as any,
-                    fontSize: col.fontWeight,
-                    fontStyle: col.fontStyle as any,
-                    textDecoration: col.textDecoration,
-                  }}>
+                  <th
+                    className={classes.header}
+                    style={{
+                      fontWeight: col.fontWeight as any,
+                      fontSize: col.fontWeight,
+                      fontStyle: col.fontStyle as any,
+                      textDecoration: col.textDecoration,
+                    }}>
                     {col.text}
                   </th>
                 ))}
@@ -86,7 +100,7 @@ export default class CustomEditor
               <tr>
                 {row.cols.toArray().map(col => col.contentType === 'Target'
                   ? (
-                    <td className={classNames([classes.cell, classes.targetCell])} />
+                    <DynaDropTarget className={classNames([classes.targetCell])} />
                   )
                   : (
                     <td
@@ -104,20 +118,26 @@ export default class CustomEditor
             ))}
           </tbody>
         </table>
+        <div>
+          <Button type="link" editMode={editMode}
+            onClick={() => {}} >
+            <i className="fa fa-plus" /> Add a Row
+          </Button>
+          <Button type="link" editMode={editMode}
+            onClick={() => {}} >
+            <i className="fa fa-plus" /> Add a Column
+          </Button>
+        </div>
         <div className={classes.initiators}>
           {initiators.map(initiator => (
-            <div
-              className={classNames([classes.initiator])}
-              style={{
-                fontWeight: initiator.fontWeight as any,
-                fontSize: initiator.fontWeight,
-                fontStyle: initiator.fontStyle as any,
-                textDecoration: initiator.textDecoration,
-              }}>
-              <DragHandle />
-              {initiator.text}
-            </div>
+            <Initiator model={initiator} editMode={editMode} onRemove={this.removeInitiator} />
           ))}
+        </div>
+        <div>
+          <Button type="link" editMode={editMode}
+            onClick={() => {}} >
+            <i className="fa fa-plus" /> Add a Choice
+          </Button>
         </div>
       </div>
     );
