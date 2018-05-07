@@ -104,6 +104,7 @@ export default class MaterialsEditor
           this.onMaterialEdit(updatedMaterial, s);
         },
         onRemove: e => this.onRemove(e),
+        onPaste: (e) => {},
         onDuplicate: (e) => {},
         onMoveUp: (e) => {},
         onMoveDown: (e) => {},
