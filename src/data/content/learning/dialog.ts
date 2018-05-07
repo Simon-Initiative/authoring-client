@@ -7,15 +7,17 @@ import { Meaning } from './meaning';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
 import createGuid from 'utils/guid';
+import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
-  title?: Maybe<Title>;
-  term?: string;
-  pronunciation?: Maybe<Pronunciation>;
-  translation?: Immutable.OrderedMap<string, Translation>;
-  meaning?: Immutable.OrderedMap<string, Meaning>;
-  id?: Maybe<string>,
   guid?: string,
+  id?: Maybe<string>,
+
+  title?: Maybe<Title>;
+
+  mediaItem?: Maybe<MediaItem>;
+  speaker?: Immutable.OrderedMap<string, Speaker>;
+  line?: Immutable.OrderedMap<string, Line>;
 };
 
 const defaultContent = {
