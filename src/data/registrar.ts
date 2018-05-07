@@ -11,6 +11,8 @@ export function registerContentTypes() {
   registerType('caption', ct.Caption.fromPersistence);
   registerType('composite_activity', ct.Composite.fromPersistence);
   registerType('custom', ct.Custom.fromPersistence);
+  registerType('extra', ct.Extra.fromPersistence);
+  registerType('anchor', ct.Anchor.fromPersistence);
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);

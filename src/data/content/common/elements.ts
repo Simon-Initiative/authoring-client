@@ -6,10 +6,10 @@ import { ContiguousText } from '../learning/contiguous';
 import { Maybe } from 'tsmonad';
 import createGuid from 'utils/guid';
 
-const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref'];
+const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra'];
 const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
 const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe'];
-const ELEMENTS_BLOCK = ['table', 'codeblock'];
+const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
   'figure'];
@@ -18,11 +18,12 @@ export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'term', 'var', '#math'];
 
 export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,
-  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'p'];
+  ...ELEMENTS_MEDIA, ...ELEMENTS_LIST, ...TEXT_ELEMENTS, 'm:math', 'table'];
 export const FLOW_ELEMENTS = [...INLINE_ELEMENTS];
 export const LINK_ELEMENTS = [...TEXT_ELEMENTS, ...ELEMENTS_LINK, 'image'];
 export const MATERIAL_ELEMENTS = [...INLINE_ELEMENTS, 'wb:inline'];
 export const BOX_ELEMENTS = [...MATERIAL_ELEMENTS, 'materials', 'alternatives'];
+export const EXTRA_ELEMENTS = [...ELEMENTS_BLOCK, ...ELEMENTS_MIXED];
 export const BODY_ELEMENTS = [...BOX_ELEMENTS, ...ELEMENTS_SEMANTIC];
 
 export type ContentElementsParams = {

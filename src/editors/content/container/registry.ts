@@ -1,4 +1,4 @@
-import { connectEditor } from './connectEditor';
+import { connectEditor, connectPopupEditor } from './connectEditor';
 import CodeBlockEditor from '../learning/CodeBlockEditor';
 import ExampleEditor from '../learning/ExampleEditor';
 import FigureEditor from '../learning/FigureEditor';
@@ -39,6 +39,7 @@ import CompositeEditor from '../learning/CompositeEditor';
 import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
+import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 
 
 let registry = null;
@@ -59,6 +60,7 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
+  registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Image'] = connectEditor(ImageEditor);
   registry['ActivityLink'] = connectEditor(ActivityLinkEditor);
