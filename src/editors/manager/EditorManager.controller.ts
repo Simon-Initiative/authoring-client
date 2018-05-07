@@ -28,7 +28,6 @@ interface OwnProps {
   userName: string;
   profile: UserProfile;
   course: any;
-
 }
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
@@ -65,7 +64,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(save(documentId, model));
     },
     onDispatch: dispatch,
-
   };
 };
 
