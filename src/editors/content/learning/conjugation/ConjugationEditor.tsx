@@ -10,12 +10,10 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
-import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../../common/controls';
+import { TextInput } from '../../common/controls';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
@@ -23,7 +21,7 @@ import ConjugateEditor from './ConjugateEditor';
 import { Maybe } from 'tsmonad';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import {
-  Discoverable, DiscoverableId,
+  DiscoverableId,
 } from 'components/common/Discoverable.controller';
 
 import { styles } from './Conjugation.styles';
@@ -74,7 +72,6 @@ export default class ConjugationEditor
   }
 
   renderToolbar() {
-    const { onShowSidebar, onDiscover } = this.props;
 
     return (
       <ToolbarGroup label="Conjugation" columns={4} highlightColor={CONTENT_COLORS.Conjugation}>

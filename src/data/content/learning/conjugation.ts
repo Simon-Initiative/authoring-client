@@ -4,7 +4,6 @@ import createGuid from '../../../utils/guid';
 import { augment, getChildren } from '../common';
 import { Cr, ConjugationCell } from './cr';
 import { CellHeader } from './cellheader';
-import { Conjugate } from './conjugate';
 import { getKey } from '../../common';
 import { Title } from '../learning/title';
 import { Pronunciation, ContiguousText } from 'data/contentTypes';

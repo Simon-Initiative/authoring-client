@@ -13,11 +13,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { CONJUGATE_ELEMENTS } from 'data/content/learning/conjugate';
-import { Select, TextInput, Button } from '../../common/controls';
-import { MediaManager } from 'editors/content/media/manager/MediaManager.controller';
-import { MIMETYPE_FILTERS, SELECTION_TYPES } from 'editors/content/media/manager/MediaManager';
-import { adjustPath } from 'editors/content/media/utils';
-import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { TextInput, Button } from '../../common/controls';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { Maybe } from 'tsmonad';
 import { modalActions } from 'actions/modal';
@@ -198,7 +194,6 @@ export default class ConjugateEditor
   }
 
   renderSidebarHeader() {
-    const { model, editMode } = this.props;
 
     return (
       <SidebarContent title="Header">
