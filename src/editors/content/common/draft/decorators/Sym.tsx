@@ -50,8 +50,8 @@ const symbols = {
   lrhar: () => <span className="sym"><img src={LRHAR_ICON} /></span>,
   rarr: () => <span className="sym">&rarr;</span>,
   rArr: () => <span className="sym"><img src={RARR_ICON} /></span>,
-  rlarr: () => <span className="sym"><img src={LARR_ICON} /></span>,
-  Vbar: () => <span className="sym"><img src={LARR_ICON} /></span>,
+  rlarr: () => <span className="sym"><img src={RLARR_ICON} /></span>,
+  Vbar: () => <span className="sym"><img src={VBAR_ICON} /></span>,
   oslash: () => <span className="sym">&empty;</span>,
   not_indep: () => <span className="sym"><img height="11" width="18"
     src={NOT_INDEP_ICON} /></span>,

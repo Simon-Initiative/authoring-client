@@ -1,8 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
 
-import createGuid from 'utils/guid';
-
 export type SymParams = {
   name?: string;
   guid?: string,

@@ -3,11 +3,10 @@ import { JSSProps } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
-import { Select, TextInput } from '../common/controls';
+import { Select } from '../common/controls';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
-import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
-import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
+import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 export interface SymEditorProps extends AbstractContentEditorProps<contentTypes.Sym> {
