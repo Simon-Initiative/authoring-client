@@ -116,7 +116,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('em') || noTextSelected || !editMode}
               tooltip="Bold">
             <i className={'fa fa-bold'}/>
           </ToolbarButton>
@@ -124,7 +124,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('em') || noTextSelected || !editMode}
               tooltip="Italic">
             <i className={'fa fa-italic'}/>
           </ToolbarButton>
@@ -132,7 +132,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('em') || noTextSelected || !editMode}
               tooltip="Strikethrough">
             <i className={'fa fa-strikethrough'}/>
           </ToolbarButton>
@@ -140,7 +140,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('em') || noTextSelected || !editMode}
               tooltip="Highlight">
             <i className={'fa fa-pencil'}/>
           </ToolbarButton>
@@ -148,7 +148,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('sup') || noTextSelected || !editMode}
               tooltip="Superscript">
             <i className={'fa fa-superscript'}/>
           </ToolbarButton>
@@ -156,7 +156,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('sub') || noTextSelected || !editMode}
               tooltip="Subscript">
             <i className={'fa fa-subscript'}/>
           </ToolbarButton>
@@ -164,7 +164,7 @@ export default class ContiguousTextToolbar
               onClick={
                 () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
               }
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('code') || noTextSelected || !editMode}
               tooltip="Code">
             <i className={'fa fa-code'}/>
           </ToolbarButton>
@@ -172,7 +172,7 @@ export default class ContiguousTextToolbar
               onClick={() => {
                 onEdit(model.toggleStyle(InlineStyles.Term, selection));
               }}
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('term') || noTextSelected || !editMode}
               tooltip="Term">
             <i className={'fa fa-book'}/>
           </ToolbarButton>
@@ -180,7 +180,7 @@ export default class ContiguousTextToolbar
               onClick={() => {
                 onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
               }}
-              disabled={noTextSelected || !editMode}
+              disabled={!supports('foreign') || noTextSelected || !editMode}
               tooltip="Foreign">
             <i className={'fa fa-globe'}/>
           </ToolbarButton>
@@ -188,7 +188,7 @@ export default class ContiguousTextToolbar
               onClick={() => {
                 onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
               }}
-              disabled={bdoDisabled || !editMode}
+              disabled={!supports('bdo') || bdoDisabled || !editMode}
               tooltip="Reverse Text Direction">
             <i className={'fa fa-angle-left'}/>
           </ToolbarButton>

@@ -12,7 +12,7 @@ const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe'];
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
-  'figure'];
+  'figure', 'conjugation'];
 
 export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
   'term', 'var', '#math'];

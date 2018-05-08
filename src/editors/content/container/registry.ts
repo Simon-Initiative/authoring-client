@@ -40,7 +40,8 @@ import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
-
+import ConjugationEditor from 'editors/content/learning/conjugation/ConjugationEditor';
+import ConjugateEditor from 'editors/content/learning/conjugation/ConjugateEditor';
 
 let registry = null;
 
@@ -60,6 +61,8 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
+  registry['Conjugation'] = connectEditor(ConjugationEditor);
+  registry['Conjugate'] = connectEditor(ConjugateEditor);
   registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Image'] = connectEditor(ImageEditor);

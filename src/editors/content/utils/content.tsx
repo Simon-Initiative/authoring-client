@@ -28,6 +28,8 @@ export const CONTENT_COLORS = {
   Table: flatui.pomegranite,
   CellData: flatui.pomegranite,
   CellHeader: flatui.pomegranite,
+  Conjugation: flatui.midnightBlue,
+  Conjugate: flatui.midnightBlue,
   BlockCode: flatui.concrete,
   BlockFormula: colors.pink,
   BlockQuote: distinct.distinctLavender,
