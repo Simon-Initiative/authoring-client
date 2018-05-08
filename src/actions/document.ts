@@ -204,8 +204,8 @@ export function load(courseId: string, documentId: string) {
           dispatch(documentLoaded(documentId, document, strategy, editingAllowed));
 
         });
-      });
-      // .catch(error => console.log('load-error:' + error));
+      })
+      .catch(error => console.log('load-error:' + error));
 
     return Promise.resolve(true);
   };
