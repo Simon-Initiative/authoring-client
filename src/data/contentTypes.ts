@@ -47,6 +47,7 @@ export { Pullout } from './content/learning/pullout';
 export { Quote } from './content/learning/quote';
 export { Row } from './content/learning/row';
 export { Source } from './content/learning/source';
+export { Sym } from './content/learning/sym';
 export { Table } from './content/learning/table';
 export { Title } from './content/learning/title';
 export { Track } from './content/learning/track';

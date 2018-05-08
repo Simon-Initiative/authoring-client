@@ -22,6 +22,7 @@ import AudioEditor from '../learning/AudioEditor';
 import VideoEditor from '../learning/VideoEditor';
 import IFrameEditor from '../learning/IFrameEditor';
 import YouTubeEditor from '../learning/YouTubeEditor';
+import SymEditor from '../learning/SymEditor';
 import OrderedListEditor from '../learning/OrderedListEditor';
 import UnorderedListEditor from '../learning/UnorderedListEditor';
 import ListItemEditor from '../learning/ListItemEditor';
@@ -79,6 +80,7 @@ function init() {
   registry['BlockCode'] = connectEditor(BlockCodeEditor);
   registry['BlockFormula'] = connectEditor(BlockFormulaEditor);
   registry['Audio'] = connectEditor(AudioEditor);
+  registry['Sym'] = connectEditor(SymEditor);
   registry['Video'] = connectEditor(VideoEditor);
   registry['IFrame'] = connectEditor(IFrameEditor);
   registry['Ol'] = connectEditor(OrderedListEditor);

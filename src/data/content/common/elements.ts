@@ -14,7 +14,7 @@ const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
   'figure'];
 
-export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign',
+export const TEXT_ELEMENTS = ['#text', 'em', 'sub', 'sup', 'ipa', 'foreign', 'sym',
   'term', 'var', '#math'];
 
 export const INLINE_ELEMENTS = [...ELEMENTS_LINK, ...ELEMENTS_MIXED, ...ELEMENTS_BLOCK,

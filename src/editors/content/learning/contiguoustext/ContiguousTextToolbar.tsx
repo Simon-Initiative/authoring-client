@@ -110,7 +110,7 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={9}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={10}>
         <ToolbarLayout.Inline>
           <ToolbarButton
               onClick={
@@ -289,6 +289,17 @@ export default class ContiguousTextToolbar
               disabled={!supports('m:math') || !pointEntitiesEnabled}
               tooltip="MathML or Latex formula">
             <i className={'fa fa-etsy'}/>
+          </ToolbarButton>
+          <ToolbarButton
+              onClick={
+                () => {
+                  onEdit(model.addEntity(
+                    EntityTypes.sym, true, new contentTypes.Sym(), selection));
+                }
+              }
+              disabled={!supports('sym') || !pointEntitiesEnabled}
+              tooltip="HTML Entity or Symbol">
+            <i className={'fa fa-circle'}/>
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
