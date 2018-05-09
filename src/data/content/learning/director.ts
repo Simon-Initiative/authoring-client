@@ -18,7 +18,7 @@ export type DirectorParams = {
   purpose?: Maybe<string>,
   popout?: Popout,
   alternate?: Alternate,
-  title?: Title,
+  titleContent?: Title,
   caption?: Caption,
   cite?: Cite,
   guid?: string,
@@ -33,7 +33,7 @@ const defaultContent = {
   purpose: Maybe.nothing(),
   popout: new Popout(),
   alternate: new Alternate(),
-  title: Title.fromText(''),
+  titleContent: Title.fromText(''),
   caption: new Caption(),
   cite: new Cite(),
   guid: '',
@@ -49,7 +49,7 @@ export class Director extends Immutable.Record(defaultContent) {
   purpose: Maybe<string>;
   popout: Popout;
   alternate: Alternate;
-  title: Title;
+  titleContent: Title;
   caption: Caption;
   cite: Cite;
   guid: string;
@@ -66,7 +66,7 @@ export class Director extends Immutable.Record(defaultContent) {
     return this.with({
       id: createGuid(),
       alternate: this.alternate.clone(),
-      title: this.title.clone(),
+      titleContent: this.titleContent.clone(),
       caption: this.caption.clone(),
       cite: this.cite.clone(),
     });
@@ -112,7 +112,7 @@ export class Director extends Immutable.Record(defaultContent) {
           break;
         case 'title':
           model = model.with(
-            { title: Title.fromPersistence(item, id) });
+            { titleContent: Title.fromPersistence(item, id) });
           break;
         case 'caption':
           model = model.with({ caption: Caption.fromPersistence(item, id) });
@@ -131,7 +131,7 @@ export class Director extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
 
     const children = [
-      this.title.toPersistence(),
+      this.titleContent.toPersistence(),
       this.cite.toPersistence(),
       this.caption.toPersistence(),
       this.popout.toPersistence(),
@@ -143,7 +143,7 @@ export class Director extends Immutable.Record(defaultContent) {
         '@id': this.id,
         '@height': this.height,
         '@width': this.width,
-        '@purpose': this.purpose.lift(p => p),
+        '@purpose': this.purpose.caseOf({ just: p => p, nothing: () => undefined }),
         '@src': this.src,
         '#array': children,
       },
