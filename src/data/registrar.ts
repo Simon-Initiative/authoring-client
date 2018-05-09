@@ -22,6 +22,8 @@ export function registerContentTypes() {
   registerType('default', ct.Default.fromPersistence);
   registerType('definition', ct.Definition.fromPersistence);
   registerType('dialog', ct.Dialog.fromPersistence);
+  registerType('line', ct.Line.fromPersistence);
+  registerType('speaker', ct.Speaker.fromPersistence);
   registerType('dl', ct.Dl.fromPersistence);
   registerType('dt', ct.Dt.fromPersistence);
   registerType('example', ct.Example.fromPersistence);

@@ -21,6 +21,8 @@ export { Dd } from './content/learning/dd';
 export { Default } from './content/learning/default';
 export { Definition } from './content/learning/definition';
 export { Dialog } from './content/learning/dialog';
+export { Speaker } from './content/learning/speaker';
+export { Line } from './content/learning/line';
 export { Dl } from './content/learning/dl';
 export { Dt } from './content/learning/dt';
 export { Example } from './content/learning/example';

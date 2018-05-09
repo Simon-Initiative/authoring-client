@@ -1,0 +1,27 @@
+.speakerContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 10px 0 20px 0;
+}
+
+.addButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #0067cb;
+  font-size: 30px;
+
+  i {
+    cursor: pointer;
+  }
+
+  &.addSpeaker {
+    height: 182px;
+    width: 50px;
+  }
+
+  &.addLine {
+    height: 90px;
+    width: 93px;
+  }
+}

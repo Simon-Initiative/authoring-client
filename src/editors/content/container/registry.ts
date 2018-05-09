@@ -40,6 +40,8 @@ import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
 import DialogEditor from 'editors/content/learning/DialogEditor';
+import SpeakerEditor from 'editors/content/learning/SpeakerEditor';
+import LineEditor from 'editors/content/learning/LineEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 
 
@@ -62,6 +64,8 @@ function init() {
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
   registry['Dialog'] = connectEditor(DialogEditor);
+  registry['Speaker'] = connectEditor(SpeakerEditor);
+  registry['Line'] = connectEditor(LineEditor);
   registry['Extra'] = connectPopupEditor(ExtraDefinitionEditor);
   registry['Link'] = connectEditor(LinkEditor);
   registry['Image'] = connectEditor(ImageEditor);

@@ -11,13 +11,7 @@ import { Video } from 'data/content/learning/video';
 import { Audio } from 'data/content/learning/audio';
 import { Speaker } from 'data/content/learning/speaker';
 import { Line } from 'data/content/learning/line';
-
-type MediaItem =
-  Image |
-  Audio |
-  Video |
-  YouTube |
-  IFrame;
+import { MediaItem } from 'data/contentTypes';
 
 export type DialogParams = {
   guid?: string,
@@ -32,10 +26,10 @@ const defaultContent = {
   contentType: 'Dialog',
   guid: '',
   id: Maybe.nothing<string>(),
-  title: new Title(),
+  title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
-  speakers: Immutable.OrderedMap<string, Speaker>(),
-  lines: Immutable.OrderedMap<string, Line>(),
+  speakers: Immutable.OrderedMap<string, Speaker>({ default: new Speaker({ id: 'default' }) }),
+  lines: Immutable.OrderedMap<string, Line>({ default: new Line({ speaker: 'default' }) }),
 };
 
 export class Dialog extends Immutable.Record(defaultContent) {
@@ -127,17 +121,17 @@ export class Dialog extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    const children = [
-      ...this.speakers.toArray().map(s => s.toPersistence()),
-      ...this.lines.toArray().map(l => l.toPersistence()),
-    ];
-
-    this.media.lift(m => children.push(m.toPersistence()));
+    const media = [];
+    this.media.lift(m => media.push(m.toPersistence()));
 
     const m = {
       dialog: {
-        '#array': children,
-        '@title': this.title.toPersistence(),
+        '#array': [
+          this.title.toPersistence(),
+          ...media,
+          ...this.speakers.toArray().map(s => s.toPersistence()),
+          ...this.lines.toArray().map(l => l.toPersistence()),
+        ],
       },
     };
 

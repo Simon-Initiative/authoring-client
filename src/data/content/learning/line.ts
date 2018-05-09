@@ -51,7 +51,7 @@ export class Line extends Immutable.Record(defaultContent) {
     });
   }
 
-  static fromPersistence(root: Object, guid: string) : Line {
+  static fromPersistence(root: Object, guid: string): Line {
 
     const m = (root as any).line;
     let model = new Line().with({ guid });
@@ -85,9 +85,9 @@ export class Line extends Immutable.Record(defaultContent) {
     return model;
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
+    console.log('material', this.material.toPersistence());
 
-    // Check with darren on this
     const children = [
       this.material.toPersistence(),
       ...this.translations.toArray().map(t => t.toPersistence()),
@@ -96,7 +96,12 @@ export class Line extends Immutable.Record(defaultContent) {
     const m = {
       line: {
         '@speaker': this.speaker,
-        ...children,
+        ...children.reduce(
+          (acc, c) => ({
+            ...acc,
+            ...c,
+          }),
+          {}),
       },
     };
 

@@ -50,6 +50,7 @@ export class Speaker extends Immutable.Record(defaultContent) {
     if (m['@id'] !== undefined) {
       model = model.with({ id: m['@id'] });
     }
+    console.log('model', model);
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }
