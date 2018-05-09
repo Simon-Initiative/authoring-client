@@ -66,6 +66,7 @@ export interface ChoiceProps  {
   allowScore?: boolean;
   allowReorder?: boolean;
   editMode: boolean;
+  hideChoiceBody?: boolean;
   context: AppContext;
   services: AppServices;
   simpleSelectProps?: {
@@ -101,7 +102,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     const {
       choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
       onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
-      simpleSelectProps,
+      simpleSelectProps, hideChoiceBody,
     } = this.props;
 
     let feedbackEditor;
@@ -154,6 +155,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         onDragDrop={onReorderChoice}
         dragType={DragTypes.Choice}
         body={choice.body}
+        hideBody={hideChoiceBody}
         onEdit={(body, src) => onEditChoice(choice.with({ body }), src)}
         onRemove={id => onRemove(id)}
         controls={

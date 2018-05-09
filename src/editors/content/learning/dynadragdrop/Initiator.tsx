@@ -14,6 +14,7 @@ export interface InitiatorProps {
   className?: string;
   model: InitiatorModel;
   editMode: boolean;
+  onSelect: (id: string) => void;
   onRemove: (guid: string) => void;
 
   connectDragSource?: any;
@@ -63,7 +64,7 @@ export class Initiator
 
   render() {
     const { className, classes, children, model, editMode,
-      connectDragSource, connectDragPreview, onRemove } = this.props;
+      connectDragSource, connectDragPreview, onSelect, onRemove } = this.props;
 
     return connectDragSource(connectDragPreview(
       <div
@@ -73,8 +74,10 @@ export class Initiator
           fontSize: model.fontWeight,
           fontStyle: model.fontStyle as any,
           textDecoration: model.textDecoration,
-        }}>
+        }}
+        onClick={() => onSelect(model.assessmentId)}>
         <DragHandle />
+
         {model.text}
 
         <Remove

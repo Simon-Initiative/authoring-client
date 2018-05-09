@@ -14,7 +14,7 @@ export const styles: JSSStyles = {
     backgroundColor: '#E7F4FE',
     boxShadow: '2px 2px 10px 0px rgba(155,165,173,1)',
     fontSize: 14,
-    cursor: 'grab',
+    cursor: 'pointer',
 
     '& .dragHandleGrab': {
       marginRight: 4,

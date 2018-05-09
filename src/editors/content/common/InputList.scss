@@ -10,10 +10,13 @@
     flex-direction: row;
     margin-bottom: 5px;
 
+    &.hide-body {
+      margin-top: 19px;
+    }
+
     .input-list-item-label {
       display: flex;
       flex-direction: row;
-      margin-right: 10px;
 
       & > * {
         height: 36px;
@@ -45,7 +48,7 @@
       display: block;
       position: relative;
       border: solid 2px transparent;
-      padding-left: 15px;
+      padding-left: 25px;
 
       &.drop-hover {
         border: dashed 2px #f4bf42;
@@ -64,6 +67,10 @@
           right: 0;
           z-index: $reposition-target - 1;
         }
+      }
+
+      &.hide-body {
+        margin-top: -19px;
       }
 
       .input-list-item-content-title {

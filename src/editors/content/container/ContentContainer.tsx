@@ -279,19 +279,21 @@ export class ContentContainer
       ? this.placeholder
       : this.props.model.content;
 
-    const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1;
-
     const countForSizing = Math.max(1, Math.min(contentOrPlaceholder.size, 10));
 
     const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
 
+        const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1
+          || this.disableContentSelection(model);
+
         const props = {
           ...this.props, model,
           onEdit: this.onChildEdit,
           onFocus: this.disableContentSelection(model)
-            ? e => console.log(e) : this.props.onFocus,
+            ? () => { /** do nothing */ }
+            : this.props.onFocus,
           parent: this,
           key: model.guid,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),

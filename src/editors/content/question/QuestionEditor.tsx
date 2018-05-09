@@ -20,8 +20,7 @@ import './QuestionEditor.scss';
 export const containsDynaDropCustom = (modelBody: ContentElements) => modelBody.content.reduce(
   (acc, val) => {
     return val.contentType === 'Custom'
-      && (console.log(val.src.substr(val.src.length - 11))
-      || val.src.substr(val.src.length - 11) === 'DynaDrop.js');
+      && val.src.substr(val.src.length - 11) === 'DynaDrop.js';
   },
   false,
 );

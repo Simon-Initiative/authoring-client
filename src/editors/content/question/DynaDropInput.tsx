@@ -22,11 +22,12 @@ export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank'
 export interface DynaDropInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   activeContext: ActiveContext;
+  selectedInitiator: string;
   onAddItemPart: (item, part, body) => void;
 }
 
 export interface DynaDropInputState extends QuestionState {
-  selectedTarget: string;
+
 }
 
 /**
@@ -35,10 +36,6 @@ export interface DynaDropInputState extends QuestionState {
 export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputState> {
   constructor(props: DynaDropInputProps) {
     super(props);
-
-    this.state = {
-      selectedTarget: props.model.items.first().guid,
-    };
   }
 
   /** Implement required abstract method to set className */
@@ -135,18 +132,24 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, hideGradingCriteria, editMode, onRemove } = this.props;
-    const { selectedTarget } = this.state;
+    const { model, selectedInitiator, hideGradingCriteria, editMode, onRemove } = this.props;
 
-    const itemIndex = model.items.toArray().findIndex(i => i.guid === selectedTarget);
-    const item = model.items.toArray()[itemIndex];
+    const itemIndex = model.items.toArray().findIndex(
+      (i: FillInTheBlank) => i.id === selectedInitiator);
+
+    if (itemIndex < 0) {
+      // selectedInitiator does not exist in model.items
+      return;
+    }
+
+    const item = model.items.toArray()[itemIndex] as FillInTheBlank;
     const part = model.parts.toArray()[itemIndex];
 
     return [(
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
-            'Target Item',
+            item.id,
             'Skills',
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
@@ -163,7 +166,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
               onItemFocus={this.props.onItemFocus}
               onFocus={this.props.onFocus}
               onBlur={this.props.onBlur}
-              itemModel={(item as FillInTheBlank)}
+              itemModel={item}
               partModel={part}
               onEdit={this.props.onEdit} />
 

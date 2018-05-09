@@ -194,10 +194,11 @@ DynaDropTargetItems
           key={choice.guid}
           index={i}
           choice={choice}
+          hideChoiceBody={true}
           allowFeedback
           allowScore
           response={response}
-          allowReorder={!itemModel.shuffle}
+          allowReorder={false}
           context={context}
           services={services}
           editMode={editMode}
@@ -217,9 +218,9 @@ DynaDropTargetItems
     } = this.props;
 
     return (
-      <TabSection className="choices">
-        <TabSectionHeader title="Choices">
-          <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+      <TabSection className="targets">
+        <TabSectionHeader title="Targets">
+          {/* <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
             <Button
               editMode={editMode}
               type="link"
@@ -229,7 +230,7 @@ DynaDropTargetItems
           </TabOptionControl>
           <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
             <ToggleSwitch checked={itemModel.shuffle} />
-          </TabOptionControl>
+          </TabOptionControl> */}
         </TabSectionHeader>
         <TabSectionContent>
           <ChoiceList>

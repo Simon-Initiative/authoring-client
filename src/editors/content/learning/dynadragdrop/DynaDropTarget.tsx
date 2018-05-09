@@ -8,6 +8,8 @@ import { DragTypes } from 'utils/drag';
 import { styles } from './DynaDropTarget.styles';
 
 export interface DynaDropTargetProps {
+  id: string;
+  label: string;
   header?: boolean;
   connectDropTarget?: any;
   isHovered?: boolean;
@@ -47,17 +49,22 @@ export class DynaDropTarget
   }
 
   render() {
-    const { className, classes, header, connectDropTarget, isHovered } = this.props;
+    const { className, classes, id,  header, connectDropTarget,
+      isHovered, label } = this.props;
 
     return connectDropTarget((
       header
       ? (
         <th className={classNames([
-          classes.dynaDropTarget, isHovered && classes.targetHover, className])} />
+          classes.dynaDropTarget, isHovered && classes.targetHover, className])}>
+          {label}
+        </th>
         )
       :(
         <td className={classNames([
-          classes.dynaDropTarget, isHovered && classes.targetHover, className])} />
+          classes.dynaDropTarget, isHovered && classes.targetHover, className])}>
+          {label}
+        </td>
       )
     ));
   }

@@ -33,6 +33,7 @@ export interface InputListItemProps {
   context: AppContext;
   services: AppServices;
   body: ContentElements;
+  hideBody?: boolean;
   options?: any;
   controls?: any;
   editMode: boolean;
@@ -108,6 +109,7 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
       context,
       services,
       body,
+      hideBody,
       options,
       controls,
       editMode,
@@ -122,18 +124,20 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
     } = this.props;
 
     return connectDropTarget(
-      <div className={`input-list-item ${className || ''}`}>
+      <div className={`input-list-item ${className || ''} \
+        ${hideBody && options ? 'hide-body' : ''}`}>
         <div className="input-list-item-label">
-          <div className="label-text">
-            {label}
-          </div>
           {isDraggable && connectDragSource(
             <div className="item-drag-handle"><DragHandle /></div>,
           )}
+          <div className="label-text">
+            {label}
+          </div>
           {controls}
         </div>
         {connectDragPreview(
-          <div className={`input-list-item-content ${isHovered && canDrop ? 'drop-hover' : ''}`}>
+          <div className={`input-list-item-content ${isHovered && canDrop ? 'drop-hover' : ''} \
+            ${hideBody && options ? 'hide-body' : ''}`}>
             {isHovered && canDrop
               ? (<div className="drop-target-container"/>)
               : (null)
@@ -142,16 +146,21 @@ export class InputListItem extends React.PureComponent<InputListItemProps> {
                 ? (<div className="input-list-item-content-title">{contentTitle}</div>)
                 : (null)
               }
-              <ContentContainer
-                activeContentGuid={this.props.activeContentGuid}
-                hover={this.props.hover}
-                onUpdateHover={this.props.onUpdateHover}
-                onFocus={this.props.onFocus}
-                context={context}
-                services={services}
-                editMode={editMode}
-                model={body}
-                onEdit={onEdit} />
+            {!hideBody
+              ? (
+                <ContentContainer
+                  activeContentGuid={this.props.activeContentGuid}
+                  hover={this.props.hover}
+                  onUpdateHover={this.props.onUpdateHover}
+                  onFocus={this.props.onFocus}
+                  context={context}
+                  services={services}
+                  editMode={editMode}
+                  model={body}
+                  onEdit={onEdit} />
+              )
+              : (null)
+            }
               {options}
             </div>,
         )}

@@ -8,7 +8,7 @@ import ActivityEditor from '../learning/ActivityEditor';
 import BlockCodeEditor from '../learning/blockcode/BlockCodeEditor';
 import BlockFormulaEditor from '../learning/blockformula/BlockFormulaEditor';
 import ContiguousTextEditor from '../learning/contiguoustext/ContiguousTextEditor';
-import CustomEditor from '../learning/CustomEditor';
+import { CustomEditor } from '../learning/CustomEditor.controller';
 import UnsupportedEditor from '../learning/UnsupportedEditor';
 import LinkEditor from '../learning/LinkEditor';
 import ActivityLinkEditor from '../learning/ActivityLinkEditor';
