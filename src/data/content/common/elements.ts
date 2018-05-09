@@ -8,7 +8,8 @@ import createGuid from 'utils/guid';
 
 const ELEMENTS_LINK = ['cite', 'link', 'activity_link', 'xref', 'input_ref', 'extra'];
 const ELEMENTS_MIXED = ['formula', 'code', 'image', 'quote'];
-const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe'];
+const ELEMENTS_MEDIA = ['video', 'audio', 'youtube', 'iframe', 'applet',
+  'flash', 'director', 'mathematica', 'panopto', 'unity'];
 const ELEMENTS_BLOCK = ['codeblock', 'p'];
 const ELEMENTS_LIST = ['ol', 'ul', 'dl'];
 const ELEMENTS_SEMANTIC = ['pullout', 'example', 'definition', 'materials', 'composite_activity',
