@@ -5,6 +5,7 @@ import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton } from './ToolbarButton';
 import { ToolbarButtonDropdown } from './ToolbarButtonDropdown';
+import { ToolbarButtonMenu, ToolbarButtonMenuItem } from './ToolbarButtonMenu';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
@@ -13,11 +14,20 @@ import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
+
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
 import { Resource } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
+
+const APPLET_ICON = require('../../../assets/java.png');
+const FLASH_ICON = require('../../../assets/flash.jpg');
+const DIRECTOR_ICON = require('../../../assets/director.png');
+const UNITY_ICON = require('../../../assets/unity.png');
+const WOLFRAM_ICON = require('../../../assets/wolfram.png');
+
+const imgSize = 24;
 
 const TableCreation = require('editors/content/learning/table/TableCreation.bs').jsComponent;
 
@@ -60,6 +70,8 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
     }));
   };
 
+  const supportsAtLeastOne = (...elements) => elements.some(e => parentSupportsElementType(e));
+
   return (
     <React.Fragment>
       <ToolbarLayout.Inline>
@@ -81,6 +93,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('ol')}>
           <i className={'fa fa-list-ol'}/>
         </ToolbarButton>
+
         <ToolbarButton
             onClick={() => {
               const li = new contentTypes.Li();
@@ -134,6 +147,36 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('formula')}>
           <i className="unicode-icon">&#8721;</i>
         </ToolbarButton>
+
+        <ToolbarButtonMenu disabled={!supportsAtLeastOne(
+          'applet', 'flash', 'director', 'mathematica', 'pannopto', 'unity')}
+          tooltip="Third party media elements" icon={<i className={'fa fa-file-video-o'}/>}>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('applet')} onClick={() => true}>
+            <img src={APPLET_ICON} height={imgSize} width={imgSize}/> Java Applet
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('flash')} onClick={() => true}>
+            <img src={FLASH_ICON} height={imgSize} width={imgSize}/> Adobe Flash
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('director')} onClick={() => true}>
+            <img src={DIRECTOR_ICON} height={imgSize} width={imgSize}/> Adobe Director
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('panopto')} onClick={() => true}>
+            <i style={ { width: 22 } } className={'fa fa-play'}/> Panopto
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('mathematica')} onClick={() => true}>
+            <img src={WOLFRAM_ICON} height={imgSize} width={imgSize}/> Wolfram Mathematica
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('unity')} onClick={() => true}>
+            <img src={UNITY_ICON} height={imgSize} width={imgSize}/> Unity
+          </ToolbarButtonMenuItem>
+        </ToolbarButtonMenu>
+
         <ToolbarButton
             onClick={() => {
               selectImage(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
