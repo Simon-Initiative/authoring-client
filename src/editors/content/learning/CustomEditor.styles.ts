@@ -9,6 +9,7 @@ export const styles: JSSStyles = {
     fontSize: 14,
     color: colors.grayDark,
     maxWidth: 800,
+    marginTop: 10,
   },
   dynaDropTable: {
 

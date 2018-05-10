@@ -14,8 +14,9 @@ export interface InitiatorProps {
   className?: string;
   model: InitiatorModel;
   editMode: boolean;
-  onSelect: (id: string) => void;
-  onRemove: (guid: string) => void;
+  onSelect?: (id: string) => void;
+  onRemove?: (guid: string) => void;
+  onDelete?: (guid: string) => void;
 
   connectDragSource?: any;
   connectDragPreview?: any;
@@ -64,26 +65,36 @@ export class Initiator
 
   render() {
     const { className, classes, children, model, editMode,
-      connectDragSource, connectDragPreview, onSelect, onRemove } = this.props;
+      connectDragSource, connectDragPreview, onSelect, onRemove,
+      onDelete } = this.props;
 
     return connectDragSource(connectDragPreview(
       <div
-        className={classNames(['Initiator', classes.initiator])}
+        className={classNames(['Initiator', classes.initiator, onSelect && classes.selectable])}
         style={{
           fontWeight: model.fontWeight as any,
           fontSize: model.fontWeight,
           fontStyle: model.fontStyle as any,
           textDecoration: model.textDecoration,
         }}
-        onClick={() => onSelect(model.assessmentId)}>
+        onClick={() => onSelect && onSelect(model.assessmentId)}>
         <DragHandle />
 
         {model.text}
 
-        <Remove
-          className={classes.removeBtn}
-          editMode={editMode}
-          onRemove={() => onRemove(model.guid)} />
+        {onRemove &&
+          <Remove
+            className={classes.removeBtn}
+            editMode={editMode}
+            onRemove={() => onRemove(model.guid)} />
+        }
+        {onDelete &&
+          <Remove
+            className={classes.removeBtn}
+            customIcon="fa fa-trash"
+            editMode={editMode}
+            onRemove={() => onDelete(model.guid)} />
+        }
       </div>,
     ));
   }

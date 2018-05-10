@@ -46,6 +46,7 @@ export class CustomEditor
     this.editQuestion = this.editQuestion.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
     this.buildTargetLabelsMap = this.buildTargetLabelsMap.bind(this);
+    this.buildTargetInitiatorsMap = this.buildTargetInitiatorsMap.bind(this);
   }
 
   componentDidMount() {
@@ -92,9 +93,7 @@ export class CustomEditor
     }));
   }
 
-  buildTargetLabelsMap(question: Question) {
-    const { selectedInitiator } = this.props;
-
+  buildTargetLabelsMap(question: Question, selectedInitiator: string) {
     //TODO selectedInitiator should really be a Maybe<string> type
 
     const currentItem = question.items.toArray().find(
@@ -114,8 +113,42 @@ export class CustomEditor
     );
   }
 
+  buildTargetInitiatorsMap(question: Question, initiators: Immutable.List<InitiatorModel>) {
+    // A utility map used by the following reduce funciton.
+    // It creates a map of initiators key'd off of their assessmentId
+    const initiatorsMap = initiators.toArray().reduce(
+      (acc, initiator) => {
+        return {
+          ...acc,
+          [initiator.assessmentId]: initiator,
+        };
+      },
+      {},
+    );
+
+    // This reduce function goes through every Response in every Part to build a map
+    // of initiators that are key'd off of the responses "match" value. This enables
+    // us to easily look up initiators associated to target's assessmentId
+    return question.parts.reduce(
+      (accParts, part) => ({
+        ...accParts,
+        ...part.responses.reduce(
+          (accResponses, response) => (+response.score > 0)
+            ? ({
+              ...accResponses,
+              [response.match]:
+                (accResponses[response.match] || []).concat(initiatorsMap[response.input]),
+            })
+            : accResponses,
+          accParts,
+        ),
+      }),
+      {},
+    );
+  }
+
   renderDynaDrop() {
-    const { classes, model, editMode, currentNode } = this.props;
+    const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode as Question;
 
     const rows = model.layoutData.caseOf({
@@ -128,66 +161,56 @@ export class CustomEditor
       nothing: () => Immutable.List<InitiatorModel>(),
     });
 
-    // build target labels map from guid to label using the selected initiator
-    const targetLabels = this.buildTargetLabelsMap(question);
+    // build a map of targets to initiators
+    const targetInitiators = this.buildTargetInitiatorsMap(question, initiators);
+
+    // build map of target ids to labels using the selected initiator
+    const targetLabels = this.buildTargetLabelsMap(question, selectedInitiator);
+
+    const renderTableRow = (row) => {
+      const isHeader = row.contentType === 'HeaderRow';
+      const Tcell = isHeader ? 'th' : 'td';
+
+      return (
+        <tr>
+          {row.cols.toArray().map(col => col.contentType === 'Target'
+          ? (
+            <DynaDropTarget
+              id={col.guid}
+              header
+              className={classNames([classes.targetCell])}
+              editMode={editMode}
+              label={`Target ${targetLabels[col.assessmentId]}`}
+              initiators={targetInitiators[col.assessmentId]} />
+          )
+          : (
+            <Tcell
+              className={isHeader ? classes.header : classes.cell}
+              style={{
+                fontWeight: col.fontWeight as any,
+                fontSize: col.fontWeight,
+                fontStyle: col.fontStyle as any,
+                textDecoration: col.textDecoration,
+              }}>
+              {col.text}
+            </Tcell>
+          ))}
+        </tr>
+      );
+    };
 
     return (
       <div className={classes.dynaDropTable}>
         <p className={classes.instructions}>
-          Each cell could either be a label or a drop target. Hover over a cell to specify its type.
-          To assign matching, select each drop target cell and provide feedback
-          (both correct and incorrect) for each option for the target cells.
+          Each cell can either be a label or a drop target. Hover over a cell and click
+          the type toggle to change it's type.
         </p>
         <table>
           <thead>
-            {rows.filter(row => row.contentType === 'HeaderRow').map(row => (
-              <tr>
-                {row.cols.toArray().map(col => col.contentType === 'Target'
-                ? (
-                  <DynaDropTarget
-                    id={col.guid}
-                    header
-                    className={classNames([classes.targetCell])}
-                    label={`${targetLabels[col.assessmentId]}`} />
-                )
-                : (
-                  <th
-                    className={classes.header}
-                    style={{
-                      fontWeight: col.fontWeight as any,
-                      fontSize: col.fontWeight,
-                      fontStyle: col.fontStyle as any,
-                      textDecoration: col.textDecoration,
-                    }}>
-                    {col.text}
-                  </th>
-                ))}
-              </tr>
-            ))}
+            {rows.filter(row => row.contentType === 'HeaderRow').map(renderTableRow)}
           </thead>
           <tbody>
-            {rows.filter(row => row.contentType === 'ContentRow').toArray().map(row => (
-              <tr>
-                {row.cols.toArray().map(col => col.contentType === 'Target'
-                  ? (
-                    <DynaDropTarget
-                      id={col.guid} className={classNames([classes.targetCell])}
-                      label={`${targetLabels[col.assessmentId]}`} />
-                  )
-                  : (
-                    <td
-                      className={classNames([classes.cell])}
-                      style={{
-                        fontWeight: col.fontWeight as any,
-                        fontSize: col.fontWeight,
-                        fontStyle: col.fontStyle as any,
-                        textDecoration: col.textDecoration,
-                      }}>
-                      {col.text}
-                    </td>
-                ))}
-              </tr>
-            ))}
+            {rows.filter(row => row.contentType === 'ContentRow').map(renderTableRow)}
           </tbody>
         </table>
         <div>
@@ -200,11 +223,15 @@ export class CustomEditor
             <i className="fa fa-plus" /> Add a Column
           </Button>
         </div>
+        <p className={classes.instructions}>
+          Select each choice below and provide feedback (both correct and incorrect)
+          for each target. Drag a choice to a drop target to assign it as a correct match.
+        </p>
         <div className={classes.initiators}>
           {initiators.map(initiator => (
             <Initiator
               model={initiator} editMode={editMode}
-              onSelect={this.selectInitiator} onRemove={this.removeInitiator} />
+              onSelect={this.selectInitiator} onDelete={this.removeInitiator} />
           ))}
         </div>
         <div>

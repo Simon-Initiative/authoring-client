@@ -4,12 +4,16 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import { DragTypes } from 'utils/drag';
+import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 
 import { styles } from './DynaDropTarget.styles';
+import { Initiator } from 'editors/content/learning/dynadragdrop/Initiator';
 
 export interface DynaDropTargetProps {
   id: string;
   label: string;
+  initiators: InitiatorModel[];
+  editMode: boolean;
   header?: boolean;
   connectDropTarget?: any;
   isHovered?: boolean;
@@ -50,22 +54,23 @@ export class DynaDropTarget
 
   render() {
     const { className, classes, id,  header, connectDropTarget,
-      isHovered, label } = this.props;
+      isHovered, label, initiators, editMode } = this.props;
+
+    const TCell = header ? 'th' : 'td';
 
     return connectDropTarget((
-      header
-      ? (
-        <th className={classNames([
-          classes.dynaDropTarget, isHovered && classes.targetHover, className])}>
+      <TCell className={classNames([
+        classes.dynaDropTarget, isHovered && classes.targetHover, className])}>
+        <div className={classes.label}>
           {label}
-        </th>
-        )
-      :(
-        <td className={classNames([
-          classes.dynaDropTarget, isHovered && classes.targetHover, className])}>
-          {label}
-        </td>
-      )
+        </div>
+        <div className={classes.initiators}>
+          {initiators && initiators.map(initiator => (
+            <Initiator
+              model={initiator} editMode={editMode} onRemove={() => {}} />
+          ))}
+        </div>
+      </TCell>
     ));
   }
 }
