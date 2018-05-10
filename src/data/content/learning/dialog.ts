@@ -28,9 +28,37 @@ const defaultContent = {
   id: Maybe.nothing<string>(),
   title: Title.fromText('Dialog Title'),
   media: Maybe.nothing<MediaItem>(),
-  speakers: Immutable.OrderedMap<string, Speaker>({ default: new Speaker({ id: 'default' }) }),
-  lines: Immutable.OrderedMap<string, Line>({ default: new Line({ speaker: 'default' }) }),
+  speakers: Immutable.OrderedMap<string, Speaker>(),
+  lines: Immutable.OrderedMap<string, Line>(),
 };
+
+function withTitles(model: Dialog): Dialog {
+
+  let count = 0;
+  const next = () => {
+    count += 1;
+    return count;
+  };
+
+  return model.with({
+    speakers: model.speakers.map((speaker) => {
+      const defaultTitle = 'Speaker ' + next();
+      const title = speaker.title.caseOf({
+        just: title => title,
+        nothing: () =>
+          speaker.content.caseOf({
+            just: content =>
+              content instanceof String
+                ? content as string
+                : defaultTitle,
+            nothing: () => defaultTitle,
+          }),
+      });
+
+      return speaker.with({ title: Maybe.just(title) });
+    }).toOrderedMap(),
+  });
+}
 
 export class Dialog extends Immutable.Record(defaultContent) {
 
@@ -76,7 +104,21 @@ export class Dialog extends Immutable.Record(defaultContent) {
       const key = getKey(item);
       const id = createGuid();
       switch (key) {
-
+        case 'speaker':
+          model = model.with({
+            speakers: model.speakers.set(id, Speaker.fromPersistence(item, id)),
+          });
+          break;
+        case 'line':
+          model = model.with({
+            lines: model.lines.set(id, Line.fromPersistence(item, id)),
+          });
+          break;
+        case 'title':
+          model = model.with({
+            title: Title.fromPersistence(item, id),
+          });
+          break;
         // Switch for each type of MediaItem
         case 'audio':
           model = model.with({
@@ -103,21 +145,16 @@ export class Dialog extends Immutable.Record(defaultContent) {
             media: Maybe.just(IFrame.fromPersistence(item, id)),
           });
           break;
-
-        case 'speaker':
-          model = model.with({
-            speakers: model.speakers.set(id, Speaker.fromPersistence(item, id)),
-          });
-          break;
-        case 'line':
-          model = model.with({
-            lines: model.lines.set(id, Line.fromPersistence(item, id)),
-          });
-          break;
         default:
       }
     });
-    return model;
+
+    return withTitles(model);
+
+    // in SpeakerEditor sidebar, 'asText' textbox actually sets the title
+    // if image, set the title as the speaker's text content and display image
+
+
   }
 
   toPersistence(): Object {

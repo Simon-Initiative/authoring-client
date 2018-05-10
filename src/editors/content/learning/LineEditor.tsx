@@ -1,20 +1,20 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
-import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { Speaker, SpeakerSize } from 'editors/content/learning/Speaker';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import './LineEditor.scss';
-import { ContentElements } from 'data/content/common/elements';
 import MaterialEditor from 'editors/content/learning/MaterialEditor';
+import { AppContext } from 'editors/common/AppContext';
+import * as Immutable from 'immutable';
+
 export interface LineEditorProps extends AbstractContentEditorProps<contentTypes.Line> {
   onShowSidebar: () => void;
-  speakers: contentTypes.Speaker[];
+  context: AppContext;
+  speakers: Immutable.OrderedMap<string, contentTypes.Speaker>;
 }
 
 export interface LineEditorState {
@@ -28,6 +28,27 @@ export default class LineEditor
 
     this.selectSpeaker = this.selectSpeaker.bind(this);
     this.onMaterialEdit = this.onMaterialEdit.bind(this);
+  }
+
+  selectSpeaker(e, selectedSpeaker) {
+    e.preventDefault();
+
+    const { model, onEdit, speakers } = this.props;
+
+    const newModel = model.with({
+      speaker: speakers.find(speaker => speaker.id === selectedSpeaker.id).id,
+    });
+
+    onEdit(newModel, newModel);
+  }
+
+  onMaterialEdit(material: contentTypes.Material, sourceObject) {
+    const { model, onEdit } = this.props;
+    const newModel = model.with({
+      material,
+    });
+
+    onEdit(newModel, sourceObject);
   }
 
 
@@ -44,43 +65,26 @@ export default class LineEditor
     );
   }
 
-  selectSpeaker(e, selectedSpeaker) {
-    const { model, onEdit, speakers } = this.props;
-
-    e.preventDefault();
-
-    const newModel = model.with({
-      speaker: speakers.find(speaker => speaker.id === selectedSpeaker.id).id,
-    });
-
-    onEdit(model, model);
-  }
-
-  onMaterialEdit(material: contentTypes.Material, sourceObject) {
-    const { model, onEdit } = this.props;
-    const newModel = model.with({
-      material,
-    });
-
-    onEdit(newModel, sourceObject);
-  }
-
   renderMain(): JSX.Element {
-    const { model, speakers, onShowSidebar } = this.props;
+    const { context, model, speakers, onShowSidebar } = this.props;
     const { material, translations } = model;
 
-    // get this line's speaker from the list of speakers passed in from dialog
     const speaker = speakers.find(speaker => speaker.id === model.speaker);
 
     return (
       <div className="lineEditor">
-        <Speaker size={SpeakerSize.Small}  model={speaker} />
-        {/* <i className="fa fa-arrow-down"/> */}
+        <Speaker
+          context={context}
+          model={speaker}
+          size={SpeakerSize.Small}   />
         <Dropdown label="">
-          {speakers.map(speaker =>
+          {speakers.toArray().map(speaker =>
             <DropdownItem
               onClick={e => this.selectSpeaker(e, speaker)}
-              label={speaker.id}/>)}
+              label={speaker.title.caseOf({
+                just: title => title,
+                nothing: () => 'Unnamed speaker',
+              })}/>)}
         </Dropdown>
         <div className="lineText">
           <MaterialEditor

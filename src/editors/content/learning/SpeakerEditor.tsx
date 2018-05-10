@@ -1,24 +1,20 @@
 import * as React from 'react';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
-import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
-import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 // import './SpeakerEditor.scss';
-import { ContentElements } from 'data/content/common/elements';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
-import { TextInput } from 'editors/content/common/controls';
 import { AppServices } from 'editors/common/AppServices';
 import { AppContext } from 'editors/common/AppContext';
 import { modalActions } from 'actions/modal';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Maybe } from 'tsmonad';
 import { Speaker, SpeakerSize } from 'editors/content/learning/Speaker';
+import { TextInput } from 'editors/content/common/controls';
 
 export interface SpeakerEditorProps extends
   AbstractContentEditorProps<contentTypes.Speaker> {
@@ -37,21 +33,22 @@ export default class SpeakerEditor
     super(props);
 
     this.state = {
-      isDisplayedAsImage: false,
+      isDisplayedAsImage: (props.model as contentTypes.Speaker).content.caseOf({
+        just: content =>
+          content instanceof contentTypes.Image
+            ? true
+            : false,
+        nothing: () => false,
+      }),
     };
 
     this.onToggleDisplayAsImage = this.onToggleDisplayAsImage.bind(this);
     this.onSelectImage = this.onSelectImage.bind(this);
+    this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
   onToggleDisplayAsImage(isDisplayedAsImage) {
     this.setState({ isDisplayedAsImage });
-
-    if (isDisplayedAsImage) {
-      // gray out text
-    } else {
-      // gray out image
-    }
   }
 
   onSelectImage() {
@@ -73,8 +70,22 @@ export default class SpeakerEditor
       });
   }
 
+  onTitleEdit(title: string) {
+    const { model, onEdit } = this.props;
+
+    const newModel = model.with({
+      title: title !== ''
+        ? Maybe.just(title)
+        : Maybe.nothing(),
+    });
+
+    onEdit(newModel, newModel);
+  }
 
   renderSidebar(): JSX.Element {
+    const { model, editMode } = this.props;
+    const { title } = model;
+
     return (
       <SidebarContent title="Speaker">
         <SidebarGroup label="Display">
@@ -86,7 +97,7 @@ export default class SpeakerEditor
                 checked={this.state.isDisplayedAsImage}
                 onChange={() => this.onToggleDisplayAsImage(true)}
                 type="radio" />&nbsp;
-            as Image
+      as Image
             </label>
           </div>
 
@@ -109,9 +120,21 @@ export default class SpeakerEditor
                 value="text"
                 checked={!this.state.isDisplayedAsImage}
                 type="radio" />&nbsp;
-            as Text
+      as Text
             </label>
           </div>
+
+          <SidebarRow label="">
+            <TextInput width="100%" label=""
+              editMode={editMode && !this.state.isDisplayedAsImage}
+              value={title.caseOf({
+                just: title => title,
+                nothing: () => '',
+              })}
+              type="text"
+              onEdit={this.onTitleEdit} />
+          </SidebarRow>
+
         </SidebarGroup>
       </SidebarContent>
     );
@@ -131,9 +154,12 @@ export default class SpeakerEditor
   }
 
   renderMain(): JSX.Element {
-    const { model } = this.props;
+    const { model, context } = this.props;
     return (
-      <Speaker size={SpeakerSize.Large} model={model}/>
+      <Speaker
+        context={context}
+        model={model}
+        size={SpeakerSize.Large}  />
     );
   }
 }

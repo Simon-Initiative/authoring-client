@@ -3,7 +3,7 @@ import { Maybe } from 'tsmonad';
 import { Image } from './image';
 import { augment, getChildren } from '../common';
 import { getKey } from '../../common';
-import createGuid from 'utils//guid';
+import createGuid from 'utils/guid';
 
 export type SpeakerParams = {
   guid?: string,

@@ -6,9 +6,12 @@ import * as contentTypes from 'data/contentTypes';
 import { styles } from './Speaker.styles';
 import './Speaker.scss';
 import { ContentType } from 'types/messages';
+import { AppContext } from 'editors/common/AppContext';
+import { buildUrl } from 'utils/path';
 
 export interface SpeakerProps {
   className?: string;
+  context: AppContext;
   model: contentTypes.Speaker;
   size?: SpeakerSize;
 }
@@ -23,38 +26,33 @@ export enum SpeakerSize {
  */
 export const Speaker: React.StatelessComponent<StyledComponentProps<SpeakerProps>>
   = injectSheetSFC<SpeakerProps>(styles)(({
-    className, classes, children, model, size = SpeakerSize.Large,
+    context, className, classes, children, model, size = SpeakerSize.Large,
   }) => {
-    const { content, title, id } = model;
+    const { title, id, content } = model;
 
     const src = content.caseOf({
       just: content =>
         content instanceof contentTypes.Image
-          ? content.src
+          ? buildUrl(context.baseUrl,
+                     context.courseId,
+                     context.resourcePath,
+                     content.src)
           : 'https://via.placeholder.com/100x100',
       nothing: () => 'https://via.placeholder.com/100x100',
     });
 
-    const defaultName = title.caseOf({
+    const displayTitle = title.caseOf({
       just: title => title,
-      nothing: () => id,
-    });
-
-    const speakerName = content.caseOf({
-      just: content =>
-        content instanceof String
-          ? content as string
-          : defaultName,
-      nothing: () => defaultName,
+      nothing: () => 'Speaker',
     });
 
     return (
       <div className="speaker">
         <div className={classNames([classes.Speaker, size, className])}>
           <div className="imageContainer">
-            <img src={src} alt={speakerName} />
+            <img src={src} alt={displayTitle} />
           </div>
-          <p>{speakerName}</p>
+          <p>{displayTitle}</p>
         </div>
       </div>
     );

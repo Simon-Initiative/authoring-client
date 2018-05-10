@@ -86,7 +86,6 @@ export class Line extends Immutable.Record(defaultContent) {
   }
 
   toPersistence(): Object {
-    console.log('material', this.material.toPersistence());
 
     const children = [
       this.material.toPersistence(),
