@@ -24,6 +24,7 @@ export type DialogParams = {
 
 const defaultContent = {
   contentType: 'Dialog',
+  elementType: 'dialog',
   guid: '',
   id: Maybe.nothing<string>(),
   title: Title.fromText('Dialog Title'),
@@ -63,6 +64,7 @@ function withTitles(model: Dialog): Dialog {
 export class Dialog extends Immutable.Record(defaultContent) {
 
   contentType: 'Dialog';
+  elementType: 'dialog';
   guid: string;
   id: Maybe<string>;
   title: Title;
@@ -150,11 +152,6 @@ export class Dialog extends Immutable.Record(defaultContent) {
     });
 
     return withTitles(model);
-
-    // in SpeakerEditor sidebar, 'asText' textbox actually sets the title
-    // if image, set the title as the speaker's text content and display image
-
-
   }
 
   toPersistence(): Object {

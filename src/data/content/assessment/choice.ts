@@ -13,6 +13,7 @@ export type ChoiceParams = {
 
 const defaultContent = {
   contentType: 'Choice',
+  elementType: 'choice',
   value: '',
   color: '',
   body: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
@@ -47,6 +48,7 @@ function simplifyBody(body: Object) : Object {
 export class Choice extends Immutable.Record(defaultContent) {
 
   contentType: 'Choice';
+  elementType: 'choice';
   value: string;
   color: string;
   body: ContentElements;

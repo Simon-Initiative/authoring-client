@@ -11,18 +11,20 @@ export type DependencyParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Dependency,
+  elementType: 'dependency',
   type: types.ConditionTypes.None,
   idref: '',
   guid: '',
 };
 
 export class Dependency extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Dependency;
+  elementType: 'dependency';
   type: types.DependencyTypes;
   idref: string;
   guid: string;
-  
+
   constructor(params?: DependencyParams) {
     super(augment(params));
   }
@@ -42,17 +44,17 @@ export class Dependency extends Immutable.Record(defaultContent) {
     if (r['@idref'] !== undefined) {
       model = model.with({ idref: r['@idref'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    return { 
+
+    return {
       dependency: {
         '@idref': this.idref,
         '@type': this.type,
-      }, 
+      },
     };
   }
 }

@@ -80,6 +80,7 @@ export default class LineEditor
         <Dropdown label="">
           {speakers.toArray().map(speaker =>
             <DropdownItem
+              key={speaker.id}
               onClick={e => this.selectSpeaker(e, speaker)}
               label={speaker.title.caseOf({
                 just: title => title,

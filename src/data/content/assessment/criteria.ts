@@ -12,6 +12,7 @@ export type GradingCriteriaParams = {
 
 const defaultGradingCriteria = {
   contentType: 'GradingCriteria',
+  elementType: 'grading_criteria',
   score: '0',
   name: '',
   body: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
@@ -21,6 +22,7 @@ const defaultGradingCriteria = {
 export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
 
   contentType: 'GradingCriteria';
+  elementType: 'grading_criteria';
   score: string;
   name: string;
   body: ContentElements;

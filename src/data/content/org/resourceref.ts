@@ -13,6 +13,7 @@ export type ResourceRefParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.ResourceRef,
+  elementType: 'resourceref',
   package: Maybe.nothing<string>(),
   version: Maybe.nothing<string>(),
   idref: '',
@@ -20,13 +21,14 @@ const defaultContent = {
 };
 
 export class ResourceRef extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.ResourceRef;
+  elementType: 'resourceref';
   package: Maybe<string>;
   version: Maybe<string>;
   idref: string;
   guid: string;
-  
+
   constructor(params?: ResourceRefParams) {
     super(augment(params));
   }
@@ -49,21 +51,21 @@ export class ResourceRef extends Immutable.Record(defaultContent) {
     if (r['@idref'] !== undefined) {
       model = model.with({ idref: r['@idref'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const r = { 
+
+    const r = {
       resourceref: {
         '@idref': this.idref,
-      }, 
+      },
     };
 
     this.version.lift(v => r.resourceref['@version'] = v);
     this.package.lift(v => r.resourceref['@package'] = v);
-    
+
     return r;
   }
 }

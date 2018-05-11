@@ -10,20 +10,22 @@ export type IconParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Icon,
+  elementType: 'icon',
   href: '',
   mime_type: '',
   guid: '',
 };
 
 export class Icon extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Icon;
+  elementType: 'icon';
   href: string;
 
   // tslint:disable-next-line
   mime_type: string;
   guid: string;
-  
+
   constructor(params?: IconParams) {
     super(augment(params));
   }
@@ -43,17 +45,17 @@ export class Icon extends Immutable.Record(defaultContent) {
     if (icon['@mime_type'] !== undefined) {
       model = model.with({ mime_type: icon['@mime_type'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    return  { 
+
+    return  {
       icon: {
         '@href': this.href,
         '@mime_type': this.mime_type,
-      }, 
+      },
     };
   }
 }

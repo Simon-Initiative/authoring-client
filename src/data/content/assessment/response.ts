@@ -17,6 +17,8 @@ export type ResponseParams = {
 };
 
 const defaultContent = {
+  contentType: 'Response',
+  elementType: 'response',
   feedback : Immutable.OrderedMap<string, Feedback>(),
   concepts : Immutable.List<string>(),
   input : '',
@@ -24,12 +26,12 @@ const defaultContent = {
   score : '0',
   name : '',
   guid: '',
-  contentType: 'Response',
 };
 
 export class Response extends Immutable.Record(defaultContent) {
 
   contentType: 'Response';
+  elementType: 'response';
   feedback : Immutable.OrderedMap<string, Feedback>;
   concepts : Immutable.List<string>;
   input : string;

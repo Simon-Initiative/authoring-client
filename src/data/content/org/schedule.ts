@@ -13,16 +13,18 @@ export type ScheduleParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Schedule,
+  elementType: 'schedule',
   before: Immutable.OrderedMap<string, Before>(),
   guid: '',
 };
 
 export class Schedule extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Schedule;
+  elementType: 'schedule';
   before?: Immutable.OrderedMap<string, Before>;
   guid: string;
-  
+
   constructor(params?: ScheduleParams) {
     super(augment(params));
   }
@@ -37,28 +39,28 @@ export class Schedule extends Immutable.Record(defaultContent) {
     let model = new Schedule({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'before':
           model = model.with({ before: model.before.set(id, Before.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       schedule: {
         '#array': this.before.toArray().map(s => s.toPersistence()),
-      }, 
+      },
     };
 
     return s;

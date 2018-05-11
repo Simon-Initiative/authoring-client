@@ -8,6 +8,7 @@ export type ParamTextParams = {
 
 const defaultContent = {
   contentType: 'ParamText',
+  elementType: 'paramtext',
   text: '',
   guid: '',
 };
@@ -15,6 +16,7 @@ const defaultContent = {
 export class ParamText extends Immutable.Record(defaultContent) {
 
   contentType: 'ParamText';
+  elementType: 'paramtext';
   text: string;
   guid: string;
 

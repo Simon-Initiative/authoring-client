@@ -12,6 +12,7 @@ export type LabelsParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Labels,
+  elementType: 'labels',
   sequence: 'Sequence',
   unit: 'Unit',
   module: 'Module',
@@ -22,6 +23,7 @@ const defaultContent = {
 export class Labels extends Immutable.Record(defaultContent) {
 
   contentType: types.ContentTypes.Labels;
+  elementType: 'labels';
   sequence: string;
   unit: string;
   module: string;

@@ -29,6 +29,7 @@ export type OlParams = {
 
 const defaultContent = {
   contentType: 'Ol',
+  elementType: 'ol',
   id: '',
   style: Maybe.nothing(),
   start: Maybe.nothing(),
@@ -40,6 +41,7 @@ const defaultContent = {
 export class Ol extends Immutable.Record(defaultContent) {
 
   contentType: 'Ol';
+  elementType: 'ol';
   id: string;
   title: Maybe<Title>;
   style: Maybe<Styles>;

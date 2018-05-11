@@ -10,6 +10,7 @@ export type MaterialParams = {
 
 const defaultContent = {
   contentType: 'Material',
+  elementType: 'material',
   content: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
   guid: '',
 };
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Material extends Immutable.Record(defaultContent) {
 
   contentType: 'Material';
+  elementType: 'material';
   content: ContentElements;
   guid: string;
 

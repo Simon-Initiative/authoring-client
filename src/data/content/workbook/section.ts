@@ -19,16 +19,18 @@ export type SectionParams = {
 };
 
 const defaultContent = {
+  contentType: 'Section',
+  elementType: 'section',
   id: Maybe.nothing(),
   title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
   body: ContentElements.fromText('', '', [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS]),
   guid: '',
-  contentType: 'Section',
 };
 
 export class Section extends Immutable.Record(defaultContent) {
   contentType: 'Section';
+  elementType: 'section';
   id: Maybe<string>;
   title: Title;
   purpose: Maybe<string>;

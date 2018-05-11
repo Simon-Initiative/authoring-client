@@ -14,6 +14,7 @@ export type SpeakerParams = {
 
 const defaultContent = {
   contentType: 'Speaker',
+  elementType: 'speaker',
   guid: '',
   id: '',
   title: Maybe.nothing<string>(),
@@ -23,6 +24,7 @@ const defaultContent = {
 export class Speaker extends Immutable.Record(defaultContent) {
 
   contentType: 'Speaker';
+  elementType: 'speaker';
   guid: string;
   id: string;
   title: Maybe<string>;
@@ -50,7 +52,6 @@ export class Speaker extends Immutable.Record(defaultContent) {
     if (m['@id'] !== undefined) {
       model = model.with({ id: m['@id'] });
     }
-    console.log('model', model);
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });
     }

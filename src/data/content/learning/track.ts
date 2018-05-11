@@ -12,6 +12,7 @@ export type TrackParams = {
 
 const defaultContent = {
   contentType: 'Track',
+  elementType: 'track',
   src: '',
   kind: '',
   label: '',
@@ -23,6 +24,7 @@ const defaultContent = {
 export class Track extends Immutable.Record(defaultContent) {
 
   contentType: 'Track';
+  elementType: 'track';
   src: string;
   kind: string;
   label: string;

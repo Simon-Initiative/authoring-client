@@ -62,10 +62,18 @@ export default class DialogEditor
     this.props.onEdit(model, sourceObject);
   }
 
-  onLineEdit(line: contentTypes.Line, sourceObject) {
-    const { model, onEdit } = this.props;
+  onLineEdit(elements: ContentElements, sourceObject) {
 
-    onEdit(model.with({ lines: model.lines.set(line.guid, line) }), sourceObject);
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
+
+    const model = this.props.model.with({
+      lines: Immutable.OrderedMap<string, contentTypes.Line>(items),
+    });
+
+    this.props.onEdit(model, sourceObject);
   }
 
   onAddSpeaker(e) {
@@ -121,11 +129,19 @@ export default class DialogEditor
 
   renderMain(): JSX.Element {
     const { model } = this.props;
-    const { media, lines } = model;
+    const { media } = model;
 
     const speakers = new ContentElements().with({
       content: model.speakers,
+      supportedElements: Immutable.List(['speaker']),
     });
+
+    const lines = new ContentElements().with({
+      content: model.lines,
+      supportedElements: Immutable.List(['line']),
+    });
+
+    const bindSpeakers = el => [{ propertyName: 'speakers', value: model.speakers }];
 
     return (
       <div>
@@ -146,30 +162,26 @@ export default class DialogEditor
             layout={Layout.Horizontal}
           />
           <div className="addButton addSpeaker">
-            {model.speakers.toArray().length === 0
-              ? 'Add speaker'
-              : null}
             <a onClick={this.onAddSpeaker}>
               <i className="fa fa-plus"></i>
             </a>
           </div>
         </div>
 
-        {lines.toArray().map(line =>
-          <LineEditor
+        <div className="lineContainer">
+          <ContentContainer
             {...this.props}
-            model={line}
+            model={lines}
             onEdit={this.onLineEdit}
-            speakers={model.speakers} />)}
-        {model.speakers.toArray().length > 0
-          ? <div className="addButton addLine">
-          {lines.toArray().length === 0
-            ? 'Add line'
-            : null}
-          <a onClick={this.onAddLine}>
-            <i className="fa fa-plus"></i>
-          </a>
+            bindProperties={bindSpeakers}
+          />
         </div>
+        {model.speakers.size > 0
+          ? <div className="addButton addLine">
+              <a onClick={this.onAddLine}>
+                <i className="fa fa-plus"></i>
+              </a>
+            </div>
           : null}
       </div>
     );

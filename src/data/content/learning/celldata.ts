@@ -13,6 +13,7 @@ export type CellDataParams = {
 
 const defaultContent = {
   contentType: 'CellData',
+  elementType: 'celldata',
   align: 'left',
   colspan: '1',
   rowspan: '1',
@@ -23,6 +24,7 @@ const defaultContent = {
 export class CellData extends Immutable.Record(defaultContent) {
 
   contentType: 'CellData';
+  elementType: 'celldata';
   align: string;
   colspan: string;
   rowspan: string;

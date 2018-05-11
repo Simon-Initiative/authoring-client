@@ -19,6 +19,7 @@ export type ParamParams = {
 
 const defaultContent = {
   contentType: 'Param',
+  elementType: 'param',
   name: '',
   content: Immutable.OrderedMap<string, ParamContent>(),
   guid: '',
@@ -27,6 +28,7 @@ const defaultContent = {
 export class Param extends Immutable.Record(defaultContent) {
 
   contentType: 'Param';
+  elementType: 'param';
   name: string;
   content: Immutable.OrderedMap<string, ParamContent>;
   guid: string;

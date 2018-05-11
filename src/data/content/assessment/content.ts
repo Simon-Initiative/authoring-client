@@ -11,6 +11,7 @@ export type ContentParams = {
 
 const defaultContent = {
   contentType: 'Content',
+  elementType: 'content',
   availability: 'always',
   body: new ContentElements().with({ supportedElements: Immutable.List(BOX_ELEMENTS) }),
   guid: '',
@@ -19,6 +20,7 @@ const defaultContent = {
 export class Content extends Immutable.Record(defaultContent) {
 
   contentType: 'Content';
+  elementType: 'content';
   availability: string;
   body: ContentElements;
   guid: string;

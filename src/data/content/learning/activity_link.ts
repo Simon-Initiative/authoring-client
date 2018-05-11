@@ -14,6 +14,7 @@ export type ActivityLinkParams = {
 
 const defaultContent = {
   contentType: 'ActivityLink',
+  elementType: 'activity_link',
   target: LinkTarget.New,
   idref: '',
   purpose: 'checkpoint',
@@ -25,6 +26,7 @@ const defaultContent = {
 export class ActivityLink extends Immutable.Record(defaultContent) {
 
   contentType: 'ActivityLink';
+  elementType: 'activity_link';
   content: ContentElements;
   target: LinkTarget;
   idref: string;

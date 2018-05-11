@@ -200,7 +200,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={5.5}>
           <ItemToolbar
             context={context}
-            courseModel={this.props.courseModel} />
+            courseModel={this.props.courseModel}
+            parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
 
         <ReactCSSTransitionGroup

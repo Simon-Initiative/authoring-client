@@ -9,6 +9,7 @@ export type SourceParams = {
 
 const defaultContent = {
   contentType: 'Source',
+  elementType: 'source',
   src: '',
   type: '',
   guid: '',
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Source extends Immutable.Record(defaultContent) {
 
   contentType: 'Source';
+  elementType: 'source';
   src: string;
   type: string;
   guid: string;

@@ -32,6 +32,7 @@ export type UnitParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Unit,
+  elementType: 'unit',
   id: '',
   title: '',
   description: Maybe.nothing<string>(),
@@ -47,8 +48,9 @@ const defaultContent = {
 };
 
 export class Unit extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Unit;
+  elementType: 'unit';
   id: string;
   title: string;
   description: Maybe<string>;
@@ -61,7 +63,7 @@ export class Unit extends Immutable.Record(defaultContent) {
   progressConstraintIdref: Maybe<string>;
   duration: Maybe<string>;
   guid: string;
-  
+
   constructor(params?: UnitParams) {
     super(defaultIdGuid(params));
   }
@@ -85,12 +87,12 @@ export class Unit extends Immutable.Record(defaultContent) {
       model = model.with({ duration: Maybe.just(s['@duration']) });
     }
 
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'metadata:metadata':
           model = model.with({ metadata: Maybe.just(item) });
@@ -132,10 +134,10 @@ export class Unit extends Immutable.Record(defaultContent) {
             { description: Maybe.just(item['description']['#text']) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -157,11 +159,11 @@ export class Unit extends Immutable.Record(defaultContent) {
 
     this.unordered.lift(p => children.push(p.toPersistence()));
 
-    const s = { 
+    const s = {
       unit: {
         '@id': this.id,
         '#array': children,
-      }, 
+      },
     };
 
     this.progressConstraintIdref.lift(p => s.unit['@progress_constraint_idref'] = p);

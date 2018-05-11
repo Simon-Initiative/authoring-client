@@ -16,6 +16,7 @@ export type MeaningParams = {
 
 const defaultContent = {
   contentType: 'Meaning',
+  elementType: 'meaning',
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   examples: Immutable.OrderedMap<string, Example>(),
@@ -26,6 +27,7 @@ const defaultContent = {
 export class Meaning extends Immutable.Record(defaultContent) {
 
   contentType: 'Meaning';
+  elementType: 'meaning';
   examples: Immutable.OrderedMap<string, Example>;
   id: Maybe<string>;
   title: Maybe<string>;

@@ -17,6 +17,7 @@ export type LineParams = {
 
 const defaultContent = {
   contentType: 'Line',
+  elementType: 'line',
   guid: '',
   id: Maybe.nothing<string>(),
   title: Maybe.nothing<string>(),
@@ -28,6 +29,7 @@ const defaultContent = {
 export class Line extends Immutable.Record(defaultContent) {
 
   contentType: 'Line';
+  elementType: 'line';
   guid: string;
   id: Maybe<string>;
   title: Maybe<string>;
@@ -57,7 +59,7 @@ export class Line extends Immutable.Record(defaultContent) {
     let model = new Line().with({ guid });
 
     if (m['@id'] !== undefined) {
-      model = model.with({ id: m['@id'] });
+      model = model.with({ id: Maybe.just(m['@id']) });
     }
     if (m['@title'] !== undefined) {
       model = model.with({ title: Maybe.just(m['@title']) });

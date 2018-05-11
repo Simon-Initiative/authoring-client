@@ -14,6 +14,7 @@ export type DndLayoutParams = {
 
 const defaultContent = {
   contentType: 'DndLayout',
+  elementType: 'dragdrop',
   guid: '',
   targetGroup: new TargetGroup(),
   initiatorGroup: new InitiatorGroup(),
@@ -22,6 +23,7 @@ const defaultContent = {
 export class DndLayout extends Immutable.Record(defaultContent) {
 
   contentType: 'DndLayout';
+  elementType: 'dragdrop';
   guid: string;
   targetGroup: TargetGroup;
   initiatorGroup: InitiatorGroup;

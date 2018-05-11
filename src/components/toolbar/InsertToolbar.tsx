@@ -242,7 +242,25 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
           <i className={'fa fa-clone'}/>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Dialog())}
+            onClick={() => {
+              const speakerId = guid();
+              const lineId = guid();
+
+              const speaker = new contentTypes.Speaker({
+                guid: speakerId, id: speakerId, title: Maybe.just('Speaker 1'),
+              });
+              const speakers =
+                Immutable.OrderedMap<string, contentTypes.Speaker>([[speakerId, speaker]]);
+
+              const material = contentTypes.Material.fromText('Empty text block', '');
+              const line = new contentTypes.Line({
+                guid: lineId, id: Maybe.just(lineId), speaker: speakerId, material,
+              });
+              const lines = Immutable.OrderedMap<string, contentTypes.Line>([[lineId, line]]);
+
+              const dialog = new contentTypes.Dialog({ speakers, lines });
+              onInsert(dialog);
+            }}
             tooltip="Insert Dialog"
             disabled={!parentSupportsElementType('dialog')}>
           <i className={'fa fa-comments'}/>

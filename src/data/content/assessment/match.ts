@@ -9,18 +9,20 @@ export type MatchParams = {
 
 const defaultContent = {
   contentType: 'Match',
+  elementType: 'match',
   input: '',
   match: '',
   guid: '',
 };
 
 export class Match extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Match';
+  elementType: 'match';
   input: string;
   match: string;
   guid: string;
-  
+
   constructor(params?: MatchParams) {
     super(augment(params));
   }
@@ -34,14 +36,14 @@ export class Match extends Immutable.Record(defaultContent) {
     const p = (root as any).match;
 
     let model = new Match({ guid });
-    
+
     if (p['@input'] !== undefined) {
       model = model.with({ input: p['@input'] });
     }
     if (p['@match'] !== undefined) {
       model = model.with({ match: p['@match'] });
     }
-    
+
     return model;
   }
 

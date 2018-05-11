@@ -32,6 +32,7 @@ export type SequenceParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Sequence,
+  elementType: 'sequence',
   id: '',
   title: '',
   description: Maybe.nothing<string>(),
@@ -49,8 +50,9 @@ const defaultContent = {
 };
 
 export class Sequence extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Sequence;
+  elementType: 'sequence';
   id: string;
   title: string;
   description: Maybe<string>;
@@ -65,7 +67,7 @@ export class Sequence extends Immutable.Record(defaultContent) {
   category: types.CategoryTypes;
   audience: types.AudienceTypes;
   guid: string;
-  
+
   constructor(params?: SequenceParams) {
     super(defaultIdGuid(params));
   }
@@ -91,12 +93,12 @@ export class Sequence extends Immutable.Record(defaultContent) {
     if (s['@audience'] !== undefined) {
       model = model.with({ audience: s['@audience'] });
     }
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'metadata:metadata':
           model = model.with({ metadata: Maybe.just(item) });
@@ -138,10 +140,10 @@ export class Sequence extends Immutable.Record(defaultContent) {
             { description: Maybe.just(item['description']['#text']) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -161,18 +163,18 @@ export class Sequence extends Immutable.Record(defaultContent) {
       this.children.toArray().forEach(c => children.push(c.toPersistence()));
     }
     this.unordered.lift(p => children.push(p.toPersistence()));
-    
-    const s = { 
+
+    const s = {
       sequence: {
         '@id': this.id,
         '@category': this.category,
         '@audience': this.audience,
         '#array': children,
-      }, 
+      },
     };
 
     this.progressConstraintIdref.lift(p => s.sequence['@progress_constraint_idref'] = p);
-    
+
     return s;
   }
 }

@@ -29,6 +29,7 @@ export type ContiguousTextParams = {
 
 const defaultContent = {
   contentType: 'ContiguousText',
+  elementType: '#text',
   content: emptyContent,
   mode: ContiguousTextMode.Regular,
   entityEditCount: 0,
@@ -73,6 +74,7 @@ function appendText(contentBlock, contentState, text) {
 export class ContiguousText extends Immutable.Record(defaultContent) {
 
   contentType: 'ContiguousText';
+  elementType: '#text';
   content: ContentState;
   entityEditCount: number;
   mode: ContiguousTextMode;

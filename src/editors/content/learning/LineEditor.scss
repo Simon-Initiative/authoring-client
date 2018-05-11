@@ -1,10 +1,13 @@
 .lineEditor {
   display: flex;
   align-items: center;
-  margin: 5px 0;
+  margin: 5px 0 5px 0px;
+
+  .dropdown {
+    margin-left: 10px;
+  }
 }
 
 .lineText {
-  margin-left: 10px;
   height: 36px;
 }

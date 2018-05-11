@@ -24,6 +24,7 @@ export type UlParams = {
 
 const defaultContent = {
   contentType: 'Ul',
+  elementType: 'ul',
   id: '',
   style: Maybe.nothing(),
   title: Maybe.nothing(),
@@ -34,6 +35,7 @@ const defaultContent = {
 export class Ul extends Immutable.Record(defaultContent) {
 
   contentType: 'Ul';
+  elementType: 'ul';
   id: string;
   title: Maybe<Title>;
   style: Maybe<Styles>;

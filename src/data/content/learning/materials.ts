@@ -16,6 +16,7 @@ export type MaterialsParams = {
 
 const defaultContent = {
   contentType: 'Materials',
+  elementType: 'materials',
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   content: Immutable.OrderedMap<string, Material>(),
@@ -26,6 +27,7 @@ const defaultContent = {
 export class Materials extends Immutable.Record(defaultContent) {
 
   contentType: 'Materials';
+  elementType: 'materials';
   content: Immutable.OrderedMap<string, Material>;
   id: Maybe<string>;
   title: Maybe<string>;

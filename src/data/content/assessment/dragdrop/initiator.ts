@@ -13,6 +13,7 @@ export type InitiatorParams = {
 
 const defaultContent = {
   contentType: 'Initiator',
+  elementType: 'initiator',
   guid: '',
   assessmentId: '',
   fontWeight: '',
@@ -25,6 +26,7 @@ const defaultContent = {
 export class Initiator extends Immutable.Record(defaultContent) {
 
   contentType: 'Initiator';
+  elementType: 'initiator';
   guid: string;
   assessmentId: string;
   fontWeight: string;
