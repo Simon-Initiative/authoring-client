@@ -14,6 +14,7 @@ export interface InitiatorProps {
   className?: string;
   model: InitiatorModel;
   editMode: boolean;
+  selected?: boolean;
   onSelect?: (id: string) => void;
   onRemove?: (guid: string) => void;
   onDelete?: (guid: string) => void;
@@ -64,13 +65,15 @@ export class Initiator
   }
 
   render() {
-    const { className, classes, children, model, editMode,
+    const { className, classes, children, model, editMode, selected,
       connectDragSource, connectDragPreview, onSelect, onRemove,
       onDelete } = this.props;
 
     return connectDragSource(connectDragPreview(
       <div
-        className={classNames(['Initiator', classes.initiator, onSelect && classes.selectable])}
+        className={classNames(['Initiator', classes.initiator,
+          onSelect && classes.selectable,
+          selected && classes.selected])}
         style={{
           fontWeight: model.fontWeight as any,
           fontSize: model.fontWeight,

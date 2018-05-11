@@ -16,8 +16,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  saveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
-  selectInitiator: (id: string) => void;
+  onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
+  onSelectInitiator: (id: string) => void;
 }
 
 interface OwnProps {
@@ -39,10 +39,10 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    saveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => {
+    onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => {
       dispatch(save(documentId, updatedAssessment));
     },
-    selectInitiator: (id: string) => {
+    onSelectInitiator: (id: string) => {
       dispatch(selectInitiator(id));
     },
   };

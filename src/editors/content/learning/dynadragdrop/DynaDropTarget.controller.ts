@@ -13,11 +13,14 @@ interface DispatchProps {
 
 interface OwnProps {
   id: string;
+  assessmentId: string;
   label: string;
   initiators: InitiatorModel[];
   editMode: boolean;
   className?: string;
   header?: boolean;
+  onDrop: (initiatorId: string, targetAssessmentId: string) => void;
+  onRemoveInitiator: (initiatorId: string, targetAssessmentId: string) => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

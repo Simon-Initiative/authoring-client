@@ -15,8 +15,103 @@ import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/in
 import { Initiator } from './dynadragdrop/Initiator';
 import { DynaDropTarget } from './dynadragdrop/DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
-import { Page, Question, Node, Choice, ContiguousText, FillInTheBlank } from 'data/contentTypes';
+import { Page, Question, Node, Part, Choice, ContiguousText,
+  FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
+
+const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
+  const currentItem = question.items.toArray().find(
+    (item: FillInTheBlank) => item.id === selectedInitiator) as FillInTheBlank;
+
+  if (!currentItem) {
+    return {};
+  }
+
+  return currentItem.choices.toArray().reduce(
+    (acc, choice: Choice, index) => ({
+      ...acc,
+      [(choice.body.content.first() as ContiguousText).extractPlainText().valueOr(null)]:
+      convert.toAlphaNotation(index),
+    }),
+    {},
+  );
+};
+
+const buildInitiatorPartMap = (question: Question, initiators: Immutable.List<InitiatorModel>) => {
+  return initiators.reduce(
+    (acc, val) =>
+      acc.set(val.assessmentId, question.parts.find(part =>
+        part.responses.first().input === val.assessmentId,
+      )),
+    Immutable.Map<string, Part>(),
+  );
+};
+
+const buildTargetInitiatorsMap =
+(question: Question, initiators: Immutable.List<InitiatorModel>) => {
+  // A utility map used by the following reduce funciton.
+  // It creates a map of initiators key'd off of their assessmentId
+  const initiatorsMap = initiators.toArray().reduce(
+    (acc, initiator) => {
+      return {
+        ...acc,
+        [initiator.assessmentId]: initiator,
+      };
+    },
+    {},
+  );
+
+  // This reduce function goes through every Response in every Part to build a map
+  // of initiators that are key'd off of the responses "match" value. This enables
+  // us to easily look up initiators associated to target's assessmentId
+  return question.parts.reduce(
+    (accParts, part) => ({
+      ...accParts,
+      ...part.responses.reduce(
+        (accResponses, response) => (+response.score > 0)
+          ? ({
+            ...accResponses,
+            [response.match]:
+              (accResponses[response.match] || []).concat(initiatorsMap[response.input]),
+          })
+          : accResponses,
+        accParts,
+      ),
+    }),
+    {},
+  );
+};
+
+const setQuestionPartWithInitiatorScore = (
+  initiatorId: string, targetAssessmentId: string, score: number,
+  model: Custom, question: Question) => {
+
+  const initiators = model.layoutData.caseOf({
+    just: ld => ld.initiatorGroup.initiators,
+    nothing: () => Immutable.List<InitiatorModel>(),
+  });
+
+  // get initiator with specified id
+  const initiator = initiators.find(i => i.guid === initiatorId);
+
+  const initiatorParts = buildInitiatorPartMap(question, initiators);
+
+  const updatedResponse = initiatorParts.get(initiator.assessmentId).responses.find(response =>
+    response.match === targetAssessmentId)
+    .with({
+      score: `${score}`,
+    });
+
+  const updatedPart = initiatorParts.get(initiator.assessmentId).withMutations((part: Part) =>
+    part.with({
+      responses: part.responses.set(updatedResponse.guid, updatedResponse),
+    }),
+  ) as Part;
+
+  return question.with({
+    parts: question.parts.set(updatedPart.guid, updatedPart),
+  });
+};
 
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   documentId: string;
@@ -25,8 +120,8 @@ export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   currentNode: Node | any;
   selectedInitiator: string;
   onShowSidebar: () => void;
-  saveAssessment: (documentId: string, updatedSssessment: AssessmentModel) => void;
-  selectInitiator: (id: string) => void;
+  onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
+  onSelectInitiator: (id: string) => void;
 }
 
 export interface CustomEditorState {
@@ -41,23 +136,23 @@ export class CustomEditor
   constructor(props) {
     super(props);
 
+    this.assignInitiator = this.assignInitiator.bind(this);
+    this.unassignInitiator = this.unassignInitiator.bind(this);
     this.selectInitiator = this.selectInitiator.bind(this);
-    this.removeInitiator = this.removeInitiator.bind(this);
-    this.editQuestion = this.editQuestion.bind(this);
+    this.deleteInitiator = this.deleteInitiator.bind(this);
+    this.onEditQuestion = this.onEditQuestion.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
-    this.buildTargetLabelsMap = this.buildTargetLabelsMap.bind(this);
-    this.buildTargetInitiatorsMap = this.buildTargetInitiatorsMap.bind(this);
   }
 
   componentDidMount() {
-    const { model, selectInitiator } = this.props;
+    const { model, onSelectInitiator } = this.props;
 
     const initiators = model.layoutData.caseOf({
       just: ld => ld.initiatorGroup.initiators,
       nothing: () => Immutable.List<InitiatorModel>(),
     });
 
-    selectInitiator(initiators.first().assessmentId);
+    onSelectInitiator(initiators.first().assessmentId);
   }
 
   renderSidebar(): JSX.Element {
@@ -73,78 +168,42 @@ export class CustomEditor
     );
   }
 
-  selectInitiator(id: string) {
-    const { selectInitiator } = this.props;
+  assignInitiator(initiatorId: string, targetAssessmentId: string) {
+    const { model, currentNode } = this.props;
 
-    selectInitiator(id);
+    const updatedQuestion = setQuestionPartWithInitiatorScore(
+      initiatorId, targetAssessmentId, 1, model, currentNode as Question);
+
+    this.onEditQuestion(updatedQuestion);
   }
 
-  removeInitiator(guid: string) {
+  unassignInitiator(initiatorId: string, targetAssessmentId: string) {
+    const { model, currentNode } = this.props;
+
+    const updatedQuestion = setQuestionPartWithInitiatorScore(
+      initiatorId, targetAssessmentId, 0, model, currentNode as Question);
+
+    this.onEditQuestion(updatedQuestion);
+  }
+
+  selectInitiator(id: string) {
+    const { onSelectInitiator } = this.props;
+
+    onSelectInitiator(id);
+  }
+
+  deleteInitiator(guid: string) {
     console.log('NOT IMPLEMENTED');
   }
 
-  editQuestion(question: Question) {
-    const { documentId, currentPage, assessment, saveAssessment } = this.props;
+  onEditQuestion(question: Question) {
+    const { documentId, currentPage, assessment, onSaveAssessment } = this.props;
 
-    saveAssessment(documentId, assessment.with({
+    onSaveAssessment(documentId, assessment.with({
       pages: assessment.pages.set(currentPage.guid, currentPage.with({
         nodes: currentPage.nodes.set(question.guid, question),
       })),
     }));
-  }
-
-  buildTargetLabelsMap(question: Question, selectedInitiator: string) {
-    //TODO selectedInitiator should really be a Maybe<string> type
-
-    const currentItem = question.items.toArray().find(
-      (item: FillInTheBlank) => item.id === selectedInitiator) as FillInTheBlank;
-
-    if (!currentItem) {
-      return {};
-    }
-
-    return currentItem.choices.toArray().reduce(
-      (acc, choice: Choice, index) => ({
-        ...acc,
-        [(choice.body.content.first() as ContiguousText).extractPlainText().valueOr(null)]:
-        convert.toAlphaNotation(index),
-      }),
-      {},
-    );
-  }
-
-  buildTargetInitiatorsMap(question: Question, initiators: Immutable.List<InitiatorModel>) {
-    // A utility map used by the following reduce funciton.
-    // It creates a map of initiators key'd off of their assessmentId
-    const initiatorsMap = initiators.toArray().reduce(
-      (acc, initiator) => {
-        return {
-          ...acc,
-          [initiator.assessmentId]: initiator,
-        };
-      },
-      {},
-    );
-
-    // This reduce function goes through every Response in every Part to build a map
-    // of initiators that are key'd off of the responses "match" value. This enables
-    // us to easily look up initiators associated to target's assessmentId
-    return question.parts.reduce(
-      (accParts, part) => ({
-        ...accParts,
-        ...part.responses.reduce(
-          (accResponses, response) => (+response.score > 0)
-            ? ({
-              ...accResponses,
-              [response.match]:
-                (accResponses[response.match] || []).concat(initiatorsMap[response.input]),
-            })
-            : accResponses,
-          accParts,
-        ),
-      }),
-      {},
-    );
   }
 
   renderDynaDrop() {
@@ -162,10 +221,10 @@ export class CustomEditor
     });
 
     // build a map of targets to initiators
-    const targetInitiators = this.buildTargetInitiatorsMap(question, initiators);
+    const targetInitiators = buildTargetInitiatorsMap(question, initiators);
 
     // build map of target ids to labels using the selected initiator
-    const targetLabels = this.buildTargetLabelsMap(question, selectedInitiator);
+    const targetLabels = buildTargetLabelsMap(question, selectedInitiator);
 
     const renderTableRow = (row) => {
       const isHeader = row.contentType === 'HeaderRow';
@@ -177,9 +236,12 @@ export class CustomEditor
           ? (
             <DynaDropTarget
               id={col.guid}
+              assessmentId={col.assessmentId}
               header
               className={classNames([classes.targetCell])}
               editMode={editMode}
+              onDrop={this.assignInitiator}
+              onRemoveInitiator={this.unassignInitiator}
               label={`Target ${targetLabels[col.assessmentId]}`}
               initiators={targetInitiators[col.assessmentId]} />
           )
@@ -231,7 +293,8 @@ export class CustomEditor
           {initiators.map(initiator => (
             <Initiator
               model={initiator} editMode={editMode}
-              onSelect={this.selectInitiator} onDelete={this.removeInitiator} />
+              selected={initiator.assessmentId === selectedInitiator}
+              onSelect={this.selectInitiator} onDelete={this.deleteInitiator} />
           ))}
         </div>
         <div>

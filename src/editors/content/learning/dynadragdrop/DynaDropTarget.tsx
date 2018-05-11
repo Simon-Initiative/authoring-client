@@ -11,12 +11,15 @@ import { Initiator } from 'editors/content/learning/dynadragdrop/Initiator';
 
 export interface DynaDropTargetProps {
   id: string;
+  assessmentId: string;
   label: string;
   initiators: InitiatorModel[];
   editMode: boolean;
   header?: boolean;
   connectDropTarget?: any;
   isHovered?: boolean;
+  onDrop: (initiatorId: string, targetAssessmentId: string) => void;
+  onRemoveInitiator: (initiatorId: string, targetAssessmentId: string) => void;
 }
 
 export interface DynaDropTargetState {
@@ -25,7 +28,8 @@ export interface DynaDropTargetState {
 
 const target = {
   drop(props, monitor) {
-    console.log('NOT IMPLEMENTED');
+    const { assessmentId, onDrop } = props;
+    onDrop(monitor.getItem().index, assessmentId);
   },
   canDrop(props, monitor) {
     return true;
@@ -53,8 +57,8 @@ export class DynaDropTarget
   }
 
   render() {
-    const { className, classes, id,  header, connectDropTarget,
-      isHovered, label, initiators, editMode } = this.props;
+    const { className, classes, id, assessmentId,  header, connectDropTarget,
+      isHovered, label, initiators, editMode, onRemoveInitiator } = this.props;
 
     const TCell = header ? 'th' : 'td';
 
@@ -67,7 +71,8 @@ export class DynaDropTarget
         <div className={classes.initiators}>
           {initiators && initiators.map(initiator => (
             <Initiator
-              model={initiator} editMode={editMode} onRemove={() => {}} />
+              model={initiator} editMode={editMode}
+              onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
           ))}
         </div>
       </TCell>
