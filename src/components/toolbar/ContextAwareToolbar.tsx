@@ -68,6 +68,7 @@ export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
 
 interface ToolbarLayoutProps {
   className?: string;
+  maxWidth?: string;
 }
 
 export const ToolbarLayout = {
@@ -100,12 +101,14 @@ export const ToolbarLayout = {
       </div>
     );
   }),
-
   Column: injectSheetSFC<ToolbarLayoutProps>(styles)(({
-    className, classes, children,
+    className, classes, children, maxWidth,
   }: StyledComponentProps<ToolbarLayoutProps>) => {
+    const style = maxWidth !== undefined ? { maxWidth } : undefined;
     return (
-      <div className={classNames([classes.toolbarLayoutColumn, className])}>
+      <div
+        style={style}
+        className={classNames([classes.toolbarLayoutColumn, className])}>
         {children}
       </div>
     );
@@ -186,7 +189,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={11}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={13}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
