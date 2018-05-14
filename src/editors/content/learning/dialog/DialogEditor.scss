@@ -1,12 +1,7 @@
 .speakerContainer {
   display: flex;
   justify-content: flex-start;
-  // flex-wrap: wrap;
   margin: 10px 0 20px 0;
-
-  div {
-    // display: inline-block;
-  }
 
   .content-decorator {
     margin-left: 30px;
@@ -14,8 +9,6 @@
 }
 
 .lineContainer {
-  // margin-left: 20px;
-
   .content-decorator {
     margin-left: 30px;
   }
