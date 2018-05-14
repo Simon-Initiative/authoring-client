@@ -29,6 +29,12 @@ export { Formula } from './content/learning/formula';
 export { IFrame } from './content/learning/iframe';
 export { Instructions } from './content/learning/instructions';
 export { Image } from './content/learning/image';
+export { Applet } from './content/learning/applet';
+export { Flash } from './content/learning/flash';
+export { Director } from './content/learning/director';
+export { Mathematica } from './content/learning/mathematica';
+export { Panopto } from './content/learning/panopto';
+export { Unity } from './content/learning/unity';
 export { Li } from './content/learning/li';
 export { Link } from './content/learning/link';
 export { Math } from './content/learning/math';
@@ -54,7 +60,7 @@ export { Translation } from './content/learning/translation';
 export { Ul } from './content/learning/ul';
 export { Video } from './content/learning/video';
 export { YouTube } from './content/learning/youtube';
-
+export { WbPath } from './content/learning/wb_path';
 
 
 // Assessment
@@ -144,6 +150,14 @@ import { Video } from './content/learning/video';
 import { YouTube } from './content/learning/youtube';
 import { IFrame } from './content/learning/iframe';
 
+import { Applet } from './content/learning/applet';
+import { Flash } from './content/learning/flash';
+import { Director } from './content/learning/director';
+import { Mathematica } from './content/learning/mathematica';
+import { Panopto } from './content/learning/panopto';
+import { Unity } from './content/learning/unity';
+
+
 export type QuestionItem =
   Essay |
   MultipleChoice |
@@ -155,6 +169,12 @@ export type QuestionItem =
   Unsupported;
 
 export type MediaItem =
+  Applet |
+  Flash |
+  Director |
+  Mathematica |
+  Panopto |
+  Unity |
   Image |
   Audio |
   Video |
