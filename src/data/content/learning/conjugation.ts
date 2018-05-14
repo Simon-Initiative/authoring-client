@@ -19,8 +19,9 @@ export type ConjugationParams = {
 };
 
 const defaultContent = {
-  id: '',
   contentType: 'Conjugation',
+  elementType: 'conjugation',
+  id: '',
   verb: '',
   pronunciation: Maybe.nothing(),
   title: Title.fromText('Title'),
@@ -38,8 +39,9 @@ function createDefaultRows() {
 
 
 export class Conjugation extends Immutable.Record(defaultContent) {
-  id: string;
   contentType: 'Conjugation';
+  elementType: 'conjugation';
+  id: string;
   verb: string;
   title: Title;
   pronunciation: Maybe<Pronunciation>;

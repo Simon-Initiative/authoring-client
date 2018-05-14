@@ -16,6 +16,7 @@ export type ConjugateParams = {
 
 const defaultContent = {
   contentType: 'Conjugate',
+  elementType: 'conjugate',
   pronouns: '',
   src: '',
   type: '',
@@ -27,6 +28,7 @@ const defaultContent = {
 export class Conjugate extends Immutable.Record(defaultContent) {
 
   contentType: 'Conjugate';
+  elementType: 'conjugate';
   pronouns: string;
   src: string;
   type: string;
