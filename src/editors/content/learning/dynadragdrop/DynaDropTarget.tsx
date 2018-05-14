@@ -12,6 +12,7 @@ import { Initiator } from 'editors/content/learning/dynadragdrop/Initiator';
 export interface DynaDropTargetProps {
   id: string;
   assessmentId: string;
+  selectedInitiator: string;
   label: string;
   initiators: InitiatorModel[];
   editMode: boolean;
@@ -58,7 +59,7 @@ export class DynaDropTarget
 
   render() {
     const { className, classes, id, assessmentId,  header, connectDropTarget,
-      isHovered, label, initiators, editMode, onRemoveInitiator } = this.props;
+      isHovered, label, initiators, editMode, onRemoveInitiator, selectedInitiator } = this.props;
 
     const TCell = header ? 'th' : 'td';
 
@@ -72,6 +73,7 @@ export class DynaDropTarget
           {initiators && initiators.map(initiator => (
             <Initiator
               model={initiator} editMode={editMode}
+              selected={initiator.assessmentId === selectedInitiator}
               onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
           ))}
         </div>

@@ -14,6 +14,7 @@ interface DispatchProps {
 interface OwnProps {
   id: string;
   assessmentId: string;
+  selectedInitiator: string;
   label: string;
   initiators: InitiatorModel[];
   editMode: boolean;

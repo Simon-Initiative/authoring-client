@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
@@ -16,6 +17,9 @@ import guid from 'utils/guid';
 import './DynaDropInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+import { Maybe } from 'tsmonad';
+import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 
 export interface DynaDropInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
@@ -34,11 +38,53 @@ export interface DynaDropInputState extends QuestionState {
 export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputState> {
   constructor(props: DynaDropInputProps) {
     super(props);
+
+    this.editInitiatorText = this.editInitiatorText.bind(this);
   }
 
   /** Implement required abstract method to set className */
   getClassName() {
     return 'dynadrop-input';
+  }
+
+  editInitiatorText(text: string, initiator: Initiator) {
+    const { model, onEdit, selectedInitiator, onBodyEdit } = this.props;
+
+    const customElement = (model.body.content.find(c =>
+      c.contentType === 'Custom') as contentTypes.Custom);
+
+    console.log('model.body', model.body)
+    console.log('customElement', customElement)
+
+    customElement.layoutData
+      .lift(ld => ld.initiatorGroup.initiators)
+      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+      .lift((initiator) => {
+        const updatedInitiator = initiator.with({
+          text,
+        });
+
+        // update custom element in question body with the updated initiator
+        const newCustomElement = customElement.withMutations(
+            (custom: contentTypes.Custom) => custom.with({
+              layoutData: custom.layoutData.caseOf({
+                just: ld => Maybe.just<DndLayout>(ld.with({
+                  initiatorGroup: ld.initiatorGroup.with({
+                    initiators: ld.initiatorGroup.initiators.map(i =>
+                      i.guid === updatedInitiator.guid ? updatedInitiator : i,
+                    ) as Immutable.List<Initiator>,
+                  }),
+                })),
+                nothing: () => Maybe.nothing<DndLayout>(),
+              }),
+            }),
+          ) as contentTypes.Custom;
+
+        // save updates
+        onBodyEdit(model.body.with({
+          content: model.body.content.set(newCustomElement.guid, newCustomElement),
+        }));
+      });
   }
 
   /** Implement parent absract methods */
@@ -88,19 +134,33 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const itemIndex = model.items.toArray().findIndex(
       (i: FillInTheBlank) => i.id === selectedInitiator);
 
+      // safeguard - return if selectedInitiator does not exist in model.items
     if (itemIndex < 0) {
-      // selectedInitiator does not exist in model.items
       return;
     }
 
     const item = model.items.toArray()[itemIndex] as FillInTheBlank;
     const part = model.parts.toArray()[itemIndex];
 
+    const initiator = (model.body.content.find(c =>
+      c.contentType === 'Custom') as contentTypes.Custom)
+      .layoutData
+      .lift(ld => ld.initiatorGroup.initiators)
+      .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
+      .caseOf({
+        just: initiator => initiator,
+        nothing: () => undefined,
+      });
+
+    if (!initiator) {
+      return;
+    }
+
     return [(
       <div key={item.guid} className="item-part-editor">
         <TabContainer
           labels={[
-            item.id,
+            initiator.text,
             'Skills',
             'Hints',
             ...(!hideGradingCriteria ? ['Criteria'] : []),
@@ -117,6 +177,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
               onItemFocus={this.props.onItemFocus}
               onFocus={this.props.onFocus}
               onBlur={this.props.onBlur}
+              initiator={initiator}
+              onEditInitiatorText={this.editInitiatorText}
               itemModel={item}
               partModel={part}
               onEdit={this.props.onEdit} />

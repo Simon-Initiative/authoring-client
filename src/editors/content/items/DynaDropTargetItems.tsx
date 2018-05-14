@@ -12,10 +12,14 @@ import {
 } from 'editors/content/common/TabContainer';
 import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
+import { TextInput } from 'editors/content/common/TextInput';
+import { ContentElements } from 'data/content/common/elements';
+import { Initiator } from 'data/content/assessment/dragdrop/initiator';
 
 export interface DynaDropTargetItemsProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
-
+  initiator: Initiator;
+  onEditInitiatorText: (text: string, initiator: Initiator) => void;
 }
 
 export interface DynaDropTargetItemsState extends AbstractItemPartEditorState {
@@ -214,10 +218,21 @@ DynaDropTargetItems
     const {
       editMode,
       itemModel,
+      initiator,
+      onEditInitiatorText,
     } = this.props;
 
     return (
       <TabSection className="targets">
+      <TabSectionHeader title="Label" />
+      <TabSectionContent>
+      <input
+        disabled={!editMode}
+        onChange={({ target: { value } }) => onEditInitiatorText(value, initiator)}
+        className="form-control form-control-sm"
+        type="text"
+        defaultValue={initiator.text} />
+      </TabSectionContent>
         <TabSectionHeader title="Targets">
           {/* <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
             <Button

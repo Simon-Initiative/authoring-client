@@ -351,6 +351,7 @@ export class CustomEditor
             <DynaDropTarget
               id={col.guid}
               assessmentId={col.assessmentId}
+              selectedInitiator={selectedInitiator}
               header
               className={classNames([classes.targetCell])}
               editMode={editMode}
