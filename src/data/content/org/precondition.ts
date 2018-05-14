@@ -11,18 +11,20 @@ export type PreconditionParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Precondition,
+  elementType: 'precondition',
   condition: types.ConditionTypes.None,
   idref: '',
   guid: '',
 };
 
 export class Precondition extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Precondition;
+  elementType: 'precondition';
   condition: types.ConditionTypes;
   idref: string;
   guid: string;
-  
+
   constructor(params?: PreconditionParams) {
     super(augment(params));
   }
@@ -42,17 +44,17 @@ export class Precondition extends Immutable.Record(defaultContent) {
     if (r['@idref'] !== undefined) {
       model = model.with({ idref: r['@idref'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    return { 
+
+    return {
       precondition: {
         '@idref': this.idref,
         '@condition': this.condition,
-      }, 
+      },
     };
   }
 }

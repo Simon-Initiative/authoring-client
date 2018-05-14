@@ -16,6 +16,12 @@ export function registerContentTypes() {
   registerType('conjugate', ct.Conjugate.fromPersistence);
   registerType('extra', ct.Extra.fromPersistence);
   registerType('anchor', ct.Anchor.fromPersistence);
+  registerType('applet', ct.Applet.fromPersistence);
+  registerType('director', ct.Director.fromPersistence);
+  registerType('mathematica', ct.Mathematica.fromPersistence);
+  registerType('flash', ct.Flash.fromPersistence);
+  registerType('panopto', ct.Panopto.fromPersistence);
+  registerType('unity', ct.Unity.fromPersistence);
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);
@@ -24,6 +30,9 @@ export function registerContentTypes() {
   registerType('dd', ct.Dd.fromPersistence);
   registerType('default', ct.Default.fromPersistence);
   registerType('definition', ct.Definition.fromPersistence);
+  registerType('dialog', ct.Dialog.fromPersistence);
+  registerType('line', ct.Line.fromPersistence);
+  registerType('speaker', ct.Speaker.fromPersistence);
   registerType('dl', ct.Dl.fromPersistence);
   registerType('dt', ct.Dt.fromPersistence);
   registerType('example', ct.Example.fromPersistence);

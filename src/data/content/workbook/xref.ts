@@ -15,6 +15,7 @@ export type XrefParams = {
 
 const defaultContent = {
   contentType: 'Xref',
+  elementType: 'xref',
   target: 'self',
   idref: '',
   page: '',
@@ -26,6 +27,7 @@ const defaultContent = {
 export class Xref extends Immutable.Record(defaultContent) {
 
   contentType: 'Xref';
+  elementType: 'xref';
   content: ContentElements;
   target: string;
   idref: string;

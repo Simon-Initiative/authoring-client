@@ -15,6 +15,7 @@ export type ActivityParams = {
 
 const defaultContent = {
   contentType: 'Activity',
+  elementType: 'activity',
   idref: '',
   purpose: 'checkpoint',
   image: Maybe.nothing<Image>(),
@@ -23,6 +24,7 @@ const defaultContent = {
 
 export class Activity extends Immutable.Record(defaultContent) {
   contentType: 'Activity';
+  elementType: 'activity';
   idref: string;
   purpose: string;
   image: Maybe<Image>;

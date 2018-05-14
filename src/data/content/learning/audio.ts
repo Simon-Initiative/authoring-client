@@ -30,6 +30,7 @@ export type AudioParams = {
 
 const defaultContent = {
   contentType: 'Audio',
+  elementType: 'audio',
   id: '',
   title: '',
   src: '',
@@ -48,6 +49,7 @@ const defaultContent = {
 export class Audio extends Immutable.Record(defaultContent) {
 
   contentType: 'Audio';
+  elementType: 'audio';
   id: string;
   title: string;
   src: string;

@@ -15,6 +15,7 @@ export type SupplementGroupParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.SupplementGroup,
+  elementType: 'supplement_group',
   title: '',
   description: '',
   supplements: Immutable.OrderedMap<string, Supplement>(),
@@ -22,13 +23,14 @@ const defaultContent = {
 };
 
 export class SupplementGroup extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.SupplementGroup;
+  elementType: 'supplement_group';
   title: string;
   description: string;
   supplements?: Immutable.OrderedMap<string, Supplement>;
   guid: string;
-  
+
   constructor(params?: SupplementGroupParams) {
     super(augment(params));
   }
@@ -43,10 +45,10 @@ export class SupplementGroup extends Immutable.Record(defaultContent) {
     let model = new SupplementGroup({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'title':
           model = model.with(
@@ -61,10 +63,10 @@ export class SupplementGroup extends Immutable.Record(defaultContent) {
             { supplements: model.supplements.set(id, Supplement.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -76,10 +78,10 @@ export class SupplementGroup extends Immutable.Record(defaultContent) {
       ...this.supplements.toArray().map(s => s.toPersistence()),
     ];
 
-    return { 
+    return {
       supplement_group: {
         '#array': children,
-      }, 
+      },
     };
 
   }

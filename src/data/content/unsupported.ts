@@ -11,6 +11,7 @@ export class Unsupported extends Immutable.Record(
   { contentType: 'Unsupported', guid: '', data: {} }) {
 
   contentType: 'Unsupported';
+  elementType: 'unsupported';
   data: Object;
   guid: string;
 

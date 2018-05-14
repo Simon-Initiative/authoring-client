@@ -16,6 +16,7 @@ export type LearningObjectiveParams = {
 
 const defaultContent = {
   contentType: 'LearningObjective',
+  elementType: 'objective',
   id: '',
   guid: '',
   title: '',
@@ -27,6 +28,7 @@ const defaultContent = {
 export class LearningObjective extends Immutable.Record(defaultContent) {
 
   contentType: 'LearningObjective';
+  elementType: 'objective';
   id: string;
   guid: string;
   title: string;

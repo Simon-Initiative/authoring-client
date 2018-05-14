@@ -3,6 +3,12 @@ import * as contentTypes from 'data/contentTypes';
 import { SidebarGroup, SidebarRow } from 'components/sidebar/ContextAwareSidebar';
 import { TextInput } from '../common/TextInput';
 import { ImageParams } from 'data/content/learning/image';
+import { AppletParams } from 'data/content/learning/applet';
+import { FlashParams } from 'data/content/learning/flash';
+import { DirectorParams } from 'data/content/learning/director';
+import { PanoptoParams } from 'data/content/learning/panopto';
+import { MathematicaParams } from 'data/content/learning/mathematica';
+import { UnityParams } from 'data/content/learning/unity';
 import { AudioParams } from 'data/content/learning/audio';
 import { VideoParams } from 'data/content/learning/video';
 import { YouTubeParams } from 'data/content/learning/youtube';
@@ -15,7 +21,10 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { ToolbarContentContainer } from '../container/ToolbarContentContainer';
 
 export type MediaType = {
-  with: (options: ImageParams | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
+  with: (options: ImageParams
+    | AppletParams | FlashParams | DirectorParams | PanoptoParams
+    | MathematicaParams | UnityParams
+    | VideoParams | YouTubeParams | IFrameParams | AudioParams) =>
     contentTypes.MediaItem;
   popout: contentTypes.Popout;
   alternate: contentTypes.Alternate;

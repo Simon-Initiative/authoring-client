@@ -41,7 +41,7 @@ export class ToolbarButtonDropdown
         type="button"
         className={
           classNames([classes.toolbarButton,
-            ToolbarButtonSize.Small, className, selected ? 'selected' : ''])}
+            ToolbarButtonSize.Wide, className, selected ? 'selected' : ''])}
         onClick={this.onClick.bind(this)}
         disabled={disabled}>
         {this.props.label}

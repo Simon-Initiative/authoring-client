@@ -61,7 +61,8 @@ export const styles: JSSStyles = {
       opacity ${TOOLBAR_HIDE_ANIMATION_DURATION_S}s ease-in`,
   },
   toolbarLayoutInline: {
-    display: 'inline-block',
+    display: 'flex',
+    flexDirection: 'row',
     height: TOOLBAR_COL_WIDTH * 2,
   },
   toolbarLayoutGrid: {

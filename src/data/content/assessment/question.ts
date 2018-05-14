@@ -37,6 +37,7 @@ export type QuestionParams = {
 
 const defaultQuestionParams = {
   contentType: 'Question',
+  elementType: 'question',
   id: '',
   body: new ContentElements(),
   concepts: Immutable.List<string>(),
@@ -217,6 +218,7 @@ function migrateExplanationToFeedback(model: Question) : Question {
 export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
+  elementType: 'question';
   id: string;
   body: ContentElements;
   concepts: Immutable.List<string>;

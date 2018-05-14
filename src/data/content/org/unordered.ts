@@ -13,16 +13,18 @@ export type UnorderedParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Unordered,
+  elementType: 'unordered',
   items: Immutable.OrderedMap<string, Item>(),
   guid: '',
 };
 
 export class Unordered extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Unordered;
+  elementType: 'unordered';
   items?: Immutable.OrderedMap<string, Item>;
   guid: string;
-  
+
   constructor(params?: UnorderedParams) {
     super(augment(params));
   }
@@ -37,28 +39,28 @@ export class Unordered extends Immutable.Record(defaultContent) {
     let model = new Unordered({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'item':
           model = model.with({ items: model.items.set(id, Item.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       unordered: {
         '#array': this.items.toArray().map(s => s.toPersistence()),
-      }, 
+      },
     };
 
     return s;

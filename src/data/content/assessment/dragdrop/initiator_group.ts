@@ -13,6 +13,7 @@ export type InitiatorGroupParams = {
 
 const defaultContent = {
   contentType: 'InitiatorGroup',
+  elementType: 'initiatorGroup',
   guid: '',
   shuffle: false,
   useInitiatorMaxWidth: false,
@@ -22,6 +23,7 @@ const defaultContent = {
 export class InitiatorGroup extends Immutable.Record(defaultContent) {
 
   contentType: 'InitiatorGroup';
+  elementType: 'initiatorGroup';
   guid: string;
   shuffle: boolean;
   useInitiatorMaxWidth: boolean;

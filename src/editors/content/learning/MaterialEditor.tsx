@@ -15,7 +15,7 @@ import { styles } from './MaterialsEditor.styles';
 export interface MaterialEditorProps
   extends AbstractContentEditorProps<contentTypes.Material> {
   onShowSidebar: () => void;
-
+  overrideRemove?: (model: Object, childModel: Object) => boolean;
 }
 
 export interface MaterialEditorState {

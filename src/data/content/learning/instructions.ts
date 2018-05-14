@@ -10,6 +10,7 @@ export type InstructionsParams = {
 
 const defaultContent = {
   contentType: 'Instructions',
+  elementType: 'instructions',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Instructions extends Immutable.Record(defaultContent) {
 
   contentType: 'Instructions';
+  elementType: 'instructions';
   content: ContentElements;
   guid: string;
 

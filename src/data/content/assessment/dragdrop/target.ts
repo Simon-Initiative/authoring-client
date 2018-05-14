@@ -8,6 +8,7 @@ export type TargetParams = {
 
 const defaultContent = {
   contentType: 'Target',
+  elementType: 'target',
   guid: '',
   assessmentId: '',
 };
@@ -15,6 +16,7 @@ const defaultContent = {
 export class Target extends Immutable.Record(defaultContent) {
 
   contentType: 'Target';
+  elementType: 'target';
   guid: string;
   assessmentId: string;
 

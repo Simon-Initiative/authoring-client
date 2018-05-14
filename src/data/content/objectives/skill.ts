@@ -15,6 +15,7 @@ export type SkillParams = {
 
 const defaultContent = {
   contentType: 'Skill',
+  elementType: 'skill',
   id: '',
   guid: '',
   title: '',
@@ -27,6 +28,7 @@ const defaultContent = {
 export class Skill extends Immutable.Record(defaultContent) {
 
   contentType: 'Skill';
+  elementType: 'skill';
   id: string;
   guid: string;
   title: string;
