@@ -13,10 +13,10 @@ export type DndTextParams = {
 const defaultContent = {
   contentType: 'DndText',
   guid: '',
-  fontWeight: '',
-  fontSize: '',
-  fontStyle: '',
-  textDecoration: '',
+  fontWeight: 'normal',
+  fontSize: '12',
+  fontStyle: 'normal',
+  textDecoration: 'none',
   text: '',
 };
 

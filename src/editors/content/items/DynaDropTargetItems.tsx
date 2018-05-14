@@ -205,8 +205,7 @@ DynaDropTargetItems
           onReorderChoice={this.onReorderChoices}
           onEditChoice={this.onChoiceEdit}
           onEditFeedback={this.onFeedbackEdit}
-          onEditScore={this.onScoreEdit}
-          onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+          onEditScore={this.onScoreEdit} />
       );
     });
   }

@@ -78,7 +78,7 @@ export interface ChoiceProps  {
   onEditChoice: (choice: contentTypes.Choice, src) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback, src) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
-  onRemove: (choiceId: string) => void;
+  onRemove?: (choiceId: string) => void;
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -157,7 +157,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         body={choice.body}
         hideBody={hideChoiceBody}
         onEdit={(body, src) => onEditChoice(choice.with({ body }), src)}
-        onRemove={id => onRemove(id)}
+        onRemove={onRemove ? id => onRemove(id) : undefined}
         controls={
           <ItemControls>
             {simpleSelectProps

@@ -15,10 +15,10 @@ const defaultContent = {
   contentType: 'Initiator',
   guid: '',
   assessmentId: '',
-  fontWeight: '',
-  fontSize: '',
-  fontStyle: '',
-  textDecoration: '',
+  fontWeight: 'normal',
+  fontSize: '12',
+  fontStyle: 'normal',
+  textDecoration: 'none',
   text: '',
 };
 

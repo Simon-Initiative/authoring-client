@@ -9,15 +9,23 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TG_COL } from 'data/content/assessment/dragdrop/target_group';
 import { convert } from 'utils/format';
-
-import { styles } from './CustomEditor.styles';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 import { Initiator } from './dynadragdrop/Initiator';
 import { DynaDropTarget } from './dynadragdrop/DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
-import { Page, Question, Node, Part, Choice, ContiguousText,
+import { Page, Question, Node, Part, Choice, Response, ContiguousText,
   FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
+import guid from 'utils/guid';
+import { Target } from 'data/content/assessment/dragdrop/target';
+import { Maybe } from 'tsmonad';
+import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { ContiguousTextMode } from 'data/content/learning/contiguous';
+import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
+import { Feedback } from 'data/content/assessment/feedback';
+
+import { styles } from './CustomEditor.styles';
 
 const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
   const currentItem = question.items.toArray().find(
@@ -30,7 +38,7 @@ const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => 
   return currentItem.choices.toArray().reduce(
     (acc, choice: Choice, index) => ({
       ...acc,
-      [(choice.body.content.first() as ContiguousText).extractPlainText().valueOr(null)]:
+      [choice.value]:
       convert.toAlphaNotation(index),
     }),
     {},
@@ -139,6 +147,7 @@ export class CustomEditor
     this.assignInitiator = this.assignInitiator.bind(this);
     this.unassignInitiator = this.unassignInitiator.bind(this);
     this.selectInitiator = this.selectInitiator.bind(this);
+    this.addInitiator = this.addInitiator.bind(this);
     this.deleteInitiator = this.deleteInitiator.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
@@ -190,6 +199,68 @@ export class CustomEditor
     const { onSelectInitiator } = this.props;
 
     onSelectInitiator(id);
+  }
+
+  addInitiator() {
+    const { model, currentNode, onEdit } = this.props;
+    const question = currentNode as Question;
+
+    const newInitiator = new InitiatorModel().with({
+      text: 'New Choice',
+      assessmentId: guid(),
+    });
+
+    const targetAssessmentIds = (question.items.first() as FillInTheBlank).choices
+      .toArray().map(c => c.value);
+
+    const newItem = new FillInTheBlank().with({
+      id: newInitiator.assessmentId,
+      choices: Immutable.OrderedMap<string, Choice>([
+        ...targetAssessmentIds.map((t) => {
+          const choice = new Choice().with({
+            value: t,
+            body: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
+          });
+          return [choice.guid, choice];
+        }),
+      ]),
+    });
+
+    const newPart = new Part().with({
+      responses: Immutable.OrderedMap<string, Response>([
+        ...targetAssessmentIds.map((t) => {
+          const response = new Response().with({
+            input: newInitiator.assessmentId,
+            match: t,
+            feedback: Immutable.OrderedMap<string, Feedback>().withMutations((fb) => {
+              const newFeedback = new Feedback();
+              return fb.set(newFeedback.guid, newFeedback);
+            }),
+          });
+          return [response.guid, response];
+        }),
+      ]),
+    });
+
+    const newModel = model.with({
+      layoutData: model.layoutData.caseOf({
+        just: ld => Maybe.just<DndLayout>(ld.with({
+          initiatorGroup: ld.initiatorGroup.with({
+            initiators: ld.initiatorGroup.initiators.push(newInitiator),
+          }),
+        })),
+        nothing: () => Maybe.nothing<DndLayout>(),
+      }),
+    });
+
+    // save question updates
+    this.onEditQuestion(question.with({
+      body: question.body.with({
+        content: question.body.content.set(newModel.guid, newModel),
+      }),
+      items: question.items.set(newItem.guid, newItem),
+      parts: question.parts.set(newPart.guid, newPart),
+    }));
   }
 
   deleteInitiator(guid: string) {
@@ -299,7 +370,7 @@ export class CustomEditor
         </div>
         <div>
           <Button type="link" editMode={editMode}
-            onClick={() => console.log('Add Choice - NOT IMPLEMENTED')} >
+            onClick={this.addInitiator} >
             <i className="fa fa-plus" /> Add a Choice
           </Button>
         </div>

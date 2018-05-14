@@ -17,8 +17,6 @@ import './DynaDropInput.scss';
 import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 
-export type PartAddPredicate = (partToAdd: 'Numeric' | 'Text' | 'FillInTheBlank') => boolean;
-
 export interface DynaDropInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   activeContext: ActiveContext;
@@ -41,53 +39,6 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   /** Implement required abstract method to set className */
   getClassName() {
     return 'dynadrop-input';
-  }
-
-  onInsertInputRef() {
-    let result = null;
-
-    const { activeContext } = this.props;
-
-    activeContext.container.lift((p) => {
-      activeContext.activeChild.lift((c) => {
-
-        if (this.props.model.body.content.has((c as any).guid)
-          && (c instanceof contentTypes.ContiguousText)) {
-
-          const selection = activeContext.textSelection.caseOf({
-            just: s => s,
-            nothing: () =>
-              TextSelection.createEmpty((c as ContiguousText).content.getFirstBlock().getKey()),
-          });
-
-          const input = guid();
-          const data = {};
-          data['@input'] = input;
-          data['$type'] = 'FillInTheBlank';
-
-          const updated = (c as contentTypes.ContiguousText).addEntity(
-            EntityTypes.input_ref, false, data, selection);
-
-          result = [this.props.model.body.with({ content:
-            this.props.model.body.content.set(updated.guid, updated),
-          }), input];
-
-        }
-
-      });
-    });
-
-    return result;
-  }
-
-  onInsertFillInTheBlank(canInsertAnotherPart: PartAddPredicate) {
-    const result = this.onInsertInputRef();
-
-    if (result !== null) {
-      const item = new contentTypes.FillInTheBlank().with({ id: result[1] });
-      const part = new contentTypes.Part();
-      this.props.onAddItemPart(item, part, result[0]);
-    }
   }
 
   /** Implement parent absract methods */
