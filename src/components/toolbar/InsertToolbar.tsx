@@ -14,7 +14,7 @@ import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { selectFile } from 'editors/content/learning/file';
-import { ContiguousTextMode } from 'data/content/learning/contiguous';
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
 import { Resource } from 'data/content/resource';
@@ -331,7 +331,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 
               onInsert(conjugation);
             }}
-            tooltip="Insert Conjugation Table"
             disabled={!parentSupportsElementType('conjugation')}>
               <i style={ { width: 22 } } className={'fa fa-language'}/> Conjugation
           </ToolbarButtonMenuItem>

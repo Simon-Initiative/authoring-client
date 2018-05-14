@@ -23,6 +23,7 @@ const defaultContent = {
 export class Cr extends Immutable.Record(defaultContent) {
 
   contentType: 'Cr';
+  elementType: 'cr';
   cells: Immutable.OrderedMap<string, ConjugationCell>;
   guid: string;
 
