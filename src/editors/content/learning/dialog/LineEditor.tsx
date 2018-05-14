@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps }
+  from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Speaker, SpeakerSize } from 'editors/content/learning/Speaker';
+import { Speaker, SpeakerSize } from 'editors/content/learning/dialog/Speaker';
 import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import './LineEditor.scss';
 import MaterialEditor from 'editors/content/learning/MaterialEditor';

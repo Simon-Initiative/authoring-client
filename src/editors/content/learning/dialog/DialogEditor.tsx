@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps }
+  from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';

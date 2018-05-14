@@ -39,9 +39,9 @@ import CompositeEditor from '../learning/CompositeEditor';
 import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
-import DialogEditor from 'editors/content/learning/DialogEditor';
-import SpeakerEditor from 'editors/content/learning/SpeakerEditor';
-import LineEditor from 'editors/content/learning/LineEditor';
+import DialogEditor from 'editors/content/learning/dialog/DialogEditor';
+import SpeakerEditor from 'editors/content/learning/dialog/SpeakerEditor';
+import LineEditor from 'editors/content/learning/dialog/LineEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 
 

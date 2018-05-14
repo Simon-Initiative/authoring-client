@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditor, AbstractContentEditorProps }
+  from 'editors/content/common/AbstractContentEditor';
 import * as contentTypes from 'data/contentTypes';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
@@ -13,7 +14,7 @@ import { AppContext } from 'editors/common/AppContext';
 import { modalActions } from 'actions/modal';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { Maybe } from 'tsmonad';
-import { Speaker, SpeakerSize } from 'editors/content/learning/Speaker';
+import { Speaker, SpeakerSize } from 'editors/content/learning/dialog/Speaker';
 import { TextInput } from 'editors/content/common/controls';
 
 export interface SpeakerEditorProps extends

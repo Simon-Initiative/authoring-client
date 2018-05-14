@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { StyledComponentProps } from 'types/component';
-import { injectSheetSFC, classNames } from 'styles/jss';
+import { classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
-import { styles } from './Speaker.styles';
-import './Speaker.scss';
 import { AppContext } from 'editors/common/AppContext';
 import { buildUrl } from 'utils/path';
+import './Speaker.scss';
 
 export interface SpeakerProps {
   className?: string;
@@ -22,9 +20,9 @@ export enum SpeakerSize {
 /**
  * Speaker React Stateless Component
  */
-export const Speaker: React.StatelessComponent<StyledComponentProps<SpeakerProps>>
-  = injectSheetSFC<SpeakerProps>(styles)(({
-    context, className, classes, children, model, size = SpeakerSize.Large,
+export const Speaker: React.StatelessComponent<SpeakerProps>
+  = (({
+    className, context, children, model, size = SpeakerSize.Large,
   }) => {
     const { title, content } = model;
 
