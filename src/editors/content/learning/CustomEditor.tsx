@@ -263,8 +263,51 @@ export class CustomEditor
     }));
   }
 
-  deleteInitiator(guid: string) {
-    console.log('NOT IMPLEMENTED');
+  deleteInitiator(initiatorId: string) {
+    const { model, currentNode, onSelectInitiator } = this.props;
+    const question = currentNode as Question;
+
+    const initiators = model.layoutData.caseOf({
+      just: ld => ld.initiatorGroup.initiators,
+      nothing: () => Immutable.List<InitiatorModel>(),
+    });
+
+    // dont allow deletion of the last initiator
+    if (initiators.size <= 1) {
+      return;
+    }
+
+    // get initiator with specified id
+    const initiator = initiators.find(i => i.guid === initiatorId);
+
+    const updatedModel = model.with({
+      layoutData: model.layoutData.caseOf({
+        just: ld => Maybe.just<DndLayout>(ld.with({
+          initiatorGroup: ld.initiatorGroup.with({
+            initiators: ld.initiatorGroup.initiators
+              .filter(i =>
+                i.assessmentId !== initiator.assessmentId) as Immutable.List<InitiatorModel>,
+          }),
+        })),
+        nothing: () => Maybe.nothing<DndLayout>(),
+      }),
+    });
+
+    const itemKey = question.items.findKey(item =>
+      (item as FillInTheBlank).id === initiator.assessmentId);
+    const partKey = question.parts.findKey(part =>
+      part.responses.first().input === initiator.assessmentId);
+
+    onSelectInitiator(initiators.first().assessmentId);
+
+    // save question updates
+    this.onEditQuestion(question.with({
+      body: question.body.with({
+        content: question.body.content.set(updatedModel.guid, updatedModel),
+      }),
+      items: question.items.remove(itemKey),
+      parts: question.parts.remove(partKey),
+    }));
   }
 
   onEditQuestion(question: Question) {

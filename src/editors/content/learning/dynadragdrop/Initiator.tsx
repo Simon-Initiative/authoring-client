@@ -89,14 +89,20 @@ export class Initiator
           <Remove
             className={classes.removeBtn}
             editMode={editMode}
-            onRemove={() => onRemove(model.guid)} />
+            onRemove={(e) => {
+              e.stopPropagation();
+              onRemove(model.guid);
+            }} />
         }
         {onDelete &&
           <Remove
             className={classes.removeBtn}
             customIcon="fa fa-trash"
             editMode={editMode}
-            onRemove={() => onDelete(model.guid)} />
+            onRemove={(e) => {
+              e.stopPropagation();
+              onDelete(model.guid);
+            }} />
         }
       </div>,
     ));
