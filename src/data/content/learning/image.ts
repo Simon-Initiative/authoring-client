@@ -29,6 +29,7 @@ export type ImageParams = {
 
 const defaultContent = {
   contentType: 'Image',
+  elementType: 'image',
   id: '',
   title: '',
   src: '',
@@ -48,6 +49,7 @@ const defaultContent = {
 export class Image extends Immutable.Record(defaultContent) {
 
   contentType: 'Image';
+  elementType: 'image';
   id: string;
   title: string;
   src: string;

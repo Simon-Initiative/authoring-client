@@ -11,25 +11,27 @@ export type TextParams = {
 };
 
 const defaultContent = {
+  contentType: 'Text',
+  elementType: 'text',
   id: '',
   name: '',
   caseSensitive: false,
   whitespace: 'trim',
   inputSize: 'small',
   guid: '',
-  contentType: 'Text',
 };
 
 export class Text extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Text';
+  elementType: 'text';
   id : string;
   name : string;
   caseSensitive: boolean;
   whitespace: string;
   inputSize: string;
   guid: string;
-  
+
   constructor(params?: TextParams) {
     super(augment(params));
   }
@@ -39,7 +41,7 @@ export class Text extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : Text {
-    
+
     const n = (json as any).text;
     let model = new Text({ guid });
 
@@ -58,7 +60,7 @@ export class Text extends Immutable.Record(defaultContent) {
     if (n['@size'] !== undefined) {
       model = model.with({ inputSize: n['@size'] });
     }
-    
+
     return model;
 
   }

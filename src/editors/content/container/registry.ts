@@ -47,6 +47,9 @@ import CompositeEditor from '../learning/CompositeEditor';
 import InstructionsEditor from '../learning/InstructionsEditor';
 import AlternativesEditor from '../learning/AlternativesEditor';
 import AlternativeEditor from '../learning/AlternativeEditor';
+import DialogEditor from 'editors/content/learning/dialog/DialogEditor';
+import SpeakerEditor from 'editors/content/learning/dialog/SpeakerEditor';
+import LineEditor from 'editors/content/learning/dialog/LineEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
 
 
@@ -68,6 +71,9 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
+  registry['Dialog'] = connectEditor(DialogEditor);
+  registry['Speaker'] = connectEditor(SpeakerEditor);
+  registry['Line'] = connectEditor(LineEditor);
   registry['Director'] = connectEditor(DirectorEditor);
   registry['Applet'] = connectEditor(AppletEditor);
   registry['Flash'] = connectEditor(FlashEditor);

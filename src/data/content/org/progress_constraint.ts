@@ -13,6 +13,7 @@ export type ProgressConstraintParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.ProgressConstraint,
+  elementType: 'progress_constraint',
   condition: types.ConditionTypes.None,
   grainSize: types.GrainSizes.Item,
   id: '',
@@ -23,6 +24,7 @@ const defaultContent = {
 export class ProgressConstraint extends Immutable.Record(defaultContent) {
 
   contentType: types.ContentTypes.ProgressConstraint;
+  elementType: 'progress_constraint';
   condition: types.ConditionTypes;
   grainSize: types.GrainSizes;
   id: string;

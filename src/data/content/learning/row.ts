@@ -16,6 +16,7 @@ export type RowParams = {
 
 const defaultContent = {
   contentType: 'Row',
+  elementType: 'row',
   cells: Immutable.OrderedMap<string, Cell>(),
   guid: '',
 };
@@ -23,6 +24,7 @@ const defaultContent = {
 export class Row extends Immutable.Record(defaultContent) {
 
   contentType: 'Row';
+  elementType: 'row';
   cells: Immutable.OrderedMap<string, Cell>;
   guid: string;
 

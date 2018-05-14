@@ -26,6 +26,7 @@ export type ItemParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Item,
+  elementType: 'item',
   id: '',
   purpose: Maybe.nothing<types.PurposeTypes>(),
   duration: Maybe.nothing<string>(),
@@ -39,8 +40,9 @@ const defaultContent = {
 };
 
 export class Item extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Item;
+  elementType: 'item';
   id: string;
   purpose: Maybe<types.PurposeTypes>;
   duration: Maybe<string>;
@@ -51,7 +53,7 @@ export class Item extends Immutable.Record(defaultContent) {
   supplements: Maybe<Supplements>;
   schedule: Maybe<Schedule>;
   guid: string;
-  
+
   constructor(params?: ItemParams) {
     super(defaultIdGuid(params));
   }
@@ -79,10 +81,10 @@ export class Item extends Immutable.Record(defaultContent) {
     }
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'resourceref':
           model = model.with({ resourceref: ResourceRef.fromPersistence(item, id) });
@@ -103,10 +105,10 @@ export class Item extends Immutable.Record(defaultContent) {
             { schedule: Maybe.just(Schedule.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -118,13 +120,13 @@ export class Item extends Immutable.Record(defaultContent) {
     this.preconditions.lift(p => children.push(p.toPersistence));
     this.supplements.lift(p => children.push(p.toPersistence));
     this.schedule.lift(p => children.push(p.toPersistence));
-    
-    const s = { 
+
+    const s = {
       item: {
         '@id': this.id,
         '@scoring_mode': this.scoringMode,
         '#array': children,
-      }, 
+      },
     };
 
     this.purpose.lift(p => s.item['@purpose'] = p);

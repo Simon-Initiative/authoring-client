@@ -26,6 +26,7 @@ export type DirectorParams = {
 
 const defaultContent = {
   contentType: 'Director',
+  elementType: 'director',
   id: '',
   width: '800',
   height: '450',
@@ -42,6 +43,7 @@ const defaultContent = {
 export class Director extends Immutable.Record(defaultContent) {
 
   contentType: 'Director';
+  elementType: 'director';
   id: string;
   width: string;
   height: string;

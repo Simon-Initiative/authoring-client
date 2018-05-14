@@ -280,6 +280,29 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!parentSupportsElementType('definition')}>
               <i style={ { width: 22 } } className={'fa fa-book'}/> Definition
           </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            onClick={() => {
+              const speakerId = guid();
+              const lineId = guid();
+
+              const speaker = new contentTypes.Speaker({
+                guid: speakerId, id: speakerId, title: Maybe.just('Speaker 1'),
+              });
+              const speakers =
+                Immutable.OrderedMap<string, contentTypes.Speaker>([[speakerId, speaker]]);
+
+              const material = contentTypes.Material.fromText('Empty text block', '');
+              const line = new contentTypes.Line({
+                guid: lineId, id: Maybe.just(lineId), speaker: speakerId, material,
+              });
+              const lines = Immutable.OrderedMap<string, contentTypes.Line>([[lineId, line]]);
+
+              const dialog = new contentTypes.Dialog({ speakers, lines });
+              onInsert(dialog);
+            }}
+            disabled={!parentSupportsElementType('dialog')}>
+              <i style={ { width: 22 } } className={'fa fa-comments'}/> Dialog
+          </ToolbarButtonMenuItem>
         </ToolbarQuadMenu>
 
         <ToolbarLayout.Column maxWidth="100px">
@@ -369,7 +392,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             </ToolbarButtonMenuItem>
           </ToolbarWideMenu>
         </ToolbarLayout.Column>
-
         <ToolbarLayout.Column maxWidth="100px">
           <ToolbarWideMenu
             icon={<i className={'fa fa-clone'}/>}
@@ -388,7 +410,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {
-
                 const material1 = new contentTypes.Material();
                 const material2 = new contentTypes.Material();
 
@@ -402,11 +423,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
               }}
               disabled={!parentSupportsElementType('materials')}>
                 <i style={ { width: 22 } } className={'fa fa-columns'}/> Horizontal group
-            </ToolbarButtonMenuItem>
-            <ToolbarButtonMenuItem
-              onClick={() => onInsert(new contentTypes.WorkbookSection())}
-              disabled={!parentSupportsElementType('section')}>
-                <i style={ { width: 22 } } className={'fa fa-list-alt'}/> Section
             </ToolbarButtonMenuItem>
           </ToolbarWideMenu>
 

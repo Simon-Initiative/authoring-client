@@ -22,6 +22,7 @@ export type ExtraParams = {
 
 const defaultContent = {
   contentType: 'Extra',
+  elementType: 'extra',
   id: Maybe.nothing(),
   anchor: new Anchor(),
   pronunciation: ContiguousText.fromText('', '', ContiguousTextMode.SimpleText),
@@ -35,6 +36,7 @@ const defaultContent = {
 export class Extra extends Immutable.Record(defaultContent) {
 
   contentType: 'Extra';
+  elementType: 'extra';
   anchor: Anchor;
   pronunciation: ContiguousText;
   translation: ContiguousText;

@@ -11,6 +11,7 @@ export type ObjectiveSkillsParams = {
 
 const defaultContent = {
   contentType: 'ObjectiveSkills',
+  elementType: 'objective_skills',
   idref: '',
   guid: '',
   skills: Immutable.Set<string>(),
@@ -19,6 +20,7 @@ const defaultContent = {
 export class ObjectiveSkills extends Immutable.Record(defaultContent) {
 
   contentType: 'ObjectiveSkills';
+  elementType: 'objective_skills';
   idref: string;
   guid: string;
   title: string;

@@ -20,6 +20,7 @@ export type DefinitionParams = {
 
 const defaultContent = {
   contentType: 'Definition',
+  elementType: 'definition',
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   term: '',
@@ -32,6 +33,7 @@ const defaultContent = {
 export class Definition extends Immutable.Record(defaultContent) {
 
   contentType: 'Definition';
+  elementType: 'definition';
   title: Maybe<Title>;
   term: string;
   pronunciation: Maybe<Pronunciation>;

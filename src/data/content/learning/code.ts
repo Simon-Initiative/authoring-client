@@ -10,6 +10,7 @@ export type CodeParams = {
 
 const defaultContent = {
   contentType: 'Code',
+  elementType: 'code',
   text: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Code extends Immutable.Record(defaultContent) {
 
   contentType: 'Code';
+  elementType: 'code';
   text: ContentElements;
   guid: string;
 

@@ -8,6 +8,7 @@ export type PoolRefParams = {
 
 const defaultPoolRefParams = {
   contentType: 'PoolRef',
+  elementType: 'pool_ref',
   idref: '',
   guid: '',
 };
@@ -15,9 +16,10 @@ const defaultPoolRefParams = {
 export class PoolRef extends Immutable.Record(defaultPoolRefParams) {
 
   contentType: 'PoolRef';
+  elementType: 'pool_ref';
   idref: string;
   guid: string;
-  
+
   constructor(params?: PoolRefParams) {
     super(augment(params));
   }
@@ -35,7 +37,7 @@ export class PoolRef extends Immutable.Record(defaultPoolRefParams) {
     if (s['@idref'] !== undefined) {
       model = model.with({ idref: s['@idref'] });
     }
-    
+
     return model;
   }
 

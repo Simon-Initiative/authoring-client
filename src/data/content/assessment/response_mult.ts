@@ -15,6 +15,7 @@ export type ResponseMultParams = {
 
 const defaultContent = {
   contentType: 'ResponseMult',
+  elementType: 'response_mult',
   matchStyle: 'any',
   score: '0',
   name: '',
@@ -23,14 +24,15 @@ const defaultContent = {
 };
 
 export class ResponseMult extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'ResponseMult';
+  elementType: 'response_mult';
   matchStyle: string;
   score: string;
   name: string;
   matches: Immutable.OrderedMap<string, Match>;
   guid: string;
-  
+
   constructor(params?: ResponseMultParams) {
     super(augment(params));
   }
@@ -44,7 +46,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     const p = (root as any).response_mult;
 
     let model = new ResponseMult({ guid });
-    
+
     if (p['@match_style'] !== undefined) {
       model = model.with({ matchStyle: p['@match_style'] });
     }
@@ -56,7 +58,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     }
 
     getChildren(p).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 
@@ -68,7 +70,7 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
       }
     });
 
-    
+
     return model;
   }
 

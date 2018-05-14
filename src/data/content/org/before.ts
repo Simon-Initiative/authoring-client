@@ -8,16 +8,18 @@ export type BeforeParams = {
 
 const defaultContent = {
   contentType: 'Before',
+  elementType: 'before',
   idref: '',
   guid: '',
 };
 
 export class Before extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Before';
+  elementType: 'before';
   idref: string;
   guid: string;
-  
+
   constructor(params?: BeforeParams) {
     super(augment(params));
   }
@@ -34,16 +36,16 @@ export class Before extends Immutable.Record(defaultContent) {
     if (before['@idref'] !== undefined) {
       model = model.with({ idref: before['@idref'] });
     }
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    return  { 
+
+    return  {
       before: {
         '@idref': this.idref,
-      }, 
+      },
     };
   }
 }

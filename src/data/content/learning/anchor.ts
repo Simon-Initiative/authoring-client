@@ -10,12 +10,14 @@ export type AnchorParams = {
 
 const defaultContent = {
   contentType: 'Anchor',
+  elementType: 'anchor',
   content: Maybe.nothing<Image>(),
   guid: '',
 };
 
 export class Anchor extends Immutable.Record(defaultContent) {
   contentType: 'Anchor';
+  elementType: 'anchor';
   content: Maybe<Image>;
   guid: string;
 

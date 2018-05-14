@@ -40,6 +40,7 @@ export type PulloutParams = {
 
 const defaultContent = {
   contentType: 'Pullout',
+  elementType: 'pullout',
   id: Maybe.nothing(),
   title: Title.fromText('Title'),
   orient: Orientation.Horizontal,
@@ -50,6 +51,7 @@ const defaultContent = {
 
 export class Pullout extends Immutable.Record(defaultContent) {
   contentType: 'Pullout';
+  elementType: 'pullout';
   id: Maybe<string>;
   title: Title;
   orient: Orientation;

@@ -13,6 +13,7 @@ export type LiParams = {
 
 const defaultContent = {
   contentType: 'Li',
+  elementType: 'li',
   title: Maybe.nothing(),
   content: new ContentElements().with({ supportedElements: Immutable.List(FLOW_ELEMENTS) }),
   guid: '',
@@ -21,6 +22,7 @@ const defaultContent = {
 export class Li extends Immutable.Record(defaultContent) {
 
   contentType: 'Li';
+  elementType: 'li';
   title: Maybe<string>;
   content: ContentElements;
   guid: string;

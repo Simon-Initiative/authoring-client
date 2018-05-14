@@ -12,6 +12,7 @@ export type HintParams = {
 
 const defaultContent = {
   contentType: 'Hint',
+  elementType: 'hint',
   targets: '',
   body: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
@@ -20,6 +21,7 @@ const defaultContent = {
 export class Hint extends Immutable.Record(defaultContent) {
 
   contentType: 'Hint';
+  elementType: 'hint';
   targets: string;
   body: ContentElements;
   guid: string;

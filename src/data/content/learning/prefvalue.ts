@@ -8,6 +8,7 @@ export type PrefValueParams = {
 
 const defaultContent = {
   contentType: 'PrefValue',
+  elementType: 'prefvalue',
   preference: '',
   guid: '',
 };
@@ -15,6 +16,7 @@ const defaultContent = {
 export class PrefValue extends Immutable.Record(defaultContent) {
 
   contentType: 'PrefValue';
+  elementType: 'prefvalue';
   preference: string;
   guid: string;
 

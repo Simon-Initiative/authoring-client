@@ -15,17 +15,19 @@ export type OrderingParams = {
 };
 
 const defaultContent = {
+  contentType: 'Ordering',
+  elementType: 'ordering',
   choices: Immutable.OrderedMap<string, Choice>(),
   id: '',
   name: '',
   shuffle: true,
   guid: '',
-  contentType: 'Ordering',
 };
 
 export class Ordering extends Immutable.Record(defaultContent) {
 
   contentType: 'Ordering';
+  elementType: 'ordering';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
   name : string;

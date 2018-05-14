@@ -13,6 +13,7 @@ export type TranslationParams = {
 
 const defaultContent = {
   contentType: 'Translation',
+  elementType: 'translation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   id: Maybe.nothing(),
   title: Maybe.nothing(),
@@ -22,6 +23,7 @@ const defaultContent = {
 export class Translation extends Immutable.Record(defaultContent) {
 
   contentType: 'Translation';
+  elementType: 'translation';
   content: ContentElements;
   id: Maybe<string>;
   title: Maybe<string>;

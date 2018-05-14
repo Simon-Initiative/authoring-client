@@ -15,6 +15,7 @@ export type AlternativeParams = {
 
 const defaultContent = {
   contentType: 'Alternative',
+  elementType: 'alternative',
   title: new Title(),
   value: '',
   content: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
@@ -23,6 +24,7 @@ const defaultContent = {
 
 export class Alternative extends Immutable.Record(defaultContent) {
   contentType: 'Alternative';
+  elementType: 'alternative';
   title: Title;
   value: string;
   content: ContentElements;

@@ -15,6 +15,7 @@ export type LinkParams = {
 
 const defaultContent = {
   contentType: 'Link',
+  elementType: 'link',
   target: LinkTarget.New,
   href: 'www.google.com',
   internal: false,
@@ -25,6 +26,7 @@ const defaultContent = {
 
 export class Link extends Immutable.Record(defaultContent) {
   contentType: 'Link';
+  elementType: 'link';
   content: Maybe<Image>;
   target: LinkTarget;
   href: string;

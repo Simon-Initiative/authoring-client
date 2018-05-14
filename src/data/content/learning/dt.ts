@@ -12,6 +12,7 @@ export type DtParams = {
 
 const defaultContent = {
   contentType: 'Dt',
+  elementType: 'dt',
   title: Maybe.nothing(),
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
@@ -20,6 +21,7 @@ const defaultContent = {
 export class Dt extends Immutable.Record(defaultContent) {
 
   contentType: 'Dt';
+  elementType: 'dt';
   title: Maybe<string>;
   content: ContentElements;
   guid: string;
