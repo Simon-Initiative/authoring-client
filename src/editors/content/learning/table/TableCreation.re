@@ -44,9 +44,9 @@ let make = (~onTableCreate, ~onHide, _children) => {
     let width = "108px";
 
     let state = self.state;
-    let boxShadow = "1px 2px 4px rgba(0, 0, 0, .5)";
+
     let gridStyle = ReactDOMRe.Style.make
-      (~backgroundColor="#EFEFEF", ~boxShadow, ~height="220px", ~width, ~padding="3px", ());
+      (~height="220px", ~width, ~padding="0px", ());
 
     let labelStyle = ReactDOMRe.Style.make(~color="#808080", ~width, ~textAlign="center", ());
 
