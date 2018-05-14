@@ -105,6 +105,7 @@ export default class ConjugationEditor
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
+      onPaste: (e) => {},
       onRemove: (e) => {},
       onDuplicate: (e) => {},
       onMoveUp: (e) => {},
