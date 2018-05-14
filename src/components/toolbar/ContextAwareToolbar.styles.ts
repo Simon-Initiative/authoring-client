@@ -63,6 +63,7 @@ export const styles: JSSStyles = {
   toolbarLayoutInline: {
     display: 'flex',
     flexDirection: 'row',
+    flexWrap: 'wrap',
     height: TOOLBAR_COL_WIDTH * 2,
   },
   toolbarLayoutGrid: {
