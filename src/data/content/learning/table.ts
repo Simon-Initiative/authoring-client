@@ -5,12 +5,18 @@ import { augment, getChildren } from '../common';
 import { Row } from './row';
 import { CellData } from './celldata';
 import { getKey } from '../../common';
+import { Title } from './title';
+import { Caption } from './caption';
+import { Cite } from './cite';
+
 
 export type TableParams = {
   id?: string,
   summary?: string,
   rowstyle?: string,
-  title?: string,
+  title?: Title,
+  caption?: Caption,
+  cite?: Cite,
   rows?: Immutable.OrderedMap<string, Row>,
   guid?: string,
 };
@@ -19,7 +25,9 @@ const defaultContent = {
   id: '',
   contentType: 'Table',
   summary: '',
-  title: '',
+  title: new Title(),
+  caption: new Caption(),
+  cite: new Cite(),
   rowstyle: 'plain',
   rows: Immutable.OrderedMap<string, Row>(),
   guid: '',
@@ -39,7 +47,9 @@ export class Table extends Immutable.Record(defaultContent) {
   contentType: 'Table';
   rowstyle: string;
   summary: string;
-  title: string;
+  title: Title;
+  caption: Caption;
+  cite: Cite;
   rows: Immutable.OrderedMap<string, Row>;
   guid: string;
 
@@ -73,9 +83,6 @@ export class Table extends Immutable.Record(defaultContent) {
     if (t['@summary'] !== undefined) {
       model = model.with({ summary: t['@summary'] });
     }
-    if (t['@title'] !== undefined) {
-      model = model.with({ title: t['@title'] });
-    }
     if (t['@rowstyle'] !== undefined) {
       model = model.with({ rowstyle: t['@rowstyle'] });
     }
@@ -88,6 +95,16 @@ export class Table extends Immutable.Record(defaultContent) {
       switch (key) {
         case 'tr':
           model = model.with({ rows: model.rows.set(id, Row.fromPersistence(item, id)) });
+          break;
+        case 'title':
+          model = model.with(
+            { title: Title.fromPersistence(item, id) });
+          break;
+        case 'caption':
+          model = model.with({ caption: Caption.fromPersistence(item, id) });
+          break;
+        case 'cite':
+          model = model.with({ cite: Cite.fromPersistence(item, id) });
           break;
         default:
 
@@ -104,13 +121,19 @@ export class Table extends Immutable.Record(defaultContent) {
       ? createDefaultRows().toArray().map(p => p.toPersistence())
       : this.rows.toArray().map(p => p.toPersistence());
 
+    const children = [
+      this.title.toPersistence(),
+      this.cite.toPersistence(),
+      this.caption.toPersistence(),
+      ...rows,
+    ];
+
     return {
       table: {
         '@id': this.id,
         '@summary': this.summary,
-        '@title': this.title,
         '@rowstyle': this.rowstyle,
-        '#array': rows,
+        '#array': children,
       },
     };
   }
