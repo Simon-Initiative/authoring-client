@@ -42,6 +42,8 @@ inlineTerminalTags['m:math'] = true;
 inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
+inlineTerminalTags['sym'] = true;
+
 
 const inlineTagsDefaultContent = {};
 inlineTagsDefaultContent['cite'] = ' ';
@@ -97,6 +99,9 @@ function getInlineHandlers() {
     'm:math': insertDataDrivenEntity.bind(
       undefined, 'IMMUTABLE',
       common.EntityTypes.math, 'math', registeredTypes['math']),
+    sym: insertDataDrivenEntity.bind(
+        undefined, 'IMMUTABLE',
+        common.EntityTypes.sym, 'sym', registeredTypes['sym']),
     quote: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.quote, 'quote', registeredTypes['quote']),

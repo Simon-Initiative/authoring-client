@@ -57,6 +57,7 @@ export function registerContentTypes() {
   registerType('pullout', ct.Pullout.fromPersistence);
   registerType('quote', ct.BlockQuote.fromPersistence);
   registerType('tr', ct.Row.fromPersistence);
+  registerType('sym', ct.Sym.fromPersistence);
   registerType('source', ct.Source.fromPersistence);
   registerType('table', ct.Table.fromPersistence);
   registerType('title', ct.Title.fromPersistence);

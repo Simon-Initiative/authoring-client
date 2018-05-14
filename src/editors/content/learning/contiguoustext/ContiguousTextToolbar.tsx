@@ -291,6 +291,17 @@ export default class ContiguousTextToolbar
             <i className={'fa fa-etsy'}/>
           </ToolbarButton>
           <ToolbarButton
+              onClick={
+                () => {
+                  onEdit(model.addEntity(
+                    EntityTypes.sym, true, new contentTypes.Sym(), selection));
+                }
+              }
+              disabled={!supports('sym') || !pointEntitiesEnabled}
+              tooltip="HTML Entity or Symbol">
+            <i className={'fa fa-circle'}/>
+          </ToolbarButton>
+          <ToolbarButton
             onClick={() => {
               selectImage(null, determineBaseUrl(this.props.resource), this.props.courseModel,
                           this.props.onDisplayModal, this.props.onDismissModal)

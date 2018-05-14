@@ -51,6 +51,7 @@ export const CONTENT_COLORS = {
   Hint: flatui.alizarin,
   Alternatives: flatui.sunflower,
   Alternative: flatui.pumpkin,
+  Sym: colors.warning,
 };
 
 export const CONTENT_ICONS = {
@@ -98,6 +99,7 @@ export const CONTENT_ICONS = {
   Hint: <i className={'fa fa-hand-o-left'}/>,
   Alternatives: <i className={'fa fa-cogs'}/>,
   Alternative: <i className={'fa fa-cog'}/>,
+  Sym: <i className={'fa fa-sun-o'}/>,
 };
 
 export const getContentColor = (type: string) => CONTENT_COLORS[type] || colors.grayLight;

@@ -35,6 +35,7 @@ inlineTerminalTags['m:math'] = true;
 inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
+inlineTerminalTags['sym'] = true;
 
 
 type Container = Object[];
@@ -59,6 +60,7 @@ const entityHandlers = {
   math,
   input_ref,
   cite,
+  sym,
   quote,
   code,
   formula_begin,
@@ -668,6 +670,12 @@ function code(s : common.RawEntityRange, text : string, entityMap : common.RawEn
   return data.toPersistence();
 }
 
+
+function sym(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
+}
 
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 
