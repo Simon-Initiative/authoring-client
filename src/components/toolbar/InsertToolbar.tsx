@@ -14,8 +14,7 @@ import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { selectFile } from 'editors/content/learning/file';
-import { ContiguousTextMode } from 'data/content/learning/contiguous';
-
+import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
 import { Resource } from 'data/content/resource';
@@ -302,6 +301,38 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             }}
             disabled={!parentSupportsElementType('dialog')}>
               <i style={ { width: 22 } } className={'fa fa-comments'}/> Dialog
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            onClick={() => {
+              const header1 = new contentTypes.CellHeader();
+              const header2 = new contentTypes.CellHeader();
+              const header3 = new contentTypes.CellHeader();
+              const conjugate = new contentTypes.Conjugate()
+                .with({
+                  content: ContiguousText.fromText(
+                    'conjugate', guid(), ContiguousTextMode.SimpleText),
+                });
+              const one = new contentTypes.Cr().with({
+                cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                  .set(header1.guid, header1)
+                  .set(header2.guid, header2),
+              });
+              const two = new contentTypes.Cr().with({
+                cells: Immutable.OrderedMap<string, contentTypes.ConjugationCell>()
+                  .set(header3.guid, header3)
+                  .set(conjugate.guid, conjugate),
+              });
+              const rows = Immutable.OrderedMap<string, contentTypes.Cr>()
+                .set(one.guid, one)
+                .set(two.guid, two);
+              const conjugation = new contentTypes.Conjugation().with({
+                rows,
+              });
+
+              onInsert(conjugation);
+            }}
+            disabled={!parentSupportsElementType('conjugation')}>
+              <i style={ { width: 22 } } className={'fa fa-language'}/> Conjugation
           </ToolbarButtonMenuItem>
         </ToolbarQuadMenu>
 

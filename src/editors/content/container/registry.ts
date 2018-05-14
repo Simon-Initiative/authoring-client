@@ -51,7 +51,8 @@ import DialogEditor from 'editors/content/learning/dialog/DialogEditor';
 import SpeakerEditor from 'editors/content/learning/dialog/SpeakerEditor';
 import LineEditor from 'editors/content/learning/dialog/LineEditor';
 import ExtraDefinitionEditor from 'editors/content/learning/ExtraDefinitionEditor';
-
+import ConjugationEditor from 'editors/content/learning/conjugation/ConjugationEditor';
+import ConjugateEditor from 'editors/content/learning/conjugation/ConjugateEditor';
 
 let registry = null;
 
@@ -71,6 +72,8 @@ function init() {
   registry['ContiguousText'] = connectEditor(ContiguousTextEditor);
   registry['CodeBlock'] = connectEditor(CodeBlockEditor);
   registry['Custom'] = connectEditor(CustomEditor);
+  registry['Conjugation'] = connectEditor(ConjugationEditor);
+  registry['Conjugate'] = connectEditor(ConjugateEditor);
   registry['Dialog'] = connectEditor(DialogEditor);
   registry['Speaker'] = connectEditor(SpeakerEditor);
   registry['Line'] = connectEditor(LineEditor);
