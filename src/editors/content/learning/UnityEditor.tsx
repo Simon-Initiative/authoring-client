@@ -216,8 +216,7 @@ export default class UnityEditor
         <div className="mediaHeader">Unity</div>
 
         <div>
-          <span className="mediaLabel">Source File:</span>
-          {file}
+          <span className="mediaLabel">Source File:</span> {file}
         </div>
 
         <span className="mediaLabel">Parameters:</span>

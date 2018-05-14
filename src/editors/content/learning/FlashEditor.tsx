@@ -231,8 +231,7 @@ export default class FlashEditor
         <div className="mediaHeader">Flash</div>
 
         <div>
-          <span className="mediaLabel">Source File:</span>
-          {file}
+          <span className="mediaLabel">Source File:</span> {file}
         </div>
 
         <span className="mediaLabel">Parameters:</span>
