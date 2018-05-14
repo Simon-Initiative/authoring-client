@@ -4,7 +4,7 @@ import guid from '../../utils/guid';
 import { getKey } from '../common';
 import { isArray } from 'util';
 import { ContentElements, TEXT_ELEMENTS, BODY_ELEMENTS } from 'data/content/common/elements';
-
+import { Maybe } from 'tsmonad';
 import { LegacyTypes } from '../types';
 import { WB_BODY_EXTENSIONS } from 'data/content/workbook/types';
 
@@ -16,7 +16,8 @@ export type WorkbookPageModelParams = {
   type?: string;
   head?: contentTypes.Head,
   body?: ContentElements,
-  lock?: contentTypes.Lock
+  lock?: contentTypes.Lock,
+  bibFile?: Maybe<Object>,
 };
 
 const defaultWorkbookPageModelParams = {
@@ -27,6 +28,7 @@ const defaultWorkbookPageModelParams = {
   head: new contentTypes.Head(),
   body: new ContentElements(),
   lock: new contentTypes.Lock(),
+  bibFile: Maybe.nothing(),
 };
 
 export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModelParams) {
@@ -38,6 +40,7 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
   head: contentTypes.Head;
   body: ContentElements;
   lock: contentTypes.Lock;
+  bibFile: Maybe<Object>;
 
   constructor(params?: WorkbookPageModelParams) {
     params ? super(params) : super();
@@ -89,6 +92,9 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
           model = model.with({ body: ContentElements
             .fromPersistence(item.body, id, WB_ELEMENTS) });
           break;
+        case 'bib:file':
+          model = model.with({ bibFile: Maybe.just(item) });
+          break;
         default:
       }
     });
@@ -102,13 +108,17 @@ export class WorkbookPageModel extends Immutable.Record(defaultWorkbookPageModel
        ? [{ p: { '#text': ' ' } }]
        : this.body.toPersistence();
 
+    const children = [
+      this.head.toPersistence(),
+      { body: { '#array': content } },
+    ];
+
+    this.bibFile.lift(b => children.push(b));
+
     const doc = [{
       workbook_page: {
         '@id': this.resource.id,
-        '#array': [
-          this.head.toPersistence(),
-          { body: { '#array': content } },
-        ],
+        '#array': children,
       },
     }];
 
