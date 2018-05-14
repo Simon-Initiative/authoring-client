@@ -39,6 +39,7 @@ const defaultContent = {
 export class Panopto extends Immutable.Record(defaultContent) {
 
   contentType: 'Panopto';
+  elementType: 'panopto';
   id: string;
   width: string;
   height: string;

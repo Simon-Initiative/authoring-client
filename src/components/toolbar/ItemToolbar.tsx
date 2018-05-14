@@ -74,9 +74,13 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
     const clipboardItem: any = loadFromLocalStorage('clipboard');
     // saveToLocalStorage handles saving contiguous text as a special
     // case, so we handle that here
-    const clipboardElementType = clipboardItem.isContiguousText
+    let clipboardElementType = null;
+
+    if (clipboardItem !== null) {
+      clipboardElementType = clipboardItem.isContiguousText
       ? '#text'
       : Object.keys(clipboardItem)[0];
+    }
 
     return (
       <React.Fragment>
@@ -102,6 +106,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             tooltip="Paste Item"
             size={ToolbarButtonSize.Wide}
             disabled={!(this.hasSelection() &&
+              clipboardItem !== null &&
               parentSupportsElementType(clipboardElementType))}>
             <i className="fa fa-paste" /> Paste
           </ToolbarButton>

@@ -51,6 +51,7 @@ const defaultContent = {
 export class Applet extends Immutable.Record(defaultContent) {
 
   contentType: 'Applet';
+  elementType: 'applet';
   id: string;
   width: string;
   height: string;

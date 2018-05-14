@@ -78,7 +78,7 @@ export class Line extends Immutable.Record(defaultContent) {
           break;
         case 'translation':
           model = model.with({
-            translations: model.translations.set(id, Translation.fromPersistence(item, '')),
+            translations: model.translations.set(id, Translation.fromPersistence(item, id)),
           });
           break;
         default:
@@ -97,12 +97,7 @@ export class Line extends Immutable.Record(defaultContent) {
     const m = {
       line: {
         '@speaker': this.speaker,
-        ...children.reduce(
-          (acc, c) => ({
-            ...acc,
-            ...c,
-          }),
-          {}),
+        '#array': children,
       },
     };
 

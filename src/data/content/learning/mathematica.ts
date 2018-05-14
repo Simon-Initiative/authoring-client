@@ -42,6 +42,7 @@ const defaultContent = {
 export class Mathematica extends Immutable.Record(defaultContent) {
 
   contentType: 'Mathematica';
+  elementType: 'mathematica';
   id: string;
   width: string;
   height: string;

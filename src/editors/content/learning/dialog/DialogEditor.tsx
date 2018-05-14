@@ -78,6 +78,7 @@ export default class DialogEditor
 
   onAddSpeaker(e) {
     e.preventDefault();
+    e.stopPropagation();
 
     const { model, onEdit } = this.props;
 
@@ -94,6 +95,7 @@ export default class DialogEditor
 
   onAddLine(e) {
     e.preventDefault();
+    e.stopPropagation();
 
     const { model, onEdit } = this.props;
     const { lines, speakers } = model;

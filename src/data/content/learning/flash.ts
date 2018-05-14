@@ -47,6 +47,7 @@ const defaultContent = {
 export class Flash extends Immutable.Record(defaultContent) {
 
   contentType: 'Flash';
+  elementType: 'flash';
   id: string;
   width: string;
   height: string;

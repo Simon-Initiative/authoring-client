@@ -45,6 +45,7 @@ const defaultContent = {
 export class Unity extends Immutable.Record(defaultContent) {
 
   contentType: 'Unity';
+  elementType: 'unity';
   id: string;
   width: string;
   height: string;
