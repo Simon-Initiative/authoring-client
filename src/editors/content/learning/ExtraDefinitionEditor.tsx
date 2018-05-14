@@ -186,6 +186,7 @@ export default class ExtraDefinitionEditor
       onDuplicate(content: Object) {},
       onMoveUp(content: Object) {},
       onMoveDown(content: Object) {},
+      onPaste() {},
       props: this.props,
     };
 
@@ -208,6 +209,7 @@ export default class ExtraDefinitionEditor
       onDuplicate(content: Object) {},
       onMoveUp(content: Object) {},
       onMoveDown(content: Object) {},
+      onPaste() {},
       props: this.props,
     };
 
