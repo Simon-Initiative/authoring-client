@@ -8,6 +8,7 @@ export type SymParams = {
 
 const defaultContent = {
   contentType: 'Sym',
+  elementType: 'sym',
   name: 'amp',
   guid: '',
 };
@@ -16,6 +17,7 @@ const defaultContent = {
 export class Sym extends Immutable.Record(defaultContent) {
 
   contentType: 'Sym';
+  elementType: 'sym';
   name: string;
   guid: string;
 
