@@ -3,9 +3,9 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
-import { ToolbarButton } from './ToolbarButton';
-import { ToolbarButtonDropdown } from './ToolbarButtonDropdown';
-import { ToolbarButtonMenu, ToolbarButtonMenuItem } from './ToolbarButtonMenu';
+import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
+import { ToolbarWideMenu, ToolbarButtonMenuItem, ToolbarQuadMenu,
+  ToolbarButtonMenuForm, ToolbarButtonMenuDivider} from './ToolbarButtonMenu';
 import { AppContext } from 'editors/common/AppContext';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
@@ -13,6 +13,7 @@ import { CourseModel } from 'data/models/course';
 import { selectAudio } from 'editors/content/learning/AudioEditor';
 import { selectImage } from 'editors/content/learning/ImageEditor';
 import { selectVideo } from 'editors/content/learning/VideoEditor';
+import { selectFile } from 'editors/content/learning/file';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 
 import guid from 'utils/guid';
@@ -72,138 +73,129 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 
   const supportsAtLeastOne = (...elements) => elements.some(e => parentSupportsElementType(e));
 
+  // Force the user to pick a file, then mutate the object with the given with function
+  // using the supplied parameter name
+  const pickFileThenInsert = (obj: any, paramName: string) => {
+    selectFile('', resourcePath, courseModel, onDisplayModal, onDismissModal)
+      .then((src) => {
+        const params = {};
+        params[paramName] = src;
+        onInsert(obj.with(params));
+      });
+  };
+
+  const imageButton = <ToolbarButton
+        className="btnQuad"
+        onClick={() => {
+          selectImage(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
+            .then((image) => {
+              if (image !== null) {
+                onInsert(image);
+              }
+            });
+        }}
+        disabled={!parentSupportsElementType('image')}>
+      <i className={'fa fa-image'}/>
+    </ToolbarButton>;
+
+  const audioButton = <ToolbarButton
+    className="btnQuad"
+    onClick={() => {
+      selectAudio(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
+        .then((audio) => {
+          if (audio !== null) {
+            onInsert(audio);
+          }
+        });
+    }}
+    disabled={!parentSupportsElementType('audio')}>
+    <i className={'fa fa-volume-up'}/>
+  </ToolbarButton>;
+
+  const youtubeButton = <ToolbarButton
+    className="btnQuad"
+    onClick={() => onInsert(new contentTypes.YouTube())}
+    disabled={!parentSupportsElementType('youtube')}>
+    <i className={'fa fa-youtube'}/>
+  </ToolbarButton>;
+
+  const iFrameButton = <ToolbarButton
+    className="btnQuad"
+    onClick={() => onInsert(new contentTypes.IFrame())}
+    disabled={!parentSupportsElementType('iframe')}>
+    <i className={'fa fa-window-maximize'}/>
+  </ToolbarButton>;
+
+  const figureButton = <ToolbarButton
+    onClick={() => onInsert(new contentTypes.Figure())}
+    tooltip="Insert Figure"
+    disabled={!parentSupportsElementType('figure')}>
+    <i className={'fa fa-address-card'}/>
+    </ToolbarButton>;
+
+  const quoteButton = <ToolbarButton
+    onClick={() => onInsert(new contentTypes.BlockQuote()
+      .with({ text: contentTypes.ContiguousText.fromText('Quote', '')
+        .with({ mode: ContiguousTextMode.SimpleText }) }))}
+    tooltip="Insert Quote"
+    disabled={!parentSupportsElementType('quote')}>
+    <i className={'fa fa-quote-right'}/>
+    </ToolbarButton>;
+
+  const codeBlockButton = <ToolbarButton
+    onClick={() => onInsert(new contentTypes.CodeBlock())}
+    tooltip="Insert Code Block"
+    disabled={!parentSupportsElementType('codeblock')}>
+    <i className={'fa fa-code'}/>
+    </ToolbarButton>;
+
+  const formulaButton = <ToolbarButton
+    onClick={() => onInsert(new contentTypes.BlockFormula().with({
+      text: contentTypes.ContiguousText.fromText('Formula', '')
+        .with({ mode: ContiguousTextMode.SimpleText }),
+    }))}
+    tooltip="Insert Formula"
+    disabled={!parentSupportsElementType('formula')}>
+    <i className="unicode-icon">&#8721;</i>
+    </ToolbarButton>;
+
   return (
     <React.Fragment>
+
+
       <ToolbarLayout.Inline>
-        <ToolbarButton
+
+        <ToolbarLayout.Column maxWidth="100px">
+          <ToolbarButton
+            size={ToolbarButtonSize.Wide}
             onClick={() => onInsert(contentTypes.ContiguousText.fromText('', guid())) }
-            tooltip="Insert Text Block"
             disabled={!parentSupportsElementType('p')}>
-          <i className="unicode-icon">T</i>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
-              const li = new contentTypes.Li();
-              onInsert(new contentTypes.Ol()
-              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
-              }));
-            }
-          }
-            tooltip="Ordered List"
-            disabled={!parentSupportsElementType('ol')}>
-          <i className={'fa fa-list-ol'}/>
-        </ToolbarButton>
-
-        <ToolbarButton
-            onClick={() => {
-              const li = new contentTypes.Li();
-              onInsert(new contentTypes.Ul()
-              .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
-              }));
-            }
-          }
-            tooltip="Unordered List"
-            disabled={!parentSupportsElementType('ul')}>
-          <i className={'fa fa-list-ul'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.WorkbookSection())}
-            tooltip="Insert Section"
-            disabled={!parentSupportsElementType('section')}>
-          <i className={'fa fa-list-alt'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Figure())}
-            tooltip="Insert Figure"
-            disabled={!parentSupportsElementType('figure')}>
-          <i className={'fa fa-address-card'}/>
-        </ToolbarButton>
-        <ToolbarButtonDropdown
-            tooltip="Insert Table"
-            label={<i className={'fa fa-table'}/>}
+              <i className="unicode-icon">T</i> Text
+          </ToolbarButton>
+          <ToolbarWideMenu
+            icon={<i className={'fa fa-table'}/>}
+            label={'Table'}
             disabled={!parentSupportsElementType('table')}>
-          <TableCreation onTableCreate={onTableCreate.bind(this, onInsert)}/>
-        </ToolbarButtonDropdown>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockQuote()
-              .with({ text: contentTypes.ContiguousText.fromText('Quote', '')
-                .with({ mode: ContiguousTextMode.SimpleText }) }))}
-            tooltip="Insert Quote"
-            disabled={!parentSupportsElementType('quote')}>
-          <i className={'fa fa-quote-right'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.CodeBlock())}
-            tooltip="Insert Code Block"
-            disabled={!parentSupportsElementType('codeblock')}>
-          <i className={'fa fa-code'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.BlockFormula().with({
-              text: contentTypes.ContiguousText.fromText('Formula', '')
-                .with({ mode: ContiguousTextMode.SimpleText }),
-            }))}
-            tooltip="Insert Formula"
-            disabled={!parentSupportsElementType('formula')}>
-          <i className="unicode-icon">&#8721;</i>
-        </ToolbarButton>
+            <ToolbarButtonMenuForm>
+              <TableCreation onTableCreate={onTableCreate.bind(this, onInsert)}/>
+            </ToolbarButtonMenuForm>
+          </ToolbarWideMenu>
+        </ToolbarLayout.Column>
 
-        <ToolbarButtonMenu disabled={!supportsAtLeastOne(
+        <ToolbarQuadMenu
+          ulComponent={imageButton}
+          urComponent={youtubeButton}
+          llComponent={audioButton}
+          lrComponent={iFrameButton}
+          disabled={!supportsAtLeastOne(
+          'image', 'audio', 'video', 'youtube', 'iframe',
           'applet', 'flash', 'director', 'mathematica', 'pannopto', 'unity')}
-          tooltip="Third party media elements" icon={<i className={'fa fa-file-video-o'}/>}>
+          >
+          <ToolbarButtonMenuForm>
+            <small className="text-muted">Media elements</small>
+          </ToolbarButtonMenuForm>
+          <ToolbarButtonMenuDivider/>
           <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('applet')} onClick={() => true}>
-            <img src={APPLET_ICON} height={imgSize} width={imgSize}/> Java Applet
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('flash')} onClick={() => true}>
-            <img src={FLASH_ICON} height={imgSize} width={imgSize}/> Adobe Flash
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('director')} onClick={() => true}>
-            <img src={DIRECTOR_ICON} height={imgSize} width={imgSize}/> Adobe Director
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('panopto')} onClick={() => true}>
-            <i style={ { width: 22 } } className={'fa fa-play'}/> Panopto
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('mathematica')} onClick={() => true}>
-            <img src={WOLFRAM_ICON} height={imgSize} width={imgSize}/> Wolfram Mathematica
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('unity')} onClick={() => true}>
-            <img src={UNITY_ICON} height={imgSize} width={imgSize}/> Unity
-          </ToolbarButtonMenuItem>
-        </ToolbarButtonMenu>
-
-        <ToolbarButton
-            onClick={() => {
-              selectImage(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
-                .then((image) => {
-                  if (image !== null) {
-                    onInsert(image);
-                  }
-                });
-            }}
-            tooltip="Insert Image"
-            disabled={!parentSupportsElementType('image')}>
-          <i className={'fa fa-image'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
-              selectAudio(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
-                .then((audio) => {
-                  if (audio !== null) {
-                    onInsert(audio);
-                  }
-                });
-            }}
-            tooltip="Insert Audio Clip"
-            disabled={!parentSupportsElementType('audio')}>
-          <i className={'fa fa-volume-up'}/>
-        </ToolbarButton>
-        <ToolbarButton
             onClick={() => {
               selectVideo(null, resourcePath, courseModel, onDisplayModal, onDismissModal)
                 .then((video) => {
@@ -212,35 +204,69 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                   }
                 });
             }}
-            tooltip="Insert Video Clip"
             disabled={!parentSupportsElementType('video')}>
-          <i className={'fa fa-film'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.YouTube())}
-            tooltip="Insert YouTube Video"
-            disabled={!parentSupportsElementType('youtube')}>
-          <i className={'fa fa-youtube'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.IFrame())}
-            tooltip="Embed Web Page"
-            disabled={!parentSupportsElementType('iframe')}>
-          <i className={'fa fa-window-maximize'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onInsert(new contentTypes.Pullout())}
-            tooltip="Insert Pullout"
-            disabled={!parentSupportsElementType('pullout')}>
-          <i className={'fa fa-external-link-square'}/>
-        </ToolbarButton>
-        <ToolbarButton
+              <i style={ { width: 22 } } className={'fa fa-film'}/>OLI hosted video
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuDivider/>
+          <ToolbarButtonMenuForm>
+            <small className="text-muted">Third party media extensions</small>
+          </ToolbarButtonMenuForm>
+          <ToolbarButtonMenuDivider/>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('mathematica')}
+            onClick={() => pickFileThenInsert(new contentTypes.Mathematica(), 'src')}>
+            <img src={WOLFRAM_ICON} height={imgSize} width={imgSize}/> Wolfram Mathematica
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('applet')}
+            onClick={() => pickFileThenInsert(new contentTypes.Applet(), 'archive')}>
+            <img src={APPLET_ICON} height={imgSize} width={imgSize}/> Java Applet
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('flash')}
+            onClick={() => pickFileThenInsert(new contentTypes.Flash(), 'src')}>
+            <img src={FLASH_ICON} height={imgSize} width={imgSize}/> Adobe Flash
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('director')}
+            onClick={() => pickFileThenInsert(new contentTypes.Director(), 'src')}>
+            <img src={DIRECTOR_ICON} height={imgSize} width={imgSize}/> Adobe Director
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('panopto')}
+            onClick={() => pickFileThenInsert(new contentTypes.Panopto(), 'src')}>
+            <i style={ { width: 22 } } className={'fa fa-play'}/> Panopto
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('mathematica')}
+            onClick={() => pickFileThenInsert(new contentTypes.Mathematica(), 'src')}>
+            <img src={WOLFRAM_ICON} height={imgSize} width={imgSize}/> Wolfram Mathematica
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
+            disabled={!parentSupportsElementType('unity')}
+            onClick={() => pickFileThenInsert(new contentTypes.Unity(), 'src')}>
+            <img src={UNITY_ICON} height={imgSize} width={imgSize}/> Unity
+          </ToolbarButtonMenuItem>
+        </ToolbarQuadMenu>
+
+        <ToolbarQuadMenu
+          ulComponent={quoteButton}
+          urComponent={codeBlockButton}
+          llComponent={formulaButton}
+          lrComponent={figureButton}
+          disabled={!supportsAtLeastOne(
+          'definition', 'example')}
+          >
+          <ToolbarButtonMenuForm>
+            <small className="text-muted">Curriculum elements</small>
+          </ToolbarButtonMenuForm>
+          <ToolbarButtonMenuDivider/>
+          <ToolbarButtonMenuItem
             onClick={() => onInsert(new contentTypes.Example())}
-            tooltip="Insert Example"
             disabled={!parentSupportsElementType('example')}>
-          <i className={'fa fa-bar-chart'}/>
-        </ToolbarButton>
-        <ToolbarButton
+              <i style={ { width: 22 } } className={'fa fa-bar-chart'}/> Example
+          </ToolbarButtonMenuItem>
+          <ToolbarButtonMenuItem
             onClick={() => {
 
               const material = contentTypes.Material.fromText('', '');
@@ -251,106 +277,169 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 
               onInsert(definition.with({ meaning: definition.meaning.set(meaning.guid, meaning) }));
             }}
-            tooltip="Insert Definition"
             disabled={!parentSupportsElementType('definition')}>
-          <i className={'fa fa-book'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
+              <i style={ { width: 22 } } className={'fa fa-book'}/> Definition
+          </ToolbarButtonMenuItem>
+        </ToolbarQuadMenu>
 
-              const material1 = new contentTypes.Material();
-              const material2 = new contentTypes.Material();
+        <ToolbarLayout.Column maxWidth="100px">
+          <ToolbarWideMenu
+            icon={<i className={'fa fa-table'}/>}
+            label={'Lists'}
+            disabled={!supportsAtLeastOne(
+              'ul', 'ol')}>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const li = new contentTypes.Li();
+                onInsert(new contentTypes.Ol()
+                .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
+                }));
+              }}
+              disabled={!parentSupportsElementType('ol')}>
+                <i style={ { width: 22 } } className={'fa fa-list-ol'}/> Ordered list
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const li = new contentTypes.Li();
+                onInsert(new contentTypes.Ul()
+                .with({ listItems: Immutable.OrderedMap<string, contentTypes.Li>().set(li.guid, li),
+                }));
+              }}
+              disabled={!parentSupportsElementType('ul')}>
+                <i style={ { width: 22 } } className={'fa fa-list-ul'}/> Unordered list
+            </ToolbarButtonMenuItem>
+          </ToolbarWideMenu>
 
-              const materials = new contentTypes.Materials().with({
-                content: Immutable.OrderedMap<string, contentTypes.Material>()
-                  .set(material1.guid, material1)
-                  .set(material2.guid, material2),
-              });
+          <ToolbarWideMenu
+            icon={<i className={'fa fa-graduation-cap'}/>}
+            label={'Learning'}
+            disabled={!supportsAtLeastOne(
+              'wb:inline', 'activity', 'composite_activity')}>
+            <ToolbarButtonMenuItem
+              onClick={() => onDisplayModal(
+                <ResourceSelection
+                  filterPredicate={(
+                    res: Resource): boolean =>
+                      res.type === LegacyTypes.inline}
+                  courseId={context.courseId}
+                  onInsert={(resource) => {
+                    onDismissModal();
+                    const resources = context.courseModel.resources.toArray();
+                    const found = resources.find(r => r.id === resource.id);
+                    if (found !== undefined) {
+                      onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                    }
+                  }}
+                  onCancel={onDismissModal}
+                />)
+              }
+              disabled={!parentSupportsElementType('wb:inline')}>
+                <i style={ { width: 22 } } className={'fa fa-flask'}/> Inline assessment
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => onDisplayModal(
+                <ResourceSelection
+                  filterPredicate={(
+                    res: Resource): boolean =>
+                      res.type === LegacyTypes.assessment2}
+                  courseId={context.courseId}
+                  onInsert={(resource) => {
+                    onDismissModal();
+                    const resources = context.courseModel.resources.toArray();
+                    const found = resources.find(r => r.id === resource.id);
+                    if (found !== undefined) {
+                      onInsert(new contentTypes.Activity().with({ idref: found.id }));
+                    }
+                  }}
+                  onCancel={onDismissModal}
+                />)
+              }
+              disabled={!parentSupportsElementType('activity')}>
+                <i style={ { width: 22 } } className={'fa fa-check'}/> Activity
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const composite = new contentTypes.Composite({
+                  title: Maybe.just(Title.fromText('Title')),
+                });
+                onInsert(composite);
+              }}
+              disabled={!parentSupportsElementType('composite_activity')}>
+                <i style={ { width: 22 } } className={'fa fa-square-o'}/> Composite activity
+            </ToolbarButtonMenuItem>
+          </ToolbarWideMenu>
+        </ToolbarLayout.Column>
 
-              onInsert(materials);
-            }}
-            tooltip="Insert Horizontal Layout"
-            disabled={!parentSupportsElementType('materials')}>
-          <i className={'fa fa-columns'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
-              const composite = new contentTypes.Composite({
-                title: Maybe.just(Title.fromText('Title')),
-              });
-              onInsert(composite);
-            }}
-            tooltip="Insert Composite Activity"
-            disabled={!parentSupportsElementType('composite_activity')}>
-          <i className={'fa fa-clone'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => {
-              const alt1 = new contentTypes.Alternative().with({
-                value: 'Item-1',
-                title: contentTypes.Title.fromText('Item-1'),
-              });
-              const alt2 = new contentTypes.Alternative().with({
-                value: 'Item-2',
-                title: contentTypes.Title.fromText('Item-2'),
-              });
+        <ToolbarLayout.Column maxWidth="100px">
+          <ToolbarWideMenu
+            icon={<i className={'fa fa-clone'}/>}
+            label={'Layout'}
+            disabled={!supportsAtLeastOne(
+              'section', 'pullout', 'materials')}>
+            <ToolbarButtonMenuItem
+              onClick={() => onInsert(new contentTypes.Pullout())}
+              disabled={!parentSupportsElementType('pullout')}>
+                <i style={ { width: 22 } } className={'fa fa-external-link-square'}/> Pullout
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => onInsert(new contentTypes.WorkbookSection())}
+              disabled={!parentSupportsElementType('section')}>
+                <i style={ { width: 22 } } className={'fa fa-list-alt'}/> Section
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
 
-              const alts = new contentTypes.Alternatives().with({
-                content: Immutable.OrderedMap<string, contentTypes.Alternative>()
-                  .set(alt1.guid, alt1)
-                  .set(alt2.guid, alt2),
-              });
+                const material1 = new contentTypes.Material();
+                const material2 = new contentTypes.Material();
 
-              onInsert(alts);
-            }}
-            tooltip="Insert Variable Content"
-            disabled={!parentSupportsElementType('alternatives')}>
-          <i className={'fa fa-cogs'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onDisplayModal(
-              <ResourceSelection
-                filterPredicate={(
-                  res: Resource): boolean =>
-                    res.type === LegacyTypes.inline}
-                courseId={context.courseId}
-                onInsert={(resource) => {
-                  onDismissModal();
-                  const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.id === resource.id);
-                  if (found !== undefined) {
-                    onInsert(new contentTypes.WbInline().with({ idref: found.id }));
-                  }
-                }}
-                onCancel={onDismissModal}
-              />)
-            }
-            tooltip="Insert Inline Assessment"
-            disabled={!parentSupportsElementType('wb:inline')}>
-          <i className={'fa fa-flask'}/>
-        </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onDisplayModal(
-              <ResourceSelection
-                filterPredicate={(
-                  res: Resource): boolean =>
-                    res.type === LegacyTypes.assessment2}
-                courseId={context.courseId}
-                onInsert={(resource) => {
-                  onDismissModal();
-                  const resources = context.courseModel.resources.toArray();
-                  const found = resources.find(r => r.id === resource.id);
-                  if (found !== undefined) {
-                    onInsert(new contentTypes.Activity().with({ idref: found.id }));
-                  }
-                }}
-                onCancel={onDismissModal}
-              />)
-            }
-            tooltip="Insert Activity"
-            disabled={!parentSupportsElementType('activity')}>
-          <i className={'fa fa-check'}/>
-        </ToolbarButton>
+                const materials = new contentTypes.Materials().with({
+                  content: Immutable.OrderedMap<string, contentTypes.Material>()
+                    .set(material1.guid, material1)
+                    .set(material2.guid, material2),
+                });
+
+                onInsert(materials);
+              }}
+              disabled={!parentSupportsElementType('materials')}>
+                <i style={ { width: 22 } } className={'fa fa-columns'}/> Horizontal group
+            </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => onInsert(new contentTypes.WorkbookSection())}
+              disabled={!parentSupportsElementType('section')}>
+                <i style={ { width: 22 } } className={'fa fa-list-alt'}/> Section
+            </ToolbarButtonMenuItem>
+          </ToolbarWideMenu>
+
+          <ToolbarWideMenu
+            icon={<i className={'fa fa-cogs'}/>}
+            label={'Advanced'}
+            disabled={!supportsAtLeastOne(
+              'alternatives')}>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const alt1 = new contentTypes.Alternative().with({
+                  value: 'Item-1',
+                  title: contentTypes.Title.fromText('Item-1'),
+                });
+                const alt2 = new contentTypes.Alternative().with({
+                  value: 'Item-2',
+                  title: contentTypes.Title.fromText('Item-2'),
+                });
+
+                const alts = new contentTypes.Alternatives().with({
+                  content: Immutable.OrderedMap<string, contentTypes.Alternative>()
+                    .set(alt1.guid, alt1)
+                    .set(alt2.guid, alt2),
+                });
+
+                onInsert(alts);
+              }}
+              disabled={!parentSupportsElementType('alternatives')}>
+                <i style={ { width: 22 } } className={'fa fa-plus-square'}/> Variable content
+            </ToolbarButtonMenuItem>
+          </ToolbarWideMenu>
+        </ToolbarLayout.Column>
+
       </ToolbarLayout.Inline>
     </React.Fragment>
   );

@@ -67,7 +67,8 @@ export const styles: JSSStyles = {
       },
     },
     '&.wide': {
-      minWidth: 72,
+      minWidth: 84,
+      maxWidth: 84,
       height: 32,
     },
   },
