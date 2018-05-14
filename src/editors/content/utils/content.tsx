@@ -4,6 +4,13 @@ import distinct from 'styles/palettes/distinct';
 import flatui from 'styles/palettes/flatui';
 
 export const CONTENT_COLORS = {
+  Param: flatui.silver,
+  Applet: flatui.greenSea,
+  Flash: flatui.greenSea,
+  Director: flatui.greenSea,
+  Mathematica: flatui.greenSea,
+  Panopto: flatui.greenSea,
+  Unity: flatui.greenSea,
   ContiguousText: flatui.orange,
   CodeBlock: flatui.wetAsphalt,
   Composite: flatui.belizeHole,
@@ -43,6 +50,13 @@ export const CONTENT_COLORS = {
 };
 
 export const CONTENT_ICONS = {
+  Applet: <i className={'fa fa-coffee'}/>,
+  Flash: <i className={'fa fa-bolt'}/>,
+  Director: <i className={'fa fa-compass'}/>,
+  Panopto: <i className={'fa fa-video-camera'}/>,
+  Unity: <i className={'fa fa-gamepad'}/>,
+  Param: <i className={'fa fa-sticky-note-o'}/>,
+  Mathematica: <i className="unicode-icon">&int;</i>,
   ContiguousText: <i className="unicode-icon">T</i>,
   CodeBlock: <i className={'fa fa-code'}/>,
   Composite: <i className={'fa fa-clone'}/>,

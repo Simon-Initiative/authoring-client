@@ -13,6 +13,12 @@ export function registerContentTypes() {
   registerType('custom', ct.Custom.fromPersistence);
   registerType('extra', ct.Extra.fromPersistence);
   registerType('anchor', ct.Anchor.fromPersistence);
+  registerType('applet', ct.Applet.fromPersistence);
+  registerType('director', ct.Director.fromPersistence);
+  registerType('mathematica', ct.Mathematica.fromPersistence);
+  registerType('flash', ct.Flash.fromPersistence);
+  registerType('panopto', ct.Panopto.fromPersistence);
+  registerType('unity', ct.Unity.fromPersistence);
   registerType('td', ct.CellData.fromPersistence);
   registerType('th', ct.CellHeader.fromPersistence);
   registerType('cite', ct.Cite.fromPersistence);
