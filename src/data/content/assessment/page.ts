@@ -21,6 +21,7 @@ export type PageParams = {
 
 const defaultPageParams = {
   contentType: 'Page',
+  elementType: 'page',
   id: '',
   title: new Title({ text: ContentElements.fromText('Assessment Page Title', '', TEXT_ELEMENTS) }),
   nodes: Immutable.OrderedMap<string, Node>(),
@@ -30,6 +31,7 @@ const defaultPageParams = {
 export class Page extends Immutable.Record(defaultPageParams) {
 
   contentType: 'Page';
+  elementType: 'page';
   id: string;
   title: Title;
   nodes: Immutable.OrderedMap<string, Node>;

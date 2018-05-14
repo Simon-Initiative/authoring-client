@@ -16,6 +16,7 @@ export type IncludeParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Include,
+  elementType: 'include',
   title: Maybe.nothing<string>(),
   idref: '',
   organziation: '',
@@ -25,15 +26,16 @@ const defaultContent = {
 };
 
 export class Include extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Include;
+  elementType: 'include';
   organization: string;
   title: Maybe<string>;
   version: string;
   idref: string;
   grainSize: Maybe<types.GrainSizes>;
   guid: string;
-  
+
   constructor(params?: IncludeParams) {
     super(augment(params));
   }
@@ -59,37 +61,37 @@ export class Include extends Immutable.Record(defaultContent) {
     if (s['@grain_size'] !== undefined) {
       model = model.with({ grainSize: s['@grain_size'] });
     }
-    
+
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
-     
+
       switch (key) {
         case 'title':
           model = model.with({ title: item['title']['#text'] });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       include: {
         '@idref': this.idref,
         '@organization': this.organization,
         '@version': this.version,
-      }, 
+      },
     };
 
     this.grainSize.lift(g => s.include['@grain_size'] = g);
     this.title.lift(text => s.include['#array'] = [{ title: { '#text': text } }]);
-    
+
     return s;
   }
 }

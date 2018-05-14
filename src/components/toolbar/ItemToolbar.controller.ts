@@ -21,6 +21,7 @@ interface DispatchProps {
 interface OwnProps {
   context: AppContext;
   courseModel: CourseModel;
+  parentSupportsElementType: (type: string) => boolean;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

@@ -17,6 +17,7 @@ export type WbInlineParams = {
 
 const defaultContent = {
   contentType: 'WbInline',
+  elementType: 'wb:inline',
   idref: '',
   src: '',
   width: '',
@@ -29,6 +30,7 @@ const defaultContent = {
 export class WbInline extends Immutable.Record(defaultContent) {
 
   contentType: 'WbInline';
+  elementType: 'wb:inline';
   idref: string;
   src: string;
   width: string;

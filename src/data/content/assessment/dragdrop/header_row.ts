@@ -11,6 +11,7 @@ export type HeaderRowParams = {
 
 const defaultContent = {
   contentType: 'HeaderRow',
+  elementType: 'headerRow',
   guid: '',
   cols: Immutable.List<DndText>(),
 };
@@ -18,6 +19,7 @@ const defaultContent = {
 export class HeaderRow extends Immutable.Record(defaultContent) {
 
   contentType: 'HeaderRow';
+  elementType: 'headerRow';
   guid: string;
   cols: Immutable.List<DndText>;
 

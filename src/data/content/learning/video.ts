@@ -34,6 +34,7 @@ export type VideoParams = {
 
 const defaultContent = {
   contentType: 'Video',
+  elementType: 'video',
   id: '',
   title: '',
   src: '',
@@ -56,6 +57,7 @@ const defaultContent = {
 export class Video extends Immutable.Record(defaultContent) {
 
   contentType: 'Video';
+  elementType: 'video';
   id: string;
   title: string;
   src: string;

@@ -24,6 +24,7 @@ export type TableParams = {
 const defaultContent = {
   id: '',
   contentType: 'Table',
+  elementType: 'table',
   summary: '',
   title: new Title(),
   caption: new Caption(),
@@ -45,6 +46,7 @@ function createDefaultRows() {
 export class Table extends Immutable.Record(defaultContent) {
   id: string;
   contentType: 'Table';
+  elementType: 'table';
   rowstyle: string;
   summary: string;
   title: Title;

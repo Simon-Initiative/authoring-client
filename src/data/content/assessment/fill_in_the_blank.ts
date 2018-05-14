@@ -15,17 +15,19 @@ export type FillInTheBlankParams = {
 };
 
 const defaultContent = {
+  contentType: 'FillInTheBlank',
+  elementType: 'fill_in_the_blank',
   choices: Immutable.OrderedMap<string, Choice>(),
   id: '',
   name: '',
   shuffle: true,
   guid: '',
-  contentType: 'FillInTheBlank',
 };
 
 export class FillInTheBlank extends Immutable.Record(defaultContent) {
 
   contentType: 'FillInTheBlank';
+  elementType: 'fill_in_the_blank';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
   name : string;

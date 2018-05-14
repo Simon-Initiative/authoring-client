@@ -18,18 +18,20 @@ export type SequencesParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Sequences,
+  elementType: 'sequences',
   progressConstraints: Maybe.nothing<ProgressConstraints>(),
   children: Immutable.OrderedMap<string, Sequence | Include>(),
   guid: '',
 };
 
 export class Sequences extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Sequences;
+  elementType: 'sequences';
   progressConstraints: Maybe<ProgressConstraints>;
   children: Immutable.OrderedMap<string, Sequence | Include>;
   guid: string;
-  
+
   constructor(params?: SequencesParams) {
     super(defaultIdGuid(params));
   }
@@ -42,12 +44,12 @@ export class Sequences extends Immutable.Record(defaultContent) {
 
     const s = (root as any).sequences;
     let model = new Sequences({ guid });
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'progress_constraints':
           model = model.with(
@@ -62,10 +64,10 @@ export class Sequences extends Immutable.Record(defaultContent) {
             { children: model.children.set(id, Include.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -78,12 +80,12 @@ export class Sequences extends Immutable.Record(defaultContent) {
 
     if (children.length === 0) {
       children.push(new Sequence().with({ title: 'Placeholder' }).toPersistence());
-    } 
-    
-    const s = { 
+    }
+
+    const s = {
       sequences: {
         '#array': children,
-      }, 
+      },
     };
 
     return s;

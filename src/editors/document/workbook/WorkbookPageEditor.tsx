@@ -106,7 +106,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   onBodyEdit(content : any, source: Object) {
     const model = this.props.model.with({ body: content });
-
     this.props.onUpdateContent(this.props.context.documentId, source);
 
     this.handleEdit(model);

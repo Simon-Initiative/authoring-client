@@ -9,12 +9,14 @@ export type DefaultParams = {
 
 const defaultContent = {
   contentType: 'Default',
+  elementType: 'default',
   content: '',
   guid: '',
 };
 
 export class Default extends Immutable.Record(defaultContent) {
   contentType: 'Default';
+  elementType: 'default';
   content: string;
   guid: string;
 

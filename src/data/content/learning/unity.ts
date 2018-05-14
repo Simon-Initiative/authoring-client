@@ -28,6 +28,7 @@ export type UnityParams = {
 
 const defaultContent = {
   contentType: 'Unity',
+  elementType: 'unity',
   id: '',
   width: '800',
   height: '450',
@@ -45,6 +46,7 @@ const defaultContent = {
 export class Unity extends Immutable.Record(defaultContent) {
 
   contentType: 'Unity';
+  elementType: 'unity';
   id: string;
   width: string;
   height: string;

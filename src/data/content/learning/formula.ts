@@ -10,6 +10,7 @@ export type FormulaParams = {
 
 const defaultContent = {
   contentType: 'Formula',
+  elementType: 'formula',
   text: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   guid: '',
 };
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Formula extends Immutable.Record(defaultContent) {
 
   contentType: 'Formula';
+  elementType: 'formula';
   text: ContentElements;
   guid: string;
 

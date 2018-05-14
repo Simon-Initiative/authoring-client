@@ -10,23 +10,25 @@ export type ShortAnswerParams = {
 };
 
 const defaultContent = {
+  contentType: 'ShortAnswer',
+  elementType: 'short_answer',
   id: '',
   name: '',
   caseSensitive: false,
   whitespace: 'trim',
   guid: '',
-  contentType: 'ShortAnswer',
 };
 
 export class ShortAnswer extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'ShortAnswer';
+  elementType: 'short_answer';
   id : string;
   name : string;
   caseSensitive: boolean;
   whitespace: string;
   guid: string;
-  
+
   constructor(params?: ShortAnswerParams) {
     super(augment(params));
   }
@@ -36,7 +38,7 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : ShortAnswer {
-    
+
     const n = (json as any).short_answer;
     let model = new ShortAnswer({ guid });
 
@@ -52,7 +54,7 @@ export class ShortAnswer extends Immutable.Record(defaultContent) {
     if (n['@case_sensitive'] !== undefined) {
       model = model.with({ caseSensitive: n['@case_sensitive'] });
     }
-    
+
     return model;
 
   }

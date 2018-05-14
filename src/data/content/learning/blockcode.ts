@@ -11,6 +11,7 @@ export type BlockCodeParams = {
 
 const defaultContent = {
   contentType: 'BlockCode',
+  elementType: 'blockcode',
   text: ContiguousText.fromText('', '').with({ mode: ContiguousTextMode.SimpleText }),
   guid: '',
 };
@@ -18,6 +19,7 @@ const defaultContent = {
 export class BlockCode extends Immutable.Record(defaultContent) {
 
   contentType: 'BlockCode';
+  elementType: 'blockcode';
   text: ContiguousText;
   guid: string;
 

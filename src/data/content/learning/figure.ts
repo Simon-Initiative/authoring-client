@@ -24,6 +24,7 @@ export type FigureParams = {
 
 const defaultContent = {
   contentType: 'Figure',
+  elementType: 'figure',
 
   guid: '',
   id: Maybe.nothing(),
@@ -35,6 +36,7 @@ const defaultContent = {
 
 export class Figure extends Immutable.Record(defaultContent) {
   contentType: 'Figure';
+  elementType: 'figure';
 
   guid: string;
   id: Maybe<string>;
