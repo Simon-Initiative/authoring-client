@@ -24,6 +24,7 @@ export type PanoptoParams = {
 
 const defaultContent = {
   contentType: 'Panopto',
+  elementType: 'panopto',
   id: '',
   width: '800',
   height: '450',

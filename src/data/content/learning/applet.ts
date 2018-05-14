@@ -31,6 +31,7 @@ export type AppletParams = {
 
 const defaultContent = {
   contentType: 'Applet',
+  elementType: 'applet',
   id: '',
   width: '800',
   height: '450',

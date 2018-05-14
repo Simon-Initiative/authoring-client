@@ -26,6 +26,7 @@ export type MathematicaParams = {
 
 const defaultContent = {
   contentType: 'Mathematica',
+  elementType: 'mathematica',
   id: '',
   width: '800',
   height: '450',

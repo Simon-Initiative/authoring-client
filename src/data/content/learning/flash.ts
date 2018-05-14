@@ -29,6 +29,7 @@ export type FlashParams = {
 
 const defaultContent = {
   contentType: 'Flash',
+  elementType: 'flash',
   id: '',
   width: '800',
   height: '450',

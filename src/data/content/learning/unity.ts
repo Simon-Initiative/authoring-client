@@ -28,6 +28,7 @@ export type UnityParams = {
 
 const defaultContent = {
   contentType: 'Unity',
+  elementType: 'unity',
   id: '',
   width: '800',
   height: '450',
