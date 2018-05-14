@@ -96,9 +96,9 @@ export function buildMissingObjectivesMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'Alert',
+    title: 'No Learning Objectives',
     // tslint:disable-next-line:max-line-length
-    message: 'This page doesn\'t include Learning Objectives. Click "Learn More" to read about how a course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
+    message: 'Your course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
   });
 
   return new Messages.Message().with({
@@ -131,9 +131,9 @@ export function buildMissingSkillsMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'Alert',
+    title: 'No Skills',
     // tslint:disable-next-line:max-line-length
-    message: 'Skills must be added to Learning Objectives so you can attach them to the questions in this assessment. Click "Learn More" to read about how a course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
+    message: 'Skills must be added to Learning Objectives before they can be attached to the questions in this assessment.',
   });
 
   return new Messages.Message().with({
