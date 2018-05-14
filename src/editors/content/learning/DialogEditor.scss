@@ -1,7 +1,12 @@
 .speakerContainer {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  // flex-wrap: wrap;
   margin: 10px 0 20px 0;
+
+  div {
+    // display: inline-block;
+  }
 
   .content-decorator {
     margin-left: 30px;
@@ -18,6 +23,7 @@
 
 .addButton {
   display: flex;
+
   justify-content: center;
   align-items: center;
   color: #0067cb;
@@ -34,11 +40,12 @@
 
   &.addSpeaker {
     height: 182px;
-    width: 150px;
+    width: 100px;
   }
 
   &.addLine {
+    margin-left: 30px;
     height: 90px;
-    width: 135px;
+    width: 76px;
   }
 }

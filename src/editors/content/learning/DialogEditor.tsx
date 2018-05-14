@@ -7,8 +7,6 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import SpeakerEditor from 'editors/content/learning/SpeakerEditor';
-import LineEditor from 'editors/content/learning/LineEditor';
 import './DialogEditor.scss';
 import { Maybe } from 'tsmonad';
 import guid from 'utils/guid';
@@ -33,6 +31,7 @@ export default class DialogEditor
     this.onAddLine = this.onAddLine.bind(this);
     this.onLineEdit = this.onLineEdit.bind(this);
     this.onSpeakerEdit = this.onSpeakerEdit.bind(this);
+    this.overrideSpeakerRemove = this.overrideSpeakerRemove.bind(this);
   }
 
   onTitleEdit(ct: ContiguousText, sourceObject) {
@@ -127,9 +126,20 @@ export default class DialogEditor
     );
   }
 
+  overrideSpeakerRemove(model: ContentElements, speaker: contentTypes.Speaker): boolean {
+    // Prevent removal of last speaker
+    if (model.size < 2) {
+      return true;
+    }
+
+    // Prevent removal if speaker is used in any lines
+    return this.props.model.lines.reduce(
+      (speakerUsed, line) => line.speaker === speaker.id ? true : speakerUsed,
+      false);
+  }
+
   renderMain(): JSX.Element {
     const { model } = this.props;
-    const { media } = model;
 
     const speakers = new ContentElements().with({
       content: model.speakers,
@@ -160,6 +170,7 @@ export default class DialogEditor
             model={speakers}
             onEdit={this.onSpeakerEdit}
             layout={Layout.Horizontal}
+            overrideRemove={this.overrideSpeakerRemove}
           />
           <div className="addButton addSpeaker">
             <a onClick={this.onAddSpeaker}>
@@ -174,14 +185,15 @@ export default class DialogEditor
             model={lines}
             onEdit={this.onLineEdit}
             bindProperties={bindSpeakers}
+            overrideRemove={(model: ContentElements, childModel) => model.size < 2}
           />
         </div>
         {model.speakers.size > 0
           ? <div className="addButton addLine">
-              <a onClick={this.onAddLine}>
-                <i className="fa fa-plus"></i>
-              </a>
-            </div>
+            <a onClick={this.onAddLine}>
+              <i className="fa fa-plus"></i>
+            </a>
+          </div>
           : null}
       </div>
     );

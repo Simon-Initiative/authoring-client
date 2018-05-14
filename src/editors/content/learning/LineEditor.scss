@@ -9,5 +9,9 @@
 }
 
 .lineText {
-  height: 36px;
+  min-height: 36px;
+
+  button {
+    padding-left: 30px;
+  }
 }

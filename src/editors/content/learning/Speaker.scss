@@ -7,9 +7,11 @@
   p {
     text-align: center;
     margin: 0;
+    text-overflow: ellipsis;
+    width: inherit;
   }
 
-  .large {
+  &.large {
     width: 150px;
     height: 182px;
 
@@ -27,7 +29,7 @@
     }
   }
 
-  .small {
+  &.small {
     width: 73px;
     height: 89px;
 

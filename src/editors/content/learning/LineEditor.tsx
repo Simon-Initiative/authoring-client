@@ -10,6 +10,9 @@ import './LineEditor.scss';
 import MaterialEditor from 'editors/content/learning/MaterialEditor';
 import { AppContext } from 'editors/common/AppContext';
 import * as Immutable from 'immutable';
+import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import guid from 'utils/guid';
 
 export interface LineEditorProps extends AbstractContentEditorProps<contentTypes.Line> {
   onShowSidebar: () => void;
@@ -28,6 +31,34 @@ export default class LineEditor
 
     this.selectSpeaker = this.selectSpeaker.bind(this);
     this.onMaterialEdit = this.onMaterialEdit.bind(this);
+    this.onAddTranslation = this.onAddTranslation.bind(this);
+    this.onTranslationEdit = this.onTranslationEdit.bind(this);
+  }
+
+  onAddTranslation() {
+
+    const id = guid();
+
+    const translation = new contentTypes.Translation().with({ guid: id });
+    const model = this.props.model.with({
+      translations: this.props.model.translations.set(translation.guid, translation),
+    });
+
+    this.props.onEdit(model, translation);
+  }
+
+  onTranslationEdit(elements, src) {
+
+    const items = elements
+      .content
+      .toArray()
+      .map(e => [e.guid, e]);
+
+    const model = this.props.model.with({
+      translations: Immutable.OrderedMap<string, contentTypes.Translation>(items),
+    });
+
+    this.props.onEdit(model, src);
   }
 
   selectSpeaker(e, selectedSpeaker) {
@@ -42,13 +73,13 @@ export default class LineEditor
     onEdit(newModel, newModel);
   }
 
-  onMaterialEdit(material: contentTypes.Material, sourceObject) {
+  onMaterialEdit(material: contentTypes.Material, src) {
     const { model, onEdit } = this.props;
     const newModel = model.with({
       material,
     });
 
-    onEdit(newModel, sourceObject);
+    onEdit(newModel, src);
   }
 
 
@@ -66,17 +97,37 @@ export default class LineEditor
   }
 
   renderMain(): JSX.Element {
-    const { context, model, speakers, onShowSidebar } = this.props;
-    const { material, translations } = model;
+    const { context, model, speakers, editMode } = this.props;
+    const { material } = model;
 
     const speaker = speakers.find(speaker => speaker.id === model.speaker);
+
+    const translations = new ContentElements().with({
+      content: model.translations,
+    });
+
+    const getLabel = (e, i) => <span>{e.contentType + ' ' + (i + 1)}</span>;
+
+    const labels = {};
+    model.translations.toArray().map((e, i) => labels[e.guid] = getLabel(e, i));
+
+    const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];
+
+    const translationEditors = model.translations.size > 0
+      ? <ContentContainer
+        {...this.props}
+        model={translations}
+        bindProperties={bindLabel}
+        onEdit={this.onTranslationEdit}
+      />
+      : null;
 
     return (
       <div className="lineEditor">
         <Speaker
           context={context}
           model={speaker}
-          size={SpeakerSize.Small}   />
+          size={SpeakerSize.Small} />
         <Dropdown label="">
           {speakers.toArray().map(speaker =>
             <DropdownItem
@@ -85,13 +136,19 @@ export default class LineEditor
               label={speaker.title.caseOf({
                 just: title => title,
                 nothing: () => 'Unnamed speaker',
-              })}/>)}
+              })} />)}
         </Dropdown>
         <div className="lineText">
           <MaterialEditor
             {...this.props}
             model={material}
-            onEdit={this.onMaterialEdit} />
+            onEdit={this.onMaterialEdit}
+            overrideRemove={(model: ContentElements, childModel) => model.size < 2} />
+          {translationEditors}
+          <button type="button"
+            disabled={!editMode}
+            onClick={this.onAddTranslation}
+            className="btn btn-link">+ Add translation</button>
         </div>
       </div>
     );

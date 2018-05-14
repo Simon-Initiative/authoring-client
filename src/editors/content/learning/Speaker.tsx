@@ -1,11 +1,9 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC, classNames } from 'styles/jss';
 import * as contentTypes from 'data/contentTypes';
 import { styles } from './Speaker.styles';
 import './Speaker.scss';
-import { ContentType } from 'types/messages';
 import { AppContext } from 'editors/common/AppContext';
 import { buildUrl } from 'utils/path';
 
@@ -28,7 +26,7 @@ export const Speaker: React.StatelessComponent<StyledComponentProps<SpeakerProps
   = injectSheetSFC<SpeakerProps>(styles)(({
     context, className, classes, children, model, size = SpeakerSize.Large,
   }) => {
-    const { title, id, content } = model;
+    const { title, content } = model;
 
     const src = content.caseOf({
       just: content =>
@@ -47,13 +45,11 @@ export const Speaker: React.StatelessComponent<StyledComponentProps<SpeakerProps
     });
 
     return (
-      <div className="speaker">
-        <div className={classNames([classes.Speaker, size, className])}>
-          <div className="imageContainer">
-            <img src={src} alt={displayTitle} />
-          </div>
-          <p>{displayTitle}</p>
+      <div className={classNames(['speaker', size, className])}>
+        <div className="imageContainer">
+          <img src={src} alt={displayTitle} />
         </div>
+        <p>{displayTitle}</p>
       </div>
     );
   });

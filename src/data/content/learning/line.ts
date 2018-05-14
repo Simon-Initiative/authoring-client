@@ -23,7 +23,7 @@ const defaultContent = {
   title: Maybe.nothing<string>(),
   speaker: '',
   material: new Material(),
-  translations: Immutable.OrderedMap(),
+  translations: Immutable.OrderedMap<string, Translation>(),
 };
 
 export class Line extends Immutable.Record(defaultContent) {

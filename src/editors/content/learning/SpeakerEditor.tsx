@@ -33,18 +33,30 @@ export default class SpeakerEditor
     super(props);
 
     this.state = {
-      isDisplayedAsImage: (props.model as contentTypes.Speaker).content.caseOf({
-        just: content =>
-          content instanceof contentTypes.Image
-            ? true
-            : false,
-        nothing: () => false,
-      }),
+      isDisplayedAsImage: this.isDisplayedAsImage(props.model),
     };
 
     this.onToggleDisplayAsImage = this.onToggleDisplayAsImage.bind(this);
     this.onSelectImage = this.onSelectImage.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
+  }
+
+  isDisplayedAsImage(speaker: contentTypes.Speaker): boolean {
+    return speaker.content.caseOf({
+      just: content =>
+        content instanceof contentTypes.Image
+          ? true
+          : false,
+      nothing: () => false,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.model !== this.props.model) {
+      this.setState({
+        isDisplayedAsImage: this.isDisplayedAsImage(nextProps.model),
+      });
+    }
   }
 
   onToggleDisplayAsImage(isDisplayedAsImage) {
