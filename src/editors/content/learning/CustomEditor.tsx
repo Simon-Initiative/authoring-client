@@ -13,19 +13,26 @@ import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/in
 import { Initiator } from './dynadragdrop/Initiator';
 import { DynaDropTarget } from './dynadragdrop/DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
-import { Page, Question, Node, Part, Choice, Response, ContiguousText,
+import { Page, Question, Node, Item, Part, Choice, Response, ContiguousText,
   FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';
 import { Target } from 'data/content/assessment/dragdrop/target';
 import { Maybe } from 'tsmonad';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { DndText, DndTextParams } from 'data/content/assessment/dragdrop/dnd_text';
+import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { Feedback } from 'data/content/assessment/feedback';
+import { choiceAssessmentIdSort } from 'editors/content/items/DynaDropTargetItems';
+import { ContentTypes } from 'data/content/org/types';
 
 import { styles } from './CustomEditor.styles';
+
+export const targetAssessmentIdSort = (a: Target, b: Target) =>
+  a.assessmentId.localeCompare(b.assessmentId);
 
 const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => {
   const currentItem = question.items.toArray().find(
@@ -35,7 +42,7 @@ const buildTargetLabelsMap = (question: Question, selectedInitiator: string) => 
     return {};
   }
 
-  return currentItem.choices.toArray().reduce(
+  return currentItem.choices.sort(choiceAssessmentIdSort).toArray().reduce(
     (acc, choice: Choice, index) => ({
       ...acc,
       [choice.value]:
@@ -121,6 +128,74 @@ const setQuestionPartWithInitiatorScore = (
   });
 };
 
+const getTargetsFromLayout = (dndLayout: DndLayout) => {
+  return dndLayout.targetGroup.rows.reduce(
+    (accRows, row) =>
+      accRows.concat(row.cols.toArray().reduce(
+        (accCols, col) => col.contentType === 'Target' ? accCols.push(col) : accCols,
+        Immutable.List<Target>(),
+      )) as Immutable.List<Target>,
+    Immutable.List<Target>(),
+  );
+};
+
+const updateItemPartsFromTargets = (
+  items: Immutable.OrderedMap<string, FillInTheBlank>,
+  parts: Immutable.OrderedMap<string, Part>,
+  targets: Immutable.List<Target>,
+) => {
+  // sort targets to ensure consistent ordering
+  const sortedTargets = targets.sort(targetAssessmentIdSort);
+
+  // compute updated parts based on targets
+  const updatedParts = parts.reduce(
+    (accParts, part) => accParts.set(part.guid, part.with({
+      responses: sortedTargets.reduce(
+        (accResponses, target) => {
+          const input = part.responses.first().input;
+          const f = new Feedback();
+
+          // find existing response with assessmentId or create a new one
+          const response = part.responses.find(r =>
+            r.match === target.assessmentId) || new Response().with({
+              input,
+              match: target.assessmentId,
+              feedback: Immutable.OrderedMap<string, Feedback>().set(f.guid, f),
+            });
+
+          return accResponses.set(response.guid, response);
+        },
+        Immutable.OrderedMap<string, Response>(),
+      ),
+    })),
+    Immutable.OrderedMap<string, Part>(),
+  );
+
+  const updatedItems = items.reduce(
+    (accItems, item) => accItems.set(item.guid, item.with({
+      choices: sortedTargets.reduce(
+        (accChoices, target) => {
+          const choice = item.choices.find(c =>
+            c.value === target.assessmentId) || new Choice().with({
+              value: target.assessmentId,
+              body: new ContentElements().with({
+                supportedElements: Immutable.List(FLOW_ELEMENTS) }),
+            });
+
+          return accChoices.set(choice.guid, choice);
+        },
+        Immutable.OrderedMap<string, Choice>(),
+      ),
+    })),
+    Immutable.OrderedMap<string, FillInTheBlank>(),
+  );
+
+  return {
+    items: updatedItems,
+    parts: updatedParts,
+  };
+};
+
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   documentId: string;
   assessment: AssessmentModel;
@@ -150,6 +225,8 @@ export class CustomEditor
     this.addInitiator = this.addInitiator.bind(this);
     this.deleteInitiator = this.deleteInitiator.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
+    this.onAddColumn = this.onAddColumn.bind(this);
+    this.onAddRow = this.onAddRow.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
   }
 
@@ -320,6 +397,74 @@ export class CustomEditor
     }));
   }
 
+  onAddColumn() {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    const updatedModel = model.with({
+      layoutData: model.layoutData.caseOf({
+        just: ld => Maybe.just<DndLayout>(ld.with({
+          targetGroup: ld.targetGroup.with({
+            rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
+              ? (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> }))
+              : (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> })),
+            ) as Immutable.List<TG_COL>,
+          }),
+        })),
+        nothing: () => Maybe.nothing<DndLayout>(),
+      }),
+    });
+
+    // save question updates
+    this.onEditQuestion(question.with({
+      body: question.body.with({
+        content: question.body.content.set(updatedModel.guid, updatedModel),
+      }),
+    }));
+  }
+
+  onAddRow() {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.push(new ContentRow().with({
+            // use the last row as a template for the new row cols (DndText or Target)
+            cols: Immutable.List<DndText | Target>(
+              ld.targetGroup.rows.last().cols.toArray().map(c =>
+                c.contentType === 'DndText'
+                ? (new DndText())
+                : (new Target({ assessmentId: guid() })),
+              ),
+            ),
+          })) as Immutable.List<TG_COL>,
+        }),
+      });
+
+      const updatedModel = model.with({
+        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
+      });
+
+      // new row might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      this.onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
+  }
+
   renderDynaDrop() {
     const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode as Question;
@@ -392,11 +537,11 @@ export class CustomEditor
         </table>
         <div>
           <Button type="link" editMode={editMode}
-            onClick={() => console.log('Add Row - NOT IMPLEMENTED')} >
+            onClick={this.onAddRow} >
             <i className="fa fa-plus" /> Add a Row
           </Button>
           <Button type="link" editMode={editMode}
-            onClick={() => console.log('Add Column - NOT IMPLEMENTED')} >
+            onClick={this.onAddColumn} >
             <i className="fa fa-plus" /> Add a Column
           </Button>
         </div>

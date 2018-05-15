@@ -10,11 +10,18 @@ import guid from 'utils/guid';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ChoiceList, Choice,
+  updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { TextInput } from 'editors/content/common/TextInput';
 import { ContentElements } from 'data/content/common/elements';
 import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+
+export const choiceAssessmentIdSort = (a: contentTypes.Choice, b: contentTypes.Choice) =>
+  a.value.localeCompare(b.value);
+
+export const responseAssessmentIdSort = (a: contentTypes.Response, b: contentTypes.Response) =>
+  a.match.localeCompare(b.match);
 
 export interface DynaDropTargetItemsProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {
@@ -184,8 +191,8 @@ DynaDropTargetItems
   renderChoices() {
     const { context, services, editMode, partModel, itemModel } = this.props;
 
-    const responses = partModel.responses.toArray();
-    const choices = itemModel.choices.toArray();
+    const responses = partModel.responses.toArray().sort(responseAssessmentIdSort);
+    const choices = itemModel.choices.toArray().sort(choiceAssessmentIdSort);
 
     return choices.map((choice, i) => {
       const response = responses[i];

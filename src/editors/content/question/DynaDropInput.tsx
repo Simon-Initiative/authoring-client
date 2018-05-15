@@ -53,9 +53,6 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
     const customElement = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom);
 
-    console.log('model.body', model.body)
-    console.log('customElement', customElement)
-
     customElement.layoutData
       .lift(ld => ld.initiatorGroup.initiators)
       .lift(initiators => initiators.find(i => i.assessmentId === selectedInitiator))
