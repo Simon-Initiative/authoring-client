@@ -5,9 +5,10 @@ import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { ModalMessage } from 'utils//ModalMessage';
 import { modalActions } from 'actions/modal';
 import { viewObjectives } from 'actions/view';
+import * as React from 'react';
 
 export function buildReportProblemAction(
-  failure: string, name: string, email: string) : Messages.MessageAction {
+  failure: string, name: string, email: string): Messages.MessageAction {
 
   const url = buildFeedbackFromCurrent(name, email);
 
@@ -56,16 +57,16 @@ export function buildPersistenceFailureMessage(reason: string, user: UserProfile
 
 }
 
-function buildModalMessageAction(label, text) : Messages.MessageAction {
+function buildModalMessageAction(label, text): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(modalActions.display(<ModalMessage text={text}/>));
+      dispatch(modalActions.display(<ModalMessage text={text} />));
     },
   };
 }
 
-function goToObjectivesPage(label: string, courseId: string) : Messages.MessageAction {
+function goToObjectivesPage(label: string, courseId: string): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
@@ -74,10 +75,18 @@ function goToObjectivesPage(label: string, courseId: string) : Messages.MessageA
   };
 }
 
+// tslint:disable:max-line-length
 const missingObjectivesDetails =
-  'Learning objectives are necessary to create skills, which are used by the \
-  learning engine to analyze question effectiveness and \
-  assess student improvement over time.';
+  <React.Fragment><p>Create Learning Objectives and their component Skills on the
+    Learning Objectives page of your course package.</p>
+    <p>Student-centered Learning Objectives and their component Skills make an OLI course effective in a few ways:</p>
+    <ul>
+      <li>Learning Objectives help authors strictly align page content to a concept, helping to avoid introducing distractions that will detract from the learning experience.</li>
+      <li>Learning Objectives give students a guide for the topics and skills they they can expect to learn and demonstrate.</li>
+      <li>Skills enable The Learning Dashboard to give teachers insights into their students' learning states. These subcomponents of Learning Objectives get attached by you to the questions in the practice and scored assessments you build for students, so their interactions can be analyzed for instructor insights.</li>
+    </ul>
+  </React.Fragment>;
+// tslint:enable:max-line-length
 
 export function buildMissingObjectivesMessage(courseId: string) {
 
@@ -87,9 +96,9 @@ export function buildMissingObjectivesMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Course Objectives',
-    message: 'Learning objectives are key to the success of a course. You should \
-    create some first.',
+    title: 'No Learning Objectives',
+    // tslint:disable-next-line:max-line-length
+    message: 'Your course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
   });
 
   return new Messages.Message().with({
@@ -101,9 +110,18 @@ export function buildMissingObjectivesMessage(courseId: string) {
   });
 }
 
+// tslint:disable:max-line-length
 const missingSkillsDetails =
-  'Skills are used by the learning engine to analyze question effectiveness and \
-  assess student improvement over time.';
+  <React.Fragment><p>Create Learning Objectives and their component Skills on the
+    Learning Objectives page of your course package.</p>
+    <p>Student-centered Learning Objectives and their component Skills make an OLI course effective in a few ways:</p>
+    <ul>
+      <li>Learning Objectives help authors strictly align page content to a concept, helping to avoid introducing distractions that will detract from the learning experience.</li>
+      <li>Learning Objectives give students a guide for the topics and skills they they can expect to learn and demonstrate.</li>
+      <li>Skills enable The Learning Dashboard to give teachers insights into their students' learning states. These subcomponents of Learning Objectives get attached by you to the questions in the practice and scored assessments you build for students, so their interactions can be analyzed for instructor insights.</li>
+    </ul>
+  </React.Fragment>;
+// tslint:enable:max-line-length
 
 export function buildMissingSkillsMessage(courseId: string) {
 
@@ -113,8 +131,9 @@ export function buildMissingSkillsMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Course Skills',
-    message: 'Learning skills are key to the success of a course. You should create some first.',
+    title: 'No Skills',
+    // tslint:disable-next-line:max-line-length
+    message: 'Skills must be added to Learning Objectives before they can be attached to the questions in this assessment.',
   });
 
   return new Messages.Message().with({
