@@ -102,7 +102,8 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: '!!underscore-template-loader!./index.html',
-            inject: false
+            inject: false,
+            favicon: 'assets/oli-icon.png',
         }),
         new webpack.HashedModuleIdsPlugin(),
     ]
