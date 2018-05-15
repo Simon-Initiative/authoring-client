@@ -15,6 +15,8 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { Source } from 'data/content/learning/source';
+import { modalActions } from 'actions/modal';
+import { selectImage } from 'editors/content/learning/ImageEditor';
 
 export interface VideoEditorProps extends AbstractContentEditorProps<Video> {
   onShowSidebar: () => void;
@@ -63,6 +65,7 @@ export default class VideoEditor
 
     this.onTypeEdit = this.onTypeEdit.bind(this);
     this.onControlEdit = this.onControlEdit.bind(this);
+    this.onSelectPoster = this.onSelectPoster.bind(this);
   }
 
   onTypeEdit(type: string) {
@@ -76,7 +79,32 @@ export default class VideoEditor
     this.props.onEdit(model, model);
   }
 
+  onSelectPoster() {
+    const { context, services, onEdit, model } = this.props;
+
+    const dispatch = (services as any).dispatch;
+    const dismiss = () => dispatch(modalActions.dismiss());
+    const display = c => dispatch(modalActions.display(c));
+
+    selectImage(
+      model,
+      context.resourcePath, context.courseModel,
+      display, dismiss)
+      .then((poster) => {
+        if (poster !== null) {
+          const updated = model.with({ poster: poster.src });
+          onEdit(updated, updated);
+        }
+      });
+  }
+
   renderSidebar() {
+
+    const posterSrc = this.props.model.poster;
+    const poster = posterSrc !== ''
+      ? posterSrc.substr(posterSrc.lastIndexOf('/') + 1)
+      : 'No poster selected';
+
     return (
       <SidebarContent title="Video">
         <SidebarGroup label="Controls">
@@ -98,6 +126,14 @@ export default class VideoEditor
             const model = this.props.model.with({ height });
             this.props.onEdit(model, model);
           }} />
+
+        <SidebarGroup label="Poster">
+          <div>{poster}</div>
+          <ToolbarButton onClick={this.onSelectPoster} size={ToolbarButtonSize.Large}>
+            <div><i className="fa fa-image"/></div>
+            <div>Change Image</div>
+          </ToolbarButton>
+        </SidebarGroup>
 
         <MediaMetadataEditor
           {...this.props}
