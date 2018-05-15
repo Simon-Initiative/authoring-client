@@ -216,7 +216,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
         <div className="flex-spacer"/>
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8.5}>
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8}>
           <ActionsToolbar
             documentResource={resource} documentId={context.documentId}
             canPreview={canPreview} />
