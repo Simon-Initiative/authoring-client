@@ -96,7 +96,7 @@ export function buildMissingObjectivesMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Learning Objectives',
+    title: 'No Learning Objectives:',
     // tslint:disable-next-line:max-line-length
     message: 'Your course\'s effectiveness is driven by student-centered Learning Objectives and Skills.',
   });
@@ -131,9 +131,9 @@ export function buildMissingSkillsMessage(courseId: string) {
   ];
 
   const content = new Messages.TitledContent().with({
-    title: 'No Skills',
+    title: 'No Skills:',
     // tslint:disable-next-line:max-line-length
-    message: 'Skills must be added to Learning Objectives before they can be attached to the questions in this assessment.',
+    message: 'Skills are key to the effectiveness of a course. You should create some first.',
   });
 
   return new Messages.Message().with({
