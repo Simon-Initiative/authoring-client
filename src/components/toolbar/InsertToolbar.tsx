@@ -237,11 +237,6 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             <i style={ { width: 22 } } className={'fa fa-play'}/> Panopto
           </ToolbarButtonMenuItem>
           <ToolbarButtonMenuItem
-            disabled={!parentSupportsElementType('mathematica')}
-            onClick={() => pickFileThenInsert(new contentTypes.Mathematica(), 'src')}>
-            <img src={WOLFRAM_ICON} height={imgSize} width={imgSize}/> Wolfram Mathematica
-          </ToolbarButtonMenuItem>
-          <ToolbarButtonMenuItem
             disabled={!parentSupportsElementType('unity')}
             onClick={() => pickFileThenInsert(new contentTypes.Unity(), 'src')}>
             <img src={UNITY_ICON} height={imgSize} width={imgSize}/> Unity
