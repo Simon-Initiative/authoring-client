@@ -46,6 +46,11 @@ export default class ContiguousTextToolbar
 
   }
 
+  shouldComponentUpdate(nextProps: ContiguousTextToolbarProps, nextState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+    || nextProps.selection !== this.props.selection;
+  }
+
   renderActiveEntity(entity) {
 
     const { key, data } = entity;

@@ -3,7 +3,6 @@ import { injectSheet, JSSProps } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
 
 import { styles } from './ItemToolbar.styles';
@@ -11,7 +10,6 @@ import { loadFromLocalStorage } from 'utils/localstorage';
 
 export interface ItemToolbarProps {
   context: AppContext;
-  courseModel: CourseModel;
   activeContext: ActiveContextState;
   onCut: (item) => void;
   onCopy: (item) => void;
