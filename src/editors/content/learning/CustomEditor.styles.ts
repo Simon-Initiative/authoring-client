@@ -17,6 +17,14 @@ export const styles: JSSStyles = {
   header: {
     padding: 4,
   },
+  dropdown: {
+    '& button': {
+      color: colors.grayDarker,
+    },
+  },
+  showOnRight: {
+    float: 'right',
+  },
   cell: {
     border: [[1, 'solid', colors.grayLight]],
     height: 40,

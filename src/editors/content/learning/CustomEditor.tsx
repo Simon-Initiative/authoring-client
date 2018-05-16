@@ -29,6 +29,7 @@ import { Feedback } from 'data/content/assessment/feedback';
 import { choiceAssessmentIdSort } from 'editors/content/items/DynaDropTargetItems';
 import { ContentTypes } from 'data/content/org/types';
 import { throttle } from 'utils/timing';
+import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 
 import { styles } from './CustomEditor.styles';
 
@@ -287,7 +288,6 @@ export class CellEditor
   }
 
   renderEdit(): JSX.Element {
-
     const html = { __html: this.state.text };
 
     return (
@@ -299,7 +299,6 @@ export class CellEditor
         contentEditable
         dangerouslySetInnerHTML={html}/>
     );
-
   }
 
   renderView(): JSX.Element {
@@ -533,7 +532,7 @@ export class CustomEditor
     }));
   }
 
-  onAddColumn() {
+  onAddColumn(index: number) {
     const { model, currentNode } = this.props;
     const question = currentNode as Question;
 
@@ -542,9 +541,9 @@ export class CustomEditor
         targetGroup: ld.targetGroup.with({
           rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
             // HeaderRow
-            ? (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> }))
+            ? (r.with({ cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> }))
             // ContentRow
-            : (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> })),
+            : (r.with({ cols: r.cols.splice(index, 0, new DndText()) as Immutable.List<DndText> })),
           ) as Immutable.List<TG_ROW>,
         }),
       });
@@ -553,14 +552,52 @@ export class CustomEditor
     });
   }
 
-  onAddRow() {
+  onRemoveColumn(index: number) {
     const { model, currentNode } = this.props;
     const question = currentNode as Question;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
         targetGroup: ld.targetGroup.with({
-          rows: ld.targetGroup.rows.push(new ContentRow().with({
+          rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
+            // HeaderRow
+            ? (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> }))
+            // ContentRow
+            : (r.with({ cols: r.cols.splice(index, 1) as Immutable.List<DndText> })),
+          ) as Immutable.List<TG_ROW>,
+        }),
+      });
+
+      const updatedModel = model.with({
+        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
+      });
+
+      // removed column might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      this.onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
+  }
+
+  onAddRow(index: number) {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.splice(index, 0, new ContentRow().with({
             // use the last row as a template for the new row cols (DndText or Target)
             cols: Immutable.List<DndText | Target>(
               ld.targetGroup.rows.last().cols.toArray().map(c =>
@@ -578,6 +615,39 @@ export class CustomEditor
       });
 
       // new row might contain targets, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      this.onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
+  }
+
+  onRemoveRow(index: number) {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.splice(index, 1) as Immutable.List<TG_ROW>,
+        }),
+      });
+
+      const updatedModel = model.with({
+        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
+      });
+
+      // removed row might contain targets, update item and parts accordingly
       const { items, parts } = updateItemPartsFromTargets(
         question.items as Immutable.OrderedMap<string, FillInTheBlank>,
         question.parts,
@@ -630,6 +700,41 @@ export class CustomEditor
     });
   }
 
+  renderDropdown(
+    index: number, onInsert: (index: number) => void,
+    onRemove: (index: number) => void,
+    term: string, showOnRight: boolean) {
+
+    const { classes, className, editMode } = this.props;
+    return (
+      <div className={classNames([classes.dropdown,
+        showOnRight && classes.showOnRight, className])}>
+        <ToolbarDropdown
+          size={ToolbarDropdownSize.Tiny}
+          hideArrow
+          positionMenuOnRight={showOnRight}
+          label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
+            classes.moreLabel])}/>} >
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onInsert(index) }>
+            {`Insert ${term} before`}
+          </button>
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onInsert(index + 1) }>
+            {`Insert ${term} after`}
+          </button>
+          <button className="dropdown-item"
+            disabled={!editMode}
+            onClick={() => onRemove(index) }>
+            {`Remove ${term}`}
+          </button>
+        </ToolbarDropdown>
+      </div>
+    );
+  }
+
   renderDynaDrop() {
     const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode as Question;
@@ -650,15 +755,25 @@ export class CustomEditor
     // build map of target ids to labels using the selected initiator
     const targetLabels = buildTargetLabelsMap(question, selectedInitiator);
 
-    const renderTableRow = (row) => {
+    const renderTableRow = (row, index) => {
       const isHeader = row.contentType === 'HeaderRow';
       const Tcell = isHeader ? 'th' : 'td';
 
       return (
-        <tr>
+        <tr key={row.guid}>
+          <Tcell>
+            {this.renderDropdown(
+              index + 1,
+              index => this.onAddRow(index),
+              index => this.onRemoveRow(index),
+              'row',
+              false,
+            )}
+          </Tcell>
           {row.cols.toArray().map(col => col.contentType === 'Target'
           ? (
             <DynaDropTarget
+              key={col.guid}
               id={col.guid}
               assessmentId={col.assessmentId}
               selectedInitiator={selectedInitiator}
@@ -672,6 +787,7 @@ export class CustomEditor
           )
           : (
             <Tcell
+              key={col.guid}
               className={isHeader ? classes.header : classes.cell}
               style={{
                 fontWeight: col.fontWeight as any,
@@ -697,19 +813,34 @@ export class CustomEditor
         </p>
         <table>
           <thead>
-            {rows.filter(row => row.contentType === 'HeaderRow').map(renderTableRow)}
+            {/* Render column options menu */}
+            <tr>
+              <th/>
+              {rows.first().cols.toArray().map((val, index) => (
+                <th>
+                {this.renderDropdown(
+                  index,
+                  index => this.onAddColumn(index),
+                  index => this.onRemoveColumn(index),
+                  'column',
+                  true,
+                )}
+                </th>
+              ))}
+            </tr>
+            {rows.filter(row => row.contentType === 'HeaderRow').toArray().map(renderTableRow)}
           </thead>
           <tbody>
-            {rows.filter(row => row.contentType === 'ContentRow').map(renderTableRow)}
+            {rows.filter(row => row.contentType === 'ContentRow').toArray().map(renderTableRow)}
           </tbody>
         </table>
         <div>
           <Button type="link" editMode={editMode}
-            onClick={this.onAddRow} >
+            onClick={() => this.onAddRow(rows.size)} >
             <i className="fa fa-plus" /> Add a Row
           </Button>
           <Button type="link" editMode={editMode}
-            onClick={this.onAddColumn} >
+            onClick={() => this.onAddColumn(rows.first().cols.size)} >
             <i className="fa fa-plus" /> Add a Column
           </Button>
         </div>

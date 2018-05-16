@@ -72,6 +72,7 @@ export class DynaDropTarget
         <div className={classes.initiators}>
           {initiators && initiators.map(initiator => (
             <Initiator
+              key={initiator.guid}
               model={initiator} editMode={editMode}
               selected={initiator.assessmentId === selectedInitiator}
               onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
