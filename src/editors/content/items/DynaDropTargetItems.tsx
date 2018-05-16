@@ -235,6 +235,7 @@ DynaDropTargetItems
       <TabSectionContent>
       <input
         disabled={!editMode}
+        style={{ fontSize: 16 }}
         onChange={({ target: { value } }) => onEditInitiatorText(value, initiator)}
         className="form-control form-control-sm"
         type="text"

@@ -21,6 +21,8 @@ export const styles: JSSStyles = {
     border: [[1, 'solid', colors.grayLight]],
     height: 40,
     padding: 4,
+    minWidth: 50,
+    minHeight: 50,
   },
   initiators: {
     marginTop: 10,

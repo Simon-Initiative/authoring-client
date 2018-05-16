@@ -7,7 +7,7 @@ import { AbstractContentEditor, AbstractContentEditorProps } from '../common/Abs
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { TG_COL } from 'data/content/assessment/dragdrop/target_group';
+import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
 import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 import { Initiator } from './dynadragdrop/Initiator';
@@ -28,6 +28,7 @@ import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { Feedback } from 'data/content/assessment/feedback';
 import { choiceAssessmentIdSort } from 'editors/content/items/DynaDropTargetItems';
 import { ContentTypes } from 'data/content/org/types';
+import { throttle } from 'utils/timing';
 
 import { styles } from './CustomEditor.styles';
 
@@ -196,6 +197,123 @@ const updateItemPartsFromTargets = (
   };
 };
 
+export interface CellEditorProps {
+  editMode: boolean;
+  text: string;
+  onEdit: (text: string) => void;
+}
+
+export interface CellEditorState {
+  text: string;
+}
+
+export class CellEditor
+  extends React.Component<StyledComponentProps<CellEditorProps>, CellEditorState> {
+  caretPosition: any;
+  direction: number;
+  ref: any;
+
+  constructor(props) {
+    super(props);
+
+    this.onChange = this.onChange.bind(this);
+    this.onKeyPress = this.onKeyPress.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+
+    this.state = {
+      text: this.props.text,
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.text !== nextState.text) {
+      return true;
+    }
+
+    return false;
+  }
+
+  onChange(e) {
+    const target = e.target;
+    const currentText = target.innerText;
+
+    this.setState(
+      { text: currentText },
+      () => {
+        const el = this.ref;
+
+        if (el.firstChild) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.setStart(el.firstChild, this.caretPosition + this.direction);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      },
+    );
+
+    this.props.onEdit(currentText);
+  }
+
+  onKeyPress(e) {
+    const BACKSPACE = 8;
+
+    const text = document.getSelection();
+    const startIndex = text.anchorOffset;
+    const endIndex = text.focusOffset;
+
+    // Keep track of the position of caret
+    if (endIndex - startIndex > 0) {
+      this.caretPosition = startIndex;
+
+      if (e.keyCode === BACKSPACE) {
+        this.direction = 0;
+      } else {
+        this.direction = 1;
+      }
+    } else {
+      this.caretPosition = endIndex;
+      if (e.keyCode === BACKSPACE) {
+        this.direction = -1;
+      } else {
+        this.direction = 1;
+      }
+    }
+  }
+
+  onKeyUp(e) {
+    e.stopPropagation();
+  }
+
+  renderEdit(): JSX.Element {
+
+    const html = { __html: this.state.text };
+
+    return (
+      <div
+        ref={r => this.ref = r}
+        onInput={this.onChange}
+        onKeyDown={this.onKeyPress}
+        onKeyUp={this.onKeyUp}
+        contentEditable
+        dangerouslySetInnerHTML={html}/>
+    );
+
+  }
+
+  renderView(): JSX.Element {
+    return <div>{this.props.text}</div>;
+  }
+
+  render() : JSX.Element {
+    const { editMode } = this.props;
+
+    return editMode ? this.renderEdit() : this.renderView();
+  }
+}
+
+
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   documentId: string;
   assessment: AssessmentModel;
@@ -225,8 +343,10 @@ export class CustomEditor
     this.addInitiator = this.addInitiator.bind(this);
     this.deleteInitiator = this.deleteInitiator.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
+    this.onEditLayoutData = this.onEditLayoutData.bind(this);
     this.onAddColumn = this.onAddColumn.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
+    this.editColText = this.editColText.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
   }
 
@@ -397,22 +517,12 @@ export class CustomEditor
     }));
   }
 
-  onAddColumn() {
+  onEditLayoutData(updatedLayoutData: DndLayout) {
     const { model, currentNode } = this.props;
     const question = currentNode as Question;
 
     const updatedModel = model.with({
-      layoutData: model.layoutData.caseOf({
-        just: ld => Maybe.just<DndLayout>(ld.with({
-          targetGroup: ld.targetGroup.with({
-            rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
-              ? (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> }))
-              : (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> })),
-            ) as Immutable.List<TG_COL>,
-          }),
-        })),
-        nothing: () => Maybe.nothing<DndLayout>(),
-      }),
+      layoutData: Maybe.just<DndLayout>(updatedLayoutData),
     });
 
     // save question updates
@@ -421,6 +531,26 @@ export class CustomEditor
         content: question.body.content.set(updatedModel.guid, updatedModel),
       }),
     }));
+  }
+
+  onAddColumn() {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.map(r => r.contentType === 'HeaderRow'
+            // HeaderRow
+            ? (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> }))
+            // ContentRow
+            : (r.with({ cols: r.cols.push(new DndText()) as Immutable.List<DndText> })),
+          ) as Immutable.List<TG_ROW>,
+        }),
+      });
+
+      this.onEditLayoutData(updatedLayoutData);
+    });
   }
 
   onAddRow() {
@@ -439,7 +569,7 @@ export class CustomEditor
                 : (new Target({ assessmentId: guid() })),
               ),
             ),
-          })) as Immutable.List<TG_COL>,
+          })) as Immutable.List<TG_ROW>,
         }),
       });
 
@@ -465,13 +595,48 @@ export class CustomEditor
     });
   }
 
+  editColText(text: string, currentCol: DndText) {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
+            // HeaderRow
+            ? row.with({
+              cols: row.cols.map(col => col.guid === currentCol.guid
+                ? col.with({
+                  text,
+                })
+                : col,
+              ) as Immutable.List<DndText>,
+            })
+            // ContentRow
+            : row.with({
+              cols: row.cols.map(col => col.guid === currentCol.guid
+                && col.contentType === 'DndText'
+                ? col.with({
+                  text,
+                })
+                : col,
+              ) as Immutable.List<DndText>,
+            }),
+          ) as Immutable.List<TG_ROW>,
+        }),
+      });
+
+      this.onEditLayoutData(updatedLayoutData);
+    });
+  }
+
   renderDynaDrop() {
     const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
     const question = currentNode as Question;
 
     const rows = model.layoutData.caseOf({
       just: ld => ld.targetGroup.rows,
-      nothing: () => Immutable.List<TG_COL>(),
+      nothing: () => Immutable.List<TG_ROW>(),
     });
 
     const initiators = model.layoutData.caseOf({
@@ -514,7 +679,10 @@ export class CustomEditor
                 fontStyle: col.fontStyle as any,
                 textDecoration: col.textDecoration,
               }}>
-              {col.text}
+              <CellEditor
+                editMode={editMode}
+                text={col.text}
+                onEdit={value => this.editColText(value, col)} />
             </Tcell>
           ))}
         </tr>
