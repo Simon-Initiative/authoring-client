@@ -167,7 +167,6 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
   render() {
 
-    console.log('rerender toolbar');
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       textSelection, classes, onDisplayModal, onDismissModal, context, resource,
