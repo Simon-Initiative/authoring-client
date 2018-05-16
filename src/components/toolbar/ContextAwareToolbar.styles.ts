@@ -6,9 +6,10 @@ export const TOOLBAR_HIDE_ANIMATION_DURATION_MS = 200;
 
 const TOOLBAR_HIDE_ANIMATION_DURATION_S = TOOLBAR_HIDE_ANIMATION_DURATION_MS / 1000;
 const TOOLBAR_GROUP_MAX_WIDTH = 600;
-const TOOLBAR_COL_WIDTH = 36;
+const TOOLBAR_COL_WIDTH = 32;
 const TOOLBAR_COL_HEIGHT = 32;
 const TOOLBAR_LABEL_HEIGHT = 22;
+const TOOLBAR_TOP_PADDING = 5;
 
 export const styles: JSSStyles = {
   toolbar: {
@@ -17,24 +18,25 @@ export const styles: JSSStyles = {
     flexDirection: 'row',
     overflowX: 'auto',
     overflowY: 'hidden',
-    padding: 5,
-    paddingBottom: 8,
-    height: 100,
+    paddingLeft: 5,
+    paddingRight: 5,
+    height: 92,
     fontSize: 12,
     color: colors.grayDark,
     borderBottom: [1, 'solid', colors.grayLight],
     backgroundColor: '#fafafa',
   },
   toolbarGroup: {
+    padding: [0, 10],
     maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
   },
   toolbarGroupContainer: {
     overflowX: 'hidden',
     overflowY: 'hidden',
-    height: (TOOLBAR_COL_HEIGHT * 2) + TOOLBAR_LABEL_HEIGHT,
+    height: (TOOLBAR_COL_HEIGHT * 2) + TOOLBAR_LABEL_HEIGHT + TOOLBAR_TOP_PADDING,
     flexShrink: 0,
     maxWidth: TOOLBAR_GROUP_MAX_WIDTH,
-    padding: [0, 15],
+    padding: [TOOLBAR_TOP_PADDING, 0, 0, 0],
     borderRight: '1px solid #ddd',
 
     '&.contextToolbar-enter': {
@@ -69,7 +71,7 @@ export const styles: JSSStyles = {
   toolbarLayoutGrid: {
     display: 'inline-block',
     width: TOOLBAR_COL_WIDTH * 2,
-    height: 72,
+    height: 64,
   },
   toolbarLayoutRow: {
     display: 'flex',

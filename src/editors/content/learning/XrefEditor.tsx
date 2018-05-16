@@ -78,7 +78,7 @@ export default class XrefEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Cross-reference" columns={2} highlightColor={CONTENT_COLORS.Xref}>
+      <ToolbarGroup label="Cross-reference" columns={3} highlightColor={CONTENT_COLORS.Xref}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-sliders" /></div>
           <div>Details</div>

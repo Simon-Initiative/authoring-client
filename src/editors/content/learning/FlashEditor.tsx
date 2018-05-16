@@ -94,7 +94,7 @@ export default class FlashEditor
         <SidebarGroup label="Source File">
           <div>{file}</div>
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-file-o"/></div>
+            <div><i className="fa fa-file-o" /></div>
             <div>Select File</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -133,36 +133,36 @@ export default class FlashEditor
     return (
       <ToolbarGroup
         label="Flash"
-        columns={5}
+        columns={6}
         highlightColor={CONTENT_COLORS.Flash}>
 
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
 
         <ToolbarLayout.Column>
-            <div style={{ marginLeft: 8 }}>Purpose</div>
-            <Select
-              editMode={this.props.editMode}
-              label=""
-              value={this.props.model.purpose.caseOf({
-                nothing: () => '',
-                just: p => p,
-              })}
-              onChange={this.onPurposeChange}>
-              <option value={''}>
-                {''}
-              </option>
-              {PurposeTypes.map(p =>
-                <option
-                  key={p.value}
-                  value={p.value}>
-                  {p.label}
-                </option>)}
-            </Select>
+          <div style={{ marginLeft: 8 }}>Purpose</div>
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={this.props.model.purpose.caseOf({
+              nothing: () => '',
+              just: p => p,
+            })}
+            onChange={this.onPurposeChange}>
+            <option value={''}>
+              {''}
+            </option>
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
+                value={p.value}>
+                {p.label}
+              </option>)}
+          </Select>
         </ToolbarLayout.Column>
 
       </ToolbarGroup>

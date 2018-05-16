@@ -24,8 +24,8 @@ export interface QuoteEditorState {
  * React Component
  */
 export default class QuoteEditor
-    extends AbstractContentEditor
-    <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.Quote, QuoteEditorProps & JSSProps, QuoteEditorState> {
 
   constructor(props) {
     super(props);
@@ -56,9 +56,9 @@ export default class QuoteEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Quote" columns={2} highlightColor={CONTENT_COLORS.BlockQuote}>
+      <ToolbarGroup label="Quote" columns={2.8} highlightColor={CONTENT_COLORS.BlockQuote}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders"/></div>
+          <div><i className="fa fa-sliders" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

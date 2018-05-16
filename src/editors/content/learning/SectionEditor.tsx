@@ -62,27 +62,27 @@ export default class SectionEditor extends AbstractContentEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Section" columns={8} highlightColor={CONTENT_COLORS.Section}>
+      <ToolbarGroup label="Section" columns={7} highlightColor={CONTENT_COLORS.Section}>
         <ToolbarLayout.Column>
-            <div style={{ marginLeft: 8 }}>Purpose</div>
-            <Select
-              editMode={this.props.editMode}
-              label=""
-              value={this.props.model.purpose.caseOf({
-                nothing: () => '',
-                just: p => p,
-              })}
-              onChange={this.onPurposeChange}>
-              <option value={''}>
-                {''}
-              </option>
-              {PurposeTypes.map(p =>
-                <option
-                  key={p.value}
-                  value={p.value}>
-                  {p.label}
-                </option>)}
-            </Select>
+          <div style={{ marginLeft: 8 }}>Purpose</div>
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={this.props.model.purpose.caseOf({
+              nothing: () => '',
+              just: p => p,
+            })}
+            onChange={this.onPurposeChange}>
+            <option value={''}>
+              {''}
+            </option>
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
+                value={p.value}>
+                {p.label}
+              </option>)}
+          </Select>
         </ToolbarLayout.Column>
 
       </ToolbarGroup>
@@ -91,27 +91,27 @@ export default class SectionEditor extends AbstractContentEditor
 
   renderMain(): JSX.Element {
     return (
-    <div>
-      <TitleTextEditor
-        context={this.props.context}
-        services={this.props.services}
-        onFocus={this.props.onFocus}
-        model={(this.props.model.title.text.content.first() as ContiguousText)}
-        editMode={this.props.editMode}
-        onEdit={this.onTitleEdit}
-        editorStyles={{ fontSize: 20 }} />
+      <div>
+        <TitleTextEditor
+          context={this.props.context}
+          services={this.props.services}
+          onFocus={this.props.onFocus}
+          model={(this.props.model.title.text.content.first() as ContiguousText)}
+          editMode={this.props.editMode}
+          onEdit={this.onTitleEdit}
+          editorStyles={{ fontSize: 20 }} />
 
-      <div className="nested-container">
-        <ContentContainer
-          activeContentGuid={null}
-          hover={null}
-          onUpdateHover={() => {}}
-          {...this.props}
-          model={this.props.model.body}
-          onEdit={this.onBodyEdit}
-        />
+        <div className="nested-container">
+          <ContentContainer
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            {...this.props}
+            model={this.props.model.body}
+            onEdit={this.onBodyEdit}
+          />
+        </div>
       </div>
-    </div>
     );
   }
 }

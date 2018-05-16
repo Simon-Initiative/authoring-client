@@ -4,6 +4,7 @@ import * as chroma from 'chroma-js';
 
 export const styles: JSSStyles = {
   wideMenu: {
+    textAlign: 'left',
     display: 'inline-block',
     width: 98,
   },
@@ -11,7 +12,7 @@ export const styles: JSSStyles = {
     background: 'transparent',
     fontSize: 12,
     color: colors.grayDarkest,
-    textAlign: 'center',
+    textAlign: 'left',
     verticalAlign: 'top',
     border: '1px solid transparent',
     cursor: 'pointer',
@@ -45,6 +46,7 @@ export const styles: JSSStyles = {
     },
 
     '& i': {
+      width: 20,
       fontSize: 16,
 
       'not(.fa)': {
@@ -73,7 +75,12 @@ export const styles: JSSStyles = {
     width: 12,
     minHeight: 72,
     height: 72,
-    borderLeft: '1px solid ' + colors.grayLighter,
+    borderLeft: '1px solid transparent',
+
+    '&:hover': {
+      color: colors.hover,
+      borderLeft: `1px solid ${colors.grayLighter}`,
+    },
   },
   quadButton: {
     border: 'none',
@@ -92,8 +99,13 @@ export const styles: JSSStyles = {
     color: colors.grayDarkest,
     border: '1px solid transparent',
     cursor: 'pointer',
-    width: 85,
+    width: 88,
     height: 63,
+    margin: [0, 5],
+
+    '& .dropdown': {
+      width: 15,
+    },
 
     '&:hover': {
       color: colors.hover,
