@@ -4,7 +4,5 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "files.associations": {
     "*.jss": "typescript"
-  },
-  "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
+  }
 }
