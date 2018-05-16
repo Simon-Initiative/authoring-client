@@ -5,11 +5,15 @@
     ],
     "jsRules": {},
     "rules": {
-      "import-name": false,
-      "variable-name": [true, "allow-pascal-case"],
-      "object-shorthand-properties-first": false,
-      "no-unused-variable": true,
-      "strict-boolean-expressions": false
+        "import-name": false,
+        "variable-name": [
+            true,
+            "allow-pascal-case"
+        ],
+        "object-shorthand-properties-first": false,
+        "no-unused-variable": true,
+        "strict-boolean-expressions": false
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "tslint.autoFixOnSave": true,
 }

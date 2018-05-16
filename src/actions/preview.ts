@@ -9,7 +9,7 @@ import { showMessage } from 'actions/messages';
 
 // The action to invoke preview.
 function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
-  return function (dispatch, getState) : Promise<persistence.PreviewResult> {
+  return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
@@ -19,7 +19,7 @@ function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
 
 export function preview(courseId: string, resource: Resource, isRefreshAttempt: boolean) {
 
-  return function (dispatch) : Promise<any> {
+  return function (dispatch): Promise<any> {
 
     return dispatch(invokePreview(resource, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
@@ -33,8 +33,8 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
           const refresh = result.message === 'pending';
           window.open(
             '/#preview' + resource.guid + '-' + courseId
-              + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-              + (refresh ? '&refresh=true' : ''),
+            + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
+            + (refresh ? '&refresh=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
           window.open('/#preview' + resource.guid + '-' + courseId, courseId);
@@ -48,8 +48,30 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
 }
 
 
+export function thinPreview(courseId: string, resource: Resource) {
+
+  return function (dispatch): Promise<any> {
+
+    return dispatch(invokePreview(resource))
+      .then((result: persistence.PreviewResult) => {
+        const refresh = result.message === 'pending';
+        window.open('/#preview/' + resource.guid + '-' + courseId);
+      }).catch((err) => {
+        const message = buildUnknownErrorMessage(err);
+        dispatch(showMessage(message));
+      });
+  };
+
+}
+
+// preview above is more complicated than we need - don't need to worry about preview success/fail, add this preview action to the course package page instead
+// add dropdown for themes
+
+// new endpoint is
+
+
 function buildEditOrgAction(
-  courseId: string, label: string) : Messages.MessageAction {
+  courseId: string, label: string): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
@@ -98,7 +120,7 @@ function buildNotSetUpMessage() {
 }
 
 
-function buildReportProblemAction() : Messages.MessageAction {
+function buildReportProblemAction(): Messages.MessageAction {
 
   const url = buildFeedbackFromCurrent(
     '',
