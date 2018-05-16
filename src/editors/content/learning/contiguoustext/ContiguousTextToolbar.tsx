@@ -304,7 +304,7 @@ export default class ContiguousTextToolbar
           <ToolbarButton
             onClick={() => {
               selectImage(null, determineBaseUrl(this.props.resource), this.props.courseModel,
-                this.props.onDisplayModal, this.props.onDismissModal)
+                          this.props.onDisplayModal, this.props.onDismissModal)
                 .then((image) => {
                   if (image !== null) {
                     onEdit(model.addEntity(EntityTypes.image, true, image, selection));

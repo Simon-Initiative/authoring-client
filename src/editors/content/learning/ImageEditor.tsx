@@ -166,7 +166,7 @@ export class ImageSizeSidebar extends
         size: {
           width: parseInt(this.props.model.width, 10),
           height: parseInt(this.props.model.height, 10),
-        }
+        },
       });
 
       const model = this.props.model.with({ width: '', height: '' });

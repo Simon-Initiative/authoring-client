@@ -175,7 +175,7 @@ export default class BlockQuoteToolbar
               () => {
                 onEdit(model.with({
                   text: model.text.addEntity(EntityTypes.link, true,
-                    new contentTypes.Link(), selection),
+                                             new contentTypes.Link(), selection),
                 }));
               }
             }
@@ -188,7 +188,7 @@ export default class BlockQuoteToolbar
               () => {
                 onEdit(model.with({
                   text: model.text.addEntity(EntityTypes.xref, true,
-                    new contentTypes.Xref(), selection),
+                                             new contentTypes.Xref(), selection),
                 }));
               }
             }
