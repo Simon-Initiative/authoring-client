@@ -22,8 +22,8 @@ export interface CiteEditorState {
  * React Component
  */
 export default class CiteEditor
-    extends AbstractContentEditor
-    <contentTypes.Cite, CiteEditorProps & JSSProps, CiteEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.Cite, CiteEditorProps & JSSProps, CiteEditorState> {
 
   constructor(props) {
     super(props);
@@ -54,11 +54,11 @@ export default class CiteEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Citation" columns={2} highlightColor={CONTENT_COLORS.Cite}>
+      <ToolbarGroup label="Citation" columns={3} highlightColor={CONTENT_COLORS.Cite}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders"/></div>
+          <div><i className="fa fa-sliders" /></div>
           <div>Details</div>
-          </ToolbarButton>
+        </ToolbarButton>
       </ToolbarGroup>
     );
   }

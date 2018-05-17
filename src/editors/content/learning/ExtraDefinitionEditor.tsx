@@ -36,8 +36,8 @@ export interface ExtraDefinitionEditorState {
  */
 @injectSheet(styles)
 export default class ExtraDefinitionEditor
-    extends AbstractContentEditor<contentTypes.Extra,
-    StyledComponentProps<ExtraDefinitionEditorProps>, ExtraDefinitionEditorState> {
+  extends AbstractContentEditor<contentTypes.Extra,
+  StyledComponentProps<ExtraDefinitionEditorProps>, ExtraDefinitionEditorState> {
 
   constructor(props) {
     super(props);
@@ -55,7 +55,7 @@ export default class ExtraDefinitionEditor
 
     return (
       <ToolbarGroup label="Rollover"
-        columns={2} highlightColor={CONTENT_COLORS.Definition}>
+        columns={3} highlightColor={CONTENT_COLORS.Definition}>
 
       </ToolbarGroup>
     );
@@ -135,7 +135,7 @@ export default class ExtraDefinitionEditor
     this.props.onEdit(model, src);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { model } = this.props;
 
     if (model.isDefinition()) {
@@ -144,7 +144,7 @@ export default class ExtraDefinitionEditor
     return this.renderAsContent();
   }
 
-  renderAsContent() : JSX.Element {
+  renderAsContent(): JSX.Element {
 
     const { className, classes } = this.props;
 
@@ -159,7 +159,7 @@ export default class ExtraDefinitionEditor
     );
   }
 
-  renderAsDefinition() : JSX.Element {
+  renderAsDefinition(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
 
@@ -181,12 +181,12 @@ export default class ExtraDefinitionEditor
       onEdit(content: Object, source: Object) {
         this.props.onEdit(this.props.model.with({ translation: content }), source);
       },
-      onAddNew(content: Object, textSelection: Maybe<TextSelection>) {},
-      onRemove(content: Object) {},
-      onDuplicate(content: Object) {},
-      onMoveUp(content: Object) {},
-      onMoveDown(content: Object) {},
-      onPaste() {},
+      onAddNew(content: Object, textSelection: Maybe<TextSelection>) { },
+      onRemove(content: Object) { },
+      onDuplicate(content: Object) { },
+      onMoveUp(content: Object) { },
+      onMoveDown(content: Object) { },
+      onPaste() { },
       props: this.props,
     };
 
@@ -195,7 +195,7 @@ export default class ExtraDefinitionEditor
       label: 'Translation',
       onEdit: this.onTranslationEdit.bind(this),
       parent: this,
-      onClick: () => {},
+      onClick: () => { },
       onFocus: (m, p, t) => this.props.onFocus(m, translationParent, t),
     });
 
@@ -204,12 +204,12 @@ export default class ExtraDefinitionEditor
       onEdit(content: Object, source: Object) {
         this.props.onEdit(this.props.model.with({ pronunciation: content }), source);
       },
-      onAddNew(content: Object, textSelection: Maybe<TextSelection>) {},
-      onRemove(content: Object) {},
-      onDuplicate(content: Object) {},
-      onMoveUp(content: Object) {},
-      onMoveDown(content: Object) {},
-      onPaste() {},
+      onAddNew(content: Object, textSelection: Maybe<TextSelection>) { },
+      onRemove(content: Object) { },
+      onDuplicate(content: Object) { },
+      onMoveUp(content: Object) { },
+      onMoveDown(content: Object) { },
+      onPaste() { },
       props: this.props,
     };
 
@@ -219,7 +219,7 @@ export default class ExtraDefinitionEditor
     const pronunciationProps = Object.assign({}, this.props, {
       model: pronunciation,
       onEdit: this.onPronunciationEdit.bind(this),
-      onClick: () => {},
+      onClick: () => { },
       onFocus: (m, p, t) => this.props.onFocus(m, pronunciationParent, t),
     });
 
@@ -228,11 +228,11 @@ export default class ExtraDefinitionEditor
 
     const meaningEditors = this.props.model.meaning.size > 0
       ? <ContentContainer
-          {...this.props}
-          model={meanings}
-          bindProperties={bindLabel}
-          onEdit={this.onMeaningEdit.bind(this)}
-        />
+        {...this.props}
+        model={meanings}
+        bindProperties={bindLabel}
+        onEdit={this.onMeaningEdit.bind(this)}
+      />
       : null;
 
     return (

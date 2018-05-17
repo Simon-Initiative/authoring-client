@@ -142,13 +142,13 @@ export default class CodeBlock
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={6}>
+      <ToolbarGroup label="Code Block" highlightColor={CONTENT_COLORS.CodeBlock} columns={7}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
             onDiscover(DiscoverableId.CodeBlockEditorLanguage);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-file-code-o"/></div>
+          <div><i className="fa fa-file-code-o" /></div>
           <div>Language</div>
         </ToolbarButton>
 
@@ -157,23 +157,23 @@ export default class CodeBlock
             onClick={() => {
               onShowSidebar();
               onDiscover(DiscoverableId.CodeBlockEditorLineNumbers);
-            }} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-sort-numeric-asc"/> Line Numbers
+            }} size={ToolbarButtonSize.ExtraWide}>
+            <i className="fa fa-sort-numeric-asc" /> Line Numbers
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
               onShowSidebar();
               onDiscover(DiscoverableId.CodeBlockEditorHighlighting);
             }}
-            size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-eraser"/> Highlighting
+            size={ToolbarButtonSize.ExtraWide}>
+            <i className="fa fa-eraser" /> Highlighting
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { source, syntax, number, start } = this.props.model;
     const { editMode } = this.props;

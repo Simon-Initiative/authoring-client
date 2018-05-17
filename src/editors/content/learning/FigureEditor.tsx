@@ -98,7 +98,7 @@ export default class FigureEditor
 
     return (
       <SidebarContent title="Figure">
-      {/* Temporarily commenting out Citation editor until citation design is finalized */}
+        {/* Temporarily commenting out Citation editor until citation design is finalized */}
         {/* <SidebarGroup label="Citation">
           <TextInput width="100%" label="Title"
             editMode={this.props.editMode}
@@ -151,7 +151,7 @@ export default class FigureEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Figure" columns={2} highlightColor={CONTENT_COLORS.Figure}>
+      <ToolbarGroup label="Figure" columns={3} highlightColor={CONTENT_COLORS.Figure}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
             <div><i className="fa fa-sliders" /></div>
