@@ -156,6 +156,22 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
       return false;
     }
 
+    // If the active content has switched, we re-render
+    const contentSwitched = this.props.content.caseOf({
+      just: t => nextProps.content.caseOf({
+        just: s => (t as any).guid !== (s as any).guid,
+        nothing: () => true,
+      }),
+      nothing: () => nextProps.content.caseOf({
+        just: s => true,
+        nothing: () => false,
+      }),
+    });
+
+    if (contentSwitched) {
+      return true;
+    }
+
     // Only other thing we need to check is for a change in
     // the supported elements
     if (this.props.supportedElements !== nextProps.supportedElements) {
