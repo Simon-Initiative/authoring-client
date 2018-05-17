@@ -27,7 +27,7 @@ export interface VideoEditorState {
 }
 
 export function selectVideo(
-  model, resourcePath, courseModel, display, dismiss) : Promise<Video> {
+  model, resourcePath, courseModel, display, dismiss): Promise<Video> {
 
   return new Promise((resolve, reject) => {
 
@@ -40,7 +40,7 @@ export function selectVideo(
         <MediaManager model={model ? model : new Video()}
           resourcePath={resourcePath}
           courseModel={courseModel}
-          onEdit={() => {}}
+          onEdit={() => { }}
           mimeFilter={MIMETYPE_FILTERS.VIDEO}
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.sources.first().src : model]}
@@ -130,7 +130,7 @@ export default class VideoEditor
         <SidebarGroup label="Poster">
           <div>{poster}</div>
           <ToolbarButton onClick={this.onSelectPoster} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-image"/></div>
+            <div><i className="fa fa-image" /></div>
             <div>Change Image</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -147,10 +147,10 @@ export default class VideoEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video} columns={2}>
+      <ToolbarGroup label="Video" highlightColor={CONTENT_COLORS.Video} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -158,7 +158,7 @@ export default class VideoEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { sources, controls, width, height } = this.props.model;
 
@@ -166,15 +166,15 @@ export default class VideoEditor
     if (sources.size > 0) {
       const src = sources.first().src;
       fullSrc = buildUrl(
-      this.props.context.baseUrl,
-      this.props.context.courseId,
-      this.props.context.resourcePath,
-      src);
+        this.props.context.baseUrl,
+        this.props.context.courseId,
+        this.props.context.resourcePath,
+        src);
     }
 
     return (
       <div className="videoEditor">
-        <video width={width} height={height} src={fullSrc} controls={controls}/>
+        <video width={width} height={height} src={fullSrc} controls={controls} />
       </div>
     );
   }

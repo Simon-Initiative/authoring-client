@@ -77,13 +77,13 @@ export default class YouTubeEditor
           <Discoverable id={DiscoverableId.YouTubeEditorSourceURL} focusChild="input">
             <div className="input-group">
               <span className="input-group-addon sourceAddon">youtube.com/watch?v=</span>
-                <TextInput
-                  {...this.props}
-                  width="100%"
-                  type="text"
-                  label=""
-                  value={src}
-                  onEdit={this.onSrcEdit} />
+              <TextInput
+                {...this.props}
+                width="100%"
+                type="text"
+                label=""
+                value={src}
+                onEdit={this.onSrcEdit} />
             </div>
           </Discoverable>
         </SidebarGroup>
@@ -119,20 +119,20 @@ export default class YouTubeEditor
     return (
       <ToolbarGroup
         label="YouTube"
-        columns={5}
+        columns={6}
         highlightColor={CONTENT_COLORS.YouTube}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
             onDiscover(DiscoverableId.YouTubeEditorSourceURL);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-youtube-play"/></div>
+          <div><i className="fa fa-youtube-play" /></div>
           <div>Source URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={() => window.open('https://youtube.com', '_blank').focus()}
             size={ToolbarButtonSize.Large}>
-            <i className="fa fa-youtube"/> YouTube.com
+            <i className="fa fa-youtube" /> YouTube.com
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>
@@ -146,7 +146,7 @@ export default class YouTubeEditor
 
     return (
       <div className="youtubeEditor">
-        <iframe src={fullSrc} height={height} width={width}/>
+        <iframe src={fullSrc} height={height} width={width} />
       </div>
     );
   }

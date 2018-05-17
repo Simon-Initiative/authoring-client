@@ -39,7 +39,7 @@ export interface ConjugationEditorState {
 // Get the key of the nth element in an ordered map
 function getKey(
   index: number, collection:
-  Immutable.OrderedMap<string,
+    Immutable.OrderedMap<string,
     contentTypes.ConjugationCell | contentTypes.Cr>) {
   return collection.toArray()[index].guid;
 }
@@ -49,8 +49,8 @@ function getKey(
  */
 @injectSheet(styles)
 export default class ConjugationEditor
-    extends AbstractContentEditor<contentTypes.Conjugation,
-    StyledComponentProps<ConjugationEditorProps>, ConjugationEditorState> {
+  extends AbstractContentEditor<contentTypes.Conjugation,
+  StyledComponentProps<ConjugationEditorProps>, ConjugationEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -74,7 +74,7 @@ export default class ConjugationEditor
   renderToolbar() {
 
     return (
-      <ToolbarGroup label="Conjugation" columns={4} highlightColor={CONTENT_COLORS.Conjugation}>
+      <ToolbarGroup label="Conjugation" columns={5} highlightColor={CONTENT_COLORS.Conjugation}>
       </ToolbarGroup>
     );
   }
@@ -101,15 +101,15 @@ export default class ConjugationEditor
     // This doesn't disable the buttons, though.
     const noManualControl = {
       supportedElements: Immutable.List<string>(),
-      onAddNew: (e) => {},
+      onAddNew: (e) => { },
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
-      onPaste: (e) => {},
-      onRemove: (e) => {},
-      onDuplicate: (e) => {},
-      onMoveUp: (e) => {},
-      onMoveDown: (e) => {},
+      onPaste: (e) => { },
+      onRemove: (e) => { },
+      onDuplicate: (e) => { },
+      onMoveUp: (e) => { },
+      onMoveDown: (e) => { },
       props: this.props,
     };
 
@@ -255,7 +255,7 @@ export default class ConjugationEditor
 
     const rows = model.rows.map((row) => {
 
-      let cell : contentTypes.ConjugationCell = new contentTypes.Conjugate();
+      let cell: contentTypes.ConjugationCell = new contentTypes.Conjugate();
 
       // Use as a template the last cell in the first row, that
       // way if it is a row of headers in place we continue it
@@ -364,30 +364,30 @@ export default class ConjugationEditor
           hideArrow
           positionMenuOnRight={showOnRight}
           label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
-            classes.moreLabel])}/>} >
+            classes.moreLabel])} />} >
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index) }>
+            onClick={() => onInsert(index)}>
             {`Insert row before`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index + 1) }>
+            onClick={() => onInsert(index + 1)}>
             {`Insert row after`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsertHeader(index) }>
+            onClick={() => onInsertHeader(index)}>
             {`Insert header row before`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsertHeader(index + 1) }>
+            onClick={() => onInsertHeader(index + 1)}>
             {`Insert header row after`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onRemove(index) }>
+            onClick={() => onRemove(index)}>
             {`Remove row`}
           </button>
         </ToolbarDropdown>
@@ -409,10 +409,10 @@ export default class ConjugationEditor
           hideArrow
           positionMenuOnRight={showOnRight}
           label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
-            classes.moreLabel])}/>} >
+            classes.moreLabel])} />} >
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onRemove(index) }>
+            onClick={() => onRemove(index)}>
             {`Remove column`}
           </button>
         </ToolbarDropdown>
@@ -429,7 +429,7 @@ export default class ConjugationEditor
     this.props.onEdit(model, sourceObject);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
 
@@ -462,10 +462,10 @@ export default class ConjugationEditor
 
     const pronunciationEditor = model.pronunciation.caseOf({
       just: p => <ContentContainer
-      {...this.props}
-      model={pronunciations}
-      onEdit={this.onPronunciationEdit.bind(this)}
-    />,
+        {...this.props}
+        model={pronunciations}
+        onEdit={this.onPronunciationEdit.bind(this)}
+      />,
       nothing: () => null,
     });
 
@@ -496,8 +496,8 @@ export default class ConjugationEditor
           className="btn btn-link">+ Add pronunciation</button>
         <table className={classNames([classes.conjugation, className])}>
           <tbody>
-          {headerRow}
-          {rows}
+            {headerRow}
+            {rows}
           </tbody>
         </table>
         <button type="button" onClick={this.onInsertRow.bind(this, model.rows.size)}

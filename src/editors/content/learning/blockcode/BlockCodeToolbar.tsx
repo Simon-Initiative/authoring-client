@@ -72,74 +72,74 @@ export default class BlockCodeToolbar
 
     return (
       <ToolbarGroup
-        label="Code" highlightColor={CONTENT_COLORS.BlockCode} columns={4}>
+        label="Code" highlightColor={CONTENT_COLORS.BlockCode} columns={5}>
         <ToolbarLayout.Inline>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Bold, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Bold">
-            <i className={'fa fa-bold'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Bold, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Bold">
+            <i className={'fa fa-bold'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Italic, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Italic">
-            <i className={'fa fa-italic'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Italic, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Italic">
+            <i className={'fa fa-italic'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Strikethrough">
-            <i className={'fa fa-strikethrough'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Strikethrough">
+            <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Highlight">
-            <i className={'fa fa-pencil'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Highlight">
+            <i className={'fa fa-pencil'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Superscript">
-            <i className={'fa fa-superscript'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Superscript">
+            <i className={'fa fa-superscript'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Subscript">
-            <i className={'fa fa-subscript'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Subscript">
+            <i className={'fa fa-subscript'} />
           </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup>
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     return null;
   }
 }

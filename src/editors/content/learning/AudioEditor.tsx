@@ -26,7 +26,7 @@ export interface AudioEditorState {
 }
 
 export function selectAudio(
-  model, resourcePath, courseModel, display, dismiss) : Promise<Audio> {
+  model, resourcePath, courseModel, display, dismiss): Promise<Audio> {
 
   return new Promise((resolve, reject) => {
 
@@ -39,7 +39,7 @@ export function selectAudio(
         <MediaManager model={model ? model : new Audio()}
           resourcePath={resourcePath}
           courseModel={courseModel}
-          onEdit={() => {}}
+          onEdit={() => { }}
           mimeFilter={MIMETYPE_FILTERS.AUDIO}
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.sources.first().src : model]}
@@ -89,8 +89,9 @@ export default class AudioEditor
       .then((audio) => {
         if (audio !== null) {
           const source = new Source({ src: audio.sources.first().src });
-          const model = this.props.model.with({ sources:
-            Immutable.OrderedMap<string, Source>().set(source.guid, source),
+          const model = this.props.model.with({
+            sources:
+              Immutable.OrderedMap<string, Source>().set(source.guid, source),
           });
           onEdit(model, model);
         }
@@ -118,17 +119,17 @@ export default class AudioEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio} columns={4}>
+      <ToolbarGroup label="Image" highlightColor={CONTENT_COLORS.Audio} columns={5}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.onSelect.bind(this)} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-volume-up"/></div>
+            <div><i className="fa fa-volume-up" /></div>
             <div>Change Audio</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
 
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -136,7 +137,7 @@ export default class AudioEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { sources, controls } = this.props.model;
 
@@ -144,15 +145,15 @@ export default class AudioEditor
     if (sources.size > 0) {
       const src = sources.first().src;
       fullSrc = buildUrl(
-      this.props.context.baseUrl,
-      this.props.context.courseId,
-      this.props.context.resourcePath,
-      src);
+        this.props.context.baseUrl,
+        this.props.context.courseId,
+        this.props.context.resourcePath,
+        src);
     }
 
     return (
       <div className="audioEditor">
-        <audio src={fullSrc} controls={controls}/>
+        <audio src={fullSrc} controls={controls} />
       </div>
     );
   }

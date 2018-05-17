@@ -48,7 +48,7 @@ export default class ExampleEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Example" columns={2} highlightColor={CONTENT_COLORS.Example}>
+      <ToolbarGroup label="Example" columns={3} highlightColor={CONTENT_COLORS.Example}>
       </ToolbarGroup>
     );
   }
