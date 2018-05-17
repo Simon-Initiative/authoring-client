@@ -25,6 +25,27 @@ export const styles: JSSStyles = {
     color: colors.grayDark,
     borderBottom: [1, 'solid', colors.grayLight],
     backgroundColor: '#fafafa',
+
+    '& .dropdown-item': {
+      cursor: 'pointer',
+
+      '&[disabled]': {
+        cursor: 'default',
+      },
+
+      '&:focus': {
+        outline: 0,
+      },
+    },
+
+    '& .unicode-icon': {
+      padding: [0, 4],
+      font: {
+        style: 'normal',
+        family: 'serif',
+        weight: 700,
+      },
+    },
   },
   toolbarGroup: {
     padding: [0, 10],

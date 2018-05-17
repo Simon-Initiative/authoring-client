@@ -86,14 +86,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
           <ToolbarButton
             onClick={() => onCut(this.getItem())}
             tooltip="Cut Item"
-            size={ToolbarButtonSize.Wide}
+            size={ToolbarButtonSize.Full}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
             onClick={() => onCopy(this.getItem())}
             tooltip="Copy Item"
-            size={ToolbarButtonSize.Wide}
+            size={ToolbarButtonSize.Full}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-copy" /> Copy
           </ToolbarButton>
