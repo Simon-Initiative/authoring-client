@@ -68,6 +68,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   onChoiceEdit(choice: contentTypes.Choice, src) {
+
     this.props.onEdit(
       this.props.itemModel.with(
       { choices: this.props.itemModel.choices.set(choice.guid, choice) }),
@@ -75,6 +76,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
   }
 
   onPartEdit(partModel: contentTypes.Part, src) {
+
     this.props.onEdit(this.props.itemModel, partModel, src);
   }
 
@@ -174,7 +176,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
 
   renderDetails() {
     const {
-      editMode, itemModel, partModel, onGetChoiceCombinations,
+      editMode, itemModel, partModel, onGetChoicePermutations,
     } = this.props;
 
     return (
@@ -215,7 +217,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
               {...this.props}
               model={partModel}
               choices={itemModel.choices.toArray()}
-              onGetChoiceCombinations={onGetChoiceCombinations}
+              onGetChoiceCombinations={onGetChoicePermutations}
               onEdit={this.onPartEdit} />
           </TabSectionContent>
         </TabSection>

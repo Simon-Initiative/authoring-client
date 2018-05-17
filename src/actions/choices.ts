@@ -45,7 +45,7 @@ export const computeCombinations = (comboNum: number) => (
   (dispatch: any, getState): CombinationsMap => {
     const choices = getState().choices.combinations;
 
-    if (!getState().choices.has(comboNum)) {
+    if (!choices.has(comboNum)) {
       const combinationsMap: CombinationsMap = generateCombinations(comboNum)
         .reduce(
           (acc, c) => acc.set(
@@ -69,7 +69,7 @@ export const computePermutations = (comboNum: number) => (
   (dispatch: any, getState): PermutationsMap => {
     const choices = getState().choices.permutations;
 
-    if (!getState().choices.has(comboNum)) {
+    if (!choices.has(comboNum)) {
       const permutationsMap: PermutationsMap = generatePermutations(comboNum)
         .reduce(
           (acc, c) => acc.set(
