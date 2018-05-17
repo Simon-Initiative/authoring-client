@@ -73,6 +73,11 @@ export const styles: JSSStyles = {
       height: 32,
       textAlign: 'left',
     },
+    '&.full': {
+      width: '100%',
+      height: 32,
+      textAlign: 'left',
+    },
     '&.extraWide': {
       minWidth: 120,
       maxWidth: 120,

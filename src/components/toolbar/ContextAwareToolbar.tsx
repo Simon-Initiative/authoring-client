@@ -200,7 +200,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7.3}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={6.7}>
           <ItemToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -216,7 +216,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
         <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10.5}>
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
           <ActionsToolbar
             documentResource={resource} documentId={context.documentId}
             canPreview={canPreview} />
