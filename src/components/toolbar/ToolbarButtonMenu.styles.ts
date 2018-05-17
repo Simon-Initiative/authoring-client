@@ -77,6 +77,22 @@ export const styles: JSSStyles = {
     height: 72,
     borderLeft: '1px solid transparent',
 
+    '& .dropdown-toggle': {
+      cursor: 'pointer',
+
+      '&[disabled]': {
+        cursor: 'default',
+      },
+    },
+
+    '& .dropdown-divider, & .dropdown-menu': {
+      cursor: 'default',
+    },
+
+    '& .dropdown-item': {
+      cursor: 'pointer',
+    },
+
     '&:hover': {
       color: colors.hover,
       borderLeft: `1px solid ${colors.grayLighter}`,
