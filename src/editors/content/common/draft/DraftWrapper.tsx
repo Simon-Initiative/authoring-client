@@ -22,7 +22,7 @@ import './DraftWrapper.scss';
 
 export interface DraftWrapperProps {
   onEdit: (text : ContiguousText, src?) => void;
-  onSelectionChange: (state: SelectionState) => void;
+  onSelectionChange: (state: SelectionState, keyPress: boolean) => void;
   content: ContiguousText;
   locked: boolean;
   context: AppContext;
@@ -232,7 +232,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
           this.lastContent = contentState;
 
-          this.props.onSelectionChange(ss);
+          this.props.onSelectionChange(ss, true);
 
           const edit = () => {
             this.props.onEdit(this.props.content.with({ content: contentState }));
@@ -247,7 +247,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
             || changeType === SelectionChangeType.Initial) {
             this.setState(
               { editorState },
-              () => this.props.onSelectionChange(ss));
+              () => this.props.onSelectionChange(ss, false));
           } else {
             this.setState({ editorState });
           }
@@ -255,6 +255,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       }
     };
   }
+
 
   forceContentChange(contentState, changeType) {
     this.lastContent = contentState;
@@ -266,6 +267,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     });
   }
 
+  shouldComponentUpdate(nextProps: DraftWrapperProps, nextState: DraftWrapperState) : boolean {
+
+    if (this.props.content.content !== nextProps.content.content) {
+      if (nextProps.content.content !== this.state.editorState.getCurrentContent()) {
+        return true;
+      }
+      return false;
+    }
+    if (this.state.editorState.getSelection() !== nextState.editorState.getSelection()) {
+      return true;
+    }
+    return false;
+  }
+
   componentWillReceiveProps(nextProps: DraftWrapperProps) {
 
     if (this.props.content.content !== nextProps.content.content) {
@@ -273,7 +288,6 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       const current = this.state.editorState.getCurrentContent();
 
       if (nextProps.content.content !== current) {
-
         this.lastContent = nextProps.content.content;
         const newEditorState = EditorState.push(
           this.state.editorState, nextProps.content.content);
@@ -312,7 +326,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         anchorOffset: range.start,
         focusOffset: range.start,
       });
-      this.props.onSelectionChange(ss);
+      this.props.onSelectionChange(ss, true);
     };
     const compositeDecorator = buildCompositeDecorator({
       activeItemId: this.props.activeItemId, services: this.props.services,
@@ -366,7 +380,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   }
 
   onGainFocus() {
-    this.props.onSelectionChange(this.state.editorState.getSelection());
+    this.props.onSelectionChange(this.state.editorState.getSelection(), false);
   }
 
   blockStyleFn(contentBlock) {

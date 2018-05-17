@@ -33,6 +33,12 @@ export default class BlockFormulaToolbar
     super(props);
   }
 
+
+  shouldComponentUpdate(nextProps: BlockFormulaToolbarProps, nextState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+    || nextProps.selection !== this.props.selection;
+  }
+
   renderActiveEntity(entity) {
 
     const { key, data } = entity;
