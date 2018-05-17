@@ -150,7 +150,8 @@ export class ToolbarQuadMenu
 
     const dropdown = (
       <div
-        className={classNames([classes.quadDropdown, 'dropdown'])}>
+        className={classNames([classes.quadDropdown,
+          disabled && classes.quadDropdownDisabled, 'dropdown'])}>
         <button
           className={classNames([classes.quadButton, 'dropdown-toggle'])}
           disabled={disabled}
@@ -182,7 +183,7 @@ export class ToolbarQuadMenu
 
     return (
       <div className={
-        classNames([classes.quadMenu, className])}>
+        classNames([classes.quadMenu, disabled && classes.quadMenuDisabled, className])}>
         {group}
       </div>
     );

@@ -93,20 +93,39 @@ export const styles: JSSStyles = {
       cursor: 'pointer',
     },
 
+    '& .toolbarButtonMenuForm': {
+      marginBottom: 0,
+    },
+
     '&:hover': {
-      color: colors.hover,
-      borderLeft: `1px solid ${colors.grayLighter}`,
+      '& $quadButton': {
+        color: colors.hover,
+      },
+    },
+  },
+  quadDropdownDisabled: {
+    cursor: 'default',
+
+    '&:hover': {
+      '& $quadButton': {
+        color: colors.grayLight,
+      },
     },
   },
   quadButton: {
     border: 'none',
     paddingTop: 26,
+    paddingBottom: 26,
     paddingLeft: 0,
     background: 'transparent',
     outline: 0,
     boxShadow: 'none',
     '&:focus': {
       outline: 0,
+    },
+
+    '&[disabled]': {
+      color: colors.grayLight,
     },
   },
   quadMenu: {
@@ -124,24 +143,17 @@ export const styles: JSSStyles = {
     },
 
     '&:hover': {
-      color: colors.hover,
       border: `1px solid ${colors.grayLighter}`,
+
+      '& $quadDropdown': {
+        borderLeft: `1px solid ${colors.grayLighter}`,
+      },
     },
     '&:active': {
       color: colors.selection,
     },
     '&:focus': {
       outline: 0,
-    },
-
-    '&[disabled]': {
-      color: colors.grayLight,
-
-      '&:hover': {
-        cursor: 'default',
-        color: colors.grayLight,
-        border: '1px solid transparent',
-      },
     },
 
     '&.selected': {
@@ -158,6 +170,16 @@ export const styles: JSSStyles = {
           family: 'serif',
           weight: 700,
         },
+      },
+    },
+  },
+  quadMenuDisabled: {
+    '&:hover': {
+      cursor: 'default',
+      border: '1px solid transparent',
+
+      '& $quadDropdown': {
+        borderLeft: '1px solid transparent',
       },
     },
   },
