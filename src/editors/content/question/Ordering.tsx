@@ -10,13 +10,13 @@ import {
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { CombinationsMap } from 'types/combinations';
+import { PermutationsMap } from 'types/combinations';
 import { ChoiceFeedback } from '../part/ChoiceFeedback';
 import { convert } from 'utils/format';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
 
 export interface OrderingProps extends QuestionProps<contentTypes.Ordering> {
-  onGetChoiceCombinations: (comboNum: number) => CombinationsMap;
+  onGetChoicePermutations: (comboNum: number) => PermutationsMap;
 }
 
 export interface OrderingState extends QuestionState {
