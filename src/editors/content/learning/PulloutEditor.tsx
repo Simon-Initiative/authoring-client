@@ -77,7 +77,7 @@ export default class PulloutEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Pullout" columns={6} highlightColor={CONTENT_COLORS.Pullout}>
+      <ToolbarGroup label="Pullout" columns={5} highlightColor={CONTENT_COLORS.Pullout}>
         <ToolbarLayout.Column>
           <Select editMode={this.props.editMode}
             value={this.props.model.pulloutType.caseOf({

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Image } from '../../../data/content/learning/image';
 import { AbstractContentEditor, AbstractContentEditorProps } from
-'../common/AbstractContentEditor';
+  '../common/AbstractContentEditor';
 import { TextInput } from '../common/TextInput';
 import { injectSheet } from 'styles/jss';
 import { Select } from '../common/Select';
@@ -87,7 +87,7 @@ export class ImageSizeSidebar extends
       .catch(err => this.setState({ isNativeSize: true }));
   }
 
-  fetchImageSize(src: string) : Promise<Size> {
+  fetchImageSize(src: string): Promise<Size> {
     const fullSrc = buildUrl(
       this.props.context.baseUrl,
       this.props.context.courseId,
@@ -162,10 +162,12 @@ export class ImageSizeSidebar extends
 
     if (isNativeSize) {
       // Save the model's width and height in state and clear the model's width and height
-      this.setState({ size: {
-        width: parseInt(this.props.model.width, 10),
-        height: parseInt(this.props.model.height, 10),
-      } });
+      this.setState({
+        size: {
+          width: parseInt(this.props.model.width, 10),
+          height: parseInt(this.props.model.height, 10),
+        },
+      });
 
       const model = this.props.model.with({ width: '', height: '' });
       this.props.onEdit(model, model);
@@ -173,7 +175,7 @@ export class ImageSizeSidebar extends
     } else {
       // Custom size, so update the model with the size stored in state if it exists
       if (this.state.size.width !== 0 &&
-          this.state.size.height !== 0) {
+        this.state.size.height !== 0) {
         const model = this.props.model.with({
           width: this.state.size.width.toString(),
           height: this.state.size.height.toString(),
@@ -190,7 +192,7 @@ export class ImageSizeSidebar extends
       <div>
         <SidebarGroup label="">
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-image"/></div>
+            <div><i className="fa fa-image" /></div>
             <div>Change Image</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -202,38 +204,38 @@ export class ImageSizeSidebar extends
                 value="native"
                 checked={this.state.isNativeSize}
                 onChange={() => this.onToggleNativeSizing(true)}
-                type="radio"/>&nbsp;
-                Default
+                type="radio" />&nbsp;
+              Default
             </label>
           </div>
-          <div className="form-check" style={ { marginBottom: '30px' } }>
+          <div className="form-check" style={{ marginBottom: '30px' }}>
             <label className="form-check-label">
               <input className="form-check-input"
                 name="sizingOptions"
                 onChange={() => this.onToggleNativeSizing(false)}
                 value="custom"
                 checked={!this.state.isNativeSize}
-                type="radio"/>&nbsp;
-                Custom
+                type="radio" />&nbsp;
+              Custom
             </label>
           </div>
 
           <SidebarRow label="Width">
             <div className="input-group input-group-sm">
-            <TextInput width="100px" label=""
-              editMode={this.props.editMode && !this.state.isNativeSize}
-              value={width.toString()}
-              type="number"
-              onEdit={this.onEditWidth}
-            /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
+              <TextInput width="100px" label=""
+                editMode={this.props.editMode && !this.state.isNativeSize}
+                value={width.toString()}
+                type="number"
+                onEdit={this.onEditWidth}
+              /><span className="input-group-addon" id="basic-addon2">pixels</span></div>
           </SidebarRow>
           <SidebarRow label="Height">
             <div className="input-group input-group-sm">
               <TextInput width="100px" label=""
-              editMode={this.props.editMode && !this.state.isNativeSize}
-              value={height.toString()}
-              type="number"
-              onEdit={this.onEditHeight} />
+                editMode={this.props.editMode && !this.state.isNativeSize}
+                value={height.toString()}
+                type="number"
+                onEdit={this.onEditHeight} />
               <span className="input-group-addon ">pixels</span>
             </div>
           </SidebarRow>
@@ -241,8 +243,8 @@ export class ImageSizeSidebar extends
             <ToggleSwitch
               {...this.props}
               editMode={this.props.editMode &&
-                        this.state.isSizeReceived &&
-                        !this.state.isNativeSize}
+                this.state.isSizeReceived &&
+                !this.state.isNativeSize}
               checked={this.state.isProportionConstrained}
               onClick={() =>
                 this.onToggleProportionContrained(!this.state.isProportionConstrained)}
@@ -262,7 +264,7 @@ export interface ImageEditorState {
   failure: boolean;
 }
 
-export function selectImage(model, resourcePath, courseModel, display, dismiss) : Promise<Image> {
+export function selectImage(model, resourcePath, courseModel, display, dismiss): Promise<Image> {
 
   return new Promise((resolve, reject) => {
 
@@ -275,7 +277,7 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss) 
         <MediaManager model={model ? model : new Image()}
           resourcePath={resourcePath}
           courseModel={courseModel}
-          onEdit={() => {}}
+          onEdit={() => { }}
           mimeFilter={MIMETYPE_FILTERS.IMAGE}
           selectionType={SELECTION_TYPES.SINGLE}
           initialSelectionPaths={[model ? model.src : null]}
@@ -292,7 +294,7 @@ export function selectImage(model, resourcePath, courseModel, display, dismiss) 
 @injectSheet(styles)
 export default class ImageEditor
   extends AbstractContentEditor
-<Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
+  <Image, StyledComponentProps<ImageEditorProps>, ImageEditorState> {
 
   constructor(props) {
     super(props);
@@ -382,7 +384,7 @@ export default class ImageEditor
           editMode={this.props.editMode}
           model={this.props.model}
           context={this.props.context}
-          onEdit={this.props.onEdit}/>
+          onEdit={this.props.onEdit} />
         {this.renderOther()}
       </SidebarContent>
     );
@@ -392,13 +394,13 @@ export default class ImageEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Image" columns={2} highlightColor={CONTENT_COLORS.Image}>
+      <ToolbarGroup label="Image" columns={3} highlightColor={CONTENT_COLORS.Image}>
         <ToolbarLayout.Column>
           {/* <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Wide}>
             <i className="fa fa-expand"/> Sizing
           </ToolbarButton> */}
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -406,7 +408,7 @@ export default class ImageEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { classes, model } = this.props;
     const { src, height, width } = model;
@@ -424,7 +426,7 @@ export default class ImageEditor
 
     return (
       <div className={classes.mediaElement}>
-        <img src={fullSrc} height={height} width={width}/>
+        <img src={fullSrc} height={height} width={width} />
       </div>
     );
   }

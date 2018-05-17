@@ -23,8 +23,8 @@ export interface MathEditorState {
  * React Component
  */
 export default class MathEditor
-    extends AbstractContentEditor
-    <contentTypes.Math, MathEditorProps & JSSProps, MathEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.Math, MathEditorProps & JSSProps, MathEditorState> {
 
   constructor(props) {
     super(props);
@@ -54,9 +54,9 @@ export default class MathEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Math Editor" columns={2} highlightColor={CONTENT_COLORS.Math}>
+      <ToolbarGroup label="Math Editor" columns={3} highlightColor={CONTENT_COLORS.Math}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-sliders"/></div>
+          <div><i className="fa fa-sliders" /></div>
           <div>Details</div>
         </ToolbarButton>
       </ToolbarGroup>

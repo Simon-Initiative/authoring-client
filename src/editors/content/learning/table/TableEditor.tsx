@@ -38,7 +38,7 @@ export interface TableEditorState {
 // Get the key of the nth element in an ordered map
 function getKey(
   index: number, collection:
-  Immutable.OrderedMap<string,
+    Immutable.OrderedMap<string,
     contentTypes.CellData | contentTypes.CellHeader | contentTypes.Row>) {
   return collection.toArray()[index].guid;
 }
@@ -48,8 +48,8 @@ function getKey(
  */
 @injectSheet(styles)
 export default class TableEditor
-    extends AbstractContentEditor<contentTypes.Table,
-    StyledComponentProps<TableEditorProps>, TableEditorState> {
+  extends AbstractContentEditor<contentTypes.Table,
+  StyledComponentProps<TableEditorProps>, TableEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -113,10 +113,10 @@ export default class TableEditor
             renderContext={undefined}
             activeContentGuid={null}
             hover={null}
-            onUpdateHover={() => {}}
+            onUpdateHover={() => { }}
             model={model.caption.content}
             onEdit={this.onCaptionEdit} />
-          </SidebarGroup>
+        </SidebarGroup>
       </SidebarContent>
     );
   }
@@ -129,7 +129,7 @@ export default class TableEditor
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
+      <ToolbarGroup label="Table" columns={5.3} highlightColor={CONTENT_COLORS.Table}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -198,17 +198,17 @@ export default class TableEditor
     // This doesn't disable the buttons, though.
     const noManualControl = {
       supportedElements: Immutable.List<string>(),
-      onAddNew: (e) => {},
+      onAddNew: (e) => { },
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
       onRemove: (e) => {
         this.onCellRemove(row, e, null);
       },
-      onPaste: (e) => {},
-      onDuplicate: (e) => {},
-      onMoveUp: (e) => {},
-      onMoveDown: (e) => {},
+      onPaste: (e) => { },
+      onDuplicate: (e) => { },
+      onMoveUp: (e) => { },
+      onMoveDown: (e) => { },
       props: this.props,
     };
 
@@ -377,20 +377,20 @@ export default class TableEditor
           hideArrow
           positionMenuOnRight={showOnRight}
           label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
-            classes.moreLabel])}/>} >
+            classes.moreLabel])} />} >
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index) }>
+            onClick={() => onInsert(index)}>
             {`Insert ${term} before`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index + 1) }>
+            onClick={() => onInsert(index + 1)}>
             {`Insert ${term} after`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onRemove(index) }>
+            onClick={() => onRemove(index)}>
             {`Remove ${term}`}
           </button>
         </ToolbarDropdown>
@@ -398,7 +398,7 @@ export default class TableEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
     const { rowstyle } = model;
@@ -427,8 +427,8 @@ export default class TableEditor
       <div className={classNames(['TableEditor', classes.tableEditor, className])}>
         <table className={classNames([classes.table, className])}>
           <tbody>
-          {headerRow}
-          {rows}
+            {headerRow}
+            {rows}
           </tbody>
         </table>
         <button type="button" onClick={this.onInsertRow.bind(this, model.rows.size)}

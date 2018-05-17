@@ -21,7 +21,7 @@ export interface SymEditorState {
  * React Component
  */
 export default class SymEditor
-    extends AbstractContentEditor<contentTypes.Sym, SymEditorProps & JSSProps, SymEditorState> {
+  extends AbstractContentEditor<contentTypes.Sym, SymEditorProps & JSSProps, SymEditorState> {
 
   constructor(props) {
     super(props);
@@ -74,7 +74,7 @@ export default class SymEditor
       <ToolbarGroup
         label="Symbol"
         highlightColor={CONTENT_COLORS.Sym}
-        columns={2}>
+        columns={3}>
 
       </ToolbarGroup>
     );

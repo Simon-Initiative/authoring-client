@@ -66,7 +66,7 @@ export default class PanoptoEditor
         <SidebarGroup label="Source File">
           <div>{file}</div>
           <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-file-o"/></div>
+            <div><i className="fa fa-file-o" /></div>
             <div>Select File</div>
           </ToolbarButton>
         </SidebarGroup>
@@ -97,12 +97,12 @@ export default class PanoptoEditor
     return (
       <ToolbarGroup
         label="Panopto"
-        columns={5}
+        columns={6}
         highlightColor={CONTENT_COLORS.Panopto}>
 
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

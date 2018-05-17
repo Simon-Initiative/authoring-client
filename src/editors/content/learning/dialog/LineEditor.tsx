@@ -92,7 +92,7 @@ export default class LineEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Line" columns={2} highlightColor={CONTENT_COLORS.Dialog}>
+      <ToolbarGroup label="Line" columns={3} highlightColor={CONTENT_COLORS.Dialog}>
       </ToolbarGroup>
     );
   }

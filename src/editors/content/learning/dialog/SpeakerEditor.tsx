@@ -110,7 +110,7 @@ export default class SpeakerEditor
                 checked={this.state.isDisplayedAsImage}
                 onChange={() => this.onToggleDisplayAsImage(true)}
                 type="radio" />&nbsp;
-      as Image
+    as Image
             </label>
           </div>
 
@@ -133,7 +133,7 @@ export default class SpeakerEditor
                 value="text"
                 checked={!this.state.isDisplayedAsImage}
                 type="radio" />&nbsp;
-      as Text
+    as Text
             </label>
           </div>
 
@@ -157,7 +157,7 @@ export default class SpeakerEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Speaker" columns={3} highlightColor={CONTENT_COLORS.Dialog}>
+      <ToolbarGroup label="Speaker" columns={4} highlightColor={CONTENT_COLORS.Dialog}>
         <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-sliders" /></div>
           <div>Change Name or Image</div>
@@ -172,7 +172,7 @@ export default class SpeakerEditor
       <Speaker
         context={context}
         model={model}
-        size={SpeakerSize.Large}  />
+        size={SpeakerSize.Large} />
     );
   }
 }

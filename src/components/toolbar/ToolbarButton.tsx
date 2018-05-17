@@ -8,6 +8,8 @@ export enum ToolbarButtonSize {
   Large = 'large',
   Small = 'small',
   Wide = 'wide',
+  Full = 'full',
+  ExtraWide = 'extraWide',
 }
 
 export interface ToolbarButtonProps {
@@ -45,7 +47,7 @@ export class ToolbarButton extends React.PureComponent<ToolbarButtonProps & JSSP
     return tooltip ?
       (
         <Tooltip title={tooltip} delay={1000} distance={5} style={{ display: 'inline-block' }}
-            size="small" arrowSize="small">
+          size="small" arrowSize="small">
           {button}
         </Tooltip>
       )
