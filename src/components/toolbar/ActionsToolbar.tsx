@@ -55,7 +55,9 @@ export const ActionsToolbar = (({
         <ToolbarButton
             onClick={() => onDisplayModal(
               <DeleteResourceView
+                resource={documentResource}
                 onCancel={onDismissModal}
+                onDelete={() => {}}
               />)}
             size={ToolbarButtonSize.Large}
             tooltip="Delete this Page"
