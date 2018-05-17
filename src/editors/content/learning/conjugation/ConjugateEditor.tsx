@@ -37,8 +37,8 @@ export interface ConjugateEditorState {
  */
 @injectSheet(styles)
 export default class ConjugateEditor
-    extends AbstractContentEditor<contentTypes.ConjugationCell,
-    StyledComponentProps<ConjugateEditorProps>, ConjugateEditorState> {
+  extends AbstractContentEditor<contentTypes.ConjugationCell,
+  StyledComponentProps<ConjugateEditorProps>, ConjugateEditorState> {
 
   constructor(props) {
     super(props);
@@ -82,7 +82,7 @@ export default class ConjugateEditor
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
       ? RenderContext.MainEditor
@@ -95,7 +95,7 @@ export default class ConjugateEditor
       return this.renderSidebar();
     }
     return (
-      <div style={ { height: '100%' } }
+      <div style={{ height: '100%' }}
         onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
         {this.renderMain()}
       </div>
@@ -156,7 +156,7 @@ export default class ConjugateEditor
 
     return (
       <div>
-        <audio src={fullSrc} controls={true}/>
+        <audio src={fullSrc} controls={true} />
         <Button
           editMode={this.props.editMode}
           onClick={this.onAudioRemove.bind(this, model)}>Remove Audio</Button>
@@ -213,7 +213,7 @@ export default class ConjugateEditor
 
     return (
       <ToolbarGroup label="Conjugate Header"
-        columns={4} highlightColor={CONTENT_COLORS.Conjugate}>
+        columns={5} highlightColor={CONTENT_COLORS.Conjugate}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-th-list"></i></div>
           <div>Details</div>
@@ -227,11 +227,11 @@ export default class ConjugateEditor
 
     return (
       <ToolbarGroup label="Conjugate"
-        columns={4} highlightColor={CONTENT_COLORS.Conjugate}>
+        columns={5} highlightColor={CONTENT_COLORS.Conjugate}>
         <ToolbarButton onClick={this.onSelect} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-music"/></div>
-            <div>Select Audio</div>
-          </ToolbarButton>
+          <div><i className="fa fa-music" /></div>
+          <div>Select Audio</div>
+        </ToolbarButton>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-th-list"></i></div>
           <div>Details</div>
@@ -253,11 +253,11 @@ export default class ConjugateEditor
       onEdit(content: Object, source: Object) {
         this.props.onEdit(this.props.model.with({ content }), source);
       },
-      onAddNew(content: Object, textSelection: Maybe<TextSelection>) {},
-      onRemove(content: Object) {},
-      onDuplicate(content: Object) {},
-      onMoveUp(content: Object) {},
-      onMoveDown(content: Object) {},
+      onAddNew(content: Object, textSelection: Maybe<TextSelection>) { },
+      onRemove(content: Object) { },
+      onDuplicate(content: Object) { },
+      onMoveUp(content: Object) { },
+      onMoveDown(content: Object) { },
       props: this.props,
     };
 
@@ -266,7 +266,7 @@ export default class ConjugateEditor
       model: this.props.model.content,
       onEdit: this.onContentEdit.bind(this),
       parent: this,
-      onClick: () => {},
+      onClick: () => { },
       onFocus: (m, p, t) => this.onFocus(m, parent, t),
     });
 
@@ -274,13 +274,13 @@ export default class ConjugateEditor
       getEditorByContentType('ContiguousText'), props);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { className, classes, model, parent, activeContentGuid } = this.props;
     const { activeChildGuid } = this.state;
 
     const cellClass =
       activeContentGuid === model.guid
-      ? classes.innerConjugateSelected : classes.innerConjugate;
+        ? classes.innerConjugateSelected : classes.innerConjugate;
 
     const bindProps = (element) => {
 
@@ -291,19 +291,19 @@ export default class ConjugateEditor
     };
 
     const hideDecorator = model.content.content.size === 0 ||
-     (model.content.content.size === 1
-      && model.content.content.first().contentType === 'ContiguousText');
+      (model.content.content.size === 1
+        && model.content.content.first().contentType === 'ContiguousText');
 
     const contentEditor = this.props.model.contentType === 'Conjugate'
       ? this.renderSimplifiedTextEditor()
       : <ContentContainer
-          {...this.props}
-          onFocus={this.onFocus}
-          hideSingleDecorator={hideDecorator}
-          bindProperties={bindProps}
-          model={this.props.model.content}
-          onEdit={this.onContentEdit.bind(this)}
-        />;
+        {...this.props}
+        onFocus={this.onFocus}
+        hideSingleDecorator={hideDecorator}
+        bindProperties={bindProps}
+        model={this.props.model.content}
+        onEdit={this.onContentEdit.bind(this)}
+      />;
 
     return (
       <div className={classNames([

@@ -24,7 +24,7 @@ interface ToolbarGroupProps {
   columns?: number;
 }
 
-export function determineBaseUrl(resource: Resource) : string {
+export function determineBaseUrl(resource: Resource): string {
   if (resource === undefined) return '';
 
   const pathTo = resource.fileNode.pathTo;
@@ -34,7 +34,7 @@ export function determineBaseUrl(resource: Resource) : string {
     .substr(0, stem.lastIndexOf('\/'));
 }
 
-const TOOLBAR_COL_WIDTH = 36;
+const TOOLBAR_COL_WIDTH = 31;
 const DEFAULT_TOOLBAR_GROUP_COLS = 10;
 
 export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
@@ -46,22 +46,22 @@ export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
       ? (
         <div className={classNames([classes.toolbarGroupContainer, className])}>
           <div style={{ width }} className={classNames([classes.toolbarGroup])}>
-              <div className={classes.tbGroupItems}>{children}</div>
-              <div className={classes.tbGroupLabel}>{label}</div>
+            <div className={classes.tbGroupItems}>{children}</div>
           </div>
+          <div className={classes.tbGroupLabel}>{label}</div>
         </div>
       )
       : (
         <div className={classes.toolbarGroupContainer}>
-          <div style={{ width: 4 * TOOLBAR_COL_WIDTH }}
-               className={classes.toolbarGroup}>
+          <div style={{ width: 6 * TOOLBAR_COL_WIDTH }}
+            className={classes.toolbarGroup}>
             <div className={classes.tbVerticallyCentered}>
               <div className={classes.tbNoAdvancedControls}>
                 This item does not have any advanced controls
               </div>
             </div>
-            <div className={classes.tbGroupLabel}>{label}</div>
           </div>
+          <div className={classes.tbGroupLabel}>{label}</div>
         </div>
       );
   });
@@ -163,7 +163,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         onEdit,
         parent: contentParent,
         activeContentGuid: contentParent.props.activeContentGuid,
-        onFocus: () => {},
+        onFocus: () => { },
         context: contentParent.props.context,
         services: contentParent.props.services,
         editMode: contentParent.props.editMode,
@@ -189,7 +189,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={13}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -200,7 +200,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={5.5}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7.3}>
           <ItemToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -208,15 +208,15 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         </ToolbarGroup>
 
         <ReactCSSTransitionGroup
-            transitionName="contextToolbar"
-            transitionEnterTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}
-            transitionLeaveTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}>
+          transitionName="contextToolbar"
+          transitionEnterTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}
+          transitionLeaveTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}>
           {contentRenderer}
         </ReactCSSTransitionGroup>
 
-        <div className="flex-spacer"/>
+        <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8.5}>
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10.5}>
           <ActionsToolbar
             documentResource={resource} documentId={context.documentId}
             canPreview={canPreview} />

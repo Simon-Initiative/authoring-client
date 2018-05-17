@@ -97,10 +97,10 @@ export default class ActivityEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={2}>
+      <ToolbarGroup label="Activity" highlightColor={CONTENT_COLORS.Activity} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
