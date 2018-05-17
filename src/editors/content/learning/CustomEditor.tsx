@@ -58,6 +58,7 @@ const buildInitiatorPartMap = (question: Question, initiators: Immutable.List<In
   return initiators.reduce(
     (acc, val) =>
       acc.set(val.assessmentId, question.parts.find(part =>
+        part.responses.first() &&
         part.responses.first().input === val.assessmentId,
       )),
     Immutable.Map<string, Part>(),
@@ -154,7 +155,7 @@ const updateItemPartsFromTargets = (
     (accParts, part) => accParts.set(part.guid, part.with({
       responses: sortedTargets.reduce(
         (accResponses, target) => {
-          const input = part.responses.first().input;
+          const input = part.responses.first() && part.responses.first().input;
           const f = new Feedback();
 
           // find existing response with assessmentId or create a new one
@@ -357,7 +358,7 @@ export class CustomEditor
       nothing: () => Immutable.List<InitiatorModel>(),
     });
 
-    onSelectInitiator(initiators.first().assessmentId);
+    onSelectInitiator(initiators.first() && initiators.first().assessmentId);
   }
 
   renderSidebar(): JSX.Element {
@@ -406,8 +407,11 @@ export class CustomEditor
       assessmentId: guid(),
     });
 
-    const targetAssessmentIds = (question.items.first() as FillInTheBlank).choices
-      .toArray().map(c => c.value);
+    let targetAssessmentIds = [];
+    if (question.items.first()) {
+      targetAssessmentIds = (question.items.first() as FillInTheBlank).choices
+        .toArray().map(c => c.value);
+    }
 
     const newItem = new FillInTheBlank().with({
       id: newInitiator.assessmentId,
@@ -492,9 +496,10 @@ export class CustomEditor
     const itemKey = question.items.findKey(item =>
       (item as FillInTheBlank).id === initiator.assessmentId);
     const partKey = question.parts.findKey(part =>
+      part.responses.first() &&
       part.responses.first().input === initiator.assessmentId);
 
-    onSelectInitiator(initiators.first().assessmentId);
+    onSelectInitiator(initiators.first() && initiators.first().assessmentId);
 
     // save question updates
     this.onEditQuestion(question.with({
@@ -600,11 +605,13 @@ export class CustomEditor
           rows: ld.targetGroup.rows.splice(index, 0, new ContentRow().with({
             // use the last row as a template for the new row cols (DndText or Target)
             cols: Immutable.List<DndText | Target>(
-              ld.targetGroup.rows.last().cols.toArray().map(c =>
-                c.contentType === 'DndText'
-                ? (new DndText())
-                : (new Target({ assessmentId: guid() })),
-              ),
+              ld.targetGroup.rows.last()
+              ? ld.targetGroup.rows.last().cols.toArray().map(c =>
+                  c.contentType === 'DndText'
+                  ? (new DndText())
+                  : (new Target({ assessmentId: guid() })),
+                )
+              : [],
             ),
           })) as Immutable.List<TG_ROW>,
         }),
@@ -809,14 +816,14 @@ export class CustomEditor
       <div className={classes.dynaDropTable}>
         <p className={classes.instructions}>
           Each cell can either be a label or a drop target. Hover over a cell and click
-          the type toggle to change it's type.
+          the toggle icon <i className="fa fa-crosshairs" /> to set/unset as a drop target.
         </p>
         <table>
           <thead>
             {/* Render column options menu */}
             <tr>
               <th/>
-              {rows.first().cols.toArray().map((val, index) => (
+              {rows.first() && rows.first().cols.toArray().map((val, index) => (
                 <th>
                 {this.renderDropdown(
                   index,
@@ -840,7 +847,7 @@ export class CustomEditor
             <i className="fa fa-plus" /> Add a Row
           </Button>
           <Button type="link" editMode={editMode}
-            onClick={() => this.onAddColumn(rows.first().cols.size)} >
+            onClick={() => this.onAddColumn(rows.first() && rows.first().cols.size)} >
             <i className="fa fa-plus" /> Add a Column
           </Button>
         </div>
@@ -871,9 +878,9 @@ export class CustomEditor
 
     return (
       <div className={classNames([classes.customEditor, className])}>
-        {model.src.substr(11) === 'DynaDrop.js'
-          ? '[Custom Element]'
-          : this.renderDynaDrop()
+        {model.src.substr(model.src.length - 11) === 'DynaDrop.js'
+          ? this.renderDynaDrop()
+          : '[Custom Element]'
         }
       </div>
     );
