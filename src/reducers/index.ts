@@ -19,6 +19,7 @@ import { questionEditor, QuestionEditorState } from './questionEditor';
 import { documents, DocumentsState } from './documents';
 import { activeContext, ActiveContextState } from './active';
 import { clipboard, ClipboardState } from './clipboard';
+import { resourceRefs, ResourceRefState } from './resourcerefs';
 
 export interface State {
   activeContext: ActiveContextState;
@@ -40,6 +41,7 @@ export interface State {
   user: UserState;
   questionEditor: QuestionEditorState;
   clipboard: ClipboardState;
+  resourceRefs: ResourceRefState;
 }
 
 const reducers = combineReducers({

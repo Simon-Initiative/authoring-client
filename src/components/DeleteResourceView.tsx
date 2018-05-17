@@ -3,6 +3,8 @@ import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
 import * as React from 'react';
 import ModalSelection from 'utils/selection/ModalSelection';
+import { miniResourceRef } from 'components/DeleteResourceView.controller';
+import { Maybe } from 'tsmonad/lib/src';
 // import './DeleteResourceView.scss';
 
 export interface DeleteResourceViewProps {
@@ -17,6 +19,7 @@ export interface DeleteResourceViewProps {
   onCancel: () => void;
   onDelete: () => void;
   resource: Resource;
+  resourceRefs: Maybe<miniResourceRef>
 }
 
 interface DeleteResourceViewState {

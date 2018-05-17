@@ -18,14 +18,15 @@ interface DispatchProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  deleteResource: (resource: Resource) => void;
 }
 
 interface OwnProps {
   documentResource: Resource;
   documentId: string;
   canPreview: boolean;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
+  // onDisplayModal: (component: any) => void;
+  // onDismissModal: () => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
@@ -50,6 +51,9 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     },
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
+    },
+    deleteResource: (resource: Resource) => {
+      return dispatch(deleteResource(resource));
     },
   };
 };

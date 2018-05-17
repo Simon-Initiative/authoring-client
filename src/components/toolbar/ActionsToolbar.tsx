@@ -16,8 +16,9 @@ export interface ActionsToolbarProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
+  // onDisplayModal: (component: any) => void;
+  // onDismissModal: () => void;
+  deleteResource: (resource: Resource) => void;
 }
 
 /**
@@ -26,7 +27,7 @@ export interface ActionsToolbarProps {
 export const ActionsToolbar = (({
   courseId, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
-  onDismissModal, onDisplayModal,
+  deleteResource,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -53,12 +54,7 @@ export const ActionsToolbar = (({
           <div>Details</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onDisplayModal(
-              <DeleteResourceView
-                resource={documentResource}
-                onCancel={onDismissModal}
-                onDelete={() => {}}
-              />)}
+            onClick={() => deleteResource(documentResource)}
             size={ToolbarButtonSize.Large}
             tooltip="Delete this Page"
             disabled={false}>
