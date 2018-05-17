@@ -82,18 +82,18 @@ export default class IFrameEditor
       <ToolbarGroup
         label="Web Page"
         highlightColor={CONTENT_COLORS.IFrame}
-        columns={4}>
+        columns={6}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
             onDiscover(DiscoverableId.IFrameEditorWebpageURL);
           }} size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-window-maximize"/></div>
+          <div><i className="fa fa-window-maximize" /></div>
           <div>Web Page URL</div>
         </ToolbarButton>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -101,7 +101,7 @@ export default class IFrameEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { src, height, width } = this.props.model;
     const fullSrc = buildUrl(
@@ -112,7 +112,7 @@ export default class IFrameEditor
 
     return (
       <div className="iframeEditor">
-        <iframe src={fullSrc} height={height} width={width}/>
+        <iframe src={fullSrc} height={height} width={width} />
       </div>
     );
   }

@@ -39,7 +39,7 @@ export interface ContiguousTextToolbarState {
 @injectSheet(styles)
 export default class ContiguousTextToolbar
   extends AbstractContentEditor<contentTypes.ContiguousText,
-    ContiguousTextToolbarProps & JSSProps, ContiguousTextToolbarState> {
+  ContiguousTextToolbarProps & JSSProps, ContiguousTextToolbarState> {
 
   constructor(props) {
     super(props);
@@ -115,196 +115,196 @@ export default class ContiguousTextToolbar
 
     return (
       <ToolbarGroup
-        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={10}>
+        label="Text Block" highlightColor={CONTENT_COLORS.ContiguousText} columns={11}>
         <ToolbarLayout.Inline>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Bold, selection))
+            }
+            disabled={!supports('em') || noTextSelected || !editMode}
+            tooltip="Bold">
+            <i className={'fa fa-bold'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
+            }
+            disabled={!supports('em') || noTextSelected || !editMode}
+            tooltip="Italic">
+            <i className={'fa fa-italic'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
+            }
+            disabled={!supports('em') || noTextSelected || !editMode}
+            tooltip="Strikethrough">
+            <i className={'fa fa-strikethrough'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
+            }
+            disabled={!supports('em') || noTextSelected || !editMode}
+            tooltip="Highlight">
+            <i className={'fa fa-pencil'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
+            }
+            disabled={!supports('sup') || noTextSelected || !editMode}
+            tooltip="Superscript">
+            <i className={'fa fa-superscript'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
+            }
+            disabled={!supports('sub') || noTextSelected || !editMode}
+            tooltip="Subscript">
+            <i className={'fa fa-subscript'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
+            }
+            disabled={!supports('code') || noTextSelected || !editMode}
+            tooltip="Code">
+            <i className={'fa fa-code'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+              onEdit(model.toggleStyle(InlineStyles.Term, selection));
+            }}
+            disabled={!supports('term') || noTextSelected || !editMode}
+            tooltip="Term">
+            <i className={'fa fa-book'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+              onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
+            }}
+            disabled={!supports('foreign') || noTextSelected || !editMode}
+            tooltip="Foreign">
+            <i className={'fa fa-globe'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => {
+              onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
+            }}
+            disabled={!supports('bdo') || bdoDisabled || !editMode}
+            tooltip="Reverse Text Direction">
+            <i className={'fa fa-angle-left'} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.quote, true, new contentTypes.Quote(), selection));
               }
-              disabled={!supports('em') || noTextSelected || !editMode}
-              tooltip="Bold">
-            <i className={'fa fa-bold'}/>
+            }
+            disabled={!supports('quote') || !rangeEntitiesEnabled}
+            tooltip="Quotation">
+            <i className={'fa fa-quote-right'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Italic, selection))
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.cite, true, new contentTypes.Cite(), selection));
               }
-              disabled={!supports('em') || noTextSelected || !editMode}
-              tooltip="Italic">
-            <i className={'fa fa-italic'}/>
+            }
+            disabled={!supports('cite') || !rangeEntitiesEnabled}
+            tooltip="Citation">
+            <i className={'fa fa-asterisk'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Strikethrough, selection))
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.link, true, new contentTypes.Link(), selection));
               }
-              disabled={!supports('em') || noTextSelected || !editMode}
-              tooltip="Strikethrough">
-            <i className={'fa fa-strikethrough'}/>
+            }
+            disabled={!supports('link') || !rangeEntitiesEnabled}
+            tooltip="External Hyperlink">
+            <i className={'fa fa-external-link'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Highlight, selection))
-              }
-              disabled={!supports('em') || noTextSelected || !editMode}
-              tooltip="Highlight">
-            <i className={'fa fa-pencil'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Superscript, selection))
-              }
-              disabled={!supports('sup') || noTextSelected || !editMode}
-              tooltip="Superscript">
-            <i className={'fa fa-superscript'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Subscript, selection))
-              }
-              disabled={!supports('sub') || noTextSelected || !editMode}
-              tooltip="Subscript">
-            <i className={'fa fa-subscript'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => onEdit(model.toggleStyle(InlineStyles.Var, selection))
-              }
-              disabled={!supports('code') || noTextSelected || !editMode}
-              tooltip="Code">
-            <i className={'fa fa-code'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Term, selection));
-              }}
-              disabled={!supports('term') || noTextSelected || !editMode}
-              tooltip="Term">
-            <i className={'fa fa-book'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.Foreign, selection));
-              }}
-              disabled={!supports('foreign') || noTextSelected || !editMode}
-              tooltip="Foreign">
-            <i className={'fa fa-globe'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={() => {
-                onEdit(model.toggleStyle(InlineStyles.BidirectionTextOverride, selection));
-              }}
-              disabled={!supports('bdo') || bdoDisabled || !editMode}
-              tooltip="Reverse Text Direction">
-            <i className={'fa fa-angle-left'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.quote, true, new contentTypes.Quote(), selection));
-                }
-              }
-              disabled={!supports('quote') || !rangeEntitiesEnabled}
-              tooltip="Quotation">
-            <i className={'fa fa-quote-right'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.cite, true, new contentTypes.Cite(), selection));
-                }
-              }
-              disabled={!supports('cite') || !rangeEntitiesEnabled}
-              tooltip="Citation">
-            <i className={'fa fa-asterisk'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.link, true, new contentTypes.Link(), selection));
-                }
-              }
-              disabled={!supports('link') || !rangeEntitiesEnabled}
-              tooltip="External Hyperlink">
-            <i className={'fa fa-external-link'}/>
-          </ToolbarButton>
-          <ToolbarButton
-              onClick={
-                () => {
-                  const material = contentTypes.Material.fromText('Sample definition', '');
-                  const m = new contentTypes.Meaning().with({ material });
-                  const extra = new contentTypes.Extra().with({
-                    meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
-                  });
+            onClick={
+              () => {
+                const material = contentTypes.Material.fromText('Sample definition', '');
+                const m = new contentTypes.Meaning().with({ material });
+                const extra = new contentTypes.Extra().with({
+                  meaning: Immutable.OrderedMap<string, contentTypes.Meaning>().set(m.guid, m),
+                });
 
-                  onEdit(model.addEntity(
-                    EntityTypes.extra, true, extra, selection));
-                }
+                onEdit(model.addEntity(
+                  EntityTypes.extra, true, extra, selection));
               }
-              disabled={!supports('extra') || !rangeEntitiesEnabled}
-              tooltip="Rollover Definition">
-            <i className={'fa fa-book'}/>
+            }
+            disabled={!supports('extra') || !rangeEntitiesEnabled}
+            tooltip="Rollover Definition">
+            <i className={'fa fa-book'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  const extra = new contentTypes.Extra().with({
-                    content: ContentElements.fromText('Sample content', '', EXTRA_ELEMENTS),
-                  });
+            onClick={
+              () => {
+                const extra = new contentTypes.Extra().with({
+                  content: ContentElements.fromText('Sample content', '', EXTRA_ELEMENTS),
+                });
 
-                  onEdit(model.addEntity(
-                    EntityTypes.extra, true, extra, selection));
-                }
+                onEdit(model.addEntity(
+                  EntityTypes.extra, true, extra, selection));
               }
-              disabled={!supports('extra') || !rangeEntitiesEnabled}
-              tooltip="Rollover Content">
-            <i className={'fa fa-address-book-o'}/>
+            }
+            disabled={!supports('extra') || !rangeEntitiesEnabled}
+            tooltip="Rollover Content">
+            <i className={'fa fa-address-book-o'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.activity_link, true, new contentTypes.ActivityLink(), selection));
-                }
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.activity_link, true, new contentTypes.ActivityLink(), selection));
               }
-              disabled={!supports('activity_link') || !rangeEntitiesEnabled}
-              tooltip="High Stakes Assessment Link">
-            <i className={'fa fa-check'}/>
+            }
+            disabled={!supports('activity_link') || !rangeEntitiesEnabled}
+            tooltip="High Stakes Assessment Link">
+            <i className={'fa fa-check'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.xref, true, new contentTypes.Xref(), selection));
-                }
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.xref, true, new contentTypes.Xref(), selection));
               }
-              disabled={!supports('xref') || !rangeEntitiesEnabled}
-              tooltip="Cross Reference Link">
-            <i className={'fa fa-map-signs'}/>
+            }
+            disabled={!supports('xref') || !rangeEntitiesEnabled}
+            tooltip="Cross Reference Link">
+            <i className={'fa fa-map-signs'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.math, true, new contentTypes.Math(), selection));
-                }
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.math, true, new contentTypes.Math(), selection));
               }
-              disabled={!supports('m:math') || !pointEntitiesEnabled}
-              tooltip="MathML or Latex formula">
-            <i className={'fa fa-etsy'}/>
+            }
+            disabled={!supports('m:math') || !pointEntitiesEnabled}
+            tooltip="MathML or Latex formula">
+            <i className={'fa fa-etsy'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.addEntity(
-                    EntityTypes.sym, true, new contentTypes.Sym(), selection));
-                }
+            onClick={
+              () => {
+                onEdit(model.addEntity(
+                  EntityTypes.sym, true, new contentTypes.Sym(), selection));
               }
-              disabled={!supports('sym') || !pointEntitiesEnabled}
-              tooltip="HTML Entity or Symbol">
-            <i className={'fa fa-circle'}/>
+            }
+            disabled={!supports('sym') || !pointEntitiesEnabled}
+            tooltip="HTML Entity or Symbol">
+            <i className={'fa fa-circle'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
@@ -318,7 +318,7 @@ export default class ContiguousTextToolbar
             }}
             tooltip="Insert Image"
             disabled={!supports('image') || !pointEntitiesEnabled}>
-            <i className={'fa fa-image'}/>
+            <i className={'fa fa-image'} />
           </ToolbarButton>
 
         </ToolbarLayout.Inline>
@@ -326,7 +326,7 @@ export default class ContiguousTextToolbar
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     return null;
   }
 

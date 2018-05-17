@@ -28,12 +28,12 @@ export default class CustomEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Audio} columns={4}>
+      <ToolbarGroup label="Custom" highlightColor={CONTENT_COLORS.Audio} columns={5}>
       </ToolbarGroup>
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { model } = this.props;
 
     return (

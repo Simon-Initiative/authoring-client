@@ -31,8 +31,8 @@ export interface CellEditorState {
  */
 @injectSheet(styles)
 export default class CellEditor
-    extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
-    StyledComponentProps<CellEditorProps>, CellEditorState> {
+  extends AbstractContentEditor<contentTypes.CellData | contentTypes.CellHeader,
+  StyledComponentProps<CellEditorProps>, CellEditorState> {
 
   constructor(props) {
     super(props);
@@ -80,7 +80,7 @@ export default class CellEditor
     );
   }
 
-  render() : JSX.Element {
+  render(): JSX.Element {
 
     const renderContext = this.props.renderContext === undefined
       ? RenderContext.MainEditor
@@ -93,7 +93,7 @@ export default class CellEditor
       return this.renderSidebar();
     }
     return (
-      <div style={ { height: '100%' } }
+      <div style={{ height: '100%' }}
         onFocus={e => this.handleOnFocus(e)} onClick={e => this.handleOnClick(e)}>
         {this.renderMain()}
       </div>
@@ -155,12 +155,12 @@ export default class CellEditor
           />
         </SidebarGroup>
         <SidebarGroup label="Header">
-        <ToggleSwitch
-              {...this.props}
-              checked={this.props.model.contentType === 'CellHeader'}
-              onClick={() =>
-                this.onToggleCellHeader()}
-              labelBefore="Display cell as a header" />
+          <ToggleSwitch
+            {...this.props}
+            checked={this.props.model.contentType === 'CellHeader'}
+            onClick={() =>
+              this.onToggleCellHeader()}
+            labelBefore="Display cell as a header" />
         </SidebarGroup>
       </SidebarContent>
     );
@@ -170,7 +170,7 @@ export default class CellEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Table Cell" columns={4} highlightColor={CONTENT_COLORS.CellData}>
+      <ToolbarGroup label="Table Cell" columns={5} highlightColor={CONTENT_COLORS.CellData}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-align-left"></i></div>
           <div>Alignment</div>
@@ -183,13 +183,13 @@ export default class CellEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { className, classes, model, parent, activeContentGuid } = this.props;
     const { activeChildGuid } = this.state;
 
     const cellClass =
       activeContentGuid === model.guid
-      ? classes.innerCellSelected : classes.innerCell;
+        ? classes.innerCellSelected : classes.innerCell;
 
     const bindProps = (element) => {
 
@@ -200,8 +200,8 @@ export default class CellEditor
     };
 
     const hideDecorator = model.content.content.size === 0 ||
-     (model.content.content.size === 1
-      && model.content.content.first().contentType === 'ContiguousText');
+      (model.content.content.size === 1
+        && model.content.content.first().contentType === 'ContiguousText');
 
     return (
       <div className={classNames([
