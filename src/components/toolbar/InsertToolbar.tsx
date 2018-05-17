@@ -369,7 +369,8 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 <ResourceSelection
                   filterPredicate={(
                     res: Resource): boolean =>
-                      res.type === LegacyTypes.inline}
+                      res.type === LegacyTypes.inline
+                        && !res.deleted}
                   courseId={context.courseId}
                   onInsert={(resource) => {
                     onDismissModal();
@@ -390,7 +391,8 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 <ResourceSelection
                   filterPredicate={(
                     res: Resource): boolean =>
-                      res.type === LegacyTypes.assessment2}
+                      res.type === LegacyTypes.assessment2
+                        && !res.deleted}
                   courseId={context.courseId}
                   onInsert={(resource) => {
                     onDismissModal();

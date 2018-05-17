@@ -32,6 +32,7 @@ import Messages from './components/message/Messages.controller';
 import * as Msg from 'types/messages';
 import { getQueryVariableFromString } from 'utils/params';
 import * as messageActions from 'actions//messages';
+import { Resource } from 'data/content/resource';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -44,7 +45,7 @@ type ResourceList = {
   createResourceFn: any,
 };
 
-function res(title, resourceType, filterFn, createResourceFn) : ResourceList {
+function res(title, resourceType, filterFn, createResourceFn): ResourceList {
   return {
     title,
     resourceType,
@@ -77,47 +78,53 @@ const createOrg = (courseId, title, type) => {
 
 const resources = {
   organizations: res(
-        'Organizations',
-        LegacyTypes.organization,
-        resource => resource.type === LegacyTypes.organization,
-        createOrg),
+    'Organizations',
+    LegacyTypes.organization,
+    (resource: Resource) => resource.type === LegacyTypes.organization
+      && !resource.deleted,
+    createOrg),
   formativeassessments: res(
-        'Formative Assessments',
-        LegacyTypes.inline,
-        resource => resource.type === LegacyTypes.inline,
-        (courseId, title, type) => new models.AssessmentModel({
-          type,
-          title: contentTypes.Title.fromText(title),
-        })),
+    'Formative Assessments',
+    LegacyTypes.inline,
+    (resource: Resource) => resource.type === LegacyTypes.inline,
+    (courseId, title, type) => new models.AssessmentModel({
+      type,
+      title: contentTypes.Title.fromText(title),
+    })),
   summativeassessments: res(
     'Summative Assessments',
     LegacyTypes.assessment2,
-    resource => resource.type === LegacyTypes.assessment2,
+    (resource: Resource) => resource.type === LegacyTypes.assessment2
+      && !resource.deleted,
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
     })),
   pages: res(
-        'Workbook Pages',
-        LegacyTypes.workbook_page,
-        resource => resource.type === LegacyTypes.workbook_page
-          && resource.id !== PLACEHOLDER_ITEM_ID,
-        (courseId, title, type) => models.WorkbookPageModel.createNew(
-          guid(), title, 'This is a new page with empty content'),
-        ),
+    'Workbook Pages',
+    LegacyTypes.workbook_page,
+    (resource: Resource) => resource.type === LegacyTypes.workbook_page
+      && resource.id !== PLACEHOLDER_ITEM_ID
+      && !resource.deleted,
+    (courseId, title, type) => models.WorkbookPageModel.createNew(
+      guid(), title, 'This is a new page with empty content'),
+  ),
   pools: res(
-        'Question Pools',
-        LegacyTypes.assessment2_pool,
-        resource => resource.type === LegacyTypes.assessment2_pool,
-        (courseId, title, type) => {
-          const q = new contentTypes.Question();
-          const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
-          return new models.PoolModel({
-            type,
-            pool: new contentTypes.Pool({ questions, id: guid(),
-              title: contentTypes.Title.fromText(title) }),
-          });
+    'Question Pools',
+    LegacyTypes.assessment2_pool,
+    (resource: Resource) => resource.type === LegacyTypes.assessment2_pool
+      && !resource.deleted,
+    (courseId, title, type) => {
+      const q = new contentTypes.Question();
+      const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);
+      return new models.PoolModel({
+        type,
+        pool: new contentTypes.Pool({
+          questions, id: guid(),
+          title: contentTypes.Title.fromText(title)
         }),
+      });
+    }),
 };
 
 interface MainProps {
@@ -199,7 +206,7 @@ export default class Main extends React.Component<MainProps, MainState> {
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
-        dispatch={onDispatch}/>
+        dispatch={onDispatch} />
     );
   }
 
@@ -207,13 +214,13 @@ export default class Main extends React.Component<MainProps, MainState> {
     const { onDispatch, expanded, user, course } = this.props;
 
     if (url === '/') {
-      return <CoursesView dispatch={onDispatch} userId={user.userId}/>;
+      return <CoursesView dispatch={onDispatch} userId={user.userId} />;
     }
     if (url === '/create') {
-      return <CreateCourseView dispatch={onDispatch}/>;
+      return <CreateCourseView dispatch={onDispatch} />;
     }
     if (url === '/import') {
-      return <ImportCourseView dispatch={onDispatch}/>;
+      return <ImportCourseView dispatch={onDispatch} />;
     }
     if (url.startsWith('/preview')) {
 
@@ -230,30 +237,30 @@ export default class Main extends React.Component<MainProps, MainState> {
         ? Maybe.nothing<string>() : Maybe.just(previewUrl);
 
       return <Preview
-          showMessage={(message: Msg.Message) => {
-            this.props.onDispatch(messageActions.showMessage(message));
-          }}
-          dismissMessage={(message: Msg.Message) => {
-            this.props.onDispatch(messageActions.dismissSpecificMessage(message));
-          }}
-          email={this.props.user.profile.email}
-          shouldRefresh={shouldRefresh}
-          previewUrl={maybePreviewUrl}
-          documentId={documentId}
-          courseId={courseId}/>;
+        showMessage={(message: Msg.Message) => {
+          this.props.onDispatch(messageActions.showMessage(message));
+        }}
+        dismissMessage={(message: Msg.Message) => {
+          this.props.onDispatch(messageActions.dismissSpecificMessage(message));
+        }}
+        email={this.props.user.profile.email}
+        shouldRefresh={shouldRefresh}
+        previewUrl={maybePreviewUrl}
+        documentId={documentId}
+        courseId={courseId} />;
 
     }
     if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView
-          course={course}
-          dispatch={onDispatch}
-          expanded={expanded}
-          userName={user.user}/>;
+        course={course}
+        dispatch={onDispatch}
+        expanded={expanded}
+        userName={user.user} />;
     }
 
     if (course) {
 
-      const documentId : string = url.substr(1, url.indexOf('-') - 1);
+      const documentId: string = url.substr(1, url.indexOf('-') - 1);
 
       if (documentId === course.guid) {
         return <CourseEditor
@@ -269,14 +276,14 @@ export default class Main extends React.Component<MainProps, MainState> {
       const onLoad = (docId: string) => onDispatch(load(course.guid, docId));
 
       return (
-          <DocumentView
-            onLoad={onLoad}
-            onRelease={onRelease}
-            profile={user.profile}
-            course={course}
-            userId={user.userId}
-            userName={user.user}
-            documentId={documentId} />
+        <DocumentView
+          onLoad={onLoad}
+          onRelease={onRelease}
+          profile={user.profile}
+          course={course}
+          userId={user.userId}
+          userName={user.user}
+          documentId={documentId} />
       );
 
     }
@@ -303,19 +310,19 @@ export default class Main extends React.Component<MainProps, MainState> {
     const currentView = this.getView(getPathName(this.props.location.pathname));
 
     return (
-        <div className="main">
-          <div className="main-header">
-            <Messages/>
-            <Header/>
-          </div>
-          <div className="main-content">
-            {currentView}
-          </div>
-          <div className="main-footer">
-            <Footer name={user.profile.username} email={user.profile.email} />
-          </div>
-          {modalDisplay}
+      <div className="main">
+        <div className="main-header">
+          <Messages />
+          <Header />
         </div>
+        <div className="main-content">
+          {currentView}
+        </div>
+        <div className="main-footer">
+          <Footer name={user.profile.username} email={user.profile.email} />
+        </div>
+        {modalDisplay}
+      </div>
     );
   }
 }

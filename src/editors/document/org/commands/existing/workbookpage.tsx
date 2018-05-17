@@ -56,8 +56,9 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
                           .guid));
 
       const predicate = (res: Resource) : boolean =>
-        res.type === LegacyTypes.workbook_page &&
-        !resourcesAlreadyInOrg.has(res.guid);
+        res.type === LegacyTypes.workbook_page
+          && !res.deleted
+          && !resourcesAlreadyInOrg.has(res.guid);
 
       return new Promise((resolve, reject) => {
         services.displayModal(

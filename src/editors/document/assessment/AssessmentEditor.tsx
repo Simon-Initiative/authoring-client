@@ -307,7 +307,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const predicate =
       (res: Resource) : boolean => {
-        return res.type === LegacyTypes.assessment2_pool;
+        return res.type === LegacyTypes.assessment2_pool
+          && !res.deleted;
       };
 
     this.props.services.displayModal(
