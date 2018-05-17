@@ -28,10 +28,15 @@ import 'react-tippy/dist/tippy.css';
 
 const loggerMiddleware = (createLogger as any)();
 
+const nodeEnv = process.env.NODE_ENV;
+
+const middleware = nodeEnv === 'production'
+  ? applyMiddleware(thunkMiddleware)
+  : applyMiddleware(thunkMiddleware, loggerMiddleware);
+
 function initStoreWithState(state) {
   const store = createStore(
-    rootReducer, state,
-    applyMiddleware(thunkMiddleware, loggerMiddleware),
+    rootReducer, state, middleware,
   );
 
   if ((module as any).hot) {

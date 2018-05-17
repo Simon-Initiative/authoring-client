@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer, TextSelection } from 'types/active.ts';
+import { ParentContainer, TextSelection, Trigger } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
@@ -133,13 +133,56 @@ export interface ToolbarProps {
 }
 
 @injectSheet(styles)
-export class ContextAwareToolbar extends React.PureComponent<StyledComponentProps<ToolbarProps>> {
+export class ContextAwareToolbar extends React.Component<StyledComponentProps<ToolbarProps>> {
 
   constructor(props) {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
+
+    // Determine if this update is due to a keypress
+    // that changed content.  These changes do not affect
+    // the toolbar, so no need to re-render
+    const isKeypress = this.props.textSelection.caseOf({
+      just: t => nextProps.textSelection.caseOf({
+        just: s => t !== s && s.triggeredBy === Trigger.KEYPRESS,
+        nothing: () => false,
+      }),
+      nothing: () => false,
+    });
+
+    if (isKeypress) {
+      return false;
+    }
+
+    // If the active content has switched, we re-render
+    const contentSwitched = this.props.content.caseOf({
+      just: t => nextProps.content.caseOf({
+        just: s => (t as any).guid !== (s as any).guid,
+        nothing: () => true,
+      }),
+      nothing: () => nextProps.content.caseOf({
+        just: s => true,
+        nothing: () => false,
+      }),
+    });
+
+    if (contentSwitched) {
+      return true;
+    }
+
+    // Only other thing we need to check is for a change in
+    // the supported elements
+    if (this.props.supportedElements !== nextProps.supportedElements) {
+      return true;
+    }
+
+    return false;
+  }
+
   render() {
+
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       textSelection, classes, onDisplayModal, onDismissModal, context, resource,
@@ -203,7 +246,6 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={6.7}>
           <ItemToolbar
             context={context}
-            courseModel={this.props.courseModel}
             parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
 
@@ -218,7 +260,8 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
           <ActionsToolbar
-            documentResource={resource} documentId={context.documentId}
+            documentResource={resource}
+            documentId={context.documentId}
             canPreview={canPreview} />
         </ToolbarGroup>
       </div>
