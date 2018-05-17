@@ -13,6 +13,7 @@ const InputRef = (props) => {
     const classes = 'form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0 ' + selected;
     return (
         <select data-offset-key={props.offsetKey} disabled
+          style={{ width:'120px', marginRight: '2px', display: 'inline' }}
           value="sample1" className={classes}>
           <option value="sample1">Dropdown</option>
         </select>
