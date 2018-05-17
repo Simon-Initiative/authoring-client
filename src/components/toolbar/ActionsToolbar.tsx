@@ -3,6 +3,7 @@ import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
+import DeleteResourceView from 'components/DeleteResourceView';
 
 export interface ActionsToolbarProps {
   courseId: string;
@@ -15,6 +16,8 @@ export interface ActionsToolbarProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 /**
@@ -23,6 +26,7 @@ export interface ActionsToolbarProps {
 export const ActionsToolbar = (({
   courseId, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
+  onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -49,10 +53,13 @@ export const ActionsToolbar = (({
           <div>Details</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
+            onClick={() => onDisplayModal(
+              <DeleteResourceView
+                onCancel={onDismissModal}
+              />)}
             size={ToolbarButtonSize.Large}
             tooltip="Delete this Page"
-            disabled>
+            disabled={false}>
           <div><i className="fa fa-trash-o"/></div>
           <div>Delete</div>
         </ToolbarButton>
