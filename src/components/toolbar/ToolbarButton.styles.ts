@@ -40,7 +40,6 @@ export const styles: JSSStyles = {
 
     '& i': {
       fontSize: 16,
-      width: 18,
 
       'not(.fa)': {
         font: {
@@ -72,6 +71,19 @@ export const styles: JSSStyles = {
       maxWidth: 84,
       height: 32,
       textAlign: 'left',
+
+      '& i': {
+        width: 18,
+      },
+    },
+    '&.full': {
+      width: '100%',
+      height: 32,
+      textAlign: 'left',
+
+      '& i': {
+        width: 18,
+      },
     },
     '&.extraWide': {
       minWidth: 120,

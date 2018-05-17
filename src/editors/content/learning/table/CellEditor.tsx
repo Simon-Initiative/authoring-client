@@ -170,7 +170,7 @@ export default class CellEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Table Cell" columns={5} highlightColor={CONTENT_COLORS.CellData}>
+      <ToolbarGroup label="Table Cell" columns={5.3} highlightColor={CONTENT_COLORS.CellData}>
         <ToolbarButton onClick={() => onShowSidebar()} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-align-left"></i></div>
           <div>Alignment</div>

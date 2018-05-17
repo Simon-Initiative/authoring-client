@@ -8,6 +8,7 @@ export enum ToolbarButtonSize {
   Large = 'large',
   Small = 'small',
   Wide = 'wide',
+  Full = 'full',
   ExtraWide = 'extraWide',
 }
 
