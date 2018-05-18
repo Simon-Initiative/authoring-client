@@ -214,8 +214,14 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
     const selection = new TextSelection(rawSelection);
 
+    // Some of the entity data objects are regular objects and do not
+    // support clone
+    const clone = info.entity.data.clone !== undefined
+      ? info.entity.data.clone()
+      : Object.assign({}, info.entity.data);
+
     return removed.addEntity(
-      info.entity.type, info.entity.mutability === 'MUTABLE', info.entity.data.clone(), selection);
+      info.entity.type, info.entity.mutability === 'MUTABLE', clone, selection);
 
   }
 

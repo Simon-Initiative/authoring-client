@@ -134,12 +134,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   renderQuestionTitle(): JSX.Element {
-    const { model, canRemoveQuestion, onRemoveQuestion } = this.props;
+    const { model, canRemoveQuestion, onRemoveQuestion, editMode } = this.props;
 
     return (
       <ContentTitle
           title={getLabelForQuestion(model)}
-          onDuplicate={this.props.onDuplicate}
+          onDuplicate={editMode ? this.props.onDuplicate : undefined}
           canRemove={canRemoveQuestion}
           removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
           onRemove={onRemoveQuestion} />

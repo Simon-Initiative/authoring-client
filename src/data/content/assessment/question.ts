@@ -250,11 +250,15 @@ function cloneInputQuestion(question: Question) : Question {
     }).toOrderedMap(),
   });
 
+
   // Now do update #2 - set the response input attr to point to the new item id
-  const parts = cloned.map((part) => {
+  const parts = cloned.parts.map((part) => {
     return part.with({
       responses: part.responses.map((response) => {
-        return response.with({ input: itemMap[response.input] });
+        if (itemMap[response.input] !== undefined) {
+          return response.with({ input: itemMap[response.input] });
+        }
+        return response;
       }).toOrderedMap(),
     });
   }).toOrderedMap();

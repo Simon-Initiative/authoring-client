@@ -17,6 +17,7 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
+import createGuid from 'utils/guid';
 
 import './PoolEditor.scss';
 
@@ -182,7 +183,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onDuplicateNode() {
-
+    if (this.state.currentNode.contentType === 'Question') {
+      const duplicated = this.state.currentNode.clone().with({
+        guid: createGuid(),
+      });
+      this.addQuestion(duplicated);
+    }
   }
 
   render() {
