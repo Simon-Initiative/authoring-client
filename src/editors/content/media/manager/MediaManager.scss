@@ -1,5 +1,6 @@
 @import 'oli/colors';
 @import 'oli/mixins';
+@import 'oli/zindex';
 
 .media-manager {
   display: flex;
@@ -22,6 +23,7 @@
         display: flex;
         flex-direction: row;
         margin-top: 5px;
+        z-index: $dropdown-menu;
 
         i {
           margin: 5px;
