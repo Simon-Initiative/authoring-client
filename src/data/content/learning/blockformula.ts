@@ -11,6 +11,7 @@ export type BlockFormulaParams = {
 
 const defaultContent = {
   contentType: 'BlockFormula',
+  elementType: 'blockformula',
   text: ContiguousText.fromText('', '').with({ mode: ContiguousTextMode.SimpleText }),
   guid: '',
 };
@@ -18,6 +19,7 @@ const defaultContent = {
 export class BlockFormula extends Immutable.Record(defaultContent) {
 
   contentType: 'BlockFormula';
+  elementType: 'blockformula';
   text: ContiguousText;
   guid: string;
 

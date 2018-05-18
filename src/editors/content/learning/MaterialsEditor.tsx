@@ -27,8 +27,8 @@ export interface MaterialsEditorState {
 
 @injectSheet(styles)
 export default class MaterialsEditor
-    extends AbstractContentEditor<contentTypes.Materials,
-    StyledComponentProps<MaterialsEditorProps>, MaterialsEditorState> {
+  extends AbstractContentEditor<contentTypes.Materials,
+  StyledComponentProps<MaterialsEditorProps>, MaterialsEditorState> {
 
   constructor(props) {
     super(props);
@@ -45,13 +45,13 @@ export default class MaterialsEditor
 
     this.props.onEdit(
       this.props.model.with(
-      { content: this.props.model.content.set(material.guid, material) }),
+        { content: this.props.model.content.set(material.guid, material) }),
       material);
   }
 
   renderToolbar() {
     return (
-      <ToolbarGroup label="Horizontal Layout" columns={4} highlightColor={CONTENT_COLORS.Materials}>
+      <ToolbarGroup label="Horizontal Layout" columns={3} highlightColor={CONTENT_COLORS.Materials}>
         <ToolbarButton onClick={this.addColumn.bind(this)} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-columns"></i></div>
           <div>Add Column</div>
@@ -69,7 +69,7 @@ export default class MaterialsEditor
   onRemove(m) {
     this.props.onEdit(
       this.props.model.with(
-      { content: this.props.model.content.delete(m.guid) }),
+        { content: this.props.model.content.delete(m.guid) }),
       null);
   }
 
@@ -80,11 +80,11 @@ export default class MaterialsEditor
 
     this.props.onEdit(
       this.props.model.with(
-      { content: this.props.model.content.set(updatedMaterial.guid, updatedMaterial) }),
+        { content: this.props.model.content.set(updatedMaterial.guid, updatedMaterial) }),
       item);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { model, classes, className } = this.props;
 
@@ -104,14 +104,15 @@ export default class MaterialsEditor
           this.onMaterialEdit(updatedMaterial, s);
         },
         onRemove: e => this.onRemove(e),
-        onDuplicate: (e) => {},
-        onMoveUp: (e) => {},
-        onMoveDown: (e) => {},
+        onPaste: (e) => { },
+        onDuplicate: (e) => { },
+        onMoveUp: (e) => { },
+        onMoveDown: (e) => { },
         props: this.props,
       };
 
       return (
-        <div style={ { width } } className={classNames([classes.materialsContents])}>
+        <div style={{ width }} className={classNames([classes.materialsContents])}>
           <MaterialEditor
             {...this.props}
             model={material}

@@ -8,6 +8,7 @@ export type PrefLabelParams = {
 
 const defaultContent = {
   contentType: 'PrefLabel',
+  elementType: 'preflabel',
   preference: '',
   guid: '',
 };
@@ -15,6 +16,7 @@ const defaultContent = {
 export class PrefLabel extends Immutable.Record(defaultContent) {
 
   contentType: 'PrefLabel';
+  elementType: 'preflabel';
   preference: string;
   guid: string;
 

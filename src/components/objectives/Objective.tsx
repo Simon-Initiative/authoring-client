@@ -3,6 +3,8 @@ import * as contentTypes from '../../data/contentTypes';
 import { Title } from './Title';
 import { Remove } from 'components/common/Remove';
 
+import './objective.scss';
+
 export interface Objective {
 
 }
@@ -54,16 +56,16 @@ export class Objective
           </div>;
     } else if (isExpanded) {
       titleBlock = <div>
-                <span >
+                <span className="objective">
                 <i className="fa fa-caret-down"></i>
-                </span>&nbsp;
+                </span>
                 <b>Objective:</b> {title}
               </div>;
     } else {
       titleBlock = <div>
-                <span >
+                <span className="objective">
                 <i className="fa fa-caret-right"></i>
-                </span>&nbsp;
+                </span>
                 <b>Objective:</b> {title}
               </div>;
     }

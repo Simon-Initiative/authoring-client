@@ -1,3 +1,13 @@
 .content-container .DraftEditor-root a.entity-hyperlink {
   color: blue;
 }
+
+.content-container .DraftEditor-root a.entity-extra {
+  color: green;
+}
+
+.tooltip-editor {
+  text-align:  left !important;
+  width: '400px';
+  overflow-x: scroll;
+}

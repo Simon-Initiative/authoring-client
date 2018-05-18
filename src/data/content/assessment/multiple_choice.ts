@@ -17,6 +17,8 @@ export type MultipleChoiceParams = {
 };
 
 const defaultContent = {
+  contentType: 'MultipleChoice',
+  elementType: 'multiple_choice',
   choices: Immutable.OrderedMap<string, Choice>(),
   id: '',
   name: '',
@@ -24,12 +26,12 @@ const defaultContent = {
   select: 'single',
   shuffle: true,
   guid: '',
-  contentType: 'MultipleChoice',
 };
 
 export class MultipleChoice extends Immutable.Record(defaultContent) {
 
   contentType: 'MultipleChoice';
+  elementType: 'multiple_choice';
   choices : Immutable.OrderedMap<string, Choice>;
   id : string;
   name : string;

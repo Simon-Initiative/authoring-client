@@ -23,6 +23,7 @@ export type PoolParams = {
 
 const defaultPoolParams = {
   contentType: 'Pool',
+  elementType: 'pool',
   id: '',
   objrefs: Immutable.OrderedMap<string, ObjRef>(),
   title: new Title({ text: ContentElements.fromText('Pool Title', '', TEXT_ELEMENTS) }),
@@ -35,6 +36,7 @@ const defaultPoolParams = {
 export class Pool extends Immutable.Record(defaultPoolParams) {
 
   contentType: 'Pool';
+  elementType: 'pool';
   id: string;
   objrefs: Immutable.OrderedMap<string, ObjRef>;
   title: Title;

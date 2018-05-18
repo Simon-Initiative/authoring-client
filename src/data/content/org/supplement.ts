@@ -14,6 +14,7 @@ export type SupplementParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Supplement,
+  elementType: 'supplement',
   title: Maybe.nothing<string>(),
   idref: '',
   purpose: Maybe.nothing<types.PurposeTypes>(),
@@ -21,13 +22,14 @@ const defaultContent = {
 };
 
 export class Supplement extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Supplement;
+  elementType: 'supplement';
   title: Maybe<string>;
   idref: string;
   purpose: Maybe<types.PurposeTypes>;
   guid: string;
-  
+
   constructor(params?: SupplementParams) {
     super(augment(params));
   }
@@ -49,32 +51,32 @@ export class Supplement extends Immutable.Record(defaultContent) {
     }
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
-     
+
       switch (key) {
         case 'title':
           model = model.with({ title: Maybe.just(item['title']['#text']) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       supplement: {
         '@idref': this.idref,
-      }, 
+      },
     };
 
     this.purpose.lift(p => s.supplement['@purpose'] = p);
     this.title.lift(text => s.supplement['#array'] = [{ title: { '#text': text } }]);
-    
+
     return s;
   }
 }

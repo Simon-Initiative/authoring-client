@@ -8,6 +8,7 @@ export type ObjRefParams = {
 
 const defaultObjRefParams = {
   contentType: 'ObjRef',
+  elementType: 'objref',
   idref: '',
   guid: '',
 };
@@ -15,6 +16,7 @@ const defaultObjRefParams = {
 export class ObjRef extends Immutable.Record(defaultObjRefParams) {
 
   contentType: 'ObjRef';
+  elementType: 'objref';
   idref: string;
   guid: string;
 

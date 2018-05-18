@@ -9,6 +9,7 @@ export type CaptionParams = {
 
 const defaultContent = {
   contentType: 'Caption',
+  elementType: 'caption',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   guid: '',
 };
@@ -16,6 +17,7 @@ const defaultContent = {
 export class Caption extends Immutable.Record(defaultContent) {
 
   contentType: 'Caption';
+  elementType: 'caption';
   content: ContentElements;
   guid: string;
 

@@ -21,6 +21,9 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { Resource } from 'data/content/resource';
+import * as Messages from 'types/messages';
+import { buildMissingSkillsMessage } from 'utils/error';
+
 import './AssessmentEditor.scss';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
@@ -35,6 +38,8 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   currentPage: string;
   currentNode: contentTypes.Node;
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -46,6 +51,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   AssessmentEditorProps,
   AssessmentEditorState>  {
 
+  noSkillsMessage: Messages.Message;
   supportedElements: Immutable.List<string>;
 
   constructor(props : AssessmentEditorProps) {
@@ -73,6 +79,21 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
+  componentDidMount() {
+    // We have no direct access to a skills list through props.context since
+    // skills cannot be deleted. Looking at skills attached to objectives
+    // will show the banner if skills are present in the course but 'deleted',
+    // aka removed from an associated objective.
+    const hasNoskills = this.props.context.objectives.reduce(
+      (bool, obj) => bool && obj.skills.size === 0,
+      true);
+
+    if (hasNoskills) {
+      this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
+      this.props.showMessage(this.noSkillsMessage);
+    }
+  }
+
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
     nextState: AssessmentEditorState) : boolean {
@@ -92,6 +113,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
+    if (this.props.context.skills.size <= 0 &&
+        nextProps.context.skills.size > 0 &&
+        this.noSkillsMessage !== undefined) {
+      this.props.dismissMessage(this.noSkillsMessage);
+    }
 
     if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
 
@@ -246,6 +272,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   onRemove() {
+    // this method is never used, but is required by ParentContainer
+    // do nothing
+  }
+
+  onPaste(childModel) {
     // this method is never used, but is required by ParentContainer
     // do nothing
   }

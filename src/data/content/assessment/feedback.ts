@@ -12,6 +12,7 @@ export type FeedbackParams = {
 
 const defaultContent = {
   contentType: 'Feedback',
+  elementType: 'feedback',
   targets: '',
   body: new ContentElements().with({ supportedElements: Immutable.List(ALT_FLOW_ELEMENTS) }),
   guid: '',
@@ -20,6 +21,7 @@ const defaultContent = {
 export class Feedback extends Immutable.Record(defaultContent) {
 
   contentType: 'Feedback';
+  elementType: 'feedback';
   targets: string;
   body: ContentElements;
   guid: string;

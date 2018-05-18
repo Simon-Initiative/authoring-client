@@ -12,7 +12,11 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { Select, TextInput } from '../../common/controls';
+import { ContentElements } from 'data/content/common/elements';
+import { ContentContainer } from '../../container/ContentContainer';
+import { Select } from '../../common/controls';
+import { ToolbarContentContainer } from '../../container/ToolbarContentContainer';
+
 import CellEditor from './CellEditor';
 import { isFirefox, isEdge, isIE } from 'utils/browser';
 import {
@@ -34,7 +38,7 @@ export interface TableEditorState {
 // Get the key of the nth element in an ordered map
 function getKey(
   index: number, collection:
-  Immutable.OrderedMap<string,
+    Immutable.OrderedMap<string,
     contentTypes.CellData | contentTypes.CellHeader | contentTypes.Row>) {
   return collection.toArray()[index].guid;
 }
@@ -44,13 +48,15 @@ function getKey(
  */
 @injectSheet(styles)
 export default class TableEditor
-    extends AbstractContentEditor<contentTypes.Table,
-    StyledComponentProps<TableEditorProps>, TableEditorState> {
+  extends AbstractContentEditor<contentTypes.Table,
+  StyledComponentProps<TableEditorProps>, TableEditorState> {
   selectionState: any;
 
   constructor(props) {
     super(props);
 
+    this.onTitleEdit = this.onTitleEdit.bind(this);
+    this.onCaptionEdit = this.onCaptionEdit.bind(this);
     this.onInsertColumn = this.onInsertColumn.bind(this);
     this.onInsertRow = this.onInsertRow.bind(this);
     this.onRemoveRow = this.onRemoveRow.bind(this);
@@ -58,27 +64,35 @@ export default class TableEditor
 
   }
 
-  onTitleEdit(title) {
-    this.props.onEdit(this.props.model.with({ title }));
+  onTitleEdit(text: ContentElements) {
+    const title = this.props.model.title.with({ text });
+    const model = this.props.model.with({ title });
+    this.props.onEdit(model, model);
+  }
+
+
+  onCaptionEdit(content: ContentElements, src) {
+    const caption = this.props.model.caption.with({ content });
+    const model = this.props.model.with({ caption });
+    this.props.onEdit(model, src);
   }
 
   renderSidebar() {
     const { model } = this.props;
-
-    const title = model.title;
     const rowStyle = model.rowstyle;
 
     return (
       <SidebarContent title="Table">
         <SidebarGroup label="Title">
           <Discoverable id={DiscoverableId.TableEditorTitle} focusChild>
-            <TextInput
-              width="100%"
-              editMode={this.props.editMode}
-              value={title}
-              label=""
-              type="text"
-              onEdit={this.onTitleEdit.bind(this)} />
+            <ContentContainer
+              {...this.props}
+              renderContext={undefined}
+              activeContentGuid={null}
+              hover={null}
+              onUpdateHover={() => { }}
+              model={model.title.text}
+              onEdit={this.onTitleEdit} />
           </Discoverable>
         </SidebarGroup>
         <SidebarGroup label="Row Style">
@@ -93,6 +107,16 @@ export default class TableEditor
             </Select>
           </Discoverable>
         </SidebarGroup>
+        <SidebarGroup label="Caption">
+          <ToolbarContentContainer
+            {...this.props}
+            renderContext={undefined}
+            activeContentGuid={null}
+            hover={null}
+            onUpdateHover={() => { }}
+            model={model.caption.content}
+            onEdit={this.onCaptionEdit} />
+        </SidebarGroup>
       </SidebarContent>
     );
   }
@@ -105,7 +129,7 @@ export default class TableEditor
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Table" columns={4} highlightColor={CONTENT_COLORS.Table}>
+      <ToolbarGroup label="Table" columns={5.3} highlightColor={CONTENT_COLORS.Table}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -174,16 +198,17 @@ export default class TableEditor
     // This doesn't disable the buttons, though.
     const noManualControl = {
       supportedElements: Immutable.List<string>(),
-      onAddNew: (e) => {},
+      onAddNew: (e) => { },
       onEdit: (e, s) => {
         this.onCellEdit.call(this, row, e, s);
       },
       onRemove: (e) => {
         this.onCellRemove(row, e, null);
       },
-      onDuplicate: (e) => {},
-      onMoveUp: (e) => {},
-      onMoveDown: (e) => {},
+      onPaste: (e) => { },
+      onDuplicate: (e) => { },
+      onMoveUp: (e) => { },
+      onMoveDown: (e) => { },
       props: this.props,
     };
 
@@ -352,20 +377,20 @@ export default class TableEditor
           hideArrow
           positionMenuOnRight={showOnRight}
           label={<i className={classNames(['fa fa-ellipsis-v', classes.dropdownLabel,
-            classes.moreLabel])}/>} >
+            classes.moreLabel])} />} >
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index) }>
+            onClick={() => onInsert(index)}>
             {`Insert ${term} before`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onInsert(index + 1) }>
+            onClick={() => onInsert(index + 1)}>
             {`Insert ${term} after`}
           </button>
           <button className="dropdown-item"
             disabled={!editMode}
-            onClick={() => onRemove(index) }>
+            onClick={() => onRemove(index)}>
             {`Remove ${term}`}
           </button>
         </ToolbarDropdown>
@@ -373,7 +398,7 @@ export default class TableEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
     const { rowstyle } = model;
@@ -402,8 +427,8 @@ export default class TableEditor
       <div className={classNames(['TableEditor', classes.tableEditor, className])}>
         <table className={classNames([classes.table, className])}>
           <tbody>
-          {headerRow}
-          {rows}
+            {headerRow}
+            {rows}
           </tbody>
         </table>
         <button type="button" onClick={this.onInsertRow.bind(this, model.rows.size)}

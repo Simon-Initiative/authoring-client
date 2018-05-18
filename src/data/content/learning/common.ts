@@ -35,6 +35,8 @@ export enum EntityTypes {
 
   // Inline entities
   activity_link = 'activity_link',
+  extra = 'extra',
+  sym = 'sym',
   link = 'link',
   image_link = 'image_link',
   image_activity_link = 'image_activity_link',
@@ -133,6 +135,7 @@ addStyle('highlight', 'HIGHLIGHT');
 addStyle('line-through', 'STRIKETHROUGH');
 addStyle('oblique', 'OBLIQUE');
 addStyle('var', 'VAR');
+addStyle('bdo', 'BDO');
 addStyle('cite', 'CITE');
 addStyle('term', 'TERM');
 addStyle('ipa', 'IPA');

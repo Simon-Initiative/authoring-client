@@ -12,6 +12,7 @@ export type CellHeaderParams = {
 
 const defaultContent = {
   contentType: 'CellHeader',
+  elementType: 'cellheader',
   align: 'left',
   colspan: '1',
   rowspan: '1',
@@ -22,6 +23,7 @@ const defaultContent = {
 export class CellHeader extends Immutable.Record(defaultContent) {
 
   contentType: 'CellHeader';
+  elementType: 'cellheader';
   align: string;
   colspan: string;
   rowspan: string;

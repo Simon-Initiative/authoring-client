@@ -17,6 +17,7 @@ export type ExampleParams = {
 
 const defaultContent = {
   contentType: 'Example',
+  elementType: 'example',
   id: Maybe.nothing(),
   title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
@@ -26,6 +27,7 @@ const defaultContent = {
 
 export class Example extends Immutable.Record(defaultContent) {
   contentType: 'Example';
+  elementType: 'example';
   id: Maybe<string>;
   title: Title;
   purpose: Maybe<string>;

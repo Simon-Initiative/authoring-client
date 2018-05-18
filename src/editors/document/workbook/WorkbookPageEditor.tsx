@@ -12,6 +12,9 @@ import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.cont
 import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
+import * as Messages from 'types/messages';
+import { buildMissingObjectivesMessage } from 'utils/error';
+import { DEFAULT_OBJECTIVE_TITLE } from 'data/models/objective';
 
 import './WorkbookPageEditor.scss';
 
@@ -25,6 +28,8 @@ export interface WorkbookPageEditorProps extends AbstractEditorProps<models.Work
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
   onUpdateHover: (hover: string) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface WorkbookPageEditorState extends AbstractEditorState {}
@@ -37,6 +42,9 @@ function hasMissingResource() : boolean {
 
 class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   WorkbookPageEditorProps, WorkbookPageEditorState> {
+
+  noObjectivesMessage: Messages.Message;
+
   constructor(props: WorkbookPageEditorProps) {
     super(props, {});
 
@@ -53,6 +61,41 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     }
   }
 
+  hasMissingObjective(
+    objrefs: Immutable.List<string>,
+    objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>) {
+
+    return objrefs
+      .toArray()
+      .some(id => !objectives.has(id));
+  }
+
+  componentDidMount() {
+    const { context, showMessage } = this.props;
+    const { objectives, courseId } = context;
+
+    if (objectives.size === 1 && objectives.first().title === DEFAULT_OBJECTIVE_TITLE ||
+        objectives.size < 1) {
+      this.noObjectivesMessage = buildMissingObjectivesMessage(courseId);
+      showMessage(this.noObjectivesMessage);
+    }
+  }
+
+  componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
+    if (this.props.context.objectives.size <= 1 &&
+        nextProps.context.objectives.size > 1 &&
+        this.noObjectivesMessage !== undefined) {
+      this.props.dismissMessage(this.noObjectivesMessage);
+    }
+
+    if (nextProps.model !== this.props.model) {
+      if (this.hasMissingObjective(
+          nextProps.model.head.objrefs, nextProps.context.objectives)) {
+        nextProps.services.refreshObjectives(nextProps.context.courseId);
+      }
+    }
+  }
+
   shouldComponentUpdate() {
     return true;
   }
@@ -63,7 +106,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
 
   onBodyEdit(content : any, source: Object) {
     const model = this.props.model.with({ body: content });
-
     this.props.onUpdateContent(this.props.context.documentId, source);
 
     this.handleEdit(model);
@@ -81,26 +123,6 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     const head = this.props.model.head.with({ title });
 
     this.props.onEdit(this.props.model.with({ head, resource }));
-  }
-
-  hasMissingObjective(
-    objrefs: Immutable.List<string>,
-    objectives: Immutable.OrderedMap<string, contentTypes.LearningObjective>) {
-
-    return objrefs
-      .toArray()
-      .some(id => !objectives.has(id));
-  }
-
-  componentWillReceiveProps(nextProps: WorkbookPageEditorProps) {
-
-    if (nextProps.model !== this.props.model) {
-      if (this.hasMissingObjective(
-        nextProps.model.head.objrefs, nextProps.context.objectives)) {
-
-        nextProps.services.refreshObjectives(nextProps.context.courseId);
-      }
-    }
   }
 
   onFocus(model, parent, textSelection) {

@@ -10,6 +10,7 @@ export type MathParams = {
 
 const defaultContent = {
   contentType: 'Math',
+  elementType: 'math',
   data: '<m:math><m:mi>c</m:mi><m:mo>=</m:mo><m:msqrt><m:msup><m:mi>a</m:mi><m:mn>2</m:mn>'
     + '</m:msup><m:mo>+</m:mo><m:msup><m:mi>b</m:mi><m:mn>2</m:mn></m:msup></m:msqrt></m:math>',
   guid: '',
@@ -17,6 +18,7 @@ const defaultContent = {
 
 export class Math extends Immutable.Record(defaultContent) {
   contentType: 'Math';
+  elementType: 'math';
   data: string;
   guid: string;
 

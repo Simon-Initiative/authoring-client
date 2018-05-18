@@ -31,8 +31,8 @@ export interface AlternativeEditorState {
 
 @injectSheet(styles)
 export default class AlternativeEditor
-    extends AbstractContentEditor<contentTypes.Alternative,
-    StyledComponentProps<AlternativeEditorProps>, AlternativeEditorState> {
+  extends AbstractContentEditor<contentTypes.Alternative,
+  StyledComponentProps<AlternativeEditorProps>, AlternativeEditorState> {
 
   constructor(props) {
     super(props);
@@ -44,7 +44,7 @@ export default class AlternativeEditor
   }
 
   onValueEdit(value: string) {
-    const spacesStripped = value.replace(' ', '');
+    const spacesStripped = value.replace(/\s+/g, '');
     const model = this.props.model.with({ value: spacesStripped });
     this.props.onEdit(model, model);
   }
@@ -74,7 +74,7 @@ export default class AlternativeEditor
     const { onShowSidebar, onDiscover, model } = this.props;
 
     return (
-      <ToolbarGroup label={model.value} columns={4} highlightColor={CONTENT_COLORS.CellData}>
+      <ToolbarGroup label={model.value} columns={5} highlightColor={CONTENT_COLORS.CellData}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -87,7 +87,7 @@ export default class AlternativeEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     const { className, classes, model, parent } = this.props;
 
     return (

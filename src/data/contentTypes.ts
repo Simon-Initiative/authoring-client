@@ -4,6 +4,7 @@ export { ActivityLink } from './content/learning/activity_link';
 export { Alternate } from './content/learning/alternate';
 export { Alternative } from './content/learning/alternative';
 export { Alternatives } from './content/learning/alternatives';
+export { Anchor } from './content/learning/anchor';
 export { Audio } from './content/learning/audio';
 export { BlockCode } from './content/learning/blockcode';
 export { BlockFormula } from './content/learning/blockformula';
@@ -16,16 +17,30 @@ export { Code } from './content/learning/code';
 export { CodeBlock } from './content/learning/codeblock';
 export { ContiguousText } from './content/learning/contiguous';
 export { Composite } from './content/learning/composite';
+export { Conjugation } from './content/learning/conjugation';
+export { Conjugate } from './content/learning/conjugate';
+export { Cr, ConjugationCell } from './content/learning/cr';
 export { Dd } from './content/learning/dd';
 export { Default } from './content/learning/default';
 export { Definition } from './content/learning/definition';
+export { Dialog } from './content/learning/dialog';
+export { Speaker } from './content/learning/speaker';
+export { Line } from './content/learning/line';
 export { Dl } from './content/learning/dl';
 export { Dt } from './content/learning/dt';
 export { Example } from './content/learning/example';
+export { Extra } from './content/learning/extra';
+export { Figure } from './content/learning/figure';
 export { Formula } from './content/learning/formula';
 export { IFrame } from './content/learning/iframe';
 export { Instructions } from './content/learning/instructions';
 export { Image } from './content/learning/image';
+export { Applet } from './content/learning/applet';
+export { Flash } from './content/learning/flash';
+export { Director } from './content/learning/director';
+export { Mathematica } from './content/learning/mathematica';
+export { Panopto } from './content/learning/panopto';
+export { Unity } from './content/learning/unity';
 export { Li } from './content/learning/li';
 export { Link } from './content/learning/link';
 export { Math } from './content/learning/math';
@@ -44,6 +59,7 @@ export { Pullout } from './content/learning/pullout';
 export { Quote } from './content/learning/quote';
 export { Row } from './content/learning/row';
 export { Source } from './content/learning/source';
+export { Sym } from './content/learning/sym';
 export { Table } from './content/learning/table';
 export { Title } from './content/learning/title';
 export { Track } from './content/learning/track';
@@ -51,7 +67,7 @@ export { Translation } from './content/learning/translation';
 export { Ul } from './content/learning/ul';
 export { Video } from './content/learning/video';
 export { YouTube } from './content/learning/youtube';
-
+export { WbPath } from './content/learning/wb_path';
 
 
 // Assessment
@@ -78,6 +94,7 @@ export { Essay } from './content/assessment/essay';
 export { GradingCriteria } from './content/assessment/criteria';
 export { ResponseMult } from './content/assessment/response_mult';
 export { Match } from './content/assessment/match';
+export { Custom } from './content/assessment/custom';
 
 // Workbook page
 export { Head } from './content/workbook/head';
@@ -140,6 +157,14 @@ import { Video } from './content/learning/video';
 import { YouTube } from './content/learning/youtube';
 import { IFrame } from './content/learning/iframe';
 
+import { Applet } from './content/learning/applet';
+import { Flash } from './content/learning/flash';
+import { Director } from './content/learning/director';
+import { Mathematica } from './content/learning/mathematica';
+import { Panopto } from './content/learning/panopto';
+import { Unity } from './content/learning/unity';
+
+
 export type QuestionItem =
   Essay |
   MultipleChoice |
@@ -151,6 +176,12 @@ export type QuestionItem =
   Unsupported;
 
 export type MediaItem =
+  Applet |
+  Flash |
+  Director |
+  Mathematica |
+  Panopto |
+  Unity |
   Image |
   Audio |
   Video |

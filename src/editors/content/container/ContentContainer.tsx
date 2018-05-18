@@ -29,13 +29,14 @@ export interface ContentContainerProps
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
   layout?: Layout;
+  overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
 }
 
 export interface ContentContainerState {
 
 }
 
-function indexOf(guid: string, model: ContentElements) : number {
+export function indexOf(guid: string, model: ContentElements) : number {
   let index = -1;
   const arr = model.content.toArray();
   for (let i = 0; i < arr.length; i += 1) {
@@ -111,7 +112,7 @@ export class ContentContainer
 
         const selection = textSelection.caseOf({
           just: s => s,
-          nothing: () => TextSelection.createEmpty(active.content.getFirstBlock().key),
+          nothing: () => undefined,
         });
 
         // We replace the text when it is effectively empty
@@ -120,7 +121,7 @@ export class ContentContainer
           onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), toAdd);
 
         // We insert after when the cursor is at the end
-        } else if (active.isCursorAtEffectiveEnd(selection)) {
+        } else if (selection === undefined || active.isCursorAtEffectiveEnd(selection)) {
           onEdit(this.insertAfter(model, toAdd, index), toAdd);
 
         // If it is at the beginning, insert the new item before the text
@@ -156,7 +157,12 @@ export class ContentContainer
   }
 
   onRemove(childModel) {
-    const { onEdit, model } = this.props;
+    const { onEdit, model, overrideRemove } = this.props;
+
+    // Call overrideRemove, and terminate if it returns true
+    if (overrideRemove !== undefined && overrideRemove(model, childModel)) {
+      return;
+    }
 
     if (model.content.has(childModel.guid)) {
 
@@ -178,9 +184,15 @@ export class ContentContainer
     }
   }
 
+  onPaste(item, textSelection: Maybe<TextSelection>) {
+    const duplicate = (item.clone() as any).with({
+      guid: guid(),
+    });
+    this.onAddNew(duplicate, textSelection);
+  }
+
   onDuplicate(childModel) {
     const { onEdit, model, activeContentGuid } = this.props;
-
     if (model.content.has(childModel.guid)) {
       const index = indexOf(activeContentGuid, model);
       const active = model.content.get(activeContentGuid);
@@ -228,8 +240,9 @@ export class ContentContainer
     const { onFocus } = this.props;
 
     if (model.contentType === 'ContiguousText') {
-      const currentTextSelection = Maybe.just(this.textSelections.get(model.guid)
-        || new TextSelection(model.content.selectionAfter));
+      const currentTextSelection = this.textSelections.get(model.guid)
+        ? Maybe.just(this.textSelections.get(model.guid))
+        : Maybe.nothing();
       return onFocus(model, this, currentTextSelection);
     }
 
@@ -322,6 +335,3 @@ export class ContentContainer
   }
 
 }
-
-
-

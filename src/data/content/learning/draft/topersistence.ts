@@ -23,6 +23,7 @@ const styleContainers = {
   OBLIQUE: () => ({ em: { '@style': 'oblique' } }),
   VAR: () => ({ var: { } }),
   TERM: () => ({ term: { } }),
+  BDO: () => ({ bdo: { } }),
   IPA: () => ({ ipa: { } }),
   FOREIGN: () => ({ foreign: { } }),
   SUBSCRIPT: () => ({ sub: { } }),
@@ -34,6 +35,7 @@ inlineTerminalTags['m:math'] = true;
 inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
+inlineTerminalTags['sym'] = true;
 
 
 type Container = Object[];
@@ -51,12 +53,14 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
+  extra,
   LINK: pastedLink,
   IMAGE: pastedImage,
   image: inlineImage,
   math,
   input_ref,
   cite,
+  sym,
   quote,
   code,
   formula_begin,
@@ -248,7 +252,13 @@ function translateOverlappingGroup(
     const root = { root: {} };
     let last = root;
 
-    set.toArray().forEach((s) => {
+    // We must serialize bdo elements first, since other styles
+    // cannot contain bdo, but bdo can contain other styels
+    const bdoFirst = set.contains('BDO')
+      ? Immutable.OrderedSet<string>(['BDO', ...set.toArray()])
+      : set;
+
+    bdoFirst.toArray().forEach((s) => {
 
       // For each style, create the object representation for that style
       if (s !== undefined) {
@@ -528,7 +538,9 @@ function translateInline(
     return obj;
   }
 
-  if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
+  if (key === 'extra') {
+    obj['extra'][common.ARRAY][0]['anchor'][common.ARRAY] = [{ '#text': sub }];
+  } else if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
     obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
   }
 
@@ -580,6 +592,11 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
 
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+  const { data } = entityMap[s.key];
+  return data.toPersistence(fromDraft);
+}
+
+function extra(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
   const { data } = entityMap[s.key];
   return data.toPersistence(fromDraft);
 }
@@ -653,6 +670,12 @@ function code(s : common.RawEntityRange, text : string, entityMap : common.RawEn
   return data.toPersistence();
 }
 
+
+function sym(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
+}
 
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 

@@ -9,6 +9,8 @@ import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
+import * as Messages from 'types/messages';
+import { dismissSpecificMessage, showMessage } from 'actions/messages';
 
 interface StateProps {
   skills: OrderedMap<string, Skill>;
@@ -23,6 +25,8 @@ interface DispatchProps {
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   onUpdateHover: (hover: string) => void;
+  showMessage: (message: Messages.Message) => void;
+  dismissMessage: (message: Messages.Message) => void;
 }
 
 interface OwnProps extends AbstractEditorProps<PoolModel> {}
@@ -53,6 +57,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     },
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));
+    },
+    showMessage: (message: Messages.Message) => {
+      return dispatch(showMessage(message));
+    },
+    dismissMessage: (message: Messages.Message) => {
+      dispatch(dismissSpecificMessage(message));
     },
   };
 };

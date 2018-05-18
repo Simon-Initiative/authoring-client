@@ -14,6 +14,7 @@ export type CiteParams = {
 
 const defaultContent = {
   contentType: 'Cite',
+  elementType: 'cite',
   title: '',
   id: '',
   entry: '',
@@ -24,6 +25,7 @@ const defaultContent = {
 export class Cite extends Immutable.Record(defaultContent) {
 
   contentType: 'Cite';
+  elementType: 'cite';
   title: string;
   id: string;
   entry: string;

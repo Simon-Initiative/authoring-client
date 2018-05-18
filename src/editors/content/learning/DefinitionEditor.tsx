@@ -38,8 +38,8 @@ export interface DefinitionEditorState {
  */
 @injectSheet(styles)
 export default class DefinitionEditor
-    extends AbstractContentEditor<contentTypes.Definition,
-    StyledComponentProps<DefinitionEditorProps>, DefinitionEditorState> {
+  extends AbstractContentEditor<contentTypes.Definition,
+  StyledComponentProps<DefinitionEditorProps>, DefinitionEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -72,13 +72,13 @@ export default class DefinitionEditor
             focusChild=".DraftEditor-editorContainer"
             focusAction={FocusAction.Click}>
             <ToolbarContentContainer
-              onFocus={() => {}}
+              onFocus={() => { }}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}
               activeContentGuid={null}
               hover={null}
-              onUpdateHover={() => {}}
+              onUpdateHover={() => { }}
               model={title.text}
               onEdit={this.onTitleEdit.bind(this)} />
           </Discoverable>
@@ -91,7 +91,7 @@ export default class DefinitionEditor
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Definition" columns={2} highlightColor={CONTENT_COLORS.Definition}>
+      <ToolbarGroup label="Definition" columns={3} highlightColor={CONTENT_COLORS.Definition}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -188,7 +188,7 @@ export default class DefinitionEditor
     this.props.onEdit(model.with({ term }), model);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
 
@@ -220,19 +220,19 @@ export default class DefinitionEditor
 
     const translationEditors = model.translation.size > 0
       ? <ContentContainer
-      {...this.props}
-      model={translations}
-      bindProperties={bindLabel}
-      onEdit={this.onTranslationEdit.bind(this)}
-    />
+        {...this.props}
+        model={translations}
+        bindProperties={bindLabel}
+        onEdit={this.onTranslationEdit.bind(this)}
+      />
       : null;
 
     const pronunciationEditor = model.pronunciation.caseOf({
       just: p => <ContentContainer
-      {...this.props}
-      model={pronunciations}
-      onEdit={this.onPronunciationEdit.bind(this)}
-    />,
+        {...this.props}
+        model={pronunciations}
+        onEdit={this.onPronunciationEdit.bind(this)}
+      />,
       nothing: () => null,
     });
 

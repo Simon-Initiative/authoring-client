@@ -17,6 +17,7 @@ export type DlParams = {
 
 const defaultContent = {
   contentType: 'Dl',
+  elementType: 'dl',
   title: Maybe.nothing(),
   content: Immutable.OrderedMap<string, TermOrDefinition>(),
   guid: '',
@@ -25,6 +26,7 @@ const defaultContent = {
 export class Dl extends Immutable.Record(defaultContent) {
 
   contentType: 'Dl';
+  elementType: 'dl';
   title: Maybe<Title>;
   content: Immutable.OrderedMap<string, TermOrDefinition>;
   guid: string;

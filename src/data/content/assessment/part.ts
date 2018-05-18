@@ -29,6 +29,7 @@ export type PartParams = {
 
 const defaultPartParams = {
   contentType: 'Part',
+  elementType: 'part',
   id: '',
   correct: '',
   scoreOutOf: '',
@@ -47,6 +48,7 @@ const defaultPartParams = {
 export class Part extends Immutable.Record(defaultPartParams) {
 
   contentType: 'Part';
+  elementType: 'part';
   id: string;
   correct: string;
   scoreOutOf: string;

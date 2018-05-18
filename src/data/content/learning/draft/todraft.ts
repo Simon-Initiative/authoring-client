@@ -13,7 +13,14 @@ export function toDraft(toParse: Object[], isInlineText : boolean = false) : Con
   };
 
   if (isInlineText) {
-    parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+
+    if (toParse instanceof Array) {
+      parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+    } else if (toParse['#array'] !== undefined) {
+      parse({ p: { '#array': toParse['#array'] } }, { draft, depth: 0 });
+    } else {
+      parse({ p: { '#array': [toParse] } }, { draft, depth: 0 });
+    }
   } else {
     toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
   }
@@ -35,6 +42,8 @@ inlineTerminalTags['m:math'] = true;
 inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
+inlineTerminalTags['sym'] = true;
+
 
 const inlineTagsDefaultContent = {};
 inlineTagsDefaultContent['cite'] = ' ';
@@ -73,12 +82,16 @@ function getInlineHandlers() {
     cite: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.cite, 'cite', registeredTypes['cite']),
+    extra: insertDataDrivenEntity.bind(
+      undefined, 'MUTABLE',
+      common.EntityTypes.extra, 'extra', registeredTypes['extra']),
     em,
     foreign: applyStyle.bind(undefined, 'FOREIGN'),
     ipa: applyStyle.bind(undefined, 'IPA'),
     sub: applyStyle.bind(undefined, 'SUBSCRIPT'),
     sup: applyStyle.bind(undefined, 'SUPERSCRIPT'),
     term: applyStyle.bind(undefined, 'TERM'),
+    bdo: applyStyle.bind(undefined, 'BDO'),
     var: applyStyle.bind(undefined, 'VAR'),
     image: imageInline,
     formula: formulaInline,
@@ -86,6 +99,9 @@ function getInlineHandlers() {
     'm:math': insertDataDrivenEntity.bind(
       undefined, 'IMMUTABLE',
       common.EntityTypes.math, 'math', registeredTypes['math']),
+    sym: insertDataDrivenEntity.bind(
+        undefined, 'IMMUTABLE',
+        common.EntityTypes.sym, 'sym', registeredTypes['sym']),
     quote: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.quote, 'quote', registeredTypes['quote']),
@@ -304,7 +320,21 @@ function processInline(
 
     } else {
 
-      const children = getChildren(item);
+      const extractFromExtra = (o) => {
+        const anchor = getChildren(item).find(o => common.getKey(o) === 'anchor');
+        if (anchor !== undefined && anchor !== null) {
+          return getChildren(anchor);
+        }
+        return [{ '#text': ' ' }];
+      };
+
+      // As soon we get another element with a non-standard need to access
+      // child content, we will want to create a generalized navigation system.
+      // But for now, when we encounter an 'extra' element we find its child 'anchor'
+      // element and parse that content, otherwise parse the immediate child content
+      const children = key === 'extra'
+        ? extractFromExtra(item)
+        : getChildren(item);
 
       children.forEach((subItem) => {
         const subKey = common.getKey(subItem);

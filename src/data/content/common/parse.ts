@@ -13,8 +13,8 @@ export const CDATA = '#cdata';
 
 export const CONTIGUOUS_TEXT_ELEMENTS = [
   'p', '#cdata', '#text', 'em', 'sub',
-  'sup', 'ipa', 'foreign',
-  'cite', 'term', 'var', 'link', 'input_ref', 'm:math', '#math', 'activity_link', 'xref'];
+  'sup', 'ipa', 'foreign', 'sym',
+  'cite', 'term', 'var', 'link', 'extra', 'input_ref', 'm:math', '#math', 'activity_link', 'xref'];
 
 export const registeredTypes = {};
 
