@@ -19,10 +19,7 @@ export type CompositeParams = {
 
 const defaultContent = {
   contentType: 'Composite',
-<<<<<<< HEAD
   elementType: 'composite',
-=======
->>>>>>> master
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   purpose: Maybe.nothing(),
@@ -33,10 +30,7 @@ const defaultContent = {
 
 export class Composite extends Immutable.Record(defaultContent) {
   contentType: 'Composite';
-<<<<<<< HEAD
   elementType: 'composite';
-=======
->>>>>>> master
   id: Maybe<string>;
   title: Maybe<Title>;
   purpose: Maybe<string>;
