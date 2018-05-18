@@ -4,7 +4,6 @@ import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 import { PaginatedResponse } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
-import { Resource } from 'data/contentTypes';
 
 /**
  * Uploads a file, receives a promise to deliver path on server

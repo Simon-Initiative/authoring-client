@@ -1,6 +1,4 @@
-import * as viewActions from 'actions/view';
 import { Resource } from 'data/content/resource';
-import * as models from 'data/models';
 import * as React from 'react';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { Maybe } from 'tsmonad/lib/src';

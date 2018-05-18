@@ -121,7 +121,7 @@ const resources = {
         type,
         pool: new contentTypes.Pool({
           questions, id: guid(),
-          title: contentTypes.Title.fromText(title)
+          title: contentTypes.Title.fromText(title),
         }),
       });
     }),

@@ -2,7 +2,6 @@ import { List, Map, OrderedMap } from 'immutable';
 import { State } from 'reducers';
 import { Dispatch } from 'react-redux';
 import * as persistence from 'data/persistence';
-import { LegacyTypes } from 'data/types';
 import { Maybe } from 'tsmonad/lib/src';
 import { Edge } from 'types/edge';
 import { Resource } from 'data/contentTypes';
