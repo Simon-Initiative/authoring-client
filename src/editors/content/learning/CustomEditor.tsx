@@ -11,6 +11,7 @@ import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
 import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 import { Initiator } from './dynadragdrop/Initiator';
+import { DynaDropLabel } from './dynadragdrop/DynaDropLabel';
 import { DynaDropTarget } from './dynadragdrop/DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
 import { Page, Question, Node, Item, Part, Choice, Response, ContiguousText,
@@ -199,121 +200,6 @@ const updateItemPartsFromTargets = (
   };
 };
 
-export interface CellEditorProps {
-  editMode: boolean;
-  text: string;
-  onEdit: (text: string) => void;
-}
-
-export interface CellEditorState {
-  text: string;
-}
-
-export class CellEditor
-  extends React.Component<StyledComponentProps<CellEditorProps>, CellEditorState> {
-  caretPosition: any;
-  direction: number;
-  ref: any;
-
-  constructor(props) {
-    super(props);
-
-    this.onChange = this.onChange.bind(this);
-    this.onKeyPress = this.onKeyPress.bind(this);
-    this.onKeyUp = this.onKeyUp.bind(this);
-
-    this.state = {
-      text: this.props.text,
-    };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.text !== nextState.text) {
-      return true;
-    }
-
-    return false;
-  }
-
-  onChange(e) {
-    const target = e.target;
-    const currentText = target.innerText;
-
-    this.setState(
-      { text: currentText },
-      () => {
-        const el = this.ref;
-
-        if (el.firstChild) {
-          const range = document.createRange();
-          const sel = window.getSelection();
-          range.setStart(el.firstChild, this.caretPosition + this.direction);
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-        }
-      },
-    );
-
-    this.props.onEdit(currentText);
-  }
-
-  onKeyPress(e) {
-    const BACKSPACE = 8;
-
-    const text = document.getSelection();
-    const startIndex = text.anchorOffset;
-    const endIndex = text.focusOffset;
-
-    // Keep track of the position of caret
-    if (endIndex - startIndex > 0) {
-      this.caretPosition = startIndex;
-
-      if (e.keyCode === BACKSPACE) {
-        this.direction = 0;
-      } else {
-        this.direction = 1;
-      }
-    } else {
-      this.caretPosition = endIndex;
-      if (e.keyCode === BACKSPACE) {
-        this.direction = -1;
-      } else {
-        this.direction = 1;
-      }
-    }
-  }
-
-  onKeyUp(e) {
-    e.stopPropagation();
-  }
-
-  renderEdit(): JSX.Element {
-    const html = { __html: this.state.text };
-
-    return (
-      <div
-        ref={r => this.ref = r}
-        onInput={this.onChange}
-        onKeyDown={this.onKeyPress}
-        onKeyUp={this.onKeyUp}
-        contentEditable
-        dangerouslySetInnerHTML={html}/>
-    );
-  }
-
-  renderView(): JSX.Element {
-    return <div>{this.props.text}</div>;
-  }
-
-  render() : JSX.Element {
-    const { editMode } = this.props;
-
-    return editMode ? this.renderEdit() : this.renderView();
-  }
-}
-
-
 export interface CustomEditorProps extends AbstractContentEditorProps<Custom> {
   documentId: string;
   assessment: AssessmentModel;
@@ -347,6 +233,7 @@ export class CustomEditor
     this.onAddColumn = this.onAddColumn.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
     this.editColText = this.editColText.bind(this);
+    this.toggleCellType = this.toggleCellType.bind(this);
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
   }
 
@@ -707,6 +594,68 @@ export class CustomEditor
     });
   }
 
+  toggleCellType(cellGuid: string) {
+    const { model, currentNode } = this.props;
+    const question = currentNode as Question;
+
+    model.layoutData.lift((ld) => {
+      const updatedLayoutData = ld.with({
+        targetGroup: ld.targetGroup.with({
+          rows: ld.targetGroup.rows.map(row => row.contentType === 'HeaderRow'
+            // HeaderRow
+            ? row
+            // ContentRow
+            : row.with({
+              cols: row.cols.map(col =>
+                // check if this cell is the toggle cell
+                col.guid === cellGuid
+                ? (
+                  // if cell is a label, return a new target
+                  col.contentType === 'DndText'
+                  ? (
+                    new Target().with({
+                      guid: guid(),
+                      assessmentId: guid(),
+                    })
+                  )
+                  // otherwise it is a target, return a new label
+                  : (
+                    new DndText().with({
+                      guid: guid(),
+                    })
+                  )
+                )
+                : (
+                  col
+                ),
+              ) as Immutable.List<DndText>,
+            }),
+          ) as Immutable.List<TG_ROW>,
+        }),
+      });
+
+      const updatedModel = model.with({
+        layoutData: Maybe.just<DndLayout>(updatedLayoutData),
+      });
+
+      // target changed, update item and parts accordingly
+      const { items, parts } = updateItemPartsFromTargets(
+        question.items as Immutable.OrderedMap<string, FillInTheBlank>,
+        question.parts,
+        getTargetsFromLayout(updatedLayoutData),
+      );
+
+      // save question updates
+      this.onEditQuestion(question.with({
+        body: question.body.with({
+          content: question.body.content.set(updatedModel.guid, updatedModel),
+        }),
+        items,
+        parts,
+      }));
+    });
+  }
+
   renderDropdown(
     index: number, onInsert: (index: number) => void,
     onRemove: (index: number) => void,
@@ -764,11 +713,11 @@ export class CustomEditor
 
     const renderTableRow = (row, index) => {
       const isHeader = row.contentType === 'HeaderRow';
-      const Tcell = isHeader ? 'th' : 'td';
+      const TCell = isHeader ? 'th' : 'td';
 
       return (
         <tr key={row.guid}>
-          <Tcell>
+          <TCell>
             {this.renderDropdown(
               index + 1,
               index => this.onAddRow(index),
@@ -776,16 +725,17 @@ export class CustomEditor
               'row',
               false,
             )}
-          </Tcell>
+          </TCell>
           {row.cols.toArray().map(col => col.contentType === 'Target'
           ? (
             <DynaDropTarget
               key={col.guid}
               id={col.guid}
+              className={classNames([classes.cell, classes.targetCell])}
+              isHeader={isHeader}
               assessmentId={col.assessmentId}
               selectedInitiator={selectedInitiator}
-              header
-              className={classNames([classes.targetCell])}
+              onToggleType={this.toggleCellType}
               editMode={editMode}
               onDrop={this.assignInitiator}
               onRemoveInitiator={this.unassignInitiator}
@@ -793,20 +743,21 @@ export class CustomEditor
               initiators={targetInitiators[col.assessmentId]} />
           )
           : (
-            <Tcell
+            <DynaDropLabel
               key={col.guid}
-              className={isHeader ? classes.header : classes.cell}
+              id={col.guid}
+              className={classNames([classes.cell, isHeader && classes.cellHeader])}
               style={{
                 fontWeight: col.fontWeight as any,
                 fontSize: col.fontWeight,
                 fontStyle: col.fontStyle as any,
                 textDecoration: col.textDecoration,
-              }}>
-              <CellEditor
-                editMode={editMode}
-                text={col.text}
-                onEdit={value => this.editColText(value, col)} />
-            </Tcell>
+              }}
+              onToggleType={this.toggleCellType}
+              isHeader={isHeader}
+              editMode={editMode}
+              text={col.text}
+              onEdit={value => this.editColText(value, col)} />
           ))}
         </tr>
       );

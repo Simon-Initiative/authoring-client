@@ -7,17 +7,14 @@ export const styles: JSSStyles = {
   dynaDropTarget: {
     extend: [disableSelect],
     backgroundColor: colors.grayLighter,
-    border: [[1, 'solid', colors.grayLight]],
-    height: 40,
+    border: [[2, 'solid', 'transparent']],
     padding: 4,
     color: colors.gray,
     fontWeight: 600,
   },
   label: {
     margin: 5,
-  },
-  initiators: {
-
+    whiteSpace: 'nowrap',
   },
   targetHover: {
     border: [[2, 'dashed', '#f4bf42']],

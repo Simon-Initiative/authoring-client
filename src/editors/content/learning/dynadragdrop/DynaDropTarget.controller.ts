@@ -16,12 +16,13 @@ interface OwnProps {
   assessmentId: string;
   selectedInitiator: string;
   label: string;
+  isHeader?: boolean;
   initiators: InitiatorModel[];
   editMode: boolean;
   className?: string;
-  header?: boolean;
   onDrop: (initiatorId: string, targetAssessmentId: string) => void;
   onRemoveInitiator: (initiatorId: string, targetAssessmentId: string) => void;
+  onToggleType: (id: string) => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

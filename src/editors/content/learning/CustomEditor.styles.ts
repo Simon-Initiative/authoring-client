@@ -14,9 +14,6 @@ export const styles: JSSStyles = {
   dynaDropTable: {
 
   },
-  header: {
-    padding: 4,
-  },
   dropdown: {
     '& button': {
       color: colors.grayDarker,
@@ -27,10 +24,20 @@ export const styles: JSSStyles = {
   },
   cell: {
     border: [[1, 'solid', colors.grayLight]],
-    height: 40,
-    padding: 4,
     minWidth: 50,
     minHeight: 50,
+    position: 'relative',
+
+    '&:hover': {
+      '& .TargetToggle': {
+        display: 'initial',
+      },
+    },
+  },
+  cellHeader: {
+    padding: 4,
+    border: [[1, 'solid', 'transparent']],
+    borderBottom: [[1, 'solid', colors.grayLight]],
   },
   initiators: {
     marginTop: 10,
