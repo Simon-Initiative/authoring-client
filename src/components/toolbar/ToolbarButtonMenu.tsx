@@ -157,11 +157,13 @@ export class ToolbarQuadMenu
           disabled={disabled}
           data-toggle="dropdown"
           data-boundary="window"
-          data-offset="-75,16"
+          data-offset="-75,0"
           >
           <span className="sr-only">Toggle Dropdown</span>
         </button>
-        <div className="dropdown-menu">
+        <div
+          style={ { marginTop: '-9px' } }
+          className="dropdown-menu">
           {this.props.children}
         </div>
       </div>
