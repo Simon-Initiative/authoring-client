@@ -38,6 +38,13 @@ export class FillInTheBlank extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+  clone() : FillInTheBlank {
+    return this.with({
+      id: createGuid(),
+      choices: this.choices.map(c => c.clone()).toOrderedMap(),
+    });
+  }
+
   with(values: FillInTheBlankParams) {
     return this.merge(values) as this;
   }

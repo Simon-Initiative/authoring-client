@@ -378,6 +378,23 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ content });
   }
 
+  updateAllInputRefs(itemMap: Object) : ContiguousText {
+
+    const content = getEntities(EntityTypes.input_ref, this.content)
+      .reduce(
+        (contentState, info) => {
+          if (itemMap[info.entity.data['@input']] !== undefined) {
+            return contentState.mergeEntityData(
+              info.entityKey, { '@input': itemMap[info.entity.data['@input']] });
+          }
+
+          return contentState;
+        },
+        this.content);
+
+    return this.with({ content });
+  }
+
   extractPlainText() : Maybe<string> {
 
     const blocks = this.content.getBlocksAsArray();
