@@ -33,6 +33,7 @@ export interface QuestionProps<ModelType>
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
   onRemoveQuestion: () => void;
+  onDuplicate: () => void;
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -138,6 +139,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <ContentTitle
           title={getLabelForQuestion(model)}
+          onDuplicate={this.props.onDuplicate}
           canRemove={canRemoveQuestion}
           removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
           onRemove={onRemoveQuestion} />

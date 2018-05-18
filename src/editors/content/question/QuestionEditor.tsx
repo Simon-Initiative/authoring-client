@@ -260,6 +260,7 @@ export class QuestionEditor
       body: this.props.model.body,
       grading: this.props.model.grading,
       onGradingChange: this.onGradingChange,
+      onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
       canRemoveQuestion: canRemove,
