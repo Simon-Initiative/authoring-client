@@ -59,6 +59,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.onDuplicateNode = this.onDuplicateNode.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -180,6 +181,10 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   }
 
+  onDuplicateNode() {
+
+  }
+
   render() {
     const { context, services, editMode, model, onEdit } = this.props;
 
@@ -233,7 +238,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 {renderAssessmentNode(
                   this.state.currentNode, assesmentNodeProps, this.onEdit,
                   this.onRemove, this.onFocus,
-                  true, null)}
+                  true, this.onDuplicateNode, null)}
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ import './QuestionEditor.scss';
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
+  onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;

@@ -69,7 +69,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onNodeRemove = this.onNodeRemove.bind(this);
     this.onEditNode = this.onEditNode.bind(this);
-
+    this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
 
     this.supportedElements = Immutable.List<string>();
@@ -426,6 +426,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
 
+  onDuplicateQuestion() {
+
+
+  }
+
   render() {
     const { context, services, editMode, model, currentNode, onEdit } = this.props;
 
@@ -479,7 +484,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <div className="nodeContainer">
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
-                  this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
+                  this.onNodeRemove, this.onFocus, this.canRemoveNode(),
+                  this.onDuplicateQuestion, this)}
               </div>
             </div>
           </div>

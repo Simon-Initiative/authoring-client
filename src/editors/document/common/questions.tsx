@@ -27,12 +27,16 @@ export type EditHandler = (guid: string, node: contentTypes.Node, src) => void;
 
 export type RemoveHandler = (guid: string) => void;
 
+export type DuplicateHandler = () => void;
+
 export type FocusHandler = (child: Object, parent: any, textSelection) => void;
 
 export function renderAssessmentNode(
   n : models.Node, props: Props, onEdit: EditHandler,
   onRemove: RemoveHandler, onFocus: FocusHandler,
-  canRemove: boolean, parent: ParentContainer) {
+  canRemove: boolean,
+  onDuplicate: DuplicateHandler,
+  parent: ParentContainer) {
 
   const isParentAssessmentGraded = props.model.resource.type !== LegacyTypes.inline;
 
@@ -50,6 +54,7 @@ export function renderAssessmentNode(
             hover={props.hover}
             onUpdateHover={props.onUpdateHover}
             model={n}
+            onDuplicate={props.editMode ? onDuplicate : undefined}
             onEdit={(c, src) => onEdit(n.guid, c, src)}
             canRemove={canRemove}
             onRemove={() => onRemove(n.guid)}
