@@ -1,54 +1,46 @@
-import { List, Map } from 'immutable';
-import { miniResourceRef } from 'components/DeleteResourceView.controller';
+import { List, Map, OrderedMap } from 'immutable';
 import { State } from 'reducers';
 import { Dispatch } from 'react-redux';
 import * as persistence from 'data/persistence';
 import { LegacyTypes } from 'data/types';
+import { Maybe } from 'tsmonad/lib/src';
+import { Edge } from 'types/edge';
+import { Resource } from 'data/contentTypes';
 
-// deleteResources
-// () => onDisplayModal(
-// <DeleteResourceView
-//   resource={documentResource}
-//   onCancel={onDismissModal}
-//   onDelete={() => {}}
-// />
+export type LOAD_RESOURCE_EDGES = 'Edges/LOAD_RESOURCE_EDGES';
+export const LOAD_RESOURCE_EDGES: LOAD_RESOURCE_EDGES = 'Edges/LOAD_RESOURCE_EDGES';
 
-export type LOAD_RESOURCE_REFS = 'Resource/LOAD_RESOURCE_REFS';
-export const LOAD_RESOURCE_REFS: LOAD_RESOURCE_REFS = 'Resource/LOAD_RESOURCE_REFS';
-
-export type LoadResourceReferencesAction = {
-  type: LOAD_RESOURCE_REFS,
-  courseId: string,
-  references: Map<string, List<miniResourceRef>>,
+export type LoadResourceEdgesAction = {
+  type: LOAD_RESOURCE_EDGES,
+  resource: Resource,
+  edges: Maybe<OrderedMap<string, Edge>>,
 };
 
-export const loadResourceReferences = (
-  courseId: string, references: Map<string, List<miniResourceRef>>):
-  LoadResourceReferencesAction => ({
-    type: LOAD_RESOURCE_REFS,
-    courseId,
-    references,
+// do we even need this?
+export const loadResourceEdges = (resource: Resource, edges: Maybe<OrderedMap<string, Edge>>):
+  LoadResourceEdgesAction => ({
+    type: LOAD_RESOURCE_EDGES,
+    resource,
+    edges,
   });
 
-export const fetchResourceReferences = (courseId: string) => (
-  (dispatch: Dispatch<State>, getState: () => State):
-  Promise<Map<string, List<miniResourceRef>>> => {
-    return persistence.fetchWebContentReferences(courseId, {
-      destinationType: LegacyTypes.webcontent,
-    })
+export const fetchResourceEdges = (resource: Resource) =>
+  (dispatch: Dispatch<State>, getState: () => State): Promise<Maybe<OrderedMap<string, Edge>>> => {
+    return persistence.fetchResourceReferences(resource.id, { destinationType: resource.type })
       .then((edges) => {
         const webcontentPathToSourceMap = edges.reduce(
           (acc, edge) => {
+            // what is the edge path to?
             const edgePathTo = edge.destinationId.replace(/^.*content\//, 'webcontent/');
             return acc.set(
               edgePathTo,
-              (acc.get(edgePathTo) || List<miniResourceRef>()).concat({
+              (acc.get(edgePathTo) || new Edge()).concat({
                 resourceId: edge.sourceId.replace(/^.*:/, ''),
                 guid: edge.metadata.jsonObject.sourceGuid,
-              }) as List<miniResourceRef>,
+              }) as Edge,
             );
           },
-          Map<string, List<miniResourceRef>>());
+          OrderedMap<string, Edge>());
 
         const references = getState().Resource.get(courseId).data.toArray()
           .reduce(
@@ -57,9 +49,9 @@ export const fetchResourceReferences = (courseId: string) => (
             ),
             Map<string, List<miniResourceRef>>());
 
-        dispatch(loadResourceReferences(courseId, references));
+        // do we need this?
+        dispatch(loadResourceEdges(resource, references));
 
         return references;
       });
-  }
-);
+  };

@@ -16,6 +16,7 @@ export {
   createWebContent,
   fetchWebContent,
   fetchWebContentReferences,
+  fetchResourceReferences,
 } from './persistence/webcontent';
 
 export { developerRegistration } from './persistence/developer';

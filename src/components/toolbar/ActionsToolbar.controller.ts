@@ -6,6 +6,10 @@ import { showSidebar } from 'actions/editorSidebar';
 import { preview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
+import { fetchResourceEdges } from 'actions/edges';
+import { Maybe } from 'tsmonad/lib/src';
+import { Edge } from 'types/edge';
+import { OrderedMap } from 'immutable';
 
 interface StateProps {
   courseId: string;
@@ -18,15 +22,15 @@ interface DispatchProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  deleteResource: (resource: Resource) => void;
+  fetchResourceEdges: (resource: Resource) => Promise<Maybe<OrderedMap<string, Edge>>>;
 }
 
 interface OwnProps {
   documentResource: Resource;
   documentId: string;
   canPreview: boolean;
-  // onDisplayModal: (component: any) => void;
-  // onDismissModal: () => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
@@ -52,8 +56,8 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
     },
-    deleteResource: (resource: Resource) => {
-      return dispatch(deleteResource(resource));
+    fetchResourceEdges: (resource: Resource) => {
+      return dispatch(fetchResourceEdges(resource));
     },
   };
 };

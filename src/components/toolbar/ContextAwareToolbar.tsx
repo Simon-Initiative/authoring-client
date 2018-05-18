@@ -260,8 +260,11 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
         <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
           <ActionsToolbar
-            documentResource={resource} documentId={context.documentId}
+            documentResource={resource}
+            documentId={context.documentId}
             canPreview={canPreview}
+            onDisplayModal={onDisplayModal}
+            onDismissModal={onDismissModal}
           />
         </ToolbarGroup>
       </div>

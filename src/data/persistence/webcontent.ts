@@ -4,6 +4,7 @@ import { credentials, getFormHeaders } from '../../actions/utils/credentials';
 import { PaginatedResponse } from 'data/types';
 import { Edge } from 'types/edge';
 import { WebContent } from 'data/content/webcontent';
+import { Resource } from 'data/contentTypes';
 
 /**
  * Uploads a file, receives a promise to deliver path on server
@@ -76,6 +77,45 @@ export function fetchWebContentReferences(packageId: string, queryParams?: {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${packageId}/edges`;
+  const headers = getFormHeaders(credentials);
+  const query = Object.assign(
+    {},
+    relationship ? { relationship } : {},
+    purpose ? { purpose } : {},
+    sourceId ? { sourceId } : {},
+    sourceType ? { sourceType } : {},
+    destinationId ? { destinationId } : {},
+    destinationType ? { destinationType } : {},
+    referenceType ? { referenceType } : {},
+    status ? { relationship } : {},
+  );
+
+  return authenticatedFetch({ method, url, headers, query }).then(res => (res as Edge[]));
+}
+
+export function fetchResourceReferences(resourceId: string, queryParams?: {
+  relationship?: string,
+  purpose?: string,
+  sourceId?: string,
+  sourceType?: string,
+  destinationId?: string,
+  destinationType?: string,
+  referenceType?: string,
+  status?: string,
+}): Promise<Edge[]> {
+  const {
+    relationship,
+    purpose,
+    sourceId,
+    sourceType,
+    destinationId,
+    destinationType,
+    referenceType,
+    status,
+  } = queryParams;
+
+  const method = 'GET';
+  const url = `${configuration.baseUrl}/${resourceId}/edges`;
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},

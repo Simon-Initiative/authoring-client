@@ -3,30 +3,23 @@ import { Resource } from 'data/content/resource';
 import * as models from 'data/models';
 import * as React from 'react';
 import ModalSelection from 'utils/selection/ModalSelection';
-import { miniResourceRef } from 'components/DeleteResourceView.controller';
 import { Maybe } from 'tsmonad/lib/src';
-// import './DeleteResourceView.scss';
+import { Edge } from 'types/edge';
+import { OrderedMap } from 'immutable';
+// import './DeleteResourceModal.scss';
 
-export interface DeleteResourceViewProps {
-  // course: models.CourseModel;
-  // dispatch: any;
-  // title: string;
-  // resourceType: string;
-  // filterFn: (resource: Resource) => boolean;
-  // createResourceFn: (
-  //   courseId: string,
-  //   title: string, type: string) => models.ContentModel;
+export interface DeleteResourceModalProps {
   onCancel: () => void;
   onDelete: () => void;
   resource: Resource;
-  resourceRefs: Maybe<miniResourceRef>
+  edges: Maybe<OrderedMap<string, Edge>>;
 }
 
-interface DeleteResourceViewState {
+interface DeleteResourceModalState {
 }
 
-export default class DeleteResourceView extends
-    React.Component<DeleteResourceViewProps, DeleteResourceViewState> {
+export default class DeleteResourceModal extends
+    React.Component<DeleteResourceModalProps, DeleteResourceModalState> {
   viewActions: any;
 
   constructor(props) {
@@ -67,7 +60,7 @@ export default class DeleteResourceView extends
           columnComparators={comparators}
           columnRenderers={columnRenderers}
           columnLabels={labels}/> */}
-          <p></p>
+          <p>Edges up in here</p>
       </ModalSelection>
     );
   }
