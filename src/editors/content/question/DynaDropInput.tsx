@@ -20,6 +20,8 @@ import { ContiguousText } from 'data/content/learning/contiguous';
 import { Initiator } from 'data/content/assessment/dragdrop/initiator';
 import { Maybe } from 'tsmonad';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { ContentElement } from 'data/content/common/interfaces';
+import { ContentElements } from 'data/content/common/elements';
 
 export interface DynaDropInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
@@ -36,10 +38,14 @@ export interface DynaDropInputState extends QuestionState {
  * DynaDropInput Question Editor
  */
 export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputState> {
+  placeholderText: ContentElement;
+
   constructor(props: DynaDropInputProps) {
     super(props);
 
     this.editInitiatorText = this.editInitiatorText.bind(this);
+
+    this.placeholderText = ContiguousText.fromText('', guid());
   }
 
   /** Implement required abstract method to set className */
@@ -108,6 +114,14 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
       onBodyEdit,
     } = this.props;
 
+    // We want this component to display a ContiguousTextEditor in the
+    // case where there is no content other than the drag and drop in the model
+    const contentWithPlaceholder = (body as ContentElements).content.size === 1
+      ? Immutable.OrderedMap<string, ContentElement>()
+          .set(this.placeholderText.guid, this.placeholderText)
+          .concat((body as ContentElements).content) as Immutable.OrderedMap<string, ContentElement>
+      : (body as ContentElements).content;
+
     return (
       <div className="question-body" key="question">
         <ContentContainer
@@ -119,7 +133,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
           editMode={editMode}
           services={services}
           context={context}
-          model={body}
+          model={(body as ContentElements).with({ content: contentWithPlaceholder })}
           onEdit={onBodyEdit} />
       </div>
     );

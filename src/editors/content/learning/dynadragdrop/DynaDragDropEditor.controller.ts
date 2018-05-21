@@ -1,12 +1,12 @@
 import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
-import { CustomEditor } from './CustomEditor';
+import { DynaDragDropEditor } from './DynaDragDropEditor';
 import { AssessmentModel } from 'data/models';
 import { Page, Node } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { EditedDocument } from 'types/document';
 import { selectInitiator } from 'actions/dynadragdrop';
-import { AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { AbstractContentEditorProps } from '../../common/AbstractContentEditor';
 import { Custom } from 'data/content/assessment/custom';
 
 interface StateProps {
@@ -51,6 +51,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
 };
 
 export const controller = connect<StateProps, DispatchProps, OwnProps>
-    (mapStateToProps, mapDispatchToProps)(CustomEditor);
+    (mapStateToProps, mapDispatchToProps)(DynaDragDropEditor);
 
-export { controller as CustomEditor };
+export { controller as DynaDragDropEditor };

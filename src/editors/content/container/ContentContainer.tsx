@@ -170,11 +170,15 @@ export class ContentContainer
       const updated = model.with({ content: model.content.delete(childModel.guid) });
 
       const indexOf = model.content.toArray().map(c => c.guid).indexOf(childModel.guid);
-      let newSelection = null;
+      let newSelection: ContentElement = null;
       if (model.content.size > 1) {
         newSelection = indexOf === 0
           ? updated.content.first()
           : model.content.toArray()[indexOf - 1];
+      }
+
+      if (this.disableContentSelection(newSelection)) {
+        newSelection = null;
       }
 
       onEdit(updated, newSelection);
@@ -265,9 +269,9 @@ export class ContentContainer
   disableContentSelection(model: ContentElement) {
     const { disableContentSelection } = this.props;
 
-    return disableContentSelection === true
+    return !!(disableContentSelection === true
       || (Array.isArray(disableContentSelection)
-        && disableContentSelection.find(type => type === model.contentType));
+        && disableContentSelection.find(type => type === model.contentType)));
   }
 
   renderMain() : JSX.Element {
@@ -290,7 +294,6 @@ export class ContentContainer
     const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
-
         const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1
           || this.disableContentSelection(model);
 

@@ -1,45 +1,15 @@
 import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
+import { disableSelect } from 'styles/mixins';
 
 export const styles: JSSStyles = {
   customEditor: {
-    paddingLeft: 10,
-  },
-  instructions: {
-    fontSize: 14,
-    color: colors.grayDark,
-    maxWidth: 800,
-    marginTop: 10,
-  },
-  dynaDropTable: {
 
   },
-  dropdown: {
-    '& button': {
-      color: colors.grayDarker,
-    },
-  },
-  showOnRight: {
-    float: 'right',
-  },
-  cell: {
-    border: [[1, 'solid', colors.grayLight]],
-    minWidth: 50,
-    minHeight: 50,
-    position: 'relative',
-
-    '&:hover': {
-      '& .TargetToggle': {
-        display: 'initial',
-      },
-    },
-  },
-  cellHeader: {
-    padding: 4,
-    border: [[1, 'solid', 'transparent']],
-    borderBottom: [[1, 'solid', colors.grayLight]],
-  },
-  initiators: {
-    marginTop: 10,
+  customEditorOther: {
+    extend: [disableSelect],
+    padding: [10, 4],
+    background: colors.grayLighter,
+    border: [[2, 'solid', colors.grayLight]],
   },
 };
