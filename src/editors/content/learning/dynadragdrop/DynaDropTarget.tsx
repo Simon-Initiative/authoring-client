@@ -67,18 +67,21 @@ export class DynaDropTarget
     const TCell = isHeader ? 'th' : 'td';
 
     return connectDropTarget((
-      <TCell className={classNames([classes.dynaDropTarget, className])}>
-        <div className={classes.label}>
-          {label}
-        </div>
-        <div className={classNames([classes.initiators, isHovered && classes.targetHover])}>
-          {initiators && initiators.map(initiator => (
-            <Initiator
-              key={initiator.guid}
-              model={initiator} editMode={editMode}
-              selected={initiator.assessmentId === selectedInitiator}
-              onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
-          ))}
+      <TCell className={classNames([classes.dynaDropTarget,
+        className])}>
+        <div className={classNames([classes.targetHover, isHovered && classes.targetHovered])}>
+          <div className={classes.label}>
+            {label}
+          </div>
+          <div className={classNames([classes.initiators])}>
+            {initiators && initiators.map(initiator => (
+              <Initiator
+                key={initiator.guid}
+                model={initiator} editMode={editMode}
+                selected={initiator.assessmentId === selectedInitiator}
+                onRemove={guid => onRemoveInitiator(guid, assessmentId)} />
+            ))}
+          </div>
         </div>
 
         <TargetToggle id={id} onToggleType={onToggleType} />
