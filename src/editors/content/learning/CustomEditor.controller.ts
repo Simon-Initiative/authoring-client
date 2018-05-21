@@ -6,6 +6,8 @@ import { Page, Node } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { EditedDocument } from 'types/document';
 import { selectInitiator } from 'actions/dynadragdrop';
+import { AbstractContentEditorProps } from '../common/AbstractContentEditor';
+import { Custom } from 'data/content/assessment/custom';
 
 interface StateProps {
   documentId: string;
@@ -20,7 +22,7 @@ interface DispatchProps {
   onSelectInitiator: (id: string) => void;
 }
 
-interface OwnProps {
+interface OwnProps extends AbstractContentEditorProps<Custom> {
 
 }
 

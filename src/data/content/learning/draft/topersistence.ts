@@ -35,6 +35,7 @@ inlineTerminalTags['m:math'] = true;
 inlineTerminalTags['#math'] = true;
 inlineTerminalTags['input_ref'] = true;
 inlineTerminalTags['image'] = true;
+inlineTerminalTags['sym'] = true;
 
 
 type Container = Object[];
@@ -52,12 +53,14 @@ const entityHandlers = {
   activity_link,
   xref,
   link,
+  extra,
   LINK: pastedLink,
   IMAGE: pastedImage,
   image: inlineImage,
   math,
   input_ref,
   cite,
+  sym,
   quote,
   code,
   formula_begin,
@@ -535,7 +538,9 @@ function translateInline(
     return obj;
   }
 
-  if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
+  if (key === 'extra') {
+    obj['extra'][common.ARRAY][0]['anchor'][common.ARRAY] = [{ '#text': sub }];
+  } else if (obj[common.getKey(obj)][common.ARRAY] === undefined) {
     obj[common.getKey(obj)][common.ARRAY] = [{ '#text': sub }];
   }
 
@@ -587,6 +592,11 @@ function pastedImage(s : common.RawEntityRange, text : string, entityMap : commo
 
 
 function link(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+  const { data } = entityMap[s.key];
+  return data.toPersistence(fromDraft);
+}
+
+function extra(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
   const { data } = entityMap[s.key];
   return data.toPersistence(fromDraft);
 }
@@ -660,6 +670,12 @@ function code(s : common.RawEntityRange, text : string, entityMap : common.RawEn
   return data.toPersistence();
 }
 
+
+function sym(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
+
+  const { data } = entityMap[s.key];
+  return data.toPersistence();
+}
 
 function math(s : common.RawEntityRange, text : string, entityMap : common.RawEntityMap) {
 

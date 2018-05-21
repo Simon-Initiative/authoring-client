@@ -28,6 +28,7 @@ export type SectionParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Section,
+  elementType: 'section',
   id: '',
   title: '',
   description: Maybe.nothing<string>(),
@@ -41,8 +42,9 @@ const defaultContent = {
 };
 
 export class Section extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Section;
+  elementType: 'section';
   id: string;
   title: string;
   description: Maybe<string>;
@@ -53,7 +55,7 @@ export class Section extends Immutable.Record(defaultContent) {
   unordered: Maybe<Unordered>;
   progressConstraintIdref: Maybe<string>;
   guid: string;
-  
+
   constructor(params?: SectionParams) {
     super(defaultIdGuid(params));
   }
@@ -73,12 +75,12 @@ export class Section extends Immutable.Record(defaultContent) {
     if (s['@progress_constraint_idref'] !== undefined) {
       model = model.with({ progressConstraintIdref: Maybe.just(s['@progress_constraint_idref']) });
     }
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'metadata:metadata':
           model = model.with({ metadata: Maybe.just(item) });
@@ -112,10 +114,10 @@ export class Section extends Immutable.Record(defaultContent) {
             { description: Maybe.just(item['description']['#text']) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
@@ -127,7 +129,7 @@ export class Section extends Immutable.Record(defaultContent) {
     this.metadata.lift(p => children.push(p));
     this.preconditions.lift(p => children.push(p.toPersistence()));
     this.supplements.lift(p => children.push(p.toPersistence()));
-    
+
     if (this.children.size === 0) {
       children.push(createPlaceholderItem().toPersistence());
     } else {
@@ -135,12 +137,12 @@ export class Section extends Immutable.Record(defaultContent) {
     }
 
     this.unordered.lift(p => children.push(p.toPersistence()));
-    
-    const s = { 
+
+    const s = {
       section: {
         '@id': this.id,
         '#array': children,
-      }, 
+      },
     };
 
     this.progressConstraintIdref.lift(p => s.section['@progress_constraint_idref'] = p);

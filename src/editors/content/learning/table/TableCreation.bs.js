@@ -39,11 +39,9 @@ function make(onTableCreate, onHide, _) {
       var width = "108px";
       var state = self[/* state */2];
       var gridStyle = {
-        backgroundColor: "#EFEFEF",
         height: "220px",
-        padding: "3px",
-        width: width,
-        boxShadow: "1px 2px 4px rgba(0, 0, 0, .5)"
+        padding: "0px",
+        width: width
       };
       var labelStyle = {
         color: "#808080",

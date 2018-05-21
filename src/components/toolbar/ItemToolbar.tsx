@@ -3,19 +3,19 @@ import { injectSheet, JSSProps } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
 
 import { styles } from './ItemToolbar.styles';
+import { loadFromLocalStorage } from 'utils/localstorage';
 
 export interface ItemToolbarProps {
   context: AppContext;
-  courseModel: CourseModel;
   activeContext: ActiveContextState;
   onCut: (item) => void;
   onCopy: (item) => void;
   onPaste: () => void;
   onRemove: (item) => void;
+  parentSupportsElementType: (type: string) => boolean;
 }
 
 /**
@@ -35,8 +35,12 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
   canDuplicate() {
     const { activeContext } = this.props;
+
+    const disallowDuplicates = ['WbInline', 'Activity', 'Speaker', 'Line'];
+
     return activeContext.activeChild.caseOf({
-      just: activeChild => activeChild && ((activeChild as any).contentType !== 'WbInline'),
+      just: activeChild => activeChild &&
+        (disallowDuplicates.indexOf((activeChild as any).contentType) === -1),
       nothing: () => false,
     });
   }
@@ -59,11 +63,22 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
 
   render() {
     const {
-      classes, onCut, onCopy, onPaste, onRemove,
+      classes, onCut, onCopy, onPaste, onRemove, parentSupportsElementType,
     } = this.props;
 
     const canMoveUp = true;
     const canMoveDown = true;
+
+    const clipboardItem: any = loadFromLocalStorage('clipboard');
+    // saveToLocalStorage handles saving contiguous text as a special
+    // case, so we handle that here
+    let clipboardElementType = null;
+
+    if (clipboardItem !== null) {
+      clipboardElementType = clipboardItem.isContiguousText
+      ? '#text'
+      : Object.keys(clipboardItem)[0];
+    }
 
     return (
       <React.Fragment>
@@ -71,15 +86,15 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
           <ToolbarButton
             onClick={() => onCut(this.getItem())}
             tooltip="Cut Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection && this.canDuplicate)}>
+            size={ToolbarButtonSize.Full}
+            disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
             onClick={() => onCopy(this.getItem())}
             tooltip="Copy Item"
-            size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection && this.canDuplicate)}>
+            size={ToolbarButtonSize.Full}
+            disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-copy" /> Copy
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -88,7 +103,9 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => onPaste()}
             tooltip="Paste Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection)}>
+            disabled={!(this.hasSelection() &&
+              clipboardItem !== null &&
+              parentSupportsElementType(clipboardElementType))}>
             <i className="fa fa-paste" /> Paste
           </ToolbarButton>
           <ToolbarButton
@@ -96,7 +113,7 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => onRemove(this.getItem())}
             tooltip="Remove Item"
             size={ToolbarButtonSize.Wide}
-            disabled={!(this.hasSelection)}>
+            disabled={!(this.hasSelection())}>
             <i className="fa fa-close" /> Remove
           </ToolbarButton>
         </ToolbarLayout.Column>
@@ -105,14 +122,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
             onClick={() => this.getContainer().onMoveUp(this.getItem())}
             tooltip="Move Item Up"
             size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection && canMoveUp)}>
+            disabled={!(this.hasSelection() && canMoveUp)}>
             <i className="fa fa-long-arrow-up" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => this.getContainer().onMoveDown(this.getItem())}
             tooltip="Move Item Down"
             size={ToolbarButtonSize.Small}
-            disabled={!(this.hasSelection && canMoveDown)}>
+            disabled={!(this.hasSelection() && canMoveDown)}>
             <i className="fa fa-long-arrow-down" />
           </ToolbarButton>
         </ToolbarLayout.Column>

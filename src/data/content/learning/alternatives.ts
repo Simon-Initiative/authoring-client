@@ -19,6 +19,7 @@ export type AlternativesParams = {
 
 const defaultContent = {
   contentType: 'Alternatives',
+  elementType: 'alternatives',
   id: Maybe.nothing(),
   title: Maybe.nothing(),
   group: Maybe.nothing(),
@@ -29,6 +30,7 @@ const defaultContent = {
 
 export class Alternatives extends Immutable.Record(defaultContent) {
   contentType: 'Alternatives';
+  elementType: 'alternatives';
   id: Maybe<string>;
   title: Maybe<Title>;
   default: Maybe<Default>;

@@ -37,8 +37,8 @@ export interface UnorderedListEditorState {
  */
 @injectSheet(styles)
 export default class UnorderedList
-    extends AbstractContentEditor<contentTypes.Ul,
-    StyledComponentProps<UnorderedListEditorProps>, UnorderedListEditorState> {
+  extends AbstractContentEditor<contentTypes.Ul,
+  StyledComponentProps<UnorderedListEditorProps>, UnorderedListEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -75,10 +75,10 @@ export default class UnorderedList
             focusChild=".DraftEditor-editorContainer"
             focusAction={FocusAction.Click}>
             <ToolbarContentContainer
-              onFocus={() => {}}
+              onFocus={() => { }}
               activeContentGuid={null}
               hover={null}
-              onUpdateHover={() => {}}
+              onUpdateHover={() => { }}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}
@@ -125,7 +125,7 @@ export default class UnorderedList
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Unordered List" columns={4} highlightColor={CONTENT_COLORS.Ul}>
+      <ToolbarGroup label="Unordered List" columns={5.3} highlightColor={CONTENT_COLORS.Ul}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -170,7 +170,7 @@ export default class UnorderedList
     this.props.onEdit(model, src);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model } = this.props;
     const { style } = model;

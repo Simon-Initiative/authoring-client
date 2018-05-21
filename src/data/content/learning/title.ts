@@ -10,6 +10,7 @@ export type TitleParams = {
 
 const defaultContent = {
   contentType: 'Title',
+  elementType: 'title',
   text: ContentElements.fromText('', '', TEXT_ELEMENTS),
   guid: '',
 };
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Title extends Immutable.Record(defaultContent) {
 
   contentType: 'Title';
+  elementType: 'title';
   text: ContentElements;
   guid: string;
 

@@ -13,6 +13,7 @@ export type HeadParams = {
 
 const defaultContent = {
   contentType: 'Head',
+  elementType: 'head',
   guid: '',
   title: new Title(),
   objrefs: Immutable.List<string>(),
@@ -21,6 +22,7 @@ const defaultContent = {
 export class Head extends Immutable.Record(defaultContent) {
 
   contentType: 'Head';
+  elementType: 'head';
   title: Title;
   guid: string;
   objrefs: Immutable.List<string>;

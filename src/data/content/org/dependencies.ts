@@ -13,16 +13,18 @@ export type DependenciesParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Dependencies,
+  elementType: 'dependencies',
   dependencies: Immutable.OrderedMap<string, Dependency>(),
   guid: '',
 };
 
 export class Dependencies extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Dependencies;
+  elementType: 'dependencies';
   dependencies?: Immutable.OrderedMap<string, Dependency>;
   guid: string;
-  
+
   constructor(params?: DependenciesParams) {
     super(augment(params));
   }
@@ -37,29 +39,29 @@ export class Dependencies extends Immutable.Record(defaultContent) {
     let model = new Dependencies({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'dependency':
           model = model.with(
             { dependencies: model.dependencies.set(id, Dependency.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       dependencies: {
         '#array': this.dependencies.toArray().map(s => s.toPersistence()),
-      }, 
+      },
     };
 
     return s;

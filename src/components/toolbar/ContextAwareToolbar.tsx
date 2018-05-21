@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer, TextSelection } from 'types/active.ts';
+import { ParentContainer, TextSelection, Trigger } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
@@ -24,7 +24,7 @@ interface ToolbarGroupProps {
   columns?: number;
 }
 
-export function determineBaseUrl(resource: Resource) : string {
+export function determineBaseUrl(resource: Resource): string {
   if (resource === undefined) return '';
 
   const pathTo = resource.fileNode.pathTo;
@@ -34,7 +34,7 @@ export function determineBaseUrl(resource: Resource) : string {
     .substr(0, stem.lastIndexOf('\/'));
 }
 
-const TOOLBAR_COL_WIDTH = 36;
+const TOOLBAR_COL_WIDTH = 31;
 const DEFAULT_TOOLBAR_GROUP_COLS = 10;
 
 export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
@@ -46,28 +46,29 @@ export const ToolbarGroup: React.StatelessComponent<ToolbarGroupProps>
       ? (
         <div className={classNames([classes.toolbarGroupContainer, className])}>
           <div style={{ width }} className={classNames([classes.toolbarGroup])}>
-              <div className={classes.tbGroupItems}>{children}</div>
-              <div className={classes.tbGroupLabel}>{label}</div>
+            <div className={classes.tbGroupItems}>{children}</div>
           </div>
+          <div className={classes.tbGroupLabel}>{label}</div>
         </div>
       )
       : (
         <div className={classes.toolbarGroupContainer}>
-          <div style={{ width: 4 * TOOLBAR_COL_WIDTH }}
-               className={classes.toolbarGroup}>
+          <div style={{ width: 6 * TOOLBAR_COL_WIDTH }}
+            className={classes.toolbarGroup}>
             <div className={classes.tbVerticallyCentered}>
               <div className={classes.tbNoAdvancedControls}>
                 This item does not have any advanced controls
               </div>
             </div>
-            <div className={classes.tbGroupLabel}>{label}</div>
           </div>
+          <div className={classes.tbGroupLabel}>{label}</div>
         </div>
       );
   });
 
 interface ToolbarLayoutProps {
   className?: string;
+  maxWidth?: string;
 }
 
 export const ToolbarLayout = {
@@ -100,12 +101,14 @@ export const ToolbarLayout = {
       </div>
     );
   }),
-
   Column: injectSheetSFC<ToolbarLayoutProps>(styles)(({
-    className, classes, children,
+    className, classes, children, maxWidth,
   }: StyledComponentProps<ToolbarLayoutProps>) => {
+    const style = maxWidth !== undefined ? { maxWidth } : undefined;
     return (
-      <div className={classNames([classes.toolbarLayoutColumn, className])}>
+      <div
+        style={style}
+        className={classNames([classes.toolbarLayoutColumn, className])}>
         {children}
       </div>
     );
@@ -130,13 +133,56 @@ export interface ToolbarProps {
 }
 
 @injectSheet(styles)
-export class ContextAwareToolbar extends React.PureComponent<StyledComponentProps<ToolbarProps>> {
+export class ContextAwareToolbar extends React.Component<StyledComponentProps<ToolbarProps>> {
 
   constructor(props) {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
+
+    // Determine if this update is due to a keypress
+    // that changed content.  These changes do not affect
+    // the toolbar, so no need to re-render
+    const isKeypress = this.props.textSelection.caseOf({
+      just: t => nextProps.textSelection.caseOf({
+        just: s => t !== s && s.triggeredBy === Trigger.KEYPRESS,
+        nothing: () => false,
+      }),
+      nothing: () => false,
+    });
+
+    if (isKeypress) {
+      return false;
+    }
+
+    // If the active content has switched, we re-render
+    const contentSwitched = this.props.content.caseOf({
+      just: t => nextProps.content.caseOf({
+        just: s => (t as any).guid !== (s as any).guid,
+        nothing: () => true,
+      }),
+      nothing: () => nextProps.content.caseOf({
+        just: s => true,
+        nothing: () => false,
+      }),
+    });
+
+    if (contentSwitched) {
+      return true;
+    }
+
+    // Only other thing we need to check is for a change in
+    // the supported elements
+    if (this.props.supportedElements !== nextProps.supportedElements) {
+      return true;
+    }
+
+    return false;
+  }
+
   render() {
+
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       textSelection, classes, onDisplayModal, onDismissModal, context, resource,
@@ -160,7 +206,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
         onEdit,
         parent: contentParent,
         activeContentGuid: contentParent.props.activeContentGuid,
-        onFocus: () => {},
+        onFocus: () => { },
         context: contentParent.props.context,
         services: contentParent.props.services,
         editMode: contentParent.props.editMode,
@@ -186,7 +232,7 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
 
     return (
       <div className={classes.toolbar}>
-        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={11}>
+        <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
             context={context}
             courseModel={this.props.courseModel}
@@ -197,24 +243,25 @@ export class ContextAwareToolbar extends React.PureComponent<StyledComponentProp
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={5.5}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={6.7}>
           <ItemToolbar
             context={context}
-            courseModel={this.props.courseModel} />
+            parentSupportsElementType={parentSupportsElementType} />
         </ToolbarGroup>
 
         <ReactCSSTransitionGroup
-            transitionName="contextToolbar"
-            transitionEnterTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}
-            transitionLeaveTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}>
+          transitionName="contextToolbar"
+          transitionEnterTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}
+          transitionLeaveTimeout={TOOLBAR_HIDE_ANIMATION_DURATION_MS}>
           {contentRenderer}
         </ReactCSSTransitionGroup>
 
-        <div className="flex-spacer"/>
+        <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={8}>
+        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
           <ActionsToolbar
-            documentResource={resource} documentId={context.documentId}
+            documentResource={resource}
+            documentId={context.documentId}
             canPreview={canPreview} />
         </ToolbarGroup>
       </div>

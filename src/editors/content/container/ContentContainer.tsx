@@ -30,6 +30,7 @@ export interface ContentContainerProps
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
   layout?: Layout;
+  overrideRemove?: (model: ContentElements, childModel: Object) => boolean;
 }
 
 export interface ContentContainerState {
@@ -157,7 +158,12 @@ export class ContentContainer
   }
 
   onRemove(childModel) {
-    const { onEdit, model } = this.props;
+    const { onEdit, model, overrideRemove } = this.props;
+
+    // Call overrideRemove, and terminate if it returns true
+    if (overrideRemove !== undefined && overrideRemove(model, childModel)) {
+      return;
+    }
 
     if (model.content.has(childModel.guid)) {
 

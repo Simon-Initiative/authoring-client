@@ -8,19 +8,21 @@ export type EssayParams = {
 };
 
 const defaultContent = {
+  contentType: 'Essay',
+  elementType: 'essay',
   id: '',
   name: '',
   guid: '',
-  contentType: 'Essay',
 };
 
 export class Essay extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Essay';
+  elementType: 'essay';
   id : string;
   name : string;
   guid: string;
-  
+
   constructor(params?: EssayParams) {
     super(augment(params));
   }
@@ -30,7 +32,7 @@ export class Essay extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : Essay {
-    
+
     const n = (json as any).essay;
     let model = new Essay({ guid });
 
@@ -40,7 +42,7 @@ export class Essay extends Immutable.Record(defaultContent) {
     if (n['@name'] !== undefined) {
       model = model.with({ name: n['@name'] });
     }
-    
+
     return model;
 
   }

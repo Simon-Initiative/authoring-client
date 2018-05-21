@@ -8,7 +8,7 @@ import {
 } from 'editors/content/common/AbstractContentEditor';
 import ContiguousTextToolbar from './ContiguousTextToolbar.controller';
 import { Maybe } from 'tsmonad';
-import { TextSelection } from 'types/active';
+import { TextSelection, Trigger } from 'types/active';
 import { getEditorByContentType } from 'editors/content/container/registry';
 import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { styles } from './ContiguousText.styles';
@@ -86,9 +86,12 @@ export default class ContiguousTextEditor
     e.stopPropagation();
   }
 
-  draftDrivenFocus(model, parent, selection) {
+  draftDrivenFocus(model, parent, selection, keypress) {
     this.props.onTextSelectionChange && this.props.onTextSelectionChange(selection);
-    this.props.onFocus(model, parent, Maybe.just(new TextSelection(selection)));
+    const textSelection = new TextSelection(selection);
+    textSelection.triggeredBy = keypress ? Trigger.KEYPRESS : Trigger.OTHER;
+
+    this.props.onFocus(model, parent, Maybe.just(textSelection));
   }
 
   renderMain() : JSX.Element {
@@ -108,13 +111,16 @@ export default class ContiguousTextEditor
           <DraftWrapper
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
             activeItemId=""
+            parentProps={this.props}
+            parent={this}
             editorStyles={Object.assign({}, editorStyles)}
-            onSelectionChange={selection => this.draftDrivenFocus(model, parent, selection)}
+            onSelectionChange={(selection, keypress) =>
+              this.draftDrivenFocus(model, parent, selection, keypress)}
             services={this.props.services}
             context={this.props.context}
             content={this.props.model}
             locked={!editMode || viewOnly}
-            onEdit={c => this.props.onEdit(c, c)} />
+            onEdit={(c, s) => this.props.onEdit(c, s === undefined ? c : s)} />
 
       </div>
     );

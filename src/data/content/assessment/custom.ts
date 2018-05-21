@@ -20,6 +20,7 @@ export type CustomParams = {
 
 const defaultContent = {
   contentType: 'Custom',
+  elementType: 'custom',
   id: '',
   guid: '',
   type: '',
@@ -36,6 +37,7 @@ const defaultContent = {
 export class Custom extends Immutable.Record(defaultContent) {
 
   contentType: 'Custom';
+  elementType: 'custom';
   id: string;
   guid: string;
   type: string;

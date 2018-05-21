@@ -12,6 +12,7 @@ export type QuoteParams = {
 
 const defaultContent = {
   contentType: 'Quote',
+  elementType: 'quote',
   text: new ContentElements().with({ supportedElements: Immutable.List(TEXT_ELEMENTS) }),
   entry: Maybe.nothing(),
   guid: '',
@@ -20,6 +21,7 @@ const defaultContent = {
 export class Quote extends Immutable.Record(defaultContent) {
 
   contentType: 'Quote';
+  elementType: 'quote';
   text: ContentElements;
   entry: Maybe<string>;
   guid: string;

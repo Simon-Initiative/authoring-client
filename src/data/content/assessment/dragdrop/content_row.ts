@@ -12,6 +12,7 @@ export type ContentRowParams = {
 
 const defaultContent = {
   contentType: 'ContentRow',
+  elementType: 'contentRow',
   guid: '',
   cols: Immutable.List<DndText | Target>(),
 };
@@ -19,6 +20,7 @@ const defaultContent = {
 export class ContentRow extends Immutable.Record(defaultContent) {
 
   contentType: 'ContentRow';
+  elementType: 'contentRow';
   guid: string;
   cols: Immutable.List<DndText | Target>;
 

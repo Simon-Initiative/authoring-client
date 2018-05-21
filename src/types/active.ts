@@ -2,6 +2,11 @@ import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { SelectionState } from 'draft-js';
 
+export enum Trigger {
+  KEYPRESS,
+  OTHER,
+}
+
 export class TextSelection {
 
   static createEmpty(key) {
@@ -9,6 +14,7 @@ export class TextSelection {
   }
 
   ss: SelectionState;
+  triggeredBy: Trigger;
 
   constructor(ss) {
     this.ss = ss;

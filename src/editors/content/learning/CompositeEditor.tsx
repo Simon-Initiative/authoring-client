@@ -35,8 +35,8 @@ export interface CompositeEditorState {
  */
 @injectSheet(styles)
 export default class CompositeEditor
-    extends AbstractContentEditor<contentTypes.Composite,
-    StyledComponentProps<CompositeEditorProps>, CompositeEditorState> {
+  extends AbstractContentEditor<contentTypes.Composite,
+  StyledComponentProps<CompositeEditorProps>, CompositeEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -51,34 +51,34 @@ export default class CompositeEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Composite Activity"/>
+      <SidebarContent title="Composite Activity" />
     );
   }
 
   renderToolbar() {
     return (
       <ToolbarGroup label="Composite Activity"
-        columns={6} highlightColor={CONTENT_COLORS.Composite}>
+        columns={7} highlightColor={CONTENT_COLORS.Composite}>
         <ToolbarLayout.Column>
-            <div style={{ marginLeft: 8 }}>Purpose</div>
-            <Select
-              editMode={this.props.editMode}
-              label=""
-              value={this.props.model.purpose.caseOf({
-                nothing: () => '',
-                just: p => p,
-              })}
-              onChange={this.onPurposeChange}>
-              <option value={''}>
-                {''}
-              </option>
-              {PurposeTypes.map(p =>
-                <option
-                  key={p.value}
-                  value={p.value}>
-                  {p.label}
-                </option>)}
-            </Select>
+          <div style={{ marginLeft: 8 }}>Purpose</div>
+          <Select
+            editMode={this.props.editMode}
+            label=""
+            value={this.props.model.purpose.caseOf({
+              nothing: () => '',
+              just: p => p,
+            })}
+            onChange={this.onPurposeChange}>
+            <option value={''}>
+              {''}
+            </option>
+            {PurposeTypes.map(p =>
+              <option
+                key={p.value}
+                value={p.value}>
+                {p.label}
+              </option>)}
+          </Select>
         </ToolbarLayout.Column>
       </ToolbarGroup>
     );
@@ -138,7 +138,7 @@ export default class CompositeEditor
     this.props.onEdit(model, model);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model, editMode } = this.props;
 
@@ -156,10 +156,10 @@ export default class CompositeEditor
 
     const instructionsEditor = model.instructions.caseOf({
       just: p => <ContentContainer
-      {...this.props}
-      model={instructions}
-      onEdit={this.onInstructionsEdit.bind(this)}
-    />,
+        {...this.props}
+        model={instructions}
+        onEdit={this.onInstructionsEdit.bind(this)}
+      />,
       nothing: () => null,
     });
 

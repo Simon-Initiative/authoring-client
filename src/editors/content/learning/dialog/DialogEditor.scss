@@ -1,0 +1,44 @@
+.speakerContainer {
+  display: flex;
+  justify-content: flex-start;
+  margin: 10px 0 20px 0;
+
+  .content-decorator {
+    margin-left: 30px;
+  }
+}
+
+.lineContainer {
+  .content-decorator {
+    margin-left: 30px;
+  }
+}
+
+.addButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  color: #0067cb;
+  font-size: 30px;
+
+  p {
+    font-size: 1rem;
+    color: #212529;
+  }
+
+  i {
+    cursor: pointer;
+  }
+
+  &.addSpeaker {
+    height: 182px;
+    width: 100px;
+  }
+
+  &.addLine {
+    margin-left: 30px;
+    height: 90px;
+    width: 76px;
+  }
+}

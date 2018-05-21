@@ -12,6 +12,7 @@ export type DndTextParams = {
 
 const defaultContent = {
   contentType: 'DndText',
+  elementType: 'text',
   guid: '',
   fontWeight: 'normal',
   fontSize: '12',
@@ -23,6 +24,7 @@ const defaultContent = {
 export class DndText extends Immutable.Record(defaultContent) {
 
   contentType: 'DndText';
+  elementType: 'text';
   guid: string;
   fontWeight: string;
   fontSize: string;

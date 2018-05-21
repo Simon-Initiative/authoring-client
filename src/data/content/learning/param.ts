@@ -6,9 +6,9 @@ import { getKey } from '../../common';
 import { ParamText } from './paramtext';
 import { PrefValue } from './prefvalue';
 import { PrefLabel } from './preflabel';
+import { WbPath } from './wb_path';
 
-
-type ParamContent = ParamText | PrefValue | PrefLabel;
+export type ParamContent = ParamText | PrefValue | PrefLabel | WbPath;
 
 
 export type ParamParams = {
@@ -19,6 +19,7 @@ export type ParamParams = {
 
 const defaultContent = {
   contentType: 'Param',
+  elementType: 'param',
   name: '',
   content: Immutable.OrderedMap<string, ParamContent>(),
   guid: '',
@@ -27,6 +28,7 @@ const defaultContent = {
 export class Param extends Immutable.Record(defaultContent) {
 
   contentType: 'Param';
+  elementType: 'param';
   name: string;
   content: Immutable.OrderedMap<string, ParamContent>;
   guid: string;
@@ -74,6 +76,11 @@ export class Param extends Immutable.Record(defaultContent) {
         case 'pref:value':
           model = model.with({
             content: model.content.set(id, PrefValue.fromPersistence(item, id)),
+          });
+          break;
+        case 'wb:path':
+          model = model.with({
+            content: model.content.set(id, WbPath.fromPersistence(item, id)),
           });
           break;
         default:

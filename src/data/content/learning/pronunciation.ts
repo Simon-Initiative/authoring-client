@@ -15,6 +15,7 @@ export type PronunciationParams = {
 
 const defaultContent = {
   contentType: 'Pronunciation',
+  elementType: 'pronunciation',
   content: new ContentElements().with({ supportedElements: Immutable.List(INLINE_ELEMENTS) }),
   id: Maybe.nothing(),
   title: Maybe.nothing(),
@@ -26,6 +27,7 @@ const defaultContent = {
 export class Pronunciation extends Immutable.Record(defaultContent) {
 
   contentType: 'Pronunciation';
+  elementType: 'pronunciation';
   content: ContentElements;
   id: Maybe<string>;
   title: Maybe<string>;

@@ -16,6 +16,7 @@ export type CodeBlockParams = {
 
 const defaultContent = {
   contentType: 'CodeBlock',
+  elementType: 'codeblock',
   id: '',
   title: '',
   source: '',
@@ -29,6 +30,7 @@ const defaultContent = {
 export class CodeBlock extends Immutable.Record(defaultContent) {
 
   contentType: 'CodeBlock';
+  elementType: 'codeblock';
   id: string;
   title: string;
   source: string;

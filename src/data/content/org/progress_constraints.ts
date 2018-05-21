@@ -13,16 +13,18 @@ export type ProgressConstraintsParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.ProgressConstraints,
+  elementType: 'progress_constraints',
   progressConstraints: Immutable.OrderedMap<string, ProgressConstraint>(),
   guid: '',
 };
 
 export class ProgressConstraints extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.ProgressConstraints;
+  elementType: 'progress_constraint';
   progressConstraints?: Immutable.OrderedMap<string, ProgressConstraint>;
   guid: string;
-  
+
   constructor(params?: ProgressConstraintsParams) {
     super(augment(params));
   }
@@ -37,10 +39,10 @@ export class ProgressConstraints extends Immutable.Record(defaultContent) {
     let model = new ProgressConstraints({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'progress_constraint':
           model = model.with(
@@ -48,19 +50,19 @@ export class ProgressConstraints extends Immutable.Record(defaultContent) {
               id, ProgressConstraint.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       progress_constraints: {
         '#array': this.progressConstraints.toArray().map(s => s.toPersistence()),
-      }, 
+      },
     };
 
     return s;

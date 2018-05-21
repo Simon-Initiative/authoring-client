@@ -23,7 +23,7 @@ export interface LinkEditorState {
  * React Component
  */
 export default class LinkEditor
-    extends AbstractContentEditor<contentTypes.Link, LinkEditorProps & JSSProps, LinkEditorState> {
+  extends AbstractContentEditor<contentTypes.Link, LinkEditorProps & JSSProps, LinkEditorState> {
 
   constructor(props) {
     super(props);
@@ -47,7 +47,7 @@ export default class LinkEditor
             value={model.href}
             type="string"
             onEdit={href => onEdit(model.with({ href }))}
-            />
+          />
         </SidebarGroup>
 
         <SidebarGroup label="Target">
@@ -70,10 +70,10 @@ export default class LinkEditor
       <ToolbarGroup
         label="External Link"
         highlightColor={CONTENT_COLORS.Xref}
-        columns={2}>
+        columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={this.props.onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

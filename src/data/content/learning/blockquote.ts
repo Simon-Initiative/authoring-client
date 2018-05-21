@@ -12,6 +12,7 @@ export type BlockQuoteParams = {
 
 const defaultContent = {
   contentType: 'BlockQuote',
+  elementType: 'blockquote',
   text: ContiguousText.fromText('', '').with({ mode: ContiguousTextMode.SimpleText }),
   entry: Maybe.nothing(),
   guid: '',
@@ -20,6 +21,7 @@ const defaultContent = {
 export class BlockQuote extends Immutable.Record(defaultContent) {
 
   contentType: 'BlockQuote';
+  elementType: 'blockquote';
   text: ContiguousText;
   entry: Maybe<string>;
   guid: string;

@@ -18,6 +18,7 @@ export type SelectionParams = {
 
 const defaultSelectionParams = {
   contentType: 'Selection',
+  elementType: 'selection',
   selectionCount: '1',
   strategy: 'random',
   exhaustion: 'reuse',
@@ -29,13 +30,14 @@ const defaultSelectionParams = {
 export class Selection extends Immutable.Record(defaultSelectionParams) {
 
   contentType: 'Selection';
+  elementType: 'selection';
   selectionCount: string;
   strategy: string;
   exhaustion: string;
   scope: string;
   source: SelectionSource;
   guid: string;
-  
+
   constructor(params?: SelectionParams) {
     super(augment(params));
   }
@@ -62,9 +64,9 @@ export class Selection extends Immutable.Record(defaultSelectionParams) {
     if (s['@scope'] !== undefined) {
       model = model.with({ scope: s['@scope'] });
     }
-    
+
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
 

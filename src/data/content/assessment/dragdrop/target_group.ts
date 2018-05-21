@@ -15,6 +15,7 @@ export type TargetGroupParams = {
 
 const defaultContent = {
   contentType: 'TargetGroup',
+  elementType: 'targetGroup',
   guid: '',
   rows: Immutable.List<TG_ROW>(),
 };
@@ -22,6 +23,7 @@ const defaultContent = {
 export class TargetGroup extends Immutable.Record(defaultContent) {
 
   contentType: 'TargetGroup';
+  elementType: 'targetGroup';
   guid: string;
   rows: Immutable.List<TG_ROW>;
 

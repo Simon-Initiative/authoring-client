@@ -8,7 +8,7 @@ export const styles: JSSStyles = {
     fontSize: 12,
     color: colors.grayDarkest,
     textAlign: 'center',
-    verticalAlign: 'top',
+    verticalAlign: 'center',
     border: '1px solid transparent',
     cursor: 'pointer',
 
@@ -67,8 +67,29 @@ export const styles: JSSStyles = {
       },
     },
     '&.wide': {
-      minWidth: 72,
+      minWidth: 84,
+      maxWidth: 84,
       height: 32,
+      textAlign: 'left',
+
+      '& i': {
+        width: 18,
+      },
+    },
+    '&.full': {
+      width: '100%',
+      height: 32,
+      textAlign: 'left',
+
+      '& i': {
+        width: 18,
+      },
+    },
+    '&.extraWide': {
+      minWidth: 120,
+      maxWidth: 120,
+      height: 32,
+      textAlign: 'left',
     },
   },
 };

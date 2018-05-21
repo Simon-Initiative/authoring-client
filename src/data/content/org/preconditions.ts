@@ -13,16 +13,18 @@ export type PreconditionsParams = {
 
 const defaultContent = {
   contentType: types.ContentTypes.Preconditions,
+  elementType: 'preconditions',
   preconditions: Immutable.OrderedMap<string, Precondition>(),
   guid: '',
 };
 
 export class Preconditions extends Immutable.Record(defaultContent) {
-  
+
   contentType: types.ContentTypes.Preconditions;
+  elementType: 'preconditions';
   preconditions?: Immutable.OrderedMap<string, Precondition>;
   guid: string;
-  
+
   constructor(params?: PreconditionsParams) {
     super(augment(params));
   }
@@ -37,29 +39,29 @@ export class Preconditions extends Immutable.Record(defaultContent) {
     let model = new Preconditions({ guid });
 
     getChildren(s).forEach((item) => {
-      
+
       const key = getKey(item);
       const id = createGuid();
-     
+
       switch (key) {
         case 'precondition':
           model = model.with(
             { preconditions: model.preconditions.set(id, Precondition.fromPersistence(item, id)) });
           break;
         default:
-          
+
       }
     });
-    
+
     return model;
   }
 
   toPersistence() : Object {
-    
-    const s = { 
+
+    const s = {
       preconditions: {
         '#array': this.preconditions.toArray().map(s => s.toPersistence()),
-      }, 
+      },
     };
 
     return s;

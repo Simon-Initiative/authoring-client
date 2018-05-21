@@ -11,23 +11,25 @@ export type NumericParams = {
 };
 
 const defaultContent = {
+  contentType: 'Numeric',
+  elementType: 'numeric',
   id: '',
   name: '',
   notation: 'automatic',
   inputSize: 'small',
   guid: '',
-  contentType: 'Numeric',
 };
 
 export class Numeric extends Immutable.Record(defaultContent) {
-  
+
   contentType: 'Numeric';
+  elementType: 'numeric';
   id : string;
   name : string;
   notation: string;
   inputSize: string;
   guid: string;
-  
+
   constructor(params?: NumericParams) {
     super(augment(params));
   }
@@ -37,7 +39,7 @@ export class Numeric extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(json: Object, guid: string) : Numeric {
-    
+
     const n = (json as any).numeric;
     let model = new Numeric({ guid });
 
@@ -53,7 +55,7 @@ export class Numeric extends Immutable.Record(defaultContent) {
     if (n['@notation'] !== undefined) {
       model = model.with({ notation: n['@notation'] });
     }
-    
+
     return model;
 
   }

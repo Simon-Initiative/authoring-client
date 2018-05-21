@@ -9,6 +9,7 @@ export type PopoutParams = {
 
 const defaultContent = {
   contentType: 'Popout',
+  elementType: 'popout',
   enable: false,
   content: '',
   guid: '',
@@ -17,6 +18,7 @@ const defaultContent = {
 export class Popout extends Immutable.Record(defaultContent) {
 
   contentType: 'Popout';
+  elementType: 'popout';
   enable: boolean;
   content: string;
   guid: string;

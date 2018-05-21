@@ -25,6 +25,7 @@ export type IFrameParams = {
 
 const defaultContent = {
   contentType: 'IFrame',
+  elementType: 'iframe',
   id: '',
   title: '',
   src: 'https://www.example.com',
@@ -41,6 +42,7 @@ const defaultContent = {
 export class IFrame extends Immutable.Record(defaultContent) {
 
   contentType: 'IFrame';
+  elementType: 'iframe';
   id: string;
   title: string;
   src: string;
