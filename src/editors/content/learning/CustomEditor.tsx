@@ -237,6 +237,19 @@ export class CustomEditor
     this.renderDynaDrop = this.renderDynaDrop.bind(this);
   }
 
+  shouldComponentUpdate(nextProps: CustomEditorProps, nextState) {
+    return this.props.model !== nextProps.model
+      || this.props.parent !== nextProps.parent
+      || this.props.editMode !== nextProps.editMode
+      || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.hover !== nextProps.hover
+      || this.props.documentId !== nextProps.documentId
+      || this.props.assessment !== nextProps.assessment
+      || this.props.currentPage !== nextProps.currentPage
+      || this.props.currentNode !== nextProps.currentNode
+      || this.props.selectedInitiator !== nextProps.selectedInitiator;
+  }
+
   componentDidMount() {
     const { model, onSelectInitiator } = this.props;
 
