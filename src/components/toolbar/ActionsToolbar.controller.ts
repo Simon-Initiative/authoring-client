@@ -22,7 +22,6 @@ interface DispatchProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  fetchResourceEdges: (resource: Resource) => Promise<Maybe<OrderedMap<string, Edge>>>;
 }
 
 interface OwnProps {
@@ -55,9 +54,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     },
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
-    },
-    fetchResourceEdges: (resource: Resource) => {
-      return dispatch(fetchResourceEdges(resource));
     },
   };
 };

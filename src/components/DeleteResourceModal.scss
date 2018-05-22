@@ -1,0 +1,14 @@
+@import 'oli/colors';
+
+.loading {
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.8em;
+  color: $gray;
+
+  i {
+    margin: 0 5px;
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+  }
+}

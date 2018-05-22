@@ -21,7 +21,6 @@ export interface ActionsToolbarProps {
   onRedo: (documentId: string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
-  fetchResourceEdges: (resource: Resource) => Promise<Maybe<OrderedMap<string, Edge>>>;
 }
 
 /**
@@ -30,7 +29,7 @@ export interface ActionsToolbarProps {
 export const ActionsToolbar = (({
   courseId, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
-  fetchResourceEdges, onDismissModal, onDisplayModal,
+  onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -38,13 +37,13 @@ export const ActionsToolbar = (({
         <ToolbarButton
           onClick={() => onUndo(documentId)}
           disabled={!canUndo}
-          size={ToolbarButtonSize.Wide}>
+          size={ToolbarButtonSize.Full}>
           <i className={'fa fa-undo'} /> Undo
         </ToolbarButton>
         <ToolbarButton
           onClick={() => onRedo(documentId)}
           disabled={!canRedo}
-          size={ToolbarButtonSize.Wide}>
+          size={ToolbarButtonSize.Full}>
           <i className={'fa fa-repeat'} /> Redo
         </ToolbarButton>
       </ToolbarLayout.Column>
@@ -57,28 +56,26 @@ export const ActionsToolbar = (({
           <div>Details</div>
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => fetchResourceEdges(documentResource)
-            .then(edges => onDisplayModal(
-              <DeleteResourceModal
-                resource={documentResource}
-                edges={edges}
-                onDelete={() => { }}
-                onCancel={onDismissModal} />))}
+          onClick={() => onDisplayModal(
+            <DeleteResourceModal
+              resource={documentResource}
+              onDismissModal={onDismissModal}
+              courseId={courseId} />)}
           size={ToolbarButtonSize.Large}
-          tooltip="Delete this Page"
+        tooltip="Delete this Page"
           disabled={false}>
           <div><i className="fa fa-trash-o" /></div>
-          <div>Delete</div>
+        <div>Delete</div>
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => onPreview(courseId, documentResource)}
-          tooltip="Preview this Page"
-          disabled={!canPreview}
-          size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-eye" /></div>
-          <div>Preview</div>
-        </ToolbarButton>
+      <ToolbarButton
+        onClick={() => onPreview(courseId, documentResource)}
+        tooltip="Preview this Page"
+        disabled={!canPreview}
+        size={ToolbarButtonSize.Large}>
+        <div><i className="fa fa-eye" /></div>
+        <div>Preview</div>
+      </ToolbarButton>
       </ToolbarLayout.Inline>
-    </React.Fragment>
+    </React.Fragment >
   );
 });
