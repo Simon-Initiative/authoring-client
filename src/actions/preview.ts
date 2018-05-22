@@ -41,14 +41,14 @@ export function preview(courseId: string, isRefreshAttempt: boolean) {
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
+          window.open();
           // Change router to remove resource from URL
-          window.open(
-            '/#preview' + resource.guid + '-' + courseId
-            + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-            + (refresh ? '&refresh=true' : ''),
-            courseId);
+            // '/#preview' + resource.guid + '-' + courseId
+            // + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
+            // + (refresh ? '&refresh=true' : ''),
+            // courseId);
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + resource.guid + '-' + courseId, courseId);
+          // window.open('/#preview' + resource.guid + '-' + courseId, courseId);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);

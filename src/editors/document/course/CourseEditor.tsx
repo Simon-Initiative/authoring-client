@@ -187,14 +187,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 </div>
               </div>
               <div className="row">
-                <div className="col-3">Generate Course Preview<br /><br />
+                <div className="col-3">Preview Full Course<br /><br />
                 </div>
                 <div className="col-9">
                   <Button
                     editMode
-                    type="outline-primary"
+                    type="primary"
                     onClick={() => onPreview(this.props.model.id)}>
-                    <i className="fa fa-eye"/>&nbsp;Preview
+                    <i className="fa fa-eye"/>&nbsp;&nbsp;Generate Preview
                   </Button>
                 </div>
               </div>
