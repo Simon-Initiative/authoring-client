@@ -2,3 +2,5 @@
 import { List, OrderedMap } from 'immutable';
 
 export type CombinationsMap = OrderedMap<string, List<string>>;
+
+export type PermutationsMap = CombinationsMap;

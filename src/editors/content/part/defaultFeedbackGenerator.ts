@@ -25,7 +25,7 @@ const getFeedbackCombinations = (userResponses, choices, allCombinations: Combin
 
   // function that calculates the key of a given combination
   const getComboKey = (combination: string[]): string => {
-    return combination.sort().join(',');
+    return combination.join(',');
   };
 
   // return the difference of all combinations and existing combinations

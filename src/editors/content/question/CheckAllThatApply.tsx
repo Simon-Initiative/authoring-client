@@ -206,9 +206,18 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     }
 
     // because we changed response match values, we must update choice refs
-    const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
+    // const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
-    onEdit(updatedModels.itemModel, updatedModels.partModel, updatedModels.itemModel);
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      itemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      this.props.onGetChoiceCombinations,
+    );
+
+    onEdit(itemModel, updatedPartModel, itemModel);
   }
 
   onPartEdit(partModel: contentTypes.Part, src) {
@@ -336,10 +345,33 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   }
 
   onChoiceEdit(c, src) {
-    this.props.onEdit(
-      this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
-      this.props.partModel, src);
+
+    const {
+      itemModel, partModel, onGetChoiceCombinations, onEdit,
+    } = this.props;
+
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = updatedItemModel.with({
+      choices: this.props.itemModel.choices.set(c.guid, c),
+    });
+
+    // update part model with default feedback
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+      src,
+    );
+
   }
 
   renderChoices() {
