@@ -73,7 +73,7 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
     const { courseId, documentId } = this.props;
 
-    persistence.initiatePreview(courseId, true)
+    persistence.initiatePreview(courseId, documentId, true)
       .then((result) => {
         if (result.type === 'PreviewSuccess') {
           if (result.message === '') {

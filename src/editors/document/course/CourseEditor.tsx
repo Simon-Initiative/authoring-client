@@ -4,7 +4,7 @@ import * as persistence from 'data/persistence';
 import * as models from 'data/models';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
-import { UserInfo, Resource } from 'data//contentTypes';
+import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
 
 import './CourseEditor.scss';
@@ -16,7 +16,6 @@ export interface CourseEditorProps {
   courseChanged: (m: models.CourseModel) => any;
   viewAllCourses: () => any;
   editMode: boolean;
-  onPreview: (courseId: string) => Promise<any>;
 }
 
 interface CourseEditorState {
@@ -126,7 +125,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   render() {
-    const { model, onPreview } = this.props;
+    const { model } = this.props;
 
     const isAdmin = hasRole('admin');
 
@@ -184,18 +183,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-3">Preview Full Course<br /><br />
-                </div>
-                <div className="col-9">
-                  <Button
-                    editMode
-                    type="primary"
-                    onClick={() => onPreview(this.props.model.id)}>
-                    <i className="fa fa-eye"/>&nbsp;&nbsp;Generate Preview
-                  </Button>
                 </div>
               </div>
               {adminRow}

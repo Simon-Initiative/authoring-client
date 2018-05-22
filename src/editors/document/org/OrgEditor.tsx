@@ -19,6 +19,7 @@ import { Title } from 'types/course';
 import { duplicateOrganization } from 'actions/models';
 
 import './OrgEditor.scss';
+import { CourseId } from 'data/types';
 
 function isNumberedNodeType(node: any) {
   return (node.contentType === contentTypes.OrganizationContentTypes.Unit
@@ -29,7 +30,7 @@ function isNumberedNodeType(node: any) {
 
 function calculatePositionsAtLevel(
   model: models.OrganizationModel, allNodeIds: string[],
-  idMap: Object, parentMap: Object) : Object {
+  idMap: Object, parentMap: Object): Object {
 
   const positions = {};
   const positionAtLevels = {};
@@ -46,7 +47,7 @@ function calculatePositionsAtLevel(
 }
 
 function hasMissingResource(
-  model: models.OrganizationModel, course: models.CourseModel) : boolean {
+  model: models.OrganizationModel, course: models.CourseModel): boolean {
 
   return model.sequences.children
     .toArray()
@@ -56,7 +57,7 @@ function hasMissingResource(
 
 function hasMissingResourceHelper(
   model: models.OrganizationModel, course: models.CourseModel,
-  node: any) : boolean {
+  node: any): boolean {
 
   if (node.contentType === 'Item') {
     return !course.resourcesById.has(node.resourceref.idref);
@@ -74,7 +75,7 @@ function hasMissingResourceHelper(
 function calculatePositionsAtLevelHelper(
   node: any, index: number, level: number,
   positions: Object, positionAtLevels: Object, allNodeIds: string[],
-  idMap: Object, parentMap: Object) : void {
+  idMap: Object, parentMap: Object): void {
 
   if (isNumberedNodeType(node)) {
     if (positionAtLevels[level] === undefined) {
@@ -101,7 +102,7 @@ function calculatePositionsAtLevelHelper(
   }
 }
 
-function identifyNewNodes(last: string[], current: string[]) : string[] {
+function identifyNewNodes(last: string[], current: string[]): string[] {
 
   const lastMap = last.reduce((p, c) => { p[c] = true; return p; }, {});
   return current.filter(c => lastMap[c] === undefined);
@@ -113,6 +114,8 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   canRedo: boolean;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  onPreview: (courseId: CourseId, organization: models.OrganizationModel) => Promise<any>;
+  course: models.CourseModel;
 }
 
 const enum TABS {
@@ -137,8 +140,10 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   parentMap: Object;
 
   constructor(props: OrgEditorProps) {
-    super(props, ({ currentTab: TABS.Content,
-      highlightedNodes: Immutable.Set<string>() } as OrgEditorState));
+    super(props, ({
+      currentTab: TABS.Content,
+      highlightedNodes: Immutable.Set<string>(),
+    } as OrgEditorState));
 
     this.onLabelsEdit = this.onLabelsEdit.bind(this);
     this.onNodeEdit = this.onNodeEdit.bind(this);
@@ -288,7 +293,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         isExpanded={isExpanded(getExpandId(node))}
         onReposition={this.onReposition.bind(this)}
         indexWithinParent={index}
-        depth={depth}/>;
+        depth={depth} />;
     };
 
     return (
@@ -296,13 +301,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         {this.renderActionBar()}
 
         <table className="table table-sm">
-        <tbody>
+          <tbody>
 
-          {render(
-            this.props.model.sequences,
-            isExpanded,renderNode, this.positionsAtLevel)}
+            {render(
+              this.props.model.sequences,
+              isExpanded, renderNode, this.positionsAtLevel)}
 
-        </tbody>
+          </tbody>
         </table>
       </div>
     );
@@ -326,7 +331,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         <Details
           editMode={this.props.editMode}
           model={this.props.model}
-          onEdit={model => this.handleEdit(model)}/>
+          onEdit={model => this.handleEdit(model)} />
       </div>
     );
   }
@@ -342,7 +347,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
           {...this.props}
           activeContentGuid={null}
           hover={null}
-          onUpdateHover={() => {}}
+          onUpdateHover={() => { }}
           parent={null}
           onFocus={this.onFocus.bind(this)}
           onEdit={this.onLabelsEdit} model={this.props.model.labels} />
@@ -377,7 +382,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   onAddSequence() {
-    const s : contentTypes.Sequence = new contentTypes.Sequence()
+    const s: contentTypes.Sequence = new contentTypes.Sequence()
       .with({ title: 'New ' + this.props.model.labels.sequence });
     const sequences = this.props.model.sequences
       .with({ children: this.props.model.sequences.children.set(s.guid, s) });
@@ -428,7 +433,13 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
         this.props.context.courseId,
         this.props.model, this.props.context.courseModel));
 
-    return <Actions onDuplicate={dupe}/>;
+    return (
+      <Actions
+        onDuplicate={dupe}
+        organization={this.props.model}
+        course={this.props.course}
+        onPreview={this.props.onPreview}
+      />);
   }
 
   renderActiveTabContent() {
@@ -456,7 +467,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
             undoEnabled={canUndo}
             redoEnabled={canRedo}
             onUndo={onUndo.bind(this, documentId)}
-            onRedo={onRedo.bind(this, documentId)}/>
+            onRedo={onRedo.bind(this, documentId)} />
 
           <h3>Organization: {this.props.model.title}</h3>
 

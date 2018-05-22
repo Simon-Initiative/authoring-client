@@ -243,6 +243,9 @@ export default class Main extends React.Component<MainProps, MainState> {
           courseId={courseId}/>;
 
     }
+    if (url.startsWith('/quick_preview')) {
+
+    }
     if (url.startsWith('/objectives-') && course) {
       return <ObjectiveSkillView
           course={course}

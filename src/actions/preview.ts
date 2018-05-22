@@ -5,15 +5,16 @@ import * as Messages from 'types/messages';
 import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
+import { OrganizationModel } from 'data/models';
 
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(isRefreshAttempt: boolean) {
+function invokePreview(resourceId: string, isRefreshAttempt: boolean) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, isRefreshAttempt);
+    return persistence.initiatePreview(course.guid, resourceId, isRefreshAttempt);
   };
 }
 
@@ -27,11 +28,12 @@ function invokeQuickPreview(resource: Resource) {
   };
 }
 
-export function preview(courseId: string, isRefreshAttempt: boolean) {
+export function preview(
+  courseId: string, organization: OrganizationModel, isRefreshAttempt: boolean) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(isRefreshAttempt))
+    return dispatch(invokePreview(organization.id, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -41,14 +43,13 @@ export function preview(courseId: string, isRefreshAttempt: boolean) {
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
-          window.open();
-          // Change router to remove resource from URL
-            // '/#preview' + resource.guid + '-' + courseId
-            // + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-            // + (refresh ? '&refresh=true' : ''),
-            // courseId);
+          window.open(
+            '/#preview' + organization.guid + '-' + courseId
+            + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
+            + (refresh ? '&refresh=true' : ''),
+            courseId);
         } else if (result.type === 'PreviewPending') {
-          // window.open('/#preview' + resource.guid + '-' + courseId, courseId);
+          window.open('/#preview' + organization.guid + '-' + courseId, courseId);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);

@@ -3,9 +3,6 @@ import CourseEditor from './CourseEditor';
 import { CourseModel } from 'data/models';
 import { courseChanged } from 'actions/course';
 import * as viewActions from 'actions/view';
-import { Resource } from 'data/contentTypes';
-import { preview } from 'actions/preview';
-import { CourseId } from 'data/types';
 
 interface StateProps {
 
@@ -14,7 +11,6 @@ interface StateProps {
 interface DispatchProps {
   courseChanged: (model: CourseModel) => void;
   viewAllCourses: () => void;
-  onPreview: (courseId: string) => Promise<any>;
 }
 
 interface OwnProps {
@@ -32,8 +28,6 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       dispatch(courseChanged(model)),
     viewAllCourses: () =>
       dispatch(viewActions.viewAllCourses()),
-    onPreview: (courseId: CourseId) =>
-      dispatch(preview(courseId, false)),
   };
 };
 
