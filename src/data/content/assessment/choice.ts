@@ -62,6 +62,12 @@ export class Choice extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
+  clone() : Choice {
+    return this.with({
+      body: this.body.clone(),
+    });
+  }
+
   static fromText(text: string, guid: string) : Choice {
     return new Choice().with({
       guid,

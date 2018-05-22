@@ -37,6 +37,11 @@ export class ResponseMult extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+
+  clone() : ResponseMult {
+    return this;
+  }
+
   with(values: ResponseMultParams) {
     return this.merge(values) as this;
   }

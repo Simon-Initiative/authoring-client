@@ -18,6 +18,7 @@ import './QuestionEditor.scss';
 
 export interface QuestionEditorProps extends AbstractContentEditorProps<contentTypes.Question> {
   onRemove: (guid: string) => void;
+  onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
   canRemove: boolean;
@@ -259,6 +260,7 @@ export class QuestionEditor
       body: this.props.model.body,
       grading: this.props.model.grading,
       onGradingChange: this.onGradingChange,
+      onDuplicate: this.props.onDuplicate,
       onBodyEdit: this.onBodyEdit,
       hideGradingCriteria: !this.props.isParentAssessmentGraded,
       canRemoveQuestion: canRemove,

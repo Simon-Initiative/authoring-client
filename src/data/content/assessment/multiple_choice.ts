@@ -44,6 +44,13 @@ export class MultipleChoice extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+  clone() : MultipleChoice {
+    return this.with({
+      id: createGuid(),
+      choices: this.choices.map(c => c.clone()).toOrderedMap(),
+    });
+  }
+
   with(values: MultipleChoiceParams) {
     return this.merge(values) as this;
   }
