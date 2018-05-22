@@ -25,6 +25,7 @@ export {
   PreviewResult,
   PreviewNotSetUp,
   initiatePreview,
+  initiateQuickPreview,
   retrieveDocument,
   bulkFetchDocuments,
   listenToDocument,

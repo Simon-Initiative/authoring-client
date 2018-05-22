@@ -3,7 +3,7 @@ import { State } from 'reducers';
 import { ActionsToolbar } from './ActionsToolbar';
 import { resetActive } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
-import { preview } from 'actions/preview';
+import { quickPreview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
 
@@ -41,7 +41,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(showSidebar(true));
     },
     onPreview: (courseId: string, resource: Resource) => {
-      return dispatch(preview(courseId, resource, false));
+      return dispatch(quickPreview(courseId, resource));
     },
     onUndo: (documentId: string) => {
       return dispatch(undo(documentId));

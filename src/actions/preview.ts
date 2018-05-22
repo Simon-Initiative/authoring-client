@@ -7,13 +7,23 @@ import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 
 
-// The action to invoke preview.
+// Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
     return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
+  };
+}
+
+// Invoke a preview for the current resource (ie Workbook Page) from the editor.
+// The full course is not built in OLI
+function invokeQuickPreview(resource: Resource) {
+  return function (dispatch, getState): Promise<{}> {
+    const { course } = getState();
+
+    return persistence.initiateQuickPreview(course.guid, resource.guid);
   };
 }
 
@@ -47,28 +57,20 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
 
 }
 
-
-export function thinPreview(courseId: string, resource: Resource) {
+// add dropdown for themes
+export function quickPreview(courseId: string, resource: Resource) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(resource))
-      .then((result: persistence.PreviewResult) => {
-        const refresh = result.message === 'pending';
-        window.open('/#preview/' + resource.guid + '-' + courseId);
+    return dispatch(invokeQuickPreview(resource))
+      .then((result) => {
+        window.open('/#quick_preview/' + resource.guid + '-' + courseId);
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
         dispatch(showMessage(message));
       });
   };
-
 }
-
-// preview above is more complicated than we need - don't need to worry about preview success/fail, add this preview action to the course package page instead
-// add dropdown for themes
-
-// new endpoint is
-
 
 function buildEditOrgAction(
   courseId: string, label: string): Messages.MessageAction {

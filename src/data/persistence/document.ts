@@ -101,6 +101,12 @@ export function initiatePreview(
     });
 }
 
+export function initiateQuickPreview(courseId: CourseId, documentId: DocumentId): Promise<{}> {
+  const url = `${configuration.baseUrl}/${courseId}/resources/quick_preview/${documentId}`;
+
+  return authenticatedFetch({ url });
+}
+
 export function bulkFetchDocuments(
   courseId: string, filters: string[], action: string): Promise<Document[]> {
 
