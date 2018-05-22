@@ -23,10 +23,43 @@ import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { ContentElement } from 'data/content/common/interfaces';
 import { ContentElements } from 'data/content/common/elements';
 
+export const isComplexScoring = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.toArray();
+
+  // scoring is complex (advanced mode) if score is not 0 or 1
+  const isAdvancedScoringMode = responses.reduce(
+    (acc, val, i) => {
+      const score = +val.score;
+      return acc || (score !== 0 && score !== 1);
+    },
+    false,
+  );
+
+  return isAdvancedScoringMode;
+};
+
+export const convertToSimpleScoring = (partModel: contentTypes.Part) => {
+  const responses = partModel.responses.toArray();
+
+  const updatedResponses = responses.reduce(
+    (acc, r) => acc.set(r.guid, r.with({ score: +r.score > 0 ? '1' : '0' })),
+    partModel.responses,
+  );
+
+  const updatedPartModel = partModel.with({
+    responses: updatedResponses,
+  });
+
+  return updatedPartModel;
+};
+
 export interface DynaDropInputProps
   extends QuestionProps<contentTypes.QuestionItem> {
   activeContext: ActiveContext;
   selectedInitiator: string;
+  advancedScoringInitialized: boolean;
+  advancedScoring: boolean;
+  onToggleAdvancedScoring: (id: string, value?: boolean) => void;
   onAddItemPart: (item, part, body) => void;
 }
 
@@ -43,6 +76,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   constructor(props: DynaDropInputProps) {
     super(props);
 
+    this.onToggleAdvanced = this.onToggleAdvanced.bind(this);
     this.editInitiatorText = this.editInitiatorText.bind(this);
 
     this.placeholderText = ContiguousText.fromText('', guid());
@@ -51,6 +85,32 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   /** Implement required abstract method to set className */
   getClassName() {
     return 'dynadrop-input';
+  }
+
+  componentDidMount() {
+    const {
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
+    } = this.props;
+
+    // initialize advanced scoring if its not already
+    if (!advancedScoringInitialized) {
+      onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));
+    }
+  }
+
+  onToggleAdvanced() {
+    const {
+      itemModel, partModel, model, onToggleAdvancedScoring, advancedScoring, onEdit,
+    } = this.props;
+
+    // if switching from advanced mode and scoring is complex, reset all scores
+    // so they are valid in simple mode. Otherwise, we can leave the scores as-is
+    if (advancedScoring && isComplexScoring(partModel)) {
+      const updatedPartModel = convertToSimpleScoring(partModel);
+      onEdit(itemModel, updatedPartModel, updatedPartModel);
+    }
+
+    onToggleAdvancedScoring(model.guid);
   }
 
   editInitiatorText(text: string, initiator: Initiator) {
@@ -140,7 +200,8 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, selectedInitiator, hideGradingCriteria, editMode, onRemove } = this.props;
+    const { model, selectedInitiator, hideGradingCriteria, editMode, onRemove,
+      advancedScoring } = this.props;
 
     const itemIndex = model.items.toArray().findIndex(
       (i: FillInTheBlank) => i.id === selectedInitiator);
@@ -186,10 +247,12 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
               editMode={this.props.editMode}
               onRemove={this.props.onRemove}
               onItemFocus={this.props.onItemFocus}
+              advancedScoring={advancedScoring}
               onFocus={this.props.onFocus}
               onBlur={this.props.onBlur}
               initiator={initiator}
               onEditInitiatorText={this.editInitiatorText}
+              onToggleAdvanced={this.onToggleAdvanced}
               itemModel={item}
               partModel={part}
               onEdit={this.props.onEdit} />
