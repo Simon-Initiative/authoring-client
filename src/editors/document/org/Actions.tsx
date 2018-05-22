@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { Resource } from 'data/contentTypes';
+import DeleteResourceModal from 'components/DeleteResourceModal';
 
 export interface Actions {
 
@@ -6,6 +8,11 @@ export interface Actions {
 
 export interface ActionsProps {
   onDuplicate: () => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
+  resource: Resource;
+  courseId: string;
+  dispatch: any;
 }
 
 export interface ActionsState {
@@ -21,6 +28,8 @@ export class Actions
   }
 
   render() {
+    const { resource, onDisplayModal, onDismissModal, courseId, dispatch, onDuplicate }
+      = this.props;
 
     return (
       <div className="org-tab">
@@ -33,7 +42,7 @@ export class Actions
           renaming sections) will not be reflected in this original organization.</dd>
           <dt className="col-sm-2 justify-content-right">
         <button
-          onClick={this.props.onDuplicate}
+          onClick={onDuplicate}
           className="btn btn-block btn-primary">
           Copy
         </button></dt>
@@ -43,7 +52,15 @@ export class Actions
           operation cannot be undone.</p>
         </dd>
         <dt className="col-sm-2">
-          <button disabled className="btn btn-block btn-danger">Delete</button>
+          <button
+            onClick={() => onDisplayModal(
+            <DeleteResourceModal
+              resource={resource}
+              onDismissModal={onDismissModal}
+              courseId={courseId}
+              dispatch={dispatch} />)}
+            disabled={false}
+            className="btn btn-block btn-danger">Delete</button>
         </dt>
 
       </dl>

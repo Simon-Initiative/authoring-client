@@ -53,7 +53,7 @@ export function fetchWebContent(
  * Fetches all webcontent references for the course, returns a Promise to resolve to
  * a list of edges
  */
-export function fetchWebContentReferences(packageId: string, queryParams?: {
+export function fetchWebContentReferences(packageId: string, queryParams: {
   relationship?: string,
   purpose?: string,
   sourceId?: string,
@@ -62,7 +62,7 @@ export function fetchWebContentReferences(packageId: string, queryParams?: {
   destinationType?: string,
   referenceType?: string,
   status?: string,
-}): Promise<Edge[]> {
+} = {}): Promise<Edge[]> {
   const {
     relationship,
     purpose,
@@ -76,45 +76,6 @@ export function fetchWebContentReferences(packageId: string, queryParams?: {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${packageId}/edges`;
-  const headers = getFormHeaders(credentials);
-  const query = Object.assign(
-    {},
-    relationship ? { relationship } : {},
-    purpose ? { purpose } : {},
-    sourceId ? { sourceId } : {},
-    sourceType ? { sourceType } : {},
-    destinationId ? { destinationId } : {},
-    destinationType ? { destinationType } : {},
-    referenceType ? { referenceType } : {},
-    status ? { relationship } : {},
-  );
-
-  return authenticatedFetch({ method, url, headers, query }).then(res => (res as Edge[]));
-}
-
-export function fetchResourceReferences(resourceId: string, queryParams?: {
-  relationship?: string,
-  purpose?: string,
-  sourceId?: string,
-  sourceType?: string,
-  destinationId?: string,
-  destinationType?: string,
-  referenceType?: string,
-  status?: string,
-}): Promise<Edge[]> {
-  const {
-    relationship,
-    purpose,
-    sourceId,
-    sourceType,
-    destinationId,
-    destinationType,
-    referenceType,
-    status,
-  } = queryParams;
-
-  const method = 'GET';
-  const url = `${configuration.baseUrl}/${resourceId}/edges`;
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},

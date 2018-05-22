@@ -4,6 +4,7 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { undo, redo } from 'actions/document';
+import { modalActions } from 'actions/modal';
 
 interface StateProps {
   canUndo: boolean;
@@ -13,6 +14,9 @@ interface StateProps {
 interface DispatchProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  dispatch: (...args: any[]) => any;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 interface OwnProps extends AbstractEditorProps<OrganizationModel> {
@@ -34,6 +38,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
     },
+    dispatch,
+    onDisplayModal: component => dispatch(modalActions.display(component)),
+    onDismissModal: () => dispatch(modalActions.dismiss()),
   };
 };
 

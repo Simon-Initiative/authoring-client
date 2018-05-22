@@ -21,6 +21,7 @@ export interface ActionsToolbarProps {
   onRedo: (documentId: string) => void;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onDispatch: (...args: any[]) => any;
 }
 
 /**
@@ -29,7 +30,7 @@ export interface ActionsToolbarProps {
 export const ActionsToolbar = (({
   courseId, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
-  onDismissModal, onDisplayModal,
+  onDismissModal, onDisplayModal, onDispatch,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -60,9 +61,10 @@ export const ActionsToolbar = (({
             <DeleteResourceModal
               resource={documentResource}
               onDismissModal={onDismissModal}
-              courseId={courseId} />)}
+              courseId={courseId}
+              dispatch={onDispatch} />)}
           size={ToolbarButtonSize.Large}
-        tooltip="Delete this Page"
+          tooltip="Delete this Page"
           disabled={false}>
           <div><i className="fa fa-trash-o" /></div>
         <div>Delete</div>

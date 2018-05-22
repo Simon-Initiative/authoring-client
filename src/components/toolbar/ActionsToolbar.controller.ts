@@ -6,7 +6,6 @@ import { showSidebar } from 'actions/editorSidebar';
 import { preview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
-import { fetchResourceEdges } from 'actions/edges';
 import { Maybe } from 'tsmonad/lib/src';
 import { Edge } from 'types/edge';
 import { OrderedMap } from 'immutable';
@@ -22,6 +21,7 @@ interface DispatchProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  onDispatch: (...args: any[]) => any;
 }
 
 interface OwnProps {
@@ -55,6 +55,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
     },
+    onDispatch: dispatch,
   };
 };
 
