@@ -19,6 +19,7 @@ export interface InitiatorProps {
   onRemove?: (guid: string) => void;
   onDelete?: (guid: string) => void;
 
+  targetId?: string;
   connectDragSource?: any;
   connectDragPreview?: any;
 }
@@ -33,7 +34,8 @@ const source = {
   },
   beginDrag(props) {
     return {
-      index: props.model.guid,
+      initiator: props.model.guid,
+      originalTargetId: props.targetId,
     };
   },
   endDrag(props) {

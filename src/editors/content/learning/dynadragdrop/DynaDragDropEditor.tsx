@@ -230,6 +230,7 @@ export class DynaDragDropEditor
     this.selectInitiator = this.selectInitiator.bind(this);
     this.addInitiator = this.addInitiator.bind(this);
     this.deleteInitiator = this.deleteInitiator.bind(this);
+    this.onTargetDrop = this.onTargetDrop.bind(this);
     this.onEditQuestion = this.onEditQuestion.bind(this);
     this.onEditLayoutData = this.onEditLayoutData.bind(this);
     this.onAddColumn = this.onAddColumn.bind(this);
@@ -410,6 +411,15 @@ export class DynaDragDropEditor
       items: question.items.remove(itemKey),
       parts: question.parts.remove(partKey),
     }));
+  }
+
+  onTargetDrop(
+    initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) {
+    this.assignInitiator(initiatorId, targetAssessmentId);
+
+    if (originalTargetAssessmentId) {
+      this.unassignInitiator(initiatorId, originalTargetAssessmentId);
+    }
   }
 
   onEditQuestion(question: Question) {
@@ -751,7 +761,7 @@ export class DynaDragDropEditor
               selectedInitiator={selectedInitiator}
               onToggleType={this.toggleCellType}
               editMode={editMode}
-              onDrop={this.assignInitiator}
+              onDrop={this.onTargetDrop}
               onRemoveInitiator={this.unassignInitiator}
               label={`Target ${targetLabels[col.assessmentId]}`}
               initiators={targetInitiators[col.assessmentId]} />

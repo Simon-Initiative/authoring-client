@@ -20,7 +20,8 @@ export interface DynaDropTargetProps {
   editMode: boolean;
   connectDropTarget?: any;
   isHovered?: boolean;
-  onDrop: (initiatorId: string, targetAssessmentId: string) => void;
+  onDrop: (
+    initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) => void;
   onRemoveInitiator: (initiatorId: string, targetAssessmentId: string) => void;
   onToggleType: (id: string) => void;
 }
@@ -32,7 +33,7 @@ export interface DynaDropTargetState {
 const target = {
   drop(props, monitor) {
     const { assessmentId, onDrop } = props;
-    onDrop(monitor.getItem().index, assessmentId);
+    onDrop(monitor.getItem().initiator, assessmentId, monitor.getItem().originalTargetId);
   },
   canDrop(props, monitor) {
     return true;
@@ -77,6 +78,7 @@ export class DynaDropTarget
             {initiators && initiators.map(initiator => (
               <Initiator
                 key={initiator.guid}
+                targetId={assessmentId}
                 model={initiator} editMode={editMode}
                 selected={initiator.assessmentId === selectedInitiator}
                 onRemove={guid => onRemoveInitiator(guid, assessmentId)} />

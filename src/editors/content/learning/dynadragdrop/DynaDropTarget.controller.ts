@@ -20,7 +20,8 @@ interface OwnProps {
   initiators: InitiatorModel[];
   editMode: boolean;
   className?: string;
-  onDrop: (initiatorId: string, targetAssessmentId: string) => void;
+  onDrop: (
+    initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) => void;
   onRemoveInitiator: (initiatorId: string, targetAssessmentId: string) => void;
   onToggleType: (id: string) => void;
 }
