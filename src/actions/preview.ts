@@ -9,22 +9,12 @@ import { OrganizationModel } from 'data/models';
 
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(resourceId: string, isRefreshAttempt: boolean) {
+function invokePreview(orgId: string, isRefreshAttempt: boolean) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, resourceId, isRefreshAttempt);
-  };
-}
-
-// Invoke a preview for the current resource (ie Workbook Page) from the editor.
-// The full course is not built in OLI
-function invokeQuickPreview(resource: Resource) {
-  return function (dispatch, getState): Promise<{}> {
-    const { course } = getState();
-
-    return persistence.initiateQuickPreview(course.guid, resource.guid);
+    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt);
   };
 }
 
@@ -59,15 +49,25 @@ export function preview(
 
 }
 
-// add dropdown for themes
+// Invoke a preview for the current resource (ie Workbook Page) from the editor.
+// The full course is not built in OLI
+function invokeQuickPreview(resource: Resource) {
+  return function (dispatch, getState): Promise<{}> {
+    const { course } = getState();
+
+    return persistence.initiateQuickPreview(course.guid, resource.guid);
+  };
+}
+
 export function quickPreview(courseId: string, resource: Resource) {
 
   return function (dispatch): Promise<any> {
 
     return dispatch(invokeQuickPreview(resource))
       .then((result) => {
-        window.open('/#quick_preview/' + resource.guid + '-' + courseId);
+        window.open('/#quick_preview/' + resource.guid + '-' + courseId, '_blank');
       }).catch((err) => {
+        console.log('err');
         const message = buildUnknownErrorMessage(err);
         dispatch(showMessage(message));
       });
