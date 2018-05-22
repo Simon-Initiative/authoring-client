@@ -59,10 +59,9 @@ export type PreviewResult =
  * @param courseId the course guid
  * @param documentId the document guid to preview
  */
-export function initiatePreview(
-  courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
+export function initiatePreview(courseId: CourseId, isRefresh: boolean): Promise<PreviewResult> {
 
-  const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
+  const url = `${configuration.baseUrl}/${courseId}/resources/preview/`
     + (isRefresh ? '?refresh=true' : '');
 
   return authenticatedFetch({ url })

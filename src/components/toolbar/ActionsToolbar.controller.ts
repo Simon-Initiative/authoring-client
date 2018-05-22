@@ -15,7 +15,7 @@ interface StateProps {
 
 interface DispatchProps {
   onShowPageDetails: () => void;
-  onPreview: (courseId: string, resource: Resource) => Promise<any>;
+  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
 }
@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
       dispatch(resetActive());
       dispatch(showSidebar(true));
     },
-    onPreview: (courseId: string, resource: Resource) => {
+    onQuickPreview: (courseId: string, resource: Resource) => {
       return dispatch(quickPreview(courseId, resource));
     },
     onUndo: (documentId: string) => {

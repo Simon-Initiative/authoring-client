@@ -8,12 +8,12 @@ import { showMessage } from 'actions/messages';
 
 
 // Invoke a preview for the entire course by setting up the course package in OLI
-function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
+function invokePreview(isRefreshAttempt: boolean) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
+    return persistence.initiatePreview(course.guid, isRefreshAttempt);
   };
 }
 
@@ -27,11 +27,11 @@ function invokeQuickPreview(resource: Resource) {
   };
 }
 
-export function preview(courseId: string, resource: Resource, isRefreshAttempt: boolean) {
+export function preview(courseId: string, isRefreshAttempt: boolean) {
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(resource, isRefreshAttempt))
+    return dispatch(invokePreview(isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -41,6 +41,7 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
           dispatch(showMessage(message));
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
+          // Change router to remove resource from URL
           window.open(
             '/#preview' + resource.guid + '-' + courseId
             + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)

@@ -12,7 +12,7 @@ export interface ActionsToolbarProps {
   canRedo: boolean;
   canPreview: boolean;
   onShowPageDetails: () => void;
-  onPreview: (courseId: string, resource: Resource) => Promise<any>;
+  onQuickPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
 }
@@ -22,7 +22,7 @@ export interface ActionsToolbarProps {
  */
 export const ActionsToolbar = (({
   courseId, documentResource, documentId, canUndo, canRedo,
-  canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
+  canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -57,7 +57,7 @@ export const ActionsToolbar = (({
           <div>Delete</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => onPreview(courseId, documentResource)}
+            onClick={() => onQuickPreview(courseId, documentResource)}
             tooltip="Preview this Page"
             disabled={!canPreview}
             size={ToolbarButtonSize.Large}>
