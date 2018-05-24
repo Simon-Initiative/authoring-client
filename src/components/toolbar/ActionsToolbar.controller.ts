@@ -6,9 +6,6 @@ import { showSidebar } from 'actions/editorSidebar';
 import { preview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
-import { Maybe } from 'tsmonad/lib/src';
-import { Edge } from 'types/edge';
-import { OrderedMap } from 'immutable';
 
 interface StateProps {
   courseId: string;

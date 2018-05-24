@@ -142,7 +142,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   constructor(props: OrgEditorProps) {
     super(props, ({
       currentTab: TABS.Content,
-      highlightedNodes: Immutable.Set<string>()
+      highlightedNodes: Immutable.Set<string>(),
     } as OrgEditorState));
 
     this.onLabelsEdit = this.onLabelsEdit.bind(this);

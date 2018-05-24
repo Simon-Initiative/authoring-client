@@ -4,9 +4,6 @@ import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
 import DeleteResourceModal from 'components/DeleteResourceModal';
-import { Edge } from 'types/edge';
-import { Maybe } from 'tsmonad/lib/src';
-import { OrderedMap } from 'immutable';
 
 export interface ActionsToolbarProps {
   courseId: string;

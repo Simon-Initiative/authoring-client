@@ -1,7 +1,6 @@
 import { Resource } from 'data/content/resource';
 import * as React from 'react';
 import ModalSelection from 'utils/selection/ModalSelection';
-import { Maybe } from 'tsmonad/lib/src';
 import { Edge } from 'types/edge';
 import { OrderedMap } from 'immutable';
 import * as persistence from 'data/persistence';
