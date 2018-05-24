@@ -14,9 +14,6 @@ interface StateProps {
 interface DispatchProps {
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  dispatch: (...args: any[]) => any;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
 }
 
 interface OwnProps extends AbstractEditorProps<OrganizationModel> {
@@ -32,15 +29,8 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onUndo: (documentId: string) => {
-      return dispatch(undo(documentId));
-    },
-    onRedo: (documentId: string) => {
-      return dispatch(redo(documentId));
-    },
-    dispatch,
-    onDisplayModal: component => dispatch(modalActions.display(component)),
-    onDismissModal: () => dispatch(modalActions.dismiss()),
+    onUndo: (documentId: string) => dispatch(undo(documentId)),
+    onRedo: (documentId: string) => dispatch(redo(documentId)),
   };
 };
 

@@ -76,6 +76,7 @@ export function fetchWebContentReferences(packageId: string, queryParams: {
 
   const method = 'GET';
   const url = `${configuration.baseUrl}/${packageId}/edges`;
+  // const urlEdgesByResource = `${configuration.baseUrl}/${packageId}/resources/edges/${resourceId}`
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},

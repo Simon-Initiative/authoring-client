@@ -4,9 +4,10 @@ import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
 import DeleteResourceModal from 'components/DeleteResourceModal';
+import { CourseModel } from 'data/models';
 
 export interface ActionsToolbarProps {
-  courseId: string;
+  course: CourseModel;
   documentResource: Resource;
   documentId: string;
   canUndo: boolean;
@@ -25,7 +26,7 @@ export interface ActionsToolbarProps {
  * ActionsToolbar React Stateless Component
  */
 export const ActionsToolbar = (({
-  courseId, documentResource, documentId, canUndo, canRedo,
+  course, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
   onDismissModal, onDisplayModal, onDispatch,
 }: ComponentProps<ActionsToolbarProps>) => {
@@ -58,7 +59,7 @@ export const ActionsToolbar = (({
             <DeleteResourceModal
               resource={documentResource}
               onDismissModal={onDismissModal}
-              courseId={courseId}
+              course={course}
               dispatch={onDispatch} />)}
           size={ToolbarButtonSize.Large}
           tooltip="Delete this Page"
@@ -67,7 +68,7 @@ export const ActionsToolbar = (({
         <div>Delete</div>
         </ToolbarButton>
       <ToolbarButton
-        onClick={() => onPreview(courseId, documentResource)}
+        onClick={() => onPreview(course.id, documentResource)}
         tooltip="Preview this Page"
         disabled={!canPreview}
         size={ToolbarButtonSize.Large}>

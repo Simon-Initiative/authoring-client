@@ -6,9 +6,10 @@ import { showSidebar } from 'actions/editorSidebar';
 import { preview } from 'actions/preview';
 import { undo, redo } from 'actions/document';
 import { Resource } from 'data/content/resource';
+import { CourseModel } from 'data/models';
 
 interface StateProps {
-  courseId: string;
+  course: CourseModel;
   canUndo: boolean;
   canRedo: boolean;
 }
@@ -31,7 +32,7 @@ interface OwnProps {
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
-    courseId: state.course.guid,
+    course: state.course,
     canUndo: state.documents.get(ownProps.documentId).undoStack.size > 0,
     canRedo: state.documents.get(ownProps.documentId).redoStack.size > 0,
   };

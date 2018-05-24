@@ -12,7 +12,7 @@ import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { SourceNodeType } from '../../content/org/drag/utils';
 import { insertNode, removeNode, updateNode } from './utils';
 import { TreeNode } from './TreeNode';
-import { Actions } from './Actions';
+import { Actions } from './Actions.controller';
 import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { Title } from 'types/course';
@@ -113,9 +113,6 @@ export interface OrgEditorProps extends AbstractEditorProps<models.OrganizationM
   canRedo: boolean;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  dispatch: (...args: any[]) => any;
-  onDisplayModal: (component: any) => void;
-  onDismissModal: () => void;
 }
 
 const enum TABS {
@@ -428,7 +425,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderActions() {
-    const { dispatch, onDisplayModal, onDismissModal, resource, courseId } = this.props;
+    const { dispatch, model } = this.props;
 
     const dupe = () => this.props.dispatch(
       duplicateOrganization(
@@ -437,11 +434,7 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
 
     return <Actions
       onDuplicate={dupe}
-      onDisplayModal={onDisplayModal}
-      onDismissModal={onDismissModal}
-      resource={resource}
-      courseId={courseId}
-      dispatch={dispatch}
+      org={model}
     />;
   }
 

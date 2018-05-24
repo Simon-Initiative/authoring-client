@@ -6,19 +6,21 @@ import { OrderedMap } from 'immutable';
 import * as persistence from 'data/persistence';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import * as viewActions from 'actions/view';
-
+import { OrganizationModel, CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
+import { LegacyTypes } from 'data/types';
 
 export interface DeleteResourceModalProps {
   onDismissModal: () => void;
-  resource: Resource;
-  courseId: string;
+  resource: Resource | OrganizationModel;
+  course: CourseModel;
   dispatch: any;
 }
 
 interface DeleteResourceModalState {
   edges: OrderedMap<string, Edge>;
   edgesAreLoaded: boolean;
+  edgeLoadFailure: boolean;
 }
 
 export default class DeleteResourceModal extends
@@ -31,6 +33,7 @@ export default class DeleteResourceModal extends
     this.state = {
       edges: OrderedMap<string, Edge>(),
       edgesAreLoaded: false,
+      edgeLoadFailure: false,
     };
 
     this.onDelete = this.onDelete.bind(this);
@@ -39,39 +42,40 @@ export default class DeleteResourceModal extends
 
   componentDidMount() {
     // change to parameterized version after backend changes for fetching resource edges
-    persistence.fetchWebContentReferences(this.props.courseId)
+    persistence.fetchWebContentReferences(this.props.course.guid)
       .then((edges) => {
         console.log('edges', edges);
         this.setState({
           edges: OrderedMap<string, Edge>(edges.map(e => [e.guid, e])),
           edgesAreLoaded: true,
         });
-      });
+      })
+      .catch(err => this.setState({ edgeLoadFailure: true }));
   }
 
   onDelete() {
-    const { dispatch, courseId, resource } = this.props;
+    const { dispatch, course, resource } = this.props;
 
-    persistence.deleteResource(courseId, resource.id)
+    persistence.deleteResource(course.id, resource.id)
       .then((_) => {
-        switch (resource.type) {
+        switch (resource.type as LegacyTypes) {
           case 'x-oli-workbook_page':
-            return dispatch(viewActions.viewPages(courseId));
+            return dispatch(viewActions.viewPages(course.id));
           case 'x-oli-inline-assessment':
-            return dispatch(viewActions.viewFormativeAssessments(courseId));
+            return dispatch(viewActions.viewFormativeAssessments(course.id));
           case 'x-oli-assessment2':
-            return dispatch(viewActions.viewSummativeAssessments(courseId));
+            return dispatch(viewActions.viewSummativeAssessments(course.id));
           case 'x-oli-assessment2-pool':
-            return dispatch(viewActions.viewPools(courseId));
+            return dispatch(viewActions.viewPools(course.id));
           case 'x-oli-organization':
-            return dispatch(viewActions.viewOrganizations(courseId));
+            return dispatch(viewActions.viewOrganizations(course.id));
           default:
             return;
         }
       });
   }
 
-  prettyPrintResourceType(type) {
+  prettyPrintResourceType(type: LegacyTypes): string {
     switch (type) {
       case 'x-oli-workbook_page':
         return 'Workbook Page';
@@ -88,23 +92,23 @@ export default class DeleteResourceModal extends
   }
 
   clickResource(id) {
-    const { dispatch, courseId, onDismissModal } = this.props;
+    const { dispatch, course, onDismissModal } = this.props;
 
-    dispatch(viewActions.viewDocument(id, courseId));
+    dispatch(viewActions.viewDocument(id, course.id));
     // dismiss modal
   }
 
   render() {
-    const { courseId, resource, onDismissModal } = this.props;
-    const { edges, edgesAreLoaded } = this.state;
+    const { course, resource, onDismissModal } = this.props;
+    const { edges, edgesAreLoaded, edgeLoadFailure } = this.state;
 
-    const resourceTypeUppercase = this.prettyPrintResourceType(resource.type);
+    const resourceTypeUppercase = this.prettyPrintResourceType(resource.type as LegacyTypes);
     const resourceTypeLowercase = resourceTypeUppercase.toLowerCase();
 
     const rows = this.state.edges.toArray().map(e => ({ key: e.guid, data: e }));
 
     const labels = [
-      'Resource ID',
+      'Resource Name',
       'Resource Type',
       'Reference Type',
     ];
@@ -129,6 +133,7 @@ export default class DeleteResourceModal extends
       };
 
     const comparators = [
+      // how to get this to compare on name?
       (direction, a, b) => safeCompare('sourceId', direction, a, b),
       (direction, a, b) => safeCompare('sourceType', direction, a, b),
       (direction, a, b) => safeCompare('referenceType', direction, a, b),
@@ -138,16 +143,25 @@ export default class DeleteResourceModal extends
       <button onClick={this.clickResource.bind(this, resource.guid)}
         className="btn btn-link">{text}</button>;
 
-    // Change to look up resource name instead of displaying ID
+    // Edge sourceId is of the form ':{resourceId}', so parse out the resourceId
+    const resourceId = (edge: Edge) => edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
+    const resourceName = (id: string) => course.resourcesById.get(id);
+
     const columnRenderers = [
-      r => link(r)(r.sourceId.slice(r.sourceId.lastIndexOf(':') + 1)),
-      r => this.prettyPrintResourceType(r.sourceType),
-      r => r.referenceType,
+      (edge: Edge) => link(edge)(resourceName(resourceId(edge))),
+      (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
+      (edge: Edge) => <span>{edge.referenceType}</span>,
     ];
 
 
     let modalBody;
 
+    if (edgeLoadFailure) {
+      modalBody = <div key="loading" className="loading">
+        <i className="fa fa-times-circle" />
+        Something went wrong - please try again
+    </div>;
+    }
     if (!edgesAreLoaded) {
       modalBody = <div key="loading" className="loading">
         <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
@@ -171,7 +185,6 @@ export default class DeleteResourceModal extends
       </React.Fragment>;
     }
 
-
     return (
       <ModalSelection
         title={`Delete ${resourceTypeUppercase} '${resource.title}'?`}
@@ -184,5 +197,4 @@ export default class DeleteResourceModal extends
       </ModalSelection>
     );
   }
-
 }
