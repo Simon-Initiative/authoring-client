@@ -42,6 +42,7 @@ export function login() {
       // Once we are authenticationed, store the token so that it can
       // be injected into the headers of outgoing API HTTP requests
       credentials.token = kc.token;
+      updateTokenCookie(credentials.token);
 
       // Also, request asynchronously the user's profile from keycloak
       kc.loadUserProfile().success((profile: UserProfile) => {
@@ -64,6 +65,11 @@ export function login() {
 
 }
 
+// This cookie is used by quick preview to provide authentication in the newly opened tab
+function updateTokenCookie(token) {
+  document.cookie = 'token=' + token;
+}
+
 function continuallyRefreshToken() {
   setTimeout(
     () => {
@@ -82,6 +88,7 @@ export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Pr
       kc.updateToken(within).success((refreshed) => {
         if (refreshed) {
           credentials.token = kc.token;
+          updateTokenCookie(credentials.token);
           resolve(true);
         } else {
           resolve(true);

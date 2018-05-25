@@ -7,7 +7,6 @@ import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
 import { OrganizationModel } from 'data/models';
 
-
 // Invoke a preview for the entire course by setting up the course package in OLI
 function invokePreview(orgId: string, isRefreshAttempt: boolean) {
   return function (dispatch, getState): Promise<persistence.PreviewResult> {
@@ -23,7 +22,7 @@ export function preview(
 
   return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(organization.id, isRefreshAttempt))
+    return dispatch(invokePreview(organization.guid, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -50,27 +49,13 @@ export function preview(
 }
 
 // Invoke a preview for the current resource (ie Workbook Page) from the editor.
-// The full course is not built in OLI
-function invokeQuickPreview(resource: Resource) {
-  return function (dispatch, getState): Promise<{}> {
-    const { course } = getState();
-
-    return persistence.initiateQuickPreview(course.guid, resource.guid);
-  };
-}
-
+// The full course is not built in OLI. Instead, we just receive an HTML page with
+// the workbook page contents.
 export function quickPreview(courseId: string, resource: Resource) {
 
-  return function (dispatch): Promise<any> {
-
-    return dispatch(invokeQuickPreview(resource))
-      .then((result) => {
-        window.open('/#quick_preview/' + resource.guid + '-' + courseId, '_blank');
-      }).catch((err) => {
-        console.log('err');
-        const message = buildUnknownErrorMessage(err);
-        dispatch(showMessage(message));
-      });
+  return function (dispatch, getState) {
+    const { course } = getState();
+    return persistence.initiateQuickPreview(course.guid, resource.guid);
   };
 }
 

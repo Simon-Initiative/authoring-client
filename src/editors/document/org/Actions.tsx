@@ -38,7 +38,7 @@ export class Actions
               <button
                 className="btn btn-block btn-primary"
                 onClick={() =>
-                  this.props.onPreview(this.props.course.id, this.props.organization)}>
+                  this.props.onPreview(this.props.course.guid, this.props.organization)}>
                 <i className="fa fa-eye" />&nbsp;&nbsp;Generate Preview
               </button>
             </dt>
