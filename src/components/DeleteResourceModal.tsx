@@ -41,10 +41,10 @@ export default class DeleteResourceModal extends
   }
 
   componentDidMount() {
-    // change to parameterized version after backend changes for fetching resource edges
-    persistence.fetchWebContentReferences(this.props.course.guid)
+    const { course, resource } = this.props;
+
+    persistence.fetchWebContentReferences(course.guid, {}, true, resource.guid)
       .then((edges) => {
-        console.log('edges', edges);
         this.setState({
           edges: OrderedMap<string, Edge>(edges.map(e => [e.guid, e])),
           edgesAreLoaded: true,
@@ -56,19 +56,19 @@ export default class DeleteResourceModal extends
   onDelete() {
     const { dispatch, course, resource } = this.props;
 
-    persistence.deleteResource(course.id, resource.id)
+    persistence.deleteResource(course.guid, resource.guid)
       .then((_) => {
         switch (resource.type as LegacyTypes) {
           case 'x-oli-workbook_page':
-            return dispatch(viewActions.viewPages(course.id));
+            return dispatch(viewActions.viewPages(course.guid));
           case 'x-oli-inline-assessment':
-            return dispatch(viewActions.viewFormativeAssessments(course.id));
+            return dispatch(viewActions.viewFormativeAssessments(course.guid));
           case 'x-oli-assessment2':
-            return dispatch(viewActions.viewSummativeAssessments(course.id));
+            return dispatch(viewActions.viewSummativeAssessments(course.guid));
           case 'x-oli-assessment2-pool':
-            return dispatch(viewActions.viewPools(course.id));
+            return dispatch(viewActions.viewPools(course.guid));
           case 'x-oli-organization':
-            return dispatch(viewActions.viewOrganizations(course.id));
+            return dispatch(viewActions.viewOrganizations(course.guid));
           default:
             return;
         }
@@ -91,11 +91,11 @@ export default class DeleteResourceModal extends
     }
   }
 
-  clickResource(id) {
+  clickResource(resourceId) {
     const { dispatch, course, onDismissModal } = this.props;
 
-    dispatch(viewActions.viewDocument(id, course.id));
-    // dismiss modal
+    dispatch(viewActions.viewDocument(resourceId, course.guid));
+    onDismissModal();
   }
 
   render() {
@@ -110,49 +110,54 @@ export default class DeleteResourceModal extends
     const labels = [
       'Resource Name',
       'Resource Type',
-      'Reference Type',
     ];
 
     const safeCompare =
-      (key: string, direction: SortDirection, a, b) => {
-        if (a[key] === null && b[key] === null) {
+      (key: string, direction: SortDirection, a: Edge, b: Edge): number => {
+        const aValue = key === 'title' ? edgeResourceTitle(edgeResourceId(a)) : a[key];
+        const bValue = key === 'title' ? edgeResourceTitle(edgeResourceId(b)) : b[key];
+
+        if (aValue === null && bValue === null) {
           return 0;
         }
-        if (a[key] === null) {
+        if (aValue === null) {
           return direction === SortDirection.Ascending ? 1 : -1;
         }
-        if (b[key] === null) {
+        if (bValue === null) {
           return direction === SortDirection.Ascending ? -1 : 1;
         }
-        if (a[key] === b[key]) {
+        if (aValue === bValue) {
           return 0;
         }
         return direction === SortDirection.Ascending
-          ? a[key].localeCompare(b[key])
-          : b[key].localeCompare(a[key]);
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
       };
 
     const comparators = [
-      // how to get this to compare on name?
-      (direction, a, b) => safeCompare('sourceId', direction, a, b),
+      (direction, a, b) => safeCompare('title', direction, a, b),
       (direction, a, b) => safeCompare('sourceType', direction, a, b),
-      (direction, a, b) => safeCompare('referenceType', direction, a, b),
     ];
 
-    const link = resource => text =>
-      <button onClick={this.clickResource.bind(this, resource.guid)}
+    // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
+    // in the form '{courseId}:{version}:{resourceId}'.
+    const edgeResourceId: (edge: Edge) => string =
+      edge => edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
+
+    const edgeResource: (resourceId: string) => Resource =
+      resourceId => course.resourcesById.get(resourceId);
+
+    const edgeResourceTitle: (id: string) => string =
+      id => edgeResource(id).title;
+
+    const link = (edge: Edge) => (text: string) =>
+      <button onClick={this.clickResource.bind(this, edgeResource(edgeResourceId(edge)).guid)}
         className="btn btn-link">{text}</button>;
 
-    // Edge sourceId is of the form ':{resourceId}', so parse out the resourceId
-    const resourceId = (edge: Edge) => edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
-    const resourceName = (id: string) => course.resourcesById.get(id);
-
     const columnRenderers = [
-      (edge: Edge) => link(edge)(resourceName(resourceId(edge))),
+      (edge: Edge) => link(edge)(edgeResourceTitle(edgeResourceId(edge))),
       (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
-      (edge: Edge) => <span>{edge.referenceType}</span>,
     ];
-
 
     let modalBody;
 
@@ -175,7 +180,7 @@ export default class DeleteResourceModal extends
     if (edgesAreLoaded && edges.size > 0) {
       modalBody = <React.Fragment>
         {/* tslint:disable-next-line:max-line-length */}
-        <p>The following {edges.size} resources use this {resourceTypeLowercase}. All references must be removed before the {resourceTypeLowercase} can be deleted:</p>
+        <p>The following {edges.size} resource{edges.size === 1 ? '' : 's'} use{edges.size === 1 ? 's' : ''} this {resourceTypeLowercase}. All references must be removed before the {resourceTypeLowercase} can be deleted.</p>
         <SortableTable
           model={rows}
           columnComparators={comparators}
