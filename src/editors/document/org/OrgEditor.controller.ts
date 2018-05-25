@@ -4,7 +4,6 @@ import { AbstractEditorProps } from '../common/AbstractEditor';
 import { OrganizationModel } from 'data/models';
 import { AppContext } from 'editors/common/AppContext';
 import { undo, redo } from 'actions/document';
-import { modalActions } from 'actions/modal';
 
 interface StateProps {
   canUndo: boolean;

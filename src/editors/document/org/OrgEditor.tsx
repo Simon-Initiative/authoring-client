@@ -425,12 +425,12 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderActions() {
-    const { dispatch, model } = this.props;
+    const { dispatch, model, context } = this.props;
 
-    const dupe = () => this.props.dispatch(
+    const dupe = () => dispatch(
       duplicateOrganization(
-        this.props.context.courseId,
-        this.props.model, this.props.context.courseModel));
+        context.courseId,
+        model, context.courseModel));
 
     return <Actions
       onDuplicate={dupe}

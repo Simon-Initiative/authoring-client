@@ -54,21 +54,31 @@ export default class DeleteResourceModal extends
   }
 
   onDelete() {
-    const { dispatch, course, resource } = this.props;
+    const { dispatch, course, resource, onDismissModal } = this.props;
 
     persistence.deleteResource(course.guid, resource.guid)
       .then((_) => {
         switch (resource.type as LegacyTypes) {
           case 'x-oli-workbook_page':
-            return dispatch(viewActions.viewPages(course.guid));
+            dispatch(viewActions.viewPages(course.guid));
+            onDismissModal();
+            break;
           case 'x-oli-inline-assessment':
-            return dispatch(viewActions.viewFormativeAssessments(course.guid));
+            dispatch(viewActions.viewFormativeAssessments(course.guid));
+            onDismissModal();
+            break;
           case 'x-oli-assessment2':
-            return dispatch(viewActions.viewSummativeAssessments(course.guid));
+            dispatch(viewActions.viewSummativeAssessments(course.guid));
+            onDismissModal();
+            break;
           case 'x-oli-assessment2-pool':
-            return dispatch(viewActions.viewPools(course.guid));
+            dispatch(viewActions.viewPools(course.guid));
+            onDismissModal();
+            break;
           case 'x-oli-organization':
-            return dispatch(viewActions.viewOrganizations(course.guid));
+            dispatch(viewActions.viewOrganizations(course.guid));
+            onDismissModal();
+            break;
           default:
             return;
         }

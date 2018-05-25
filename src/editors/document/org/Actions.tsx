@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Resource } from 'data/contentTypes';
 import DeleteResourceModal from 'components/DeleteResourceModal';
 import { OrganizationModel, CourseModel } from 'data/models';
 

@@ -86,7 +86,8 @@ const resources = {
   formativeassessments: res(
     'Formative Assessments',
     LegacyTypes.inline,
-    (resource: Resource) => resource.type === LegacyTypes.inline,
+    (resource: Resource) => resource.type === LegacyTypes.inline
+      && !resource.deleted,
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
