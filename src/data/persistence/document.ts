@@ -102,27 +102,30 @@ export function initiatePreview(
 }
 
 export function initiateQuickPreview(courseId: CourseId, documentId: DocumentId) {
-  const src = `${configuration.baseUrl}/${courseId}/resources/quick_preview/${documentId}`;
-  const win = window.open();
-  const iframe = document.createElement('iframe');
-  iframe.src = src;
-  // Styles to make the iframe take up the full window
-  const stylesString = `
-    position:fixed;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    width:100%;
-    height:100%;
-    border:none;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    z-index:999999;`;
-  iframe.setAttribute('style', stylesString);
+  const protocol = window.location.protocol + '//';
+  const hostname = window.location.host;
+  const prefix = 'content-service/api';
+  const src = `${protocol + hostname}/${prefix}/${courseId}/resources/quick_preview/${documentId}`;
+  const win = window.open(src, '_blank');
+  // const iframe = document.createElement('iframe');
+  // iframe.src = src;
+  // // Styles to make the iframe take up the full window
+  // const stylesString = `
+  //   position:fixed;
+  //   top:0px;
+  //   left:0px;
+  //   bottom:0px;
+  //   right:0px;
+  //   width:100%;
+  //   height:100%;
+  //   border:none;
+  //   margin:0;
+  //   padding:0;
+  //   overflow:hidden;
+  //   z-index:999999;`;
+  // iframe.setAttribute('style', stylesString);
 
-  win.document.body.appendChild(iframe);
+  // win.document.body.appendChild(iframe);
 }
 
 export function bulkFetchDocuments(
