@@ -33,6 +33,12 @@ export default class BlockFormulaToolbar
     super(props);
   }
 
+
+  shouldComponentUpdate(nextProps: BlockFormulaToolbarProps, nextState) {
+    return super.shouldComponentUpdate(nextProps, nextState)
+    || nextProps.selection !== this.props.selection;
+  }
+
   renderActiveEntity(entity) {
 
     const { key, data } = entity;
@@ -80,87 +86,87 @@ export default class BlockFormulaToolbar
 
     return (
       <ToolbarGroup
-        label="Formula" highlightColor={CONTENT_COLORS.BlockFormula} columns={4}>
+        label="Formula" highlightColor={CONTENT_COLORS.BlockFormula} columns={5.4}>
         <ToolbarLayout.Inline>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Bold, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Bold">
-            <i className={'fa fa-bold'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Bold, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Bold">
+            <i className={'fa fa-bold'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Italic, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Italic">
-            <i className={'fa fa-italic'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Italic, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Italic">
+            <i className={'fa fa-italic'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Strikethrough">
-            <i className={'fa fa-strikethrough'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Strikethrough, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Strikethrough">
+            <i className={'fa fa-strikethrough'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Highlight, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Highlight">
-            <i className={'fa fa-pencil'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Highlight, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Highlight">
+            <i className={'fa fa-pencil'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Superscript, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Superscript">
-            <i className={'fa fa-superscript'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Superscript, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Superscript">
+            <i className={'fa fa-superscript'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => onEdit(model.with({
-                  text: model.text.toggleStyle(InlineStyles.Subscript, selection),
-                }))
-              }
-              disabled={noTextSelected || !editMode}
-              tooltip="Subscript">
-            <i className={'fa fa-subscript'}/>
+            onClick={
+              () => onEdit(model.with({
+                text: model.text.toggleStyle(InlineStyles.Subscript, selection),
+              }))
+            }
+            disabled={noTextSelected || !editMode}
+            tooltip="Subscript">
+            <i className={'fa fa-subscript'} />
           </ToolbarButton>
           <ToolbarButton
-              onClick={
-                () => {
-                  onEdit(model.with({
-                    text: model.text.addEntity(
-                      EntityTypes.math, true, new contentTypes.Math(), selection),
-                  }));
-                }
+            onClick={
+              () => {
+                onEdit(model.with({
+                  text: model.text.addEntity(
+                    EntityTypes.math, true, new contentTypes.Math(), selection),
+                }));
               }
-              disabled={!supports('m:math') || !pointEntitiesEnabled}
-              tooltip="MathML or Latex formula">
-            <i className={'fa fa-etsy'}/>
+            }
+            disabled={!supports('m:math') || !pointEntitiesEnabled}
+            tooltip="MathML or Latex formula">
+            <i className={'fa fa-etsy'} />
           </ToolbarButton>
         </ToolbarLayout.Inline>
       </ToolbarGroup>
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
     return null;
   }
 }

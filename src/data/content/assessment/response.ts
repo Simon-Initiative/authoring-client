@@ -44,6 +44,14 @@ export class Response extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+
+  clone() : Response {
+    return this.with({
+      feedback: this.feedback.map(f => f.clone()).toOrderedMap(),
+    });
+  }
+
+
   with(values: ResponseParams) {
     return this.merge(values) as this;
   }

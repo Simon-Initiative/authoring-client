@@ -3,7 +3,6 @@ import { injectSheet, JSSProps } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
 import { ActiveContextState } from 'reducers/active';
 
 import { styles } from './ItemToolbar.styles';
@@ -11,7 +10,6 @@ import { loadFromLocalStorage } from 'utils/localstorage';
 
 export interface ItemToolbarProps {
   context: AppContext;
-  courseModel: CourseModel;
   activeContext: ActiveContextState;
   onCut: (item) => void;
   onCopy: (item) => void;
@@ -88,14 +86,14 @@ export class ItemToolbar extends React.PureComponent<ItemToolbarProps & JSSProps
           <ToolbarButton
             onClick={() => onCut(this.getItem())}
             tooltip="Cut Item"
-            size={ToolbarButtonSize.Wide}
+            size={ToolbarButtonSize.Full}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-cut" /> Cut
           </ToolbarButton>
           <ToolbarButton
             onClick={() => onCopy(this.getItem())}
             tooltip="Copy Item"
-            size={ToolbarButtonSize.Wide}
+            size={ToolbarButtonSize.Full}
             disabled={!(this.hasSelection() && this.canDuplicate())}>
             <i className="fa fa-copy" /> Copy
           </ToolbarButton>

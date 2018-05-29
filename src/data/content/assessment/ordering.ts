@@ -38,6 +38,13 @@ export class Ordering extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+  clone() : Ordering {
+    return this.with({
+      id: createGuid(),
+      choices: this.choices.map(c => c.clone()).toOrderedMap(),
+    });
+  }
+
   with(values: OrderingParams) {
     return this.merge(values) as this;
   }

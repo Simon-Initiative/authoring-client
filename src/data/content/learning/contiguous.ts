@@ -214,8 +214,14 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
     const selection = new TextSelection(rawSelection);
 
+    // Some of the entity data objects are regular objects and do not
+    // support clone
+    const clone = info.entity.data.clone !== undefined
+      ? info.entity.data.clone()
+      : Object.assign({}, info.entity.data);
+
     return removed.addEntity(
-      info.entity.type, info.entity.mutability === 'MUTABLE', info.entity.data.clone(), selection);
+      info.entity.type, info.entity.mutability === 'MUTABLE', clone, selection);
 
   }
 
@@ -369,6 +375,23 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
           if (byId[info.entity.data['@input']] !== undefined) {
             const type = byId[info.entity.data['@input']].contentType;
             return contentState.mergeEntityData(info.entityKey, { $type: type });
+          }
+
+          return contentState;
+        },
+        this.content);
+
+    return this.with({ content });
+  }
+
+  updateAllInputRefs(itemMap: Object) : ContiguousText {
+
+    const content = getEntities(EntityTypes.input_ref, this.content)
+      .reduce(
+        (contentState, info) => {
+          if (itemMap[info.entity.data['@input']] !== undefined) {
+            return contentState.mergeEntityData(
+              info.entityKey, { '@input': itemMap[info.entity.data['@input']] });
           }
 
           return contentState;

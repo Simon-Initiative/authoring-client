@@ -30,13 +30,13 @@ export const ActionsToolbar = (({
         <ToolbarButton
             onClick={() => onUndo(documentId)}
             disabled={!canUndo}
-            size={ToolbarButtonSize.Wide}>
+            size={ToolbarButtonSize.Full}>
           <i className={'fa fa-undo'}/> Undo
         </ToolbarButton>
         <ToolbarButton
             onClick={() => onRedo(documentId)}
             disabled={!canRedo}
-            size={ToolbarButtonSize.Wide}>
+            size={ToolbarButtonSize.Full}>
           <i className={'fa fa-repeat'}/> Redo
         </ToolbarButton>
       </ToolbarLayout.Column>

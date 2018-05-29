@@ -38,7 +38,7 @@ export interface ToolbarButtonMenuItemProps {
 export const ToolbarButtonMenuForm = (props) => {
   return (
     <form className="px-3 py-0">
-      <div className="form-group">
+      <div className="form-group toolbarButtonMenuForm">
         {React.Children.map(
           props.children,
           c => React.cloneElement(c as any, { onHide: props.onHide }))}
@@ -145,21 +145,25 @@ export class ToolbarQuadMenu
 
   render() {
     const {
-      className, classes, ulComponent, llComponent, lrComponent, urComponent,
+      className, classes, ulComponent, llComponent, lrComponent, urComponent, disabled,
     } = this.props;
 
     const dropdown = (
       <div
-        className={classNames([classes.quadDropdown, 'dropdown'])}>
+        className={classNames([classes.quadDropdown,
+          disabled && classes.quadDropdownDisabled, 'dropdown'])}>
         <button
           className={classNames([classes.quadButton, 'dropdown-toggle'])}
+          disabled={disabled}
           data-toggle="dropdown"
           data-boundary="window"
-          data-offset="-75,16"
+          data-offset="-75,0"
           >
           <span className="sr-only">Toggle Dropdown</span>
         </button>
-        <div className="dropdown-menu">
+        <div
+          style={ { marginTop: '-9px' } }
+          className="dropdown-menu">
           {this.props.children}
         </div>
       </div>
@@ -181,7 +185,7 @@ export class ToolbarQuadMenu
 
     return (
       <div className={
-        classNames([classes.quadMenu, className])}>
+        classNames([classes.quadMenu, disabled && classes.quadMenuDisabled, className])}>
         {group}
       </div>
     );

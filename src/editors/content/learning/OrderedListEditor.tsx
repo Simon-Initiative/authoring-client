@@ -38,8 +38,8 @@ export interface OrderedListEditorState {
  */
 @injectSheet(styles)
 export default class OrderedList
-    extends AbstractContentEditor<contentTypes.Ol,
-    StyledComponentProps<OrderedListEditorProps>, OrderedListEditorState> {
+  extends AbstractContentEditor<contentTypes.Ol,
+  StyledComponentProps<OrderedListEditorProps>, OrderedListEditorState> {
   selectionState: any;
 
   constructor(props) {
@@ -81,13 +81,13 @@ export default class OrderedList
             focusChild=".DraftEditor-editorContainer"
             focusAction={FocusAction.Click}>
             <ToolbarContentContainer
-              onFocus={() => {}}
+              onFocus={() => { }}
               context={this.props.context}
               services={this.props.services}
               editMode={this.props.editMode}
               activeContentGuid={null}
               hover={null}
-              onUpdateHover={() => {}}
+              onUpdateHover={() => { }}
               model={title.text}
               onEdit={this.onTitleEdit.bind(this)} />
           </Discoverable>
@@ -114,13 +114,13 @@ export default class OrderedList
         </SidebarGroup>
         <SidebarGroup label="Start">
           <Discoverable id={DiscoverableId.OrderedListEditorStart} focusChild>
-          <TextInput
-            editMode={this.props.editMode}
-            label=""
-            value={start}
-            type="number"
-            width="100%"
-            onEdit={this.onStartChange.bind(this)} />
+            <TextInput
+              editMode={this.props.editMode}
+              label=""
+              value={start}
+              type="number"
+              width="100%"
+              onEdit={this.onStartChange.bind(this)} />
           </Discoverable>
         </SidebarGroup>
       </SidebarContent>
@@ -147,7 +147,7 @@ export default class OrderedList
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Ordered List" columns={6} highlightColor={CONTENT_COLORS.Ol}>
+      <ToolbarGroup label="Ordered List" columns={7.6} highlightColor={CONTENT_COLORS.Ol}>
         <ToolbarButton
           onClick={() => {
             onShowSidebar();
@@ -200,7 +200,7 @@ export default class OrderedList
     this.props.onEdit(model, src);
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model } = this.props;
     const { style } = model;
@@ -243,7 +243,7 @@ export default class OrderedList
     const labels = {};
     model.listItems.toArray().map((e, i) => {
       labels[e.guid]
-        = <span style={ { display: 'inline-block', minWidth: '12px' } }>{getLabel(e, i)}</span>;
+        = <span style={{ display: 'inline-block', minWidth: '12px' }}>{getLabel(e, i)}</span>;
     });
 
     const bindLabel = el => [{ propertyName: 'label', value: labels[el.guid] }];

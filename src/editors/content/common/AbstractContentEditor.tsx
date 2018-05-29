@@ -45,8 +45,13 @@ export abstract class
     super(props);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
+  shouldComponentUpdate(nextProps: AbstractContentEditorProps<ModelType>, nextState) {
+
+    return this.props.model !== nextProps.model
+      || this.props.parent !== nextProps.parent
+      || this.props.editMode !== nextProps.editMode
+      || this.props.activeContentGuid !== nextProps.activeContentGuid
+      || this.props.hover !== nextProps.hover;
   }
 
   abstract renderMain() : JSX.Element;

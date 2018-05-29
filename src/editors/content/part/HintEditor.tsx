@@ -57,7 +57,7 @@ export default class HintEditor
   renderToolbar() {
 
     return (
-      <ToolbarGroup label="Hint" columns={8} highlightColor={CONTENT_COLORS.Hint}>
+      <ToolbarGroup label="Hint" columns={9} highlightColor={CONTENT_COLORS.Hint}>
       </ToolbarGroup>
     );
   }
@@ -71,7 +71,7 @@ export default class HintEditor
   }
 
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     return (
       <div className="itemWrapper hint">
@@ -81,7 +81,7 @@ export default class HintEditor
             {...this.props}
             model={this.props.model.body}
             onEdit={this.onBodyEdit}
-            />
+          />
         </div>
       </div>
     );

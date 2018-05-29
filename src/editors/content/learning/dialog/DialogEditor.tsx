@@ -124,7 +124,7 @@ export default class DialogEditor
 
   renderToolbar(): JSX.Element {
     return (
-      <ToolbarGroup label="Dialog" columns={2} highlightColor={CONTENT_COLORS.Dialog}>
+      <ToolbarGroup label="Dialog" columns={3} highlightColor={CONTENT_COLORS.Dialog}>
       </ToolbarGroup>
     );
   }

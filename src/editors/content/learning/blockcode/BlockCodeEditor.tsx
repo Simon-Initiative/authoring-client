@@ -23,8 +23,8 @@ export interface BlockCodeEditorState {
 
 @injectSheet(styles)
 export default class BlockCodeEditor
-    extends AbstractContentEditor
-    <contentTypes.BlockCode, BlockCodeEditorProps & JSSProps, BlockCodeEditorState> {
+  extends AbstractContentEditor
+  <contentTypes.BlockCode, BlockCodeEditorProps & JSSProps, BlockCodeEditorState> {
 
   constructor(props) {
     super(props);
@@ -44,7 +44,7 @@ export default class BlockCodeEditor
 
   renderSidebar() {
     return (
-      <SidebarContent title="Code"/>
+      <SidebarContent title="Code" />
     );
   }
 
@@ -52,10 +52,10 @@ export default class BlockCodeEditor
     const { onShowSidebar } = this.props;
 
     return (
-      <ToolbarGroup label="Code" highlightColor={CONTENT_COLORS.BlockCode} columns={2}>
+      <ToolbarGroup label="Code" highlightColor={CONTENT_COLORS.BlockCode} columns={3}>
         <ToolbarLayout.Column>
           <ToolbarButton onClick={onShowSidebar} size={ToolbarButtonSize.Large}>
-            <div><i className="fa fa-sliders"/></div>
+            <div><i className="fa fa-sliders" /></div>
             <div>Details</div>
           </ToolbarButton>
         </ToolbarLayout.Column>

@@ -35,12 +35,12 @@ export interface AlternativesEditorState {
 
 @injectSheet(styles)
 export default class AlternativesEditor
-    extends AbstractContentEditor<contentTypes.Alternatives,
-    StyledComponentProps<AlternativesEditorProps>, AlternativesEditorState> {
+  extends AbstractContentEditor<contentTypes.Alternatives,
+  StyledComponentProps<AlternativesEditorProps>, AlternativesEditorState> {
 
   defaultTabIndex: number;
 
-  constructor(props : AlternativesEditorProps) {
+  constructor(props: AlternativesEditorProps) {
     super(props);
 
     this.onGroupEdit = this.onGroupEdit.bind(this);
@@ -121,7 +121,7 @@ export default class AlternativesEditor
     const { onShowSidebar, onDiscover } = this.props;
 
     return (
-      <ToolbarGroup label="Variable Content" columns={5}
+      <ToolbarGroup label="Variable Content" columns={6}
         highlightColor={CONTENT_COLORS.Alternatives}>
         <ToolbarButton onClick={this.onAlternativeAdd.bind(this)} size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-plus-square-o"></i></div>
@@ -133,14 +133,14 @@ export default class AlternativesEditor
               onShowSidebar();
               onDiscover(DiscoverableId.AlternativesEditorGroup);
             }} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-group"/> Group
+            <i className="fa fa-group" /> Group
           </ToolbarButton>
           <ToolbarButton
             onClick={() => {
               onShowSidebar();
               onDiscover(DiscoverableId.AlternativesEditorDefault);
             }} size={ToolbarButtonSize.Wide}>
-            <i className="fa fa-check-square-o"/> Default
+            <i className="fa fa-check-square-o" /> Default
           </ToolbarButton>
         </ToolbarLayout.Column>
       </ToolbarGroup>
@@ -243,7 +243,7 @@ export default class AlternativesEditor
     // to be disabled, but allows editing of the child attributes
     return {
       supportedElements: Immutable.List<string>(),
-      onAddNew: (e) => {},
+      onAddNew: (e) => { },
       onEdit: (e, s) => {
         this.onAlternativeEdit(e, s);
       },
@@ -270,8 +270,8 @@ export default class AlternativesEditor
         });
         this.props.onEdit(model, model);
       },
-      onMoveUp: (e) => {},
-      onMoveDown: (e) => {},
+      onMoveUp: (e) => { },
+      onMoveDown: (e) => { },
       props: this.props,
     };
 
@@ -325,7 +325,7 @@ export default class AlternativesEditor
     );
   }
 
-  renderMain() : JSX.Element {
+  renderMain(): JSX.Element {
 
     const { className, classes, model } = this.props;
 
