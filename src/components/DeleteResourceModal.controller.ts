@@ -15,9 +15,9 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onDeleteResource: (resource: Resource | OrganizationModel, course: CourseModel) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel) => void;
   // how can I pull the course out of redux state instead of passing as parameter?
-  onClickResource: (id: string, course: CourseModel) => any;
+  onClickResource: (id: string, course: CourseModel) => void;
 }
 
 interface OwnProps {
@@ -35,9 +35,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
     // should resource be a union type? having trouble updating when it's an org
-    onDeleteResource: (resource: Resource | OrganizationModel, course: CourseModel) => {
-      const updatedResource = (resource as Resource)
-      .with({ resourceState: ResourceState.DELETED });
+    onDeleteResource: (resource: Resource, course: CourseModel) => {
+      const updatedResource = resource.with({ resourceState: ResourceState.DELETED });
       const resources = Immutable.OrderedMap<string, Resource>([[
         updatedResource.guid, updatedResource,
       ]]);

@@ -10,10 +10,10 @@ import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 
 export interface DeleteResourceModalProps {
-  resource: Resource | OrganizationModel;
+  resource: Resource;
   course: CourseModel;
-  onClickResource: (id: string) => void;
-  onDeleteResource: (resource: Resource | OrganizationModel, course: CourseModel) => void;
+  onClickResource: (id: string, course: CourseModel) => void;
+  onDeleteResource: (resource: Resource, course: CourseModel) => void;
   onDismissModal: () => void;
 }
 
