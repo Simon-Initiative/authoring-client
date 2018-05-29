@@ -107,6 +107,8 @@ export function initiateQuickPreview(courseId: CourseId, documentId: DocumentId)
   const prefix = 'content-service/api';
   const src = `${protocol + hostname}/${prefix}/${courseId}/resources/quick_preview/${documentId}`;
   const win = window.open(src, '_blank');
+
+  // Temporarily commenting out until authenticated preview is supported in backend.
   // const iframe = document.createElement('iframe');
   // iframe.src = src;
   // // Styles to make the iframe take up the full window

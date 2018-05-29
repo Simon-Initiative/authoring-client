@@ -32,14 +32,14 @@ export class Actions
 
         <dl className="row">
 
-          <dd className="col-sm-10">Generate a <strong>preview</strong> of this organization.
-          The full course organization will be generated in the OLI platform.</dd>
+          <dd className="col-sm-10"><strong>Publish</strong> the complete course package
+          using this organization to the OLI development server.</dd>
             <dt className="col-sm-2 justify-content-right">
               <button
                 className="btn btn-block btn-primary"
                 onClick={() =>
                   this.props.onPreview(this.props.course.guid, this.props.organization)}>
-                <i className="fa fa-eye" />&nbsp;&nbsp;Generate Preview
+                Publish
               </button>
             </dt>
 
