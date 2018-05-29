@@ -16,12 +16,9 @@ import { ToggleSwitch } from 'components/common/ToggleSwitch';
 import { TextInput } from 'editors/content/common/TextInput';
 import { ContentElements } from 'data/content/common/elements';
 import { Initiator } from 'data/content/assessment/dragdrop/initiator';
-
-export const choiceAssessmentIdSort = (a: contentTypes.Choice, b: contentTypes.Choice) =>
-  a.value.localeCompare(b.value);
-
-export const responseAssessmentIdSort = (a: contentTypes.Response, b: contentTypes.Response) =>
-  a.match.localeCompare(b.match);
+import {
+  choiceAssessmentIdSort, responseAssessmentIdSort,
+} from 'editors/content/learning/dynadragdrop/utils';
 
 export interface DynaDropTargetItemsProps
   extends AbstractItemPartEditorProps<contentTypes.FillInTheBlank> {

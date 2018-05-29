@@ -23,15 +23,15 @@ const defaultContent = {
   elementType: 'custom',
   id: '',
   guid: '',
-  type: '',
+  type: 'javascript',
   layout: '',
   layoutData: Maybe.nothing(),
   src: '',
-  width: 0,
-  height: 0,
+  width: 100,
+  height: 100,
   logging: false,
-  paramName: '',
-  paramText: '',
+  paramName: 'showInputs',
+  paramText: 'false',
 };
 
 export class Custom extends Immutable.Record(defaultContent) {

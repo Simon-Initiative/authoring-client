@@ -26,8 +26,8 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
   return {
     activeContext: state.activeContext,
     selectedInitiator: state.dynadragdrop.selectedInitiator,
-    advancedScoringInitialized: state.questionEditor.hasIn(['scoring', ownProps.partModel.guid]),
-    advancedScoring: state.questionEditor.getIn(['scoring', ownProps.partModel.guid]),
+    advancedScoringInitialized: state.questionEditor.hasIn(['scoring', ownProps.model.guid]),
+    advancedScoring: state.questionEditor.getIn(['scoring', ownProps.model.guid]),
   };
 };
 

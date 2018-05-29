@@ -3,7 +3,19 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
 import { ContentElements } from 'data/content/common/elements';
+import { ContentElement } from 'data/content/common/interfaces';
 import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
+import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
+import { InitiatorGroup } from 'data/content/assessment/dragdrop/initiator_group';
+import { TargetGroup } from 'data/content/assessment/dragdrop/target_group';
+import { Maybe } from 'tsmonad';
+import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
+import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
+import { Target } from 'data/content/assessment/dragdrop/target';
+import { Initiator } from 'data/content/assessment/dragdrop/initiator';
+import {
+  getTargetsFromLayout, updateItemPartsFromTargets,
+} from 'editors/content/learning/dynadragdrop/utils';
 
 const defaultInputBody = () =>  ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
@@ -72,6 +84,7 @@ export class AddQuestion
     this.onAddMultipleChoice = this.onAddMultipleChoice.bind(this);
     this.onAddEssay = this.onAddEssay.bind(this);
     this.onAddMultipart = this.onAddMultipart.bind(this);
+    this.onAddDragDrop = this.onAddDragDrop.bind(this);
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
   }
@@ -162,6 +175,111 @@ export class AddQuestion
     this.props.onQuestionAdd(q);
   }
 
+  onAddDragDrop() {
+    const inputAssessmentId = guid();
+
+    const newDndLayout = new DndLayout().with({
+      guid: guid(),
+      initiatorGroup: new InitiatorGroup().with({
+        guid: guid(),
+        initiators: Immutable.List<Initiator>().push(new Initiator().with({
+          guid: guid(),
+          assessmentId: inputAssessmentId,
+          text: 'New Choice',
+        })),
+      }),
+      targetGroup: new TargetGroup().with({
+        guid: guid(),
+        rows: [new ContentRow(), new ContentRow(), new ContentRow()].reduce(
+          (accRows, newRow) => accRows.push(newRow.with({
+            guid: guid(),
+            cols: [new Target(), new DndText(), new DndText()].reduce(
+              (accCol, newCol) => accCol.push(
+                newCol.contentType === 'DndText'
+                ? newCol.with({
+                  guid: guid(),
+                  text: 'Enter text or set as drop target',
+                })
+                : newCol.with({
+                  guid: guid(),
+                  assessmentId: guid(),
+                })),
+              Immutable.List<DndText | Target>(),
+            ),
+          })),
+          Immutable.List<ContentRow>(),
+        ),
+      }),
+    });
+
+    const newCustom = new contentTypes.Custom().with({
+      guid: guid(),
+      id: guid(),
+      layout: '',
+      layoutData: Maybe.just<DndLayout>(newDndLayout),
+      src: 'DynaDrop.js',
+    });
+
+    // create question body
+    let newBody = ContentElements.fromText(
+      'Drag choices to the correct targets in the table', '', QUESTION_BODY_ELEMENTS);
+
+    newBody = newBody.with({
+      content: newBody.content.set(newCustom.guid, newCustom) as ContentElements,
+    });
+
+    // create default items
+    const matchValue = guid();
+    const newChoice = new contentTypes.Choice().with({
+      guid: guid(),
+      value: matchValue,
+    });
+    const newChoices = Immutable.OrderedMap<string, contentTypes.Choice>()
+      .set(newChoice.guid, newChoice);
+    const newFillInTheBlank = new contentTypes.FillInTheBlank().with({
+      guid: guid(),
+      id: inputAssessmentId,
+      choices: newChoices,
+    });
+    const newItems = Immutable.OrderedMap<string, contentTypes.FillInTheBlank>()
+      .set(newFillInTheBlank.guid, newFillInTheBlank);
+
+    // create default parts
+    const newFeedback = new contentTypes.Feedback().with({
+      guid: guid(),
+      body: ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS),
+    });
+    const newFeedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
+      .set(newFeedback.guid, newFeedback);
+    const newResponse = new contentTypes.Response({
+      match: matchValue,
+      input: inputAssessmentId,
+      score: '0',
+      feedback: newFeedbacks,
+    });
+    const newPart = new contentTypes.Part().with({
+      guid: guid(),
+      responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(newResponse.guid, newResponse),
+    });
+    const newParts = Immutable.OrderedMap<string, contentTypes.Part>()
+      .set(newPart.guid, newPart);
+
+    const targets = getTargetsFromLayout(newDndLayout);
+    const { items, parts } = updateItemPartsFromTargets(newItems, newParts, targets);
+
+    const q = new contentTypes.Question()
+      .with({
+        guid: guid(),
+        id: guid(),
+        body: newBody,
+        items,
+        parts,
+      });
+
+    this.props.onQuestionAdd(q);
+  }
+
   render() {
 
     const essayOrNot = this.props.isSummative
@@ -185,6 +303,8 @@ export class AddQuestion
           {essayOrNot}
           <a onClick={this.onAddMultipart}
             className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+          <a onClick={this.onAddDragDrop}
+            className="dropdown-item">Drag and Drop</a>
         </div>
       </div>
     );
