@@ -5,7 +5,6 @@ import { Maybe } from 'tsmonad';
 import { getKey } from '../common';
 
 import { LegacyTypes } from '../types';
-import { ResourceState } from 'data/content/resource';
 
 export type OrganizationModelParams = {
   resource?: contentTypes.Resource,

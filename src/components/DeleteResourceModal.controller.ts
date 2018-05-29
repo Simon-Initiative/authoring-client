@@ -3,7 +3,7 @@ import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import DeleteResourceModal from './DeleteResourceModal';
 import { Resource } from 'data/contentTypes';
-import { OrganizationModel, CourseModel } from 'data/models';
+import { CourseModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
 import { ResourceState } from 'data/content/resource';
 import { updateCourseResources } from 'actions/course';

@@ -5,7 +5,7 @@ import { Edge } from 'types/edge';
 import { OrderedMap } from 'immutable';
 import * as persistence from 'data/persistence';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
-import { OrganizationModel, CourseModel } from 'data/models';
+import { CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 
@@ -74,7 +74,7 @@ export default class DeleteResourceModal extends
   }
 
   render() {
-    const { course, resource, onDismissModal, onClickResource } = this.props;
+    const { course, resource, onDismissModal } = this.props;
     const { edges, edgesAreLoaded, edgeLoadFailure } = this.state;
 
     const resourceTypeUppercase = this.prettyPrintResourceType(resource.type as LegacyTypes);
