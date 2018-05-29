@@ -85,20 +85,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha256-C8oQVJ33cKtnkARnmeWp6SDChkU+u7KvsNMFUzkkUzk=" crossorigin="anonymous"></script>
 
 
-<% if (htmlWebpackPlugin.options.googleAnalytics) { %>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-5145430-2"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  <% if (htmlWebpackPlugin.options.googleAnalytics.trackingId) { %>
-    ga('create', '<%= htmlWebpackPlugin.options.googleAnalytics.trackingId%>', 'auto');
-    <% } else { throw new Error("html-webpack-template requires googleAnalytics.trackingId config"); }%>
-  <% if (htmlWebpackPlugin.options.googleAnalytics.pageViewOnLoad) { %>
-    ga('send', 'pageview');
-  <% } %>
+  if (window.location.href.indexOf('echo.oli.cmu.edu') === -1) {
+    window['ga-disable-UA-5145430-2'] = true;
+  }
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-5145430-2');
 </script>
-<% } %>
+
 </body>
 </html>
 
