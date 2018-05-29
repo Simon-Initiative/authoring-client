@@ -215,6 +215,108 @@ function migrateExplanationToFeedback(model: Question) : Question {
 
 }
 
+// Cloning an input question requires that we:
+// 1. update the input attribute of all input_ref entities found in the
+//    question body to point to the newly assigned item id.
+// 2. update the response input attribute to point to the newly assigned
+//    item id.
+function cloneInputQuestion(question: Question) : Question {
+
+  // The approach here is to gust clone the whole thing first, then
+  // go back and post-process to make the updates that we need:
+
+  const cloned = question.with({
+    id: createGuid(),
+    body: question.body.clone(),
+    explanation: question.explanation.clone(),
+    parts: question.parts.map(p => p.clone()).toOrderedMap(),
+    items: question.items.map(i => i.clone()).toOrderedMap(),
+  });
+
+  // Calculate the mapping of old item ids to new item ids
+  const itemMap = {};
+  const newItems = cloned.items.toArray();
+  question.items.toArray().forEach(
+    (item, index) => itemMap[(item as any).id] = (newItems[index] as any).id);
+
+  // First do update #1 - update all input_ref input attributes to point
+  // to the new item ids
+  const body = cloned.body.with({
+    content: cloned.body.content.map((c) => {
+      if (c.contentType === 'ContiguousText') {
+        return (c as ContiguousText).updateAllInputRefs(itemMap);
+      }
+      return c;
+    }).toOrderedMap(),
+  });
+
+
+  // Now do update #2 - set the response input attr to point to the new item id
+  const parts = cloned.parts.map((part) => {
+    return part.with({
+      responses: part.responses.map((response) => {
+        if (itemMap[response.input] !== undefined) {
+          return response.with({ input: itemMap[response.input] });
+        }
+        return response;
+      }).toOrderedMap(),
+    });
+  }).toOrderedMap();
+
+  return cloned.with({
+    body,
+    parts,
+  });
+}
+
+// Cloning a single select multiple choice question requires that
+// we update the choice#value attribute in lock step with the
+// response#match attribute:
+function cloneMultipleChoiceQuestion(question: Question) : Question {
+
+  // Remap existing value ids to newly assigned ones, storing
+  // the mapping in valueMap for later use.
+  const valueMap = {};
+  const items = question.items.map((item) => {
+
+    // Clone all the choices, but assign new values and track
+    // the mapping of old choice values to new ones
+    const mc = item as MultipleChoice;
+    const choices = mc.choices.map((choice) => {
+      const value = createGuid();
+      valueMap[choice.value] = value;
+
+      return choice.clone().with({
+        value,
+      });
+    }).toOrderedMap();
+
+    return (item as MultipleChoice).with({
+      id: createGuid(),
+      choices,
+    });
+  }).toOrderedMap();
+
+  // Now clone parts, but post process to update the match attribute
+  // of response objects to use the new choice values
+  const initialPartsClone = question.parts.map(p => p.clone()).toOrderedMap();
+  const parts = initialPartsClone.map((part) => {
+    return part.with({
+      responses: part.responses.map((response) => {
+        return response.with({ match: valueMap[response.match] });
+      }).toOrderedMap(),
+    });
+  }).toOrderedMap();
+
+  return question.with({
+    id: createGuid(),
+    body: question.body.clone(),
+    explanation: question.explanation.clone(),
+    parts,
+    items,
+  });
+}
+
 export class Question extends Immutable.Record(defaultQuestionParams) {
 
   contentType: 'Question';
@@ -231,6 +333,43 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
 
   constructor(params?: QuestionParams) {
     super(augment(params));
+  }
+
+
+  clone() : Question {
+
+    const item = this.items.first();
+
+    // If there isn't a single item, there isn't much
+    // to do here at all:
+    if (item === undefined) {
+      return this.with({
+        id: createGuid(),
+        body: this.body.clone(),
+        explanation: this.explanation.clone(),
+      });
+    }
+
+    // Otherwise, use first item to determine the
+    // question type because we have to handle single select
+    // multiple choice questions and any input-based questions specially
+    if (item.contentType === 'MultipleChoice' && item.select === 'single') {
+      return cloneMultipleChoiceQuestion(this);
+    }
+    if (item.contentType === 'Numeric'
+      || item.contentType === 'Text'
+      || item.contentType === 'FillInTheBlank') {
+      return cloneInputQuestion(this);
+    }
+
+    // All other question types can get by with just a top-down clone:
+    return this.with({
+      id: createGuid(),
+      body: this.body.clone(),
+      explanation: this.explanation.clone(),
+      items: this.items.map(i => i.clone()).toOrderedMap(),
+      parts: this.parts.map(p => p.clone()).toOrderedMap(),
+    });
   }
 
   with(values: QuestionParams) {

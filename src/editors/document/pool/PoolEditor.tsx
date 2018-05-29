@@ -17,6 +17,7 @@ import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTe
 import { ContiguousText } from 'data/content/learning/contiguous';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
+import createGuid from 'utils/guid';
 
 import './PoolEditor.scss';
 
@@ -59,6 +60,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.onDuplicateNode = this.onDuplicateNode.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -180,6 +182,15 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   }
 
+  onDuplicateNode() {
+    if (this.state.currentNode.contentType === 'Question') {
+      const duplicated = this.state.currentNode.clone().with({
+        guid: createGuid(),
+      });
+      this.addQuestion(duplicated);
+    }
+  }
+
   render() {
     const { context, services, editMode, model, onEdit } = this.props;
 
@@ -233,7 +244,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 {renderAssessmentNode(
                   this.state.currentNode, assesmentNodeProps, this.onEdit,
                   this.onRemove, this.onFocus,
-                  true, null)}
+                  true, this.onDuplicateNode, null)}
               </div>
             </div>
           </div>

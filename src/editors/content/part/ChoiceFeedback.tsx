@@ -126,21 +126,30 @@ export abstract class ChoiceFeedback
   }
 
   onEditMatchSelections(responseId, choices, selected) {
-    const { model, onEdit } = this.props;
 
-    onEdit(
-      model.with({
-        responses: model.responses.set(
-          responseId,
-          model.responses.get(responseId).with({
-            match: selected.map(id =>
-              choices.find(c => c.guid === id).value,
-            )
-            .join(','),
-          }),
-        ),
-      }),
-      null);
+    const { model, onGetChoiceCombinations, onEdit } = this.props;
+
+    const updatedPart = model.with({
+      responses: model.responses.set(
+        responseId,
+        model.responses.get(responseId).with({
+          match: selected.map(id =>
+            choices.find(c => c.guid === id).value,
+          )
+          .join(','),
+        }),
+      ),
+    });
+
+    const updatedModel = modelWithDefaultFeedback(
+      updatedPart,
+      choices,
+      getGeneratedResponseBody(updatedPart),
+      getGeneratedResponseScore(updatedPart),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+    onEdit(updatedModel, null);
   }
 
   getSelectedMatches(response, choices) {

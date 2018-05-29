@@ -14,6 +14,7 @@ import './SelectionEditor.scss';
 
 export interface SelectionProps extends AbstractContentEditorProps<contentTypes.Selection> {
   onRemove: (guid: string) => void;
+  onDuplicate?: () => void;
   isParentAssessmentGraded?: boolean;
   allSkills: Immutable.OrderedMap<string, Skill>;
 }

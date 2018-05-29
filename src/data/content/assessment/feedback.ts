@@ -30,6 +30,12 @@ export class Feedback extends Immutable.Record(defaultContent) {
     super(augment(params));
   }
 
+  clone() : Feedback {
+    return this.with({
+      body: this.body.clone(),
+    });
+  }
+
   with(values: FeedbackParams) {
     return this.merge(values) as this;
   }

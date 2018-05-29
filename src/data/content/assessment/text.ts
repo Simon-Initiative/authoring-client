@@ -1,5 +1,6 @@
 import * as Immutable from 'immutable';
 import { augment } from '../common';
+import createGuid from 'utils/guid';
 
 export type TextParams = {
   id? : string,
@@ -34,6 +35,12 @@ export class Text extends Immutable.Record(defaultContent) {
 
   constructor(params?: TextParams) {
     super(augment(params));
+  }
+
+  clone() : Text {
+    return this.with({
+      id: createGuid(),
+    });
   }
 
   with(values: TextParams) {

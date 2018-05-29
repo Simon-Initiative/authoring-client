@@ -340,7 +340,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
 
         <ToolbarLayout.Column maxWidth="100px">
           <ToolbarWideMenu
-            icon={<i className={'fa fa-table'} />}
+            icon={<i className={'fa fa-list'} />}
             label={'Lists'}
             disabled={!supportsAtLeastOne(
               'ul', 'ol')}>

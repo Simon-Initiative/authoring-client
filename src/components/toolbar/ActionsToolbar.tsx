@@ -33,16 +33,16 @@ export const ActionsToolbar = (({
     <React.Fragment>
       <ToolbarLayout.Column>
         <ToolbarButton
-          onClick={() => onUndo(documentId)}
-          disabled={!canUndo}
-          size={ToolbarButtonSize.Full}>
-          <i className={'fa fa-undo'} /> Undo
+            onClick={() => onUndo(documentId)}
+            disabled={!canUndo}
+            size={ToolbarButtonSize.Full}>
+          <i className={'fa fa-undo'}/> Undo
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => onRedo(documentId)}
-          disabled={!canRedo}
-          size={ToolbarButtonSize.Full}>
-          <i className={'fa fa-repeat'} /> Redo
+            onClick={() => onRedo(documentId)}
+            disabled={!canRedo}
+            size={ToolbarButtonSize.Full}>
+          <i className={'fa fa-repeat'}/> Redo
         </ToolbarButton>
       </ToolbarLayout.Column>
       <ToolbarLayout.Inline>
