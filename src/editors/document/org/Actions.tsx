@@ -1,5 +1,5 @@
 import * as React from 'react';
-import DeleteResourceModal from 'components/DeleteResourceModal';
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { OrganizationModel, CourseModel } from 'data/models';
 
 export interface Actions {
@@ -28,7 +28,7 @@ export class Actions
   }
 
   render() {
-    const { org, onDisplayModal, onDismissModal, course, dispatch, onDuplicate }
+    const { org, onDisplayModal, onDismissModal, course, onDuplicate }
       = this.props;
 
     return (
@@ -58,9 +58,8 @@ export class Actions
               onClick={() => onDisplayModal(
                 <DeleteResourceModal
                   resource={org}
-                  onDismissModal={onDismissModal}
                   course={course}
-                  dispatch={dispatch} />)}>
+                  onDismissModal={onDismissModal} />)}>
               Delete
             </button>
           </dt>

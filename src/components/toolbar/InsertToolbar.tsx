@@ -19,7 +19,7 @@ import { selectFile } from 'editors/content/learning/file';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
 import { styles } from './InsertToolbar.style';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
 
@@ -376,10 +376,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             <ToolbarButtonMenuItem
               onClick={() => onDisplayModal(
                 <ResourceSelection
-                  filterPredicate={(
-                    res: Resource): boolean =>
-                      res.type === LegacyTypes.inline
-                        && !res.deleted}
+                  filterPredicate={(res: Resource): boolean =>
+                    res.type === LegacyTypes.inline
+                      && !(res.resourceState === ResourceState.DELETED)}
                   courseId={context.courseId}
                   onInsert={(resource) => {
                     onDismissModal();
@@ -398,10 +397,9 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             <ToolbarButtonMenuItem
               onClick={() => onDisplayModal(
                 <ResourceSelection
-                  filterPredicate={(
-                    res: Resource): boolean =>
-                      res.type === LegacyTypes.assessment2
-                        && !res.deleted}
+                  filterPredicate={(res: Resource): boolean =>
+                    res.type === LegacyTypes.assessment2
+                      && !(res.resourceState === ResourceState.DELETED)}
                   courseId={context.courseId}
                   onInsert={(resource) => {
                     onDismissModal();

@@ -9,7 +9,7 @@ import createGuid from 'utils/guid';
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { insertNode } from '../../utils';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 
 export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
@@ -57,7 +57,7 @@ export class AddExistingWorkbookPageCommand extends AbstractCommand {
 
       const predicate = (res: Resource) : boolean =>
         res.type === LegacyTypes.workbook_page
-          && !res.deleted
+          && !(res.resourceState === ResourceState.DELETED)
           && !resourcesAlreadyInOrg.has(res.guid);
 
       return new Promise((resolve, reject) => {

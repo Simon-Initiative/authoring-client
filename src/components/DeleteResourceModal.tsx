@@ -5,16 +5,16 @@ import { Edge } from 'types/edge';
 import { OrderedMap } from 'immutable';
 import * as persistence from 'data/persistence';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
-import * as viewActions from 'actions/view';
 import { OrganizationModel, CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
 
 export interface DeleteResourceModalProps {
-  onDismissModal: () => void;
   resource: Resource | OrganizationModel;
   course: CourseModel;
-  dispatch: any;
+  onClickResource: (id: string) => void;
+  onDeleteResource: (resource: Resource | OrganizationModel, course: CourseModel) => void;
+  onDismissModal: () => void;
 }
 
 interface DeleteResourceModalState {
@@ -25,7 +25,6 @@ interface DeleteResourceModalState {
 
 export default class DeleteResourceModal extends
   React.Component<DeleteResourceModalProps, DeleteResourceModalState> {
-  viewActions: any;
 
   constructor(props) {
     super(props);
@@ -37,7 +36,6 @@ export default class DeleteResourceModal extends
     };
 
     this.onDelete = this.onDelete.bind(this);
-    this.clickResource = this.clickResource.bind(this);
   }
 
   componentDidMount() {
@@ -54,35 +52,10 @@ export default class DeleteResourceModal extends
   }
 
   onDelete() {
-    const { dispatch, course, resource, onDismissModal } = this.props;
+    const { course, resource, onDeleteResource } = this.props;
 
     persistence.deleteResource(course.guid, resource.guid)
-      .then((_) => {
-        switch (resource.type as LegacyTypes) {
-          case 'x-oli-workbook_page':
-            dispatch(viewActions.viewPages(course.guid));
-            onDismissModal();
-            break;
-          case 'x-oli-inline-assessment':
-            dispatch(viewActions.viewFormativeAssessments(course.guid));
-            onDismissModal();
-            break;
-          case 'x-oli-assessment2':
-            dispatch(viewActions.viewSummativeAssessments(course.guid));
-            onDismissModal();
-            break;
-          case 'x-oli-assessment2-pool':
-            dispatch(viewActions.viewPools(course.guid));
-            onDismissModal();
-            break;
-          case 'x-oli-organization':
-            dispatch(viewActions.viewOrganizations(course.guid));
-            onDismissModal();
-            break;
-          default:
-            return;
-        }
-      });
+      .then(_ =>  onDeleteResource(resource, course));
   }
 
   prettyPrintResourceType(type: LegacyTypes): string {
@@ -101,15 +74,8 @@ export default class DeleteResourceModal extends
     }
   }
 
-  clickResource(resourceId) {
-    const { dispatch, course, onDismissModal } = this.props;
-
-    dispatch(viewActions.viewDocument(resourceId, course.guid));
-    onDismissModal();
-  }
-
   render() {
-    const { course, resource, onDismissModal } = this.props;
+    const { course, resource, onDismissModal, onClickResource } = this.props;
     const { edges, edgesAreLoaded, edgeLoadFailure } = this.state;
 
     const resourceTypeUppercase = this.prettyPrintResourceType(resource.type as LegacyTypes);
@@ -161,7 +127,7 @@ export default class DeleteResourceModal extends
       id => edgeResource(id).title;
 
     const link = (edge: Edge) => (text: string) =>
-      <button onClick={this.clickResource.bind(this, edgeResource(edgeResourceId(edge)).guid)}
+      <button onClick={onClickResource.bind(this, edgeResource(edgeResourceId(edge)).guid, course)}
         className="btn btn-link">{text}</button>;
 
     const columnRenderers = [

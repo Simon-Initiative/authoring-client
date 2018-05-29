@@ -32,7 +32,7 @@ import Messages from './components/message/Messages.controller';
 import * as Msg from 'types/messages';
 import { getQueryVariableFromString } from 'utils/params';
 import * as messageActions from 'actions//messages';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
@@ -81,13 +81,13 @@ const resources = {
     'Organizations',
     LegacyTypes.organization,
     (resource: Resource) => resource.type === LegacyTypes.organization
-      && !resource.deleted,
+      && !(resource.resourceState === ResourceState.DELETED),
     createOrg),
   formativeassessments: res(
     'Formative Assessments',
     LegacyTypes.inline,
     (resource: Resource) => resource.type === LegacyTypes.inline
-      && !resource.deleted,
+      && !(resource.resourceState === ResourceState.DELETED),
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
@@ -96,7 +96,7 @@ const resources = {
     'Summative Assessments',
     LegacyTypes.assessment2,
     (resource: Resource) => resource.type === LegacyTypes.assessment2
-      && !resource.deleted,
+      && !(resource.resourceState === ResourceState.DELETED),
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
@@ -106,7 +106,7 @@ const resources = {
     LegacyTypes.workbook_page,
     (resource: Resource) => resource.type === LegacyTypes.workbook_page
       && resource.id !== PLACEHOLDER_ITEM_ID
-      && !resource.deleted,
+      && !(resource.resourceState === ResourceState.DELETED),
     (courseId, title, type) => models.WorkbookPageModel.createNew(
       guid(), title, 'This is a new page with empty content'),
   ),
@@ -114,7 +114,7 @@ const resources = {
     'Question Pools',
     LegacyTypes.assessment2_pool,
     (resource: Resource) => resource.type === LegacyTypes.assessment2_pool
-      && !resource.deleted,
+      && !(resource.resourceState === ResourceState.DELETED),
     (courseId, title, type) => {
       const q = new contentTypes.Question();
       const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);

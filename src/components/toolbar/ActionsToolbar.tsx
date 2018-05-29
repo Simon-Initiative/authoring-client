@@ -3,7 +3,7 @@ import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
-import DeleteResourceModal from 'components/DeleteResourceModal';
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
 
 export interface ActionsToolbarProps {
@@ -58,9 +58,8 @@ export const ActionsToolbar = (({
           onClick={() => onDisplayModal(
             <DeleteResourceModal
               resource={documentResource}
-              onDismissModal={onDismissModal}
               course={course}
-              dispatch={onDispatch} />)}
+              onDismissModal={onDismissModal} />)}
           size={ToolbarButtonSize.Large}
           tooltip="Delete this Page"
           disabled={false}>
