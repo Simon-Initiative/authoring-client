@@ -9,7 +9,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  dispatch: (...args: any[]) => any;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
 }
@@ -27,7 +26,6 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    dispatch,
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
   };

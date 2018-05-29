@@ -12,7 +12,6 @@ export interface ActionsProps {
   onDismissModal: () => void;
   org: OrganizationModel;
   course: CourseModel;
-  dispatch: any;
 }
 
 export interface ActionsState {
