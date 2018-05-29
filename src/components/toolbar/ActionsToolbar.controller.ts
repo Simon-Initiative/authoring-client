@@ -19,7 +19,6 @@ interface DispatchProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
-  onDispatch: (...args: any[]) => any;
 }
 
 interface OwnProps {
@@ -53,7 +52,6 @@ const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): Disp
     onRedo: (documentId: string) => {
       return dispatch(redo(documentId));
     },
-    onDispatch: dispatch,
   };
 };
 
