@@ -57,7 +57,7 @@ export class Actions
               className="btn btn-block btn-danger"
               onClick={() => onDisplayModal(
                 <DeleteResourceModal
-                  resource={org}
+                  resource={org.resource}
                   course={course}
                   onDismissModal={onDismissModal} />)}>
               Delete

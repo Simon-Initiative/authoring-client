@@ -23,7 +23,6 @@ export type OrganizationModelParams = {
   preferenceValues?: Maybe<Object>;
   labels?: contentTypes.Labels;
   sequences?: contentTypes.Sequences;
-  resourceState?: ResourceState;
 };
 const defaultOrganizationModelParams = {
   modelType: 'OrganizationModel',
@@ -42,7 +41,6 @@ const defaultOrganizationModelParams = {
   preferenceValues: Maybe.nothing<Object>(),
   labels: new contentTypes.Labels(),
   sequences: new contentTypes.Sequences(),
-  resourceState: ResourceState.ACTIVE,
 };
 
 
@@ -64,7 +62,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
   preferenceValues: Maybe<Object>;
   labels: contentTypes.Labels;
   sequences: contentTypes.Sequences;
-  resourceState: ResourceState;
 
   constructor(params?: OrganizationModelParams) {
     params ? super(params) : super();
@@ -84,7 +81,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
       guid: a.guid,
       type: a.type,
       title: a.title,
-      resourceState: a.resourceState ? a.resourceState : ResourceState.ACTIVE,
     });
 
     if (a.lock !== undefined && a.lock !== null) {
@@ -164,7 +160,6 @@ export class OrganizationModel extends Immutable.Record(defaultOrganizationModel
         '@id': this.resource.id,
         '@version': this.version,
         '#array': children,
-        resourceState: this.resourceState,
       },
     }];
 

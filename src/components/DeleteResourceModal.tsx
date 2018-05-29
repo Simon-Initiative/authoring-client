@@ -12,7 +12,6 @@ import { LegacyTypes } from 'data/types';
 export interface DeleteResourceModalProps {
   resource: Resource;
   course: CourseModel;
-  onClickResource: (id: string, course: CourseModel) => void;
   onDeleteResource: (resource: Resource, course: CourseModel) => void;
   onDismissModal: () => void;
 }
@@ -127,8 +126,8 @@ export default class DeleteResourceModal extends
       id => edgeResource(id).title;
 
     const link = (edge: Edge) => (text: string) =>
-      <button onClick={onClickResource.bind(this, edgeResource(edgeResourceId(edge)).guid, course)}
-        className="btn btn-link">{text}</button>;
+      <a href={`/#${edgeResource(edgeResourceId(edge)).guid}-${course.guid}`}
+        className="btn btn-link">{text}</a>;
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(edgeResourceTitle(edgeResourceId(edge))),
