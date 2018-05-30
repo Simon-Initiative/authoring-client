@@ -10,6 +10,7 @@ import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { LegacyTypes } from 'data/types';
+import { ResourceState } from 'data/content/resource';
 
 export interface ActivityLinkEditorProps
   extends AbstractContentEditorProps<contentTypes.ActivityLink> {
@@ -40,7 +41,7 @@ export default class ActivityLinkEditor
 
     const highStakesOptions = context.courseModel.resources
       .toArray()
-      .filter(resource => resource.type === LegacyTypes.assessment2)
+      .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (

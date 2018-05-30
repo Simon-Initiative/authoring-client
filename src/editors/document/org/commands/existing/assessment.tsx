@@ -35,7 +35,7 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2
-        && !(res.resourceState === ResourceState.DELETED);
+        && res.resourceState !== ResourceState.DELETED;
 
     return new Promise((resolve, reject) => {
       services.displayModal(

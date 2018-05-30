@@ -81,13 +81,13 @@ const resources = {
     'Organizations',
     LegacyTypes.organization,
     (resource: Resource) => resource.type === LegacyTypes.organization
-      && !(resource.resourceState === ResourceState.DELETED),
+      && resource.resourceState !== ResourceState.DELETED,
     createOrg),
   formativeassessments: res(
     'Formative Assessments',
     LegacyTypes.inline,
     (resource: Resource) => resource.type === LegacyTypes.inline
-      && !(resource.resourceState === ResourceState.DELETED),
+      && resource.resourceState !== ResourceState.DELETED,
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
@@ -96,7 +96,7 @@ const resources = {
     'Summative Assessments',
     LegacyTypes.assessment2,
     (resource: Resource) => resource.type === LegacyTypes.assessment2
-      && !(resource.resourceState === ResourceState.DELETED),
+      && resource.resourceState !== ResourceState.DELETED,
     (courseId, title, type) => new models.AssessmentModel({
       type,
       title: contentTypes.Title.fromText(title),
@@ -106,7 +106,7 @@ const resources = {
     LegacyTypes.workbook_page,
     (resource: Resource) => resource.type === LegacyTypes.workbook_page
       && resource.id !== PLACEHOLDER_ITEM_ID
-      && !(resource.resourceState === ResourceState.DELETED),
+      && resource.resourceState !== ResourceState.DELETED,
     (courseId, title, type) => models.WorkbookPageModel.createNew(
       guid(), title, 'This is a new page with empty content'),
   ),
@@ -114,7 +114,7 @@ const resources = {
     'Question Pools',
     LegacyTypes.assessment2_pool,
     (resource: Resource) => resource.type === LegacyTypes.assessment2_pool
-      && !(resource.resourceState === ResourceState.DELETED),
+      && resource.resourceState !== ResourceState.DELETED,
     (courseId, title, type) => {
       const q = new contentTypes.Question();
       const questions = Immutable.OrderedMap<string, contentTypes.Question>().set(q.guid, q);

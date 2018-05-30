@@ -1,4 +1,4 @@
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import * as React from 'react';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { Edge } from 'types/edge';
@@ -43,18 +43,38 @@ export default class DeleteResourceModal extends
     persistence.fetchWebContentReferences(course.guid, {}, true, resource.guid)
       .then((edges) => {
         this.setState({
-          edges: OrderedMap<string, Edge>(edges.map(e => [e.guid, e])),
+          edges: OrderedMap<string, Edge>(
+            edges
+              // filter out deleted resources
+              .filter(edge => this.edgeResource(this.edgeResourceId(edge)).resourceState
+                !== ResourceState.DELETED)
+              .map(e => [e.guid, e]),
+          ),
           edgesAreLoaded: true,
         });
       })
       .catch(err => this.setState({ edgeLoadFailure: true }));
   }
 
+  // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
+  // in the form '{courseId}:{version}:{resourceId}'.
+  edgeResourceId(edge: Edge): string {
+    return edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
+  }
+
+  edgeResource(resourceId: string): Resource {
+    return this.props.course.resourcesById.get(resourceId);
+  }
+
+  edgeResourceTitle(id: string): string {
+    return this.edgeResource(id).title;
+  }
+
   onDelete() {
     const { course, resource, onDeleteResource } = this.props;
 
     persistence.deleteResource(course.guid, resource.guid)
-      .then(_ =>  onDeleteResource(resource, course));
+      .then(_ => onDeleteResource(resource, course));
   }
 
   prettyPrintResourceType(type: LegacyTypes): string {
@@ -89,8 +109,8 @@ export default class DeleteResourceModal extends
 
     const safeCompare =
       (key: string, direction: SortDirection, a: Edge, b: Edge): number => {
-        const aValue = key === 'title' ? edgeResourceTitle(edgeResourceId(a)) : a[key];
-        const bValue = key === 'title' ? edgeResourceTitle(edgeResourceId(b)) : b[key];
+        const aValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(a)) : a[key];
+        const bValue = key === 'title' ? this.edgeResourceTitle(this.edgeResourceId(b)) : b[key];
 
         if (aValue === null && bValue === null) {
           return 0;
@@ -114,23 +134,12 @@ export default class DeleteResourceModal extends
       (direction, a, b) => safeCompare('sourceType', direction, a, b),
     ];
 
-    // Edge sourceId looks like 'javascript-evz4jsnu:1.0:welcome',
-    // in the form '{courseId}:{version}:{resourceId}'.
-    const edgeResourceId: (edge: Edge) => string =
-      edge => edge.sourceId.slice(edge.sourceId.lastIndexOf(':') + 1);
-
-    const edgeResource: (resourceId: string) => Resource =
-      resourceId => course.resourcesById.get(resourceId);
-
-    const edgeResourceTitle: (id: string) => string =
-      id => edgeResource(id).title;
-
     const link = (edge: Edge) => (text: string) =>
-      <a href={`/#${edgeResource(edgeResourceId(edge)).guid}-${course.guid}`}
+      <a href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
         className="btn btn-link">{text}</a>;
 
     const columnRenderers = [
-      (edge: Edge) => link(edge)(edgeResourceTitle(edgeResourceId(edge))),
+      (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
       (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
     ];
 

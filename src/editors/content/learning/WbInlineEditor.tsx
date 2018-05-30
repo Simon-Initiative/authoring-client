@@ -11,6 +11,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 
 import './WbInline.scss';
+import { ResourceState } from 'data/content/resource';
 
 export interface WbInlineEditorProps extends AbstractContentEditorProps<contentTypes.WbInline> {
   onShowSidebar: () => void;
@@ -59,7 +60,7 @@ export default class WbInlineEditor
   renderSidebar() {
     const inlineAssessmentOptions = this.props.context.courseModel.resources
       .toArray()
-      .filter(r => r.type === LegacyTypes.inline)
+      .filter(r => r.type === LegacyTypes.inline && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (
