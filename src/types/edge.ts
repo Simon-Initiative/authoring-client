@@ -1,3 +1,5 @@
+import { LegacyTypes } from 'data/types';
+
 type PathElement = {
   name: string;
   parent: PathElement;
@@ -7,10 +9,12 @@ export type Edge = {
   rev: number;
   guid: string;
   relationship: string;
+  sourceGuid: string;
   sourceId: string;
-  sourceType: string;
+  sourceType: LegacyTypes;
+  destinationGuid: string;
   destinationId: string;
-  destinationType: string;
+  destinationType: LegacyTypes;
   referenceType: string;
   status: string;
   metadata: {

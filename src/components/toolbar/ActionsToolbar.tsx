@@ -3,9 +3,11 @@ import { ComponentProps } from 'types/component';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
+import { CourseModel } from 'data/models';
 
 export interface ActionsToolbarProps {
-  courseId: string;
+  course: CourseModel;
   documentResource: Resource;
   documentId: string;
   canUndo: boolean;
@@ -15,14 +17,17 @@ export interface ActionsToolbarProps {
   onPreview: (courseId: string, resource: Resource) => Promise<any>;
   onUndo: (documentId: string) => void;
   onRedo: (documentId: string) => void;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
 }
 
 /**
  * ActionsToolbar React Stateless Component
  */
 export const ActionsToolbar = (({
-  courseId, documentResource, documentId, canUndo, canRedo,
+  course, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onPreview, onUndo, onRedo,
+  onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
   return (
     <React.Fragment>
@@ -42,29 +47,32 @@ export const ActionsToolbar = (({
       </ToolbarLayout.Column>
       <ToolbarLayout.Inline>
         <ToolbarButton
-            onClick={() => onShowPageDetails()}
-            tooltip="View and Edit Page Details"
-            size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-info-circle"/></div>
+          onClick={() => onShowPageDetails()}
+          tooltip="View and Edit Page Details"
+          size={ToolbarButtonSize.Large}>
+          <div><i className="fa fa-info-circle" /></div>
           <div>Details</div>
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => console.log('NOT IMPLEMENTED')}
-            size={ToolbarButtonSize.Large}
-            tooltip="Delete this Page"
-            disabled>
-          <div><i className="fa fa-trash-o"/></div>
-          <div>Delete</div>
+          onClick={() => onDisplayModal(
+            <DeleteResourceModal
+              resource={documentResource}
+              course={course}
+              onDismissModal={onDismissModal} />)}
+          size={ToolbarButtonSize.Large}
+          tooltip="Delete this Page">
+          <div><i className="fa fa-trash-o" /></div>
+        <div>Delete</div>
         </ToolbarButton>
-        <ToolbarButton
-            onClick={() => onPreview(courseId, documentResource)}
-            tooltip="Preview this Page"
-            disabled={!canPreview}
-            size={ToolbarButtonSize.Large}>
-          <div><i className="fa fa-eye"/></div>
-          <div>Preview</div>
-        </ToolbarButton>
+      <ToolbarButton
+        onClick={() => onPreview(course.id, documentResource)}
+        tooltip="Preview this Page"
+        disabled={!canPreview}
+        size={ToolbarButtonSize.Large}>
+        <div><i className="fa fa-eye" /></div>
+        <div>Preview</div>
+      </ToolbarButton>
       </ToolbarLayout.Inline>
-    </React.Fragment>
+    </React.Fragment >
   );
 });

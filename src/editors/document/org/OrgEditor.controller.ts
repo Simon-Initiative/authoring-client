@@ -28,12 +28,8 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    onUndo: (documentId: string) => {
-      return dispatch(undo(documentId));
-    },
-    onRedo: (documentId: string) => {
-      return dispatch(redo(documentId));
-    },
+    onUndo: (documentId: string) => dispatch(undo(documentId)),
+    onRedo: (documentId: string) => dispatch(redo(documentId)),
   };
 };
 

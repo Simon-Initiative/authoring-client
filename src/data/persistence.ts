@@ -35,3 +35,7 @@ export {
 export {
   fetchServerTime,
 } from './persistence/time';
+
+export {
+  deleteResource,
+} from './persistence/resource';

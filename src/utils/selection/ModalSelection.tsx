@@ -6,6 +6,7 @@ interface ModalSelection {
 
 export interface ModalSelectionProps {
   okLabel?: string;
+  okClassName?: string;
   cancelLabel?: string;
   disableInsert?: boolean;
   title: string;
@@ -29,6 +30,8 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
       ? this.props.okLabel : 'Insert';
     const cancelLabel = this.props.cancelLabel !== undefined
       ? this.props.cancelLabel : 'Cancel';
+    const okClassName = this.props.okClassName !== undefined
+      ? this.props.okClassName : 'primary';
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
@@ -49,7 +52,7 @@ class ModalSelection extends React.PureComponent<ModalSelectionProps, {}> {
                 disabled={disableInsert}
                 type="button"
                 onClick={(e) => { e.preventDefault(); this.props.onInsert(); } }
-                className="btn btn-primary">{okLabel}</button>
+                className={`btn btn-${okClassName}`}>{okLabel}</button>
               <button type="button" className="btn btn-link"
                 onClick={(e) => { e.preventDefault(); this.props.onCancel(); } }
                 data-dismiss="modal">{cancelLabel}</button>

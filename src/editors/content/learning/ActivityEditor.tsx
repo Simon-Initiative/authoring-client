@@ -13,6 +13,7 @@ import { injectSheet } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 
 import { styles } from './Activity.styles';
+import { ResourceState } from 'data/content/resource';
 
 export interface ActivityEditorProps extends AbstractContentEditorProps<contentTypes.Activity> {
   onShowSidebar: () => void;
@@ -62,7 +63,7 @@ export default class ActivityEditor
   renderSidebar() {
     const activityOptions = this.props.context.courseModel.resources
       .toArray()
-      .filter(r => r.type === LegacyTypes.assessment2)
+      .filter(r => r.type === LegacyTypes.assessment2 && r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (
