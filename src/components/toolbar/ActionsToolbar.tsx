@@ -25,7 +25,7 @@ export interface ActionsToolbarProps {
  * ActionsToolbar React Stateless Component
  */
 export const ActionsToolbar = (({
-  course, courseId, documentResource, documentId, canUndo, canRedo,
+  course, documentResource, documentId, canUndo, canRedo,
   canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
   onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
@@ -65,7 +65,7 @@ export const ActionsToolbar = (({
         <div>Delete</div>
       </ToolbarButton>
       <ToolbarButton
-        onClick={() => onQuickPreview(courseId, documentResource)}
+        onClick={() => onQuickPreview(course.guid, documentResource)}
         tooltip="Preview this Page"
         disabled={!canPreview}
         size={ToolbarButtonSize.Large}>
