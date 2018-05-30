@@ -29,7 +29,7 @@ export class Actions
   }
 
   render() {
-    const { org, onDisplayModal, onDismissModal, course, onDuplicate }
+    const { org, onDisplayModal, onDismissModal, course }
       = this.props;
 
     return (
@@ -43,7 +43,7 @@ export class Actions
               <button
                 className="btn btn-block btn-primary"
                 onClick={() =>
-                  this.props.onPreview(this.props.course.guid, this.props.organization)}>
+                  this.props.onPreview(this.props.course.guid, this.props.org)}>
                 Publish
               </button>
             </dt>
