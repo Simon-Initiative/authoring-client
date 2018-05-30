@@ -20,7 +20,7 @@ import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
 import createGuid from 'utils/guid';
@@ -306,17 +306,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onSelectPool() {
 
-    const predicate =
-      (res: Resource) : boolean => {
-        return res.type === LegacyTypes.assessment2_pool;
-      };
+    const predicate = (res: Resource): boolean =>
+      res.type === LegacyTypes.assessment2_pool
+        && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
-        <ResourceSelection
-          filterPredicate={predicate}
-          courseId={this.props.context.courseId}
-          onInsert={this.onInsertPool}
-          onCancel={this.onCancelSelectPool}/>);
+      <ResourceSelection
+        filterPredicate={predicate}
+        courseId={this.props.context.courseId}
+        onInsert={this.onInsertPool}
+        onCancel={this.onCancelSelectPool}/>);
   }
 
   onCancelSelectPool() {

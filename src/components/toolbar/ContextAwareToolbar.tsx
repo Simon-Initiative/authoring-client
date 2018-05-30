@@ -262,7 +262,10 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
           <ActionsToolbar
             documentResource={resource}
             documentId={context.documentId}
-            canPreview={canPreview} />
+            canPreview={canPreview}
+            onDisplayModal={onDisplayModal}
+            onDismissModal={onDismissModal}
+          />
         </ToolbarGroup>
       </div>
     );

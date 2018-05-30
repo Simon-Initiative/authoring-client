@@ -3,7 +3,7 @@ import * as models from 'data/models';
 import * as t from 'data/contentTypes';
 import createGuid from 'utils/guid';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import { insertNode } from '../../utils';
 import { LegacyTypes } from 'data/types';
 
@@ -33,9 +33,9 @@ export class AddExistingAssessmentCommand extends AbstractCommand {
     parent: t.Sequences | t.Sequence | t.Unit | t.Module  | t.Section | t.Item | t.Include,
     context, services) : Promise<models.OrganizationModel> {
 
-    const predicate = (res: Resource) : boolean => {
-      return res.type === LegacyTypes.assessment2;
-    };
+    const predicate = (res: Resource): boolean =>
+      res.type === LegacyTypes.assessment2
+        && res.resourceState !== ResourceState.DELETED;
 
     return new Promise((resolve, reject) => {
       services.displayModal(

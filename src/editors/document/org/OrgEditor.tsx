@@ -12,7 +12,7 @@ import { collapseNodes, expandNodes } from '../../../actions/expand';
 import { SourceNodeType } from '../../content/org/drag/utils';
 import { insertNode, removeNode, updateNode } from './utils';
 import { TreeNode } from './TreeNode';
-import { Actions } from './Actions';
+import { Actions } from './Actions.controller';
 import { Details } from './Details';
 import { LabelsEditor } from '../../content/org/LabelsEditor';
 import { Title } from 'types/course';
@@ -428,15 +428,17 @@ class OrgEditor extends AbstractEditor<models.OrganizationModel,
   }
 
   renderActions() {
-    const dupe = () => this.props.dispatch(
+    const { dispatch, model, context } = this.props;
+
+    const dupe = () => dispatch(
       duplicateOrganization(
-        this.props.context.courseId,
-        this.props.model, this.props.context.courseModel));
+        context.courseId,
+        model, context.courseModel));
 
     return (
       <Actions
         onDuplicate={dupe}
-        organization={this.props.model}
+        org={model}
         course={this.props.course}
         onPreview={this.props.onPreview}
       />);

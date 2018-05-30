@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { OrganizationModel, CourseModel } from 'data/models';
 import { CourseId } from 'data/types';
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 
 export interface Actions {
 
@@ -9,7 +10,9 @@ export interface Actions {
 export interface ActionsProps {
   onDuplicate: () => void;
   onPreview: (courseId: CourseId, organization: OrganizationModel) => Promise<any>;
-  organization: OrganizationModel;
+  onDisplayModal: (component: any) => void;
+  onDismissModal: () => void;
+  org: OrganizationModel;
   course: CourseModel;
 }
 
@@ -26,6 +29,8 @@ export class Actions
   }
 
   render() {
+    const { org, onDisplayModal, onDismissModal, course, onDuplicate }
+      = this.props;
 
     return (
       <div className="org-tab">
@@ -56,13 +61,21 @@ export class Actions
               Copy
             </button>
           </dt>
-
           <dd className="col-sm-10">
             <p>Permanently <strong>delete</strong> this organization from the course package. This
           operation cannot be undone.</p>
           </dd>
           <dt className="col-sm-2">
-            <button disabled className="btn btn-block btn-danger">Delete</button>
+            <button
+              disabled={false}
+              className="btn btn-block btn-danger"
+              onClick={() => onDisplayModal(
+                <DeleteResourceModal
+                  resource={org.resource}
+                  course={course}
+                  onDismissModal={onDismissModal} />)}>
+              Delete
+            </button>
           </dt>
 
         </dl>

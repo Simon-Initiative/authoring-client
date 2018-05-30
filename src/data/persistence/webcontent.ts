@@ -53,16 +53,20 @@ export function fetchWebContent(
  * Fetches all webcontent references for the course, returns a Promise to resolve to
  * a list of edges
  */
-export function fetchWebContentReferences(packageId: string, queryParams?: {
-  relationship?: string,
-  purpose?: string,
-  sourceId?: string,
-  sourceType?: string,
-  destinationId?: string,
-  destinationType?: string,
-  referenceType?: string,
-  status?: string,
-}): Promise<Edge[]> {
+export function fetchWebContentReferences(
+  packageId: string,
+  queryParams: {
+    relationship?: string,
+    purpose?: string,
+    sourceId?: string,
+    sourceType?: string,
+    destinationId?: string,
+    destinationType?: string,
+    referenceType?: string,
+    status?: string,
+  } = {},
+  byResource = false,
+  resourceId = ''): Promise<Edge[]> {
   const {
     relationship,
     purpose,
@@ -75,7 +79,10 @@ export function fetchWebContentReferences(packageId: string, queryParams?: {
   } = queryParams;
 
   const method = 'GET';
-  const url = `${configuration.baseUrl}/${packageId}/edges`;
+  const url = byResource
+    ? `${configuration.baseUrl}/${packageId}/resources/edges/${resourceId}`
+    : `${configuration.baseUrl}/${packageId}/edges`;
+
   const headers = getFormHeaders(credentials);
   const query = Object.assign(
     {},
