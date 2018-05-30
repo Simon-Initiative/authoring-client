@@ -15,7 +15,9 @@ interface DispatchProps {
 
 interface OwnProps {
   onDuplicate: () => void;
+  onPreview: (courseId: string, organization: OrganizationModel) => Promise<any>;
   org: OrganizationModel;
+  course: CourseModel;
 }
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {

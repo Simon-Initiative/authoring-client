@@ -64,6 +64,7 @@ export function login() {
 
 }
 
+
 function continuallyRefreshToken() {
   setTimeout(
     () => {
@@ -82,6 +83,7 @@ export function refreshTokenIfInvalid(within: number = WITHIN_FIVE_SECONDS) : Pr
       kc.updateToken(within).success((refreshed) => {
         if (refreshed) {
           credentials.token = kc.token;
+          // updateTokenCookie(credentials.token);
           resolve(true);
         } else {
           resolve(true);

@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { OrganizationModel, CourseModel } from 'data/models';
+import { CourseId } from 'data/types';
+import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 
 export interface Actions {
 
@@ -8,6 +9,7 @@ export interface Actions {
 
 export interface ActionsProps {
   onDuplicate: () => void;
+  onPreview: (courseId: CourseId, organization: OrganizationModel) => Promise<any>;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
   org: OrganizationModel;
@@ -27,7 +29,7 @@ export class Actions
   }
 
   render() {
-    const { org, onDisplayModal, onDismissModal, course, onDuplicate }
+    const { org, onDisplayModal, onDismissModal, course }
       = this.props;
 
     return (
@@ -35,17 +37,30 @@ export class Actions
 
         <dl className="row">
 
+          <dd className="col-sm-10"><strong>Publish</strong> the complete course package
+          using this organization to the OLI development server.</dd>
+            <dt className="col-sm-2 justify-content-right">
+              <button
+                className="btn btn-block btn-primary"
+                onClick={() =>
+                  this.props.onPreview(this.props.course.guid, this.props.org)}>
+                Publish
+              </button>
+            </dt>
+
+          <br/><br/>
+
           <dd className="col-sm-10">Create a <strong>copy</strong> of this organization.
           Changes you make to the structure
             of the copy (e.g. adding units, removing modules,
           renaming sections) will not be reflected in this original organization.</dd>
           <dt className="col-sm-2 justify-content-right">
             <button
-              onClick={onDuplicate}
+              onClick={this.props.onDuplicate}
               className="btn btn-block btn-primary">
               Copy
-        </button></dt>
-
+            </button>
+          </dt>
           <dd className="col-sm-10">
             <p>Permanently <strong>delete</strong> this organization from the course package. This
           operation cannot be undone.</p>

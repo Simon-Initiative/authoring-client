@@ -125,7 +125,7 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
   }
 
   render() {
-    const model = this.props.model;
+    const { model } = this.props;
 
     const isAdmin = hasRole('admin');
 
