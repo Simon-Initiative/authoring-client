@@ -179,29 +179,22 @@ export class AddQuestion
     const inputAssessmentId = guid();
 
     const newDndLayout = new DndLayout().with({
-      guid: guid(),
       initiatorGroup: new InitiatorGroup().with({
-        guid: guid(),
         initiators: Immutable.List<Initiator>().push(new Initiator().with({
-          guid: guid(),
           assessmentId: inputAssessmentId,
           text: 'New Choice',
         })),
       }),
       targetGroup: new TargetGroup().with({
-        guid: guid(),
         rows: [new ContentRow(), new ContentRow(), new ContentRow()].reduce(
           (accRows, newRow) => accRows.push(newRow.with({
-            guid: guid(),
             cols: [new Target(), new DndText(), new DndText()].reduce(
               (accCol, newCol) => accCol.push(
                 newCol.contentType === 'DndText'
                 ? newCol.with({
-                  guid: guid(),
                   text: 'Enter text or set as drop target',
                 })
                 : newCol.with({
-                  guid: guid(),
                   assessmentId: guid(),
                 })),
               Immutable.List<DndText | Target>(),
@@ -213,7 +206,6 @@ export class AddQuestion
     });
 
     const newCustom = new contentTypes.Custom().with({
-      guid: guid(),
       id: guid(),
       layout: '',
       layoutData: Maybe.just<DndLayout>(newDndLayout),
@@ -231,13 +223,11 @@ export class AddQuestion
     // create default items
     const matchValue = guid();
     const newChoice = new contentTypes.Choice().with({
-      guid: guid(),
       value: matchValue,
     });
     const newChoices = Immutable.OrderedMap<string, contentTypes.Choice>()
       .set(newChoice.guid, newChoice);
     const newFillInTheBlank = new contentTypes.FillInTheBlank().with({
-      guid: guid(),
       id: inputAssessmentId,
       choices: newChoices,
     });
@@ -246,7 +236,6 @@ export class AddQuestion
 
     // create default parts
     const newFeedback = new contentTypes.Feedback().with({
-      guid: guid(),
       body: ContentElements.fromText('Enter feedback here', '', ALT_FLOW_ELEMENTS),
     });
     const newFeedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>()
@@ -258,7 +247,6 @@ export class AddQuestion
       feedback: newFeedbacks,
     });
     const newPart = new contentTypes.Part().with({
-      guid: guid(),
       responses: Immutable.OrderedMap<string, contentTypes.Response>()
         .set(newResponse.guid, newResponse),
     });
@@ -270,7 +258,6 @@ export class AddQuestion
 
     const q = new contentTypes.Question()
       .with({
-        guid: guid(),
         id: guid(),
         body: newBody,
         items,
