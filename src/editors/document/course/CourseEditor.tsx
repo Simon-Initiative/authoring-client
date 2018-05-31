@@ -6,6 +6,8 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
+import { Theme } from 'data/persistence/package';
+import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
 
@@ -20,6 +22,7 @@ export interface CourseEditorProps {
 
 interface CourseEditorState {
   selectedDevelopers: UserInfo[];
+  themes: Theme[];
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -28,10 +31,19 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     this.state = {
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
+      themes: [],
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
     this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
+    this.onEditTheme = this.onEditTheme.bind(this);
+  }
+
+  componentDidMount() {
+    persistence.fetchCourseThemes(this.props.model.guid)
+      .then(themes => this.setState({
+        themes: themes.sort((a, b) => a.id.localeCompare(b.id)),
+      }));
   }
 
   componentWillReceiveProps(nextProps: CourseEditorProps) {
@@ -116,6 +128,41 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  renderThemes() {
+    const { themes } = this.state;
+
+    const option = (theme: Theme) =>
+      <option
+        key={theme.id}
+        value={theme.id}>
+        {theme.id + (theme.default ? ' (Default)' : '')}
+      </option>;
+
+    const options = themes.map(theme => option(theme));
+    const defaultTheme = themes.find(theme => theme.default);
+
+    return (
+      <Select
+        {...this.props}
+        className="themeSelect"
+        value={defaultTheme && defaultTheme.id}
+        onChange={this.onEditTheme}>
+        {options}
+      </Select>
+    );
+  }
+
+  onEditTheme(themeId: string) {
+    persistence.setCourseTheme(this.props.model.guid, themeId)
+      // Update the dropdown with the new default theme
+      .then(x => this.setState({
+        themes: this.state.themes.map(
+          theme => theme.id === themeId
+            ? Object.assign(theme, { default: true })
+            : Object.assign(theme, { default: false })),
+      }));
+  }
+
   removePackage() {
     persistence.deleteCoursePackage(this.props.model.guid)
       .then((document) => {
@@ -173,6 +220,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               <div className="row">
                 <div className="col-3">Team members</div>
                 <div className="col-9">{this.renderDevelopers()}</div>
+              </div>
+              <div className="row">
+                <div className="col-3">Theme</div>
+                <div className="col-9">{this.renderThemes()}</div>
               </div>
               <div className="row">
                 <div className="col-3">Version</div>

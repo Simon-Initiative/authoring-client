@@ -73,4 +73,24 @@ export function fetchCourseResources(courseId: string): Promise<CourseResource[]
 
 }
 
+export type Theme = {
+  id: string,
+  location: string,
+  default: boolean,
+};
+
+export function fetchCourseThemes(course: string): Promise<Theme[]> {
+  const url = `${configuration.baseUrl}/${course}/themes/available`;
+  const method = 'GET';
+
+  return authenticatedFetch({ url, method }) as Promise<Theme[]>;
+}
+
+export function setCourseTheme(course: string, theme: string): Promise<{}> {
+  const url = `${configuration.baseUrl}/packages/${course}/theme`;
+  const method = 'PUT';
+  const body = JSON.stringify({ theme });
+
+  return authenticatedFetch({ url, method, body });
+}
 

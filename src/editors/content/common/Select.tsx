@@ -2,6 +2,7 @@ import * as React from 'react';
 import guid from '../../../utils/guid';
 
 export type SelectProps = {
+  className?: string;
   label?: string;
   editMode: boolean;
   children?: any;
@@ -14,7 +15,7 @@ export const Select = (props: SelectProps) => {
   const select = <select disabled={!props.editMode}
     value={props.value}
     onChange={e => props.onChange(e.target.value)}
-    className="form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0" id={id}>
+    className={`form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0 ${props.className}`} id={id}>
     {props.children}
   </select>;
 
