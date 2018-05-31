@@ -8,14 +8,10 @@ import { TabContainer } from 'editors/content/common/TabContainer';
 import { DynaDropTargetItems } from '../items/DynaDropTargetItems';
 import { FillInTheBlank }
   from 'data/content/assessment/fill_in_the_blank';
-import { Text } from '../items/Text';
-import { Numeric } from '../items/Numeric';
 import { ContentContainer } from 'editors/content/container//ContentContainer';
-import { ActiveContext, TextSelection } from 'types/active';
-import { EntityTypes } from '../../../data/content/learning/common';
+import { ActiveContext } from 'types/active';
 import guid from 'utils/guid';
 import './DynaDropInput.scss';
-import { Button } from 'editors/content/common/Button';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Initiator } from 'data/content/assessment/dragdrop/initiator';
 import { Maybe } from 'tsmonad';
@@ -114,7 +110,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   }
 
   editInitiatorText(text: string, initiator: Initiator) {
-    const { model, onEdit, selectedInitiator, onBodyEdit } = this.props;
+    const { model, selectedInitiator, onBodyEdit } = this.props;
 
     const customElement = (model.body.content.find(c =>
       c.contentType === 'Custom') as contentTypes.Custom);
@@ -200,7 +196,7 @@ export class DynaDropInput extends Question<DynaDropInputProps, DynaDropInputSta
   }
 
   renderItemParts(): JSX.Element[] {
-    const { model, selectedInitiator, hideGradingCriteria, editMode, onRemove,
+    const { model, selectedInitiator, hideGradingCriteria,
       advancedScoring } = this.props;
 
     const itemIndex = model.items.toArray().findIndex(

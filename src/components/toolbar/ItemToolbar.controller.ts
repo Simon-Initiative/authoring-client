@@ -3,7 +3,6 @@ import { State } from 'reducers';
 import { ActiveContextState } from 'reducers/active';
 import { ItemToolbar } from './ItemToolbar';
 import { AppContext } from 'editors/common/AppContext';
-import { CourseModel } from 'data/models/course';
 import { remove } from 'actions/active';
 import { cut, copy, paste } from 'actions/clipboard';
 

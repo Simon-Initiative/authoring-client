@@ -1,20 +1,14 @@
 import * as React from 'react';
-import { OrderedMap } from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
     AbstractItemPartEditor, AbstractItemPartEditorProps,
     AbstractItemPartEditorState,
 } from '../common/AbstractItemPartEditor';
-import { Button } from '../common/controls';
-import guid from 'utils/guid';
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { ChoiceList, Choice,
-  updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { TextInput } from 'editors/content/common/TextInput';
-import { ContentElements } from 'data/content/common/elements';
 import { Initiator } from 'data/content/assessment/dragdrop/initiator';
 import {
   choiceAssessmentIdSort, responseAssessmentIdSort,
@@ -143,7 +137,6 @@ DynaDropTargetItems
   render() {
     const {
       editMode,
-      itemModel,
       initiator,
       advancedScoring,
       onEditInitiatorText,

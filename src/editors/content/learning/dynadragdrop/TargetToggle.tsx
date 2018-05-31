@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheetSFC, classNames } from 'styles/jss';
 

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
-import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { DragTypes } from 'utils/drag';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 import { TargetToggle } from './TargetToggle';

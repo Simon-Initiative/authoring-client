@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { classNames } from 'styles/jss';
 
 import './Remove.scss';
 

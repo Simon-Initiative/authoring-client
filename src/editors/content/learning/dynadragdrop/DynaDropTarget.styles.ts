@@ -1,7 +1,6 @@
 import { JSSStyles } from 'styles/jss';
 import { disableSelect } from 'styles/mixins';
 import colors from 'styles/colors';
-import distinct from 'styles/palettes/distinct';
 
 export const styles: JSSStyles = {
   dynaDropTarget: {

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import * as Immutable from 'immutable';
+import { DragSource } from 'react-dnd';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames } from 'styles/jss';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
@@ -69,12 +68,12 @@ export class Initiator
   }
 
   render() {
-    const { className, classes, children, model, editMode, selected,
+    const { classes, model, editMode, selected,
       connectDragSource, connectDragPreview, onSelect, onRemove,
       onDelete } = this.props;
     let { canDelete } = this.props;
 
-    if (canDelete !== false) {
+    if (canDelete) {
       canDelete = true;
     }
 

@@ -48,7 +48,7 @@ export class ContentDecorator
 
   render() {
     const {
-      classes, isActiveContent, contentType, hideContentLabel,
+      classes, isActiveContent, contentType,
       children, onSelect, onMouseOver, isHoveringContent, className,
     } = this.props;
 

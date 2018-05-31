@@ -3,7 +3,6 @@ import * as Immutable from 'immutable';
 import * as contentTypes from '../../../data/contentTypes';
 import guid from '../../../utils/guid';
 import { ContentElements } from 'data/content/common/elements';
-import { ContentElement } from 'data/content/common/interfaces';
 import { QUESTION_BODY_ELEMENTS, ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
 import { InitiatorGroup } from 'data/content/assessment/dragdrop/initiator_group';

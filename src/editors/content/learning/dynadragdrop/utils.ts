@@ -2,7 +2,7 @@ import * as Immutable from 'immutable';
 import { Custom } from 'data/content/assessment/custom';
 import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
-import { Page, Question, Node, Item, Part, Choice, Response, ContiguousText,
+import { Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
 import { Target } from 'data/content/assessment/dragdrop/target';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';

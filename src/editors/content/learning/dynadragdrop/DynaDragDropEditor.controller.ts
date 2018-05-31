@@ -4,7 +4,6 @@ import { DynaDragDropEditor } from './DynaDragDropEditor';
 import { AssessmentModel } from 'data/models';
 import { Page, Node, Question } from 'data/contentTypes';
 import { save } from 'actions/document';
-import { EditedDocument } from 'types/document';
 import { selectInitiator } from 'actions/dynadragdrop';
 import { AbstractContentEditorProps } from '../../common/AbstractContentEditor';
 import { Custom } from 'data/content/assessment/custom';

@@ -6,7 +6,6 @@ import {
   CLEAR_INITIATOR,
 } from 'actions/dynadragdrop';
 import { OtherAction } from './utils';
-import { isNullOrUndefined } from 'util';
 
 export type ActionTypes = SelectInitiatorAction | ClearInitiatorAction | OtherAction;
 export type DynaDragDrop = Map<string, string>;

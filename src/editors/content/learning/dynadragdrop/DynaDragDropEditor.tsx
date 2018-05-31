@@ -10,31 +10,26 @@ import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controlle
 import { ToolbarGroup } from 'components/toolbar/ContextAwareToolbar';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { TG_ROW } from 'data/content/assessment/dragdrop/target_group';
-import { convert } from 'utils/format';
 import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/initiator';
 import { Initiator } from './Initiator';
 import { DynaDropLabel } from './DynaDropLabel';
 import { DynaDropTarget } from './DynaDropTarget.controller';
 import { Button } from 'editors/content/common/Button';
-import { Page, Question, Node, Item, Part, Choice, Response, ContiguousText,
+import { Page, Question, Part, Choice, Response,
   FillInTheBlank } from 'data/contentTypes';
 import { AssessmentModel } from 'data/models';
 import guid from 'utils/guid';
 import { Target } from 'data/content/assessment/dragdrop/target';
 import { Maybe } from 'tsmonad';
 import { DndLayout } from 'data/content/assessment/dragdrop/dnd_layout';
-import { DndText, DndTextParams } from 'data/content/assessment/dragdrop/dnd_text';
+import { DndText } from 'data/content/assessment/dragdrop/dnd_text';
 import { ContentRow } from 'data/content/assessment/dragdrop/content_row';
-import { ContiguousTextMode } from 'data/content/learning/contiguous';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
-import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { Feedback } from 'data/content/assessment/feedback';
 import {
-  choiceAssessmentIdSort, setQuestionPartWithInitiatorScore, updateItemPartsFromTargets,
+  setQuestionPartWithInitiatorScore, updateItemPartsFromTargets,
   getTargetsFromLayout, buildTargetLabelsMap, buildTargetInitiatorsMap,
 } from 'editors/content/learning/dynadragdrop/utils';
-import { ContentTypes } from 'data/content/org/types';
-import { throttle } from 'utils/timing';
 import { ToolbarDropdown, ToolbarDropdownSize } from 'components/toolbar/ToolbarDropdown';
 
 import { styles } from './DynaDragDropEditor.styles';
@@ -138,7 +133,7 @@ export class DynaDragDropEditor
   }
 
   addInitiator() {
-    const { model, currentNode, onEdit } = this.props;
+    const { model, currentNode } = this.props;
     const question = currentNode;
 
     const newInitiator = new InitiatorModel().with({
@@ -290,8 +285,7 @@ export class DynaDragDropEditor
   }
 
   onAddColumn(index: number) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
+    const { model } = this.props;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -425,8 +419,7 @@ export class DynaDragDropEditor
   }
 
   editColText(text: string, currentCol: DndText) {
-    const { model, currentNode } = this.props;
-    const question = currentNode;
+    const { model } = this.props;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({

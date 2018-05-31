@@ -4,7 +4,6 @@ import { QuestionProps } from './Question';
 import { DynaDropInput } from './DynaDropInput';
 import { State } from 'reducers';
 import { ActiveContext } from 'types/active';
-import { selectInitiator } from 'actions/dynadragdrop';
 import { toggleAdvancedScoring } from 'actions/questionEditor';
 
 interface StateProps {
