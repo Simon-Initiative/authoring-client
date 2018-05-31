@@ -7,6 +7,7 @@ import { Initiator as InitiatorModel } from 'data/content/assessment/dragdrop/in
 import { DragHandle } from 'components/common/DragHandle';
 import { DragTypes } from 'utils/drag';
 import { Remove } from 'components/common/Remove';
+import { Tooltip } from 'utils/tooltip';
 
 import { styles } from './Initiator.styles';
 
@@ -15,6 +16,7 @@ export interface InitiatorProps {
   model: InitiatorModel;
   editMode: boolean;
   selected?: boolean;
+  canDelete?: boolean;
   onSelect?: (id: string) => void;
   onRemove?: (guid: string) => void;
   onDelete?: (guid: string) => void;
@@ -70,6 +72,11 @@ export class Initiator
     const { className, classes, children, model, editMode, selected,
       connectDragSource, connectDragPreview, onSelect, onRemove,
       onDelete } = this.props;
+    let { canDelete } = this.props;
+
+    if (canDelete !== false) {
+      canDelete = true;
+    }
 
     return connectDragSource(connectDragPreview(
       <div
@@ -88,23 +95,33 @@ export class Initiator
         {model.text}
 
         {onRemove &&
-          <Remove
-            className={classes.removeBtn}
-            editMode={editMode}
-            onRemove={(e) => {
-              e.stopPropagation();
-              onRemove(model.guid);
-            }} />
+          <Tooltip title="Remove choice from target" delay={1000}>
+            <Remove
+              className={classes.removeBtn}
+              editMode={editMode}
+              onRemove={(e) => {
+                e.stopPropagation();
+                onRemove(model.guid);
+              }} />
+          </Tooltip>
         }
         {onDelete &&
-          <Remove
-            className={classes.removeBtn}
-            customIcon="fa fa-trash"
-            editMode={editMode}
-            onRemove={(e) => {
-              e.stopPropagation();
-              onDelete(model.guid);
-            }} />
+          <Tooltip
+            title={canDelete
+                ? 'Delete choice'
+                : 'Drag and drop questions must contain at least one choice. '
+                  + 'Please add another choice before removing.'
+            }
+            delay={1000}>
+            <Remove
+              className={classes.removeBtn}
+              customIcon="fa fa-trash"
+              editMode={editMode && canDelete}
+              onRemove={(e) => {
+                e.stopPropagation();
+                onDelete(model.guid);
+              }} />
+          </Tooltip>
         }
       </div>,
     ));

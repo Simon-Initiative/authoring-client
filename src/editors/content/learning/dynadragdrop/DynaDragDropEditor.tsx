@@ -238,7 +238,11 @@ export class DynaDragDropEditor
       part.responses.first() &&
       part.responses.first().input === initiator.assessmentId);
 
-    onSelectInitiator(initiators.first() && initiators.first().assessmentId);
+    // select the first initiator in the new model
+    updatedModel.layoutData.lift(ld =>
+      onSelectInitiator(ld.initiatorGroup.initiators.first()
+        && ld.initiatorGroup.initiators.first().assessmentId),
+    );
 
     // save question updates
     this.onEditQuestion(question.with({
@@ -580,7 +584,7 @@ export class DynaDragDropEditor
         <tr key={row.guid}>
           <TCell>
             {this.renderDropdown(
-              index + 1,
+              index,
               index => this.onAddRow(index),
               index => this.onRemoveRow(index),
               'row',
@@ -672,7 +676,9 @@ export class DynaDragDropEditor
             <Initiator
               model={initiator} editMode={editMode}
               selected={initiator.assessmentId === selectedInitiator}
-              onSelect={this.selectInitiator} onDelete={this.deleteInitiator} />
+              onSelect={this.selectInitiator}
+              canDelete={initiators.size > 1}
+              onDelete={this.deleteInitiator} />
           ))}
         </div>
         <div>

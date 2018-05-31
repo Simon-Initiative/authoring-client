@@ -41,4 +41,12 @@ export const styles: JSSStyles = {
       color: chroma('#E7F4FE').darken(3).hex(),
     },
   },
+  removeBtnDisabled: {
+    float: 'none',
+
+    '& button': {
+      padding: [0, 10, 3, 10],
+      color: chroma('#E7F4FE').darken(1).hex(),
+    },
+  },
 };
