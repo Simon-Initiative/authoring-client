@@ -258,7 +258,7 @@ export class DynaDragDropEditor
     initiatorId: string, targetAssessmentId: string, originalTargetAssessmentId: string) {
     this.assignInitiator(initiatorId, targetAssessmentId);
 
-    if (originalTargetAssessmentId) {
+    if (originalTargetAssessmentId && targetAssessmentId !== originalTargetAssessmentId) {
       this.unassignInitiator(initiatorId, originalTargetAssessmentId);
     }
   }
