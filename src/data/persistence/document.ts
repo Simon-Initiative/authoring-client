@@ -63,7 +63,7 @@ export function initiatePreview(
   courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
 
   const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
-    + (isRefresh ? '?refresh=true' : '');
+    + (isRefresh ? '?refresh=true' : '') + '&redeploy=true';
 
   return authenticatedFetch({ url })
     .then((json : any) => {
