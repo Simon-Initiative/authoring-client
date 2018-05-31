@@ -640,7 +640,7 @@ export class DynaDragDropEditor
             <tr>
               <th/>
               {rows.first() && rows.first().cols.toArray().map((val, index) => (
-                <th>
+                <th key={val.guid}>
                 {this.renderDropdown(
                   index,
                   index => this.onAddColumn(index),
@@ -674,6 +674,7 @@ export class DynaDragDropEditor
         <div className={classes.initiators}>
           {initiators.map(initiator => (
             <Initiator
+              key={initiator.guid}
               model={initiator} editMode={editMode}
               selected={initiator.assessmentId === selectedInitiator}
               onSelect={this.selectInitiator}
