@@ -160,7 +160,8 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
           theme => theme.id === themeId
             ? Object.assign(theme, { default: true })
             : Object.assign(theme, { default: false })),
-      }));
+      }))
+      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
   }
 
   removePackage() {
