@@ -43,7 +43,7 @@ export interface DynaDragDropEditorProps extends AbstractContentEditorProps<Cust
   documentId: string;
   assessment: AssessmentModel;
   currentPage: Page;
-  currentNode: Node | any;
+  currentNode: Question;
   selectedInitiator: string;
   onShowSidebar: () => void;
   onSaveAssessment: (documentId: string, updatedAssessment: AssessmentModel) => void;
@@ -117,7 +117,7 @@ export class DynaDragDropEditor
     const { model, currentNode } = this.props;
 
     const updatedQuestion = setQuestionPartWithInitiatorScore(
-      initiatorId, targetAssessmentId, 1, model, currentNode as Question);
+      initiatorId, targetAssessmentId, 1, model, currentNode);
 
     this.onEditQuestion(updatedQuestion);
   }
@@ -126,7 +126,7 @@ export class DynaDragDropEditor
     const { model, currentNode } = this.props;
 
     const updatedQuestion = setQuestionPartWithInitiatorScore(
-      initiatorId, targetAssessmentId, 0, model, currentNode as Question);
+      initiatorId, targetAssessmentId, 0, model, currentNode);
 
     this.onEditQuestion(updatedQuestion);
   }
@@ -139,7 +139,7 @@ export class DynaDragDropEditor
 
   addInitiator() {
     const { model, currentNode, onEdit } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     const newInitiator = new InitiatorModel().with({
       text: 'New Choice',
@@ -204,7 +204,7 @@ export class DynaDragDropEditor
 
   deleteInitiator(initiatorId: string) {
     const { model, currentNode, onSelectInitiator } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     const initiators = model.layoutData.caseOf({
       just: ld => ld.initiatorGroup.initiators,
@@ -275,7 +275,7 @@ export class DynaDragDropEditor
 
   onEditLayoutData(updatedLayoutData: DndLayout) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     const updatedModel = model.with({
       layoutData: Maybe.just<DndLayout>(updatedLayoutData),
@@ -291,7 +291,7 @@ export class DynaDragDropEditor
 
   onAddColumn(index: number) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -311,7 +311,7 @@ export class DynaDragDropEditor
 
   onRemoveColumn(index: number) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -349,7 +349,7 @@ export class DynaDragDropEditor
 
   onAddRow(index: number) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -393,7 +393,7 @@ export class DynaDragDropEditor
 
   onRemoveRow(index: number) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -426,7 +426,7 @@ export class DynaDragDropEditor
 
   editColText(text: string, currentCol: DndText) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -461,7 +461,7 @@ export class DynaDragDropEditor
 
   toggleCellType(cellGuid: string) {
     const { model, currentNode } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     model.layoutData.lift((ld) => {
       const updatedLayoutData = ld.with({
@@ -558,7 +558,7 @@ export class DynaDragDropEditor
 
   renderMain() : JSX.Element {
     const { classes, model, editMode, currentNode, selectedInitiator } = this.props;
-    const question = currentNode as Question;
+    const question = currentNode;
 
     const rows = model.layoutData.caseOf({
       just: ld => ld.targetGroup.rows,

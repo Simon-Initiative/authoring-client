@@ -2,7 +2,7 @@ import { connect, Dispatch } from 'react-redux';
 import { State } from 'reducers';
 import { DynaDragDropEditor } from './DynaDragDropEditor';
 import { AssessmentModel } from 'data/models';
-import { Page, Node } from 'data/contentTypes';
+import { Page, Node, Question } from 'data/contentTypes';
 import { save } from 'actions/document';
 import { EditedDocument } from 'types/document';
 import { selectInitiator } from 'actions/dynadragdrop';
@@ -34,7 +34,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
       just: cp => (state.documents.first().document.model as AssessmentModel).pages.get(cp),
       nothing: () => undefined,
     }),
-    currentNode: state.documents.first().currentNode.valueOr(undefined),
+    currentNode: state.documents.first().currentNode.valueOr(undefined) as Question,
     selectedInitiator: state.dynadragdrop.selectedInitiator,
   };
 };
