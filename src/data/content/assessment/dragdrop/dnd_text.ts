@@ -8,6 +8,7 @@ export type DndTextParams = {
   fontStyle?: string;
   textDecoration?: string;
   text?: string;
+  textType?: string;
 };
 
 const defaultContent = {
@@ -19,6 +20,7 @@ const defaultContent = {
   fontStyle: 'normal',
   textDecoration: 'none',
   text: '',
+  textType: 'span',
 };
 
 export class DndText extends Immutable.Record(defaultContent) {
@@ -31,6 +33,7 @@ export class DndText extends Immutable.Record(defaultContent) {
   fontStyle: string;
   textDecoration: string;
   text: string;
+  textType: string;
 
   constructor(params?: DndTextParams) {
     super(augment(params));
@@ -45,21 +48,27 @@ export class DndText extends Immutable.Record(defaultContent) {
     const q = (json as any).text;
     let model = new DndText({ guid });
 
-    if (q['span'] !== undefined) {
-      if (q['span']['@fontWeight'] !== undefined) {
-        model = model.with({ fontWeight: q['span']['@fontWeight'] });
+    const textType = q['span'] ? 'span' : q['p'] ? 'p' : undefined;
+
+    if (textType !== undefined) {
+      model = model.with({
+        textType,
+      });
+
+      if (q[textType]['@fontWeight'] !== undefined) {
+        model = model.with({ fontWeight: q[textType]['@fontWeight'] });
       }
-      if (q['span']['@fontSize'] !== undefined) {
-        model = model.with({ fontSize: q['span']['@fontSize'] });
+      if (q[textType]['@fontSize'] !== undefined) {
+        model = model.with({ fontSize: q[textType]['@fontSize'] });
       }
-      if (q['span']['@fontStyle'] !== undefined) {
-        model = model.with({ fontStyle: q['span']['@fontStyle'] });
+      if (q[textType]['@fontStyle'] !== undefined) {
+        model = model.with({ fontStyle: q[textType]['@fontStyle'] });
       }
-      if (q['span']['@textDecoration'] !== undefined) {
-        model = model.with({ textDecoration: q['span']['@textDecoration'] });
+      if (q[textType]['@textDecoration'] !== undefined) {
+        model = model.with({ textDecoration: q[textType]['@textDecoration'] });
       }
-      if (q['span']['#text'] !== undefined) {
-        model = model.with({ text: q['span']['#text'] });
+      if (q[textType]['#text'] !== undefined) {
+        model = model.with({ text: q[textType]['#text'] });
       }
     }
 
@@ -69,7 +78,7 @@ export class DndText extends Immutable.Record(defaultContent) {
   toPersistence() : Object {
     return {
       text: {
-        span: {
+        [this.textType]: {
           '@fontWeight': this.fontWeight,
           '@fontSize': this.fontSize,
           '@fontStyle': this.fontStyle,
