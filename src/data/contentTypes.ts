@@ -77,6 +77,7 @@ export { Question } from './content/assessment/question';
 export { Part } from './content/assessment/part';
 export { Response } from './content/assessment/response';
 export { Hint } from './content/assessment/hint';
+export { ImageHotspot } from './content/assessment/image_hotspot/image_hotspot';
 export { Feedback } from './content/assessment/feedback';
 export { MultipleChoice } from './content/assessment/multiple_choice';
 export { FillInTheBlank } from './content/assessment/fill_in_the_blank';
@@ -164,16 +165,7 @@ import { Mathematica } from './content/learning/mathematica';
 import { Panopto } from './content/learning/panopto';
 import { Unity } from './content/learning/unity';
 
-
-export type QuestionItem =
-  Essay |
-  MultipleChoice |
-  FillInTheBlank |
-  Ordering |
-  Numeric |
-  ShortAnswer |
-  Text |
-  Unsupported;
+export { Item as QuestionItem } from './content/assessment/question';
 
 export type MediaItem =
   Applet |
