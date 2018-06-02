@@ -5,7 +5,7 @@
 			"import { JSSStyles } from 'styles/jss';",
 			"",
 			"export const styles: JSSStyles = {",
-			"  exampleClass: {",
+			"  ${TM_FILENAME_BASE}: {",
 			"",
 			"  },",
 			"};",

@@ -16,10 +16,10 @@ const defaultContent = {
   elementType: 'initiator',
   guid: '',
   assessmentId: '',
-  fontWeight: '',
-  fontSize: '',
-  fontStyle: '',
-  textDecoration: '',
+  fontWeight: 'normal',
+  fontSize: '12',
+  fontStyle: 'normal',
+  textDecoration: 'none',
   text: '',
 };
 

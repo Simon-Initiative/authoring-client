@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { choices, ChoicesState } from './choices';
 import { course, CourseState } from './course';
 import { discoverable, DiscoverableState } from './discoverable';
+import { dynadragdrop, DynaDragDropState } from './dynadragdrop';
 import { editorSidebar, EditorSidebarState } from './editorSidebar';
 import { expanded, ExpandedState } from './expanded';
 import { hover, HoverState } from './hover';
@@ -26,6 +27,7 @@ export interface State {
   choices: ChoicesState;
   course: CourseState;
   discoverable: DiscoverableState;
+  dynadragdrop: DynaDragDropState;
   editorSidebar: EditorSidebarState;
   expanded: ExpandedState;
   hover: HoverState;
@@ -48,6 +50,7 @@ const reducers = combineReducers({
   choices,        // Supporting data for choices
   course,         // Information about current course
   discoverable,   // Global discoverable events
+  dynadragdrop,   // DynaDrop Drag and Drop
   editorSidebar,  // Editor sidebar state
   expanded,       // preserves expaned state of tree UIs
   hover,          // content hover state

@@ -67,6 +67,7 @@ export interface ChoiceProps  {
   allowScore?: boolean;
   allowReorder?: boolean;
   editMode: boolean;
+  hideChoiceBody?: boolean;
   context: AppContext;
   services: AppServices;
   simpleSelectProps?: {
@@ -78,7 +79,7 @@ export interface ChoiceProps  {
   onEditChoice: (choice: contentTypes.Choice, src) => void;
   onEditFeedback?: (response: contentTypes.Response, feedback: contentTypes.Feedback, src) => void;
   onEditScore?: (response: contentTypes.Response, score: string) => void;
-  onRemove: (choiceId: string) => void;
+  onRemove?: (choiceId: string) => void;
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -102,7 +103,7 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
     const {
       choice, context, editMode, index, response, services, onReorderChoice, onEditChoice,
       onEditFeedback, onEditScore, onRemove, allowReorder, allowFeedback, allowScore,
-      simpleSelectProps,
+      simpleSelectProps, hideChoiceBody,
     } = this.props;
 
     let feedbackEditor;
@@ -155,8 +156,9 @@ export class Choice extends React.PureComponent<ChoiceProps, ChoiceState> {
         onDragDrop={onReorderChoice}
         dragType={DragTypes.Choice}
         body={choice.body}
+        hideBody={hideChoiceBody}
         onEdit={(body, src) => onEditChoice(choice.with({ body }), src)}
-        onRemove={id => onRemove(id)}
+        onRemove={onRemove ? id => onRemove(id) : undefined}
         controls={
           <ItemControls>
             {simpleSelectProps
