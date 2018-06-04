@@ -103,9 +103,9 @@ export class MediaMetadataEditor
     // this.onAlternateEdit = this.onAlternateEdit.bind(this);
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onCaptionEdit = this.onCaptionEdit.bind(this);
-    this.onCitationTitleEdit = this.onCitationTitleEdit.bind(this);
-    this.onCitationEntryEdit = this.onCitationEntryEdit.bind(this);
-    this.onCitationContentEdit = this.onCitationContentEdit.bind(this);
+    // this.onCitationTitleEdit = this.onCitationTitleEdit.bind(this);
+    // this.onCitationEntryEdit = this.onCitationEntryEdit.bind(this);
+    // this.onCitationContentEdit = this.onCitationContentEdit.bind(this);
   }
 
   onPopoutEdit(content: string) {
@@ -140,23 +140,23 @@ export class MediaMetadataEditor
     this.props.onEdit(model, src);
   }
 
-  onCitationTitleEdit(title: string) {
-    const cite = this.props.model.cite.with({ title });
-    const model = (this.props.model as MediaType).with({ cite });
-    this.props.onEdit(model, model);
-  }
+  // onCitationTitleEdit(title: string) {
+  //   const cite = this.props.model.cite.with({ title });
+  //   const model = (this.props.model as MediaType).with({ cite });
+  //   this.props.onEdit(model, model);
+  // }
 
-  onCitationEntryEdit(entry: string) {
-    const cite = this.props.model.cite.with({ entry });
-    const model = (this.props.model as MediaType).with({ cite });
-    this.props.onEdit(model, model);
-  }
+  // onCitationEntryEdit(entry: string) {
+  //   const cite = this.props.model.cite.with({ entry });
+  //   const model = (this.props.model as MediaType).with({ cite });
+  //   this.props.onEdit(model, model);
+  // }
 
-  onCitationContentEdit(content: ContentElements, src) {
-    const cite = this.props.model.cite.with({ content });
-    const model = (this.props.model as MediaType).with({ cite });
-    this.props.onEdit(model, src);
-  }
+  // onCitationContentEdit(content: ContentElements, src) {
+  //   const cite = this.props.model.cite.with({ content });
+  //   const model = (this.props.model as MediaType).with({ cite });
+  //   this.props.onEdit(model, src);
+  // }
 
   render() {
     const { popout, titleContent, caption, cite } = this.props.model;
@@ -202,7 +202,7 @@ export class MediaMetadataEditor
               model={caption.content}
               onEdit={this.onCaptionEdit} />
         </SidebarGroup>
-        <SidebarGroup label="Citation">
+        {/* <SidebarGroup label="Citation">
           <TextInput width="100%" label="Title"
             editMode={this.props.editMode}
             value={cite.title}
@@ -221,7 +221,7 @@ export class MediaMetadataEditor
             onUpdateHover={() => { }}
             model={cite.content}
             onEdit={this.onCitationContentEdit} />
-        </SidebarGroup>
+        </SidebarGroup> */}
       </div>
     );
   }
