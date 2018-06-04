@@ -47,7 +47,7 @@ class Footer extends React.PureComponent<FooterProps, {}> {
           </div>
         </div>
         <div className="footer-section right">
-          Course Editor v{getVersion()}
+          Course Author v{getVersion()}
         </div>
       </footer>
     );

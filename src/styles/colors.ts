@@ -38,4 +38,7 @@ export default {
   get active() { return chroma(this.selection).darken(2).hex(); },
 
   contentSelection: '#eca037',
+
+  // Misc
+  pureApple: '#6ab04c',
 };
