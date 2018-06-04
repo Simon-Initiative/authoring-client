@@ -473,6 +473,14 @@ export class ObjectiveSkillView
     unified.documents[index] = updatedDocument;
     unified.objectives = unified.objectives.delete(obj.id);
 
+    // We need to remap the existing objective ids to the
+    // new version of the newBucket document
+    const idsToDocument = unified.mapping
+      .filter((doc, id) => doc._id === originalDocument._id)
+      .map((doc, id) => updatedDocument)
+      .toOrderedMap();
+    unified.mapping = unified.mapping.merge(idsToDocument);
+
     if (originalDocument === unified.newBucket) {
       unified.newBucket = updatedDocument;
     }
@@ -582,21 +590,29 @@ export class ObjectiveSkillView
     const objectives = (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
       .objectives.set(obj.id, obj);
 
-
-
     const model =
       (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
       .with({ objectives });
 
     const document = this.state.objectives.newBucket.with({ model });
 
-    const unified = this.state.objectives;
+    const unified = Object.assign({}, this.state.objectives);
 
     const index = unified.documents.indexOf(unified.newBucket);
 
     unified.documents[index] = document;
     unified.objectives = unified.objectives.set(obj.id, obj);
-    unified.mapping = unified.mapping.set(obj.id, document);
+
+    // The key step is to remap all newly created objective ids
+    // to the updated newBucket document
+    const idsToDocument = unified.mapping
+      .filter((doc, id) => doc._id === this.state.objectives.newBucket._id)
+      .map((doc, id) => document)
+      .toOrderedMap()
+      .set(id, document);
+
+    unified.mapping = unified.mapping.merge(idsToDocument);
+
     unified.newBucket = document;
 
     this.setState({ objectives: unified });
