@@ -159,7 +159,7 @@ export class MediaMetadataEditor
   // }
 
   render() {
-    const { popout, titleContent, caption, cite } = this.props.model;
+    const { popout, titleContent, caption } = this.props.model;
 
     return (
       <div>
