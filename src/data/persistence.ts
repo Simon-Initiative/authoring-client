@@ -5,6 +5,8 @@ export { skillsDownload } from './persistence/skills';
 
 export {
   fetchCourseResources,
+  fetchCourseThemes,
+  setCourseTheme,
   CourseResource,
   getEditablePackages,
   retrieveCoursePackage,

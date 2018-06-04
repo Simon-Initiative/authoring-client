@@ -6,6 +6,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
+import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
 
@@ -18,8 +19,14 @@ export interface CourseEditorProps {
   editMode: boolean;
 }
 
+type ThemeSelection = {
+  id: string,
+  selected: boolean,
+};
+
 interface CourseEditorState {
   selectedDevelopers: UserInfo[];
+  themes: ThemeSelection[];
 }
 
 class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState> {
@@ -28,10 +35,35 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
     this.state = {
       selectedDevelopers: props.model.developers.filter(d => d.isDeveloper).toArray(),
+      themes: [],
     };
 
     this.onEditDevelopers = this.onEditDevelopers.bind(this);
     this.renderMenuItemChildren = this.renderMenuItemChildren.bind(this);
+    this.onEditTheme = this.onEditTheme.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchGlobalThemes();
+  }
+
+  // Fetch all globally available themes, sort alphabetically, and choose one to be selected
+  fetchGlobalThemes() {
+    const { model } = this.props;
+
+    persistence.fetchCourseThemes(model.guid)
+      .then(themes => this.setState({
+        themes: themes
+          .sort((a, b) => a.id.localeCompare(b.id))
+          // The course may have a default theme set under the 'theme' property of the model.
+          // If not, use the global default theme as the selected option
+          .map(theme => ({
+            id: theme.id,
+            selected: model.theme
+              ? theme.id === model.theme
+              : theme.default,
+          })),
+      }));
   }
 
   componentWillReceiveProps(nextProps: CourseEditorProps) {
@@ -116,6 +148,48 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
     );
   }
 
+  renderThemes() {
+    const { themes } = this.state;
+
+    const option = (theme: ThemeSelection) =>
+      <option
+        key={theme.id}
+        value={theme.id}>
+        {theme.id}
+      </option>;
+
+    const options = themes.map(option);
+    const selectedTheme = themes.find(theme => theme.selected);
+
+    return (
+      <Select
+        {...this.props}
+        className="themeSelect"
+        value={selectedTheme && selectedTheme.id}
+        onChange={this.onEditTheme}>
+        {options}
+      </Select>
+    );
+  }
+
+  onEditTheme(themeId: string) {
+    const { model, courseChanged } = this.props;
+
+    persistence.setCourseTheme(model.guid, themeId)
+      // Update the dropdown and course model with the newly selected theme
+      .then((_) => {
+        this.setState({
+          themes: this.state.themes.map(
+            theme => theme.id === themeId
+              ? Object.assign(theme, { selected: true })
+              : Object.assign(theme, { selected: false })),
+        });
+        courseChanged(model.with({ theme: themeId }));
+      })
+      .catch(err => console.log(`Error setting theme ${themeId}: ${err}`));
+
+  }
+
   removePackage() {
     persistence.deleteCoursePackage(this.props.model.guid)
       .then((document) => {
@@ -173,6 +247,10 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
               <div className="row">
                 <div className="col-3">Team members</div>
                 <div className="col-9">{this.renderDevelopers()}</div>
+              </div>
+              <div className="row">
+                <div className="col-3">Theme</div>
+                <div className="col-9">{this.renderThemes()}</div>
               </div>
               <div className="row">
                 <div className="col-3">Version</div>
