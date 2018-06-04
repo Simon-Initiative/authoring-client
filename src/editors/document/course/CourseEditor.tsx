@@ -6,11 +6,9 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { hasRole } from 'actions/utils/keycloak';
 import { UserInfo } from 'data//contentTypes';
 import { Button } from 'editors/content/common/Button';
-import { Theme } from 'data/persistence/package';
 import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
-import { courseChanged } from 'actions/course';
 
 const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
@@ -152,7 +150,6 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
 
   renderThemes() {
     const { themes } = this.state;
-    const { model } = this.props;
 
     const option = (theme: ThemeSelection) =>
       <option
