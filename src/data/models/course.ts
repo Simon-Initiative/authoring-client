@@ -15,6 +15,7 @@ export type CourseModelParams = {
   metadata?: contentTypes.MetaData,
   options?: string,
   icon?: contentTypes.WebContent,
+  theme?: string,
   resources?: Immutable.OrderedMap<string, contentTypes.Resource>,
   resourcesById?: Immutable.OrderedMap<string, contentTypes.Resource>,
   webContents?: Immutable.OrderedMap<string, contentTypes.WebContent>,
@@ -34,6 +35,7 @@ const defaultCourseModel = {
   metadata: new contentTypes.MetaData(),
   options: '',
   icon: new contentTypes.WebContent(),
+  theme: '',
   resources: Immutable.OrderedMap<string, contentTypes.Resource>(),
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>(),
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>(),
@@ -53,7 +55,7 @@ function toKV(arr, deserialize) {
 }
 
 function buildResourceMap(params: CourseModelParams) : CourseModelParams {
-    
+
   if (params.resources !== undefined) {
     let map = Immutable.OrderedMap<string, contentTypes.Resource>();
     params.resources.forEach((value, key) => map = map.set(value.id, value));
@@ -75,6 +77,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   metadata: contentTypes.MetaData;
   options: string;
   icon: contentTypes.WebContent;
+  theme: string;
   resources: Immutable.OrderedMap<string, contentTypes.Resource>;
   resourcesById: Immutable.OrderedMap<string, contentTypes.Resource>;
   webContents: Immutable.OrderedMap<string, contentTypes.WebContent>;
@@ -89,7 +92,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
   }
 
   static fromPersistence(json: Object): CourseModel {
-    
+
     const c = json as any;
 
     const metadata =
@@ -118,7 +121,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
         developers = developers.set(deserialized.userName, deserialized);
       });
     }
-    
+
     const model = new CourseModel({
       rev: c.rev,
       guid: c.guid,
@@ -130,12 +133,13 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       buildStatus: c.buildStatus,
       options: JSON.stringify(c.options),
       icon: new contentTypes.WebContent(),
+      theme: c.theme,
       metadata,
       resources,
       webContents,
       developers,
     });
-    
+
     return model;
   }
 
@@ -144,6 +148,7 @@ export class CourseModel extends Immutable.Record(defaultCourseModel) {
       package: {
         '@id': this.id,
         icon: this.icon.toPersistence(),
+        theme: this.theme,
         title: this.title,
         '@version': this.version,
         metadata: this.metadata.toPersistence(),
