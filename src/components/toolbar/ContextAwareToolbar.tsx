@@ -141,25 +141,11 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
   shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
 
-    // Determine if this update is due to a keypress
-    // that changed content.  These changes do not affect
-    // the toolbar, so no need to re-render
-    const isKeypress = this.props.textSelection.caseOf({
-      just: t => nextProps.textSelection.caseOf({
-        just: s => t !== s && s.triggeredBy === Trigger.KEYPRESS,
-        nothing: () => false,
-      }),
-      nothing: () => false,
-    });
-
-    if (isKeypress) {
-      return false;
-    }
-
-    // If the active content has switched, we re-render
-    const contentSwitched = this.props.content.caseOf({
+    // See if the content switched or changed
+    const contentSwitchedOrChanged = this.props.content.caseOf({
       just: t => nextProps.content.caseOf({
-        just: s => (t as any).guid !== (s as any).guid,
+        just: s => (t as any).guid !== (s as any).guid
+          || s !== t,
         nothing: () => true,
       }),
       nothing: () => nextProps.content.caseOf({
@@ -168,7 +154,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
       }),
     });
 
-    if (contentSwitched) {
+    if (contentSwitchedOrChanged) {
       return true;
     }
 
