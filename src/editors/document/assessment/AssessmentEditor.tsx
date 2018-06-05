@@ -55,7 +55,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   noSkillsMessage: Messages.Message;
   supportedElements: Immutable.List<string>;
 
-  constructor(props : AssessmentEditorProps) {
+  constructor(props: AssessmentEditorProps) {
     super(props, ({} as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
@@ -97,17 +97,17 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
-    nextState: AssessmentEditorState) : boolean {
+    nextState: AssessmentEditorState): boolean {
 
     const shouldUpdate = this.props.model !== nextProps.model
-        || this.props.activeContext !== nextProps.activeContext
-        || this.props.expanded !== nextProps.expanded
-        || this.props.editMode !== nextProps.editMode
-        || this.props.hover !== nextProps.hover
-        || this.props.currentPage !== nextProps.currentPage
-        || this.props.currentNode !== nextProps.currentNode
-        || this.state.undoStackSize !== nextState.undoStackSize
-        || this.state.redoStackSize !== nextState.redoStackSize;
+      || this.props.activeContext !== nextProps.activeContext
+      || this.props.expanded !== nextProps.expanded
+      || this.props.editMode !== nextProps.editMode
+      || this.props.hover !== nextProps.hover
+      || this.props.currentPage !== nextProps.currentPage
+      || this.props.currentNode !== nextProps.currentNode
+      || this.state.undoStackSize !== nextState.undoStackSize
+      || this.state.redoStackSize !== nextState.redoStackSize;
 
     return shouldUpdate;
   }
@@ -115,8 +115,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
     if (this.props.context.skills.size <= 0 &&
-        nextProps.context.skills.size > 0 &&
-        this.noSkillsMessage !== undefined) {
+      nextProps.context.skills.size > 0 &&
+      this.noSkillsMessage !== undefined) {
       this.props.dismissMessage(this.noSkillsMessage);
     }
 
@@ -136,8 +136,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
-              onSetCurrentNode(
-                activeContext.documentId.valueOr(null), node));
+                onSetCurrentNode(
+                  activeContext.documentId.valueOr(null), node));
           },
         });
     }
@@ -145,7 +145,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   getCurrentPage(props) {
     return props.model.pages.get(this.props.currentPage)
-    || props.model.pages.first();
+      || props.model.pages.first();
   }
 
   onPageEdit(page: contentTypes.Page) {
@@ -187,7 +187,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  onEditNode(guid : string, node : models.Node, src) {
+  onEditNode(guid: string, node: models.Node, src) {
 
     const { activeContext, onSetCurrentNode } = this.props;
 
@@ -308,14 +308,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2_pool
-        && res.resourceState !== ResourceState.DELETED;
+      && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
         courseId={this.props.context.courseId}
         onInsert={this.onInsertPool}
-        onCancel={this.onCancelSelectPool}/>);
+        onCancel={this.onCancelSelectPool} />);
   }
 
   onCancelSelectPool() {
@@ -331,16 +331,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
 
     this.props.services.fetchIdByGuid(resource.guid)
-    .then((idref) => {
-      const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
-      this.addNode(pool);
-    });
+      .then((idref) => {
+        const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
+        this.addNode(pool);
+      });
   }
 
   renderSettings() {
     return (
       <Collapse caption="Settings">
-        <div style={ { marginLeft: '25px' } }>
+        <div style={{ marginLeft: '25px' }}>
           <form>
 
             <div className="form-group row">
@@ -393,7 +393,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         <AddQuestion
           editMode={this.props.editMode}
           onQuestionAdd={this.addQuestion.bind(this)}
-          isSummative={this.props.model.type === LegacyTypes.assessment2}/>
+          isSummative={this.props.model.type === LegacyTypes.assessment2} />
 
         <span className="slash">/</span>
 
@@ -459,7 +459,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <ContextAwareToolbar context={this.props.context} model={model}/>
+        <ContextAwareToolbar context={this.props.context} model={model} />
         <div className="assessment-content">
           <div className="html-editor-well">
 
@@ -484,7 +484,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
-                  />
+                />
               </div>
               <div className="nodeContainer">
                 {renderAssessmentNode(

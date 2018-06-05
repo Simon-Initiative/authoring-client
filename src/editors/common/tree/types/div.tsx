@@ -73,10 +73,21 @@ export class DraggableNode
 
 }
 
-export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRenderer<NodeType> {
+export function buildRenderer<NodeType extends Types.HasGuid>(): Types.TreeRenderer<NodeType> {
+
+  function renderAdd() {
+
+  }
 
   return {
-    renderTree: children => <div>{children}</div>,
+    renderTree: children => (
+      <div className="treeContainer">
+        <div className="treeList">
+          {children}
+        </div>
+        <a onClick={renderAdd} className="insertNew">Insert new...</a>
+      </div>
+    ),
 
     renderNode: (
       nodeId, node, nodeState, renderedNode, dropTarget, indexWithinParent, editMode) => {
@@ -90,8 +101,6 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
           {dropTarget}
         </div>
       );
-
-
     },
 
     renderDropTarget: (
@@ -101,7 +110,7 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
       parentModel: Maybe<NodeType>,
       parentModelId: Maybe<string>,
       isBottom: boolean,
-      editMode: boolean) : JSX.Element => {
+      editMode: boolean): JSX.Element => {
 
       const props = {
         index,
@@ -114,10 +123,9 @@ export function buildRenderer<NodeType extends Types.HasGuid>() : Types.TreeRend
 
       const dropClass = isBottom ? 'bottom-drop' : 'top-drop';
 
-
       return (
         <div className={dropClass}>
-          <RepositionTarget {...props}/>
+          <RepositionTarget {...props} />
         </div>
       );
 
