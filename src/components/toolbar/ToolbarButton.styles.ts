@@ -67,8 +67,8 @@ export const styles: JSSStyles = {
       },
     },
     '&.wide': {
-      minWidth: 84,
-      maxWidth: 84,
+      minWidth: 86,
+      maxWidth: 86,
       height: 32,
       textAlign: 'left',
 
