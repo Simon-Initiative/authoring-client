@@ -64,7 +64,7 @@ export const getLabelForQuestion = (question: contentTypes.Question): string => 
 
       return 'Check All That Apply';
     case 'Ordering':
-      return 'Ordering Question';
+      return 'Ordering';
     case 'Essay':
       return 'Essay';
     case 'ShortAnswer':
