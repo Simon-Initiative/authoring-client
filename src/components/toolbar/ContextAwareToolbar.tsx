@@ -123,8 +123,7 @@ export interface ToolbarProps {
   container: Maybe<ParentContainer>;
   context: AppContext;
   model: ContentModel;
-  textSelection: Maybe<TextSelection>;
-  onInsert: (content: Object, textSelection) => void;
+  onInsert: (content: Object) => void;
   onEdit: (content: Object) => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
@@ -171,7 +170,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const {
       onInsert, onEdit, content, container, supportedElements, model,
-      textSelection, classes, onDisplayModal, onDismissModal, context, resource,
+      classes, onDisplayModal, onDismissModal, context, resource,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -223,7 +222,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
             context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
-            onInsert={item => onInsert(item, textSelection)}
+            onInsert={item => onInsert(item)}
             parentSupportsElementType={parentSupportsElementType}
             onDisplayModal={onDisplayModal}
             onDismissModal={onDismissModal} />
