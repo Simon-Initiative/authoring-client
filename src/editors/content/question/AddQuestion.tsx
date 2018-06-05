@@ -272,6 +272,10 @@ export class AddQuestion
       ? <a onClick={this.onAddEssay} className="dropdown-item">Essay</a>
       : null;
 
+    const dynaDragDropOrNot = !this.props.isSummative
+      ? <a onClick={this.onAddDragDrop} className="dropdown-item">Drag and Drop</a>
+      : null;
+
     return (
       <div className="dropdown" style={ { display: 'inline' } }>
         <button disabled={!this.props.editMode}
@@ -289,8 +293,7 @@ export class AddQuestion
           {essayOrNot}
           <a onClick={this.onAddMultipart}
             className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
-          <a onClick={this.onAddDragDrop}
-            className="dropdown-item">Drag and Drop</a>
+          {dynaDragDropOrNot}
         </div>
       </div>
     );
