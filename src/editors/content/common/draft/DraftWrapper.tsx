@@ -19,6 +19,8 @@ import { findEntity, EntityRange } from 'data/content/learning/draft/changes';
 import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
+import parseContent from 'data/parsers/parse';
+
 
 export interface DraftWrapperProps {
   onEdit: (text : ContiguousText, src?) => void;
@@ -353,6 +355,20 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
   handlePastedText(text, html) {
 
     // Returning true prevents pasting
+    if (html !== undefined && html !== null) {
+
+      const parsed = parseContent(html).caseOf({
+        just: (element) => {
+          console.log(element);
+          return true;
+        },
+        nothing: () => false,
+      });
+
+      if (parsed) {
+        return true;
+      }
+    }
 
     // Prevent pasting in single block mode if it would introduce
     // a line break
