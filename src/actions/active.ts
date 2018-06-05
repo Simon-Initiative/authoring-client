@@ -56,13 +56,15 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: Object, textSelection: Maybe<TextSelection>) {
+export function insert(content: Object) {
   return function (dispatch, getState) {
 
     const { activeContext } = getState();
+
     activeContext.container.lift((parent : ParentContainer) => {
-      parent.onAddNew(content, textSelection);
+      parent.onAddNew(content, activeContext.textSelection);
     });
+
   };
 }
 
