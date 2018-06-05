@@ -4,7 +4,7 @@ import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
 import { showSidebar } from 'actions/editorSidebar';
-import { ParentContainer, TextSelection } from 'types/active.ts';
+import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { AppContext } from 'editors/common/AppContext';
