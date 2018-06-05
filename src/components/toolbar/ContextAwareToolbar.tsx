@@ -243,7 +243,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={6.7}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7}>
           <ItemToolbar
             context={context}
             parentSupportsElementType={parentSupportsElementType} />
