@@ -61,6 +61,43 @@
     min-width: 250px;
   }
 
+  a.insertNew:not([href]):not([tabindex]):hover {
+    color: darken(#3f4446, 20%);
+    text-decoration: underline;
+    background-color: darken(#edeff0, 10%);
+  }
+
+  a.insertNew:not([href]):not([tabindex]) {
+    color: #3f4446;
+  }
+
+  .insertWindow {
+    background-color: #E2E4E6;
+    font-size: 80%;
+    // border-radius: 3px;
+    height: 100%;
+    width: 100%;
+
+    a.dropdown-item {
+      &:hover {
+        background-color: #f8f9fa;
+      }
+      &:active {
+        background-color: #f8f9fa;
+      }
+      cursor: pointer;
+    }
+  }
+
+  .insertNew {
+    display: block;
+    cursor: pointer;
+    background-color: #E2E4E6;
+    font-size: 80%;
+    border-radius: 0 0 3px 3px;
+    padding: 8px 10px;
+  }
+
   .label {
     font-family: $sans-font;
     // lineHeight: 1.25;

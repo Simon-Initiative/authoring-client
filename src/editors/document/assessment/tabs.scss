@@ -27,6 +27,7 @@ $active-tab: $blue;
 
   &:hover {
     background-color: lighten(#edeff0, 5%);
+    // background-color: #edeff0;
   }
 
   .content {
@@ -47,5 +48,6 @@ $active-tab: $blue;
 }
 
 .tab-item-active, .tab-item-active:hover {
-  background-color: #edeff0;
+  //
+  border-left: 3px solid $blue;
 }

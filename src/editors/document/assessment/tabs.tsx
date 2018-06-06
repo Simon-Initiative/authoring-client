@@ -4,7 +4,6 @@ import * as Tree from 'editors/common/tree';
 import {
   Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool, PoolRef,
 } from 'data/contentTypes';
-import { DragHandle } from 'components/common/DragHandle.tsx';
 import { getLabelForQuestion } from 'editors/content/question/Question';
 
 import './tabs.scss';

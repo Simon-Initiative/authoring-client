@@ -6,7 +6,6 @@ import * as Tree from 'editors/common/tree';
 import { Node as AssessmentNode } from 'data/contentTypes';
 import { renderTab } from './tabs';
 import { findNodeByGuid } from './utils';
-import { CourseModel } from 'data/models';
 
 export interface OutlineProps {
   editMode: boolean;

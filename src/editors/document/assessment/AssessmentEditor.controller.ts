@@ -5,7 +5,7 @@ import { State } from 'reducers';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
 import { AbstractEditorProps } from '../common/AbstractEditor';
-import { AssessmentModel, CourseModel } from 'data/models';
+import { AssessmentModel } from 'data/models';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';

@@ -6,6 +6,7 @@
   flex-direction: row;
   padding-bottom: 10px;
   border-bottom: 1px solid #ddd;
+  line-height: 31px;
   @include disable-select;
 
   .title {

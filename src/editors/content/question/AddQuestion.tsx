@@ -273,13 +273,7 @@ export class AddQuestion
       : null;
 
     return (
-      <div className="dropdown" style={ { display: 'inline' } }>
-        <button disabled={!this.props.editMode}
-          className="btn btn-link dropdown-toggle"
-          type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <b>Question</b>
-        </button>
-        <div className="dropdown-menu">
+      <React.Fragment>
           <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
             className="dropdown-item">Multiple choice</a>
           <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }}
@@ -288,11 +282,10 @@ export class AddQuestion
           <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
           {essayOrNot}
           <a onClick={this.onAddMultipart}
-            className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+            className="dropdown-item">Input (text, numeric, dropdown)</a>
           <a onClick={this.onAddDragDrop}
-            className="dropdown-item">Drag and Drop</a>
-        </div>
-      </div>
+            className="dropdown-item">Drag and drop</a>
+      </React.Fragment>
     );
 
   }

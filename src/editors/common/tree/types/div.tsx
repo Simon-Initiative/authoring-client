@@ -75,17 +75,12 @@ export class DraggableNode
 
 export function buildRenderer<NodeType extends Types.HasGuid>(): Types.TreeRenderer<NodeType> {
 
-  function renderAdd() {
-
-  }
-
   return {
     renderTree: children => (
       <div className="treeContainer">
         <div className="treeList">
           {children}
         </div>
-        <a onClick={renderAdd} className="insertNew">Insert new...</a>
       </div>
     ),
 

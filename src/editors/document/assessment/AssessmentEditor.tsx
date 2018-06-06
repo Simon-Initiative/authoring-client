@@ -26,6 +26,8 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
+import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
+import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -41,10 +43,11 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-
+  hideInsertWindow: boolean;
 }
 
 
@@ -56,7 +59,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   supportedElements: Immutable.List<string>;
 
   constructor(props: AssessmentEditorProps) {
-    super(props, ({} as AssessmentEditorState));
+    super(props, ({ hideInsertWindow: true } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
@@ -72,6 +75,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEditNode = this.onEditNode.bind(this);
     this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.toggleInsertWindow = this.toggleInsertWindow.bind(this);
 
     this.supportedElements = Immutable.List<string>();
 
@@ -107,7 +111,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       || this.props.currentPage !== nextProps.currentPage
       || this.props.currentNode !== nextProps.currentNode
       || this.state.undoStackSize !== nextState.undoStackSize
-      || this.state.redoStackSize !== nextState.redoStackSize;
+      || this.state.redoStackSize !== nextState.redoStackSize
+      || this.state.hideInsertWindow !== nextState.hideInsertWindow;
 
     return shouldUpdate;
   }
@@ -181,7 +186,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             this.props.onSetCurrentNode(
               this.props.activeContext.documentId.valueOr(null), questions.last());
           }
-
         }
       }
     }
@@ -243,23 +247,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       this.handleEdit(this.props.model.with({ pages }));
     }
-
   }
 
   onAddContent() {
     let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
     this.addNode(content);
+    this.setState({
+      hideInsertWindow: true,
+    });
   }
 
   addQuestion(question: contentTypes.Question) {
     const content = question.with({ guid: guid() });
     this.addNode(content);
+    this.setState({
+      hideInsertWindow: true,
+    });
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
     this.addNode(pool);
+    this.setState({
+      hideInsertWindow: true,
+    });
   }
 
   addNode(node) {
@@ -334,6 +346,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       .then((idref) => {
         const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
         this.addNode(pool);
+        this.setState({
+          hideInsertWindow: true,
+        });
       });
   }
 
@@ -379,37 +394,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderAdd() {
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
+    const { editMode } = this.props;
+    const { hideInsertWindow } = this.state;
+
+    const questionPoolOrNothing = editMode && !isInline
+      ? <a className="dropdown-item" onClick={this.onSelectPool}>Question Pool</a>
+      : null;
+
+    const embeddedPoolOrNothing = editMode && !isInline
+      ? <a className="dropdown-item" onClick={this.onAddPool}>Embedded Pool</a>
+      : null;
+
     return (
-      <div className="add-menu">
-
-        <span className="label">Insert new: </span>
-
-        <button disabled={!this.props.editMode}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddContent}>Content</button>
-
-        <span className="slash">/</span>
-
-        <AddQuestion
-          editMode={this.props.editMode}
-          onQuestionAdd={this.addQuestion.bind(this)}
-          isSummative={this.props.model.type === LegacyTypes.assessment2} />
-
-        <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onSelectPool}>Question Pool</button>
-
-        <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPool}>Embedded Pool</button>
-
-      </div>
+      <React.Fragment>
+        <div className={`insertWindow ${hideInsertWindow ? 'd-none' : ''}`}>
+          <AddQuestion
+            editMode={this.props.editMode}
+            onQuestionAdd={this.addQuestion.bind(this)}
+            isSummative={this.props.model.type === LegacyTypes.assessment2} />
+          <ToolbarButtonMenuDivider />
+          <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a>
+          {questionPoolOrNothing}
+          {embeddedPoolOrNothing}
+        </div>
+        <a onClick={this.toggleInsertWindow} className="insertNew">Insert new...</a>
+      </React.Fragment>
     );
   }
 
@@ -436,9 +445,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
+  toggleInsertWindow() {
+    this.setState({
+      hideInsertWindow: !this.state.hideInsertWindow,
+    });
+  }
+
   render() {
     const { context, services, editMode, model, currentNode, onEdit } = this.props;
-
 
     const page = this.getCurrentPage(this.props);
 
@@ -472,8 +486,6 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            {this.renderAdd()}
-
             <div className="outline">
               <div className="outlineContainer">
                 <Outline
@@ -485,6 +497,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
                 />
+                {this.renderAdd()}
               </div>
               <div className="nodeContainer">
                 {renderAssessmentNode(
