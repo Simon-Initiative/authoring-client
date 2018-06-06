@@ -71,6 +71,19 @@ export class Part extends Immutable.Record(defaultPartParams) {
     return this.merge(values) as this;
   }
 
+
+  clone() : Part {
+    return this.with({
+      id: createGuid(),
+      criteria: this.criteria.map(c => c.clone()).toOrderedMap(),
+      responses: this.responses.map(c => c.clone()).toOrderedMap(),
+      responseMult: this.responseMult.map(c => c.clone()).toOrderedMap(),
+      hints: this.hints.map(c => c.clone()).toOrderedMap(),
+      explanation: this.explanation.clone(),
+    });
+  }
+
+
   static fromPersistence(json: any, guid: string) {
 
     let model = new Part({ guid });

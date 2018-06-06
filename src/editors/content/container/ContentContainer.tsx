@@ -24,7 +24,8 @@ export enum Layout {
 
 export interface ContentContainerProps
     extends AbstractContentEditorProps<ContentElements> {
-  hideContentLabel?: boolean;
+  hideContentLabel?: boolean | string[];
+  disableContentSelection?: boolean | string[];
   bindProperties?: (element: ContentElement) => BoundProperty[];
   activeContentGuid: string;
   hideSingleDecorator?: boolean;
@@ -169,11 +170,15 @@ export class ContentContainer
       const updated = model.with({ content: model.content.delete(childModel.guid) });
 
       const indexOf = model.content.toArray().map(c => c.guid).indexOf(childModel.guid);
-      let newSelection = null;
+      let newSelection: ContentElement = null;
       if (model.content.size > 1) {
         newSelection = indexOf === 0
           ? updated.content.first()
           : model.content.toArray()[indexOf - 1];
+      }
+
+      if (this.disableContentSelection(newSelection)) {
+        newSelection = null;
       }
 
       onEdit(updated, newSelection);
@@ -261,8 +266,16 @@ export class ContentContainer
     e.stopPropagation();
   }
 
+  disableContentSelection(model: ContentElement) {
+    const { disableContentSelection } = this.props;
+
+    return !!(disableContentSelection === true
+      || (Array.isArray(disableContentSelection)
+        && disableContentSelection.find(type => type === model.contentType)));
+  }
+
   renderMain() : JSX.Element {
-    const { hideContentLabel, hover,
+    const { hideContentLabel, disableContentSelection, hover,
       hideSingleDecorator = false,
       onUpdateHover, layout = Layout.Vertical } = this.props;
 
@@ -276,17 +289,20 @@ export class ContentContainer
       ? this.placeholder
       : this.props.model.content;
 
-    const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1;
-
     const countForSizing = Math.max(1, Math.min(contentOrPlaceholder.size, 10));
 
     const editors = contentOrPlaceholder
       .toArray()
       .map((model) => {
+        const hideDecorator = hideSingleDecorator && contentOrPlaceholder.size === 1
+          || this.disableContentSelection(model);
 
         const props = {
           ...this.props, model,
           onEdit: this.onChildEdit,
+          onFocus: this.disableContentSelection(model)
+            ? () => { /** do nothing */ }
+            : this.props.onFocus,
           parent: this,
           key: model.guid,
           onTextSelectionChange: s =>  this.textSelections = this.textSelections.set(model.guid, s),
@@ -311,6 +327,7 @@ export class ContentContainer
               contentType={model.contentType}
               onSelect={() => this.onSelect(model)}
               hideContentLabel={hideContentLabel}
+              disableContentSelection={disableContentSelection}
               key={model.guid}
               onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
               isHoveringContent={isHoverContent}

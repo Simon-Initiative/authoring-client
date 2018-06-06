@@ -10,7 +10,8 @@ export interface ContentDecoratorProps {
   onSelect: () => void;
   isActiveContent: boolean;
   contentType: string;
-  hideContentLabel?: boolean;
+  hideContentLabel?: boolean | string[];
+  disableContentSelection?: boolean | string[];
   isHoveringContent: boolean;
   onMouseOver: () => void;
 }
@@ -26,11 +27,28 @@ export class ContentDecorator
 
   constructor(props, childState) {
     super(props);
+
+    this.hideContentLabel = this.hideContentLabel.bind(this);
+  }
+
+  hideContentLabel() {
+    const { hideContentLabel, contentType } = this.props;
+
+    return hideContentLabel === true
+      || (Array.isArray(hideContentLabel) && hideContentLabel.find(type => type === contentType));
+  }
+
+  disableContentSelection() {
+    const { disableContentSelection, contentType } = this.props;
+
+    return disableContentSelection === true
+      || (Array.isArray(disableContentSelection)
+        && disableContentSelection.find(type => type === contentType));
   }
 
   render() {
     const {
-      classes, isActiveContent, contentType, hideContentLabel,
+      classes, isActiveContent, contentType,
       children, onSelect, onMouseOver, isHoveringContent, className,
     } = this.props;
 
@@ -44,7 +62,7 @@ export class ContentDecorator
           className,
         ])}
       onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
-        {hideContentLabel
+        {this.hideContentLabel() || this.disableContentSelection()
           ? null
           : (
             <div

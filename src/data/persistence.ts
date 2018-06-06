@@ -5,6 +5,8 @@ export { skillsDownload } from './persistence/skills';
 
 export {
   fetchCourseResources,
+  fetchCourseThemes,
+  setCourseTheme,
   CourseResource,
   getEditablePackages,
   retrieveCoursePackage,
@@ -25,6 +27,7 @@ export {
   PreviewResult,
   PreviewNotSetUp,
   initiatePreview,
+  initiateQuickPreview,
   retrieveDocument,
   bulkFetchDocuments,
   listenToDocument,
@@ -35,3 +38,7 @@ export {
 export {
   fetchServerTime,
 } from './persistence/time';
+
+export {
+  deleteResource,
+} from './persistence/resource';

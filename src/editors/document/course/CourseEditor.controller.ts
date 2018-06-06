@@ -24,12 +24,10 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
-    courseChanged: (model: CourseModel) => {
-      dispatch(courseChanged(model));
-    },
-    viewAllCourses: () => {
-      dispatch(viewActions.viewAllCourses());
-    },
+    courseChanged: (model: CourseModel) =>
+      dispatch(courseChanged(model)),
+    viewAllCourses: () =>
+      dispatch(viewActions.viewAllCourses()),
   };
 };
 

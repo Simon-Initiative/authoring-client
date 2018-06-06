@@ -64,7 +64,7 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<State>, ownProps: OwnProps): DispatchProps => {
   return {
-    onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
+    onInsert: content => dispatch(insert(content)),
     onEdit: content =>  dispatch(edit(content)),
     onHide: () => dispatch(showSidebar(false)),
     onSetCurrentPage: (documentId: string, pageId: string) =>

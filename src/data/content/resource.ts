@@ -11,7 +11,15 @@ export type ResourceParams = {
   dateCreated?: Date,
   dateUpdated?: Date,
   fileNode?: FileNode,
+  resourceState?: ResourceState,
 };
+
+// Added to support soft resource deletion
+export enum ResourceState {
+  ACTIVE = 'ACTIVE',
+  DELETED = 'DELETED',
+  RESTORED = 'RESTORED',
+}
 
 const monthsToOrdinal = {
   Jan: 0,
@@ -52,7 +60,8 @@ function parseDate(value: string) : Date {
 
 export class Resource extends Immutable.Record(
   {contentType: 'Resource',rev:0, guid: '', id: '', type: '', title: '',
-    dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode()}) {
+    dateCreated: new Date(), dateUpdated: new Date(), fileNode: new FileNode(),
+    resourceState: ResourceState.ACTIVE}) {
 
   contentType: 'Resource';
   rev: number;
@@ -63,6 +72,7 @@ export class Resource extends Immutable.Record(
   dateCreated: Date;
   dateUpdated: Date;
   fileNode: FileNode;
+  resourceState: ResourceState;
 
   constructor(params?: ResourceParams) {
     params ? super(params) : super();
@@ -86,6 +96,8 @@ export class Resource extends Immutable.Record(
         ? new Date() : parseDate(a.dateUpdated),
       fileNode: isNullOrUndefined(a.fileNode)
         ? new FileNode() : FileNode.fromPersistence(a.fileNode),
+      resourceState: a.resourceState === undefined || a.resourceState === null
+        ? ResourceState.ACTIVE : a.resourceState,
     });
 
     return model;
@@ -100,6 +112,7 @@ export class Resource extends Immutable.Record(
       title: this.title,
       dateCreated: JSON.stringify(this.dateCreated),
       dateUpdated: JSON.stringify(this.dateUpdated),
+      resourceState: this.resourceState,
     };
   }
 }

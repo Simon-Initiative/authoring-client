@@ -11,6 +11,7 @@ import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButt
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { SidebarContent } from 'components/sidebar/ContextAwareSidebar.controller';
 import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
+import { ResourceState } from 'data/content/resource';
 
 export interface XrefEditorProps
   extends AbstractContentEditorProps<contentTypes.Xref> {
@@ -37,7 +38,8 @@ export default class XrefEditor
 
     const pages = context.courseModel.resources
       .toArray()
-      .filter(resource => resource.type === LegacyTypes.workbook_page)
+      .filter(r => r.type === LegacyTypes.workbook_page &&
+        r.resourceState !== ResourceState.DELETED)
       .map(r => <option key={r.id} value={r.id}>{r.title}</option>);
 
     return (

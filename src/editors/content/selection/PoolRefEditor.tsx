@@ -3,7 +3,7 @@ import * as contentTypes from 'data/contentTypes';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
 import { LegacyTypes } from 'data/types';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 
 export interface PoolRefEditor {
   guid: string;
@@ -97,10 +97,9 @@ export class PoolRefEditor
 
   onClick() {
 
-    const predicate =
-      (res: Resource) : boolean => {
-        return res.type === LegacyTypes.assessment2_pool;
-      };
+    const predicate = (res: Resource) : boolean =>
+      res.type === LegacyTypes.assessment2_pool
+        && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
         <ResourceSelection

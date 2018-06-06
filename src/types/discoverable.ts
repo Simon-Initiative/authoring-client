@@ -2,6 +2,7 @@ export enum DiscoverableId {
   CodeBlockEditorHighlighting,
   CodeBlockEditorLineNumbers,
   CodeBlockEditorLanguage,
+  CustomEditorDetails,
   OrderedListEditorTitle,
   OrderedListEditorStyle,
   OrderedListEditorStart,

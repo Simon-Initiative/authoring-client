@@ -206,9 +206,18 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
     }
 
     // because we changed response match values, we must update choice refs
-    const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
+    // const updatedModels = updateChoiceValuesAndRefs(itemModel, updatedPartModel);
 
-    onEdit(updatedModels.itemModel, updatedModels.partModel, updatedModels.itemModel);
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      itemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      this.props.onGetChoiceCombinations,
+    );
+
+    onEdit(itemModel, updatedPartModel, itemModel);
   }
 
   onPartEdit(partModel: contentTypes.Part, src) {
@@ -274,30 +283,34 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     let updatedItemModel = itemModel;
     let updatedPartModel = partModel;
-    updatedItemModel = itemModel.with({
-      choices: itemModel.choices.delete(choiceId),
-    });
 
-    // update models with new choices and references
-    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
-    updatedItemModel = updatedModels.itemModel;
-    updatedPartModel = updatedModels.partModel;
+    // prevent removal of last choice
+    if (itemModel.choices.size > 1) {
+      updatedItemModel = itemModel.with({
+        choices: itemModel.choices.delete(choiceId),
+      });
 
-    // update part model with default feedback
-    updatedPartModel = modelWithDefaultFeedback(
-      updatedPartModel,
-      updatedItemModel.choices.toArray(),
-      getGeneratedResponseBody(updatedPartModel),
-      getGeneratedResponseScore(updatedPartModel),
-      AUTOGEN_MAX_CHOICES,
-      onGetChoiceCombinations,
-    );
+      // update models with new choices and references
+      const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+      updatedItemModel = updatedModels.itemModel;
+      updatedPartModel = updatedModels.partModel;
 
-    onEdit(
-      updatedItemModel,
-      updatedPartModel,
-      null,
-    );
+      // update part model with default feedback
+      updatedPartModel = modelWithDefaultFeedback(
+        updatedPartModel,
+        updatedItemModel.choices.toArray(),
+        getGeneratedResponseBody(updatedPartModel),
+        getGeneratedResponseScore(updatedPartModel),
+        AUTOGEN_MAX_CHOICES,
+        onGetChoiceCombinations,
+      );
+
+      onEdit(
+        updatedItemModel,
+        updatedPartModel,
+        null,
+      );
+    }
   }
 
   onReorderChoices(originalIndex: number, newIndex: number) {
@@ -336,10 +349,33 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
   }
 
   onChoiceEdit(c, src) {
-    this.props.onEdit(
-      this.props.itemModel.with(
-      { choices: this.props.itemModel.choices.set(c.guid, c) }),
-      this.props.partModel, src);
+
+    const {
+      itemModel, partModel, onGetChoiceCombinations, onEdit,
+    } = this.props;
+
+    let updatedItemModel = itemModel;
+    let updatedPartModel = partModel;
+    updatedItemModel = updatedItemModel.with({
+      choices: this.props.itemModel.choices.set(c.guid, c),
+    });
+
+    // update part model with default feedback
+    updatedPartModel = modelWithDefaultFeedback(
+      updatedPartModel,
+      updatedItemModel.choices.toArray(),
+      getGeneratedResponseBody(updatedPartModel),
+      getGeneratedResponseScore(updatedPartModel),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+
+    onEdit(
+      updatedItemModel,
+      updatedPartModel,
+      src,
+    );
+
   }
 
   renderChoices() {
@@ -371,7 +407,10 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={choiceId => this.onRemoveChoice(choiceId)} />
+            onRemove={itemModel.choices.size > 1
+              ? choiceId => this.onRemoveChoice(choiceId)
+              : undefined
+            } />
         );
       });
   }

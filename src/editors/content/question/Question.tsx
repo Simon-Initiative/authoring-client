@@ -12,9 +12,10 @@ import { CriteriaEditor } from '../question/CriteriaEditor';
 import { Skill } from 'types/course';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 import guid from 'utils/guid';
+import { ContentContainer } from 'editors/content/container/ContentContainer';
+import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
 
 import './Question.scss';
-import { ContentContainer } from 'editors/content/container/ContentContainer';
 
 const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question. '
@@ -33,6 +34,7 @@ export interface QuestionProps<ModelType>
   model: contentTypes.Question;
   canRemoveQuestion: boolean;
   onRemoveQuestion: () => void;
+  onDuplicate: () => void;
   activeContentGuid: string;
   hover: string;
   onUpdateHover: (hover: string) => void;
@@ -42,9 +44,13 @@ export interface QuestionState {
 
 }
 
-const getLabelForQuestion = (question: contentTypes.Question): string => {
+export const getLabelForQuestion = (question: contentTypes.Question): string => {
+  if (containsDynaDropCustom(question.body)) {
+    return 'Drag and Drop';
+  }
+
   if (question.items.size === 0) {
-    return 'Input Question';
+    return 'Input';
   }
 
   // Look at first item and base label off of that
@@ -53,20 +59,20 @@ const getLabelForQuestion = (question: contentTypes.Question): string => {
   switch (item.contentType) {
     case 'MultipleChoice':
       if (item.select === 'single') {
-        return 'Multiple Choice Question';
+        return 'Multiple Choice';
       }
 
-      return 'Check All That Apply Question';
+      return 'Check All That Apply';
     case 'Ordering':
-      return 'Ordering Question';
+      return 'Ordering';
     case 'Essay':
-      return 'Essay Question';
+      return 'Essay';
     case 'ShortAnswer':
-      return 'Short Answer Question';
+      return 'Short Answer';
     case 'Text':
     case 'Numeric':
     case 'FillInTheBlank':
-      return 'Input Question';
+      return 'Input';
     default:
       return 'Question';
   }
@@ -133,11 +139,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   }
 
   renderQuestionTitle(): JSX.Element {
-    const { model, canRemoveQuestion, onRemoveQuestion } = this.props;
+    const { model, canRemoveQuestion, onRemoveQuestion, editMode } = this.props;
 
     return (
       <ContentTitle
           title={getLabelForQuestion(model)}
+          onDuplicate={editMode ? this.props.onDuplicate : undefined}
           canRemove={canRemoveQuestion}
           removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
           onRemove={onRemoveQuestion} />

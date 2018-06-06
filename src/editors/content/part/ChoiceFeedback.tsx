@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import * as contentTypes from '../../../data/contentTypes';
-
+import { ALT_FLOW_ELEMENTS } from 'data/content/assessment/types';
 import { AbstractContentEditor, AbstractContentEditorProps } from '../common/AbstractContentEditor';
 import { convert } from 'utils/format';
 import { ContentElements } from 'data/content/common/elements';
@@ -33,7 +33,9 @@ export interface ChoiceFeedbackState {
  */
 export abstract class ChoiceFeedback
     extends AbstractContentEditor<contentTypes.Part, ChoiceFeedbackProps, ChoiceFeedbackState> {
+
   defaultFeedbackResponse: contentTypes.Response;
+  placeholderResponse: contentTypes.Response;
 
   constructor(props) {
     super(props);
@@ -49,6 +51,8 @@ export abstract class ChoiceFeedback
     this.onDefaultFeedbackEdit = this.onDefaultFeedbackEdit.bind(this);
     this.onEditMatchSelections = this.onEditMatchSelections.bind(this);
     this.getSelectedMatches = this.getSelectedMatches.bind(this);
+
+    this.placeholderResponse = this.buildResponsePlaceholder();
   }
 
   onResponseEdit(response, src) {
@@ -95,7 +99,7 @@ export abstract class ChoiceFeedback
     onEdit(model.with({
       responses: model.responses.set(
         response.guid,
-        model.responses.get(response.guid).with({ score }),
+        response.with({ score }),
       ),
     }));
   }
@@ -126,21 +130,30 @@ export abstract class ChoiceFeedback
   }
 
   onEditMatchSelections(responseId, choices, selected) {
-    const { model, onEdit } = this.props;
 
-    onEdit(
-      model.with({
-        responses: model.responses.set(
-          responseId,
-          model.responses.get(responseId).with({
-            match: selected.map(id =>
-              choices.find(c => c.guid === id).value,
-            )
-            .join(','),
-          }),
-        ),
-      }),
-      null);
+    const { model, onGetChoiceCombinations, onEdit } = this.props;
+
+    const updatedPart = model.with({
+      responses: model.responses.set(
+        responseId,
+        model.responses.get(responseId).with({
+          match: selected.map(id =>
+            choices.find(c => c.guid === id).value,
+          )
+          .join(','),
+        }),
+      ),
+    });
+
+    const updatedModel = modelWithDefaultFeedback(
+      updatedPart,
+      choices,
+      getGeneratedResponseBody(updatedPart),
+      getGeneratedResponseScore(updatedPart),
+      AUTOGEN_MAX_CHOICES,
+      onGetChoiceCombinations,
+    );
+    onEdit(updatedModel, null);
   }
 
   getSelectedMatches(response, choices) {
@@ -161,6 +174,20 @@ export abstract class ChoiceFeedback
     );
   }
 
+  buildResponsePlaceholder() : contentTypes.Response {
+
+    const feedback = new contentTypes.Feedback({
+      body: ContentElements.fromText('', '', ALT_FLOW_ELEMENTS),
+    });
+    const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
+
+    return new contentTypes.Response({
+      guid: guid(),
+      score: '1',
+      feedback: feedbacks.set(feedback.guid, feedback),
+    });
+  }
+
   renderResponses() {
     const { choices, model, context, services, editMode, simpleFeedback } = this.props;
     const { invalidFeedback } = this.state;
@@ -168,7 +195,11 @@ export abstract class ChoiceFeedback
     // filter out all auto generated responses (identified by AUTOGEN string in name field)
     const userResponses = model.responses.toArray().filter(autogenResponseFilter);
 
-    return userResponses
+    const responsesOrPlaceholder = userResponses.length === 0
+      ? [this.placeholderResponse]
+      : userResponses;
+
+    return responsesOrPlaceholder
       .map((response, i) => {
         return (
         <InputListItem

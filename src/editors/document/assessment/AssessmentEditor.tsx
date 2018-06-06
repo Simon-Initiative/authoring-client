@@ -20,9 +20,10 @@ import { ActiveContext, ParentContainer, TextSelection } from 'types/active';
 import { TitleTextEditor } from 'editors/content/learning/contiguoustext/TitleTextEditor';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import ResourceSelection from 'utils/selection/ResourceSelection.controller';
-import { Resource } from 'data/content/resource';
+import { Resource, ResourceState } from 'data/content/resource';
 import * as Messages from 'types/messages';
 import { buildMissingSkillsMessage } from 'utils/error';
+import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
 
@@ -69,7 +70,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onNodeRemove = this.onNodeRemove.bind(this);
     this.onEditNode = this.onEditNode.bind(this);
-
+    this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
 
     this.supportedElements = Immutable.List<string>();
@@ -305,17 +306,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   onSelectPool() {
 
-    const predicate =
-      (res: Resource) : boolean => {
-        return res.type === LegacyTypes.assessment2_pool;
-      };
+    const predicate = (res: Resource): boolean =>
+      res.type === LegacyTypes.assessment2_pool
+        && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
-        <ResourceSelection
-          filterPredicate={predicate}
-          courseId={this.props.context.courseId}
-          onInsert={this.onInsertPool}
-          onCancel={this.onCancelSelectPool}/>);
+      <ResourceSelection
+        filterPredicate={predicate}
+        courseId={this.props.context.courseId}
+        onInsert={this.onInsertPool}
+        onCancel={this.onCancelSelectPool}/>);
   }
 
   onCancelSelectPool() {
@@ -426,6 +426,16 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   }
 
+  onDuplicateQuestion() {
+
+    if (this.props.currentNode.contentType === 'Question') {
+      const duplicated = this.props.currentNode.clone().with({
+        guid: createGuid(),
+      });
+      this.addNode(duplicated);
+    }
+  }
+
   render() {
     const { context, services, editMode, model, currentNode, onEdit } = this.props;
 
@@ -479,7 +489,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               <div className="nodeContainer">
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
-                  this.onNodeRemove, this.onFocus, this.canRemoveNode(), this)}
+                  this.onNodeRemove, this.onFocus, this.canRemoveNode(),
+                  this.onDuplicateQuestion, this)}
               </div>
             </div>
           </div>

@@ -18,20 +18,21 @@ export const autogenResponseFilter = (response) => {
 /**
  * Generates the remaining feedback match combinations of choices not specified by the user
  */
-const getFeedbackCombinations = (userResponses, choices, allCombinations: CombinationsMap) => {
+const getFeedbackCombinations =
+(userResponses, choices, allCombinations: CombinationsMap): Immutable.List<string> => {
   // get all user specified combinations
   const existingCombinations = userResponses.map(response => response.match.split(',')
     .filter(s => s));
 
   // function that calculates the key of a given combination
   const getComboKey = (combination: string[]): string => {
-    return combination.sort().join(',');
+    return combination.join(',');
   };
 
   // return the difference of all combinations and existing combinations
   return allCombinations.keySeq().filter(combinationKey =>
     !existingCombinations.reduce((acc, e) => acc || combinationKey === getComboKey(e), false),
-  );
+  ).toList();
 };
 
 /**
@@ -51,8 +52,8 @@ export const modelWithDefaultFeedback =
     // remove all existing default responses
     const userResponses = model.responses.filter(r => !r.name.match(/^AUTOGEN.*/));
 
-    let generatedResponses;
-    if (choices.length > maxGenChoices) {
+    let generatedResponses: contentTypes.Response[];
+    if (choices.length <= 1 || choices.length > maxGenChoices) {
       const feedback = new contentTypes.Feedback({
         body,
       });
@@ -67,11 +68,12 @@ export const modelWithDefaultFeedback =
         }),
       ];
     } else {
-      // // update available choice combinations before proceeding
+      // update available choice combinations before proceeding
       const allCombinations = onUpdateChoiceCombinations(choices.length);
 
       // generate new default responses
       generatedResponses = getFeedbackCombinations(userResponses, choices, allCombinations)
+        .toArray()
         .map((combo, i) => {
           const feedback = new contentTypes.Feedback({
             // We only want to clone elements other than the first one, otherwise
@@ -90,8 +92,6 @@ export const modelWithDefaultFeedback =
           });
         });
     }
-
-
 
     const updatedModel = model.with({
       responses: Immutable.OrderedMap(

@@ -36,6 +36,11 @@ export class GradingCriteria extends Immutable.Record(defaultGradingCriteria) {
     return this.merge(values) as this;
   }
 
+  clone() : GradingCriteria {
+    return this.with({
+      body: this.body.clone(),
+    });
+  }
 
   static fromText(text: string, guid: string) : GradingCriteria {
     return new GradingCriteria().with({

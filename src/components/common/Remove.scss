@@ -8,4 +8,24 @@
       color: $danger;
     }
   }
+
+  & button[disabled] {
+    &.btn {
+      i {
+        color: $gray;
+      }
+    }
+
+    &.btn:hover {
+      i {
+        color: $gray;
+      }
+    }
+
+    &.btn:active {
+      i {
+        color: $gray;
+      }
+    }
+  }
 }

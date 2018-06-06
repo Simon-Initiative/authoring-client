@@ -33,20 +33,18 @@ export type ContentTitleProps = {
 export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
   title, canRemove, removeDisabledMessage, onDuplicate, onRemove,
 }) => {
+
+
+
   return (
     <div className="content-title">
       <div className="title">{title}</div>
       <div className="flex-spacer"/>
-      {onDuplicate
-        ? (
-          <div
-            className="action-btn action-btn-duplicate"
-            onClick={onDuplicate}>
-            <i className="fa fa-copy" />
-          </div>
-        )
-        : (null)
-      }
+      <div
+        className={`action-btn action-btn-duplicate ${onDuplicate ? '' : 'disabled'}`}
+        onClick={onDuplicate}>
+        <i className="fa fa-copy" />
+      </div>
       <RemoveButton
         editMode={canRemove} onClick={onRemove}
         removeDisabledMessage={removeDisabledMessage || DEFAULT_REMOVE_DISABLED_MSG}/>

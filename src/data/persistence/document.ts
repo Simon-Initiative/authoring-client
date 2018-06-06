@@ -63,7 +63,7 @@ export function initiatePreview(
   courseId: CourseId, documentId: DocumentId, isRefresh: boolean): Promise<PreviewResult> {
 
   const url = `${configuration.baseUrl}/${courseId}/resources/preview/${documentId}`
-    + (isRefresh ? '?refresh=true' : '');
+    + '?redeploy=true' + (isRefresh ? '&refresh=true' : '');
 
   return authenticatedFetch({ url })
     .then((json : any) => {
@@ -99,6 +99,35 @@ export function initiatePreview(
         message,
       } as PreviewNotSetUp;
     });
+}
+
+export function initiateQuickPreview(courseId: CourseId, documentId: DocumentId) {
+  const protocol = window.location.protocol + '//';
+  const hostname = window.location.host;
+  const prefix = 'content-service/api';
+  const src = `${protocol + hostname}/${prefix}/${courseId}/resources/quick_preview/${documentId}`;
+  window.open(src, '_blank');
+
+  // Temporarily commenting out until authenticated preview is supported in backend.
+  // const iframe = document.createElement('iframe');
+  // iframe.src = src;
+  // // Styles to make the iframe take up the full window
+  // const stylesString = `
+  //   position:fixed;
+  //   top:0px;
+  //   left:0px;
+  //   bottom:0px;
+  //   right:0px;
+  //   width:100%;
+  //   height:100%;
+  //   border:none;
+  //   margin:0;
+  //   padding:0;
+  //   overflow:hidden;
+  //   z-index:999999;`;
+  // iframe.setAttribute('style', stylesString);
+
+  // win.document.body.appendChild(iframe);
 }
 
 export function bulkFetchDocuments(

@@ -5,23 +5,24 @@ import * as Messages from 'types/messages';
 import * as viewActions from 'actions/view';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { showMessage } from 'actions/messages';
+import { OrganizationModel } from 'data/models';
 
-
-// The action to invoke preview.
-function invokePreview(resource: Resource, isRefreshAttempt: boolean) {
-  return function (dispatch, getState) : Promise<persistence.PreviewResult> {
+// Invoke a preview for the entire course by setting up the course package in OLI
+function invokePreview(orgId: string, isRefreshAttempt: boolean) {
+  return function (dispatch, getState): Promise<persistence.PreviewResult> {
 
     const { course } = getState();
 
-    return persistence.initiatePreview(course.guid, resource.guid, isRefreshAttempt);
+    return persistence.initiatePreview(course.guid, orgId, isRefreshAttempt);
   };
 }
 
-export function preview(courseId: string, resource: Resource, isRefreshAttempt: boolean) {
+export function preview(
+  courseId: string, organization: OrganizationModel, isRefreshAttempt: boolean) {
 
-  return function (dispatch) : Promise<any> {
+  return function (dispatch): Promise<any> {
 
-    return dispatch(invokePreview(resource, isRefreshAttempt))
+    return dispatch(invokePreview(organization.guid, isRefreshAttempt))
       .then((result: persistence.PreviewResult) => {
         if (result.type === 'MissingFromOrganization') {
           const message = buildMissingFromOrgMessage(courseId);
@@ -32,12 +33,12 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
         } else if (result.type === 'PreviewSuccess') {
           const refresh = result.message === 'pending';
           window.open(
-            '/#preview' + resource.guid + '-' + courseId
-              + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
-              + (refresh ? '&refresh=true' : ''),
+            '/#preview' + organization.guid + '-' + courseId
+            + '?url=' + encodeURIComponent(result.activityUrl || result.sectionUrl)
+            + (refresh ? '&refresh=true' : ''),
             courseId);
         } else if (result.type === 'PreviewPending') {
-          window.open('/#preview' + resource.guid + '-' + courseId, courseId);
+          window.open('/#preview' + organization.guid + '-' + courseId, courseId);
         }
       }).catch((err) => {
         const message = buildUnknownErrorMessage(err);
@@ -47,9 +48,19 @@ export function preview(courseId: string, resource: Resource, isRefreshAttempt: 
 
 }
 
+// Invoke a preview for the current resource (ie Workbook Page) from the editor.
+// The full course is not built in OLI. Instead, we just receive an HTML page with
+// the workbook page contents.
+export function quickPreview(courseId: string, resource: Resource) {
+
+  return function (dispatch, getState) {
+    const { course } = getState();
+    return persistence.initiateQuickPreview(course.guid, resource.guid);
+  };
+}
 
 function buildEditOrgAction(
-  courseId: string, label: string) : Messages.MessageAction {
+  courseId: string, label: string): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
@@ -98,7 +109,7 @@ function buildNotSetUpMessage() {
 }
 
 
-function buildReportProblemAction() : Messages.MessageAction {
+function buildReportProblemAction(): Messages.MessageAction {
 
   const url = buildFeedbackFromCurrent(
     '',
