@@ -136,8 +136,11 @@ export default class DeleteResourceModal extends
     ];
 
     const link = (edge: Edge) => (text: string) =>
-      <a href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
-        className="btn btn-link">{text}</a>;
+      <a onClick={this.props.onDismissModal}
+         href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
+         className="btn btn-link">
+        {text}
+      </a>;
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
