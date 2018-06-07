@@ -227,8 +227,8 @@ export default class ContiguousTextToolbar
               }
             }
             disabled={!supports('link') || !rangeEntitiesEnabled}
-            tooltip="External Hyperlink">
-            <i className={'fa fa-external-link'} />
+            tooltip="Hyperlink">
+            <i className={'fa fa-link'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={
