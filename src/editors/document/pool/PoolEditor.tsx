@@ -41,6 +41,7 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
 
 interface PoolEditorState extends AbstractEditorState {
   currentNode: contentTypes.Node;
+  hideInsertWindow: boolean;
 }
 
 class PoolEditor extends AbstractEditor<models.PoolModel,
@@ -51,7 +52,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   pendingCurrentNode: Maybe<contentTypes.Question>;
 
   constructor(props) {
-    super(props, { currentNode: props.model.pool.questions.first() });
+    super(props, { currentNode: props.model.pool.questions.first(), hideInsertWindow: true });
 
     this.onEdit = this.onEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
@@ -61,6 +62,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onDuplicateNode = this.onDuplicateNode.bind(this);
+    this.toggleInsertWindow = this.toggleInsertWindow.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -107,6 +109,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     this.pendingCurrentNode = Maybe.just(q);
     this.handleEdit(updated);
+    this.setState({
+      hideInsertWindow: true,
+    });
   }
 
   onTitleEdit(ct: ContiguousText, src) {
@@ -122,7 +127,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.props.onEdit(this.props.model.with({ pool, resource }));
   }
 
-  onEdit(guid : string, question : contentTypes.Question, src) {
+  onEdit(guid: string, question: contentTypes.Question, src) {
 
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
@@ -191,6 +196,29 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     }
   }
 
+  renderAdd() {
+    const { editMode } = this.props;
+    const { hideInsertWindow } = this.state;
+
+    return (
+      <React.Fragment>
+        <div className={`insertWindow ${hideInsertWindow ? 'd-none' : ''}`}>
+          <AddQuestion
+            editMode={this.props.editMode}
+            onQuestionAdd={this.addQuestion.bind(this)}
+            isSummative />
+        </div>
+        <a onClick={this.toggleInsertWindow} className="insertNew">Insert new...</a>
+      </React.Fragment>
+    );
+  }
+
+  toggleInsertWindow() {
+    this.setState({
+      hideInsertWindow: !this.state.hideInsertWindow,
+    });
+  }
+
   render() {
     const { context, services, editMode, model, onEdit } = this.props;
 
@@ -210,7 +238,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <div className="pool-editor">
-        <ContextAwareToolbar context={context} model={model}/>
+        <ContextAwareToolbar context={context} model={model} />
         <div className="pool-content">
           <div className="html-editor-well">
 
@@ -223,11 +251,6 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            <AddQuestion
-              editMode={this.props.editMode}
-              onQuestionAdd={this.addQuestion.bind(this)}
-              isSummative={true}/>
-
             <div className="outline">
               <div className="outlineContainer">
                 <Outline
@@ -238,7 +261,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
-                  />
+                />
+                {this.renderAdd()}
               </div>
               <div className="nodeContainer">
                 {renderAssessmentNode(
@@ -248,12 +272,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               </div>
             </div>
           </div>
-        <ContextAwareSidebar
-          context={context}
-          services={services}
-          editMode={editMode}
-          model={model}
-          onEditModel={onEdit} />
+          <ContextAwareSidebar
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={model}
+            onEditModel={onEdit} />
         </div>
       </div>
     );

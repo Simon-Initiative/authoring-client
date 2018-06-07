@@ -205,17 +205,16 @@ class Tab extends React.PureComponent<TabProperties, {}> {
   }
 
   render(): JSX.Element {
+    const {
+      node, nodeState, handlers, label, previewText, children, connectDragSource, showSkills,
+    } = this.props;
 
     const classes = 'tab-item '
-      + (this.props.nodeState.isSelected ? 'tab-item-active' : '');
+      + (nodeState.isSelected ? 'tab-item-active' : '');
 
     const indentation = {
-      marginLeft: this.props.nodeState.depth * 15,
+      marginLeft: nodeState.depth * 15,
     };
-
-    const {
-      node, handlers, label, previewText, children, connectDragSource, showSkills,
-    } = this.props;
 
     const tab =
       <div>
@@ -227,7 +226,7 @@ class Tab extends React.PureComponent<TabProperties, {}> {
 
           <div className="d-flex w-100 flex-column justify-content-between">
             <small className="content">
-              {previewText}
+              {`${nodeState.indexWithinParent + 1}. ${previewText}`}
             </small>
             <div className="info d-flex justify-content-between">
               <Label {...this.props}>{label}</Label>
