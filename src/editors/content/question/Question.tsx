@@ -64,7 +64,7 @@ export const getLabelForQuestion = (question: contentTypes.Question): string => 
 
       return 'Check All That Apply';
     case 'Ordering':
-      return 'Ordering Question';
+      return 'Ordering';
     case 'Essay':
       return 'Essay';
     case 'ShortAnswer':
@@ -73,6 +73,8 @@ export const getLabelForQuestion = (question: contentTypes.Question): string => 
     case 'Numeric':
     case 'FillInTheBlank':
       return 'Input';
+    case 'ImageHotspot':
+      return 'Image Hotspot';
     default:
       return 'Question';
   }

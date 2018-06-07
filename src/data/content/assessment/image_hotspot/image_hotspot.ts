@@ -23,13 +23,13 @@ const defaultContent = {
   src: '',
   width: 100,
   height: 100,
-  select: '',
+  select: 'single',
 };
 
 export class ImageHotspot extends Immutable.Record(defaultContent) {
 
   contentType: 'ImageHotspot';
-  elementType: 'multiple_choice';
+  elementType: 'image_hotspot';
   guid: string;
   id: string;
   hotspots: Immutable.OrderedMap<string, Hotspot>;

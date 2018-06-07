@@ -433,7 +433,7 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
-            <div className="instruction-label">Select the correct choices</div>
+            <div className="instruction-label">Select the correct choices and provide feedback</div>
             <ChoiceList>
               {this.renderChoices()}
             </ChoiceList>

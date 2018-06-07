@@ -7,6 +7,7 @@ import { ContentElements } from 'data/content/common/elements';
 import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
+import { ImageHotspot } from './ImageHotspot.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
 import { DynaDropInput } from './DynaDropInput.controller';
@@ -316,6 +317,11 @@ export class QuestionEditor
     if (item.contentType === 'Essay') {
       return (
         <Essay {...questionProps} itemModel={item} />
+      );
+    }
+    if (item.contentType === 'ImageHotspot') {
+      return (
+        <ImageHotspot {...questionProps} itemModel={item} />
       );
     }
   }

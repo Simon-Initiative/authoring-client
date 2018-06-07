@@ -163,6 +163,9 @@ DynaDropTargetItems
         <TabSectionHeader title="Targets">
         </TabSectionHeader>
         <TabSectionContent>
+          <div className="instruction-label">
+            Select the correct targets and provide feedback
+          </div>
           <ChoiceList>
             {this.renderChoices()}
           </ChoiceList>
