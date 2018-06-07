@@ -35,7 +35,7 @@
 		border: 2px solid $primary;
 		color: $primary;
 
-		&:hover {
+		&:hover:not([disabled]) {
 			background-color: lighten($primary, 40%);
 		}
 
@@ -57,7 +57,7 @@
 		border: 2px solid $remove;
 		color: $white;
 
-		&:hover {
+		&:hover:not([disabled]) {
 			background-color: darken($remove, 10%);
 			border-color: darken($remove, 10%);
 		}
@@ -92,7 +92,7 @@
 		color: $primary;
 		font-weight: 600;
 
-		&:hover {
+		&:hover:not([disabled]) {
 			text-decoration: underline;
 		}
 
@@ -115,7 +115,7 @@
 			background-color: inherit;
 			border: inherit;
 
-			&:hover {
+			&:hover:not([disabled]) {
 				color: darken($remove, 10%);
 				background-color: inherit;
 				border-color: inherit;
