@@ -10,11 +10,7 @@ import { SidebarGroup } from 'components/sidebar/ContextAwareSidebar';
 import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
-import { buildUrl } from 'utils/path';
 import { modalActions } from 'actions/modal';
-import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
-import { AppContext } from 'editors/common/AppContext';
-import { MediaItem } from 'types/media';
 import { selectFile } from 'editors/content/learning/file';
 
 export interface LinkEditorProps extends AbstractContentEditorProps<contentTypes.Link> {
@@ -184,7 +180,7 @@ export default class LinkEditor
 
   renderSideBarWebContent() {
 
-    const { model, onEdit, editMode } = this.props;
+    const { model, editMode } = this.props;
 
     const extractFilename = (href: string) => {
       const index = href.lastIndexOf('/');
