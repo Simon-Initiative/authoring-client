@@ -10,12 +10,16 @@
 	border: none;
 	transition: none;
 
+	&[disabled] {
+		cursor: default;
+	}
+
 	&.btn-primary, &.btn-ok {
 		background-color: $primary;
 		border: 2px solid $primary;
 		color: $white;
 
-		&:hover {
+		&:hover:not([disabled]) {
 			background-color: darken($primary, 10%);
 			border-color: darken($primary, 10%);
 		}
