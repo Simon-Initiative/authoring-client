@@ -7,6 +7,7 @@ import { styles } from './LoadingSpinner.styles';
 
 export interface LoadingSpinnerProps {
   className?: string;
+  failed?: boolean;
   message: string;
 }
 
@@ -27,12 +28,14 @@ export class LoadingSpinner
   }
 
   render() {
-    const { className, classes, children, message } = this.props;
+    const { className, classes, children, message, failed } = this.props;
 
     return (
       <div className={classNames(['LoadingSpinner', classes.LoadingSpinner, className])}>
-        <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-        {message}
+        {failed
+          ? <i className="fa fa-times-circle" />
+          : <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />}
+        &nbsp;{message}
       </div>
     );
   }

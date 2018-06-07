@@ -1,9 +1,12 @@
-export const styles = {
-  loading: {
+import colors from 'styles/colors';
+import { JSSStyles } from 'styles/jss';
+
+export const styles: JSSStyles = {
+  LoadingSpinner: {
     padding: '20px 0',
     textAlign: 'center',
     fontSize: '0.8em',
-    color: '$gray',
+    color: colors.gray,
 
     '&i': {
       margin: '0 5px',
