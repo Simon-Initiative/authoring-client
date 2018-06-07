@@ -215,6 +215,17 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
 
+    const actionsToolbarLabel = () => {
+      switch (model.modelType) {
+        case 'AssessmentModel':
+          return 'Assessment';
+        case 'WorkbookPageModel':
+          return 'Page';
+        default:
+          return 'Actions';
+      }
+    };
+
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
@@ -243,7 +254,10 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
         <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
+        <ToolbarGroup
+          className={classes.toolbarActionsGroup}
+          label={actionsToolbarLabel()}
+          columns={10}>
           <ActionsToolbar
             documentResource={resource}
             documentId={context.documentId}
