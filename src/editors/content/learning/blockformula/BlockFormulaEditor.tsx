@@ -55,6 +55,7 @@ export default class BlockFormulaEditor
         <div className={classes.formulaWrapper}>
           <ContiguousTextEditor
             {...this.props}
+            onInsertParsedContent={() => {}}
             onFocus={this.onFocusOverride}
             model={this.props.model.text}
             onEdit={this.onEditText}>

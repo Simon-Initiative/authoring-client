@@ -23,6 +23,7 @@ export const ContiguousTextViewer:
     return (
       <div className={classNames([className])}>
         <ContiguousTextEditor
+          onInsertParsedContent={() => {}}
           activeContentGuid={null}
           hover={null}
           onUpdateHover={() => {}}

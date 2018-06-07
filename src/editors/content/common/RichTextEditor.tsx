@@ -36,6 +36,7 @@ export class RichTextEditor
   renderSidebar() {
     return null;
   }
+
   renderToolbar() {
     return null;
   }
@@ -43,6 +44,7 @@ export class RichTextEditor
   renderMain() : JSX.Element {
 
     const editor = <ContiguousTextEditor
+            onInsertParsedContent={() => {}}
             activeContentGuid={null}
             hover={null}
             onUpdateHover={() => {}}

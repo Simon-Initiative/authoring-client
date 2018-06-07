@@ -2,28 +2,35 @@ import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ContentParser } from 'data/parsers/common/types';
+import { ContentParser, ParsedContent, ContentDependency } from 'data/parsers/common/types';
 import { toArray } from 'data/parsers/common/utils';
 import { ContentElements, INLINE_ELEMENTS } from 'data/content/common/elements';
 
-const parse : ContentParser = (data: string) : Maybe<ContentElement> => {
+// Content parser for Google Sheets. See sheets.sample.html for a sample of data
+// obtained when pasting from Sheets
+
+const parse : ContentParser = (data: string) : Maybe<ParsedContent> => {
   if (isGoogleSheets(data)) {
     return tryToParse(data);
   }
   return Maybe.nothing();
 };
 
-function tryToParse(data: string) : Maybe<ContentElement> {
+function tryToParse(data: string) : Maybe<ParsedContent> {
 
   const tableString = data.substr(data.indexOf('<table'));
 
   const parser = new DOMParser();
-  const dom = parser.parseFromString(tableString, 'application/xml');
+  const dom = parser.parseFromString(tableString, 'text/html');
 
   const table = createTable(dom);
 
   if (table !== null) {
-    return Maybe.just(table);
+    const parsed : ParsedContent = {
+      elements: Immutable.List<ContentElement>([table]),
+      dependencies: Immutable.List<ContentDependency>(),
+    };
+    return Maybe.just(parsed);
   }
   return Maybe.nothing();
 }
@@ -69,10 +76,8 @@ function createRow(node) : contentTypes.Row {
 
 function createCell(node) : contentTypes.CellData | contentTypes.CellHeader {
 
-  console.log(node);
-
   return new contentTypes.CellData().with({
-    content: ContentElements.fromText(node.nodeValue, '', INLINE_ELEMENTS),
+    content: ContentElements.fromHTML(node.innerHTML, '', INLINE_ELEMENTS),
   });
 }
 

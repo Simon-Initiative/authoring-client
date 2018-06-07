@@ -20,6 +20,7 @@ import guid from '../../../../utils/guid';
 import { updateData } from 'data/content/common/clone';
 import './DraftWrapper.scss';
 import parseContent from 'data/parsers/parse';
+import { ParsedContent } from 'data/parsers/common/types';
 
 
 export interface DraftWrapperProps {
@@ -34,6 +35,7 @@ export interface DraftWrapperProps {
   singleBlockOnly: boolean;
   parentProps: Object;
   parent: any;
+  onInsertParsedContent: (content: ParsedContent) => void;
 }
 
 interface DraftWrapperState {
@@ -358,8 +360,8 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     if (html !== undefined && html !== null) {
 
       const parsed = parseContent(html).caseOf({
-        just: (element) => {
-          console.log(element);
+        just: (parsedContent) => {
+          setTimeout(() => this.props.onInsertParsedContent(parsedContent), 0);
           return true;
         },
         nothing: () => false,

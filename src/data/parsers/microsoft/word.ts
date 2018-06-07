@@ -1,8 +1,7 @@
 import { Maybe } from 'tsmonad';
-import { ContentElement } from 'data/content/common/interfaces';
-import { ContentParser } from 'data/parsers/common/types';
+import { ContentParser, ParsedContent } from 'data/parsers/common/types';
 
-const parse : ContentParser = (data: string) : Maybe<ContentElement> => {
+const parse : ContentParser = (data: string) : Maybe<ParsedContent> => {
   return Maybe.nothing();
 };
 

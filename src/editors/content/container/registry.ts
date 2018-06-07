@@ -8,7 +8,7 @@ import WbInlineEditor from '../learning/WbInlineEditor';
 import ActivityEditor from '../learning/ActivityEditor';
 import BlockCodeEditor from '../learning/blockcode/BlockCodeEditor';
 import BlockFormulaEditor from '../learning/blockformula/BlockFormulaEditor';
-import ContiguousTextEditor from '../learning/contiguoustext/ContiguousTextEditor';
+import { ContiguousTextEditor } from '../learning/contiguoustext/ContiguousTextEditor.controller';
 import { CustomEditor } from '../learning/CustomEditor';
 import UnsupportedEditor from '../learning/UnsupportedEditor';
 import LinkEditor from '../learning/LinkEditor';

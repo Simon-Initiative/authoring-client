@@ -19,6 +19,7 @@ export interface ContiguousTextEditorProps
   editorStyles?: any;
   hideBorder?: boolean;
   onTextSelectionChange?: (selection: any) => void;
+  onInsertParsedContent: (resourcePath: string, o) => void;
 }
 
 export interface ContiguousTextEditorState {
@@ -109,6 +110,8 @@ export default class ContiguousTextEditor
           viewOnly && classes.viewOnly, className])}>
 
           <DraftWrapper
+            onInsertParsedContent={o =>
+              this.props.onInsertParsedContent(this.props.context.resourcePath, o)}
             singleBlockOnly={model.mode === ContiguousTextMode.SimpleText}
             activeItemId=""
             parentProps={this.props}

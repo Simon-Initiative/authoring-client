@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { ContentState, SelectionState, Modifier, Entity } from 'draft-js';
+import { ContentState, SelectionState, Modifier, Entity, convertFromHTML } from 'draft-js';
 import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
@@ -107,6 +107,17 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
     return new ContiguousText({ guid, mode, content: ContentState.createFromText(text) });
+  }
+
+  static fromHTML(html: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+
+    const blocksFromHTML = convertFromHTML(html);
+    const content = ContentState.createFromBlockArray(
+      blocksFromHTML.contentBlocks,
+      blocksFromHTML.entityMap,
+    );
+
+    return new ContiguousText({ guid, mode, content });
   }
 
   toPersistence() : Object {
