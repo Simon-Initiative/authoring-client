@@ -6,6 +6,8 @@ import * as viewActions from '../actions/view';
 import { isNullOrUndefined } from 'util';
 
 import './CreateCourseView.scss';
+import { buildFeedbackFromCurrent } from 'utils/feedback';
+import { Toast, Severity } from 'components/common/Toast';
 
 const BOOK_IMAGE = require('../../assets/book.svg');
 
@@ -16,6 +18,8 @@ export interface CreateCourseViewProps {
 export interface CreateCourseViewState {
   waiting: boolean;
   error: boolean;
+  disabled: boolean;
+  inputText: string;
 }
 
 class CreateCourseView extends React.PureComponent<CreateCourseViewProps, CreateCourseViewState> {
@@ -26,7 +30,11 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     this.state = {
       waiting: false,
       error: false,
+      disabled: true,
+      inputText: '',
     };
+
+    this.onChange = this.onChange.bind(this);
   }
 
   startCreation(title: string) {
@@ -46,77 +54,85 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       });
   }
 
+  onChange(e) {
+    const value: string = e.target.value;
+
+    this.setState({
+      inputText: value,
+      disabled: value.trim() === '',
+    });
+  }
+
   createCourse(e) {
     e.preventDefault();
 
-    const title = (this.refs['title'] as any).value;
-    if (isNullOrUndefined(title) || title === '') {
-      return;
-    }
-
-    this.setState({ waiting: true }, () => this.startCreation(title));
+    this.setState({ waiting: true }, () => this.startCreation(this.state.inputText.trim()));
   }
 
   render() {
 
-    const inputs = (
-      <div className="col-md-4 offset-sm-4">
-        <button onClick={this.createCourse.bind(this)}
-                className="btn btn-secondary btn-lg btn-block outline serif">
-          Create Course
+    const button = (
+      <div className="col-md-6 offset-sm-3">
+        <div className="creationContainer">
+          <button disabled={this.state.disabled}
+            onClick={this.createCourse.bind(this)}>
+            Create Course
         </button>
+        </div>
       </div>
     );
 
+    const waitingIcon = <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />;
+    const waitingHeading = 'Setting up your course';
+    const waitingContent = <p>We'll take you there as soon as it's ready.</p>;
     const waiting = (
-      <div className="col-md-4 offset-sm-4">
-        <div className="alert alert-info" role="alert">
-          <h4 className="alert-heading">Course Creation in Progress</h4>
-          <p>A new course is being created for you. </p>
-          <p className="mb-0">Upon completion of the course creation you will
-            be taken to the front page of the new course.
-          </p>
-        </div>
+      <div className="col-md-6 offset-sm-3">
+        <Toast
+          icon={waitingIcon}
+          heading={waitingHeading}
+          content={waitingContent}
+          severity={Severity.Waiting} />
       </div>
     );
 
+    const errorIcon = <i className="fa fa-exclamation-circle" />;
+    const errorHeading = 'Oops';
+    const errorContent = <p>Something went wrong. Please try again, and
+    if the problem remains you can contact us with the link below.</p>;
     const error = (
-      <div className="col-md-4 offset-sm-4">
-        <div className="alert alert-danger" role="alert">
-          <h4 className="alert-heading">Error!</h4>
-          <p>A problem was encountered trying to create the new course</p>
-          <p className="mb-0">Please try again, if the problem persists please
-            contact support.
-          </p>
-        </div>
+      <div className="col-md-6 offset-sm-3">
+        <Toast
+          icon={errorIcon}
+          heading={errorHeading}
+          content={errorContent}
+          severity={Severity.Error} />
       </div>
     );
-
-    const imageViaStyle = {
-      backgroundImage: 'url(' + BOOK_IMAGE + ')',
-    };
 
     return (
-      <div style={imageViaStyle} className="create-course-view full container-fluid">
+      <div className="create-course-view full container-fluid">
         <div className="row">
-          <div className="col-md-12">
-            <h1>Create a new course content package</h1>
-
+          <div className="col-md-4 offset-sm-4">
+            <h2>What's your course called?</h2>
           </div>
         </div>
         <div className="row">
           <fieldset>
-            <input type="text" ref="title" className="col-md-12" id="input"
-                   placeholder="Math Primer, Engineering Statics, Spanish"/>
-            <label htmlFor="input">Course Name</label>
+            <input
+              value={this.state.inputText}
+              onChange={this.onChange}
+              type="text"
+              id="input"
+              placeholder="e.g. Introduction to Psychology, Spanish I" />
           </fieldset>
         </div>
         <div className="row">
+          {button}
           {this.state.waiting
             ? waiting
             : this.state.error
               ? error
-              : inputs }
+              : null}
         </div>
       </div>
     );

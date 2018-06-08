@@ -1,73 +1,148 @@
 @import 'oli/colors';
 @import 'oli/typography';
 
+$button-blue: #3498DB;
+
 .create-course-view {
-  background-color: $blue;
-  background-repeat: no-repeat;
-  background-size: 30%;
-  background-position-x: 25%;
-  background-position-y: 40%;
+  background: linear-gradient(to top, #6fc7e4, #75aaf0);
   padding-top: 4rem;
   padding-bottom: 4rem;
   margin-bottom: 3rem;
   text-align: left;
   color: $white;
 
-  .btn.btn-secondary {
-    color: $white;
-    margin-top:2rem;
-
-    img {
-      margin-right: 0.5rem;
-    }
-
-    &:hover {
-      background-color: $white;
-      color: $blue;
-    }
-  }
-
   &.full {
     height: 100vh;
     padding: 10rem;
 
-    h1 {
-      font-family: $serif-font;
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1.7rem;
+      text-align: center;
     }
 
     fieldset {
       width: 100%;
       position: relative;
+      text-align: center;
     }
 
     input {
-      padding: 2rem;
-      color: #000;
-      border: 1px solid #0055ab;
+      width: 400px;
+      outline: none;
+      padding: 1rem;
+      font-size: 1.2rem;
+      line-height: 1.2rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid white;
+      color: white;
+
+      &::placeholder {
+        color: white;
+      }
     }
 
-    input::placeholder {
-      color: #c3c6cb;
-    }
+    .creationContainer {
+      text-align: center;
+      outline: none;
 
-    label {
-      top: 37px;
+      button {
+        background-color: $button-blue;
+        text-decoration: none;
+        color: white;
+        width: 250px;
+        height: 75px;
+        position: relative;
+        margin-top: 30px;
+        border: none;
+        padding: 16px;
+        font-size: 1.6rem;
+        border-radius: 10px;
+        transition: all 0.2s;
+
+        top: 10px;
+        &:active:not([disabled]) {
+          top: 18px;
+        }
+
+        cursor: pointer;
+        &[disabled] {
+          cursor: default;
+        }
+
+        &:focus {
+          outline: none;
+        }
+
+        box-shadow: 0px 15px 0px 0px darken($button-blue, 5%);
+        &:active {
+          box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
+        }
+      }
+    }
+  }
+
+  .toast {
+    margin-top: 50px;
+    transition: all 1s ease;
+    background-color: white;
+    padding: 21px 0;
+    border-radius: 4px;
+    box-shadow: 1px 7px 14px -5px rgba(0,0,0,0.2);
+    color: #222;
+    position: relative;
+
+    .toast-icon {
       position: absolute;
-      display: block;
-      transition: 0.2s;
-      margin-left: 2rem;
-      margin-top: -25px;
+      top: 50%;
+      left: 22px;
+      font-size: 2rem;
+      transform: translateY(-50%);
     }
 
-    input:focus + label {
-      top: 12px;
-      margin-top: 0px;
-      margin-left: 2rem;
-      color: #000;
+    .toast-content {
+      padding-left: 70px;
+      padding-right: 20px;
+
+      .toast-heading {
+        font-size: 1.1rem;
+        font-weight: bold;
+      }
+
+      p {
+        margin: 0;
+        color: #878787
+      }
     }
 
-    input:focus {
-      outline: 2px solid #0055ab;
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+
+    &.waiting {
+      .toast-icon {
+        color: $info;
+      }
+      &:before {
+        background-color: $info;
+      }
+    }
+
+    &.error {
+      .toast-icon {
+        color: $alizarin;
+      }
+      &:before {
+        background-color: $alizarin;
+      }
     }
   }
 }

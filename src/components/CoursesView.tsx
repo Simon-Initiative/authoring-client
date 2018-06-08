@@ -8,6 +8,7 @@ import { Maybe } from 'tsmonad';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
 
 import './CoursesView.scss';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 type CourseDescription = {
   guid: string,
@@ -172,9 +173,9 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 
   renderWaiting() {
     return (
-      <p className="lead">
-        Loading...
-      </p>
+      <div className="lead" style={{ width: '175px' }} >
+        <LoadingSpinner message="Loading courses..." />
+      </div>
     );
   }
 
@@ -184,17 +185,19 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 
         <div className="my-course-packages">
 
-          <h2 style={ { display: 'inline' } }>My Course Packages</h2>
+          <h2 style={ { display: 'inline' } }>My Courses</h2>
 
           {this.renderActionBar()}
 
           <div style={ { marginTop: '30px' }}>
 
-          {this.state.courses.caseOf({
+{this.renderNoCourses()}
+          {/* {this.state.courses.caseOf({
             just: courses => courses.length === 0
-              ? this.renderNoCourses() : this.renderCourses(courses),
+              ? this.renderNoCourses()
+              : this.renderCourses(courses),
             nothing: () => this.renderWaiting(),
-          })}
+          })} */}
 
           </div>
         </div>

@@ -6,6 +6,7 @@ import { showMessage } from 'actions/messages';
 import * as Messages from 'types/messages';
 
 import './ImportCourseView.scss';
+import { Severity, Toast } from 'components/common/Toast';
 
 const BOOK_IMAGE = require('../../assets/book.svg');
 
@@ -14,16 +15,16 @@ export interface ImportCourseViewProps {
 }
 
 export interface ImportCourseViewState {
-
+  disabled: boolean;
+  inputText: string;
 }
 
-function buildImportMessage() : Messages.Message {
+function buildImportMessage(): Messages.Message {
 
   const content = new Messages.TitledContent().with({
-    title: 'Importing course.',
+    title: 'Importing course',
     message: 'Your course is importing. To check on the progress,'
       + ' reload the page.',
-
   });
 
   return new Messages.Message().with({
@@ -40,70 +41,89 @@ export class ImportCourseView
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      disabled: true,
+      inputText: '',
+    };
+
+    this.onChange = this.onChange.bind(this);
     this.onImport = this.onImport.bind(this);
   }
 
-  onImport() {
+  onChange(e) {
+    const value: string = e.target.value;
 
-    const url = (this.refs['url'] as any).value;
-    if (url === undefined || url === null) {
-      return;
-    }
+    this.setState({
+      inputText: value,
+      disabled: value.trim() === '',
+    });
+  }
 
-    persistence.importPackage(url);
+  onImport(e) {
+    e.preventDefault();
 
+    persistence.importPackage(this.state.inputText.trim());
     this.props.dispatch(viewActions.viewAllCourses());
-
     this.props.dispatch(showMessage(buildImportMessage()));
   }
 
   render() {
 
-    const inputs = (
-      <div className="col-md-4 offset-sm-4">
-        <button onClick={this.onImport.bind(this)}
-                className="btn btn-secondary btn-lg btn-block outline serif">
-          Import Course
+    const button = (
+      <div className="col-md-6 offset-md-3">
+        <div className="creationContainer">
+          <button disabled={this.state.disabled}
+            onClick={this.onImport.bind(this)}>
+            Import Course
         </button>
+        </div>
       </div>
     );
 
-    const imageViaStyle = {
-      backgroundImage: 'url(' + BOOK_IMAGE + ')',
-    };
+    const noteIcon = <i className="fa fa-exclamation-circle" />;
+    const noteHeading = 'Note';
+    const noteContent = <React.Fragment>
+      <p>Importing an existing OLI course can take several minutes,
+        especially if the course is large and contains many assets.
+      </p>
+      <br />
+      <p>After you initiate an import, you will be taken to the
+        &quot;My Courses&quot; page, where you can see the status
+        of the course that you are importing.
+      </p>
+    </React.Fragment>;
+    const note = (
+      <div className="col-md-6 offset-md-3">
+        <Toast
+          icon={noteIcon}
+          heading={noteHeading}
+          content={noteContent}
+          severity={Severity.Info} />
+      </div>
+    );
 
     return (
-      <div style={imageViaStyle} className="import-course-view full container-fluid">
+      <div className="import-course-view full container-fluid">
         <div className="row">
-          <div className="col-md-12">
-            <h1>Import an existing course content package</h1>
+          <div className="col-md-6 offset-md-3">
+            <h2>Import an existing course</h2>
           </div>
         </div>
         <div className="row">
           <fieldset>
-            <input type="text" ref="url" className="col-md-12" id="input"
-                   placeholder="Enter the full path of the location of course SVN repository"/>
-            <label htmlFor="input">SVN URL</label>
+            <input
+            value={this.state.inputText}
+            onChange={this.onChange}
+            type="text"
+            className="col-md-6 offset-md-3" id="input"
+            placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/" />
           </fieldset>
         </div>
-        {inputs}
-        <br/>
+        {button}
+        <br />
         <div className="row">
-          <div className="col-md-8 offset-sm-2">
-            <div className="alert alert-info" role="alert">
-              <h4 className="alert-heading">Note</h4>
-              <p className="mb-0">Importing an existing OLI course package
-              can take several minutes, especially if the course package
-              is large and contains many assets.
-              </p>
-              <br/>
-              <p className="mb-0">After you initiate an import, you will
-              be taken to the
-              &quot;My Course Packages&quot; page, where you can see the status
-              of the course package that you are importing.
-              </p>
-            </div>
-          </div>
+          {note}
         </div>
       </div>
     );
