@@ -1,7 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 
 import { styles } from './LoadingSpinner.styles';
 
@@ -28,7 +27,7 @@ export class LoadingSpinner
   }
 
   render() {
-    const { className, classes, children, message, failed } = this.props;
+    const { className, classes, message, failed } = this.props;
 
     return (
       <div className={classNames(['LoadingSpinner', classes.LoadingSpinner, className])}>

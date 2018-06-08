@@ -191,13 +191,12 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 
           <div style={ { marginTop: '30px' }}>
 
-{this.renderNoCourses()}
-          {/* {this.state.courses.caseOf({
+          {this.state.courses.caseOf({
             just: courses => courses.length === 0
               ? this.renderNoCourses()
               : this.renderCourses(courses),
             nothing: () => this.renderWaiting(),
-          })} */}
+          })}
 
           </div>
         </div>

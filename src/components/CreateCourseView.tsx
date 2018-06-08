@@ -3,13 +3,9 @@ import guid from '../utils/guid';
 import * as persistence from '../data/persistence';
 import * as models from '../data/models';
 import * as viewActions from '../actions/view';
-import { isNullOrUndefined } from 'util';
 
 import './CreateCourseView.scss';
-import { buildFeedbackFromCurrent } from 'utils/feedback';
 import { Toast, Severity } from 'components/common/Toast';
-
-const BOOK_IMAGE = require('../../assets/book.svg');
 
 export interface CreateCourseViewProps {
   dispatch: any;

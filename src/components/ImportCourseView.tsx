@@ -8,8 +8,6 @@ import * as Messages from 'types/messages';
 import './ImportCourseView.scss';
 import { Severity, Toast } from 'components/common/Toast';
 
-const BOOK_IMAGE = require('../../assets/book.svg');
-
 export interface ImportCourseViewProps {
   dispatch: any;
 }

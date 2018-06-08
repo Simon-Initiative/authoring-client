@@ -52,7 +52,7 @@ export class Actions
   }
 
   render() {
-    const { course, org, onDisplayModal, onDismissModal, onDuplicate, onPreview }
+    const { course, org, onDisplayModal, onDismissModal, onDuplicate }
       = this.props;
 
     const { isPublishing, failedPublish } = this.state;

@@ -7,7 +7,7 @@ import { toDraft } from './draft/todraft';
 import { TextSelection } from 'types/active';
 import {
   getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
-  Changes, detectChanges, removeEntity as internalRemoveEntity
+  Changes, detectChanges, removeEntity as internalRemoveEntity,
 } from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
@@ -105,7 +105,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     root: Object[], guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
     return new ContiguousText({
       guid, mode,
-      content: toDraft(root, mode === ContiguousTextMode.SimpleText)
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText),
     });
   }
 
