@@ -167,13 +167,7 @@ const PoolRefTab = (props: TabProps) => {
 
   const newPoolRefText = newText('Question Pool');
 
-  const poolId = (p.source as PoolRef).idref;
-  const poolTitle = '';
-  // Need to get course from redux and get the pool title through resourcesById
-  // const poolTitle = course.resourcesById.get(poolId).title.extractPlainText().caseOf({
-  //   just: t => t !== '' ? t : newPoolText,
-  //   nothing: () => newPoolText,
-  // });
+  const poolTitle = 'Question Pool';
 
   return (
     <Tab

@@ -126,6 +126,7 @@ export class SelectionEditor
                 editMode={this.props.editMode}
                 onQuestionAdd={this.onAddQuestion.bind(this)}
                 isSummative={true}/>
+              <br />
             </div>
           )
         }
@@ -172,16 +173,17 @@ export class SelectionEditor
             .title.text.content.first() as ContiguousText)}
           onEdit={this.onTitleEdit}
           editorStyles={{ fontSize: 20 }} />;
-
     }
 
     return (
       <div className="selection-editor">
           {this.renderTitle()}
 
-          {controls}
+          <br />
 
           {titleEditor}
+
+          {controls}
 
           {this.renderSource()}
 
