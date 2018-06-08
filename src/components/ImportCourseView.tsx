@@ -46,6 +46,7 @@ export class ImportCourseView
     };
 
     this.onChange = this.onChange.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.onImport = this.onImport.bind(this);
   }
 
@@ -58,9 +59,13 @@ export class ImportCourseView
     });
   }
 
-  onImport(e) {
-    e.preventDefault();
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      this.onImport();
+    }
+  }
 
+  onImport() {
     persistence.importPackage(this.state.inputText.trim());
     this.props.dispatch(viewActions.viewAllCourses());
     this.props.dispatch(showMessage(buildImportMessage()));
@@ -72,7 +77,7 @@ export class ImportCourseView
       <div className="col-md-6 offset-md-3">
         <div className="creationContainer">
           <button disabled={this.state.disabled}
-            onClick={this.onImport.bind(this)}>
+            onClick={this.onImport}>
             Import Course
         </button>
         </div>
@@ -111,11 +116,12 @@ export class ImportCourseView
         <div className="row">
           <fieldset>
             <input
-            value={this.state.inputText}
-            onChange={this.onChange}
-            type="text"
-            className="col-md-6 offset-md-3" id="input"
-            placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/" />
+              value={this.state.inputText}
+              onChange={this.onChange}
+              onKeyPress={this.handleKeyPress}
+              type="text"
+              className="col-md-6 offset-md-3" id="input"
+              placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/" />
           </fieldset>
         </div>
         {button}

@@ -31,6 +31,8 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     };
 
     this.onChange = this.onChange.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.createCourse = this.createCourse.bind(this);
   }
 
   startCreation(title: string) {
@@ -59,10 +61,17 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     });
   }
 
-  createCourse(e) {
-    e.preventDefault();
+  handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      this.createCourse();
+    }
+  }
 
-    this.setState({ waiting: true }, () => this.startCreation(this.state.inputText.trim()));
+  createCourse() {
+    this.setState(
+      { waiting: true },
+      () => this.startCreation(this.state.inputText.trim()),
+    );
   }
 
   render() {
@@ -71,7 +80,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
       <div className="col-md-6 offset-sm-3">
         <div className="creationContainer">
           <button disabled={this.state.disabled}
-            onClick={this.createCourse.bind(this)}>
+            onClick={this.createCourse}>
             Create Course
         </button>
         </div>
@@ -117,6 +126,7 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
             <input
               value={this.state.inputText}
               onChange={this.onChange}
+              onKeyPress={this.handleKeyPress}
               type="text"
               id="input"
               placeholder="e.g. Introduction to Psychology, Spanish I" />
