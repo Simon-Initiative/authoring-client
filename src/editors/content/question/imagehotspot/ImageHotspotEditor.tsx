@@ -6,6 +6,7 @@ import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
+import { RectangleEditor } from './RectangleEditor';
 
 import { styles } from './ImageHotspotEditor.styles';
 
@@ -14,15 +15,6 @@ const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
     cx: coords.get(0),
     cy: coords.get(1),
     r: coords.get(2),
-  };
-};
-
-const mapCoordsToRectProps = (coords: Immutable.List<number>) => {
-  return {
-    x: coords.get(0),
-    y: coords.get(1),
-    width: coords.get(2) - coords.get(0),
-    height: coords.get(3) - coords.get(1),
   };
 };
 
@@ -37,10 +29,11 @@ export interface ImageHotspotEditorProps {
   editMode: boolean;
   model: contentTypes.ImageHotspot;
   context: AppContext;
+  onEdit: (model: contentTypes.ImageHotspot) => void;
 }
 
 export interface ImageHotspotEditorState {
-
+  selectedHotspot: string;
 }
 
 /**
@@ -53,10 +46,34 @@ export class ImageHotspotEditor
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      selectedHotspot: null,
+    };
+
+    this.onSelectHotspot = this.onSelectHotspot.bind(this);
+  }
+
+  onEditCoords(guid: string, coords: Immutable.List<number>) {
+    const { model, onEdit } = this.props;
+
+    onEdit(model.with({
+      hotspots: model.hotspots.set(
+        guid,
+        model.hotspots.get(guid).with({ coords }),
+      ),
+    }));
+  }
+
+  onSelectHotspot(guid: string) {
+    this.setState({
+      selectedHotspot: guid,
+    });
   }
 
   render() {
     const { className, classes, children, editMode, context, model } = this.props;
+    const { selectedHotspot } = this.state;
 
     return (
       <div
@@ -80,9 +97,9 @@ export class ImageHotspotEditor
         <ToolbarButton
             onClick={() => {}}
             size={ToolbarButtonSize.Fit}
-            tooltip="Create an oval hotspot"
+            tooltip="Create a circle hotspot"
             disabled={!editMode}>
-          Oval
+          Circle
         </ToolbarButton>
         <ToolbarButton
             onClick={() => {}}
@@ -101,10 +118,10 @@ export class ImageHotspotEditor
           Remove Hotspot
         </ToolbarButton>
         </div>
-        <div className={classes.imageBody}>
+        <div className={classes.imageBody} onClick={() => this.onSelectHotspot(null)}>
           {model.src
             ? (
-              <div className={classes.imageBody}>
+              <div className={classes.hotspotBody}>
                 <img
                   src={buildUrl(
                     context.baseUrl,
@@ -116,17 +133,21 @@ export class ImageHotspotEditor
                 <svg className={classes.hotspots} width={model.width} height={model.height}>
                   {model.hotspots.map((hotspot) => {
                     switch (hotspot.shape) {
+                      case 'rect':
+                        return (
+                          <RectangleEditor
+                            className={classes.hotspot}
+                            id={hotspot.guid}
+                            selected={hotspot.guid === selectedHotspot}
+                            coords={hotspot.coords}
+                            onSelect={this.onSelectHotspot}
+                            onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
+                        );
                       case 'circle':
                         return (
                           <circle
                             className={classes.hotspot}
                             {...mapCoordsToCircleProps(hotspot.coords)} />
-                        );
-                      case 'rect':
-                        return (
-                          <rect
-                            className={classes.hotspot}
-                            {...mapCoordsToRectProps(hotspot.coords)} />
                         );
                       case 'poly':
                         return (

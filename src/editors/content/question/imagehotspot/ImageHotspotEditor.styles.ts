@@ -8,7 +8,7 @@ export const styles: JSSStyles = {
     display: 'flex',
     flexDirection: 'column',
     border: BORDER_STYLE,
-    maxWidth: 800,
+    minWidth: 500,
   },
   toolbar: {
     display: 'flex',
@@ -18,8 +18,12 @@ export const styles: JSSStyles = {
     padding: 2,
   },
   imageBody: {
+    flex: 1,
+  },
+  hotspotBody: {
     position: 'relative',
     overflow: 'hidden',
+    backgroundColor: colors.grayLighter,
   },
   hotspots: {
     position: 'absolute',
@@ -34,7 +38,7 @@ export const styles: JSSStyles = {
     stroke: colors.selection,
     strokeWidth: 2,
     strokeOpacity: 0.8,
-    cursor: 'grab',
+    cursor: 'pointer',
 
     '&:hover': {
       fill: colors.hover,
@@ -42,9 +46,7 @@ export const styles: JSSStyles = {
     },
   },
   noImage: {
-    flex: 1,
     minHeight: 300,
-    backgroundColor: colors.grayLighter,
   },
   removeHotspotButton: {
     color: colors.remove,
