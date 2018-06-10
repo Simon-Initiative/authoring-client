@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool, PoolRef,
+  Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool,
 } from 'data/contentTypes';
 import { getLabelForQuestion } from 'editors/content/question/Question';
 
@@ -163,18 +163,15 @@ const PoolTab = (props: TabProps) => {
 };
 
 const PoolRefTab = (props: TabProps) => {
-  const p = props.node as Selection;
 
   const newPoolRefText = newText('Question Pool');
-
-  const poolTitle = 'Question Pool';
 
   return (
     <Tab
       {...props}
       tooltip={selection(props.node as Selection)}
       label="Question Pool"
-      previewText={poolTitle}
+      previewText={newPoolRefText}
     />
   );
 };

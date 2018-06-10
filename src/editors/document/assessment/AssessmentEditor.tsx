@@ -26,7 +26,6 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
-import { Dropdown, DropdownItem } from 'editors/content/common/Dropdown';
 import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {

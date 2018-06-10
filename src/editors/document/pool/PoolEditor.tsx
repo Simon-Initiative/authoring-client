@@ -204,7 +204,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       <React.Fragment>
         <div className={`insertWindow ${hideInsertWindow ? 'd-none' : ''}`}>
           <AddQuestion
-            editMode={this.props.editMode}
+            editMode={editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative />
         </div>
