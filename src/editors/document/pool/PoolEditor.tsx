@@ -208,7 +208,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative />
         </div>
-        <a onClick={this.collapseInsertPopup} className="insertNew">Insert new...</a>
+        <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
       </React.Fragment>
     );
   }
