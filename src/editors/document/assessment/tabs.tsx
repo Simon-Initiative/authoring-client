@@ -69,14 +69,14 @@ const Skills = (props) => {
   const skills = countSkills(props.question);
   const noSkills = skills === 0;
   return (
-    <small className={noSkills ? 'noSkills' : 'hasSkills'}>
+    <small className={noSkills ? 'no-skills' : 'has-skills'}>
       {skills + ' skill' + (skills === 1 ? '' : 's')}
     </small>
   );
 };
 
 const Label = (props) => {
-  return <small className="tabLabel">{props.children}</small>;
+  return <small className="tab-label">{props.children}</small>;
 };
 
 const QuestionTab = (props: TabProps) => {

@@ -46,7 +46,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-  hideInsertWindow: boolean;
+  collapseInsertPopup: boolean;
 }
 
 
@@ -58,7 +58,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   supportedElements: Immutable.List<string>;
 
   constructor(props: AssessmentEditorProps) {
-    super(props, ({ hideInsertWindow: true } as AssessmentEditorState));
+    super(props, ({ collapseInsertPopup: true } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
@@ -74,7 +74,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEditNode = this.onEditNode.bind(this);
     this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
-    this.toggleInsertWindow = this.toggleInsertWindow.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     this.supportedElements = Immutable.List<string>();
 
@@ -111,7 +111,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       || this.props.currentNode !== nextProps.currentNode
       || this.state.undoStackSize !== nextState.undoStackSize
       || this.state.redoStackSize !== nextState.redoStackSize
-      || this.state.hideInsertWindow !== nextState.hideInsertWindow;
+      || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
 
     return shouldUpdate;
   }
@@ -253,7 +253,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     content = content.with({ guid: guid() });
     this.addNode(content);
     this.setState({
-      hideInsertWindow: true,
+      collapseInsertPopup: true,
     });
   }
 
@@ -261,7 +261,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const content = question.with({ guid: guid() });
     this.addNode(content);
     this.setState({
-      hideInsertWindow: true,
+      collapseInsertPopup: true,
     });
   }
 
@@ -269,7 +269,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
     this.addNode(pool);
     this.setState({
-      hideInsertWindow: true,
+      collapseInsertPopup: true,
     });
   }
 
@@ -346,7 +346,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
         const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
         this.addNode(pool);
         this.setState({
-          hideInsertWindow: true,
+          collapseInsertPopup: true,
         });
       });
   }
@@ -394,7 +394,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
     const { editMode } = this.props;
-    const { hideInsertWindow } = this.state;
+    const { collapseInsertPopup } = this.state;
 
     const questionPoolOrNothing = editMode && !isInline
       ? <a className="dropdown-item" onClick={this.onSelectPool}>Question Pool</a>
@@ -406,7 +406,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <React.Fragment>
-        <div className={`insert-popup ${hideInsertWindow ? 'collapsed' : ''}`}>
+        <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={this.props.editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
@@ -416,7 +416,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           {questionPoolOrNothing}
           {embeddedPoolOrNothing}
         </div>
-        <a onClick={this.toggleInsertWindow} className="insert-new">Insert new...</a>
+        <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
       </React.Fragment>
     );
   }
@@ -444,9 +444,9 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  toggleInsertWindow() {
+  collapseInsertPopup() {
     this.setState({
-      hideInsertWindow: !this.state.hideInsertWindow,
+      collapseInsertPopup: !this.state.collapseInsertPopup,
     });
   }
 

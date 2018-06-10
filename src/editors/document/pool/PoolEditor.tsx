@@ -41,7 +41,7 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
 
 interface PoolEditorState extends AbstractEditorState {
   currentNode: contentTypes.Node;
-  hideInsertWindow: boolean;
+  collapseInsertPopup: boolean;
 }
 
 class PoolEditor extends AbstractEditor<models.PoolModel,
@@ -52,7 +52,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   pendingCurrentNode: Maybe<contentTypes.Question>;
 
   constructor(props) {
-    super(props, { currentNode: props.model.pool.questions.first(), hideInsertWindow: true });
+    super(props, { currentNode: props.model.pool.questions.first(), collapseInsertPopup: true });
 
     this.onEdit = this.onEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
@@ -62,7 +62,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onDuplicateNode = this.onDuplicateNode.bind(this);
-    this.toggleInsertWindow = this.toggleInsertWindow.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -110,7 +110,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.pendingCurrentNode = Maybe.just(q);
     this.handleEdit(updated);
     this.setState({
-      hideInsertWindow: true,
+      collapseInsertPopup: true,
     });
   }
 
@@ -198,24 +198,24 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   renderAdd() {
     const { editMode } = this.props;
-    const { hideInsertWindow } = this.state;
+    const { collapseInsertPopup } = this.state;
 
     return (
       <React.Fragment>
-        <div className={`insertWindow ${hideInsertWindow ? 'd-none' : ''}`}>
+        <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
             isSummative />
         </div>
-        <a onClick={this.toggleInsertWindow} className="insertNew">Insert new...</a>
+        <a onClick={this.collapseInsertPopup} className="insertNew">Insert new...</a>
       </React.Fragment>
     );
   }
 
-  toggleInsertWindow() {
+  collapseInsertPopup() {
     this.setState({
-      hideInsertWindow: !this.state.hideInsertWindow,
+      collapseInsertPopup: !this.state.collapseInsertPopup,
     });
   }
 
@@ -251,8 +251,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            <div className="outline">
-              <div className="outlineContainer">
+            <div className="outline-and-node-container">
+              <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
                   nodes={model.pool.questions}
@@ -264,7 +264,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 />
                 {this.renderAdd()}
               </div>
-              <div className="nodeContainer">
+              <div className="node-container">
                 {renderAssessmentNode(
                   this.state.currentNode, assesmentNodeProps, this.onEdit,
                   this.onRemove, this.onFocus,

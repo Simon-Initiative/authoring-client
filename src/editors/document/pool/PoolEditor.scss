@@ -17,9 +17,19 @@
     flex: 1;
 
     .html-editor-well {
+      display: flex;
       flex: 1;
+      flex-direction: column;
       overflow: auto;
-      padding: 0 30px 30px 30px;
+      padding: 0 10px 30px 30px;
+
+      .content-decorator {
+        margin-top: 20px;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
 
       .content-container > * {
         margin: 10px 0;
@@ -27,39 +37,55 @@
     }
   }
 
-  .outline {
+  .outline-and-node-container {
+    margin-top: 20px;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: stretch;
   }
 
-  .outlineContainer {
-    flex-basis: 300px;
+  .outline-container {
+    display: flex;
+    overflow-y: auto;
+    flex: 0 0 300px;
+    flex-direction: column;
     margin-right: 2px;
-    min-width: 250px;
-    height: 100%;
+
+    .tree-container, .tree-list {
+      padding-right: 6px;
+      overflow-y: auto;
+    }
   }
 
-  .nodeContainer {
-    width: 100%;
+  .insert-new {
+    cursor: pointer;
+    background-color: #E2E4E6;
+    font-size: 80%;
+    border-radius: 0 0 3px 3px;
+    padding: 8px 10px;
+    flex: 0 0 auto;
   }
 
-  a.insertNew:not([href]):not([tabindex]):hover {
+  a.insert-new:not([href]):not([tabindex]):hover {
     color: darken(#3f4446, 20%);
     text-decoration: underline;
     background-color: darken(#edeff0, 10%);
   }
 
-  a.insertNew:not([href]):not([tabindex]) {
+  a.insert-new:not([href]):not([tabindex]) {
     color: #3f4446;
   }
 
-  .insertWindow {
+  .insert-popup {
     background-color: #E2E4E6;
     font-size: 80%;
-    height: 100%;
+    max-height: 100%;
     width: 100%;
+    transition: max-height .4s;
+    overflow: hidden;
+    flex: 0 0 auto;
+
+    &.collapsed {
+      max-height: 0;
+    }
 
     a.dropdown-item {
       &:hover {
@@ -72,13 +98,9 @@
     }
   }
 
-  .insertNew {
-    display: block;
-    cursor: pointer;
-    background-color: #E2E4E6;
-    font-size: 80%;
-    border-radius: 0 0 3px 3px;
-    padding: 8px 10px;
+  .node-container {
+    overflow: auto;
+    flex: 1 1 auto;
   }
 
   .label {
