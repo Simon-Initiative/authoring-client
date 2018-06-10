@@ -276,6 +276,10 @@ export class AddQuestion
       ? <a onClick={this.onAddEssay} className="dropdown-item">Essay</a>
       : null;
 
+    const dynaDragDropOrNot = !this.props.isSummative
+      ? <a onClick={this.onAddDragDrop} className="dropdown-item">Drag and Drop</a>
+      : null;
+
     return (
       <React.Fragment>
         <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
@@ -286,9 +290,8 @@ export class AddQuestion
         <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
         {essayOrNot}
         <a onClick={this.onAddMultipart}
-          className="dropdown-item">Input (text, numeric, dropdown)</a>
-        <a onClick={this.onAddDragDrop}
-          className="dropdown-item">Drag and drop</a>
+          className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+        {dynaDragDropOrNot}
       </React.Fragment>
     );
 

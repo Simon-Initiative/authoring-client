@@ -46,7 +46,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   componentWillReceiveProps(nextProps: ResourceViewProps): void {
     if (nextProps.resourceType !== this.props.resourceType &&
-        nextProps.title !== this.props.title) {
+      nextProps.title !== this.props.title) {
       this.setState({
         resources: this.getFilteredRows(nextProps),
       });
@@ -127,10 +127,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   // Filter resources shown based on title and id
   filterBySearchText(searchText: string): void {
     const text = searchText.trim().toLowerCase();
-    const filterFn = (r) => {
+    const filterFn = (r: Resource): boolean => {
       const { title, id } = r;
-      const titleLower = title.toLowerCase();
-      const idLower = id.toLowerCase();
+      const titleLower = title ? title.toLowerCase() : '';
+      const idLower = id ? id.toLowerCase() : '';
 
       return text === '' ||
         titleLower.indexOf(text) > -1 ||
