@@ -84,12 +84,15 @@ const QuestionTab = (props: TabProps) => {
 
   const newQuestionText = newText('Question');
 
-  const questionText = (q.body.content.first() as ContiguousText)
-    .extractPlainText()
-    .caseOf({
-      just: t => t !== '' ? t : newQuestionText,
-      nothing: () => newQuestionText,
-    });
+  const ct = q.body.content.first() as ContiguousText;
+  const questionText = ct
+    ? ct
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newQuestionText,
+        nothing: () => newQuestionText,
+      })
+    : newQuestionText;
 
   return (
     <Tab
@@ -112,9 +115,9 @@ const ContentTab = (props: TabProps) => {
 
   const newContentText = newText('Supporting Content');
 
-  const previewText = textBlocks.size > 0
-    ? (textBlocks.first() as ContiguousText)
-      .extractPlainText()
+  const ct = (textBlocks.first() as ContiguousText);
+  const previewText = textBlocks.size > 0 && ct
+    ? ct.extractPlainText()
       .caseOf({
         just: t => t !== '' ? t : newContentText,
         nothing: () => newContentText,
@@ -147,10 +150,13 @@ const PoolTab = (props: TabProps) => {
 
   const newPoolText = newText('Embedded Pool');
 
-  const poolTitle = (p.source as Pool).title.text.extractPlainText().caseOf({
-    just: t => t !== '' ? t : newPoolText,
-    nothing: () => newPoolText,
-  });
+  const pool = p.source as Pool;
+  const poolTitle = pool
+    ? pool.title.text.extractPlainText().caseOf({
+      just: t => t !== '' ? t : newPoolText,
+      nothing: () => newPoolText,
+    })
+    : newPoolText;
 
   return (
     <Tab
