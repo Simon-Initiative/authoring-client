@@ -407,7 +407,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <React.Fragment>
-        <div className={`insertWindow ${hideInsertWindow ? 'd-none' : ''}`}>
+        <div className={`insert-popup ${hideInsertWindow ? 'collapsed' : ''}`}>
           <AddQuestion
             editMode={this.props.editMode}
             onQuestionAdd={this.addQuestion.bind(this)}
@@ -417,7 +417,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           {questionPoolOrNothing}
           {embeddedPoolOrNothing}
         </div>
-        <a onClick={this.toggleInsertWindow} className="insertNew">Insert new...</a>
+        <a onClick={this.toggleInsertWindow} className="insert-new">Insert new...</a>
       </React.Fragment>
     );
   }
@@ -486,8 +486,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            <div className="outline">
-              <div className="outlineContainer">
+            <div className="outline-and-node-container">
+              <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
                   nodes={page.nodes}
@@ -499,7 +499,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                 />
                 {this.renderAdd()}
               </div>
-              <div className="nodeContainer">
+              <div className="node-container">
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(),

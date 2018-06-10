@@ -77,8 +77,8 @@ export function buildRenderer<NodeType extends Types.HasGuid>(): Types.TreeRende
 
   return {
     renderTree: children => (
-      <div className="treeContainer">
-        <div className="treeList">
+      <div className="tree-container">
+        <div className="tree-list">
           {children}
         </div>
       </div>

@@ -1,12 +1,15 @@
 @import 'oli/colors';
 
-.treeContainer {
+.tree-container {
+  max-height: 100%;
   background-color: #E2E4E6;
   border-radius: 3px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 
-  .treeList {
+  .tree-list {
+    max-height: 100%;
+    overflow: hidden;
     padding: 0.4em;
     padding-bottom: 1px;
   }
