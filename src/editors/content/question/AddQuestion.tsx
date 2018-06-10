@@ -16,7 +16,7 @@ import {
   getTargetsFromLayout, updateItemPartsFromTargets,
 } from 'editors/content/learning/dynadragdrop/utils';
 
-const defaultInputBody = () =>  ContentElements.fromText
+const defaultInputBody = () => ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
 
 export interface AddQuestion {
@@ -51,8 +51,10 @@ export function createMultipleChoiceQuestion(select: string) {
   const choice = contentTypes.Choice.fromText('', guid()).with({ value });
   const feedback = contentTypes.Feedback.fromText('', guid());
   let response = new contentTypes.Response({ match });
-  response = response.with({ guid: guid(),
-    feedback: response.feedback.set(feedback.guid, feedback) });
+  response = response.with({
+    guid: guid(),
+    feedback: response.feedback.set(feedback.guid, feedback),
+  });
 
   const choices = Immutable.OrderedMap<string, contentTypes.Choice>().set(choice.guid, choice);
   const responses = Immutable.OrderedMap<string, contentTypes.Response>()
@@ -122,18 +124,19 @@ export class AddQuestion
       .with({ match: '*', score: '1', feedback: feedbacks });
 
     const part = new contentTypes.Part()
-      .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
-        .set(response.guid, response),
+      .with({
+        responses: Immutable.OrderedMap<string, contentTypes.Response>()
+          .set(response.guid, response),
       });
 
     const question = new contentTypes.Question()
-        .with({
-          body: contentTypes.Question.emptyBody(),
-          items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
-            .set(item.guid, item),
-          parts: Immutable.OrderedMap<string, contentTypes.Part>()
-            .set(part.guid, part),
-        });
+      .with({
+        body: contentTypes.Question.emptyBody(),
+        items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
+          .set(item.guid, item),
+        parts: Immutable.OrderedMap<string, contentTypes.Part>()
+          .set(part.guid, part),
+      });
 
     this.props.onQuestionAdd(question);
   }
@@ -150,18 +153,19 @@ export class AddQuestion
     const response = new contentTypes.Response({ match: '*', score: '1', feedback: feedbacks });
 
     const part = new contentTypes.Part()
-      .with({ responses: Immutable.OrderedMap<string, contentTypes.Response>()
-        .set(response.guid, response),
+      .with({
+        responses: Immutable.OrderedMap<string, contentTypes.Response>()
+          .set(response.guid, response),
       });
 
     const question = new contentTypes.Question()
-        .with({
-          body: contentTypes.Question.emptyBody(),
-          items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
-            .set(item.guid, item),
-          parts: Immutable.OrderedMap<string, contentTypes.Part>()
-            .set(part.guid, part),
-        });
+      .with({
+        body: contentTypes.Question.emptyBody(),
+        items: Immutable.OrderedMap<string, contentTypes.QuestionItem>()
+          .set(item.guid, item),
+        parts: Immutable.OrderedMap<string, contentTypes.Part>()
+          .set(part.guid, part),
+      });
 
     this.props.onQuestionAdd(question);
   }
@@ -190,12 +194,12 @@ export class AddQuestion
             cols: [new Target(), new DndText(), new DndText()].reduce(
               (accCol, newCol) => accCol.push(
                 newCol.contentType === 'DndText'
-                ? newCol.with({
-                  text: 'Enter text or set as drop target',
-                })
-                : newCol.with({
-                  assessmentId: guid(),
-                })),
+                  ? newCol.with({
+                    text: 'Enter text or set as drop target',
+                  })
+                  : newCol.with({
+                    assessmentId: guid(),
+                  })),
               Immutable.List<DndText | Target>(),
             ),
           })),
@@ -274,17 +278,17 @@ export class AddQuestion
 
     return (
       <React.Fragment>
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
-            className="dropdown-item">Multiple choice</a>
-          <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }}
-            className="dropdown-item">Check all that apply</a>
-          <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
-          <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
-          {essayOrNot}
-          <a onClick={this.onAddMultipart}
-            className="dropdown-item">Input (text, numeric, dropdown)</a>
-          <a onClick={this.onAddDragDrop}
-            className="dropdown-item">Drag and drop</a>
+        <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
+          className="dropdown-item">Multiple choice</a>
+        <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('multiple'); }}
+          className="dropdown-item">Check all that apply</a>
+        <a onClick={this.onAddOrdering} className="dropdown-item">Ordering</a>
+        <a onClick={this.onAddShortAnswer} className="dropdown-item">Short answer</a>
+        {essayOrNot}
+        <a onClick={this.onAddMultipart}
+          className="dropdown-item">Input (text, numeric, dropdown)</a>
+        <a onClick={this.onAddDragDrop}
+          className="dropdown-item">Drag and drop</a>
       </React.Fragment>
     );
 

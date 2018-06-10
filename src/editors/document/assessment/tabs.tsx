@@ -82,16 +82,18 @@ const Label = (props) => {
 const QuestionTab = (props: TabProps) => {
   const q = props.node as Question;
 
-  const newQuestionText = newText('Question');
 
-  const ct = q.body.content.first() as ContiguousText;
-  const questionText = ct
-    ? ct
-      .extractPlainText()
-      .caseOf({
-        just: t => t !== '' ? t : newQuestionText,
-        nothing: () => newQuestionText,
-      })
+  const textBlocks = q.body.content
+    .filter(contentElement => contentElement.contentType === 'ContiguousText');
+
+  const newQuestionText = newText('Question');
+  const questionText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+        .extractPlainText()
+        .caseOf({
+          just: t => t !== '' ? t : newQuestionText,
+          nothing: () => newQuestionText,
+        })
     : newQuestionText;
 
   return (
@@ -114,14 +116,13 @@ const ContentTab = (props: TabProps) => {
     .filter(contentElement => contentElement.contentType === 'ContiguousText');
 
   const newContentText = newText('Supporting Content');
-
-  const ct = (textBlocks.first() as ContiguousText);
-  const previewText = textBlocks.size > 0 && ct
-    ? ct.extractPlainText()
-      .caseOf({
-        just: t => t !== '' ? t : newContentText,
-        nothing: () => newContentText,
-      })
+  const previewText = textBlocks.size > 0
+    ? (textBlocks.first() as ContiguousText)
+        .extractPlainText()
+        .caseOf({
+          just: t => t !== '' ? t : newContentText,
+          nothing: () => newContentText,
+        })
     : c.body.content.first().contentType;
 
   return (
