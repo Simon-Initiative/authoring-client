@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { ContentModel } from 'data/models';
+import { ContentModel, AssessmentModel } from 'data/models';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
@@ -43,6 +43,7 @@ export interface InsertToolbarProps {
   context: AppContext;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
   resourcePath: string;
   courseModel: CourseModel;
 }
@@ -67,6 +68,7 @@ function collectInlines(model: ContentModel) : Immutable.Map<string, ContentElem
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
   classes, onInsert, parentSupportsElementType, resourcePath, context,
   courseModel, onDisplayModal, onDismissModal, requestLatestModel,
+  onCreateNew,
 }) => {
 
   const onTableCreate = (onInsert, numRows, numCols) => {
@@ -419,8 +421,27 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 });
               }}
               disabled={!parentSupportsElementType('wb:inline')}>
-              <i style={{ width: 22 }} className={'fa fa-flask'} /> Inline assessment
+              <i style={{ width: 22 }} className={'fa fa-check'} /> Insert existing assessment...
             </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const model = new AssessmentModel({
+                  type: LegacyTypes.inline,
+                  title: contentTypes.Title.fromText('New Assessment'),
+                });
+
+                onCreateNew(model)
+                .then((resource) => {
+                  onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                });
+
+              }}
+              disabled={!parentSupportsElementType('wb:inline')}>
+              <i style={{ width: 22 }} className={'fa fa-check'} /> Create new assessment
+            </ToolbarButtonMenuItem>
+
+            <ToolbarButtonMenuDivider/>
+
             <ToolbarButtonMenuItem
               onClick={() => onDisplayModal(
                 <ResourceSelection
@@ -440,7 +461,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 />)
               }
               disabled={!parentSupportsElementType('activity')}>
-              <i style={{ width: 22 }} className={'fa fa-check'} /> Activity
+              <i style={{ width: 22 }} className={'fa fa-flask'} /> Activity
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {

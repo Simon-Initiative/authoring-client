@@ -15,6 +15,7 @@ import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
 
+
 import { styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.styles';
 
 interface ToolbarGroupProps {
@@ -129,6 +130,7 @@ export interface ToolbarProps {
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
 }
 
 @injectSheet(styles)
@@ -171,6 +173,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       classes, onDisplayModal, onDismissModal, context, resource,
+      onCreateNew,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -223,6 +226,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
+            onCreateNew={onCreateNew}
             requestLatestModel={requestModel}
             context={context}
             courseModel={this.props.courseModel}

@@ -164,6 +164,26 @@ function logResourceDetails(resource: Resource) {
   );
 }
 
+export function createNew(model: models.ContentModel) {
+
+  return function (dispatch, getState) : Promise<persistence.Document> {
+
+    const course = getState().course;
+
+    return new Promise((resolve, reject) => {
+      persistence.createDocument(course.guid, model)
+      .then((result) => {
+        const r = (result as any).model.resource;
+
+        const updated = Immutable.OrderedMap<string, Resource>([[r.guid, r]]);
+        dispatch(updateCourseResources(updated));
+
+        resolve(r);
+      });
+    });
+  };
+}
+
 export function load(courseId: string, documentId: string) {
   return function (dispatch, getState) : Promise<boolean> {
 
