@@ -88,6 +88,7 @@ export class AddQuestion
     this.onAddDragDrop = this.onAddDragDrop.bind(this);
     this.onAddOrdering = this.onAddOrdering.bind(this);
     this.onAddShortAnswer = this.onAddShortAnswer.bind(this);
+    this.onAddImageHotspot = this.onAddImageHotspot.bind(this);
   }
 
   onAddMultipleChoice(select: string) {
@@ -270,6 +271,10 @@ export class AddQuestion
     this.props.onQuestionAdd(q);
   }
 
+  onAddImageHotspot() {
+    console.log('NOT IMPLEMENTED');
+  }
+
   render() {
 
     const essayOrNot = this.props.isSummative
@@ -281,6 +286,7 @@ export class AddQuestion
       : null;
 
     return (
+
       <React.Fragment>
         <a onClick={(e) => { e.preventDefault(); this.onAddMultipleChoice('single'); }}
           className="dropdown-item">Multiple choice</a>
@@ -292,7 +298,10 @@ export class AddQuestion
         <a onClick={this.onAddMultipart}
           className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         {dynaDragDropOrNot}
+        <a onClick={this.onAddImageHotspot}
+          className="dropdown-item">Image Hotspot</a>                                            
       </React.Fragment>
+
     );
 
   }
