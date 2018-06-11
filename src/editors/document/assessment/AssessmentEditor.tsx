@@ -12,7 +12,7 @@ import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
-import * as Tree from '../../common/tree';
+import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -202,7 +202,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     onSetCurrentNode(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
-    this.onEditNodes(Tree.updateNode(guid, node, nodes, getChildren, setChildren));
+    this.onEditNodes(updateNode(guid, node, nodes, getChildren, setChildren));
   }
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
@@ -235,7 +235,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     let page = this.getCurrentPage(this.props);
 
-    const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
+    const removed = removeNode(guid, page.nodes, getChildren, setChildren);
 
     if (removed.size > 0) {
       locateNextOfKin(page.nodes, guid).lift(node =>

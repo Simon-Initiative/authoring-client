@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { insertNode, isSameNode, removeNode } from './utils';
+import { insertNode, removeNode } from 'data/utils/tree';
+import { isSameNode } from './utils';
 
 import { buildRenderer as buildDivRenderer } from './types/div';
 
