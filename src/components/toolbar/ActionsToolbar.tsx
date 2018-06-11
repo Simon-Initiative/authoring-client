@@ -51,7 +51,7 @@ export const ActionsToolbar = (({
           tooltip="View and Edit Page Details"
           size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-info-circle" /></div>
-          <div>Details</div>
+          <div>Info</div>
         </ToolbarButton>
         <ToolbarButton
           onClick={() => onDisplayModal(
