@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
-import { insertNode, isSameNode, removeNode } from './utils';
+import { insertNode, removeNode } from 'data/utils/tree';
+import { isSameNode } from './utils';
 
 import { buildRenderer as buildDivRenderer } from './types/div';
 
@@ -135,7 +136,7 @@ export class Tree<NodeType extends Types.HasGuid>
         const dropTargets = [];
         if (i === renderedNodes.length - 1) {
           dropTargets.push(treeRenderer.renderDropTarget(
-            r.indexWithinParent + 1, this.onDrop, canHandleDrop, 
+            r.indexWithinParent + 1, this.onDrop, canHandleDrop,
             r.parent, parentId, true, editMode));
         }
 

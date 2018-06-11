@@ -1,15 +1,15 @@
 import { Maybe } from 'tsmonad';
 import * as Immutable from 'immutable';
 
+import { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
+export { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
+
 
 export enum TreeType {
   DIV,
   TABLE, // Not supported yet
 }
 
-export interface HasGuid {
-  guid: string;
-}
 
 export type RenderedNode<NodeType extends HasGuid> = {
   nodeId: NodeId,
@@ -48,21 +48,7 @@ export type NodeRenderer<NodeType extends HasGuid>
      nodeState: NodeState<NodeType>,
      handlers: Handlers) => JSX.Element;
 
-// What we use to uniquely identify a tree node.
-export type NodeId = string;
 
-// The data for a tree.
-export type Nodes<NodeType extends HasGuid> = Immutable.OrderedMap<NodeId, NodeType>;
-
-// We abstract away navigating the tree and allow the client
-// to implement this to control navigation
-export type ChildrenAccessor<NodeType extends HasGuid>
-  = (node: NodeType) => Maybe<Nodes<NodeType>>;
-
-// Similar to accessor, we give control to the client as to
-// how to mutate children in a tree.
-export type ChildrenMutator<NodeType extends HasGuid>
-  = (node: NodeType, children: Nodes<NodeType>) => NodeType;
 
 // Metadata regarding a node
 export type NodeState<NodeType extends HasGuid> = {

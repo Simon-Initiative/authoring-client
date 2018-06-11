@@ -215,10 +215,15 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
 
+    const requestModel = () => {
+      return Promise.resolve(this.props.model);
+    };
+
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
+            requestLatestModel={requestModel}
             context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
