@@ -1,12 +1,6 @@
 import * as React from 'react';
-import * as Immutable from 'immutable';
-import * as persistence from 'data/persistence';
-import * as viewActions from 'actions/view';
-import { showMessage } from 'actions/messages';
-import * as Messages from 'types/messages';
 
 import './CourseCreation.scss';
-import { Severity, Toast } from 'components/common/Toast';
 
 export interface CourseCreationProps {
   title: string;
@@ -58,7 +52,7 @@ export class CourseCreation
   }
 
   render() {
-    const { title, buttonLabel, placeholder, toast, onSubmit, submitted } = this.props;
+    const { title, buttonLabel, placeholder, toast, submitted } = this.props;
     const { disabled, inputText } = this.state;
 
     const button =
