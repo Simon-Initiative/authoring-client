@@ -35,15 +35,10 @@ class Footer extends React.PureComponent<FooterProps, {}> {
         </div>
         <div className="footer-section center">
           <div className="centered">
-            <a href={CREATIVE_COMMONS_URL} target="_blank" className="ccLicense">
-              <img src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
-            </a>
-            <div className="license">
-              Unless otherwise noted this work is licensed under a<span> </span>
+            Unless otherwise noted, this work is licensed under a&nbsp;
               <a href={CREATIVE_COMMONS_URL} target="_blank" rel="license">
-                Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported License
+              Creative Commons BY-NC-SA 4.0
               </a>
-            </div>
           </div>
         </div>
         <div className="footer-section right">

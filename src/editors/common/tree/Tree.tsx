@@ -143,9 +143,16 @@ export class Tree<NodeType extends Types.HasGuid>
         dropTargets.push(treeRenderer.renderDropTarget(
           r.indexWithinParent, this.onDrop, canHandleDrop, r.parent, parentId, false, editMode));
 
+        const nodeState = {
+          depth: r.depth,
+          indexWithinParent: r.indexWithinParent,
+          parentNode: r.parent,
+          isSelected: selected === r.nodeId,
+        };
+
         return treeRenderer.renderNode(
             r.nodeId, r.node,
-            { depth: r.depth, parentNode: r.parent, isSelected: selected === r.nodeId },
+            nodeState,
             r.component, dropTargets, r.indexWithinParent, editMode);
 
       });

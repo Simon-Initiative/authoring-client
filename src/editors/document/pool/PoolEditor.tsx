@@ -37,10 +37,12 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  course: models.CourseModel;
 }
 
 interface PoolEditorState extends AbstractEditorState {
   currentNode: contentTypes.Node;
+  collapseInsertPopup: boolean;
 }
 
 class PoolEditor extends AbstractEditor<models.PoolModel,
@@ -51,7 +53,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   pendingCurrentNode: Maybe<contentTypes.Question>;
 
   constructor(props) {
-    super(props, { currentNode: props.model.pool.questions.first() });
+    super(props, { currentNode: props.model.pool.questions.first(), collapseInsertPopup: true });
 
     this.onEdit = this.onEdit.bind(this);
     this.onRemove = this.onRemove.bind(this);
@@ -61,6 +63,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.onDuplicateNode = this.onDuplicateNode.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
@@ -107,6 +110,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     this.pendingCurrentNode = Maybe.just(q);
     this.handleEdit(updated);
+    this.setState({
+      collapseInsertPopup: true,
+    });
   }
 
   onTitleEdit(ct: ContiguousText, src) {
@@ -122,7 +128,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.props.onEdit(this.props.model.with({ pool, resource }));
   }
 
-  onEdit(guid : string, question : contentTypes.Question, src) {
+  onEdit(guid: string, question: contentTypes.Question, src) {
 
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
@@ -191,8 +197,31 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     }
   }
 
+  renderAdd() {
+    const { editMode } = this.props;
+    const { collapseInsertPopup } = this.state;
+
+    return (
+      <React.Fragment>
+        <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
+          <AddQuestion
+            editMode={editMode}
+            onQuestionAdd={this.addQuestion.bind(this)}
+            isSummative />
+        </div>
+        <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
+      </React.Fragment>
+    );
+  }
+
+  collapseInsertPopup() {
+    this.setState({
+      collapseInsertPopup: !this.state.collapseInsertPopup,
+    });
+  }
+
   render() {
-    const { context, services, editMode, model, onEdit } = this.props;
+    const { context, services, editMode, model, onEdit, course } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
@@ -210,7 +239,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
     return (
       <div className="pool-editor">
-        <ContextAwareToolbar context={context} model={model}/>
+        <ContextAwareToolbar context={context} model={model} />
         <div className="pool-content">
           <div className="html-editor-well">
 
@@ -223,13 +252,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            <AddQuestion
-              editMode={this.props.editMode}
-              onQuestionAdd={this.addQuestion.bind(this)}
-              isSummative={true}/>
-
-            <div className="outline">
-              <div className="outlineContainer">
+            <div className="outline-and-node-container">
+              <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
                   nodes={model.pool.questions}
@@ -238,9 +262,11 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
-                  />
+                  course={course}
+                />
+                {this.renderAdd()}
               </div>
-              <div className="nodeContainer">
+              <div className="node-container">
                 {renderAssessmentNode(
                   this.state.currentNode, assesmentNodeProps, this.onEdit,
                   this.onRemove, this.onFocus,
@@ -248,12 +274,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
               </div>
             </div>
           </div>
-        <ContextAwareSidebar
-          context={context}
-          services={services}
-          editMode={editMode}
-          model={model}
-          onEditModel={onEdit} />
+          <ContextAwareSidebar
+            context={context}
+            services={services}
+            editMode={editMode}
+            model={model}
+            onEditModel={onEdit} />
         </div>
       </div>
     );

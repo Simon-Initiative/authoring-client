@@ -53,7 +53,10 @@ export class ContentEditor
     const { model, onRemove } = this.props;
 
     return (
-      <ContentTitle title="Content" onRemove={() => onRemove(model.guid)} canRemove={true} />
+      <ContentTitle
+        title="Supporting Content"
+        onRemove={() => onRemove(model.guid)}
+        canRemove={true} />
     );
   }
 
