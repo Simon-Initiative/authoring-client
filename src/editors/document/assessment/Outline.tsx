@@ -6,6 +6,7 @@ import * as Tree from 'editors/common/tree';
 import { Node as AssessmentNode } from 'data/contentTypes';
 import { renderTab } from './tabs';
 import { findNodeByGuid } from './utils';
+import { CourseModel } from 'data/models';
 
 export interface OutlineProps {
   editMode: boolean;
@@ -15,6 +16,7 @@ export interface OutlineProps {
   onEdit: (nodes: Immutable.OrderedMap<string, AssessmentNode>) => void;
   onChangeExpansion: (expanded: Immutable.Set<string>) => void;
   onSelect: (selectedNode: AssessmentNode) => void;
+  course: CourseModel;
 }
 
 export function getChildren(node: AssessmentNode)
@@ -121,7 +123,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
   render() {
 
     const { nodes, expandedNodes, selected, editMode,
-      onEdit, onChangeExpansion } = this.props;
+      onEdit, onChangeExpansion, course } = this.props;
 
     return (
       <Tree.Component
@@ -135,7 +137,7 @@ export class Outline extends React.PureComponent<OutlineProps, {}> {
         onEdit={onEdit}
         onChangeExpansion={onChangeExpansion}
         onSelect={this.onSelect}
-        renderNodeComponent={renderTab}
+        renderNodeComponent={renderTab.bind(null, course)}
         canHandleDrop={canHandleDrop}
         />
     );

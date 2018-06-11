@@ -1,27 +1,51 @@
 @import 'oli/colors';
+@import 'palettes/flatui';
 
 $active-tab: $blue;
 
+.no-skills {
+  color: $alizarin;
+}
+
+.has-skills {
+  color: $emerald;
+}
+
 .tab-item {
   cursor: pointer;
-  padding: 5px;
   border-style: none;
-  border-radius: 0px;
-  border-width: 1;
   border-color: #CCCCCC;
   color: black;
   background-color: transparent;
 
+  padding: 6px 6px 2px 8px;
+  margin-bottom: 6px;
+
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  border-radius: 3px;
+
   &:hover {
-    border-bottom: 1px solid $active-tab;
+    background-color: lighten(#edeff0, 5%);
+  }
+
+  .content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info {
+    .tab-label {
+      color: $gray-light;
+    }
+
+    small {
+      display: inline-block;
+    }
   }
 }
 
-.tab-item-active {
-  background-color: $active-tab;
-  color: white;
-
-  &:hover {
-    border-bottom: 2px solid $active-tab;
-  }
+.tab-item-active, .tab-item-active:hover {
+  border-left: 3px solid $blue;
 }
