@@ -3,10 +3,23 @@ import colors from 'styles/colors';
 
 export const styles: JSSStyles = {
   RectangleEditor: {
+    fill: colors.selection,
+    fillOpacity: 0.5,
+    stroke: colors.selection,
+    strokeWidth: 2,
+    strokeOpacity: 0.8,
+    cursor: 'pointer',
 
+    '&:hover': {
+      fill: colors.hover,
+      stroke: colors.hover,
+    },
+    '&:active': {
+      cursor: 'grabbing',
+    },
   },
   selected: {
-    cursor: [['grab'], '!important'],
+    cursor: 'grab',
 
     '&:hover': {
       fill: [[colors.selection], '!important'],

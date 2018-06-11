@@ -1,10 +1,12 @@
 import { JSSStyles } from 'styles/jss';
 import colors from 'styles/colors';
+import { disableSelect } from 'styles/mixins';
 
 const BORDER_STYLE = '1px solid #ced4da';
 
 export const styles: JSSStyles = {
   ImageHotspotEditor: {
+    extend: [disableSelect],
     display: 'flex',
     flexDirection: 'column',
     border: BORDER_STYLE,
@@ -31,19 +33,6 @@ export const styles: JSSStyles = {
     left: 0,
     bottom: 0,
     right: 0,
-  },
-  hotspot: {
-    fill: colors.selection,
-    fillOpacity: 0.5,
-    stroke: colors.selection,
-    strokeWidth: 2,
-    strokeOpacity: 0.8,
-    cursor: 'pointer',
-
-    '&:hover': {
-      fill: colors.hover,
-      stroke: colors.hover,
-    },
   },
   noImage: {
     minHeight: 300,
