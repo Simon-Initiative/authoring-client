@@ -8,7 +8,7 @@ $button-blue: #3498DB;
   background: linear-gradient(to top, #6fc7e4, #75aaf0);
   color: $white;
   height: 100vh;
-  padding-top: 5rem;
+  padding-top: 8rem;
   display: flex;
   justify-content: center;
 
@@ -51,11 +51,11 @@ $button-blue: #3498DB;
         text-decoration: none;
         color: white;
         width: 250px;
-        height: 75px;
+        height: 60px;
         position: relative;
-        margin-top: 30px;
+        margin-top: 45px;
         border: none;
-        padding: 16px;
+        padding: 12px;
         font-size: 1.6rem;
         border-radius: 10px;
         transition: all 0.2s;
@@ -63,16 +63,21 @@ $button-blue: #3498DB;
 
         &:not(:disabled) {
           cursor: pointer;
-          box-shadow: 0px 15px 0px 0px darken($button-blue, 5%);
-          top: 3px;
+          box-shadow: 0px 12px 0px 0px darken($button-blue, 5%);
+          top: 6px;
         }
         &:active {
           box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
           top: 11px;
         }
-
         &:focus {
           outline: none;
+        }
+
+        &.course-creation__button--submitted {
+          box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
+          top: 11px;
+          cursor: default;
         }
       }
     }

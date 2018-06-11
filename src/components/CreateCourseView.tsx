@@ -79,8 +79,9 @@ class CreateCourseView extends React.PureComponent<CreateCourseViewProps, Create
     return (
       <CourseCreation
         title="What's your course called?"
+        placeholder="e.g. Introduction to Psychology, Spanish I"
         buttonLabel="Create Course"
-        placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/"
+        submitted={this.state.error || this.state.waiting}
         toast={this.state.waiting
           ? waiting
           : this.state.error

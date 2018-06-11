@@ -14,6 +14,7 @@ export interface CourseCreationProps {
   placeholder: string;
   toast?: JSX.Element;
   onSubmit: (inputText: string) => void;
+  submitted?: boolean;
 }
 
 export interface CourseCreationState {
@@ -57,12 +58,16 @@ export class CourseCreation
   }
 
   render() {
-    const { title, buttonLabel, placeholder, toast, onSubmit } = this.props;
+    const { title, buttonLabel, placeholder, toast, onSubmit, submitted } = this.props;
     const { disabled, inputText } = this.state;
 
     const button =
       <div className="course-creation__button">
-        <button disabled={disabled}
+        <button
+          className={submitted
+            ? 'course-creation__button--submitted'
+            : ''}
+          disabled={disabled}
           onClick={this.submit}>
           {buttonLabel}
         </button>
