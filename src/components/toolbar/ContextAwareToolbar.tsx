@@ -15,6 +15,7 @@ import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
 
+
 import { styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.styles';
 
 interface ToolbarGroupProps {
@@ -129,6 +130,7 @@ export interface ToolbarProps {
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
 }
 
 @injectSheet(styles)
@@ -138,7 +140,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
+  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>): boolean {
 
     // See if the content switched or changed
     const contentSwitchedOrChanged = this.props.content.caseOf({
@@ -171,6 +173,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     const {
       onInsert, onEdit, content, container, supportedElements, model,
       classes, onDisplayModal, onDismissModal, context, resource,
+      onCreateNew,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -215,10 +218,25 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
 
+    const requestModel = () => Promise.resolve(this.props.model);
+
+    const actionsToolbarLabel = () => {
+      switch (model.modelType) {
+        case 'AssessmentModel':
+          return 'Assessment';
+        case 'WorkbookPageModel':
+          return 'Page';
+        default:
+          return 'Actions';
+      }
+    };
+
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
+            onCreateNew={onCreateNew}
+            requestLatestModel={requestModel}
             context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
@@ -243,7 +261,10 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
         <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
+        <ToolbarGroup
+          className={classes.toolbarActionsGroup}
+          label={actionsToolbarLabel()}
+          columns={10}>
           <ActionsToolbar
             documentResource={resource}
             documentId={context.documentId}

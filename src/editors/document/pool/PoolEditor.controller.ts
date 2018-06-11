@@ -4,7 +4,7 @@ import PoolEditor from './PoolEditor';
 import { fetchSkills } from 'actions/skills';
 import { Skill } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
-import { PoolModel } from 'data/models';
+import { PoolModel, CourseModel } from 'data/models';
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import * as activeActions from 'actions/active';
@@ -16,6 +16,7 @@ interface StateProps {
   skills: OrderedMap<string, Skill>;
   activeContext: any;
   hover: string;
+  course: CourseModel;
 }
 
 interface DispatchProps {
@@ -32,12 +33,13 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<PoolModel> {}
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { activeContext, skills, hover } = state;
+  const { activeContext, skills, hover, course } = state;
 
   return {
     activeContext,
     skills,
     hover,
+    course,
   };
 };
 

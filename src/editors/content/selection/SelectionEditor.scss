@@ -9,8 +9,13 @@
     .insert-toolbar {
       span {
         line-height: 1.25;
-        font-size: 0.8rem;
         color: $gray-dark;
+      }
+
+      a {
+        font-size: 0.8rem;
+        cursor: pointer;
+        list-style-type: disc;
       }
     }
   }

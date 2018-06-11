@@ -5,8 +5,10 @@ import { augment } from '../common';
 import { cloneContent } from '../common/clone';
 import { toDraft } from './draft/todraft';
 import { TextSelection } from 'types/active';
-import { getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
-  Changes, detectChanges, removeEntity as internalRemoveEntity} from './draft/changes';
+import {
+  getEntities, getAllEntities, removeInputRef as removeInputRefDraft, EntityInfo,
+  Changes, detectChanges, removeEntity as internalRemoveEntity,
+} from './draft/changes';
 import { EntityTypes } from '../learning/common';
 import { fromDraft } from './draft/topersistence';
 import createGuid from 'utils/guid';
@@ -88,11 +90,11 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.merge(values) as this;
   }
 
-  clone() : ContiguousText {
+  clone(): ContiguousText {
 
     const entities = getAllEntities(this.content);
 
-    const updated = entities.reduce((ct : ContiguousText, e) => ct.cloneEntity(e), this);
+    const updated = entities.reduce((ct: ContiguousText, e) => ct.cloneEntity(e), this);
 
     return updated.with({
       content: cloneContent(updated.content),
@@ -100,12 +102,14 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(
-    root: Object[], guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
-    return new ContiguousText({ guid, mode,
-      content: toDraft(root, mode === ContiguousTextMode.SimpleText) });
+    root: Object[], guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
+    return new ContiguousText({
+      guid, mode,
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText),
+    });
   }
 
-  static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+  static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular): ContiguousText {
     return new ContiguousText({ guid, mode, content: ContentState.createFromText(text) });
   }
 
@@ -120,11 +124,11 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return new ContiguousText({ guid, mode, content });
   }
 
-  toPersistence() : Object {
+  toPersistence(): Object {
     return fromDraft(this.content, this.mode === ContiguousTextMode.SimpleText);
   }
 
-  selectionOverlapsEntity(selection: TextSelection) : boolean {
+  selectionOverlapsEntity(selection: TextSelection): boolean {
     return this.content.getBlocksAsArray()
       .reduce(
         (acc, block) => {
@@ -145,11 +149,11 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   // Return a set of strings representing all the styles that are
   // overlapped by the supplied text selection.
-  getOverlappingInlineStyles(selection: TextSelection) : Immutable.Set<string> {
+  getOverlappingInlineStyles(selection: TextSelection): Immutable.Set<string> {
     return this.content.getBlocksAsArray()
       .reduce(
         (acc, block) => {
-          let overlaps : Immutable.Set<string> = acc;
+          let overlaps: Immutable.Set<string> = acc;
           let styles = Immutable.OrderedSet<string>();
           block.findStyleRanges(
             (c) => { styles = c.getStyle(); return c.style.size !== 0; },
@@ -164,7 +168,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
         Immutable.Set<string>());
   }
 
-  getEntityAtCursor(selection: TextSelection) : Maybe<InlineEntity> {
+  getEntityAtCursor(selection: TextSelection): Maybe<InlineEntity> {
     const block = this.content.getBlockForKey(selection.getFocusKey());
 
     if (block === undefined) {
@@ -180,7 +184,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return Maybe.just({ key, data: entity.getData() });
   }
 
-  toggleStyle(style: InlineStyles, selection: TextSelection) : ContiguousText {
+  toggleStyle(style: InlineStyles, selection: TextSelection): ContiguousText {
 
     // Determine whether we need to apply or remove the style based
     // on the presence of the style at the first character of the
@@ -191,9 +195,23 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
     const currentStyles = currentContentBlock.getInlineStyleAt(start);
 
-    const content = currentStyles.has(style)
+    let content = currentStyles.has(style)
       ? Modifier.removeInlineStyle(this.content, selection.getRawSelectionState(), style)
       : Modifier.applyInlineStyle(this.content, selection.getRawSelectionState(), style);
+
+    // Handle removing complementary styles when the complement is toggled
+    if (style === InlineStyles.Subscript) {
+      content = Modifier.removeInlineStyle(
+        content,
+        selection.getRawSelectionState(),
+        InlineStyles.Superscript);
+    }
+    if (style === InlineStyles.Superscript) {
+      content = Modifier.removeInlineStyle(
+        content,
+        selection.getRawSelectionState(),
+        InlineStyles.Subscript);
+    }
 
     return this.with({
       content,
@@ -236,7 +254,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   }
 
-  removeEntity(key: string) : ContiguousText {
+  removeEntity(key: string): ContiguousText {
     return this.with({
       content: internalRemoveEntity(this.content, (k, e) => k === key),
       entityEditCount: this.entityEditCount + 1,
@@ -244,7 +262,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   addEntity(
-    type: string, isMutable: boolean, data: Object, selection: TextSelection) : ContiguousText {
+    type: string, isMutable: boolean, data: Object, selection: TextSelection): ContiguousText {
 
     const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
     let selectionState = selection.getRawSelectionState();
@@ -305,11 +323,11 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
   }
 
-  detectInputRefChanges(previous: ContiguousText) : Changes {
+  detectInputRefChanges(previous: ContiguousText): Changes {
     return detectChanges(EntityTypes.input_ref, '@input', previous.content, this.content);
   }
 
-  split(s: TextSelection) : ContiguousTextPair {
+  split(s: TextSelection): ContiguousTextPair {
 
     // Draft.js splitBlock should only be called when selection is collapsed.
     // So, if it isn't, we adjust the selection to make it collapsed (just for
@@ -353,7 +371,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
 
   // Returns true if the contiguous text contains one block and
   // the text in that block is empty or contains all spaces
-  isEffectivelyEmpty() : boolean {
+  isEffectivelyEmpty(): boolean {
     return this.content.getBlockMap().size === 1
       && this.content.getFirstBlock().text.trim() === '';
   }
@@ -361,17 +379,17 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   // Returns true if the selection is collapsed and the cursor is
   // positioned in the last block and no text other than spaces
   // follows the cursor
-  isCursorAtEffectiveEnd(textSelection: TextSelection) : boolean {
+  isCursorAtEffectiveEnd(textSelection: TextSelection): boolean {
     const last = this.content.getLastBlock();
     return textSelection.isCollapsed()
       && last.key === textSelection.getAnchorKey()
       && (last.text.length <= textSelection.getAnchorOffset()
-      || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
+        || (last.text as string).substr(textSelection.getAnchorOffset()).trim() === '');
   }
 
   // Returns true if the selection is collapsed and is at the
   // very beginning of the first block
-  isCursorAtBeginning(textSelection: TextSelection) : boolean {
+  isCursorAtBeginning(textSelection: TextSelection): boolean {
     const first = this.content.getFirstBlock();
     return textSelection.isCollapsed()
       && first.key === textSelection.getAnchorKey()
@@ -395,7 +413,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ content });
   }
 
-  updateAllInputRefs(itemMap: Object) : ContiguousText {
+  updateAllInputRefs(itemMap: Object): ContiguousText {
 
     const content = getEntities(EntityTypes.input_ref, this.content)
       .reduce(
@@ -412,7 +430,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return this.with({ content });
   }
 
-  extractPlainText() : Maybe<string> {
+  extractPlainText(): Maybe<string> {
 
     const blocks = this.content.getBlocksAsArray();
     const unstyled = blocks.filter(b => b.type === 'unstyled');
