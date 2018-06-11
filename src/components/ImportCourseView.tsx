@@ -90,11 +90,6 @@ export class ImportCourseView
       <p>Importing an existing OLI course can take several minutes,
         especially if the course is large and contains many assets.
       </p>
-      <br />
-      <p>After you initiate an import, you will be taken to the
-        &quot;My Courses&quot; page, where you can see the status
-        of the course that you are importing.
-      </p>
     </React.Fragment>;
     const note = (
       <div className="col-md-6 offset-md-3">
@@ -110,7 +105,7 @@ export class ImportCourseView
       <div className="import-course-view full container-fluid">
         <div className="row">
           <div className="col-md-6 offset-md-3">
-            <h2>Import an existing course</h2>
+            <h2>Import a course from an SVN repository</h2>
           </div>
         </div>
         <div className="row">

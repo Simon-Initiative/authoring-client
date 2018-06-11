@@ -3,7 +3,6 @@ import { JSSStyles } from 'styles/jss';
 
 export const styles: JSSStyles = {
   LoadingSpinner: {
-    padding: '20px 0',
     textAlign: 'center',
     fontSize: '0.8em',
     color: colors.gray,
