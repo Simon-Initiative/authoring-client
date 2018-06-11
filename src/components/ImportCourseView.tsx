@@ -7,22 +7,21 @@ import * as Messages from 'types/messages';
 
 import './ImportCourseView.scss';
 import { Severity, Toast } from 'components/common/Toast';
+import { CourseCreation } from 'components/CourseCreation';
 
 export interface ImportCourseViewProps {
   dispatch: any;
 }
 
 export interface ImportCourseViewState {
-  disabled: boolean;
-  inputText: string;
+
 }
 
 function buildImportMessage(): Messages.Message {
 
   const content = new Messages.TitledContent().with({
     title: 'Importing course',
-    message: 'Your course is importing. To check on the progress,'
-      + ' reload the page.',
+    message: 'Your course is importing. To check on the progress, reload the page.',
   });
 
   return new Messages.Message().with({
@@ -40,79 +39,39 @@ export class ImportCourseView
   constructor(props) {
     super(props);
 
-    this.state = {
-      disabled: true,
-      inputText: '',
-    };
-
-    this.onChange = this.onChange.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.onImport = this.onImport.bind(this);
   }
 
-  onChange(e) {
-    const value: string = e.target.value;
-
-    this.setState({
-      inputText: value,
-      disabled: value.trim() === '',
-    });
-  }
-
-  handleKeyPress(e) {
-    if (e.key === 'Enter') {
-      this.onImport();
-    }
-  }
-
-  onImport() {
-    persistence.importPackage(this.state.inputText.trim());
+  onImport(inputText: string) {
+    persistence.importPackage(inputText);
     this.props.dispatch(viewActions.viewAllCourses());
     this.props.dispatch(showMessage(buildImportMessage()));
   }
 
   render() {
-
-    const button = (
-      <div className="creation-container">
-        <button disabled={this.state.disabled}
-          onClick={this.onImport}>
-          Import Course
-        </button>
-      </div>
-    );
-
-    const noteIcon = <i className="fa fa-exclamation-circle" />;
-    const noteHeading = 'Note';
-    const noteContent =
+    const toastIcon = <i className="fa fa-exclamation-circle" />;
+    const toastHeading = 'Note';
+    const toastContent =
       <React.Fragment>
         <p>Importing an existing OLI course can take several minutes,
           especially if the course is large and contains many assets.
         </p>
       </React.Fragment>;
-    const note =
+    const toast =
       <Toast
-        icon={noteIcon}
-        heading={noteHeading}
-        content={noteContent}
+        icon={toastIcon}
+        heading={toastHeading}
+        content={toastContent}
         severity={Severity.Info} />;
 
     return (
-      <div className="import-course-view full container-fluid">
-        <div className="import-content">
-          <h2>Import a course from SVN</h2>
-          <input
-            value={this.state.inputText}
-            onChange={this.onChange}
-            onKeyPress={this.handleKeyPress}
-            type="text"
-            className="url-input" id="input"
-            placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/" />
-          {button}
-          <br />
-          {note}
-        </div>
-      </div >
+      <CourseCreation
+        title="Import a course from SVN"
+        buttonLabel="Import Course"
+        placeholder="e.g. https://svn.oli.cmu.edu/svn/content/biology/intro_biology/trunk/"
+        toast={toast}
+        onSubmit={this.onImport}
+      />
     );
   }
 }

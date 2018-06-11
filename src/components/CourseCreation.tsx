@@ -9,11 +9,11 @@ import './CourseCreation.scss';
 import { Severity, Toast } from 'components/common/Toast';
 
 export interface CourseCreationProps {
-  pageTitle: string;
+  title: string;
   buttonLabel: string;
-  inputPlaceholder: string;
+  placeholder: string;
   toast?: JSX.Element;
-  onSubmit: () => void;
+  onSubmit: (inputText: string) => void;
 }
 
 export interface CourseCreationState {
@@ -34,6 +34,7 @@ export class CourseCreation
 
     this.onChange = this.onChange.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.submit = this.submit.bind(this);
   }
 
   onChange(e) {
@@ -47,33 +48,37 @@ export class CourseCreation
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {
-      this.props.onSubmit();
+      this.submit();
     }
   }
 
+  submit() {
+    this.props.onSubmit(this.state.inputText.trim());
+  }
+
   render() {
-    const { pageTitle, buttonLabel, inputPlaceholder, toast, onSubmit } = this.props;
+    const { title, buttonLabel, placeholder, toast, onSubmit } = this.props;
     const { disabled, inputText } = this.state;
 
     const button =
-      <div className="creation-container">
+      <div className="course-creation__button">
         <button disabled={disabled}
-          onClick={onSubmit}>
+          onClick={this.submit}>
           {buttonLabel}
         </button>
       </div>;
 
     return (
-      <div className="course-creation full container-fluid">
-        <div className="import-content">
-          <h2>{pageTitle}</h2>
+      <div className="course-creation container-fluid">
+        <div className="course-creation__content">
+          <h1>{title}</h1>
           <input
             value={inputText}
             onChange={this.onChange}
             onKeyPress={this.handleKeyPress}
             type="text"
-            className="url-input" id="input"
-            placeholder={inputPlaceholder} />
+            className="course-creation__input" id="input"
+            placeholder={placeholder} />
           {button}
           <br />
           {toast}
