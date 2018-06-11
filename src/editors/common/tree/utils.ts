@@ -1,7 +1,6 @@
-import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 
-import { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
+import { HasGuid } from 'data/utils/tree';
 
 // Determines whether two things that might be nodes
 // are the same node.  In the context of our tree

@@ -1,7 +1,6 @@
 import { Maybe } from 'tsmonad';
-import * as Immutable from 'immutable';
 
-import { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
+import { HasGuid, NodeId } from 'data/utils/tree';
 export { ChildrenAccessor, ChildrenMutator, HasGuid, NodeId, Nodes } from 'data/utils/tree';
 
 

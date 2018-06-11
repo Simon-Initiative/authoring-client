@@ -4,9 +4,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import * as models from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
-import { ChildrenAccessor, HasGuid, Nodes, visitNodes } from 'data/utils/tree';
-import { combineReducers } from 'redux';
-
+import { HasGuid, Nodes, visitNodes } from 'data/utils/tree';
 
 export function findNodes(
   model: models.WorkbookPageModel,
