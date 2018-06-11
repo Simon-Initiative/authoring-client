@@ -143,11 +143,11 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     return (
       <ContentTitle
-          title={getLabelForQuestion(model)}
-          onDuplicate={editMode ? this.props.onDuplicate : undefined}
-          canRemove={canRemoveQuestion}
-          removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
-          onRemove={onRemoveQuestion} />
+        title={getLabelForQuestion(model)}
+        onDuplicate={editMode ? this.props.onDuplicate : undefined}
+        canRemove={canRemoveQuestion}
+        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
+        onRemove={onRemoveQuestion} />
     );
   }
 
@@ -181,7 +181,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const additionalOptions = this.renderAdditionalOptions();
     if (additionalOptions.length > 0) {
       options = options.concat(
-        <div key="flex-spacer" className="flex-spacer"/>,
+        <div key="flex-spacer" className="flex-spacer" />,
         ...additionalOptions,
       );
     }
@@ -206,16 +206,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     return (
       <div className="question-body" key="question">
-          <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
-            model={body}
-            onEdit={onBodyEdit} />
+        <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          editMode={editMode}
+          services={services}
+          context={context}
+          model={body}
+          onEdit={onBodyEdit} />
       </div>
     );
   }
@@ -232,12 +232,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <Tab className="skills-tab">
         <TabSection className="skills">
-          <TabSectionHeader title="Attached Skills"/>
+          <TabSectionHeader title="Attached Skills" />
           <TabSectionContent>
             <SkillsEditor
               activeContentGuid={null}
               hover={null}
-              onUpdateHover={() => {}}
+              onUpdateHover={() => { }}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -277,7 +277,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               <CriteriaEditor
                 activeContentGuid={null}
                 hover={null}
-                onUpdateHover={() => {}}
+                onUpdateHover={() => { }}
                 onFocus={this.props.onItemFocus.bind(this, c, this)}
                 parent={null}
                 key={c.guid}
@@ -336,7 +336,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
-                && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
+              && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
           ]}>
 
           {this.renderDetails() ? this.renderDetailsTab() : null}

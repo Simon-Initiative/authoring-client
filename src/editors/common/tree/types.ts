@@ -67,6 +67,7 @@ export type ChildrenMutator<NodeType extends HasGuid>
 // Metadata regarding a node
 export type NodeState<NodeType extends HasGuid> = {
   depth: number,
+  indexWithinParent: number,
   isSelected: boolean,
   parentNode: Maybe<NodeType>,
 };

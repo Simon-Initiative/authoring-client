@@ -47,6 +47,7 @@ function renderVisibleNodesHelper<NodeType extends HasGuid>(
       // Record metadata about this node
       const nodeState = {
         parentNode,
+        indexWithinParent,
         isSelected: selectedNodes.has(nodeId),
         depth,
       };

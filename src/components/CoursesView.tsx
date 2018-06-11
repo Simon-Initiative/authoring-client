@@ -182,22 +182,18 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   render() {
     return (
       <div className="courses-view">
-
         <div className="my-course-packages">
-
           <h2 style={{ display: 'inline' }}>My Courses</h2>
 
           {this.renderActionBar()}
 
           <div style={{ marginTop: '30px' }}>
-
             {this.state.courses.caseOf({
               just: courses => courses.length === 0
                 ? this.renderNoCourses()
                 : this.renderCourses(courses),
               nothing: () => this.renderWaiting(),
             })}
-
           </div>
         </div>
       </div>
