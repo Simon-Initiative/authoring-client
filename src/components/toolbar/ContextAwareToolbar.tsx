@@ -140,7 +140,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
+  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>): boolean {
 
     // See if the content switched or changed
     const contentSwitchedOrChanged = this.props.content.caseOf({
@@ -218,8 +218,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
 
-    const requestModel = () => {
-      return Promise.resolve(this.props.model);
+    const requestModel = () => Promise.resolve(this.props.model);
 
     const actionsToolbarLabel = () => {
       switch (model.modelType) {
@@ -230,7 +229,6 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
         default:
           return 'Actions';
       }
-
     };
 
     return (
