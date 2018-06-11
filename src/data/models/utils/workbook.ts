@@ -6,6 +6,8 @@ import * as models from 'data/models';
 import { ContentElement } from 'data/content/common/interfaces';
 import { HasGuid, Nodes, visitNodes } from 'data/utils/tree';
 
+// Given a workbook page model and a predicate, find all content type
+// instances (aka ContentElements) that meet the predicate
 export function findNodes(
   model: models.WorkbookPageModel,
   predicate: (node: ContentElement) => boolean) : ContentElement[] {
@@ -22,6 +24,7 @@ export function findNodes(
   return matching;
 }
 
+// Combine arbitrary number of ordered maps into one
 function combine(...maps: Immutable.OrderedMap<string, any>[])
   : Immutable.OrderedMap<string, any> {
   return maps.reduce(
@@ -32,7 +35,7 @@ function combine(...maps: Immutable.OrderedMap<string, any>[])
   );
 }
 
-// A minimal navigator to visit material content
+// Defines how we navigate through workbook page content elements
 function getChildren<NodeType extends HasGuid>(
   node: HasGuid) : Maybe<Nodes<NodeType>> {
   switch ((node as any).contentType) {
