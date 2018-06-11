@@ -1,85 +1,73 @@
 @import 'oli/colors';
 @import 'oli/typography';
 
-$button-blue: #3498DB;
-
 .create-course-view {
-  background: linear-gradient(to top, #6fc7e4, #75aaf0);
+  background-color: $blue;
+  background-repeat: no-repeat;
+  background-size: 30%;
+  background-position-x: 25%;
+  background-position-y: 40%;
   padding-top: 4rem;
   padding-bottom: 4rem;
   margin-bottom: 3rem;
   text-align: left;
   color: $white;
 
+  .btn.btn-secondary {
+    color: $white;
+    margin-top:2rem;
+
+    img {
+      margin-right: 0.5rem;
+    }
+
+    &:hover {
+      background-color: $white;
+      color: $blue;
+    }
+  }
+
   &.full {
     height: 100vh;
     padding: 10rem;
 
-    h2 {
-      margin-bottom: 20px;
-      font-size: 1.7rem;
-      text-align: center;
+    h1 {
+      font-family: $serif-font;
     }
 
     fieldset {
       width: 100%;
       position: relative;
-      text-align: center;
     }
 
     input {
-      width: 400px;
-      outline: none;
-      padding: 1rem;
-      font-size: 1.2rem;
-      line-height: 1.2rem;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid white;
-      color: white;
-
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.8);
-      }
+      padding: 2rem;
+      color: #000;
+      border: 1px solid #0055ab;
     }
 
-    .creationContainer {
-      text-align: center;
-      outline: none;
+    input::placeholder {
+      color: #c3c6cb;
+    }
 
-      button {
-        background-color: $button-blue;
-        text-decoration: none;
-        color: white;
-        width: 250px;
-        height: 75px;
-        position: relative;
-        margin-top: 30px;
-        border: none;
-        padding: 16px;
-        font-size: 1.6rem;
-        border-radius: 10px;
-        transition: all 0.2s;
+    label {
+      top: 37px;
+      position: absolute;
+      display: block;
+      transition: 0.2s;
+      margin-left: 2rem;
+      margin-top: -25px;
+    }
 
-        top: 10px;
-        &:active:not([disabled]) {
-          top: 18px;
-        }
+    input:focus + label {
+      top: 12px;
+      margin-top: 0px;
+      margin-left: 2rem;
+      color: #000;
+    }
 
-        cursor: pointer;
-        &[disabled] {
-          cursor: default;
-        }
-
-        &:focus {
-          outline: none;
-        }
-
-        box-shadow: 0px 15px 0px 0px darken($button-blue, 5%);
-        &:active {
-          box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
-        }
-      }
+    input:focus {
+      outline: 2px solid #0055ab;
     }
   }
 }
