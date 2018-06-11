@@ -121,7 +121,7 @@ export class SelectionEditor
         {
           this.props.model.source.contentType === 'Pool' && (
             <div className="insert-toolbar">
-              <span>Insert New:</span>
+              <span>Add new question:</span>
               <AddQuestion
                 editMode={this.props.editMode}
                 onQuestionAdd={this.onAddQuestion.bind(this)}
@@ -132,14 +132,14 @@ export class SelectionEditor
         }
         <form className="form-inline">
           <Select editMode={this.props.editMode}
-            label="Strategy" value={this.props.model.strategy}
+            label="Selection Strategy" value={this.props.model.strategy}
             onChange={this.onStrategyChange}>
             <option value="random">Random</option>
-            <option value="random_with_replace">Random with replace</option>
-            <option value="ordered">Ordered</option>
+            <option value="random_with_replace">Random (allow duplicates)</option>
+            <option value="ordered">In order</option>
           </Select>
           <Select editMode={this.props.editMode}
-            label="Exhaustion" value={this.props.model.exhaustion}
+            label="On Question Exhaustion" value={this.props.model.exhaustion}
             onChange={this.onExhaustionChange}>
             <option value="reuse">Reuse</option>
             <option value="skip">Skip</option>
@@ -152,7 +152,7 @@ export class SelectionEditor
             <option value="resource">Resource</option>
           </Select>
 
-          Count:&nbsp;&nbsp;&nbsp;
+          Question Count&nbsp;&nbsp;&nbsp;
           <TextInput
             editMode={this.props.editMode}
             width="75px"

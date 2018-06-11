@@ -37,6 +37,7 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  course: models.CourseModel;
 }
 
 interface PoolEditorState extends AbstractEditorState {
@@ -220,7 +221,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   render() {
-    const { context, services, editMode, model, onEdit } = this.props;
+    const { context, services, editMode, model, onEdit, course } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
@@ -261,6 +262,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
+                  course={course}
                 />
                 {this.renderAdd()}
               </div>

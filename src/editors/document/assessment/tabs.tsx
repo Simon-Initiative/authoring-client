@@ -2,15 +2,17 @@ import * as React from 'react';
 
 import * as Tree from 'editors/common/tree';
 import {
-  Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool,
+  Node as AssessmentNode, Question, Selection, ContiguousText, Content, Pool, PoolRef,
 } from 'data/contentTypes';
 import { getLabelForQuestion } from 'editors/content/question/Question';
 
 import './tabs.scss';
+import { CourseModel } from 'data/models';
 
 const newText: (type: string) => string = type => 'New ' + type;
 
 export interface TabProps {
+  course?: CourseModel;
   node: AssessmentNode;
   nodeState: Tree.NodeState<AssessmentNode>;
   handlers: Tree.Handlers;
@@ -18,7 +20,8 @@ export interface TabProps {
 }
 
 export function renderTab(
-  node: AssessmentNode, nodeState: Tree.NodeState<AssessmentNode>,
+  course: CourseModel, node: AssessmentNode,
+  nodeState: Tree.NodeState<AssessmentNode>,
   handlers: Tree.Handlers): JSX.Element {
 
   switch (node.contentType) {
@@ -34,10 +37,10 @@ export function renderTab(
     case 'Selection':
       if (node.source.contentType === 'PoolRef') {
         return <PoolRefTab
-          node={node} nodeState={nodeState} handlers={handlers} />;
+          course={course} node={node} nodeState={nodeState} handlers={handlers} />;
       }
       return <PoolTab
-        node={node} nodeState={nodeState} handlers={handlers} />;
+        course={course} node={node} nodeState={nodeState} handlers={handlers} />;
     default:
       return <UnsupportedTab
         node={node} nodeState={nodeState} handlers={handlers} />;
@@ -52,9 +55,11 @@ const strategy = (s: string): string => {
     case 'random':
       return 'randomly';
     case 'random_with_replace':
-      return 'randomly (with replace)';
-    case 'orderd':
+      return 'randomly with duplicates';
+    case 'ordered':
       return 'in order';
+    default:
+      return '';
   }
 };
 
@@ -89,11 +94,11 @@ const QuestionTab = (props: TabProps) => {
   const newQuestionText = newText('Question');
   const questionText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
-        .extractPlainText()
-        .caseOf({
-          just: t => t !== '' ? t : newQuestionText,
-          nothing: () => newQuestionText,
-        })
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newQuestionText,
+        nothing: () => newQuestionText,
+      })
     : newQuestionText;
 
   return (
@@ -118,11 +123,11 @@ const ContentTab = (props: TabProps) => {
   const newContentText = newText('Supporting Content');
   const previewText = textBlocks.size > 0
     ? (textBlocks.first() as ContiguousText)
-        .extractPlainText()
-        .caseOf({
-          just: t => t !== '' ? t : newContentText,
-          nothing: () => newContentText,
-        })
+      .extractPlainText()
+      .caseOf({
+        just: t => t !== '' ? t : newContentText,
+        nothing: () => newContentText,
+      })
     : c.body.content.first().contentType;
 
   return (
@@ -133,7 +138,6 @@ const ContentTab = (props: TabProps) => {
     />
   );
 };
-
 
 const UnsupportedTab = (props: TabProps) => {
   return (
@@ -148,37 +152,39 @@ const UnsupportedTab = (props: TabProps) => {
 
 const PoolTab = (props: TabProps) => {
   const p = props.node as Selection;
-
-  const newPoolText = newText('Embedded Pool');
-
   const pool = p.source as Pool;
-  const poolTitle = pool
+
+  const previewText = pool
     ? pool.title.text.extractPlainText().caseOf({
-      just: t => t !== '' ? t : newPoolText,
-      nothing: () => newPoolText,
-    })
-    : newPoolText;
+      just: t => t,
+      nothing: () => '',
+    }) + ' (' + selection(p) + ')'
+    : selection(p);
 
   return (
     <Tab
       {...props}
-      tooltip={selection(props.node as Selection)}
+      tooltip={selection(p)}
       label="Embedded Pool"
-      previewText={poolTitle}
+      previewText={previewText}
     />
   );
 };
 
 const PoolRefTab = (props: TabProps) => {
+  const p = props.node as Selection;
+  const pool = p.source as PoolRef;
 
-  const newPoolRefText = newText('Question Pool');
+  const previewText = pool
+    ? props.course.resourcesById.get(pool.idref).title + ' (' + selection(p) + ')'
+    : selection(p);
 
   return (
     <Tab
       {...props}
-      tooltip={selection(props.node as Selection)}
+      tooltip={selection(p)}
       label="Question Pool"
-      previewText={newPoolRefText}
+      previewText={previewText}
     />
   );
 };

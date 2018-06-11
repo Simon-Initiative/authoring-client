@@ -43,6 +43,7 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
   onSetCurrentPage: (documentId: string, pageId: string) => void;
+  course: models.CourseModel;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
@@ -451,7 +452,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   }
 
   render() {
-    const { context, services, editMode, model, currentNode, onEdit } = this.props;
+    const { context, services, editMode, model, course, currentNode, onEdit } = this.props;
 
     const page = this.getCurrentPage(this.props);
 
@@ -495,6 +496,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
+                  course={course}
                 />
                 {this.renderAdd()}
               </div>
