@@ -25,7 +25,7 @@ export interface RectangleEditorProps {
   id: string;
   coords: Immutable.List<number>;
   selected: boolean;
-  onSelect: (guid: string) => void;
+  onSelect: (guid: Maybe<string>) => void;
   onEdit: (coords: Immutable.List<number>) => void;
 }
 
@@ -184,7 +184,7 @@ export class RectangleEditor
   onSelect(id: string, e) {
     const { onSelect } = this.props;
 
-    onSelect(id);
+    onSelect(Maybe.just(id));
     e.stopPropagation();
   }
 

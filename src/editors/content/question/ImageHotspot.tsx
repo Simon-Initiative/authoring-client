@@ -76,7 +76,6 @@ export class ImageHotspot
     this.onToggleSimpleSelect = this.onToggleSimpleSelect.bind(this);
     this.onFeedbackEdit = this.onFeedbackEdit.bind(this);
     this.onScoreEdit = this.onScoreEdit.bind(this);
-    this.onImageHotspotEdit = this.onImageHotspotEdit.bind(this);
 
     this.choiceMap = Immutable.Map<string, contentTypes.Choice>();
   }
@@ -136,12 +135,6 @@ export class ImageHotspot
     onEdit(itemModel, updatedPartModel, updatedPartModel);
   }
 
-  onImageHotspotEdit(imageHotspot: contentTypes.ImageHotspot) {
-    const { onEdit, partModel } = this.props;
-
-    onEdit(imageHotspot, partModel, imageHotspot);
-  }
-
   /** Overrides parent method renderQuestionSection */
   renderQuestionSection() {
     const {
@@ -150,7 +143,9 @@ export class ImageHotspot
       context,
       body,
       itemModel,
+      partModel,
       onBodyEdit,
+      onEdit,
     } = this.props;
 
     return (
@@ -168,9 +163,10 @@ export class ImageHotspot
 
           <ImageHotspotEditor
             editMode={editMode}
-            onEdit={this.onImageHotspotEdit}
+            onEdit={onEdit}
             context={context}
-            model={itemModel} />
+            model={itemModel}
+            partModel={partModel} />
       </div>
     );
   }
