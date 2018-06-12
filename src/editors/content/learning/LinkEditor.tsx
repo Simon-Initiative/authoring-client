@@ -216,6 +216,7 @@ export default class LinkEditor
   }
 
   onSourceChange(isExternal) {
+    console.log(isExternal);
     this.setState({ isExternal });
   }
 
