@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
-import { Button } from '../common/controls';
-import guid from 'utils/guid';
 import {
     Question, QuestionProps, QuestionState,
 } from './Question';
@@ -34,11 +32,11 @@ export const isComplexScoring = (partModel: contentTypes.Part) => {
   return isAdvancedScoringMode;
 };
 
-export const convertToSimpleScoring = (partModel: contentTypes.Part) => {
+export const resetAllScores = (partModel: contentTypes.Part) => {
   const responses = partModel.responses.toArray();
 
   const updatedResponses = responses.reduce(
-    (acc, r) => acc.set(r.guid, r.with({ score: +r.score > 0 ? '1' : '0' })),
+    (acc, r) => acc.set(r.guid, r.with({ score: '0' })),
     partModel.responses,
   );
 
@@ -80,6 +78,17 @@ export class ImageHotspot
     this.choiceMap = Immutable.Map<string, contentTypes.Choice>();
   }
 
+  componentDidMount() {
+    const {
+      partModel, model, advancedScoringInitialized, onToggleAdvancedScoring,
+    } = this.props;
+
+    // initialize advanced scoring if its not already
+    if (!advancedScoringInitialized) {
+      onToggleAdvancedScoring(model.guid, isComplexScoring(partModel));
+    }
+  }
+
   /** Implement required abstract method to set className */
   getClassName() {
     const { classes, className } = this.props;
@@ -94,7 +103,7 @@ export class ImageHotspot
     // if switching from advanced mode and scoring is complex, reset all scores
     // so they are valid in simple mode. Otherwise, we can leave the scores as-is
     if (advancedScoring && isComplexScoring(partModel)) {
-      const updatedPartModel = convertToSimpleScoring(partModel);
+      const updatedPartModel = resetAllScores(partModel);
       onEdit(itemModel, updatedPartModel, updatedPartModel);
     }
 
@@ -104,7 +113,7 @@ export class ImageHotspot
   onToggleSimpleSelect(response: contentTypes.Response, choice: contentTypes.Choice) {
     const { itemModel, partModel, onEdit } = this.props;
 
-    let updatedPartModel = convertToSimpleScoring(partModel);
+    let updatedPartModel = resetAllScores(partModel);
 
     updatedPartModel = updatedPartModel.with({
       responses: updatedPartModel.responses.set(
@@ -165,6 +174,7 @@ export class ImageHotspot
             editMode={editMode}
             onEdit={onEdit}
             context={context}
+            services={services}
             model={itemModel}
             partModel={partModel} />
       </div>
@@ -228,7 +238,14 @@ export class ImageHotspot
     return (
       <React.Fragment>
         <TabSection key="choices" className="choices">
-          <TabSectionHeader title="Hotspots" />
+          <TabSectionHeader title="Hotspots">
+            <TabOptionControl key="advancedscoring" name="" >
+              <ToggleSwitch
+                labelBefore="Advanced"
+                checked={advancedScoring}
+                onClick={this.onToggleAdvanced}/>
+            </TabOptionControl>
+          </TabSectionHeader>
           <TabSectionContent>
             <div className="instruction-label">
               Select the correct hotspots and provide feedback

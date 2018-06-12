@@ -12,6 +12,13 @@ import { styles } from './ImageHotspotEditor.styles';
 import { Hotspot } from 'data/content/assessment/image_hotspot/hotspot';
 import guid from 'utils/guid';
 import { Maybe } from 'tsmonad';
+import ModalSelection from 'utils/selection/ModalSelection';
+import {
+  MediaManager, MIMETYPE_FILTERS, SELECTION_TYPES,
+} from 'editors/content/media/manager/MediaManager.controller';
+import { modalActions } from 'actions/modal';
+import { AppServices } from 'editors/common/AppServices';
+import { adjustPath } from 'editors/content/media/utils';
 
 const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
   return {
@@ -27,12 +34,41 @@ const mapCoordsToPolygonProps = (coords: Immutable.List<number>) => {
   };
 };
 
+const selectImage = (
+  src: string, resourcePath: string, courseModel, display, dismiss):
+  Promise<string> => {
+
+  return new Promise((resolve, reject) => {
+    let selected = src;
+
+    const mediaLibrary =
+      <ModalSelection title="Select an image"
+        onInsert={() => { dismiss(); resolve(selected); }}
+        onCancel={() => dismiss()}>
+        <MediaManager
+          model={new contentTypes.Image().with({ src })}
+          resourcePath={resourcePath}
+          courseModel={courseModel}
+          onEdit={() => { }}
+          mimeFilter={MIMETYPE_FILTERS.IMAGE}
+          selectionType={SELECTION_TYPES.SINGLE}
+          initialSelectionPaths={[src]}
+          onSelectionChange={(img) => {
+            selected = adjustPath(img[0].pathTo, resourcePath);
+          }} />
+      </ModalSelection>;
+
+    display(mediaLibrary);
+  });
+};
+
 export interface ImageHotspotEditorProps {
   className?: string;
   editMode: boolean;
   model: contentTypes.ImageHotspot;
   partModel: contentTypes.Part;
   context: AppContext;
+  services: AppServices;
   onEdit: (model: contentTypes.ImageHotspot, partModel: contentTypes.Part, src?: Object) => void;
 }
 
@@ -58,6 +94,7 @@ export class ImageHotspotEditor
 
     this.setRef = this.setRef.bind(this);
     this.handleOutsideClick = this.handleOutsideClick.bind(this);
+    this.onSelectImage = this.onSelectImage.bind(this);
     this.onEditCoords = this.onEditCoords.bind(this);
     this.onSelectHotspot = this.onSelectHotspot.bind(this);
     this.onAddHotspot = this.onAddHotspot.bind(this);
@@ -103,6 +140,21 @@ export class ImageHotspotEditor
     });
   }
 
+  onSelectImage() {
+    const { context, services, model, partModel, onEdit } = this.props;
+
+    const dispatch = (services as any).dispatch;
+    const dismiss = () => dispatch(modalActions.dismiss());
+    const display = c => dispatch(modalActions.display(c));
+
+    selectImage(
+      model.src,
+      context.resourcePath, context.courseModel,
+      display, dismiss)
+      .then((src) => {
+        onEdit(model.with({ src }), partModel);
+      });
+  }
   onAddHotspot(shape: string) {
     const { model, partModel, onEdit } = this.props;
 
@@ -193,7 +245,7 @@ export class ImageHotspotEditor
         style={{ width: model.width && model.width + 2 }}>
         <div className={classes.toolbar}>
         <ToolbarButton
-            onClick={() => { console.log('NOT IMPLEMENTED'); }}
+            onClick={this.onSelectImage}
             size={ToolbarButtonSize.Small}
             tooltip="Select Hotspot Image"
             disabled={!editMode}>
@@ -210,14 +262,14 @@ export class ImageHotspotEditor
             onClick={() => { console.log('NOT IMPLEMENTED'); }}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a circle hotspot"
-            disabled={!editMode}>
+            disabled={true || !editMode}>
           Circle
         </ToolbarButton>
         <ToolbarButton
             onClick={() => { console.log('NOT IMPLEMENTED'); }}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a polygon hotspot"
-            disabled={!editMode}>
+            disabled={true || !editMode}>
           Polygon
         </ToolbarButton>
         <div className="flex-spacer" />
