@@ -6,6 +6,7 @@ import guid from '../../../utils/guid';
 import { ContentTitle } from 'editors/content/common/ContentTitle';
 
 import './ContentEditor.scss';
+import { ContentElements } from 'data/content/common/elements';
 
 type IdTypes = {
   availability: string,
@@ -40,13 +41,13 @@ export class ContentEditor
     this.onAvailability = this.onAvailability.bind(this);
   }
 
-  onBodyEdit(body) {
+  onBodyEdit(body: ContentElements, src) {
     const concept = this.props.model.with({ body });
-    this.props.onEdit(concept);
+    this.props.onEdit(concept, src);
   }
 
-  onAvailability(availability) {
-    this.props.onEdit(this.props.model.with({ availability }));
+  onAvailability(availability: string, src) {
+    this.props.onEdit(this.props.model.with({ availability }), src);
   }
 
   renderTitle() {
