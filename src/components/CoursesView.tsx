@@ -29,7 +29,7 @@ export interface CoursesViewState {
 }
 
 
-function buildReportProblemAction() : Messages.MessageAction {
+function buildReportProblemAction(): Messages.MessageAction {
 
   const url = buildFeedbackFromCurrent(
     '',
@@ -44,7 +44,7 @@ function buildReportProblemAction() : Messages.MessageAction {
   };
 }
 
-function buildErrorMessage() : Messages.Message {
+function buildErrorMessage(): Messages.Message {
 
   const content = new Messages.TitledContent().with({
     title: 'Error contacting server.',
@@ -103,7 +103,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 
   renderActionBar() {
     return (
-      <div style={ { display: 'inline', float: 'right' } }>
+      <div style={{ display: 'inline', float: 'right' }}>
         <button
           type="button" className="btn btn-primary" key="createNew"
           onClick={this.createCourse.bind(this)}>
@@ -134,7 +134,7 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
             type="button" className="btn btn-link" key={guid}
             onClick={this.onSelect.bind(this, guid)}>
             <b>
-              {title +  ' - v' + version + (isReady ? '' : ' (Import in process)')}
+              {title + ' - v' + version + (isReady ? '' : ' (Import in process)')}
             </b>
           </button>;
 
@@ -155,17 +155,17 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   renderNoCourses() {
     return (
       <div>
-      <p className="lead">
-        <b>You have no course packages available.</b>
-      </p>
+        <p className="lead">
+          <b>You have no course packages available.</b>
+        </p>
 
-      Try:
+        Try:
 
       <ul>
-        <li>Creating a new course package</li>
-        <li>Importing an existing OLI course package directly from a Subversion repository</li>
-        <li>Contacting another user to have them grant you access to their course package</li>
-      </ul>
+          <li>Creating a new course package</li>
+          <li>Importing an existing OLI course package directly from a Subversion repository</li>
+          <li>Contacting another user to have them grant you access to their course package</li>
+        </ul>
 
       </div>
     );
@@ -182,22 +182,18 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
   render() {
     return (
       <div className="courses-view">
-
         <div className="my-course-packages">
-
-          <h2 style={ { display: 'inline' } }>My Courses</h2>
+          <h2 style={{ display: 'inline' }}>My Courses</h2>
 
           {this.renderActionBar()}
 
-          <div style={ { marginTop: '30px' }}>
-
-          {this.state.courses.caseOf({
-            just: courses => courses.length === 0
-              ? this.renderNoCourses()
-              : this.renderCourses(courses),
-            nothing: () => this.renderWaiting(),
-          })}
-
+          <div style={{ marginTop: '30px' }}>
+            {this.state.courses.caseOf({
+              just: courses => courses.length === 0
+                ? this.renderNoCourses()
+                : this.renderCourses(courses),
+              nothing: () => this.renderWaiting(),
+            })}
           </div>
         </div>
       </div>
@@ -206,5 +202,3 @@ class CoursesView extends React.PureComponent<CoursesViewProps, CoursesViewState
 }
 
 export default CoursesView;
-
-
