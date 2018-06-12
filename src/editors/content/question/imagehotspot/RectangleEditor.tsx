@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import * as contentTypes from 'data/contentTypes';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import { throttle } from 'utils/timing';
@@ -21,10 +22,22 @@ type Point = {
   y: number,
 };
 
+type BoundingClientRect = {
+  bottom: number,
+  height: number,
+  left: number,
+  right: number,
+  top: number,
+  width: number,
+  x: number,
+  y: number,
+};
+
 export interface RectangleEditorProps {
   id: string;
   coords: Immutable.List<number>;
   selected: boolean;
+  boundingClientRect: Maybe<BoundingClientRect>;
   onSelect: (guid: Maybe<string>) => void;
   onEdit: (coords: Immutable.List<number>) => void;
 }
@@ -73,8 +86,9 @@ export class RectangleEditor
       dragPointIndices: { x: pointIndices.x, y: pointIndices.y },
     });
 
-    // register mouse movements
+    // register global mouse listeners
     window.addEventListener('mousemove', this.onResizeDrag);
+    window.addEventListener('mouseup', this.endResize);
 
     e.stopPropagation();
   }
@@ -83,38 +97,71 @@ export class RectangleEditor
     const { onEdit } = this.props;
     const { newCoords } = this.state;
 
-    // unregister mouse movements
+    // unregister global mouse listeners
     window.removeEventListener('mousemove', this.onResizeDrag);
+    window.removeEventListener('mouseup', this.endResize);
 
     newCoords.lift(coords => onEdit(coords));
 
     this.setState({
       newCoords: Maybe.nothing<Immutable.List<number>>(),
+      dragPointBegin: null,
+      dragMouseBegin: null,
+      dragPointIndices: null,
     });
 
     e.stopPropagation();
   }
 
   onResizeDrag(e) {
-    const { coords } = this.props;
+    const { coords, boundingClientRect } = this.props;
     const { newCoords, dragPointBegin, dragMouseBegin, dragPointIndices } = this.state;
-    const { clientX, clientY } = e;
 
     if (dragPointIndices) {
-      const offsets = {
-        x: clientX - dragMouseBegin.x,
-        y: clientY - dragMouseBegin.y,
-      };
-      const newPointPosition = {
-        x: dragPointBegin.x + offsets.x,
-        y: dragPointBegin.y + offsets.y,
-      };
+      boundingClientRect.lift((boundingClient) => {
+        const { x, y, width, height } = boundingClient;
+        const { clientX, clientY } = e;
 
-      this.setState({
-        newCoords: Maybe.just(newCoords.valueOr(coords)
-          .set(dragPointIndices.x, newPointPosition.x)
-          .set(dragPointIndices.y, newPointPosition.y),
-        ),
+        // ensure new position is inside the bounds of the image
+        const dragMouse = {
+          x: Math.min(Math.max(clientX, x), x + width),
+          y: Math.min(Math.max(clientY, y), y + height),
+        };
+
+        // calculate the offset distance from where the drag began to where the mouse is
+        const offsets = {
+          x: dragMouse.x - dragMouseBegin.x,
+          y: dragMouse.y - dragMouseBegin.y,
+        };
+
+        // calculate the new point position using the offsets
+        let newPointPosition = {
+          x: dragPointBegin.x + offsets.x,
+          y: dragPointBegin.y + offsets.y,
+        };
+
+        // maintain minimum hotspot size using opposite point as constraint
+        const MINIMUM_SIZE_PX = 10;
+        const constraintIndices = {
+          x: (dragPointIndices.x + 2) % 4,  // opposite point x coords index
+          y: (dragPointIndices.y + 2) % 4,  // opposite point y coords index
+        };
+        newPointPosition = {
+          x: constraintIndices.x < dragPointIndices.x
+            ? Math.max(newPointPosition.x, coords.get(constraintIndices.x) + MINIMUM_SIZE_PX)
+            : Math.min(newPointPosition.x, coords.get(constraintIndices.x) - MINIMUM_SIZE_PX),
+          y: constraintIndices.y < dragPointIndices.y
+            ? Math.max(newPointPosition.y, coords.get(constraintIndices.y) + MINIMUM_SIZE_PX)
+            : Math.min(newPointPosition.y, coords.get(constraintIndices.y) - MINIMUM_SIZE_PX),
+        };
+
+        // update point location in state
+        this.setState({
+          newCoords: Maybe.just(newCoords.valueOr(coords)
+            .set(dragPointIndices.x, newPointPosition.x)
+            .set(dragPointIndices.y, newPointPosition.y),
+          ),
+        });
       });
     }
   }
@@ -128,8 +175,9 @@ export class RectangleEditor
       dragMouseBegin: { x: clientX, y: clientY },
     });
 
-    // register mouse movements
+    // register global mouse listeners
     window.addEventListener('mousemove', this.onMoveDrag);
+    window.addEventListener('mouseup', this.endMove);
 
     e.stopPropagation();
   }
@@ -138,45 +186,63 @@ export class RectangleEditor
     const { onEdit } = this.props;
     const { newCoords } = this.state;
 
-    // unregister mouse movements
+    // unregister global mouse listeners
     window.removeEventListener('mousemove', this.onMoveDrag);
+    window.removeEventListener('mouseup', this.endMove);
 
     newCoords.lift(coords => onEdit(coords));
 
     this.setState({
       newCoords: Maybe.nothing<Immutable.List<number>>(),
+      dragPointBegin: null,
+      dragMouseBegin: null,
+      dragPointIndices: null,
     });
 
     e.stopPropagation();
   }
 
   onMoveDrag(e) {
-    const { coords } = this.props;
+    const { coords, boundingClientRect } = this.props;
     const { newCoords, dragPointBegin, dragMouseBegin } = this.state;
     const { clientX, clientY } = e;
 
     if (dragPointBegin) {
-      const offsets = {
-        x: clientX - dragMouseBegin.x,
-        y: clientY - dragMouseBegin.y,
-      };
+      boundingClientRect.lift((boundingClient) => {
+        const { clientX, clientY } = e;
 
-      const { width, height } = mapCoordsToRectProps(coords);
+        const offsets = {
+          x: clientX - dragMouseBegin.x,
+          y: clientY - dragMouseBegin.y,
+        };
 
-      const calculatedCoords = {
-        x1: dragPointBegin.x + offsets.x,
-        y1: dragPointBegin.y + offsets.y,
-        x2: (dragPointBegin.x + offsets.x) + width,
-        y2: (dragPointBegin.y + offsets.y) + height,
-      };
+        const { width, height } = mapCoordsToRectProps(coords);
 
-      this.setState({
-        newCoords: Maybe.just(newCoords.valueOr(coords)
-          .set(0, calculatedCoords.x1)
-          .set(1, calculatedCoords.y1)
-          .set(2, calculatedCoords.x2)
-          .set(3, calculatedCoords.y2),
-        ),
+        let calculatedCoords = {
+          x1: dragPointBegin.x + offsets.x,
+          y1: dragPointBegin.y + offsets.y,
+          x2: (dragPointBegin.x + offsets.x) + width,
+          y2: (dragPointBegin.y + offsets.y) + height,
+        };
+
+        // ensure new location is inside the hotspot area
+        calculatedCoords = {
+          x1: Math.min(Math.max(calculatedCoords.x1, 0), (boundingClient.width - width)),
+          y1: Math.min(Math.max(calculatedCoords.y1, 0), (boundingClient.height - height)),
+          x2: Math.min(
+            Math.max(calculatedCoords.x2, width), boundingClient.width),
+          y2: Math.min(
+            Math.max(calculatedCoords.y2, height), boundingClient.height),
+        };
+
+        this.setState({
+          newCoords: Maybe.just(newCoords.valueOr(coords)
+            .set(0, calculatedCoords.x1)
+            .set(1, calculatedCoords.y1)
+            .set(2, calculatedCoords.x2)
+            .set(3, calculatedCoords.y2),
+          ),
+        });
       });
     }
   }
