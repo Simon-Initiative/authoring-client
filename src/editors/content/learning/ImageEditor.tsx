@@ -16,6 +16,7 @@ import { ToolbarGroup, ToolbarLayout } from 'components/toolbar/ContextAwareTool
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { CONTENT_COLORS } from 'editors/content/utils/content';
 import { buildUrl } from 'utils/path';
+import { fetchImageSize, ImageSize } from 'utils/image';
 import ModalSelection from 'utils/selection/ModalSelection';
 import { modalActions } from 'actions/modal';
 import { MediaMetadataEditor } from 'editors/content/learning/MediaItems';
@@ -27,11 +28,6 @@ const IMAGE = require('../../../../assets/400x300.png');
 
 import { styles } from './MediaElement.styles';
 
-interface Size {
-  width: number;
-  height: number;
-}
-
 export interface ImageSizeSidebarProps {
   services: AppServices;
   editMode: boolean;
@@ -41,7 +37,7 @@ export interface ImageSizeSidebarProps {
 }
 
 export interface ImageSizeSidebarState {
-  size: Size;
+  size: ImageSize;
   aspectRatio: number;
   isNativeSize: boolean;
   isProportionConstrained: boolean;
@@ -77,7 +73,7 @@ export class ImageSizeSidebar extends
   }
 
   setImageSize() {
-    this.fetchImageSize(this.props.model.src)
+    fetchImageSize(this.props.model.src, this.props.context)
       .then(size => this.setState({
         aspectRatio: size.width / size.height,
         size,
@@ -85,24 +81,6 @@ export class ImageSizeSidebar extends
         isSizeReceived: true,
       }))
       .catch(err => this.setState({ isNativeSize: true }));
-  }
-
-  fetchImageSize(src: string): Promise<Size> {
-    const fullSrc = buildUrl(
-      this.props.context.baseUrl,
-      this.props.context.courseId,
-      this.props.context.resourcePath,
-      src);
-    const img = new (window as any).Image();
-    return new Promise((resolve, reject) => {
-      img.onload = () => {
-        resolve({ height: img.height, width: img.width });
-      };
-      img.onerror = (err) => {
-        reject(err);
-      };
-      img.src = fullSrc;
-    });
   }
 
   onSelect() {

@@ -19,6 +19,7 @@ import {
 import { modalActions } from 'actions/modal';
 import { AppServices } from 'editors/common/AppServices';
 import { adjustPath } from 'editors/content/media/utils';
+import { fetchImageSize } from 'utils/image';
 
 const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
   return {
@@ -133,12 +134,35 @@ export class ImageHotspotEditor
 
     selectImage(
       model.src,
-      context.resourcePath, context.courseModel,
-      display, dismiss)
-      .then((src) => {
-        onEdit(model.with({ src }), partModel);
-      });
+      context.resourcePath,
+      context.courseModel,
+      display,
+      dismiss,
+    ).then(src => fetchImageSize(src, context)
+      .then(({ width, height }) => ({
+        src,
+        width,
+        height,
+      }))
+      .catch(() => Promise.resolve({
+        src,
+        // default to 400 x 600 on sizing failure
+        width: 600,
+        height: 400,
+      })),
+    )
+    .then(({ src, width, height }) => {
+      onEdit(
+        model.with({
+          src,
+          width,
+          height,
+        }),
+        partModel,
+      );
+    });
   }
+
   onAddHotspot(shape: string) {
     const { model, partModel, onEdit } = this.props;
 
