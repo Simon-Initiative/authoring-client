@@ -8,6 +8,7 @@ import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import { CourseModel } from 'data/models';
 import './DeleteResourceModal.scss';
 import { LegacyTypes } from 'data/types';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 export interface DeleteResourceModalProps {
   resource: Resource;
@@ -135,36 +136,32 @@ export default class DeleteResourceModal extends
     ];
 
     const link = (edge: Edge) => (text: string) =>
-      <a href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
-        className="btn btn-link">{text}</a>;
+      <a onClick={this.props.onDismissModal}
+         href={`/#${this.edgeResource(this.edgeResourceId(edge)).guid}-${course.guid}`}
+         className="btn btn-link">
+        {text}
+      </a>;
 
     const columnRenderers = [
       (edge: Edge) => link(edge)(this.edgeResourceTitle(this.edgeResourceId(edge))),
       (edge: Edge) => <span>{this.prettyPrintResourceType(edge.sourceType)}</span>,
     ];
 
-    let modalBody;
+    const failureIcon =
+      <LoadingSpinner failed message="Something went wrong - please try again" />;
 
-    if (edgeLoadFailure) {
-      modalBody = <div key="loading" className="loading">
-        <i className="fa fa-times-circle" />
-        Something went wrong - please try again
-    </div>;
-    }
-    if (!edgesAreLoaded) {
-      modalBody = <div key="loading" className="loading">
-        <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-        Checking if this {resourceTypeLowercase} can be safely deleted
-      </div>;
-    }
-    if (edgesAreLoaded && edges.size === 0) {
-      // tslint:disable-next-line:max-line-length
-      modalBody = <p>Are you sure you want to delete this {resourceTypeLowercase}? This action cannot be undone.</p>;
-    }
-    if (edgesAreLoaded && edges.size > 0) {
-      modalBody = <React.Fragment>
+    const loadingSpinner =
+      <LoadingSpinner message=
+        {`Checking if this ${resourceTypeLowercase} can be safely deleted`} />;
+
+    const deletionConfirmation =
+      <p>Are you sure you want to delete this {resourceTypeLowercase}?&nbsp;
+      This action cannot be undone.</p>;
+
+    const edgeTable =
+      <React.Fragment>
         {/* tslint:disable-next-line:max-line-length */}
-        <p>The following {edges.size} resource{edges.size === 1 ? '' : 's'} use{edges.size === 1 ? 's' : ''} this {resourceTypeLowercase}. All references must be removed before the {resourceTypeLowercase} can be deleted.</p>
+        <p>The following {edges.size === 1 ? 'resource' : edges.size.toString() + ' resources'} use{edges.size === 1 ? 's' : ''} this {resourceTypeLowercase}. All references must be removed before the {resourceTypeLowercase} can be deleted.</p>
         <SortableTable
           model={rows}
           columnComparators={comparators}
@@ -172,7 +169,6 @@ export default class DeleteResourceModal extends
           columnLabels={labels}
         />
       </React.Fragment>;
-    }
 
     return (
       <ModalSelection
@@ -182,7 +178,13 @@ export default class DeleteResourceModal extends
         okClassName="danger"
         okLabel="Delete"
         disableInsert={edgesAreLoaded && edges.size !== 0}>
-        {modalBody}
+        {edgeLoadFailure
+          ? failureIcon
+          : !edgesAreLoaded
+            ? loadingSpinner
+            : edgesAreLoaded && edges.size === 0
+              ? deletionConfirmation
+              : edgeTable}
       </ModalSelection>
     );
   }

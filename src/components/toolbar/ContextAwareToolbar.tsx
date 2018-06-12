@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
 import { injectSheet, injectSheetSFC, classNames } from 'styles/jss';
 import { RenderContext } from 'editors/content/common/AbstractContentEditor';
-import { ParentContainer, TextSelection, Trigger } from 'types/active.ts';
+import { ParentContainer } from 'types/active.ts';
 import { getEditorByContentType } from 'editors/content/container/registry.ts';
 import { Maybe } from 'tsmonad';
 import { Resource } from 'data/content/resource';
@@ -14,6 +14,7 @@ import { ItemToolbar } from './ItemToolbar.controller';
 import { ActionsToolbar } from './ActionsToolbar.controller';
 import { CourseModel } from 'data/models/course';
 import { ContentModel, ModelTypes } from 'data/models';
+
 
 import { styles, TOOLBAR_HIDE_ANIMATION_DURATION_MS } from './ContextAwareToolbar.styles';
 
@@ -123,13 +124,13 @@ export interface ToolbarProps {
   container: Maybe<ParentContainer>;
   context: AppContext;
   model: ContentModel;
-  textSelection: Maybe<TextSelection>;
-  onInsert: (content: Object, textSelection) => void;
+  onInsert: (content: Object) => void;
   onEdit: (content: Object) => void;
   hideLabels?: boolean;
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
 }
 
 @injectSheet(styles)
@@ -139,27 +140,13 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
     super(props);
   }
 
-  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>) : boolean {
+  shouldComponentUpdate(nextProps: StyledComponentProps<ToolbarProps>): boolean {
 
-    // Determine if this update is due to a keypress
-    // that changed content.  These changes do not affect
-    // the toolbar, so no need to re-render
-    const isKeypress = this.props.textSelection.caseOf({
-      just: t => nextProps.textSelection.caseOf({
-        just: s => t !== s && s.triggeredBy === Trigger.KEYPRESS,
-        nothing: () => false,
-      }),
-      nothing: () => false,
-    });
-
-    if (isKeypress) {
-      return false;
-    }
-
-    // If the active content has switched, we re-render
-    const contentSwitched = this.props.content.caseOf({
+    // See if the content switched or changed
+    const contentSwitchedOrChanged = this.props.content.caseOf({
       just: t => nextProps.content.caseOf({
-        just: s => (t as any).guid !== (s as any).guid,
+        just: s => (t as any).guid !== (s as any).guid
+          || s !== t,
         nothing: () => true,
       }),
       nothing: () => nextProps.content.caseOf({
@@ -168,7 +155,7 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
       }),
     });
 
-    if (contentSwitched) {
+    if (contentSwitchedOrChanged) {
       return true;
     }
 
@@ -185,7 +172,8 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const {
       onInsert, onEdit, content, container, supportedElements, model,
-      textSelection, classes, onDisplayModal, onDismissModal, context, resource,
+      classes, onDisplayModal, onDismissModal, context, resource,
+      onCreateNew,
     } = this.props;
 
     const contentModel = content.caseOf({
@@ -230,20 +218,35 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
     const canPreview = model.modelType === ModelTypes.WorkbookPageModel;
 
+    const requestModel = () => Promise.resolve(this.props.model);
+
+    const actionsToolbarLabel = () => {
+      switch (model.modelType) {
+        case 'AssessmentModel':
+          return 'Assessment';
+        case 'WorkbookPageModel':
+          return 'Page';
+        default:
+          return 'Actions';
+      }
+    };
+
     return (
       <div className={classes.toolbar}>
         <ToolbarGroup className={classes.toolbarInsertGroup} label="Insert" columns={16.8}>
           <InsertToolbar
+            onCreateNew={onCreateNew}
+            requestLatestModel={requestModel}
             context={context}
             courseModel={this.props.courseModel}
             resourcePath={determineBaseUrl(this.props.resource)}
-            onInsert={item => onInsert(item, textSelection)}
+            onInsert={item => onInsert(item)}
             parentSupportsElementType={parentSupportsElementType}
             onDisplayModal={onDisplayModal}
             onDismissModal={onDismissModal} />
         </ToolbarGroup>
 
-        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={6.7}>
+        <ToolbarGroup className={classes.toolbarItemGroup} label="Item" columns={7}>
           <ItemToolbar
             context={context}
             parentSupportsElementType={parentSupportsElementType} />
@@ -258,7 +261,10 @@ export class ContextAwareToolbar extends React.Component<StyledComponentProps<To
 
         <div className="flex-spacer" />
 
-        <ToolbarGroup className={classes.toolbarActionsGroup} label="Actions" columns={10}>
+        <ToolbarGroup
+          className={classes.toolbarActionsGroup}
+          label={actionsToolbarLabel()}
+          columns={10}>
           <ActionsToolbar
             documentResource={resource}
             documentId={context.documentId}

@@ -11,6 +11,7 @@ import { OrderedMediaLibrary } from 'editors/content/media/OrderedMediaLibrary';
 import { webContentsPath } from '../utils';
 import { CourseModel } from 'data/models/course';
 import './MediaManager.scss';
+import { LoadingSpinner } from 'components/common/LoadingSpinner';
 
 const PAGELOAD_TRIGGER_MARGIN_PX = 100;
 const MAX_NAME_LENGTH = 26;
@@ -208,13 +209,13 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     }
 
     if (!isLoadingMedia && this.scrollView.scrollTop + PAGELOAD_TRIGGER_MARGIN_PX
-        > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
+      > (this.scrollContent.offsetHeight - this.scrollView.offsetHeight)) {
       onLoadCourseMediaNextPage(mimeFilter, searchText, orderBy, order);
     }
   }
 
   onFileUpload(files: FileList) {
-    const { courseModel , mimeFilter, onLoadCourseMediaNextPage,
+    const { courseModel, mimeFilter, onLoadCourseMediaNextPage,
       onResetMedia } = this.props;
     const { searchText, orderBy, order } = this.state;
 
@@ -334,7 +335,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     return (
       <div className="media-list">
         <div className="list-header">
-          <div className="sel-col"/>
+          <div className="sel-col" />
           <div className="name-col">Name</div>
           <div className="refs-col">References</div>
           <div className="date-col">Date Modified</div>
@@ -344,23 +345,23 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           <div ref={el => this.scrollContent = el}>
             {mediaItems.map(item => (
               <div key={item.guid}
-                  className={
-                    `media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
-                    + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
-                  onClick={() => this.onSelect(item.guid)}>
+                className={
+                  `media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                  + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
+                onClick={() => this.onSelect(item.guid)}>
                 <div className="sel-col">
                   <input
-                      type="checkbox"
-                      readOnly
-                      className="selection-check"
-                      checked={this.isSelected(item.guid)}
-                      onClick={() => this.onSelect(item.guid)} />
+                    type="checkbox"
+                    readOnly
+                    className="selection-check"
+                    checked={this.isSelected(item.guid)}
+                    onClick={() => this.onSelect(item.guid)} />
                 </div>
                 <div className="name-col">
                   <MediaIcon
-                      filename={item.fileName}
-                      mimeType={item.mimeType}
-                      url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
+                    filename={item.fileName}
+                    mimeType={item.mimeType}
+                    url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
                   {` ${item.fileName}`}
                 </div>
                 <div className="refs-col">
@@ -371,12 +372,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               </div>
             ))}
             {isLoadingMedia && !allItemsLoaded
-              ? (
-                <div key="loading" className="loading">
-                  <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-                  {PAGE_LOADING_MESSAGE}
-                </div>
-              )
+              ? <LoadingSpinner key="loading" message={PAGE_LOADING_MESSAGE} />
               : null
             }
           </div>
@@ -408,19 +404,19 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
         <div className="scroll-content" ref={el => this.scrollContent = el}>
           {mediaItems.map(item => (
             <div key={item.guid}
-                className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
-                  + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
-                onClick={() => this.onSelect(item.guid)}>
+              className={`media-item ${this.isSelected(item.guid) ? 'selected' : ''} `
+                + `${selectionType !== SELECTION_TYPES.NONE ? 'selectable' : ''}`}
+              onClick={() => this.onSelect(item.guid)}>
               <input
-                  type="checkbox"
-                  readOnly
-                  className="selection-check"
-                  checked={this.isSelected(item.guid)}
-                  onClick={() => this.onSelect(item.guid)} />
+                type="checkbox"
+                readOnly
+                className="selection-check"
+                checked={this.isSelected(item.guid)}
+                onClick={() => this.onSelect(item.guid)} />
               <MediaIcon
-                  filename={item.fileName}
-                  mimeType={item.mimeType}
-                  url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
+                filename={item.fileName}
+                mimeType={item.mimeType}
+                url={webContentsPath(item.pathTo, resourcePath, courseModel.guid)} />
               <div className="name">
                 {stringFormat.ellipsize(item.fileName, MAX_NAME_LENGTH, 5)}
               </div>
@@ -478,7 +474,7 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
             <div className="flex-spacer" />
             <Button type="link" editMode onClick={() =>
-                this.setState({ showDetails: !showDetails })}>
+              this.setState({ showDetails: !showDetails })}>
               {showDetails ? 'Hide' : 'Details'}
             </Button>
           </div>
@@ -504,12 +500,12 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                 <div>
                   <b>References:</b> {
                     mediaItemRefs.get(selectedItem.guid)
-                    ? (
-                      mediaItemRefs.get(selectedItem.guid).size
-                    )
-                    : (
-                      <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
-                    )
+                      ? (
+                        mediaItemRefs.get(selectedItem.guid).size
+                      )
+                      : (
+                        <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+                      )
                   }
                 </div>
                 <div>
@@ -517,9 +513,9 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
                     && mediaItemRefs.get(selectedItem.guid).map((ref, i) => (
                       <span key={ref.guid}>
                         <a href={`./#${ref.guid}-${courseModel.guid}`}
-                            target="_blank">
-                            {stringFormat.ellipsize(
-                              courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
+                          target="_blank">
+                          {stringFormat.ellipsize(
+                            courseModel.resourcesById.get(ref.resourceId).title, 20, 5)}
                         </a>
                         {i < mediaItemRefs.get(selectedItem.guid).size - 1 ? ', ' : ''}
                       </span>
@@ -548,17 +544,17 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
     return (
       <div className={`media-manager ${className || ''}`}>
         <div className="media-toolbar">
-            <input
-              id={id}
-              style={ { display: 'none' } }
-              accept={mimeFilter && `${mimeFilter}/*`}
-              multiple={true}
-              onChange={({ target: { files } }) => this.onFileUpload(files)}
-              type="file" />
+          <input
+            id={id}
+            style={{ display: 'none' }}
+            accept={mimeFilter && `${mimeFilter}/*`}
+            multiple={true}
+            onChange={({ target: { files } }) => this.onFileUpload(files)}
+            type="file" />
           <Button
-              className="media-toolbar-item upload"
-              editMode
-              onClick={() => this.onUploadClick(id)}>
+            className="media-toolbar-item upload"
+            editMode
+            onClick={() => this.onUploadClick(id)}>
             <i className="fa fa-upload" /> Upload
           </Button>
           <div className="media-toolbar-item layout-control">
@@ -573,13 +569,13 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
               <i className="fa fa-th-list" />
             </button>
           </div>
-          <div className="media-toolbar-item flex-spacer"/>
+          <div className="media-toolbar-item flex-spacer" />
           <div className="media-toolbar-item sort-control dropdown">
             Sort By:
             <button
-                className="btn btn-secondary dropdown-toggle sort-btn"
-                type="button" id="dropdownMenu2"
-                data-toggle="dropdown">
+              className="btn btn-secondary dropdown-toggle sort-btn"
+              type="button" id="dropdownMenu2"
+              data-toggle="dropdown">
               <i className={SORT_MAPPINGS[getSortMappingKey(orderBy, order)].icon} />
               {` ${getSortMappingKey(orderBy, order)}`}
             </button>
@@ -598,11 +594,11 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           <div className="media-toolbar-item search">
             <div className="input-group">
               <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search"
-                  value={searchText}
-                  onChange={({ target: { value } }) => this.onSearch(value)} />
+                type="text"
+                className="form-control"
+                placeholder="Search"
+                value={searchText}
+                onChange={({ target: { value } }) => this.onSearch(value)} />
             </div>
           </div>
         </div>
@@ -621,10 +617,10 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           </div>
         </div>
         <div className="media-infobar">
-            <div className="flex-spacer"/>
-            {mediaCount && mediaCount.totalResults > -Infinity &&
-              <div>Showing {mediaCount.numResults} of {mediaCount.totalResults}</div>
-            }
+          <div className="flex-spacer" />
+          {mediaCount && mediaCount.totalResults > -Infinity &&
+            <div>Showing {mediaCount.numResults} of {mediaCount.totalResults}</div>
+          }
         </div>
       </div>
     );

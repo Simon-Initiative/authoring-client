@@ -12,7 +12,7 @@ import { Collapse } from '../../content/common/Collapse';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { renderAssessmentNode } from '../common/questions';
 import { getChildren, Outline, setChildren } from './Outline';
-import * as Tree from '../../common/tree';
+import { updateNode, removeNode } from 'data/utils/tree';
 import { hasUnknownSkill } from 'utils/skills';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
 import { ContextAwareSidebar } from 'components/sidebar/ContextAwareSidebar.controller';
@@ -26,6 +26,7 @@ import { buildMissingSkillsMessage } from 'utils/error';
 import createGuid from 'utils/guid';
 
 import './AssessmentEditor.scss';
+import { ToolbarButtonMenuDivider } from 'components/toolbar/ToolbarButtonMenu';
 
 export interface AssessmentEditorProps extends AbstractEditorProps<models.AssessmentModel> {
   onFetchSkills: (courseId: string) => void;
@@ -41,10 +42,12 @@ export interface AssessmentEditorProps extends AbstractEditorProps<models.Assess
   onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
+  onSetCurrentPage: (documentId: string, pageId: string) => void;
+  course: models.CourseModel;
 }
 
 interface AssessmentEditorState extends AbstractEditorState {
-
+  collapseInsertPopup: boolean;
 }
 
 
@@ -55,8 +58,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   noSkillsMessage: Messages.Message;
   supportedElements: Immutable.List<string>;
 
-  constructor(props : AssessmentEditorProps) {
-    super(props, ({} as AssessmentEditorState));
+  constructor(props: AssessmentEditorProps) {
+    super(props, ({ collapseInsertPopup: true } as AssessmentEditorState));
 
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onAddContent = this.onAddContent.bind(this);
@@ -72,6 +75,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEditNode = this.onEditNode.bind(this);
     this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     this.supportedElements = Immutable.List<string>();
 
@@ -97,17 +101,18 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   shouldComponentUpdate(
     nextProps: AssessmentEditorProps,
-    nextState: AssessmentEditorState) : boolean {
+    nextState: AssessmentEditorState): boolean {
 
     const shouldUpdate = this.props.model !== nextProps.model
-        || this.props.activeContext !== nextProps.activeContext
-        || this.props.expanded !== nextProps.expanded
-        || this.props.editMode !== nextProps.editMode
-        || this.props.hover !== nextProps.hover
-        || this.props.currentPage !== nextProps.currentPage
-        || this.props.currentNode !== nextProps.currentNode
-        || this.state.undoStackSize !== nextState.undoStackSize
-        || this.state.redoStackSize !== nextState.redoStackSize;
+      || this.props.activeContext !== nextProps.activeContext
+      || this.props.expanded !== nextProps.expanded
+      || this.props.editMode !== nextProps.editMode
+      || this.props.hover !== nextProps.hover
+      || this.props.currentPage !== nextProps.currentPage
+      || this.props.currentNode !== nextProps.currentNode
+      || this.state.undoStackSize !== nextState.undoStackSize
+      || this.state.redoStackSize !== nextState.redoStackSize
+      || this.state.collapseInsertPopup !== nextState.collapseInsertPopup;
 
     return shouldUpdate;
   }
@@ -115,8 +120,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   componentWillReceiveProps(nextProps: AssessmentEditorProps) {
 
     if (this.props.context.skills.size <= 0 &&
-        nextProps.context.skills.size > 0 &&
-        this.noSkillsMessage !== undefined) {
+      nextProps.context.skills.size > 0 &&
+      this.noSkillsMessage !== undefined) {
       this.props.dismissMessage(this.noSkillsMessage);
     }
 
@@ -136,8 +141,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
           nothing: () => {
             locateNextOfKin(
               this.getCurrentPage(this.props).nodes, this.props.currentNode.guid).lift(node =>
-              onSetCurrentNode(
-                activeContext.documentId.valueOr(null), node));
+                onSetCurrentNode(
+                  activeContext.documentId.valueOr(null), node));
           },
         });
     }
@@ -145,7 +150,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
   getCurrentPage(props) {
     return props.model.pages.get(this.props.currentPage)
-    || props.model.pages.first();
+      || props.model.pages.first();
   }
 
   onPageEdit(page: contentTypes.Page) {
@@ -181,13 +186,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
             this.props.onSetCurrentNode(
               this.props.activeContext.documentId.valueOr(null), questions.last());
           }
-
         }
       }
     }
   }
 
-  onEditNode(guid : string, node : models.Node, src) {
+  onEditNode(guid: string, node: models.Node, src) {
 
     const { activeContext, onSetCurrentNode } = this.props;
 
@@ -198,7 +202,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     onSetCurrentNode(activeContext.documentId.valueOr(null), node);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
-    this.onEditNodes(Tree.updateNode(guid, node, nodes, getChildren, setChildren));
+    this.onEditNodes(updateNode(guid, node, nodes, getChildren, setChildren));
   }
 
   onEditNodes(nodes: Immutable.OrderedMap<string, models.Node>) {
@@ -231,7 +235,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     let page = this.getCurrentPage(this.props);
 
-    const removed = Tree.removeNode(guid, page.nodes, getChildren, setChildren);
+    const removed = removeNode(guid, page.nodes, getChildren, setChildren);
 
     if (removed.size > 0) {
       locateNextOfKin(page.nodes, guid).lift(node =>
@@ -243,23 +247,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
       this.handleEdit(this.props.model.with({ pages }));
     }
-
   }
 
   onAddContent() {
     let content = contentTypes.Content.fromText('', '');
     content = content.with({ guid: guid() });
     this.addNode(content);
+    this.setState({
+      collapseInsertPopup: true,
+    });
   }
 
   addQuestion(question: contentTypes.Question) {
     const content = question.with({ guid: guid() });
     this.addNode(content);
+    this.setState({
+      collapseInsertPopup: true,
+    });
   }
 
   onAddPool() {
     const pool = new contentTypes.Selection({ source: new contentTypes.Pool() });
     this.addNode(pool);
+    this.setState({
+      collapseInsertPopup: true,
+    });
   }
 
   addNode(node) {
@@ -308,14 +320,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     const predicate = (res: Resource): boolean =>
       res.type === LegacyTypes.assessment2_pool
-        && res.resourceState !== ResourceState.DELETED;
+      && res.resourceState !== ResourceState.DELETED;
 
     this.props.services.displayModal(
       <ResourceSelection
         filterPredicate={predicate}
         courseId={this.props.context.courseId}
         onInsert={this.onInsertPool}
-        onCancel={this.onCancelSelectPool}/>);
+        onCancel={this.onCancelSelectPool} />);
   }
 
   onCancelSelectPool() {
@@ -331,16 +343,19 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
 
     this.props.services.fetchIdByGuid(resource.guid)
-    .then((idref) => {
-      const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
-      this.addNode(pool);
-    });
+      .then((idref) => {
+        const pool = new contentTypes.Selection({ source: new contentTypes.PoolRef({ idref }) });
+        this.addNode(pool);
+        this.setState({
+          collapseInsertPopup: true,
+        });
+      });
   }
 
   renderSettings() {
     return (
       <Collapse caption="Settings">
-        <div style={ { marginLeft: '25px' } }>
+        <div style={{ marginLeft: '25px' }}>
           <form>
 
             <div className="form-group row">
@@ -379,37 +394,31 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
   renderAdd() {
     const isInline = this.props.model.resource.type === LegacyTypes.inline;
 
+    const { editMode } = this.props;
+    const { collapseInsertPopup } = this.state;
+
+    const questionPoolOrNothing = editMode && !isInline
+      ? <a className="dropdown-item" onClick={this.onSelectPool}>Question Pool</a>
+      : null;
+
+    const embeddedPoolOrNothing = editMode && !isInline
+      ? <a className="dropdown-item" onClick={this.onAddPool}>Embedded Pool</a>
+      : null;
+
     return (
-      <div className="add-menu">
-
-        <span className="label">Insert new: </span>
-
-        <button disabled={!this.props.editMode}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddContent}>Content</button>
-
-        <span className="slash">/</span>
-
-        <AddQuestion
-          editMode={this.props.editMode}
-          onQuestionAdd={this.addQuestion.bind(this)}
-          isSummative={this.props.model.type === LegacyTypes.assessment2}/>
-
-        <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onSelectPool}>Question Pool</button>
-
-        <span className="slash">/</span>
-
-        <button
-          disabled={!this.props.editMode || isInline}
-          type="button" className="btn btn-link btn-sm"
-          onClick={this.onAddPool}>Embedded Pool</button>
-
-      </div>
+      <React.Fragment>
+        <div className={`insert-popup ${collapseInsertPopup ? 'collapsed' : ''}`}>
+          <AddQuestion
+            editMode={this.props.editMode}
+            onQuestionAdd={this.addQuestion.bind(this)}
+            isSummative={this.props.model.type === LegacyTypes.assessment2} />
+          <ToolbarButtonMenuDivider />
+          <a className="dropdown-item" onClick={this.onAddContent}>Supporting Content</a>
+          {questionPoolOrNothing}
+          {embeddedPoolOrNothing}
+        </div>
+        <a onClick={this.collapseInsertPopup} className="insert-new">Insert new...</a>
+      </React.Fragment>
     );
   }
 
@@ -436,9 +445,14 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     }
   }
 
-  render() {
-    const { context, services, editMode, model, currentNode, onEdit } = this.props;
+  collapseInsertPopup() {
+    this.setState({
+      collapseInsertPopup: !this.state.collapseInsertPopup,
+    });
+  }
 
+  render() {
+    const { context, services, editMode, model, course, currentNode, onEdit } = this.props;
 
     const page = this.getCurrentPage(this.props);
 
@@ -459,7 +473,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
 
     return (
       <div className="assessment-editor">
-        <ContextAwareToolbar context={this.props.context} model={model}/>
+        <ContextAwareToolbar context={this.props.context} model={model} />
         <div className="assessment-content">
           <div className="html-editor-well">
 
@@ -472,10 +486,8 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
               onEdit={this.onTitleEdit}
               editorStyles={{ fontSize: 32 }} />
 
-            {this.renderAdd()}
-
-            <div className="outline">
-              <div className="outlineContainer">
+            <div className="outline-and-node-container">
+              <div className="outline-container">
                 <Outline
                   editMode={this.props.editMode}
                   nodes={page.nodes}
@@ -484,9 +496,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
-                  />
+                  course={course}
+                />
+                {this.renderAdd()}
               </div>
-              <div className="nodeContainer">
+              <div className="node-container">
                 {renderAssessmentNode(
                   currentNode, assessmentNodeProps, this.onEditNode,
                   this.onNodeRemove, this.onFocus, this.canRemoveNode(),

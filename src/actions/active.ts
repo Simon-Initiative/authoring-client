@@ -1,7 +1,9 @@
 import { ParentContainer, TextSelection } from 'types/active';
 import { Maybe } from 'tsmonad';
 import { ActiveContextState } from 'reducers/active';
+import { ParsedContent } from 'data/parsers/common/types';
 import * as contentTypes from 'data/contentTypes';
+import { resolveWithProgressUI } from './progress';
 
 export type UPDATE_CONTENT = 'active/UPDATE_CONTENT';
 export const UPDATE_CONTENT: UPDATE_CONTENT = 'active/UPDATE_CONTENT';
@@ -56,15 +58,50 @@ export const resetActive = (): ResetActiveAction => ({
 });
 
 
-export function insert(content: Object, textSelection: Maybe<TextSelection>) {
+export function insert(content: Object) {
   return function (dispatch, getState) {
 
     const { activeContext } = getState();
+
     activeContext.container.lift((parent : ParentContainer) => {
-      parent.onAddNew(content, textSelection);
+      parent.onAddNew(content, activeContext.textSelection);
     });
+
   };
 }
+
+export function insertParsedContent(resourcePath: string, parsedContent: ParsedContent) {
+
+  return function (dispatch, getState) {
+
+    const { activeContext, course } = getState();
+    const courseId = course.guid;
+
+    activeContext.container.lift((parent : ParentContainer) => {
+
+      // If we have dependencies to resolve, we first present the user with a UI
+      // allowing them to track the resolution progress
+      if (parsedContent.dependencies.size > 0) {
+
+        resolveWithProgressUI(
+          dispatch,
+          parsedContent,
+          courseId,
+          resourcePath,
+          (e) => {
+            parent.onAddNew(e.toArray(), activeContext.textSelection);
+          });
+
+      } else {
+        // Otherwise, just add the elements
+        parent.onAddNew(parsedContent.elements.toArray(), activeContext.textSelection);
+      }
+    });
+
+  };
+
+}
+
 
 export function edit(content: Object) {
   return function (dispatch, getState) {

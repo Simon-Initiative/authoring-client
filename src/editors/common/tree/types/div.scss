@@ -1,9 +1,24 @@
+@import 'oli/colors';
+
+.tree-container {
+  max-height: 100%;
+  background-color: #E2E4E6;
+  border-radius: 3px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  .tree-list {
+    max-height: 100%;
+    overflow: hidden;
+    padding: 0.4em;
+    padding-bottom: 1px;
+  }
+}
+
 .div-node {
 
   position: relative;
-  height: 40px;
   display: block;
-  padding: 0px;
 
   .top-drop {
     position: absolute;
@@ -12,14 +27,10 @@
     width: 100%;
   }
 
-  .botton-drop {
+  .bottom-drop {
     position: absolute;
     top: 35px;
     height: 10px;
     width: 100%;
   }
-}
-
-.draggable-tree-node {
-
 }

@@ -283,30 +283,34 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
 
     let updatedItemModel = itemModel;
     let updatedPartModel = partModel;
-    updatedItemModel = itemModel.with({
-      choices: itemModel.choices.delete(choiceId),
-    });
 
-    // update models with new choices and references
-    const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
-    updatedItemModel = updatedModels.itemModel;
-    updatedPartModel = updatedModels.partModel;
+    // prevent removal of last choice
+    if (itemModel.choices.size > 1) {
+      updatedItemModel = itemModel.with({
+        choices: itemModel.choices.delete(choiceId),
+      });
 
-    // update part model with default feedback
-    updatedPartModel = modelWithDefaultFeedback(
-      updatedPartModel,
-      updatedItemModel.choices.toArray(),
-      getGeneratedResponseBody(updatedPartModel),
-      getGeneratedResponseScore(updatedPartModel),
-      AUTOGEN_MAX_CHOICES,
-      onGetChoiceCombinations,
-    );
+      // update models with new choices and references
+      const updatedModels = updateChoiceValuesAndRefs(updatedItemModel, partModel);
+      updatedItemModel = updatedModels.itemModel;
+      updatedPartModel = updatedModels.partModel;
 
-    onEdit(
-      updatedItemModel,
-      updatedPartModel,
-      null,
-    );
+      // update part model with default feedback
+      updatedPartModel = modelWithDefaultFeedback(
+        updatedPartModel,
+        updatedItemModel.choices.toArray(),
+        getGeneratedResponseBody(updatedPartModel),
+        getGeneratedResponseScore(updatedPartModel),
+        AUTOGEN_MAX_CHOICES,
+        onGetChoiceCombinations,
+      );
+
+      onEdit(
+        updatedItemModel,
+        updatedPartModel,
+        null,
+      );
+    }
   }
 
   onReorderChoices(originalIndex: number, newIndex: number) {
@@ -403,7 +407,10 @@ export class CheckAllThatApply extends Question<CheckAllThatApplyProps, CheckAll
             editMode={editMode}
             onReorderChoice={this.onReorderChoices}
             onEditChoice={this.onChoiceEdit}
-            onRemove={choiceId => this.onRemoveChoice(choiceId)} />
+            onRemove={itemModel.choices.size > 1
+              ? choiceId => this.onRemoveChoice(choiceId)
+              : undefined
+            } />
         );
       });
   }

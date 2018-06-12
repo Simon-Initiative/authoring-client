@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
+import { createNew } from 'actions/document';
 import { showSidebar } from 'actions/editorSidebar';
-import { ParentContainer, TextSelection } from 'types/active.ts';
+import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
 import { Maybe } from 'tsmonad';
 import { AppContext } from 'editors/common/AppContext';
@@ -16,17 +17,17 @@ interface StateProps {
   supportedElements: Immutable.List<string>;
   content: Object;
   container: Maybe<ParentContainer>;
-  textSelection: Maybe<TextSelection>;
   courseModel: CourseModel;
   resource: Resource;
 }
 
 interface DispatchProps {
-  onInsert: (content: Object, textSelection) => void;
+  onInsert: (content: Object) => void;
   onEdit: (content: Object) => void;
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
 }
 
 interface OwnProps {
@@ -50,7 +51,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
     supportedElements,
     content: activeContext.activeChild,
     container: activeContext.container,
-    textSelection: activeContext.textSelection,
   };
 
 };
@@ -59,10 +59,16 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
 
   return {
     onEdit: content =>  dispatch(edit(content)),
-    onInsert: (content, textSelection) => dispatch(insert(content, textSelection)),
+    onInsert: content => dispatch(insert(content)),
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onShowSidebar: () => dispatch(showSidebar(true)),
+    onCreateNew: (model: ContentModel) => {
+      return new Promise((resolve, reject) => {
+        dispatch(createNew(model))
+        .then(resource => resolve(resource));
+      });
+    },
   };
 };
 
