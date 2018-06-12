@@ -21,7 +21,7 @@ const defaultContent = {
   id: Maybe.nothing(),
   title: Title.fromText('Title'),
   purpose: Maybe.nothing(),
-  content: ContentElements.fromText('Content', '', BOX_ELEMENTS),
+  content: new ContentElements().with({ supportedElements: Immutable.List<string>(BOX_ELEMENTS) }),
   guid: '',
 };
 
