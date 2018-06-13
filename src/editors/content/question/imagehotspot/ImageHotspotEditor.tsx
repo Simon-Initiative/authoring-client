@@ -24,6 +24,8 @@ import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
 import { PolygonEditor } from './PolygonEditor';
 
+const DEFAULT_IMAGE = require('./hotspot_instructions.png');
+
 const selectImage = (
   src: string, resourcePath: string, courseModel, display, dismiss):
   Promise<string> => {
@@ -284,8 +286,14 @@ export class ImageHotspotEditor
             onClick={() => this.onRemoveHotspot(selectedHotspot.valueOr(''))}
             size={ToolbarButtonSize.Fit}
             className={classes.removeHotspotButton}
-            tooltip="Remove selected hotspot"
-            disabled={selectedHotspot.caseOf({ just: () => false, nothing: () => true })}>
+            tooltip={selectedHotspot.caseOf({ just: () => true, nothing: () => false })
+              && model.hotspots.size <= 1
+                ? 'An Image Hotspot must contain at least one hotspot. '
+                  + 'Please add another hotspot before removing this one.'
+                : 'Remove selected hotspot'
+            }
+            disabled={selectedHotspot.caseOf({ just: () => false, nothing: () => true })
+              || model.hotspots.size <= 1}>
           Remove Hotspot
         </ToolbarButton>
         </div>
@@ -298,11 +306,13 @@ export class ImageHotspotEditor
                 className={classes.hotspotBody}>
                 <img
                   ref={this.setSvgRef}
-                  src={buildUrl(
-                    context.baseUrl,
-                    context.courseId,
-                    context.resourcePath,
-                    model.src,
+                  src={model.src === 'NO_IMAGE_SELECTED'
+                    ? DEFAULT_IMAGE
+                    : buildUrl(
+                      context.baseUrl,
+                      context.courseId,
+                      context.resourcePath,
+                      model.src,
                   )}
                   width={model.width} height={model.height} />
                 <svg

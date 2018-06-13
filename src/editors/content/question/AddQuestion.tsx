@@ -16,12 +16,6 @@ import {
   getTargetsFromLayout, updateItemPartsFromTargets,
 } from 'editors/content/learning/dynadragdrop/utils';
 
-const DEFAULT_HOTSPOT_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAA8C\
-AYAAABIFuztAAAAx0lEQVR42u3VMQ0AAAgEMVCO9McBCXsr4ZbrSqYA4KkNBAADAcBAADAQAAwEAAwEAAMBwEA\
-AMBAADAQADAQAAwHAQAAwEAAMBAAMBAADAcBAADAQAAwEAAwEAAMBwEAAMBAADAQADAQAAwHAQAAwEAAMBAAMB\
-AADAcBAADAQAAxEBgAMBAADAcBAADAQADAQAAwEAAMBwEAAMBAAMBAADAQAAwHAQAAwEAAwEAAMBAADAcBAADA\
-QADAQAAwEAAMBwEAAMBAAuC2SnJWJIN61iQAAAABJRU5ErkJggg==';
-
 const defaultInputBody = () => ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
 
@@ -281,7 +275,7 @@ export class AddQuestion
     let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
 
     let item = new contentTypes.ImageHotspot().with({
-      src: DEFAULT_HOTSPOT_IMAGE,
+      src: 'NO_IMAGE_SELECTED',
     });
 
     // create new hotspot
