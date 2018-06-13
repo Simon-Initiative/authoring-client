@@ -11,7 +11,10 @@ export const Remove = (props) => {
         onClick={e => props.editMode && props.onRemove(e)}
         type="button"
         className="btn btn-sm">
-        <i className={props.customIcon || `fa fa-close`}></i>
+        {console.clear() || console.log('props.loading', props.loading)}
+        {props.loading
+          ? <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" />
+          : <i className={props.customIcon || `fa fa-close`}></i>}
       </button>
     </span>
   );
