@@ -7,6 +7,7 @@ import { injectSheet, classNames, JSSProps } from 'styles/jss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from './RectangleEditor';
+import { CircleEditor } from './CircleEditor';
 
 import { styles } from './ImageHotspotEditor.styles';
 import { Hotspot } from 'data/content/assessment/image_hotspot/hotspot';
@@ -89,7 +90,7 @@ export interface ImageHotspotEditorState {
 export class ImageHotspotEditor
     extends React.PureComponent<StyledComponentProps<ImageHotspotEditorProps>,
     ImageHotspotEditorState> {
-  ref: any;
+  svgRef: any;
 
   constructor(props) {
     super(props);
@@ -98,7 +99,7 @@ export class ImageHotspotEditor
       selectedHotspot: Maybe.nothing(),
     };
 
-    this.setRef = this.setRef.bind(this);
+    this.setSvgRef = this.setSvgRef.bind(this);
     this.onSelectImage = this.onSelectImage.bind(this);
     this.onEditCoords = this.onEditCoords.bind(this);
     this.onSelectHotspot = this.onSelectHotspot.bind(this);
@@ -106,8 +107,8 @@ export class ImageHotspotEditor
     this.onRemoveHotspot = this.onRemoveHotspot.bind(this);
   }
 
-  setRef(ref) {
-    this.ref = ref;
+  setSvgRef(svgRef) {
+    this.svgRef = svgRef;
   }
 
   onEditCoords(guid: string, coords: Immutable.List<number>) {
@@ -300,9 +301,9 @@ export class ImageHotspotEditor
           {model.src
             ? (
               <div
-                ref={this.setRef}
                 className={classes.hotspotBody}>
                 <img
+                  ref={this.setSvgRef}
                   src={buildUrl(
                     context.baseUrl,
                     context.courseId,
@@ -310,7 +311,8 @@ export class ImageHotspotEditor
                     model.src,
                   )}
                   width={model.width} height={model.height} />
-                <svg className={classes.hotspots} width={model.width} height={model.height}>
+                <svg
+                  className={classes.hotspots} width={model.width} height={model.height}>
                   {model.hotspots.sort(h => h.guid === selectedHotspot.valueOr('') ? 1 : 0)
                     .toArray()
                     .map((hotspot) => {
@@ -322,8 +324,8 @@ export class ImageHotspotEditor
                               id={hotspot.guid}
                               label={getFeedbackLabel(hotspot.value, partModel)}
                               selected={hotspot.guid === selectedHotspot.valueOr('')}
-                              boundingClientRect={this.ref
-                                ? Maybe.just(this.ref.getBoundingClientRect())
+                              boundingClientRect={this.svgRef
+                                ? Maybe.just(this.svgRef.getBoundingClientRect())
                                 : Maybe.nothing()}
                               coords={hotspot.coords}
                               onSelect={this.onSelectHotspot}
@@ -331,10 +333,17 @@ export class ImageHotspotEditor
                           );
                         case 'circle':
                           return (
-                            <circle
+                            <CircleEditor
                               key={hotspot.guid}
-                              className={classes.hotspot}
-                              {...mapCoordsToCircleProps(hotspot.coords)} />
+                              id={hotspot.guid}
+                              label={getFeedbackLabel(hotspot.value, partModel)}
+                              selected={hotspot.guid === selectedHotspot.valueOr('')}
+                              boundingClientRect={this.svgRef
+                                ? Maybe.just(this.svgRef.getBoundingClientRect())
+                                : Maybe.nothing()}
+                              coords={hotspot.coords}
+                              onSelect={this.onSelectHotspot}
+                              onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
                           );
                         case 'poly':
                           return (
