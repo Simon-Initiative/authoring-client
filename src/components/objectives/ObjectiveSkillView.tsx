@@ -444,37 +444,35 @@ export class ObjectiveSkillView
     }
   }
 
-  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
-
+  detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
     // Update the parent objective
     const index = objective.skills.indexOf(model.id);
     const skills = objective.skills.remove(index);
     const updated = objective.with({ skills });
 
     this.onObjectiveEdit(updated);
-
   }
 
-  removeObjective(obj: contentTypes.LearningObjective) {
-    const originalDocument = this.state.objectives.mapping.get(obj.id);
+  deleteSkill(skill: contentTypes.Skill) {
+    const originalDocument = this.state.skills.mapping.get(skill.id);
 
-    const objectives = (originalDocument.model as models.LearningObjectivesModel)
-      .objectives.delete(obj.guid);
+    const skills = (originalDocument.model as models.SkillsModel)
+      .skills.delete(skill.guid);
     const model =
-      (originalDocument.model as models.LearningObjectivesModel)
-      .with({ objectives });
+      (originalDocument.model as models.SkillsModel)
+      .with({ skills });
 
     const updatedDocument = originalDocument.with({ model });
 
-    const unified = Object.assign({}, this.state.objectives);
+    const unified = Object.assign({}, this.state.skills);
 
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
-    unified.objectives = unified.objectives.delete(obj.id);
+    unified.skills = unified.skills.delete(skill.id);
 
-    // We need to remap the existing objective ids to the
-    // new version of the newBucket document
+    // We need to remap the existing skill ids to the
+    // new version of the edited document
     const idsToDocument = unified.mapping
       .filter((doc, id) => doc._id === originalDocument._id)
       .map((doc, id) => updatedDocument)
@@ -486,12 +484,111 @@ export class ObjectiveSkillView
     }
 
     this.setState(
-      { objectives: unified, isSavePending: true },
+      { skills: unified, isSavePending: true },
 
       () => persistence.persistDocument(updatedDocument)
         .then(result => this.saveCompleted())
         .catch(error => this.failureEncountered(error)),
     );
+
+    this.props.onSetSkills(unified.skills);
+  }
+
+  // WARNING: Do not use countSkillRefs from within a render
+  // method or within a for-loop of any kind, given that
+  // this impl is n^2 with respect to the number of objectives
+  // and skills mapped to them
+  countSkillRefs(model: contentTypes.Skill) : number {
+    return this.state.objectives.objectives
+      .toArray()
+      .map(o => o.skills.contains(model.id) ? 1 : 0)
+      .reduce((acc, count) => acc + count, 0);
+  }
+
+  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
+
+    // We simply detach when this skill is present in more than
+    // one objective.
+    if (this.countSkillRefs(model) > 1) {
+
+      this.detachSkill(objective, model);
+
+    } else {
+      // Otherwise, we will perform a true delete, but only if the
+      // skill is not referenced by any assessments
+      this.canDeleteSkill(model)
+      .then((canDelete) => {
+
+        if (canDelete) {
+          this.detachSkill(objective, model);
+          this.deleteSkill(model);
+        }
+      });
+    }
+
+  }
+
+  canDeleteObjective(obj: contentTypes.LearningObjective) : Promise<boolean> {
+
+    // TODO, Replace this with call to Edge API, display of modal, etc
+    return Promise.resolve(true);
+  }
+
+  canDeleteSkill(skill: contentTypes.Skill) : Promise<boolean> {
+
+    // TODO, Replace this with call to Edge API, display of modal, etc
+    return Promise.resolve(true);
+  }
+
+
+  removeObjective(obj: contentTypes.LearningObjective) {
+
+    this.canDeleteObjective(obj)
+      .then((canDelete) => {
+
+        if (canDelete) {
+          const originalDocument = this.state.objectives.mapping.get(obj.id);
+
+          const objectives = (originalDocument.model as models.LearningObjectivesModel)
+            .objectives.delete(obj.guid);
+          const model =
+            (originalDocument.model as models.LearningObjectivesModel)
+            .with({ objectives });
+
+          const updatedDocument = originalDocument.with({ model });
+
+          const unified = Object.assign({}, this.state.objectives);
+
+          const index = unified.documents.indexOf(originalDocument);
+
+          unified.documents[index] = updatedDocument;
+          unified.objectives = unified.objectives.delete(obj.id);
+
+          // We need to remap the existing objective ids to the
+          // new version of the newBucket document
+          const idsToDocument = unified.mapping
+            .filter((doc, id) => doc._id === originalDocument._id)
+            .map((doc, id) => updatedDocument)
+            .toOrderedMap();
+          unified.mapping = unified.mapping.merge(idsToDocument);
+
+          if (originalDocument === unified.newBucket) {
+            unified.newBucket = updatedDocument;
+          }
+
+          this.setState(
+            { objectives: unified, isSavePending: true },
+
+            () => persistence.persistDocument(updatedDocument)
+              .then(result => this.saveCompleted())
+              .catch(error => this.failureEncountered(error)),
+          );
+
+          this.props.onSetObjectives(unified.objectives);
+        }
+
+      });
+
   }
 
   onToggleExpanded(guid) {
