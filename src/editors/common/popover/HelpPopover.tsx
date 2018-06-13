@@ -39,8 +39,6 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
 
     const modal = <ModalMessage>{this.props.children}</ModalMessage>;
 
-    console.log('activateOnClick', props.activateOnClick);
-
     return props.activateOnClick
       ? <div className="help-popover-container help-popover-trigger">
         <i onClick={() => props.displayModal(modal)}
