@@ -177,7 +177,7 @@ export default class DeleteResourceModal extends
         onInsert={this.onDelete}
         okClassName="danger"
         okLabel="Delete"
-        disableInsert={edgesAreLoaded && edges.size !== 0}>
+        disableInsert={!edgesAreLoaded || edges.size !== 0}>
         {edgeLoadFailure
           ? failureIcon
           : !edgesAreLoaded

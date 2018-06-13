@@ -2,6 +2,7 @@ import * as Immutable from 'immutable';
 import * as Messages from 'types/messages';
 import { ModalMessage } from 'utils//ModalMessage';
 import { modalActions } from 'actions/modal';
+import { Priority } from 'types/messages/message';
 
 // Helper UI function for rendering the lock display for any type of editor
 
@@ -34,6 +35,7 @@ export function buildReadOnlyMessage(lockDetails: LockDetails, retryAction) {
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Warning,
+    priority: Priority.High,
     canUserDismiss: false,
     actions: Immutable.List(actions),
     content,
@@ -67,6 +69,7 @@ export function buildLockExpiredMessage(retryAction) {
   return new Messages.Message().with({
     scope: Messages.Scope.Resource,
     severity: Messages.Severity.Warning,
+    priority: Priority.High,
     canUserDismiss: false,
     content,
     actions: Immutable.List(actions),
