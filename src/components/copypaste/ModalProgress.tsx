@@ -89,7 +89,7 @@ export class ModalProgress extends React.Component<ModalProgressProps, ModalProg
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
-      data-backdrop="static" className="modal fade">
+      data-backdrop className="modal fade">
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">

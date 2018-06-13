@@ -29,6 +29,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './ObjectiveSkillView.scss';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -657,7 +658,15 @@ export class ObjectiveSkillView
   }
 
   renderTitle() {
-    return <h2>Learning Objectives and Skills</h2>;
+    const src = 'https://www.youtube.com/embed/14O7XCgsznY';
+
+    return (
+      <h2>Learning Objectives and Skills&nbsp;&nbsp;
+        <HelpPopover activateOnClick>
+          <iframe src={src} height={500} width={'100%'} />
+        </HelpPopover>
+      </h2>
+    );
   }
 
   render() {

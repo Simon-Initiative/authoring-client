@@ -40,7 +40,7 @@ import CourseEditor from 'editors/document/course//CourseEditor.controller';
 
 type ResourceList = {
   title: string,
-  resourceType: string,
+  resourceType: LegacyTypes,
   filterFn: any,
   createResourceFn: any,
 };

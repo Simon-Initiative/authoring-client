@@ -12,13 +12,15 @@ import './ResourceView.scss';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
+import { LegacyTypes } from 'data/types';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
-  resourceType: string;
+  resourceType: LegacyTypes;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
     courseId: string,
@@ -146,7 +148,15 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const creationTitle = <h2>{this.props.title}</h2>;
+
+    const orgHelpIcon = <HelpPopover activateOnClick>
+      <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
+    </HelpPopover>;
+
+    // Only the organizations tab includes a help icon
+    const creationTitle = this.props.resourceType === LegacyTypes.organization
+      ? <h2>{this.props.title}  {orgHelpIcon}</h2>
+      : <h2>{this.props.title}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [
