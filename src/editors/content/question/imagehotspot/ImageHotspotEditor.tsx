@@ -183,8 +183,15 @@ export class ImageHotspotEditor
     switch (shape) {
       // case 'poly':
       //   break;
-      // case 'circle':
-      //   break;
+      case 'circle':
+        newHotspot = newHotspot.with({
+          coords: Immutable.List<number>([
+            Math.floor(model.width / 2),
+            Math.floor(model.height / 2),
+            100,
+          ]),
+        });
+        break;
       case 'rect':
       default:
         newHotspot = newHotspot.with({
@@ -272,14 +279,14 @@ export class ImageHotspotEditor
           Rectangle
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => { console.log('NOT IMPLEMENTED'); }}
+            onClick={() => this.onAddHotspot('circle')}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a circle hotspot"
-            disabled={true || !editMode}>
+            disabled={!editMode}>
           Circle
         </ToolbarButton>
         <ToolbarButton
-            onClick={() => { console.log('NOT IMPLEMENTED'); }}
+            onClick={() => this.onAddHotspot('poly')}
             size={ToolbarButtonSize.Fit}
             tooltip="Create a polygon hotspot"
             disabled={true || !editMode}>
