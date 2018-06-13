@@ -1,13 +1,9 @@
-import { Resource, ResourceState } from 'data/content/resource';
+import { Resource } from 'data/content/resource';
 import * as React from 'react';
-import ModalSelection from 'utils/selection/ModalSelection';
 import { Edge } from 'types/edge';
-import { OrderedMap } from 'immutable';
-import * as persistence from 'data/persistence';
 import { SortDirection, SortableTable } from 'components/common/SortableTable';
 import { CourseModel } from 'data/models';
 import { LegacyTypes } from 'data/types';
-import { LoadingSpinner } from 'components/common/LoadingSpinner';
 import * as contentTypes from 'data/contentTypes';
 import { AppServices } from 'editors/common/AppServices';
 import { ModalMessage } from 'utils/ModalMessage';
@@ -66,7 +62,7 @@ export default class DeleteObjectiveSkillModal extends
   }
 
   render() {
-    const { course, model, services, edges } = this.props;
+    const { course, model, edges } = this.props;
 
     const modelType = model.contentType === 'Skill' ? 'skill' : 'learning objective';
 
