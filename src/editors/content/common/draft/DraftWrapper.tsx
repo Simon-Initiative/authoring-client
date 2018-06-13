@@ -8,8 +8,8 @@ import {
 } from 'draft-js';
 
 import {
-    cloneDuplicatedEntities, determineChangeType,
-    SelectionChangeType,
+  cloneDuplicatedEntities, determineChangeType,
+  SelectionChangeType,
 } from './utils';
 import { AppServices } from '../../../common/AppServices';
 import { AppContext } from '../../../common/AppContext';
@@ -24,7 +24,7 @@ import { ParsedContent } from 'data/parsers/common/types';
 
 
 export interface DraftWrapperProps {
-  onEdit: (text : ContiguousText, src?) => void;
+  onEdit: (text: ContiguousText, src?) => void;
   onSelectionChange: (state: SelectionState, keyPress: boolean) => void;
   content: ContiguousText;
   locked: boolean;
@@ -204,7 +204,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
       editorState: newEditorState,
     };
 
-    this.onChange = (currentEditorState : EditorState) => {
+    this.onChange = (currentEditorState: EditorState) => {
 
       // You wouldn't think that this check would be necessary, but I was seeing
       // change notifications fired from Draft even when it was not in edit mode.
@@ -213,7 +213,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
         let editorState = currentEditorState;
 
         const ss = editorState.getSelection();
-        const changeType : SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
+        const changeType: SelectionChangeType = determineChangeType(this.lastSelectionState, ss);
         this.lastSelectionState = ss;
 
         let contentState = editorState.getCurrentContent();
@@ -271,7 +271,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     });
   }
 
-  shouldComponentUpdate(nextProps: DraftWrapperProps, nextState: DraftWrapperState) : boolean {
+  shouldComponentUpdate(nextProps: DraftWrapperProps, nextState: DraftWrapperState): boolean {
 
     if (this.props.content.content !== nextProps.content.content) {
       if (nextProps.content.content !== this.state.editorState.getCurrentContent()) {
@@ -322,7 +322,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     };
     const onSelect = (entityKey) => {
       // Force selection just before the entity
-      const range : EntityRange = findEntity(
+      const range: EntityRange = findEntity(
         (key, e) => entityKey === key, this.state.editorState.getCurrentContent());
       const ss = SelectionState.createEmpty(range.contentBlock.key).merge({
         anchorKey: range.contentBlock.key,
@@ -359,17 +359,21 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     // Returning true prevents pasting
     if (html !== undefined && html !== null) {
 
-      const parsed = parseContent(html).caseOf({
+      // Try parsing the html, but in case of failure, paste the plain text
+      parseContent(html).caseOf({
         just: (parsedContent) => {
           setTimeout(() => this.props.onInsertParsedContent(parsedContent), 0);
-          return true;
         },
-        nothing: () => false,
+        nothing: () => {
+          const { editorState } = this.state;
+          this.onChange(EditorState.push(editorState, Modifier.replaceText(
+            editorState.getCurrentContent(),
+            editorState.getSelection(),
+            text)));
+        },
       });
 
-      if (parsed) {
-        return true;
-      }
+      return true;
     }
 
     // Prevent pasting in single block mode if it would introduce
@@ -410,7 +414,7 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
 
   render() {
 
-    const editorStyle : any = this.props.editorStyles !== undefined
+    const editorStyle: any = this.props.editorStyles !== undefined
       ? Object.assign({}, this.props.editorStyles)
       : Object.assign({}, styles.editor);
 
@@ -419,25 +423,25 @@ class DraftWrapper extends React.Component<DraftWrapperProps, DraftWrapperState>
     editorStyle.left = '0px';
 
     return (
-        <div
-          className="draft-wrapper"
-          style={editorStyle}
-          onClick={this.focus}>
+      <div
+        className="draft-wrapper"
+        style={editorStyle}
+        onClick={this.focus}>
 
-          <Editor ref={e => this.editor = e}
-            onFocus={this.onGainFocus.bind(this)}
-            spellCheck={true}
-            stripPastedStyles={false}
-            handleReturn={this.handleReturn.bind(this)}
-            handleCutFragment={this.handleCutFragment.bind(this)}
-            handlePastedText={this.handlePastedText.bind(this)}
-            handlePastedFragment={this.handlePastedFragment.bind(this)}
-            customStyleMap={styleMap}
-            blockRenderMap={blockRenderMap}
-            blockStyleFn={this.blockStyleFn.bind(this)}
-            editorState={this.state.editorState}
-            readOnly={this.props.locked}
-            onChange={this.onChange} />
+        <Editor ref={e => this.editor = e}
+          onFocus={this.onGainFocus.bind(this)}
+          spellCheck={true}
+          stripPastedStyles={false}
+          handleReturn={this.handleReturn.bind(this)}
+          handleCutFragment={this.handleCutFragment.bind(this)}
+          handlePastedText={this.handlePastedText.bind(this)}
+          handlePastedFragment={this.handlePastedFragment.bind(this)}
+          customStyleMap={styleMap}
+          blockRenderMap={blockRenderMap}
+          blockStyleFn={this.blockStyleFn.bind(this)}
+          editorState={this.state.editorState}
+          readOnly={this.props.locked}
+          onChange={this.onChange} />
 
       </div>
     );
