@@ -16,6 +16,12 @@ import {
   getTargetsFromLayout, updateItemPartsFromTargets,
 } from 'editors/content/learning/dynadragdrop/utils';
 
+const DEFAULT_HOTSPOT_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAA8C\
+AYAAABIFuztAAAAx0lEQVR42u3VMQ0AAAgEMVCO9McBCXsr4ZbrSqYA4KkNBAADAcBAADAQAAwEAAwEAAMBwEA\
+AMBAADAQADAQAAwHAQAAwEAAMBAAMBAADAcBAADAQAAwEAAwEAAMBwEAAMBAADAQADAQAAwHAQAAwEAAMBAAMB\
+AADAcBAADAQAAxEBgAMBAADAcBAADAQADAQAAwEAAMBwEAAMBAAMBAADAQAAwHAQAAwEAAwEAAMBAADAcBAADA\
+QADAQAAwEAAMBwEAAMBAAuC2SnJWJIN61iQAAAABJRU5ErkJggg==';
+
 const defaultInputBody = () => ContentElements.fromText
   ('Add numeric, text, or dropdown components', '', QUESTION_BODY_ELEMENTS);
 
@@ -272,7 +278,46 @@ export class AddQuestion
   }
 
   onAddImageHotspot() {
-    console.log('NOT IMPLEMENTED');
+    let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
+
+    let item = new contentTypes.ImageHotspot().with({
+      src: DEFAULT_HOTSPOT_IMAGE,
+    });
+
+    // create new hotspot
+    const match = guid();
+    const hotspot = new contentTypes.Hotspot().with({
+      shape: 'rect',
+      value: match,
+      coords: Immutable.List<number>([
+        Math.floor(item.width / 2) - 50,
+        Math.floor(item.height / 2) - 50,
+        Math.floor(item.width / 2) + 50,
+        Math.floor(item.height / 2) + 50,
+      ]),
+    });
+
+    item = item.with({
+      hotspots: item.hotspots.set(hotspot.guid, hotspot),
+    });
+
+    const feedback = contentTypes.Feedback.fromText('', guid());
+    let response = new contentTypes.Response({ match });
+    response = response.with({
+      guid: guid(),
+      feedback: response.feedback.set(feedback.guid, feedback),
+    });
+
+    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+      .set(response.guid, response);
+
+    question = question.with({ items: question.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    part = part.with({ guid: guid(), responses });
+    question = question.with({ parts: question.parts.set(part.guid, part) });
+
+    this.props.onQuestionAdd(question);
   }
 
   render() {
@@ -299,7 +344,7 @@ export class AddQuestion
           className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
         {dynaDragDropOrNot}
         <a onClick={this.onAddImageHotspot}
-          className="dropdown-item">Image Hotspot</a>                                            
+          className="dropdown-item">Image Hotspot</a>
       </React.Fragment>
 
     );

@@ -78,6 +78,7 @@ export { Part } from './content/assessment/part';
 export { Response } from './content/assessment/response';
 export { Hint } from './content/assessment/hint';
 export { ImageHotspot } from './content/assessment/image_hotspot/image_hotspot';
+export { Hotspot } from './content/assessment/image_hotspot/hotspot';
 export { Feedback } from './content/assessment/feedback';
 export { MultipleChoice } from './content/assessment/multiple_choice';
 export { FillInTheBlank } from './content/assessment/fill_in_the_blank';

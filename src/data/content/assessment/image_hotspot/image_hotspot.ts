@@ -21,8 +21,8 @@ const defaultContent = {
   id: '',
   hotspots : Immutable.OrderedMap<string, Hotspot>(),
   src: '',
-  width: 100,
-  height: 100,
+  width: 600,
+  height: 400,
   select: 'single',
 };
 
