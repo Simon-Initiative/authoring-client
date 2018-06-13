@@ -6,7 +6,6 @@ export interface ModalMessage {
 
 export interface ModalMessageProps {
   okLabel?: string;
-  text: string;
 }
 
 export class ModalMessage extends React.PureComponent<ModalMessageProps, {}> {
@@ -34,7 +33,7 @@ export class ModalMessage extends React.PureComponent<ModalMessageProps, {}> {
               </button>
             </div>
             <div className="modal-body">
-              {this.props.text}
+              {this.props.children}
             </div>
             <div className="modal-footer">
               <button type="button"
