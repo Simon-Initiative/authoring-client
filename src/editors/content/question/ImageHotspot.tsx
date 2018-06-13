@@ -7,9 +7,9 @@ import {
 import {
   TabSection, TabSectionContent, TabOptionControl, TabSectionHeader,
 } from 'editors/content/common/TabContainer';
-import { ChoiceList, Choice, updateChoiceValuesAndRefs } from 'editors/content/common/Choice';
+import { ChoiceList, Choice } from 'editors/content/common/Choice';
 import { ToggleSwitch } from 'components/common/ToggleSwitch';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { StyledComponentProps } from 'types/component';
 import { ContentElements, FLOW_ELEMENTS } from 'data/content/common/elements';
 import { ContentContainer } from 'editors/content/container/ContentContainer';
@@ -233,7 +233,7 @@ export class ImageHotspot
   }
 
   renderDetails() {
-    const { editMode, itemModel, advancedScoring } = this.props;
+    const { advancedScoring } = this.props;
 
     return (
       <React.Fragment>

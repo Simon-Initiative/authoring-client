@@ -145,14 +145,6 @@ export { LearningObjective } from './content/objectives/objective';
 export { ObjectiveSkills } from './content/objectives/objective_skills';
 export { Skill } from './content/objectives/skill';
 
-import { Essay } from './content/assessment/essay';
-import { Ordering } from './content/assessment/ordering';
-import { ShortAnswer } from './content/assessment/short_answer';
-import { FillInTheBlank } from './content/assessment/fill_in_the_blank';
-import { Text } from './content/assessment/text';
-import { MultipleChoice } from './content/assessment/multiple_choice';
-import { Numeric } from './content/assessment/numeric';
-import { Unsupported } from './content/unsupported';
 import { Image } from './content/learning/image';
 import { Audio } from './content/learning/audio';
 import { Video } from './content/learning/video';

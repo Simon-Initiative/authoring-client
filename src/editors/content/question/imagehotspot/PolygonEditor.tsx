@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { throttle } from 'utils/timing';
 import { Maybe } from 'tsmonad';
 import { BoundingClientRect, Point } from 'types/common';
@@ -188,7 +188,7 @@ export class PolygonEditor
 
     dragMouseBegin.lift((dragMouseBeginVal) => {
       boundingClientRect.lift((boundingClient) => {
-        const { x, y, width, height } = boundingClient;
+        const { x, y } = boundingClient;
         const { clientX, clientY } = e;
 
         const dragMouse = {

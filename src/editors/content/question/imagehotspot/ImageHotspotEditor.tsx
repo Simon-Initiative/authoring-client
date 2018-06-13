@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import { AppContext } from 'editors/common/AppContext';
 import { StyledComponentProps } from 'types/component';
-import { injectSheet, classNames, JSSProps } from 'styles/jss';
+import { injectSheet, classNames } from 'styles/jss';
 import { ToolbarButton, ToolbarButtonSize } from 'components/toolbar/ToolbarButton';
 import { buildUrl } from 'utils/path';
 import { RectangleEditor } from './RectangleEditor';
