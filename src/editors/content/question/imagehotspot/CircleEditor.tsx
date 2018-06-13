@@ -196,9 +196,9 @@ export class CircleEditor
           // ensure new location is inside the hotspot area
           calculatedCoords = {
             cx: Math.min(
-              Math.max(calculatedCoords.cx, radius), (boundingClient.width - radius)),
+              Math.max(calculatedCoords.cx, 0), boundingClient.width),
             cy: Math.min(
-              Math.max(calculatedCoords.cy, radius), (boundingClient.height - radius)),
+              Math.max(calculatedCoords.cy, 0), boundingClient.height),
           };
 
           this.setState({

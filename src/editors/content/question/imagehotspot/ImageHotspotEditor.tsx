@@ -22,20 +22,7 @@ import { AppServices } from 'editors/common/AppServices';
 import { adjustPath } from 'editors/content/media/utils';
 import { fetchImageSize } from 'utils/image';
 import { convert } from 'utils/format';
-
-const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
-  return {
-    cx: coords.get(0),
-    cy: coords.get(1),
-    r: coords.get(2),
-  };
-};
-
-const mapCoordsToPolygonProps = (coords: Immutable.List<number>) => {
-  return {
-    points: coords.join(','),
-  };
-};
+import { PolygonEditor } from './PolygonEditor';
 
 const selectImage = (
   src: string, resourcePath: string, courseModel, display, dismiss):
@@ -354,10 +341,17 @@ export class ImageHotspotEditor
                           );
                         case 'poly':
                           return (
-                            <polygon
+                            <PolygonEditor
                               key={hotspot.guid}
-                              className={classes.hotspot}
-                              {...mapCoordsToPolygonProps(hotspot.coords)} />
+                              id={hotspot.guid}
+                              label={getFeedbackLabel(hotspot.value, partModel)}
+                              selected={hotspot.guid === selectedHotspot.valueOr('')}
+                              boundingClientRect={this.svgRef
+                                ? Maybe.just(this.svgRef.getBoundingClientRect())
+                                : Maybe.nothing()}
+                              coords={hotspot.coords}
+                              onSelect={this.onSelectHotspot}
+                              onEdit={coords => this.onEditCoords(hotspot.guid, coords)} />
                           );
                         default:
                           return null;
