@@ -19,21 +19,25 @@ export const autogenResponseFilter = (response) => {
  * Generates the remaining feedback match combinations of choices not specified by the user
  */
 const getFeedbackCombinations =
-(userResponses, choices, allCombinations: CombinationsMap): Immutable.List<string> => {
+  (userResponses, choices, allCombinations: CombinationsMap,
+   normalizerMap: Object): Immutable.List<string> => {
   // get all user specified combinations
-  const existingCombinations = userResponses.map(response => response.match.split(',')
-    .filter(s => s));
+
+    const existingCombinations = userResponses.map(response => response.match.split(',')
+      .filter(s => s));
+
+    const normalizedToLetters = existingCombinations.map(combo => combo.map(c => normalizerMap[c]));
 
   // function that calculates the key of a given combination
-  const getComboKey = (combination: string[]): string => {
-    return combination.join(',');
-  };
+    const getComboKey = (combination: string[]): string => {
+      return combination.join(',');
+    };
 
-  // return the difference of all combinations and existing combinations
-  return allCombinations.keySeq().filter(combinationKey =>
-    !existingCombinations.reduce((acc, e) => acc || combinationKey === getComboKey(e), false),
-  ).toList();
-};
+    // return the difference of all combinations and existing combinations
+    return allCombinations.keySeq().filter(combinationKey =>
+      !normalizedToLetters.reduce((acc, e) => acc || combinationKey === getComboKey(e), false),
+    ).toList();
+  };
 
 /**
  * Returns a new model with default feedback generated using all combinations of the choices
@@ -71,8 +75,27 @@ export const modelWithDefaultFeedback =
       // update available choice combinations before proceeding
       const allCombinations = onUpdateChoiceCombinations(choices.length);
 
+      // A map of the actual choice values to A, B, C, D, in order
+      const normalizerMap = choices.reduce(
+        (o, choice, index) => {
+          o[choice.value] = String.fromCharCode(65 + index);
+          return o;
+        },
+        {});
+
+      // A reverse map to retrieve the original choice value given A, B, C, etc
+      const reverseMap = Object.keys(normalizerMap)
+        .reduce(
+          (o, c) => {
+            o[normalizerMap[c]] = c;
+            return o;
+          },
+          {},
+        );
+
       // generate new default responses
-      generatedResponses = getFeedbackCombinations(userResponses, choices, allCombinations)
+      generatedResponses = getFeedbackCombinations(
+        userResponses, choices, allCombinations, normalizerMap)
         .toArray()
         .map((combo, i) => {
           const feedback = new contentTypes.Feedback({
@@ -82,7 +105,11 @@ export const modelWithDefaultFeedback =
             body: i === 0 ? body : body.clone(),
           });
           const feedbacks = Immutable.OrderedMap<string, contentTypes.Feedback>();
-          const match = combo;
+
+          // Convert the letters in the combo back to the original choice values
+          const match = combo.split(',')
+            .map(letter => reverseMap[letter])
+            .join(',');
 
           return new contentTypes.Response({
             name: 'AUTOGEN',
