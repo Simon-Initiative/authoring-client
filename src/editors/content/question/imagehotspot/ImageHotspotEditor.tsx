@@ -20,6 +20,7 @@ import { modalActions } from 'actions/modal';
 import { AppServices } from 'editors/common/AppServices';
 import { adjustPath } from 'editors/content/media/utils';
 import { fetchImageSize } from 'utils/image';
+import { convert } from 'utils/format';
 
 const mapCoordsToCircleProps = (coords: Immutable.List<number>) => {
   return {
@@ -61,6 +62,10 @@ const selectImage = (
 
     display(mediaLibrary);
   });
+};
+
+const getFeedbackLabel = (value: string, partModel: contentTypes.Part) => {
+  return convert.toAlphaNotation(partModel.responses.toArray().findIndex(r => r.match === value));
 };
 
 export interface ImageHotspotEditorProps {
@@ -243,7 +248,7 @@ export class ImageHotspotEditor
   }
 
   render() {
-    const { className, classes, editMode, context, model } = this.props;
+    const { className, classes, editMode, context, model, partModel } = this.props;
     const { selectedHotspot } = this.state;
 
     return (
@@ -315,6 +320,7 @@ export class ImageHotspotEditor
                             <RectangleEditor
                               key={hotspot.guid}
                               id={hotspot.guid}
+                              label={getFeedbackLabel(hotspot.value, partModel)}
                               selected={hotspot.guid === selectedHotspot.valueOr('')}
                               boundingClientRect={this.ref
                                 ? Maybe.just(this.ref.getBoundingClientRect())

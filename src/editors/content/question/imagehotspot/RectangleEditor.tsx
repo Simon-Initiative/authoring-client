@@ -35,6 +35,7 @@ type BoundingClientRect = {
 
 export interface RectangleEditorProps {
   id: string;
+  label: string;
   coords: Immutable.List<number>;
   selected: boolean;
   boundingClientRect: Maybe<BoundingClientRect>;
@@ -296,7 +297,7 @@ export class RectangleEditor
   }
 
   render() {
-    const { className, classes, id, coords, selected } = this.props;
+    const { className, classes, id, label, coords, selected } = this.props;
     const { newCoords } = this.state;
 
     const renderCoords = newCoords.valueOr(coords);
@@ -313,6 +314,14 @@ export class RectangleEditor
           }}
           onMouseUp={e => this.endMove(e)}
           {...mapCoordsToRectProps(renderCoords)} />
+        <text
+          className={classes.label}
+          x={renderCoords.get(0)
+            + Math.floor((renderCoords.get(2) - renderCoords.get(0)) / 2) - 7}
+          y={renderCoords.get(1)
+            + Math.floor((renderCoords.get(3) - renderCoords.get(1)) / 2) + 7}>
+          {label}
+        </text>
         {selected && this.renderResizeHandles(renderCoords)}
       </React.Fragment>
     );

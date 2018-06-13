@@ -32,6 +32,13 @@ export const styles: JSSStyles = {
     fill: colors.selection,
     boxShadow: '0px 0px 1px 1px rgba(0,0,0,0.75)',
   },
+  label: {
+    stroke: 'none',
+    fill: colors.white,
+    fontSize: 20,
+    fontWeight: 600,
+    pointerEvents: 'none',
+  },
   nesw: {
     cursor: 'nesw-resize',
   },
