@@ -661,7 +661,7 @@ export class ObjectiveSkillView
     const src = 'https://www.youtube.com/embed/14O7XCgsznY';
 
     return (
-      <h2>Learning Objectives and Skills&nbsp;&nbsp;
+      <h2>Learning Objectives and Skills&nbsp;
         <HelpPopover activateOnClick>
           <iframe src={src} height={500} width={'100%'} />
         </HelpPopover>

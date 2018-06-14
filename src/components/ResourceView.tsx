@@ -150,8 +150,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const helpPopover = this.props.helpPopover ? this.props.helpPopover : '';
-    const creationTitle = <h2>{this.props.title}  {helpPopover}</h2>;
+    const creationTitle = <h2>{this.props.title}  {this.props.helpPopover}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [
