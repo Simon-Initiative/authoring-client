@@ -2,7 +2,6 @@ import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from '../common';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
-import { SSL_OP_TLS_ROLLBACK_BUG } from 'constants';
 
 let inlineHandlers = null;
 
@@ -186,29 +185,6 @@ function insertDataDrivenEntity(
     data,
   };
 }
-
-
-function insertEntity(
-  mutability: string, type: string, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
-  backingTextProvider: Object) {
-
-  const key = common.generateRandomKey();
-
-  workingBlock.entities.push({ offset, length, key });
-
-  const data = extractAttrs(item);
-  data[common.CDATA] = item[common.getKey(item)][common.CDATA];
-  data[common.TEXT] = item[common.getKey(item)][common.TEXT];
-
-  context.draft.entityMap[key] = {
-    type,
-    mutability,
-    data,
-  };
-}
-
-
 
 function inputRefHandler(
   mutability: string, type: string, offset: number, length: number, item: Object,
