@@ -18,6 +18,7 @@ export interface SkillProps {
   title: string;
   highlighted: boolean;
   mouseOver: boolean;
+  loading: boolean;
 }
 
 export interface SkillState {
@@ -44,6 +45,7 @@ export class Skill
 
     const remove = mouseOver && editMode
       ? <Remove editMode={this.props.editMode}
+              loading={this.props.loading}
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
       : null;
 

@@ -21,6 +21,7 @@ export interface ObjectiveProps {
   title: string;
   highlighted: boolean;
   mouseOver: boolean;
+  loading: boolean;
 }
 
 export interface ObjectiveState {
@@ -98,6 +99,7 @@ export class Objective
               Existing
             </button>
             <Remove editMode={this.props.editMode}
+              loading={this.props.loading}
               onRemove={this.props.onRemove.bind(undefined, this.props.model)}/>
           </div>
           : null;
