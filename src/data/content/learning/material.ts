@@ -11,7 +11,8 @@ export type MaterialParams = {
 const defaultContent = {
   contentType: 'Material',
   elementType: 'material',
-  content: new ContentElements().with({ supportedElements: Immutable.List(MATERIAL_ELEMENTS) }),
+  content: new ContentElements().with(
+    { supportedElements: Immutable.List<string>(MATERIAL_ELEMENTS) }),
   guid: '',
 };
 

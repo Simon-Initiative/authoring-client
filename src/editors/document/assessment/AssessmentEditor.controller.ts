@@ -5,7 +5,7 @@ import { State } from 'reducers';
 import { fetchSkills } from 'actions/skills';
 import { setCurrentNode } from 'actions/document';
 import { AbstractEditorProps } from '../common/AbstractEditor';
-import { AssessmentModel } from 'data/models';
+import { AssessmentModel, CourseModel } from 'data/models';
 import * as activeActions from 'actions/active';
 import { updateHover } from 'actions/hover';
 import { ParentContainer, TextSelection } from 'types/active';
@@ -16,6 +16,7 @@ import { dismissSpecificMessage, showMessage } from 'actions/messages';
 interface StateProps {
   activeContext: any;
   hover: string;
+  course: CourseModel;
   currentPage: string;
   currentNode: contentTypes.Node;
 }
@@ -35,11 +36,12 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<AssessmentModel> {}
 
 const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
-  const { activeContext, hover, documents } = state;
+  const { activeContext, hover, documents, course } = state;
 
   return {
     activeContext,
     hover,
+    course,
     currentPage: activeContext.documentId.caseOf({
       just: docId => documents.get(docId).currentPage.valueOr(null),
       nothing: null,

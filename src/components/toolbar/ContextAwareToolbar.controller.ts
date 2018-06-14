@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { ContextAwareToolbar } from './ContextAwareToolbar';
 import { ActiveContextState } from 'reducers/active';
 import { insert, edit } from 'actions/active';
+import { createNew } from 'actions/document';
 import { showSidebar } from 'actions/editorSidebar';
 import { ParentContainer } from 'types/active.ts';
 import { Resource } from 'data/content/resource';
@@ -26,6 +27,7 @@ interface DispatchProps {
   onShowSidebar: () => void;
   onDisplayModal: (component) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
 }
 
 interface OwnProps {
@@ -61,6 +63,12 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
     onDisplayModal: component => dispatch(modalActions.display(component)),
     onDismissModal: () => dispatch(modalActions.dismiss()),
     onShowSidebar: () => dispatch(showSidebar(true)),
+    onCreateNew: (model: ContentModel) => {
+      return new Promise((resolve, reject) => {
+        dispatch(createNew(model))
+        .then(resource => resolve(resource));
+      });
+    },
   };
 };
 

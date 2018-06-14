@@ -31,7 +31,7 @@ const defaultContent = {
   title: Title.fromText('Title'),
   caption: Maybe.nothing(),
   cite: Maybe.nothing(),
-  content: ContentElements.fromText('Content', '', BOX_ELEMENTS),
+  content: new ContentElements().with({ supportedElements: Immutable.List<string>(BOX_ELEMENTS) }),
 };
 
 export class Figure extends Immutable.Record(defaultContent) {

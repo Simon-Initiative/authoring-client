@@ -16,10 +16,10 @@
     flex-direction: row;
 
     &.center {
-      flex: 1;
+      flex: 1 1 auto;
       text-align: center;
-      vertical-align: middle;
       margin: 0 10px;
+      line-height: 50px;
 
       .ccLicense {
         margin-right: 15px;
@@ -46,10 +46,12 @@
 
     &.left {
       text-align: left;
+      min-width: 231px;
     }
 
     &.right {
       text-align: right;
+      min-width: 150px;
     }
   }
 
@@ -61,7 +63,6 @@
 
   .centered {
     display: flex;
-    flex-direction: row;
     margin: 0 auto;
   }
 }

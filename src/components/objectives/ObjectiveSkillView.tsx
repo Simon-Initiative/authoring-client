@@ -29,6 +29,9 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './ObjectiveSkillView.scss';
+import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
+import { LegacyTypes } from 'data/types';
+import { ModalMessage } from 'utils/ModalMessage';
 
 export interface ObjectiveSkillViewProps {
   userName: string;
@@ -54,6 +57,7 @@ interface ObjectiveSkillViewState {
   skills: UnifiedSkillsModel;
   objectives: UnifiedObjectivesModel;
   isSavePending: boolean;
+  loading: boolean;
 }
 
 // The Learning Objectives and Skills documents require specialized handling
@@ -81,6 +85,7 @@ export class ObjectiveSkillView
       skills: null,
       objectives: null,
       isSavePending: false,
+      loading: false,
     };
     this.unmounted = false;
     this.failureMessage = Maybe.nothing<Messages.Message>();
@@ -173,10 +178,7 @@ export class ObjectiveSkillView
             objectives,
             skills,
           });
-
-
         }
-
       });
   }
 
@@ -190,9 +192,9 @@ export class ObjectiveSkillView
         .map(o => ({ title: o.title, id: o.id })));
 
     const skillObjects = skills.map(skill => (skill.model as SkillsModel)
-        .skills
-        .toArray()
-        .map(s => ({ title: s.title, id: s.id })));
+      .skills
+      .toArray()
+      .map(s => ({ title: s.title, id: s.id })));
 
     logger.group(
       LogLevel.INFO,
@@ -201,9 +203,9 @@ export class ObjectiveSkillView
       (logger) => {
         objectiveObjects[0].forEach((objective) => {
           logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id})`);
+            .setVisibility(LogAttribute.TAG, false)
+            .setVisibility(LogAttribute.DATE, false)
+            .info(LogTag.DEFAULT, `${objective.title} (id: ${objective.id})`);
         });
       },
       LogStyle.HEADER + LogStyle.BLUE,
@@ -216,9 +218,9 @@ export class ObjectiveSkillView
       (logger) => {
         skillObjects[0].forEach((skill) => {
           logger
-          .setVisibility(LogAttribute.TAG, false)
-          .setVisibility(LogAttribute.DATE, false)
-          .info(LogTag.DEFAULT, `${skill.title} (${skill.id})`);
+            .setVisibility(LogAttribute.TAG, false)
+            .setVisibility(LogAttribute.DATE, false)
+            .info(LogTag.DEFAULT, `${skill.title} (${skill.id})`);
         });
       },
       LogStyle.HEADER + LogStyle.BLUE,
@@ -248,7 +250,7 @@ export class ObjectiveSkillView
       .objectives.set(obj.guid, obj);
     const model =
       (originalDocument.model as models.LearningObjectivesModel)
-      .with({ objectives });
+        .with({ objectives });
 
     const updatedDocument = originalDocument.with({ model });
 
@@ -293,7 +295,7 @@ export class ObjectiveSkillView
       .skills.set(model.guid, model);
     const updatedModel =
       (originalDocument.model as models.SkillsModel)
-      .with({ skills });
+        .with({ skills });
     const updatedDocument = originalDocument.with({ model: updatedModel });
 
     // Determine if we are making an edit to our special document that
@@ -332,7 +334,7 @@ export class ObjectiveSkillView
     onUpdateSkills(Immutable.OrderedMap([[model.id, model]]));
   }
 
-  createNewSkill() : Promise<string> {
+  createNewSkill(): Promise<string> {
     const { onUpdateSkills } = this.props;
 
     // Create the new skill and persist it
@@ -444,37 +446,35 @@ export class ObjectiveSkillView
     }
   }
 
-  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
-
+  detachSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
     // Update the parent objective
     const index = objective.skills.indexOf(model.id);
     const skills = objective.skills.remove(index);
     const updated = objective.with({ skills });
 
     this.onObjectiveEdit(updated);
-
   }
 
-  removeObjective(obj: contentTypes.LearningObjective) {
-    const originalDocument = this.state.objectives.mapping.get(obj.id);
+  deleteSkill(skill: contentTypes.Skill) {
+    const originalDocument = this.state.skills.mapping.get(skill.id);
 
-    const objectives = (originalDocument.model as models.LearningObjectivesModel)
-      .objectives.delete(obj.guid);
+    const skills = (originalDocument.model as models.SkillsModel)
+      .skills.delete(skill.guid);
     const model =
-      (originalDocument.model as models.LearningObjectivesModel)
-      .with({ objectives });
+      (originalDocument.model as models.SkillsModel)
+        .with({ skills });
 
     const updatedDocument = originalDocument.with({ model });
 
-    const unified = Object.assign({}, this.state.objectives);
+    const unified = Object.assign({}, this.state.skills);
 
     const index = unified.documents.indexOf(originalDocument);
 
     unified.documents[index] = updatedDocument;
-    unified.objectives = unified.objectives.delete(obj.id);
+    unified.skills = unified.skills.delete(skill.id);
 
-    // We need to remap the existing objective ids to the
-    // new version of the newBucket document
+    // We need to remap the existing skill ids to the
+    // new version of the edited document
     const idsToDocument = unified.mapping
       .filter((doc, id) => doc._id === originalDocument._id)
       .map((doc, id) => updatedDocument)
@@ -486,12 +486,181 @@ export class ObjectiveSkillView
     }
 
     this.setState(
-      { objectives: unified, isSavePending: true },
+      { skills: unified, isSavePending: true },
 
       () => persistence.persistDocument(updatedDocument)
         .then(result => this.saveCompleted())
         .catch(error => this.failureEncountered(error)),
     );
+
+    this.props.onSetSkills(unified.skills);
+  }
+
+  // WARNING: Do not use countSkillRefs from within a render
+  // method or within a for-loop of any kind, given that
+  // this impl is O(obj * skills) with respect to the number of objectives
+  // and skills mapped to them
+  countSkillRefs(model: contentTypes.Skill): number {
+    return this.state.objectives.objectives
+      .toArray()
+      .map(o => o.skills.contains(model.id) ? 1 : 0)
+      .reduce((acc, count) => acc + count, 0);
+  }
+
+  removeSkill(objective: contentTypes.LearningObjective, model: contentTypes.Skill) {
+
+    // We simply detach when this skill is present in more than
+    // one objective.
+    if (this.countSkillRefs(model) > 1) {
+
+      this.detachSkill(objective, model);
+
+    } else {
+      // Otherwise, we will perform a true delete, but only if the
+      // skill is not referenced by any assessments
+      this.canDeleteSkill(model)
+        .then((canDelete) => {
+
+          if (canDelete) {
+            this.detachSkill(objective, model);
+            this.deleteSkill(model);
+          }
+        });
+    }
+
+  }
+
+  canDeleteObjective(obj: contentTypes.LearningObjective): Promise<boolean> {
+    const { course } = this.props;
+
+    if (obj.skills.size > 0) {
+      this.services.displayModal(
+        <ModalMessage
+          okLabel="Okay">
+          All skills must be removed from an objective before the objective can be deleted.
+        </ModalMessage>);
+      return Promise.resolve(false);
+    }
+
+    this.setState({
+      loading: true,
+    });
+
+    return persistence.fetchWebContentReferences(course.guid, { destinationId: obj.id })
+      .then((edges) => {
+        this.setState({
+          loading: false,
+        });
+
+        if (edges.length === 0) {
+          return Promise.resolve(true);
+        }
+        this.services.displayModal(
+          <DeleteObjectiveSkillModal
+            model={obj}
+            course={course}
+            edges={edges}
+            services={this.services} />);
+        return Promise.resolve(false);
+      })
+      .catch((err) => {
+        console.log(`Error removing objective ${obj}: ${err}`);
+        this.setState({
+          loading: false,
+        });
+        return Promise.resolve(false);
+      });
+  }
+
+  canDeleteSkill(skill: contentTypes.Skill): Promise<boolean> {
+
+    const { course } = this.props;
+
+    this.setState({
+      loading: true,
+    });
+
+    return persistence.fetchWebContentReferences(course.guid, { destinationId: skill.id })
+      .then((edges) => {
+
+        this.setState({
+          loading: false,
+        });
+
+        // Remove edges where the source is an objective, since we know there is only one
+        // objective linking to this skill
+        const withoutObjectives = edges.filter(e =>
+          e.sourceType !== LegacyTypes.learning_objective);
+
+        if (withoutObjectives.length === 0) {
+          return Promise.resolve(true);
+        }
+        this.services.displayModal(
+          <DeleteObjectiveSkillModal
+            services={this.services}
+            course={course}
+            model={skill}
+            edges={withoutObjectives} />);
+        return Promise.resolve(false);
+      })
+      .catch((err) => {
+        console.log(`Error removing skill ${skill}: ${err}`);
+        this.setState({
+          loading: false,
+        });
+        return Promise.resolve(false);
+      });
+  }
+
+
+  removeObjective(obj: contentTypes.LearningObjective) {
+
+    this.canDeleteObjective(obj)
+      .then((canDelete) => {
+
+        if (canDelete) {
+          const originalDocument = this.state.objectives.mapping.get(obj.id);
+
+          const objectives = (originalDocument.model as models.LearningObjectivesModel)
+            .objectives.delete(obj.guid);
+          const model =
+            (originalDocument.model as models.LearningObjectivesModel)
+              .with({ objectives });
+
+          const updatedDocument = originalDocument.with({ model });
+
+          const unified = Object.assign({}, this.state.objectives);
+
+          const index = unified.documents.indexOf(originalDocument);
+
+          unified.documents[index] = updatedDocument;
+          unified.objectives = unified.objectives.delete(obj.id);
+
+          // We need to remap the existing objective ids to the
+          // new version of the newBucket document
+          const idsToDocument = unified.mapping
+            .filter((doc, id) => doc._id === originalDocument._id)
+            .map((doc, id) => updatedDocument)
+            .toOrderedMap();
+          unified.mapping = unified.mapping.merge(idsToDocument);
+
+          if (originalDocument === unified.newBucket) {
+            unified.newBucket = updatedDocument;
+          }
+
+          this.setState(
+            { objectives: unified, isSavePending: true },
+
+            () => persistence.persistDocument(updatedDocument)
+              .then(result => this.saveCompleted())
+              .catch(error => this.failureEncountered(error)),
+          );
+
+          this.props.onSetObjectives(unified.objectives);
+        }
+
+      });
+
   }
 
   onToggleExpanded(guid) {
@@ -545,7 +714,8 @@ export class ObjectiveSkillView
           isExpanded={isExpanded(objective.id)}
           toggleExpanded={this.onToggleExpanded}
           editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
-          onEdit={this.onObjectiveEdit} />);
+          onEdit={this.onObjectiveEdit}
+          loading={this.state.loading} />);
 
         if (isExpanded(objective.id)) {
 
@@ -569,7 +739,8 @@ export class ObjectiveSkillView
                 isExpanded={false}
                 toggleExpanded={this.onToggleExpanded}
                 editMode={this.state.aggregateModel.isLocked && !this.state.isSavePending}
-                onEdit={this.onSkillEdit} />);
+                onEdit={this.onSkillEdit}
+                loading={this.state.loading} />);
             }
           });
         }
@@ -592,7 +763,7 @@ export class ObjectiveSkillView
 
     const model =
       (this.state.objectives.newBucket.model as models.LearningObjectivesModel)
-      .with({ objectives });
+        .with({ objectives });
 
     const document = this.state.objectives.newBucket.with({ model });
 
@@ -642,7 +813,7 @@ export class ObjectiveSkillView
 
     return (
       <div className="table-toolbar input-group">
-        <div className="flex-spacer"/>
+        <div className="flex-spacer" />
         <DuplicateListingInput
           editMode={editable}
           buttonLabel="Create"

@@ -24,7 +24,7 @@ const defaultContent = {
   id: Maybe.nothing(),
   title: Title.fromText('New Section Title'),
   purpose: Maybe.nothing(),
-  body: ContentElements.fromText('', '', [...BODY_ELEMENTS, ...WB_BODY_EXTENSIONS]),
+  body: new ContentElements().with({ supportedElements: Immutable.List<string>(BODY_ELEMENTS) }),
   guid: '',
 };
 

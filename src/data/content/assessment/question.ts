@@ -19,9 +19,10 @@ import { getKey } from '../../common';
 import { augment, getChildren } from '../common';
 import { ContiguousText } from 'data/content/learning/contiguous';
 import { Changes } from 'data/content/learning/draft/changes';
+import { ImageHotspot } from 'data/content/assessment/image_hotspot/image_hotspot';
 
 export type Item = MultipleChoice | FillInTheBlank | Ordering | Essay
-  | ShortAnswer | Numeric | Text | Unsupported;
+  | ShortAnswer | Numeric | Text | ImageHotspot | Unsupported;
 
 export type QuestionParams = {
   id?: string;
@@ -422,7 +423,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
           break;
         // We do not yet support image_hotspot:
         case 'image_hotspot':
-          model = model.with({ items: model.items.set(id, Unsupported.fromPersistence(item, id)) });
+          model = model.with({
+            items: model.items.set(id, ImageHotspot.fromPersistence(item, id)) });
           break;
         case 'multiple_choice':
           model = model.with(

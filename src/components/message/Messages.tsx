@@ -17,18 +17,20 @@ export interface MessagesState {
 
 }
 
-function mostRecent(
+// Chooses the message with the highest priority, or the most recently triggered
+// message given matching priorities
+function highestPriority(
   messages: Immutable.OrderedMap<string, Msg>, severity: Severity)
   : Msg[] {
 
   const last = messages
     .filter(m => m.severity === severity)
+    .sortBy(m => m.priority)
     .toOrderedMap()
     .last();
 
   return last ? [last] : [];
 }
-
 
 export class Messages
   extends React.PureComponent<MessagesProps, MessagesState> {
@@ -42,9 +44,9 @@ export class Messages
 
     // Only display one instance of each message severity at a time
 
-    const errors = mostRecent(this.props.messages, Severity.Error);
-    const warnings = mostRecent(this.props.messages, Severity.Warning);
-    const infos = mostRecent(this.props.messages, Severity.Information);
+    const errors = highestPriority(this.props.messages, Severity.Error);
+    const warnings = highestPriority(this.props.messages, Severity.Warning);
+    const infos = highestPriority(this.props.messages, Severity.Information);
 
     const messages = [...errors, ...warnings, ...infos];
 

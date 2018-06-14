@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
+import { ContentModel, AssessmentModel } from 'data/models';
 import { injectSheetSFC } from 'styles/jss';
 import { ToolbarLayout } from './ContextAwareToolbar';
 import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
@@ -18,10 +19,12 @@ import { selectVideo } from 'editors/content/learning/VideoEditor';
 import { selectFile } from 'editors/content/learning/file';
 import { ContiguousText, ContiguousTextMode } from 'data/content/learning/contiguous';
 import guid from 'utils/guid';
+import { ContentElement } from 'data/content/common/interfaces';
 import { styles } from './InsertToolbar.style';
 import { Resource, ResourceState } from 'data/content/resource';
 import { Title } from 'data/content/learning/title';
 import { Maybe } from 'tsmonad';
+import { findNodes } from 'data/models/utils/workbook';
 
 const APPLET_ICON = require('../../../assets/java.png');
 const FLASH_ICON = require('../../../assets/flash.jpg');
@@ -35,12 +38,28 @@ const TableCreation = require('editors/content/learning/table/TableCreation.bs')
 
 export interface InsertToolbarProps {
   onInsert: (content: Object) => void;
+  requestLatestModel: () => Promise<ContentModel>;
   parentSupportsElementType: (type: string) => boolean;
   context: AppContext;
   onDisplayModal: (component: any) => void;
   onDismissModal: () => void;
+  onCreateNew: (model: ContentModel) => Promise<Resource>;
   resourcePath: string;
   courseModel: CourseModel;
+}
+
+function collectInlines(model: ContentModel) : Immutable.Map<string, ContentElement> {
+
+  if (model.modelType === 'WorkbookPageModel') {
+
+    const found = findNodes(model, (n) => {
+      return n.contentType === 'WbInline';
+    })
+    .map(e => [e.idref, e]);
+
+    return Immutable.Map<string, ContentElement>(found);
+  }
+  return Immutable.Map<string, ContentElement>();
 }
 
 /**
@@ -48,7 +67,8 @@ export interface InsertToolbarProps {
  */
 export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
   classes, onInsert, parentSupportsElementType, resourcePath, context,
-  courseModel, onDisplayModal, onDismissModal,
+  courseModel, onDisplayModal, onDismissModal, requestLatestModel,
+  onCreateNew,
 }) => {
 
   const onTableCreate = (onInsert, numRows, numCols) => {
@@ -374,26 +394,54 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
             disabled={!supportsAtLeastOne(
               'wb:inline', 'activity', 'composite_activity')}>
             <ToolbarButtonMenuItem
-              onClick={() => onDisplayModal(
-                <ResourceSelection
-                  filterPredicate={(res: Resource): boolean =>
-                    res.type === LegacyTypes.inline
-                      && res.resourceState !== ResourceState.DELETED}
-                  courseId={context.courseId}
-                  onInsert={(resource) => {
-                    onDismissModal();
-                    const resources = context.courseModel.resources.toArray();
-                    const found = resources.find(r => r.id === resource.id);
-                    if (found !== undefined) {
-                      onInsert(new contentTypes.WbInline().with({ idref: found.id }));
-                    }
-                  }}
-                  onCancel={onDismissModal}
-                />)
-              }
+              onClick={() => {
+
+                requestLatestModel()
+                .then((model) => {
+
+                  const existingInlines = collectInlines(model);
+
+                  return onDisplayModal(
+                  <ResourceSelection
+                    filterPredicate={(res: Resource): boolean =>
+                      res.type === LegacyTypes.inline
+                        && res.resourceState !== ResourceState.DELETED
+                        && !existingInlines.has(res.id)}
+                    courseId={context.courseId}
+                    onInsert={(resource) => {
+                      onDismissModal();
+                      const resources = context.courseModel.resources.toArray();
+                      const found = resources.find(r => r.id === resource.id);
+                      if (found !== undefined) {
+                        onInsert(new contentTypes.WbInline().with({ idref: found.id }));
+                      }
+                    }}
+                    onCancel={onDismissModal}
+                  />);
+                });
+              }}
               disabled={!parentSupportsElementType('wb:inline')}>
-              <i style={{ width: 22 }} className={'fa fa-flask'} /> Inline assessment
+              <i style={{ width: 22 }} className={'fa fa-check'} /> Insert existing assessment...
             </ToolbarButtonMenuItem>
+            <ToolbarButtonMenuItem
+              onClick={() => {
+                const model = new AssessmentModel({
+                  type: LegacyTypes.inline,
+                  title: contentTypes.Title.fromText('New Assessment'),
+                });
+
+                onCreateNew(model)
+                .then((resource) => {
+                  onInsert(new contentTypes.WbInline().with({ idref: resource.id }));
+                });
+
+              }}
+              disabled={!parentSupportsElementType('wb:inline')}>
+              <i style={{ width: 22 }} className={'fa fa-check'} /> Create new assessment
+            </ToolbarButtonMenuItem>
+
+            <ToolbarButtonMenuDivider/>
+
             <ToolbarButtonMenuItem
               onClick={() => onDisplayModal(
                 <ResourceSelection
@@ -413,7 +461,7 @@ export const InsertToolbar = injectSheetSFC<InsertToolbarProps>(styles)(({
                 />)
               }
               disabled={!parentSupportsElementType('activity')}>
-              <i style={{ width: 22 }} className={'fa fa-check'} /> Activity
+              <i style={{ width: 22 }} className={'fa fa-flask'} /> Activity
             </ToolbarButtonMenuItem>
             <ToolbarButtonMenuItem
               onClick={() => {

@@ -33,6 +33,7 @@ export const TitleTextEditor
     return (
       <div className={classNames([classes.titleTextEditor, className])}>
         <ContiguousTextEditor
+          onInsertParsedContent={() => {}}
           className={classes.contiguousTextEditor}
           activeContentGuid={null}
           hover={null}
