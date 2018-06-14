@@ -1,6 +1,5 @@
-import { appendText } from './common';
 import { AbstractCommand } from '../../command';
-import { AtomicBlockUtils, EditorState, Modifier, SelectionState } from 'draft-js';
+import { AtomicBlockUtils, EditorState, Modifier } from 'draft-js';
 
 export class InsertBlockEntityCommand
  extends AbstractCommand<EditorState> {
@@ -41,65 +40,31 @@ export class InsertInlineEntityCommand extends AbstractCommand<EditorState> {
   type: string;
   mutability: string;
   data: Object;
+  backingText: string;
 
-  constructor(type: string, mutability: string, data: Object) {
+  constructor(type: string, mutability: string, data: Object, backingText) {
     super();
 
     this.type = type;
     this.mutability = mutability;
     this.data = data;
+    this.backingText = backingText;
   }
 
   execute(editorState: EditorState, context, services) : Promise<EditorState> {
     let contentState = editorState.getCurrentContent();
-    let selectionState = editorState.getSelection();
+    const selectionState = editorState.getSelection();
 
-    // We cannot insert an entity at the beginning of a content block,
-    // to handle that case we adjust and add 1 to the focus offset
-    if (selectionState.focusOffset === selectionState.anchorOffset
-      && selectionState.focusKey === selectionState.anchorKey) {
+    // Create the entity
+    contentState = contentState.createEntity(this.type, this.mutability, this.data);
+    const entityKey = contentState.getLastCreatedEntityKey();
 
-      if (selectionState.focusOffset === 0) {
-
-        const block = contentState.getBlockForKey(selectionState.anchorKey);
-        contentState = appendText(block, contentState, '  ');
-        const text = block.getText();
-
-        selectionState = new SelectionState({
-          anchorKey: selectionState.anchorKey,
-          focusKey: selectionState.focusKey,
-          anchorOffset: text.length + 1,
-          focusOffset: text.length + 2,
-        });
-      } else {
-
-        selectionState = new SelectionState({
-          anchorKey: selectionState.anchorKey,
-          focusKey: selectionState.focusKey,
-          anchorOffset: selectionState.anchorOffset,
-          focusOffset: selectionState.anchorOffset + 1,
-        });
-      }
+    // Insert the backing text with entity
+    contentState = Modifier.replaceText(
+      contentState, selectionState, this.backingText, undefined, entityKey);
 
 
-    }
-
-    const block = contentState.getBlockForKey(selectionState.anchorKey);
-    const text = block.getText();
-
-    if (text.length < selectionState.focusOffset) {
-      contentState = appendText(block, contentState, '  ');
-    }
-
-    const contentStateWithEntity = contentState.createEntity(this.type, this.mutability, this.data);
-    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    const contentStateWithLink = Modifier.applyEntity(
-      contentState,
-      selectionState,
-      entityKey,
-    );
-
-    return Promise.resolve(EditorState.set(editorState, { currentContent: contentStateWithLink }));
+    return Promise.resolve(EditorState.set(editorState, { currentContent: contentState }));
   }
 }
 
