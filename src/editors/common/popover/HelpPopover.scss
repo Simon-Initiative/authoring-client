@@ -2,19 +2,18 @@
 
 .help-popover-trigger {
   display: inline-block;
-  height: 36px;
-  line-height: 36px;
+  height: 100%;
+  line-height: 100%;
   color: $blue;
   cursor: pointer;
 }
 
 .help-popover-container {
   max-width: 250px;
-  padding: .6rem .2rem;
+  padding: 0 .2rem;
   text-align: left;
 
   p {
-    line-height: 1.3rem;
     margin-bottom: 0;
   }
 }

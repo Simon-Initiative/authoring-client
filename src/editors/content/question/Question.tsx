@@ -16,6 +16,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
 
 import './Question.scss';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question. '
@@ -141,13 +142,20 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   renderQuestionTitle(): JSX.Element {
     const { model, canRemoveQuestion, onRemoveQuestion, editMode } = this.props;
 
+    const checkAllHelpPopover = <HelpPopover activateOnClick>
+      <iframe src="https://www.youtube.com/embed/-9Pd4B6Yy2M" height={500} width={'100%'} />
+    </HelpPopover>;
+
     return (
       <ContentTitle
         title={getLabelForQuestion(model)}
         onDuplicate={editMode ? this.props.onDuplicate : undefined}
         canRemove={canRemoveQuestion}
         removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
-        onRemove={onRemoveQuestion} />
+        onRemove={onRemoveQuestion}
+        helpPopover={getLabelForQuestion(model) === 'Check All That Apply'
+          ? checkAllHelpPopover
+          : null} />
     );
   }
 

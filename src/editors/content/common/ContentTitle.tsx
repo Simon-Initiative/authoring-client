@@ -30,13 +30,14 @@ export type ContentTitleProps = {
   removeDisabledMessage?: string;
   onDuplicate?: (e) => void;
   onRemove?: (e) => void;
+  helpPopover?: JSX.Element;
 };
 
 export const ContentTitle: React.StatelessComponent<ContentTitleProps> = ({
-  title, canRemove, removeDisabledMessage, onDuplicate, onRemove,
+  title, canRemove, removeDisabledMessage, onDuplicate, onRemove, helpPopover,
 }) => (
     <div className="content-title">
-      <div className="title">{title}</div>
+      <div className="title">{title} {helpPopover}</div>
 
       <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 
