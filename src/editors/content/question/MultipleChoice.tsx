@@ -245,36 +245,56 @@ export class MultipleChoice
   renderChoices() {
     const { context, services, editMode, partModel, itemModel, advancedScoring } = this.props;
 
-    const responses = partModel.responses.toArray();
+    const responsesByMatch = partModel.responses
+      .toArray()
+      .reduce(
+        (o, response) => {
+          o[response.match] = response;
+          return o;
+        },
+        {},
+      );
+
     const choices = itemModel.choices.toArray();
 
     return choices.map((choice, i) => {
-      const response = responses[i];
+
+      const response = responsesByMatch[choice.value];
+
+      if (response !== undefined) {
+        return (
+          <Choice
+            activeContentGuid={this.props.activeContentGuid}
+            hover={this.props.hover}
+            onUpdateHover={this.props.onUpdateHover}
+            onFocus={this.props.onFocus}
+            key={choice.guid}
+            index={i}
+            choice={choice}
+            allowFeedback
+            allowScore={advancedScoring}
+            simpleSelectProps={{
+              selected: response.score !== '0',
+              onToggleSimpleSelect: this.onToggleSimpleSelect,
+            }}
+            response={response}
+            allowReorder={!itemModel.shuffle}
+            context={context}
+            services={services}
+            editMode={editMode}
+            onReorderChoice={this.onReorderChoices}
+            onEditChoice={this.onChoiceEdit}
+            onEditFeedback={this.onFeedbackEdit}
+            onEditScore={this.onScoreEdit}
+            onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+        );
+      }
+
+      // If we cannot locate a response, this must be bad data.  Just display an error.
       return (
-        <Choice
-          activeContentGuid={this.props.activeContentGuid}
-          hover={this.props.hover}
-          onUpdateHover={this.props.onUpdateHover}
-          onFocus={this.props.onFocus}
-          key={choice.guid}
-          index={i}
-          choice={choice}
-          allowFeedback
-          allowScore={advancedScoring}
-          simpleSelectProps={{
-            selected: response.score !== '0',
-            onToggleSimpleSelect: this.onToggleSimpleSelect,
-          }}
-          response={response}
-          allowReorder={!itemModel.shuffle}
-          context={context}
-          services={services}
-          editMode={editMode}
-          onReorderChoice={this.onReorderChoices}
-          onEditChoice={this.onChoiceEdit}
-          onEditFeedback={this.onFeedbackEdit}
-          onEditScore={this.onScoreEdit}
-          onRemove={choiceId => this.onRemoveChoice(choiceId, response)} />
+        <div className="alert alert-danger" role="alert">
+          Could not match choice and response. Please check the original XML.
+        </div>
       );
     });
   }
