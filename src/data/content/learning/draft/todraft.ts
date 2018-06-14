@@ -38,11 +38,13 @@ const blockHandlers = {
 // Translation routines to convert from persistence model to draft model
 
 const inlineTerminalTags = {};
-inlineTerminalTags['m:math'] = true;
-inlineTerminalTags['#math'] = true;
-inlineTerminalTags['input_ref'] = true;
-inlineTerminalTags['image'] = true;
-inlineTerminalTags['sym'] = true;
+inlineTerminalTags['m:math'] = ' ';
+inlineTerminalTags['#math'] = ' ';
+
+// We inject 5 spaces so that the InputRef decorator can do its thing.
+inlineTerminalTags['input_ref'] = '     ';
+inlineTerminalTags['image'] = ' ';
+inlineTerminalTags['sym'] = ' ';
 
 
 const inlineTagsDefaultContent = {};
@@ -316,7 +318,7 @@ function processInline(
     // Handle elements that do not have children, but
     // do require a specialized entity renderer
     if (inlineTerminalTags[key]) {
-      blockContext.fullText += ' ';
+      blockContext.fullText += inlineTerminalTags[key];
 
     } else {
 

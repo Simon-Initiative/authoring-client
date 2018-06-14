@@ -144,7 +144,7 @@ export class QuestionEditor
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
-      const delta = detectInputRefChanges(this.lastBody, body);
+      const delta = detectInputRefChanges(body, this.lastBody);
 
       // For any deletions of input_refs, we need to make sure that we remove
       // the corresponding item and part from the question model
@@ -244,6 +244,8 @@ export class QuestionEditor
       items: this.props.model.items.set(item.guid, item),
       parts: this.props.model.parts.set(part.guid, part),
     });
+
+    this.lastBody = body;
 
     this.props.onEdit(model, null);
   }

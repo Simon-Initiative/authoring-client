@@ -1,3 +1,21 @@
 .InputRefSelected {
   outline: #b75963 solid thin;
 }
+
+.textSpan {
+  background-image: url('../../../../../../assets/text.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.numericSpan {
+  background-image: url('../../../../../../assets/numeric.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.dropdownSpan {
+  background-image: url('../../../../../../assets/dropdown.png');
+  background-repeat: no-repeat;
+  background-position: center;
+}

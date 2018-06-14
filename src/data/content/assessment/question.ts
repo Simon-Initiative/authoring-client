@@ -86,7 +86,7 @@ export function detectInputRefChanges(
     deletions: Immutable.List(),
   };
 
-  return current.toArray()
+  return current.content.toArray()
     .filter(c => c.contentType === 'ContiguousText')
     .reduce(
       (delta, c) => {
