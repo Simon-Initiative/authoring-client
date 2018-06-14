@@ -537,6 +537,7 @@ export class ObjectiveSkillView
     if (obj.skills.size > 0) {
       this.services.displayModal(
         <ModalMessage
+          onCancel={() => this.services.dismissModal()}
           okLabel="Okay">
           All skills must be removed from an objective before the objective can be deleted.
         </ModalMessage>);

@@ -13,8 +13,6 @@ import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
 import { LegacyTypes } from 'data/types';
-import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
-import { Maybe } from 'tsmonad/lib/src';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
