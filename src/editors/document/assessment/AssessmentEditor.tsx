@@ -75,6 +75,7 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
     this.onEditNode = this.onEditNode.bind(this);
     this.onDuplicateQuestion = this.onDuplicateQuestion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.unFocus = this.unFocus.bind(this);
     this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
     this.supportedElements = Immutable.List<string>();
@@ -427,6 +428,11 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  unFocus() {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, null, null, Maybe.nothing());
+  }
+
   onAddNew(item) {
 
   }
@@ -475,12 +481,12 @@ class AssessmentEditor extends AbstractEditor<models.AssessmentModel,
       <div className="assessment-editor">
         <ContextAwareToolbar context={this.props.context} model={model} />
         <div className="assessment-content">
-          <div className="html-editor-well">
+          <div className="html-editor-well" onClick={() => this.unFocus()}>
 
             <TitleTextEditor
               context={context}
               services={services}
-              onFocus={this.onFocus.bind(this)}
+              onFocus={() => this.unFocus()}
               model={(model.title.text.content.first() as ContiguousText)}
               editMode={editMode}
               onEdit={this.onTitleEdit}

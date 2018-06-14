@@ -62,6 +62,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.unFocus = this.unFocus.bind(this);
     this.onDuplicateNode = this.onDuplicateNode.bind(this);
     this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
 
@@ -158,6 +159,11 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  unFocus() {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, null, null, Maybe.nothing());
+  }
+
   onRemove(guid: string) {
 
     const { model } = this.props;
@@ -241,12 +247,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       <div className="pool-editor">
         <ContextAwareToolbar context={context} model={model} />
         <div className="pool-content">
-          <div className="html-editor-well">
+          <div className="html-editor-well" onClick={() => this.unFocus()}>
 
             <TitleTextEditor
               context={context}
               services={services}
-              onFocus={this.onFocus.bind(this)}
+              onFocus={() => this.unFocus()}
               model={(model.pool.title.text.content.first() as ContiguousText)}
               editMode={editMode}
               onEdit={this.onTitleEdit}

@@ -51,6 +51,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
     this.onTitleEdit = this.onTitleEdit.bind(this);
     this.onModelEdit = this.onModelEdit.bind(this);
     this.onObjectivesEdit = this.onObjectivesEdit.bind(this);
+    this.onFocus = this.onFocus.bind(this);
+    this.unFocus = this.unFocus.bind(this);
 
     if (this.hasMissingObjective(
       props.model.head.objrefs, props.context.objectives)) {
@@ -130,6 +132,11 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  unFocus() {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, null, null, Maybe.nothing());
+  }
+
   onObjectivesEdit(objrefs: Immutable.List<string>) {
     const head = this.props.model.head.with({ objrefs });
     this.handleEdit(this.props.model.with({ head }));
@@ -149,7 +156,8 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
   }
 
   render() {
-    const { model, context, services, editMode, hover, onEdit, onUpdateHover } = this.props;
+    const { model, context, services, editMode, hover,
+      onEdit, onUpdateHover } = this.props;
 
     const activeGuid = this.props.activeContext.activeChild.caseOf({
       just: c => (c as any).guid,
@@ -160,12 +168,12 @@ class WorkbookPageEditor extends AbstractEditor<models.WorkbookPageModel,
       <div className="workbookpage-editor">
         <ContextAwareToolbar context={context} model={model} />
         <div className="wb-content">
-          <div className="html-editor-well">
+          <div className="html-editor-well" onClick={() => this.unFocus()}>
 
             <TitleTextEditor
               context={context}
               services={services}
-              onFocus={this.onFocus.bind(this)}
+              onFocus={() => this.unFocus()}
               model={(model.head.title.text.content.first() as ContiguousText)}
               editMode={editMode}
               onEdit={this.onTitleEdit}

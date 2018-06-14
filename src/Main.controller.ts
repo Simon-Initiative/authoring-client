@@ -4,6 +4,8 @@ import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
 import { ExpandedState } from 'reducers/expanded';
 import { ServerState } from 'reducers/server';
+import { HoverState } from 'reducers/hover';
+import { updateHover } from 'actions/hover';
 import Main from './Main';
 
 interface StateProps {
@@ -12,10 +14,12 @@ interface StateProps {
   course: CourseState;
   expanded: ExpandedState;
   server: ServerState;
+  hover: HoverState;
 }
 
 interface DispatchProps {
   onDispatch: (...args: any[]) => any;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface OwnProps {
@@ -37,12 +41,16 @@ const mapStateToProps = (state): StateProps => {
     course,
     expanded,
     server,
+    hover: state.hover,
   };
 };
 
 const mapDispatchToProps = (dispatch): DispatchProps => {
   return {
     onDispatch: dispatch,
+    onUpdateHover: (hover: string) => {
+      return dispatch(updateHover(hover));
+    },
   };
 };
 

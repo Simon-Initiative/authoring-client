@@ -42,6 +42,13 @@ export class SelectionEditor
     this.onTitleEdit = this.onTitleEdit.bind(this);
   }
 
+  /** Override Parent Method */
+  handleOnClick(e) {
+    if (this.props.onHandleClick !== undefined) {
+      this.props.onHandleClick(e);
+    }
+  }
+
   onStrategyChange(strategy) {
     this.props.onEdit(this.props.model.with({ strategy }));
   }

@@ -21,7 +21,12 @@
       flex: 1;
       flex-direction: column;
       overflow: auto;
-      padding: 0 10px 30px 30px;
+      padding: 10px 20px 0 20px;
+
+      .TitleTextEditor {
+        margin-bottom: 10px;
+        border-bottom: 1px solid $gray-lighter;
+      }
 
       .content-decorator {
         margin-top: 20px;
@@ -46,7 +51,6 @@
   }
 
   .outline-and-node-container {
-    margin-top: 20px;
     display: flex;
     flex: 1 1 auto;
   }

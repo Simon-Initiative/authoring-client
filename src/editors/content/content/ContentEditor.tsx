@@ -41,6 +41,13 @@ export class ContentEditor
     this.onAvailability = this.onAvailability.bind(this);
   }
 
+  /** Override Parent Method */
+  handleOnClick(e) {
+    if (this.props.onHandleClick !== undefined) {
+      this.props.onHandleClick(e);
+    }
+  }
+
   onBodyEdit(body: ContentElements, src) {
     const concept = this.props.model.with({ body });
     this.props.onEdit(concept, src);
