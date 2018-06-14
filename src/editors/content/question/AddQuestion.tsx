@@ -324,6 +324,11 @@ export class AddQuestion
       ? <a onClick={this.onAddDragDrop} className="dropdown-item">Drag and Drop</a>
       : null;
 
+    const imageHotSpotOrNot = !this.props.isSummative
+      ? <a onClick={this.onAddImageHotspot}
+          className="dropdown-item">Image Hotspot</a>
+      : null;
+
     return (
 
       <React.Fragment>
@@ -336,9 +341,10 @@ export class AddQuestion
         {essayOrNot}
         <a onClick={this.onAddMultipart}
           className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+
         {dynaDragDropOrNot}
-        <a onClick={this.onAddImageHotspot}
-          className="dropdown-item">Image Hotspot</a>
+        {imageHotSpotOrNot}
+
       </React.Fragment>
 
     );
