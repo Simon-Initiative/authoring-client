@@ -37,6 +37,7 @@ import { Resource, ResourceState } from 'data/content/resource';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
 import CourseEditor from 'editors/document/course//CourseEditor.controller';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 type ResourceList = {
   title: string,
@@ -199,6 +200,10 @@ export default class Main extends React.Component<MainProps, MainState> {
   renderResource(resource: ResourceList) {
     const { onDispatch, server, course } = this.props;
 
+    const orgHelpPopover = <HelpPopover activateOnClick>
+      <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
+    </HelpPopover>;
+
     return (
       <ResourceView
         serverTimeSkewInMs={server.timeSkewInMs}
@@ -207,7 +212,8 @@ export default class Main extends React.Component<MainProps, MainState> {
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
-        dispatch={onDispatch} />
+        dispatch={onDispatch}
+        helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null} />
     );
   }
 

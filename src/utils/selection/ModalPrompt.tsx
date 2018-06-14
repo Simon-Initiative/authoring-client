@@ -29,7 +29,7 @@ class ModalPrompt extends React.PureComponent<ModalPromptProps, {}> {
 
     return (
       <div ref={(modal) => { this.modal = modal; }}
-      data-backdrop className="modal fade">
+      data-backdrop="static" className="modal fade">
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content">
             <div className="modal-header">
