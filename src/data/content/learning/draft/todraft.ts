@@ -2,10 +2,15 @@ import { ContentState, convertFromRaw } from 'draft-js';
 import * as common from '../common';
 import { registeredTypes } from '../../common/parse';
 import guid from 'utils/guid';
+import { SSL_OP_TLS_ROLLBACK_BUG } from 'constants';
 
 let inlineHandlers = null;
 
-export function toDraft(toParse: Object[], isInlineText : boolean = false) : ContentState {
+
+
+export function toDraft(
+  toParse: Object[],
+  isInlineText : boolean = false, backingTextProvider : Object = null) : ContentState {
 
   const draft : common.RawDraft = {
     entityMap : {},
@@ -15,14 +20,14 @@ export function toDraft(toParse: Object[], isInlineText : boolean = false) : Con
   if (isInlineText) {
 
     if (toParse instanceof Array) {
-      parse({ p: { '#array': toParse } }, { draft, depth: 0 });
+      parse({ p: { '#array': toParse } }, { draft, depth: 0 }, backingTextProvider);
     } else if (toParse['#array'] !== undefined) {
-      parse({ p: { '#array': toParse['#array'] } }, { draft, depth: 0 });
+      parse({ p: { '#array': toParse['#array'] } }, { draft, depth: 0 }, backingTextProvider);
     } else {
-      parse({ p: { '#array': [toParse] } }, { draft, depth: 0 });
+      parse({ p: { '#array': [toParse] } }, { draft, depth: 0 }, backingTextProvider);
     }
   } else {
-    toParse.forEach(entry => parse(entry, { draft, depth: 0 }));
+    toParse.forEach(entry => parse(entry, { draft, depth: 0 }, backingTextProvider));
   }
   return convertFromRaw(draft);
 }
@@ -38,14 +43,27 @@ const blockHandlers = {
 // Translation routines to convert from persistence model to draft model
 
 const inlineTerminalTags = {};
-inlineTerminalTags['m:math'] = ' ';
-inlineTerminalTags['#math'] = ' ';
 
-// We inject 5 spaces so that the InputRef decorator can do its thing.
-inlineTerminalTags['input_ref'] = '     ';
-inlineTerminalTags['image'] = ' ';
-inlineTerminalTags['sym'] = ' ';
+// The following ones simply use a space.
+const singleSpace = (item, provider) => ' ';
+inlineTerminalTags['m:math'] = singleSpace;
+inlineTerminalTags['#math'] = singleSpace;
+inlineTerminalTags['image'] = singleSpace;
+inlineTerminalTags['sym'] = singleSpace;
 
+// Content of input_refs are data-driven
+inlineTerminalTags['input_ref'] = (item, provider) => {
+  if (item['input_ref']['@input'] !== undefined && provider !== null) {
+    const questionItem = provider[item['input_ref']['@input']];
+    if (questionItem !== undefined) {
+      if (questionItem.contentType === 'FillInTheBlank') {
+        return ' Dropdown ';
+      }
+      return ' ' + questionItem.contentType + ' ';
+    }
+  }
+  return ' Unknown ';
+};
 
 const inlineTagsDefaultContent = {};
 inlineTagsDefaultContent['cite'] = ' ';
@@ -66,12 +84,13 @@ type InlineHandler = (
   offset: number, length: number, item: Object,
   context: ParsingContext,
   workingBlock: WorkingBlock,
-  blockBeforeChildren: WorkingBlock) => void;
+  blockBeforeChildren: WorkingBlock,
+  backingTextProvider: Object) => void;
 
 
 function getInlineHandlers() {
   const inlineHandlers = {
-    input_ref: insertEntity.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
+    input_ref: inputRefHandler.bind(undefined, 'IMMUTABLE', common.EntityTypes.input_ref),
     activity_link: insertDataDrivenEntity.bind(
       undefined, 'MUTABLE',
       common.EntityTypes.activity_link, 'activity_link', registeredTypes['activity_link']),
@@ -152,7 +171,8 @@ function extractAttrs(item: Object) : Object {
 function insertDataDrivenEntity(
   mutability: string, type: string, label,
   fromPersistence, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
+  context: ParsingContext, workingBlock: WorkingBlock,
+  blockBefore: WorkingBlock, backingTextProvider: Object) {
 
   const key = common.generateRandomKey();
 
@@ -170,7 +190,8 @@ function insertDataDrivenEntity(
 
 function insertEntity(
   mutability: string, type: string, offset: number, length: number, item: Object,
-  context: ParsingContext, workingBlock: WorkingBlock) {
+  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
+  backingTextProvider: Object) {
 
   const key = common.generateRandomKey();
 
@@ -186,6 +207,30 @@ function insertEntity(
     data,
   };
 }
+
+
+
+function inputRefHandler(
+  mutability: string, type: string, offset: number, length: number, item: Object,
+  context: ParsingContext, workingBlock: WorkingBlock, blockBefore: WorkingBlock,
+  backingTextProvider: Object) {
+
+  const key = common.generateRandomKey();
+
+  workingBlock.entities.push({ offset, length, key });
+
+  const data = extractAttrs(item);
+  data['$type'] = backingTextProvider[item['input_ref']['@input']].contentType;
+  data[common.CDATA] = item[common.getKey(item)][common.CDATA];
+  data[common.TEXT] = item[common.getKey(item)][common.TEXT];
+
+  context.draft.entityMap[key] = {
+    type,
+    mutability,
+    data,
+  };
+}
+
 
 function hashMath(
   offset: number, length: number, item: Object,
@@ -301,7 +346,7 @@ function cloneWorkingBlock(blockContext: WorkingBlock) : WorkingBlock {
 
 function processInline(
   item: Object,
-  context: ParsingContext, blockContext: WorkingBlock) {
+  context: ParsingContext, blockContext: WorkingBlock, backingTextProvider: Object) {
 
   const key = common.getKey(item);
 
@@ -318,7 +363,8 @@ function processInline(
     // Handle elements that do not have children, but
     // do require a specialized entity renderer
     if (inlineTerminalTags[key]) {
-      blockContext.fullText += inlineTerminalTags[key];
+
+      blockContext.fullText += inlineTerminalTags[key](item, backingTextProvider);
 
     } else {
 
@@ -343,7 +389,7 @@ function processInline(
         if (subKey === common.CDATA || subKey === common.TEXT) {
           blockContext.fullText += subItem[subKey];
         } else {
-          processInline(subItem, context, blockContext);
+          processInline(subItem, context, blockContext, backingTextProvider);
         }
       });
 
@@ -361,12 +407,14 @@ function processInline(
 
     const text = blockContext.fullText.substring(offset);
     const handler = getInlineHandler(key);
-    handler(offset, text.length, item, context, blockContext, blockBeforeChildren);
+    handler(
+      offset, text.length, item, context,
+      blockContext, blockBeforeChildren, backingTextProvider);
   }
 
 }
 
-function paragraph(item: Object, context: ParsingContext) {
+function paragraph(item: Object, context: ParsingContext, backingTextProvider: Object) {
 
   const children = getChildren(item);
 
@@ -376,7 +424,7 @@ function paragraph(item: Object, context: ParsingContext) {
     entities : [],
   };
 
-  children.forEach(subItem => processInline(subItem, context, blockContext));
+  children.forEach(subItem => processInline(subItem, context, blockContext, backingTextProvider));
 
   addNewBlock(context.draft, {
     data: extractIdTitle(item),
@@ -408,11 +456,11 @@ function pureTextBlockHandler(key: string, item: Object, context: ParsingContext
   });
 }
 
-function arrayHandler(item: Object, context: ParsingContext) {
-  item['#array'].forEach(item => parse(item, context));
+function arrayHandler(item: Object, context: ParsingContext, backingTextProvider: Object) {
+  item['#array'].forEach(item => parse(item, context, backingTextProvider));
 }
 
-function parse(item: Object, context: ParsingContext) {
+function parse(item: Object, context: ParsingContext, backingTextProvider: Object) {
 
   // item is an object with one key.
 
@@ -435,14 +483,14 @@ function parse(item: Object, context: ParsingContext) {
     // single inline style tag (e.g. an entire 'choice' was
     // bold)
     if (inlineHandler !== undefined) {
-      blockHandlers['p']({ p: { '#array': [item] } }, context);
+      blockHandlers['p']({ p: { '#array': [item] } }, context, backingTextProvider);
     } else {
       console.log('Unsupported Text content encountered: key = [' + key + '], contents next line');
       console.dir(item);
     }
 
   } else {
-    handler(item, context);
+    handler(item, context, backingTextProvider);
   }
 
 }

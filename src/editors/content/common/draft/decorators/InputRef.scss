@@ -3,19 +3,19 @@
 }
 
 .textSpan {
-  background-image: url('../../../../../../assets/text.png');
-  background-repeat: no-repeat;
-  background-position: center;
+  border: 1px solid #808080;
+  border-radius: 3px;
+  background-color: lightgrey;
 }
 
 .numericSpan {
-  background-image: url('../../../../../../assets/numeric.png');
-  background-repeat: no-repeat;
-  background-position: center;
+  border: 1px solid #808080;
+  border-radius: 3px;
+  background-color: lightgrey;
 }
 
 .dropdownSpan {
-  background-image: url('../../../../../../assets/dropdown.png');
-  background-repeat: no-repeat;
-  background-position: center;
+  border: 1px solid #808080;
+  border-radius: 3px;
+  background-color: lightgrey;
 }

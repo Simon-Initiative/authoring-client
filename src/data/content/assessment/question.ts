@@ -52,11 +52,10 @@ const defaultQuestionParams = {
 const defaultItem = new ShortAnswer().toPersistence();
 const defaultPart = new Part().toPersistence();
 
-// Find all input ref tags and add a '$type' attribute to its data
-// to indicate the type of the item
-export function tagInputRefsWithType(model: Question) {
+// Create a map of item ids to the items
+export function buildItemMap(model: Question) {
 
-  const byId = model.items.toArray().reduce(
+  return model.items.toArray().reduce(
     (p, c) => {
       if ((c as any).id !== undefined) {
         p[(c as any).id] = c;
@@ -66,15 +65,6 @@ export function tagInputRefsWithType(model: Question) {
       return p;
     },
     {});
-
-  const body = model.body.with({ content: model.body.content.map((c) => {
-    if (c.contentType === 'ContiguousText') {
-      return (c as ContiguousText).tagInputRefsWithType(byId);
-    }
-    return c;
-  }).toOrderedMap() });
-
-  return model.with({ body });
 
 }
 
@@ -408,6 +398,8 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       model = model.with({ grading: question['@grading'] });
     }
 
+    let body = null;
+
     getChildren(question).forEach((item) => {
 
       const key = getKey(item);
@@ -419,8 +411,7 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
             { concepts: model.concepts.push((item as any)['cmd:concept']['#text']) });
           break;
         case 'body':
-          model = model.with({ body: ContentElements.fromPersistence(
-            item['body'], id, QUESTION_BODY_ELEMENTS) });
+          body = item;
           break;
         case 'essay':
           model = model.with({ items: model.items.set(id, Essay.fromPersistence(item, id)) });
@@ -471,8 +462,16 @@ export class Question extends Immutable.Record(defaultQuestionParams) {
       }
     });
 
+    if (body !== null) {
+
+      const backingTextProvider = buildItemMap(model);
+      model = model.with({ body: ContentElements.fromPersistence(
+        body['body'], createGuid(), QUESTION_BODY_ELEMENTS, backingTextProvider) });
+    }
+
+
     return migrateExplanationToFeedback(
-        ensureResponsesExist(tagInputRefsWithType(migrateSkillsToParts(model))));
+        ensureResponsesExist(migrateSkillsToParts(model)));
   }
 
   toPersistence() : Object {

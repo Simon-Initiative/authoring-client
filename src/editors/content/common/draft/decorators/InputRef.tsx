@@ -12,27 +12,31 @@ const InputRef = (props) => {
   if (data.$type === 'FillInTheBlank') {
     return (
       <span className="dropdownSpan" data-offset-key={props.offsetKey}>
-        &emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        {props.children}
+      </span>
     );
   }
   if (data.$type === 'Numeric') {
     return (
       <span className="numericSpan" data-offset-key={props.offsetKey}>
-      &emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        {props.children}
+      </span>
     );
 
   }
   if (data.$type === 'Text') {
     return (
       <span className="textSpan" data-offset-key={props.offsetKey}>
-      &emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        {props.children}
+      </span>
     );
 
   }
 
   return (
     <span className="textSpan" data-offset-key={props.offsetKey}>
-    &emsp;&emsp;&emsp;&emsp;&emsp;</span>
+      {props.children}
+    </span>
   );
 };
 

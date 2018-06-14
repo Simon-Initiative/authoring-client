@@ -100,9 +100,10 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
   }
 
   static fromPersistence(
-    root: Object[], guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
+    root: Object[], guid: string, mode = ContiguousTextMode.Regular,
+    backingTextProvider: Object = null) : ContiguousText {
     return new ContiguousText({ guid, mode,
-      content: toDraft(root, mode === ContiguousTextMode.SimpleText) });
+      content: toDraft(root, mode === ContiguousTextMode.SimpleText, backingTextProvider) });
   }
 
   static fromText(text: string, guid: string, mode = ContiguousTextMode.Regular) : ContiguousText {
@@ -288,6 +289,43 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     });
   }
 
+  insertEntity(
+    type: string, isMutable: boolean, data: Object,
+    selection: TextSelection, backingText: string) : ContiguousText {
+
+    const mutability = isMutable ? 'MUTABLE' : 'IMMUTABLE';
+    const selectionState = selection.getRawSelectionState();
+
+    let contentState = this.content;
+
+    // Create the entity
+    contentState = contentState.createEntity(type, mutability, data);
+    const entityKey = contentState.getLastCreatedEntityKey();
+
+    // Insert the backing text with entity
+    contentState = Modifier.replaceText(
+      contentState, selectionState, backingText, undefined, entityKey);
+
+    // Add a space if this new entity results in none at the
+    // end of the line
+    const block = this.content.getBlockForKey(selectionState.getFocusKey());
+    console.log(selectionState);
+    console.log(block);
+    if (
+      (selectionState.getIsBackward()
+        && selectionState.getAnchorOffset() === block.text.length) ||
+      (!selectionState.getIsBackward()
+        && selectionState.getFocusOffset() === block.text.length)) {
+
+      contentState = appendText(block, contentState, '  ');
+    }
+
+    return this.with({
+      content: contentState,
+      entityEditCount: this.entityEditCount + 1,
+    });
+  }
+
   removeInputRef(id: string) {
     return this.with({
       content: removeInputRefDraft(this.content, id),
@@ -365,23 +403,6 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     return textSelection.isCollapsed()
       && first.key === textSelection.getAnchorKey()
       && textSelection.getAnchorOffset() === 0;
-  }
-
-  tagInputRefsWithType(byId: Object) {
-
-    const content = getEntities(EntityTypes.input_ref, this.content)
-      .reduce(
-        (contentState, info) => {
-          if (byId[info.entity.data['@input']] !== undefined) {
-            const type = byId[info.entity.data['@input']].contentType;
-            return contentState.mergeEntityData(info.entityKey, { $type: type });
-          }
-
-          return contentState;
-        },
-        this.content);
-
-    return this.with({ content });
   }
 
   updateAllInputRefs(itemMap: Object) : ContiguousText {

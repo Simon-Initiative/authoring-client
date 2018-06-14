@@ -68,8 +68,12 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
             data['@input'] = input;
             data['$type'] = type;
 
-            const updated = (c as contentTypes.ContiguousText).addEntity(
-              EntityTypes.input_ref, false, data, selection);
+            const backingText = type === 'FillInTheBlank'
+              ? ' Dropdown '
+              : ' ' + type + ' ';
+
+            const updated = (c as contentTypes.ContiguousText).insertEntity(
+              EntityTypes.input_ref, false, data, selection, backingText);
 
             result = [this.props.model.body.with({ content:
               this.props.model.body.content.set(updated.guid, updated),

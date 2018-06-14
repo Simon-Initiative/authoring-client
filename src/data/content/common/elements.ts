@@ -77,9 +77,10 @@ export class ContentElements extends Immutable.Record(defaultContent) {
 
   static fromPersistence(
     root: Object, guid: string,
-    supportedElements: string[]) : ContentElements {
+    supportedElements: string[],
+    backingTextProvider: Object = null) : ContentElements {
 
-    const content = parseContent(root, supportedElements);
+    const content = parseContent(root, supportedElements, backingTextProvider);
     return new ContentElements({ guid, content,
       supportedElements: Immutable.List(supportedElements) });
   }

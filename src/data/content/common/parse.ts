@@ -63,7 +63,8 @@ export function getKey(item) : Maybe<string> {
   return Maybe.just(keys[0]);
 }
 
-function parseElements(elements: Object[], factories, textElements) : ContentElement[] {
+function parseElements(
+  elements: Object[], factories, textElements, backingTextProvider) : ContentElement[] {
 
   const parsedObjects : ContentElement[] = [];
 
@@ -80,7 +81,8 @@ function parseElements(elements: Object[], factories, textElements) : ContentEle
         if (textElements[key] === undefined) {
 
           if (textBuffer.length > 0) {
-            parsedObjects.push(ContiguousText.fromPersistence(textBuffer, guid()));
+            parsedObjects.push(ContiguousText.fromPersistence(
+              textBuffer, guid(), ContiguousTextMode.Regular, backingTextProvider));
             textBuffer = [];
           }
 
@@ -98,7 +100,8 @@ function parseElements(elements: Object[], factories, textElements) : ContentEle
       },
       nothing: () => {
         if (textBuffer.length > 0) {
-          parsedObjects.push(ContiguousText.fromPersistence(textBuffer, guid()));
+          parsedObjects.push(ContiguousText.fromPersistence(
+            textBuffer, guid(), ContiguousTextMode.Regular, backingTextProvider));
           textBuffer = [];
         }
 
@@ -108,7 +111,9 @@ function parseElements(elements: Object[], factories, textElements) : ContentEle
   });
 
   if (textBuffer.length > 0) {
-    parsedObjects.push(ContiguousText.fromPersistence(textBuffer, guid()));
+    parsedObjects.push(ContiguousText.fromPersistence(
+      textBuffer, guid(),
+      ContiguousTextMode.Regular, backingTextProvider));
   }
 
   return parsedObjects;
@@ -124,7 +129,8 @@ function isAllContiguous(arr, textElements) : boolean {
       true);
 }
 
-export function parseContent(obj: Object, supportedElementKeys: string[])
+export function parseContent(
+  obj: Object, supportedElementKeys: string[], backingTextProvider: Object = null)
   : Immutable.OrderedMap<string, ContentElement> {
 
   // Create a lookup table for the registered factory deserialization
@@ -154,13 +160,14 @@ export function parseContent(obj: Object, supportedElementKeys: string[])
     // Parse these elements in simple mode (to get the effect of one ContentBlock),
     // but be sure to reset to Regular mode.
     const text = ContiguousText.fromPersistence(
-      inputAsArray, guid(), ContiguousTextMode.SimpleText)
+      inputAsArray, guid(), ContiguousTextMode.SimpleText, backingTextProvider)
       .with({ mode: ContiguousTextMode.Regular });
     return Immutable.OrderedMap<string, ContentElement>([[text.guid, text]]);
   }
 
   // Parse the elements and collect the deserialized content here
-  const parsedObjects : ContentElement[] = parseElements(inputAsArray, factories, textElements);
+  const parsedObjects : ContentElement[]
+    = parseElements(inputAsArray, factories, textElements, backingTextProvider);
 
   // Convert to the Immutable representation and return
   const keyValuePairs = parsedObjects.map(h => [h.guid, h]);

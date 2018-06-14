@@ -30,7 +30,7 @@ const block = type => new commands.ToggleBlockTypeCommand(type);
 const insertBlock
   = (type, mutability, data) => new commands.InsertBlockEntityCommand(type, mutability, data);
 const insertInline
-  = (type, mutability, data) => new commands.InsertInlineEntityCommand(type, mutability, data);
+  = (type, mutability, data) => new commands.InsertInlineEntityCommand(type, mutability, data, ' ');
 
 
 export function flowInline() {
