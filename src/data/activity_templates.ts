@@ -29,7 +29,6 @@ export function assessmentTemplate(title: string) {
                       },
                     },
                   ],
-                  '@id': 'd81b20d521a04762b805bad4e107dea0',
                   '@title': '',
                 },
               },
@@ -65,7 +64,6 @@ export function assessmentTemplate(title: string) {
                             },
                           },
                         ],
-                        '@id': 'ef7c8106d0e141bb9a63bc981385b751',
                         '@title': '',
                       },
                     },
@@ -74,7 +72,6 @@ export function assessmentTemplate(title: string) {
                         '#text': 'Albert sees that his girlfriend has written her password '
                           + 'on a note beside her computer; he logs in and sends a joke email to '
                           + 'one of her friends. This action is: ',
-                        '@id': 'ac24c7868c7f24c9a8877494035036e09',
                         '@title': '',
                       },
                     },
