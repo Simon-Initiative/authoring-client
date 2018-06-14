@@ -7,7 +7,7 @@ import './InputRef.scss';
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
 
-  const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
+  // const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
 
   if (data.$type === 'FillInTheBlank') {
     return (
