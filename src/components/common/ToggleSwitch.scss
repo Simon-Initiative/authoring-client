@@ -92,11 +92,7 @@
 
         &:after,
         &:before {
-          width: 65%;
-        }
-
-        &:after {
-          border-radius: 45%;
+          left: 10%;
         }
       }
 
@@ -108,10 +104,6 @@
         &:after,
         &:before {
           width: 55%;
-        }
-
-        &:after {
-          border-radius: 50%;
         }
       }
 

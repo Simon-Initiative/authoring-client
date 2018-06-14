@@ -31,6 +31,14 @@
         }
       }
 
+      .content-decorator {
+        margin-top: 20px;
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
       .content-container > * {
         margin: 10px 0;
       }

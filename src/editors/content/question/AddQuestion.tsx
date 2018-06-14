@@ -272,7 +272,46 @@ export class AddQuestion
   }
 
   onAddImageHotspot() {
-    console.log('NOT IMPLEMENTED');
+    let question = new contentTypes.Question().with({ body: contentTypes.Question.emptyBody() });
+
+    let item = new contentTypes.ImageHotspot().with({
+      src: 'NO_IMAGE_SELECTED',
+    });
+
+    // create new hotspot
+    const match = guid();
+    const hotspot = new contentTypes.Hotspot().with({
+      shape: 'rect',
+      value: match,
+      coords: Immutable.List<number>([
+        Math.floor(item.width / 2) - 50,
+        Math.floor(item.height / 2) - 50,
+        Math.floor(item.width / 2) + 50,
+        Math.floor(item.height / 2) + 50,
+      ]),
+    });
+
+    item = item.with({
+      hotspots: item.hotspots.set(hotspot.guid, hotspot),
+    });
+
+    const feedback = contentTypes.Feedback.fromText('', guid());
+    let response = new contentTypes.Response({ match });
+    response = response.with({
+      guid: guid(),
+      feedback: response.feedback.set(feedback.guid, feedback),
+    });
+
+    const responses = Immutable.OrderedMap<string, contentTypes.Response>()
+      .set(response.guid, response);
+
+    question = question.with({ items: question.items.set(item.guid, item) });
+
+    let part = new contentTypes.Part();
+    part = part.with({ guid: guid(), responses });
+    question = question.with({ parts: question.parts.set(part.guid, part) });
+
+    this.props.onQuestionAdd(question);
   }
 
   render() {
@@ -283,6 +322,11 @@ export class AddQuestion
 
     const dynaDragDropOrNot = !this.props.isSummative
       ? <a onClick={this.onAddDragDrop} className="dropdown-item">Drag and Drop</a>
+      : null;
+
+    const imageHotSpotOrNot = !this.props.isSummative
+      ? <a onClick={this.onAddImageHotspot}
+          className="dropdown-item">Image Hotspot</a>
       : null;
 
     return (
@@ -297,9 +341,10 @@ export class AddQuestion
         {essayOrNot}
         <a onClick={this.onAddMultipart}
           className="dropdown-item">Input (Text, Numeric, Dropdown)</a>
+
         {dynaDragDropOrNot}
-        <a onClick={this.onAddImageHotspot}
-          className="dropdown-item">Image Hotspot</a>                                            
+        {imageHotSpotOrNot}
+
       </React.Fragment>
 
     );

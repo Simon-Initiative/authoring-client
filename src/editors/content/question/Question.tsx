@@ -73,6 +73,8 @@ export const getLabelForQuestion = (question: contentTypes.Question): string => 
     case 'Numeric':
     case 'FillInTheBlank':
       return 'Input';
+    case 'ImageHotspot':
+      return 'Image Hotspot';
     default:
       return 'Question';
   }

@@ -74,6 +74,18 @@ const getSortMappingKey = (orderBy: string, order?: string) => {
     && (order === undefined || order === SORT_MAPPINGS[key].order));
 };
 
+const popOpenImage = ({ target: link }) => {
+  const w = window.open(
+    link.href,
+    link.target || '_blank',
+    'menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=no,'
+    + 'resizable=no,dependent,width=800,height=620',
+  );
+
+  // allow the link to work if popup is blocked
+  return w ? false : true;
+};
+
 export interface MediaManagerProps {
   className?: string;
   model: Media;
@@ -457,7 +469,8 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
             <a
               href={webContentsPath(
                 selectedItem.pathTo, resourcePath, courseModel.guid)}
-              target="_blank"  >
+              target="_blank"
+              onClick={popOpenImage} >
               {stringFormat.ellipsize(selectedItem.fileName, 65, 5)}</a>
             <div className="flex-spacer" />
             <Button type="link" editMode onClick={() =>
@@ -580,9 +593,6 @@ export class MediaManager extends React.PureComponent<MediaManagerProps, MediaMa
           </div>
           <div className="media-toolbar-item search">
             <div className="input-group">
-              <span className="input-group-addon">
-                <i className="fa fa-search" />
-              </span>
               <input
                 type="text"
                 className="form-control"
