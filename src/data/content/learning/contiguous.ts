@@ -309,8 +309,7 @@ export class ContiguousText extends Immutable.Record(defaultContent) {
     // Add a space if this new entity results in none at the
     // end of the line
     const block = this.content.getBlockForKey(selectionState.getFocusKey());
-    console.log(selectionState);
-    console.log(block);
+
     if (
       (selectionState.getIsBackward()
         && selectionState.getAnchorOffset() === block.text.length) ||
