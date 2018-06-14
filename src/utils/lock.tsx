@@ -15,7 +15,7 @@ function buildModalMessageAction(label, text) : Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(modalActions.display(<ModalMessage text={text}/>));
+      dispatch(modalActions.display(<ModalMessage>{text}</ModalMessage>));
     },
   };
 }
