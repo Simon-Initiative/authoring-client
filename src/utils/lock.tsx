@@ -1,6 +1,6 @@
 import * as Immutable from 'immutable';
 import * as Messages from 'types/messages';
-import { ModalMessage } from 'utils//ModalMessage';
+import { ModalMessage } from 'utils/ModalMessage';
 import { modalActions } from 'actions/modal';
 import { Priority } from 'types/messages/message';
 
@@ -15,7 +15,8 @@ function buildModalMessageAction(label, text) : Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(modalActions.display(<ModalMessage>{text}</ModalMessage>));
+      dispatch(modalActions.display(
+        <ModalMessage onCancel={dispatch(modalActions.dismiss())}>{text}</ModalMessage>));
     },
   };
 }

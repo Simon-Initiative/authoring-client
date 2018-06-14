@@ -2,7 +2,7 @@ import * as Messages from 'types/messages';
 import * as Immutable from 'immutable';
 import { UserProfile } from 'types/user';
 import { buildFeedbackFromCurrent } from 'utils/feedback';
-import { ModalMessage } from 'utils//ModalMessage';
+import { ModalMessage } from 'utils/ModalMessage';
 import { modalActions } from 'actions/modal';
 import { viewObjectives } from 'actions/view';
 import * as React from 'react';
@@ -61,7 +61,8 @@ function buildModalMessageAction(label, text): Messages.MessageAction {
   return {
     label,
     execute: (message: Messages.Message, dispatch) => {
-      dispatch(modalActions.display(<ModalMessage>{text}</ModalMessage>));
+      dispatch(modalActions.display(
+        <ModalMessage onCancel={dispatch(modalActions.dismiss())}>{text}</ModalMessage>));
     },
   };
 }

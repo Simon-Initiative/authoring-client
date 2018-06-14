@@ -29,7 +29,7 @@ const defaultContent = {
   elementType: 'youtube',
   id: '',
   title: '',
-  src: 'C0DPdy98e4c',
+  src: 'J1neqSGaCX0',
   width: '500',
   height: '300',
   controls: true,

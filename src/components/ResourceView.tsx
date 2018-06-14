@@ -12,17 +12,19 @@ import './ResourceView.scss';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
+import { LegacyTypes } from 'data/types';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
-  resourceType: string;
+  resourceType: LegacyTypes;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
     courseId: string,
     title: string, type: string) => models.ContentModel;
+  helpPopover?: JSX.Element;
 }
 
 interface ResourceViewState {
@@ -146,7 +148,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const creationTitle = <h2>{this.props.title}</h2>;
+    const creationTitle = <h2>{this.props.title}  {this.props.helpPopover}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [

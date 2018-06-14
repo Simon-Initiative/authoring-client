@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { Tooltip } from 'utils/tooltip';
 import './HelpPopover.scss';
+import { ModalMessage } from 'utils/ModalMessage';
 
 export type HelpPopoverProps = {
-  title?: string,
   position?: Position,
+  activateOnClick?: boolean,
+  displayModal: (component: any) => void;
+  dismissModal: () => void;
 };
 
 export enum Position {
@@ -21,6 +24,7 @@ const DEFAULT_TOOLTIP_PROPS = {
   arrow: true,
   position: Position.Top,
   className: 'help-popover-trigger',
+  activateOnClick: false,
 };
 
 const mergeWithDefaultProps = props =>
@@ -34,36 +38,21 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
   render() {
     const props = mergeWithDefaultProps(this.props);
 
-    const icon = <i className={'fa fa-question-circle'}></i>;
+    const modal = <ModalMessage onCancel={props.dismissModal}>{this.props.children}</ModalMessage>;
 
-    return (
-      this.props.children
-        ? <Tooltip
-            {...props}
-            html={
-              <div className="help-popover-container">
-                {this.props.children}
-              </div>}>
-            {icon}
-          </Tooltip>
-        : <Tooltip 
-            {...props}
-            title={this.props.title || ''}>
-            {icon}
-          </Tooltip>
-    );
+    return props.activateOnClick
+      ? <div className="help-popover-container help-popover-trigger">
+        <i onClick={() => props.displayModal(modal)}
+           className={'fa fa-question-circle'}></i>
+      </div>
+
+      : <Tooltip
+        {...props}
+        html={
+          <div className="help-popover-container">
+            {this.props.children}
+          </div>}>
+        <i className={'fa fa-question-circle'}></i>
+      </Tooltip>;
   }
 }
-
-/* Example of HelpPopover usage. Leaving in code until we use this in production.
-<span className="float-right">
-  {<HelpPopover>
-    <div>
-      <p>Looks like you could use some help.</p>
-      <br />
-      <p>You can click <a href="#" target="_blank">here</a> to 
-      get some more information.</p>
-    </div>
-  </HelpPopover>}
-</span> 
-*/

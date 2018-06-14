@@ -29,6 +29,7 @@ import { SkillsModel } from 'data/models/skill';
 import { logger, LogTag, LogLevel, LogAttribute, LogStyle } from 'utils/logger';
 
 import './ObjectiveSkillView.scss';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 import DeleteObjectiveSkillModal from 'components/objectives/DeleteObjectiveSkillModal';
 import { LegacyTypes } from 'data/types';
 import { ModalMessage } from 'utils/ModalMessage';
@@ -536,6 +537,7 @@ export class ObjectiveSkillView
     if (obj.skills.size > 0) {
       this.services.displayModal(
         <ModalMessage
+          onCancel={() => this.services.dismissModal()}
           okLabel="Okay">
           All skills must be removed from an objective before the objective can be deleted.
         </ModalMessage>);
@@ -828,7 +830,15 @@ export class ObjectiveSkillView
   }
 
   renderTitle() {
-    return <h2>Learning Objectives and Skills</h2>;
+    const src = 'https://www.youtube.com/embed/14O7XCgsznY';
+
+    return (
+      <h2>Learning Objectives and Skills&nbsp;
+        <HelpPopover activateOnClick>
+          <iframe src={src} height={500} width={'100%'} />
+        </HelpPopover>
+      </h2>
+    );
   }
 
   render() {
