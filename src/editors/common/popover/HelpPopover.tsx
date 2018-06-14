@@ -7,6 +7,7 @@ export type HelpPopoverProps = {
   position?: Position,
   activateOnClick?: boolean,
   displayModal: (component: any) => void;
+  dismissModal: () => void;
 };
 
 export enum Position {
@@ -37,7 +38,7 @@ export class HelpPopover extends React.PureComponent<HelpPopoverProps, {}> {
   render() {
     const props = mergeWithDefaultProps(this.props);
 
-    const modal = <ModalMessage>{this.props.children}</ModalMessage>;
+    const modal = <ModalMessage onCancel={props.dismissModal}>{this.props.children}</ModalMessage>;
 
     return props.activateOnClick
       ? <div className="help-popover-container help-popover-trigger">
