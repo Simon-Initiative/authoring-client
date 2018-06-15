@@ -1,7 +1,9 @@
 import { connect } from 'react-redux';
 import { OrderedMap } from 'immutable';
 import PoolEditor from './PoolEditor';
+import * as contentTypes from 'data/contentTypes';
 import { fetchSkills } from 'actions/skills';
+import { setCurrentNode } from 'actions/document';
 import { Skill } from 'types/course';
 import { AbstractEditorProps } from '../common/AbstractEditor';
 import { PoolModel, CourseModel } from 'data/models';
@@ -17,6 +19,7 @@ interface StateProps {
   activeContext: any;
   hover: string;
   course: CourseModel;
+  currentNode: Maybe<contentTypes.Node>;
 }
 
 interface DispatchProps {
@@ -25,6 +28,7 @@ interface DispatchProps {
   onUpdateContentSelection: (
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
+  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
@@ -33,13 +37,17 @@ interface DispatchProps {
 interface OwnProps extends AbstractEditorProps<PoolModel> {}
 
 const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
-  const { activeContext, skills, hover, course } = state;
+  const { activeContext, skills, hover, course, documents } = state;
 
   return {
     activeContext,
     skills,
     hover,
     course,
+    currentNode: activeContext.documentId.caseOf({
+      just: docId => documents.get(docId).currentNode,
+      nothing: Maybe.nothing(),
+    }),
   };
 };
 
@@ -56,6 +64,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => {
       parent: ParentContainer, textSelection: Maybe<TextSelection>) => {
 
       return dispatch(activeActions.updateContext(documentId, content, parent, textSelection));
+    },
+    onSetCurrentNode: (documentId: string, node: contentTypes.Node) => {
+      return dispatch(setCurrentNode(documentId, node));
     },
     onUpdateHover: (hover: string) => {
       return dispatch(updateHover(hover));

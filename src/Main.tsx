@@ -11,6 +11,7 @@ import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
 import { ExpandedState } from 'reducers/expanded';
 import { ServerState } from 'reducers/server';
+import { HoverState } from 'reducers/hover';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
@@ -136,7 +137,9 @@ interface MainProps {
   course: CourseState;
   expanded: ExpandedState;
   server: ServerState;
+  hover: HoverState;
   onDispatch: (...args: any[]) => any;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface MainState {
@@ -300,7 +303,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
 
   render(): JSX.Element {
-    const { modal, user } = this.props;
+    const { modal, user, hover, onUpdateHover } = this.props;
 
     if (user === null) {
       return null;
@@ -317,7 +320,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     const currentView = this.getView(getPathName(this.props.location.pathname));
 
     return (
-      <div className="main">
+      <div className="main" onMouseOver={() => hover && onUpdateHover(null)}>
         <div className="main-header">
           <Messages />
           <Header />

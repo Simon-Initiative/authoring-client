@@ -339,7 +339,12 @@ export class ContentContainer
               hideContentLabel={hideContentLabel}
               disableContentSelection={disableContentSelection}
               key={model.guid}
-              onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
+              onMouseOver={(e) => {
+                if (onUpdateHover) {
+                  onUpdateHover(model.guid);
+                  e.stopPropagation();
+                }
+              }}
               isHoveringContent={isHoverContent}
               isActiveContent={isActiveContent}
               className={decoratorClassNames}

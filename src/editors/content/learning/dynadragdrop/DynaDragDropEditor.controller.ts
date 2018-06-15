@@ -31,9 +31,9 @@ const mapStateToProps = (state: State, ownProps: OwnProps): StateProps => {
     assessment: (state.documents.first().document.model as AssessmentModel),
     currentPage: state.documents.first().currentPage.caseOf({
       just: cp => (state.documents.first().document.model as AssessmentModel).pages.get(cp),
-      nothing: () => undefined,
+      nothing: () => null,
     }),
-    currentNode: state.documents.first().currentNode.valueOr(undefined) as Question,
+    currentNode: state.documents.first().currentNode.valueOr(null) as Question,
     selectedInitiator: state.dynadragdrop.selectedInitiator,
   };
 };

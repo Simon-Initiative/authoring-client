@@ -13,7 +13,7 @@ export interface ContentDecoratorProps {
   hideContentLabel?: boolean | string[];
   disableContentSelection?: boolean | string[];
   isHoveringContent: boolean;
-  onMouseOver: () => void;
+  onMouseOver: (e) => void;
 }
 
 export interface ContentDecoratorState {
@@ -61,7 +61,7 @@ export class ContentDecorator
           isHoveringContent && classes.hover,
           className,
         ])}
-      onMouseOver={(e) => { onMouseOver(); e.stopPropagation(); }}>
+      onMouseOver={onMouseOver}>
         {this.hideContentLabel() || this.disableContentSelection()
           ? null
           : (

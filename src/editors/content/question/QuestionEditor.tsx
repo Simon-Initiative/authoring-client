@@ -117,6 +117,14 @@ export class QuestionEditor
     return false;
   }
 
+
+  /** Override Parent Method */
+  handleOnClick(e) {
+    if (this.props.onHandleClick !== undefined) {
+      this.props.onHandleClick(e);
+    }
+  }
+
   onBlur(activeItemId: string) {
     if (this.state.activeItemId === activeItemId) {
       this.setState({ activeItemId: null });

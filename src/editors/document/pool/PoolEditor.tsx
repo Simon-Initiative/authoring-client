@@ -7,7 +7,7 @@ import * as contentTypes from '../../../data/contentTypes';
 import { AddQuestion } from '../../content/question/AddQuestion';
 import { Outline } from '../assessment/Outline';
 import { renderAssessmentNode } from '../common/questions';
-import { findNodeByGuid } from '../assessment/utils';
+import { findNodeByGuid, locateNextOfKin } from '../assessment/utils';
 import { hasUnknownSkill } from 'utils/skills';
 import { Skill } from 'types/course';
 import { ContextAwareToolbar } from 'components/toolbar/ContextAwareToolbar.controller';
@@ -34,6 +34,8 @@ export interface PoolEditorProps extends AbstractEditorProps<models.PoolModel> {
     documentId: string, content: Object, container: ParentContainer,
     textSelection: Maybe<TextSelection>) => void;
   hover: string;
+  currentNode: Maybe<contentTypes.Node>;
+  onSetCurrentNode: (documentId: string, node: contentTypes.Node) => void;
   onUpdateHover: (hover: string) => void;
   showMessage: (message: Messages.Message) => void;
   dismissMessage: (message: Messages.Message) => void;
@@ -50,7 +52,6 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   PoolEditorState>  {
 
   noSkillsMessage: Messages.Message;
-  pendingCurrentNode: Maybe<contentTypes.Question>;
 
   constructor(props) {
     super(props, { currentNode: props.model.pool.questions.first(), collapseInsertPopup: true });
@@ -62,10 +63,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
     this.onSelect = this.onSelect.bind(this);
     this.onChangeExpansion = this.onChangeExpansion.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.unFocus = this.unFocus.bind(this);
     this.onDuplicateNode = this.onDuplicateNode.bind(this);
     this.collapseInsertPopup = this.collapseInsertPopup.bind(this);
-
-    this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
 
     if (hasUnknownSkill(props.model, props.skills)) {
       props.onFetchSkills(props.context.courseId);
@@ -85,6 +85,8 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.noSkillsMessage = buildMissingSkillsMessage(this.props.context.courseId);
       this.props.showMessage(this.noSkillsMessage);
     }
+
+    this.onSelect(this.props.model.pool.questions.first());
   }
 
   componentWillReceiveProps(nextProps: PoolEditorProps) {
@@ -92,23 +94,40 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.props.dismissMessage(this.noSkillsMessage);
     }
 
-    findNodeByGuid(nextProps.model.pool.questions, this.state.currentNode.guid)
-      .lift(currentNode => this.setState({ currentNode }));
+    if (this.props.currentNode !== nextProps.currentNode && this.props.model !== nextProps.model) {
+      // Handle the case that the current node has changed externally,
+      // for instance, from an undo/redo
+      const { model, activeContext, onSetCurrentNode } = this.props;
 
-    this.pendingCurrentNode
-      .lift((currentNode) => {
-        this.pendingCurrentNode = Maybe.nothing<contentTypes.Question>();
-        this.setState({ currentNode });
+      const currentNodeGuid = nextProps.currentNode.caseOf({
+        just: currentNode => currentNode.guid,
+        nothing: () => '',
       });
+      const previousNodeGuid = this.props.currentNode.caseOf({
+        just: currentNode => currentNode.guid,
+        nothing: () => '',
+      });
+
+      findNodeByGuid(nextProps.model.pool.questions, currentNodeGuid)
+      .caseOf({
+        just: (currentNode) => {
+          onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
+        },
+        nothing: () => {
+          locateNextOfKin(model.pool.questions, previousNodeGuid).lift(node =>
+            onSetCurrentNode(
+              activeContext.documentId.valueOr(null), node));
+        },
+      });
+    }
   }
 
-  addQuestion(q) {
-
-    const pool = this.props.model.pool.with(
-      { questions: this.props.model.pool.questions.set(q.guid, q) });
+  addQuestion(question: contentTypes.Question) {
+    const pool = this.props.model.pool.with({
+      questions: this.props.model.pool.questions.set(question.guid, question) });
     const updated = this.props.model.with({ pool });
 
-    this.pendingCurrentNode = Maybe.just(q);
+    this.props.onSetCurrentNode(this.props.activeContext.documentId.valueOr(null), question);
     this.handleEdit(updated);
     this.setState({
       collapseInsertPopup: true,
@@ -150,7 +169,9 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onSelect(currentNode: contentTypes.Node) {
-    this.setState({ currentNode });
+    const { activeContext, onSetCurrentNode } = this.props;
+
+    onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
   }
 
   onFocus(model: Object, parent, textSelection) {
@@ -158,9 +179,14 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.props.context.documentId, model, parent, textSelection);
   }
 
+  unFocus() {
+    this.props.onUpdateContentSelection(
+      this.props.context.documentId, null, null, Maybe.nothing());
+  }
+
   onRemove(guid: string) {
 
-    const { model } = this.props;
+    const { model, activeContext, onSetCurrentNode } = this.props;
 
     if (model.pool.questions.size > 1) {
 
@@ -179,9 +205,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       // Get the node at the adjusted index
       const newCurrent = pool.questions
         .toArray()[adjustedIndex];
-
-      // Set it to be the new current (pending)
-      this.pendingCurrentNode = Maybe.just(newCurrent);
+      onSetCurrentNode(activeContext.documentId.valueOr(null), newCurrent);
 
       this.handleEdit(this.props.model.with({ pool }));
     }
@@ -189,12 +213,16 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   onDuplicateNode() {
-    if (this.state.currentNode.contentType === 'Question') {
-      const duplicated = this.state.currentNode.clone().with({
-        guid: createGuid(),
-      });
-      this.addQuestion(duplicated);
-    }
+    const { currentNode } = this.props;
+
+    currentNode.lift((node) => {
+      if (node.contentType === 'Question') {
+        const duplicated = node.clone().with({
+          guid: createGuid(),
+        });
+        this.addQuestion(duplicated);
+      }
+    });
   }
 
   renderAdd() {
@@ -221,7 +249,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
   }
 
   render() {
-    const { context, services, editMode, model, onEdit, course } = this.props;
+    const { context, services, editMode, model, onEdit, course, currentNode } = this.props;
 
     // We currently do not allow expanding / collapsing in the outline,
     // so we simply tell the outline to expand every node.
@@ -241,12 +269,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       <div className="pool-editor">
         <ContextAwareToolbar context={context} model={model} />
         <div className="pool-content">
-          <div className="html-editor-well">
+          <div className="html-editor-well" onClick={() => this.unFocus()}>
 
             <TitleTextEditor
               context={context}
               services={services}
-              onFocus={this.onFocus.bind(this)}
+              onFocus={() => this.unFocus()}
               model={(model.pool.title.text.content.first() as ContiguousText)}
               editMode={editMode}
               onEdit={this.onTitleEdit}
@@ -258,7 +286,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                   editMode={this.props.editMode}
                   nodes={model.pool.questions}
                   expandedNodes={expanded}
-                  selected={this.state.currentNode.guid}
+                  selected={currentNode.caseOf({ just: node => node.guid, nothing: () => '' })}
                   onEdit={this.onEditNodes.bind(this)}
                   onChangeExpansion={this.onChangeExpansion.bind(this)}
                   onSelect={this.onSelect.bind(this)}
@@ -267,10 +295,13 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
                 {this.renderAdd()}
               </div>
               <div className="node-container">
-                {renderAssessmentNode(
-                  this.state.currentNode, assesmentNodeProps, this.onEdit,
-                  this.onRemove, this.onFocus,
-                  true, this.onDuplicateNode, null)}
+                {currentNode.caseOf({
+                  just: node => renderAssessmentNode(
+                    node, assesmentNodeProps, this.onEdit,
+                    this.onRemove, this.onFocus,
+                    true, this.onDuplicateNode, null),
+                  nothing: () => null,
+                })}
               </div>
             </div>
           </div>

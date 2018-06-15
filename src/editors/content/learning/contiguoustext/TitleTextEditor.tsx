@@ -31,7 +31,7 @@ export const TitleTextEditor
   editMode, onEdit, onFocus, editorStyles,
 }) => {
     return (
-      <div className={classNames([classes.titleTextEditor, className])}>
+      <div className={classNames(['TitleTextEditor', classes.titleTextEditor, className])}>
         <ContiguousTextEditor
           onInsertParsedContent={() => {}}
           className={classes.contiguousTextEditor}
