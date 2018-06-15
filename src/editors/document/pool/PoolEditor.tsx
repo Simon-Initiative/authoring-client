@@ -99,10 +99,6 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       // for instance, from an undo/redo
       const { model, activeContext, onSetCurrentNode } = this.props;
 
-      const currentNodeGuid = nextProps.currentNode.caseOf({
-        just: currentNode => currentNode.guid,
-        nothing: () => '',
-      });
       const previousNodeGuid = this.props.currentNode.caseOf({
         just: currentNode => currentNode.guid,
         nothing: () => '',
