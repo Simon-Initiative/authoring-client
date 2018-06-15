@@ -94,7 +94,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
       this.props.dismissMessage(this.noSkillsMessage);
     }
 
-    if (this.props.currentNode !== nextProps.currentNode && this.props.model !== nextProps.model) {
+    if (this.props.currentNode === nextProps.currentNode && this.props.model !== nextProps.model) {
       // Handle the case that the current node has changed externally,
       // for instance, from an undo/redo
       const { model, activeContext, onSetCurrentNode } = this.props;
@@ -108,7 +108,7 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
         nothing: () => '',
       });
 
-      findNodeByGuid(nextProps.model.pool.questions, currentNodeGuid)
+      findNodeByGuid(nextProps.model.pool.questions, previousNodeGuid)
       .caseOf({
         just: (currentNode) => {
           onSetCurrentNode(activeContext.documentId.valueOr(null), currentNode);
@@ -149,9 +149,12 @@ class PoolEditor extends AbstractEditor<models.PoolModel,
 
   onEdit(guid: string, question: contentTypes.Question, src) {
 
+    const { onSetCurrentNode, activeContext } = this.props;
+
     const questions = this.props.model.pool.questions.set(guid, question);
     const pool = this.props.model.pool.with({ questions });
 
+    onSetCurrentNode(activeContext.documentId.valueOr(null), question);
     this.props.onUpdateContent(this.props.context.documentId, src);
 
     this.handleEdit(this.props.model.with({ pool }));
