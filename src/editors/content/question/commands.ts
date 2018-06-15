@@ -27,7 +27,12 @@ export class InsertInputRefCommand extends AbstractCommand<EditorState> {
     data['@input'] = input;
     data['$type'] = this.typeLabel;
 
-    const delegate = new InsertInlineEntityCommand(EntityTypes.input_ref, 'IMMUTABLE', data);
+    const backingText = this.typeLabel === 'FillInTheBlank'
+      ? ' Dropdown '
+      : ' ' + this.typeLabel + ' ';
+
+    const delegate = new InsertInlineEntityCommand(
+      EntityTypes.input_ref, 'IMMUTABLE', data, backingText);
 
     return delegate.execute(state, context, services);
   }

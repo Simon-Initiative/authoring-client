@@ -77,15 +77,23 @@ export class ContentElements extends Immutable.Record(defaultContent) {
 
   static fromPersistence(
     root: Object, guid: string,
-    supportedElements: string[]) : ContentElements {
+    supportedElements: string[],
+    backingTextProvider: Object = null) : ContentElements {
 
-    const content = parseContent(root, supportedElements);
+    const content = parseContent(root, supportedElements, backingTextProvider);
     return new ContentElements({ guid, content,
       supportedElements: Immutable.List(supportedElements) });
   }
 
   static fromText(text: string, guid: string, supportedElements: string[]) : ContentElements {
     const t = ContiguousText.fromText(text, createGuid());
+    return new ContentElements({ guid,
+      supportedElements: Immutable.List(supportedElements),
+      content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t) });
+  }
+
+  static fromHTML(html: string, guid: string, supportedElements: string[]) : ContentElements {
+    const t = ContiguousText.fromHTML(html, createGuid());
     return new ContentElements({ guid,
       supportedElements: Immutable.List(supportedElements),
       content: Immutable.OrderedMap<string, ContentElement>().set(t.guid, t) });

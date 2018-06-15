@@ -55,6 +55,7 @@ export default class BlockQuoteEditor
         <div className={classes.quoteWrapper}>
           <ContiguousTextEditor
             {...this.props}
+            onInsertParsedContent={() => {}}
             onFocus={this.onFocusOverride}
             model={this.props.model.text}
             onEdit={this.onEditText}>

@@ -70,6 +70,7 @@ export default class BlockCodeEditor
       <div className={classNames(['codeEditor', classes.codeEditor])}>
         <ContiguousTextEditor
           {...this.props}
+          onInsertParsedContent={() => {}}
           onFocus={this.onFocusOverride}
           model={this.props.model.text}
           onEdit={this.onEditText}

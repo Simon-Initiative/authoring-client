@@ -1,0 +1,84 @@
+@import 'oli/colors';
+@import 'oli/typography';
+
+$button-blue: #3498DB;
+
+.course-creation {
+  min-width: 600px;
+  background: linear-gradient(to top, #6fc7e4, #75aaf0);
+  color: $white;
+  height: 100vh;
+  padding-top: 8rem;
+  display: flex;
+  justify-content: center;
+
+  .course-creation__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 600px;
+  }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.7rem;
+      text-align: center;
+    }
+
+    input {
+      min-width: 576px;
+      margin: 0 auto;
+      outline: none;
+      padding: 1rem;
+      font-size: 1.05rem;
+      line-height: 1.2rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid white;
+      color: white;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+
+    .course-creation__button {
+      text-align: center;
+      outline: none;
+
+      button {
+        background-color: $button-blue;
+        text-decoration: none;
+        color: white;
+        width: 250px;
+        height: 60px;
+        position: relative;
+        margin-top: 45px;
+        border: none;
+        padding: 12px;
+        font-size: 1.6rem;
+        border-radius: 10px;
+        transition: all 0.2s;
+        top: 18px;
+
+        &:not(:disabled) {
+          cursor: pointer;
+          box-shadow: 0px 12px 0px 0px darken($button-blue, 5%);
+          top: 6px;
+        }
+        &:active {
+          box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
+          top: 11px;
+        }
+        &:focus {
+          outline: none;
+        }
+
+        &.course-creation__button--submitted {
+          box-shadow: 0px 7px 0px 0px darken($button-blue, 5%);
+          top: 11px;
+          cursor: default;
+        }
+      }
+    }
+  }

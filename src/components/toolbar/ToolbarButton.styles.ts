@@ -91,5 +91,9 @@ export const styles: JSSStyles = {
       height: 32,
       textAlign: 'left',
     },
+    '&.fit': {
+      height: 32,
+      textAlign: 'left',
+    },
   },
 };

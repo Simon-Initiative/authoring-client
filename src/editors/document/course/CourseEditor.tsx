@@ -10,7 +10,7 @@ import { Select } from 'editors/content/common/Select';
 
 import './CourseEditor.scss';
 
-const THUMBNAIL = require('../../../../assets/ph-courseView.png');
+// const THUMBNAIL = require('../../../../assets/ph-courseView.png');
 
 export interface CourseEditorProps {
   model: models.CourseModel;
@@ -256,13 +256,14 @@ class CourseEditor extends React.Component<CourseEditorProps, CourseEditorState>
                 <div className="col-3">Version</div>
                 <div className="col-9">{model.version}</div>
               </div>
-              <div className="row">
+              {/* Disabling Thumbnail until it has a real purpose */}
+              {/* <div className="row">
                 <div className="col-3">Thumbnail<br /><br />
                 </div>
                 <div className="col-9">
                   <img src={THUMBNAIL} className="img-fluid" alt=""></img>
                 </div>
-              </div>
+              </div> */}
               {adminRow}
             </div>
           </div>

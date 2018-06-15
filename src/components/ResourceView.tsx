@@ -12,17 +12,19 @@ import './ResourceView.scss';
 import { SortDirection, SortableTable } from './common/SortableTable';
 import SearchBar from 'components/common/SearchBar';
 import { highlightMatches } from 'components/common/SearchBarLogic';
+import { LegacyTypes } from 'data/types';
 
 export interface ResourceViewProps {
   course: models.CourseModel;
   dispatch: any;
   serverTimeSkewInMs: number;
   title: string;
-  resourceType: string;
+  resourceType: LegacyTypes;
   filterFn: (resource: Resource) => boolean;
   createResourceFn: (
     courseId: string,
     title: string, type: string) => models.ContentModel;
+  helpPopover?: JSX.Element;
 }
 
 interface ResourceViewState {
@@ -46,7 +48,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
 
   componentWillReceiveProps(nextProps: ResourceViewProps): void {
     if (nextProps.resourceType !== this.props.resourceType &&
-        nextProps.title !== this.props.title) {
+      nextProps.title !== this.props.title) {
       this.setState({
         resources: this.getFilteredRows(nextProps),
       });
@@ -127,10 +129,10 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   // Filter resources shown based on title and id
   filterBySearchText(searchText: string): void {
     const text = searchText.trim().toLowerCase();
-    const filterFn = (r) => {
+    const filterFn = (r: Resource): boolean => {
       const { title, id } = r;
-      const titleLower = title.toLowerCase();
-      const idLower = id.toLowerCase();
+      const titleLower = title ? title.toLowerCase() : '';
+      const idLower = id ? id.toLowerCase() : '';
 
       return text === '' ||
         titleLower.indexOf(text) > -1 ||
@@ -146,7 +148,7 @@ export default class ResourceView extends React.Component<ResourceViewProps, Res
   }
 
   renderResources() {
-    const creationTitle = <h2>{this.props.title}</h2>;
+    const creationTitle = <h2>{this.props.title}  {this.props.helpPopover}</h2>;
     const rows = this.state.resources.map(r => ({ key: r.guid, data: r }));
 
     const labels = [

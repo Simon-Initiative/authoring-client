@@ -1,7 +1,7 @@
 import * as Immutable from 'immutable';
 import { Maybe } from 'tsmonad';
 import { ChildrenAccessor, ChildrenMutator, NodeId, Nodes } from 'editors/common/tree/types';
-import { insertNode, removeNode, updateNode } from 'editors/common/tree/utils';
+import { insertNode, removeNode, updateNode } from 'data/utils/tree';
 
 type TestNode = {
   value: number,

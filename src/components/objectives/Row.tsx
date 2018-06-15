@@ -19,6 +19,7 @@ export interface RowProps {
   model: RowType;
   title: string;
   highlighted: boolean;
+  loading: boolean;
 }
 
 export interface RowState {

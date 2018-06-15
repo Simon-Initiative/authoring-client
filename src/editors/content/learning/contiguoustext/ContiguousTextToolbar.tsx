@@ -208,7 +208,7 @@ export default class ContiguousTextToolbar
             tooltip="Quotation">
             <i className={'fa fa-quote-right'} />
           </ToolbarButton>
-          <ToolbarButton
+          {/* <ToolbarButton
             onClick={
               () => {
                 onEdit(model.addEntity(
@@ -218,7 +218,7 @@ export default class ContiguousTextToolbar
             disabled={!supports('cite') || !rangeEntitiesEnabled}
             tooltip="Citation">
             <i className={'fa fa-asterisk'} />
-          </ToolbarButton>
+          </ToolbarButton> */}
           <ToolbarButton
             onClick={
               () => {
@@ -227,8 +227,8 @@ export default class ContiguousTextToolbar
               }
             }
             disabled={!supports('link') || !rangeEntitiesEnabled}
-            tooltip="External Hyperlink">
-            <i className={'fa fa-external-link'} />
+            tooltip="Hyperlink">
+            <i className={'fa fa-link'} />
           </ToolbarButton>
           <ToolbarButton
             onClick={

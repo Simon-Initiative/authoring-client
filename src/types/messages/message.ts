@@ -9,6 +9,14 @@ export enum Severity {
   Information = 'Information',
 }
 
+export enum Priority {
+  Lowest,
+  Low,
+  Medium,
+  High,
+  Highest,
+}
+
 export enum Scope {
   Application,
   Package,
@@ -34,6 +42,7 @@ export type MessageContents = TitledContent;
 export type MessageParams = {
   guid? : string,
   severity?: Severity;
+  priority?: Priority;
   scope?: Scope;
   content?: MessageContents;
   actions?: Immutable.List<MessageAction>;
@@ -43,6 +52,7 @@ export type MessageParams = {
 const defaultContent = {
   guid: '',
   severity: Severity.Error,
+  priority: Priority.Medium,
   scope: Scope.Resource,
   content: new TitledContent(),
   actions: Immutable.List<MessageAction>(),
@@ -53,6 +63,7 @@ export class Message extends Immutable.Record(defaultContent) {
 
   guid: string;
   severity: Severity;
+  priority: Priority;
   scope: Scope;
   content: MessageContents;
   actions: Immutable.List<MessageAction>;

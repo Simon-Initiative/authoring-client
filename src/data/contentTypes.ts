@@ -77,6 +77,8 @@ export { Question } from './content/assessment/question';
 export { Part } from './content/assessment/part';
 export { Response } from './content/assessment/response';
 export { Hint } from './content/assessment/hint';
+export { ImageHotspot } from './content/assessment/image_hotspot/image_hotspot';
+export { Hotspot } from './content/assessment/image_hotspot/hotspot';
 export { Feedback } from './content/assessment/feedback';
 export { MultipleChoice } from './content/assessment/multiple_choice';
 export { FillInTheBlank } from './content/assessment/fill_in_the_blank';
@@ -143,14 +145,6 @@ export { LearningObjective } from './content/objectives/objective';
 export { ObjectiveSkills } from './content/objectives/objective_skills';
 export { Skill } from './content/objectives/skill';
 
-import { Essay } from './content/assessment/essay';
-import { Ordering } from './content/assessment/ordering';
-import { ShortAnswer } from './content/assessment/short_answer';
-import { FillInTheBlank } from './content/assessment/fill_in_the_blank';
-import { Text } from './content/assessment/text';
-import { MultipleChoice } from './content/assessment/multiple_choice';
-import { Numeric } from './content/assessment/numeric';
-import { Unsupported } from './content/unsupported';
 import { Image } from './content/learning/image';
 import { Audio } from './content/learning/audio';
 import { Video } from './content/learning/video';
@@ -164,16 +158,7 @@ import { Mathematica } from './content/learning/mathematica';
 import { Panopto } from './content/learning/panopto';
 import { Unity } from './content/learning/unity';
 
-
-export type QuestionItem =
-  Essay |
-  MultipleChoice |
-  FillInTheBlank |
-  Ordering |
-  Numeric |
-  ShortAnswer |
-  Text |
-  Unsupported;
+export { Item as QuestionItem } from './content/assessment/question';
 
 export type MediaItem =
   Applet |

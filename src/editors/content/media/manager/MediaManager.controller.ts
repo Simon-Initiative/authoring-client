@@ -7,6 +7,8 @@ import { Media, MediaItem } from 'types/media';
 import { MediaManager, SELECTION_TYPES } from './MediaManager';
 import { CourseModel } from 'data/models/course';
 
+export { MIMETYPE_FILTERS, SELECTION_TYPES } from './MediaManager';
+
 interface StateProps {
   media: Maybe<OrderedMediaLibrary>;
 }

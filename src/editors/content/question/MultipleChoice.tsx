@@ -322,7 +322,7 @@ export class MultipleChoice
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
-            <div className="instruction-label">Select the correct choice</div>
+            <div className="instruction-label">Select the correct choice and provide feedback</div>
             <ChoiceList className="multiple-choice-choices">
               {this.renderChoices()}
             </ChoiceList>

@@ -16,6 +16,7 @@ import { ContentContainer } from 'editors/content/container/ContentContainer';
 import { containsDynaDropCustom } from 'editors/content/question/QuestionEditor';
 
 import './Question.scss';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 const REMOVE_QUESTION_DISABLED_MSG =
   'An assessment must contain at least one question. '
@@ -73,6 +74,8 @@ export const getLabelForQuestion = (question: contentTypes.Question): string => 
     case 'Numeric':
     case 'FillInTheBlank':
       return 'Input';
+    case 'ImageHotspot':
+      return 'Image Hotspot';
     default:
       return 'Question';
   }
@@ -141,13 +144,20 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
   renderQuestionTitle(): JSX.Element {
     const { model, canRemoveQuestion, onRemoveQuestion, editMode } = this.props;
 
+    const checkAllHelpPopover = <HelpPopover activateOnClick>
+      <iframe src="https://www.youtube.com/embed/-9Pd4B6Yy2M" height={500} width={'100%'} />
+    </HelpPopover>;
+
     return (
       <ContentTitle
-          title={getLabelForQuestion(model)}
-          onDuplicate={editMode ? this.props.onDuplicate : undefined}
-          canRemove={canRemoveQuestion}
-          removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
-          onRemove={onRemoveQuestion} />
+        title={getLabelForQuestion(model)}
+        onDuplicate={editMode ? this.props.onDuplicate : undefined}
+        canRemove={canRemoveQuestion}
+        removeDisabledMessage={REMOVE_QUESTION_DISABLED_MSG}
+        onRemove={onRemoveQuestion}
+        helpPopover={getLabelForQuestion(model) === 'Check All That Apply'
+          ? checkAllHelpPopover
+          : null} />
     );
   }
 
@@ -181,7 +191,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     const additionalOptions = this.renderAdditionalOptions();
     if (additionalOptions.length > 0) {
       options = options.concat(
-        <div key="flex-spacer" className="flex-spacer"/>,
+        <div key="flex-spacer" className="flex-spacer" />,
         ...additionalOptions,
       );
     }
@@ -206,16 +216,16 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
 
     return (
       <div className="question-body" key="question">
-          <ContentContainer
-            activeContentGuid={this.props.activeContentGuid}
-            hover={this.props.hover}
-            onUpdateHover={this.props.onUpdateHover}
-            onFocus={this.props.onFocus}
-            editMode={editMode}
-            services={services}
-            context={context}
-            model={body}
-            onEdit={onBodyEdit} />
+        <ContentContainer
+          activeContentGuid={this.props.activeContentGuid}
+          hover={this.props.hover}
+          onUpdateHover={this.props.onUpdateHover}
+          onFocus={this.props.onFocus}
+          editMode={editMode}
+          services={services}
+          context={context}
+          model={body}
+          onEdit={onBodyEdit} />
       </div>
     );
   }
@@ -232,12 +242,12 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
     return (
       <Tab className="skills-tab">
         <TabSection className="skills">
-          <TabSectionHeader title="Attached Skills"/>
+          <TabSectionHeader title="Attached Skills" />
           <TabSectionContent>
             <SkillsEditor
               activeContentGuid={null}
               hover={null}
-              onUpdateHover={() => {}}
+              onUpdateHover={() => { }}
               editMode={this.props.editMode}
               services={this.props.services}
               context={this.props.context}
@@ -277,7 +287,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
               <CriteriaEditor
                 activeContentGuid={null}
                 hover={null}
-                onUpdateHover={() => {}}
+                onUpdateHover={() => { }}
                 onFocus={this.props.onItemFocus.bind(this, c, this)}
                 parent={null}
                 key={c.guid}
@@ -336,7 +346,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
             ...(this.renderHintsTab(item, parts[index]) ? ['Hints'] : []),
             ...(!hideGradingCriteria ? ['Criteria'] : []),
             ...(showAdditionalTabs
-                && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
+              && (this.renderAdditionalTabs() as TabElement[]).map(tab => tab.label)),
           ]}>
 
           {this.renderDetails() ? this.renderDetailsTab() : null}

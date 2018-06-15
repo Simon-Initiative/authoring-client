@@ -85,12 +85,14 @@ export class ContentContainer
     this.onChildEdit(childModel, childModel);
   }
 
-  insertAt(model, toInsert, index) {
+  insertAt(model, toInsert: Object[], index) {
     const arr = model.content
       .map((v, k) => [k, v])
       .toArray();
 
-    arr.splice(index, 0, [toInsert.guid, toInsert]);
+    toInsert.map(i => [(i as any).guid, i])
+      .reverse()
+      .forEach(i => arr.splice(index, 0, i));
 
     return model.with({ content: Immutable.OrderedMap<string, ContentElement>(arr) });
   }
@@ -103,6 +105,12 @@ export class ContentContainer
     const { onEdit, model, activeContentGuid } = this.props;
 
     // The following defines the insertion logic
+
+    // Support either a scalar or array of elements to add
+    const arrToAdd = toAdd instanceof Array
+      ? toAdd
+      : [toAdd];
+    const firstItem = arrToAdd[0];
 
     if (model.content.has(activeContentGuid)) {
 
@@ -118,34 +126,36 @@ export class ContentContainer
 
         // We replace the text when it is effectively empty
         if (active.isEffectivelyEmpty()) {
-          const updated : ContentElements = this.insertAfter(model, toAdd, index);
-          onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), toAdd);
+          const updated : ContentElements = this.insertAfter(model, arrToAdd, index);
+          onEdit(updated.with({ content: updated.content.delete(activeContentGuid) }), firstItem);
 
         // We insert after when the cursor is at the end
         } else if (selection === undefined || active.isCursorAtEffectiveEnd(selection)) {
-          onEdit(this.insertAfter(model, toAdd, index), toAdd);
+          onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
 
         // If it is at the beginning, insert the new item before the text
         } else if (active.isCursorAtBeginning(selection)) {
-          onEdit(this.insertAfter(model, toAdd, index - 1), toAdd);
+          onEdit(this.insertAfter(model, arrToAdd, index - 1), firstItem);
 
         // Otherwise we split the contiguous block in two parts and insert in between
         } else {
           const pair = active.split(selection);
           let updated = model.with({ content: model.content.set(pair[0].guid, pair[0]) });
-          updated = this.insertAfter(updated, toAdd, index);
-          updated = this.insertAfter(updated, pair[1], index + 1);
-          onEdit(updated, toAdd);
+          updated = this.insertAfter(updated, arrToAdd, index);
+          updated = this.insertAfter(updated, [pair[1]], index + arrToAdd.length);
+          onEdit(updated, firstItem);
         }
 
       } else {
-        onEdit(this.insertAfter(model, toAdd, index), toAdd);
+        onEdit(this.insertAfter(model, arrToAdd, index), firstItem);
       }
 
     } else {
       // If somehow the active selected item isn't in this ContentElements, we
       // still want to support addition of the new element.  Just insert it at the end
-      onEdit(model.with({ content: model.content.set(toAdd.guid, toAdd) }), toAdd);
+      const mapToAdd = Immutable.OrderedMap<string, ContentElement>(
+        [arrToAdd.map(i => [(i as any).guid, i])]);
+      onEdit(model.with({ content: model.content.merge(mapToAdd) }), firstItem);
     }
 
     this.onSelect(toAdd);
@@ -221,7 +231,7 @@ export class ContentContainer
       const newModel = model.with({
         content: model.content.delete(childModel.guid)});
 
-      onEdit(this.insertAt(newModel, childModel, (Math.max(index - 1, 0))), childModel);
+      onEdit(this.insertAt(newModel, [childModel], (Math.max(index - 1, 0))), childModel);
     }
   }
 
@@ -236,7 +246,7 @@ export class ContentContainer
 
       onEdit(
         this.insertAt(
-          newModel, childModel, (Math.min(index + 1, newModel.content.size))),
+          newModel, [childModel], (Math.min(index + 1, newModel.content.size))),
         childModel);
     }
   }
@@ -329,7 +339,12 @@ export class ContentContainer
               hideContentLabel={hideContentLabel}
               disableContentSelection={disableContentSelection}
               key={model.guid}
-              onMouseOver={() => onUpdateHover && onUpdateHover(model.guid) }
+              onMouseOver={(e) => {
+                if (onUpdateHover) {
+                  onUpdateHover(model.guid);
+                  e.stopPropagation();
+                }
+              }}
               isHoveringContent={isHoverContent}
               isActiveContent={isActiveContent}
               className={decoratorClassNames}

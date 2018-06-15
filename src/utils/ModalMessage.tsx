@@ -6,7 +6,7 @@ export interface ModalMessage {
 
 export interface ModalMessageProps {
   okLabel?: string;
-  text: string;
+  onCancel: () => void;
 }
 
 export class ModalMessage extends React.PureComponent<ModalMessageProps, {}> {
@@ -29,19 +29,17 @@ export class ModalMessage extends React.PureComponent<ModalMessageProps, {}> {
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+              <button onClick={this.props.onCancel} type="button" className="close"
+                data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div className="modal-body">
-              {this.props.text}
+              {this.props.children}
             </div>
             <div className="modal-footer">
               <button type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  (window as any).$(this.modal).modal('hide');
-                }}
+                onClick={this.props.onCancel}
                 className="btn btn-primary">{okLabel}</button>
             </div>
           </div>

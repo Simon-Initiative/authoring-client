@@ -11,6 +11,7 @@ import { ModalState } from 'reducers/modal';
 import { CourseState } from 'reducers/course';
 import { ExpandedState } from 'reducers/expanded';
 import { ServerState } from 'reducers/server';
+import { HoverState } from 'reducers/hover';
 import * as contentTypes from './data/contentTypes';
 import * as models from './data/models';
 import guid from './utils/guid';
@@ -37,10 +38,11 @@ import { Resource, ResourceState } from 'data/content/resource';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './Main.scss';
 import CourseEditor from 'editors/document/course//CourseEditor.controller';
+import { HelpPopover } from 'editors/common/popover/HelpPopover.controller';
 
 type ResourceList = {
   title: string,
-  resourceType: string,
+  resourceType: LegacyTypes,
   filterFn: any,
   createResourceFn: any,
 };
@@ -135,7 +137,9 @@ interface MainProps {
   course: CourseState;
   expanded: ExpandedState;
   server: ServerState;
+  hover: HoverState;
   onDispatch: (...args: any[]) => any;
+  onUpdateHover: (hover: string) => void;
 }
 
 interface MainState {
@@ -199,6 +203,10 @@ export default class Main extends React.Component<MainProps, MainState> {
   renderResource(resource: ResourceList) {
     const { onDispatch, server, course } = this.props;
 
+    const orgHelpPopover = <HelpPopover activateOnClick>
+      <iframe src="https://www.youtube.com/embed/iJvYU20xU-E" height={500} width={'100%'} />
+    </HelpPopover>;
+
     return (
       <ResourceView
         serverTimeSkewInMs={server.timeSkewInMs}
@@ -207,7 +215,8 @@ export default class Main extends React.Component<MainProps, MainState> {
         resourceType={resource.resourceType}
         filterFn={resource.filterFn}
         createResourceFn={resource.createResourceFn}
-        dispatch={onDispatch} />
+        dispatch={onDispatch}
+        helpPopover={resource.resourceType === LegacyTypes.organization ? orgHelpPopover : null} />
     );
   }
 
@@ -294,7 +303,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
 
   render(): JSX.Element {
-    const { modal, user } = this.props;
+    const { modal, user, hover, onUpdateHover } = this.props;
 
     if (user === null) {
       return null;
@@ -311,7 +320,7 @@ export default class Main extends React.Component<MainProps, MainState> {
     const currentView = this.getView(getPathName(this.props.location.pathname));
 
     return (
-      <div className="main">
+      <div className="main" onMouseOver={() => hover && onUpdateHover(null)}>
         <div className="main-header">
           <Messages />
           <Header />

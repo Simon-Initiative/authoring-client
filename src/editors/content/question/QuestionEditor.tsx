@@ -7,6 +7,7 @@ import { ContentElements } from 'data/content/common/elements';
 import { MultipleChoice } from './MultipleChoice.controller';
 import { Essay } from './Essay';
 import { CheckAllThatApply } from './CheckAllThatApply.controller';
+import { ImageHotspot } from './ImageHotspot.controller';
 import { ShortAnswer } from './ShortAnswer';
 import { Ordering } from './Ordering.controller';
 import { DynaDropInput } from './DynaDropInput.controller';
@@ -116,6 +117,14 @@ export class QuestionEditor
     return false;
   }
 
+
+  /** Override Parent Method */
+  handleOnClick(e) {
+    if (this.props.onHandleClick !== undefined) {
+      this.props.onHandleClick(e);
+    }
+  }
+
   onBlur(activeItemId: string) {
     if (this.state.activeItemId === activeItemId) {
       this.setState({ activeItemId: null });
@@ -144,7 +153,7 @@ export class QuestionEditor
     let question = this.props.model.with({ body });
 
     if (this.lastBody !== undefined) {
-      const delta = detectInputRefChanges(this.lastBody, body);
+      const delta = detectInputRefChanges(body, this.lastBody);
 
       // For any deletions of input_refs, we need to make sure that we remove
       // the corresponding item and part from the question model
@@ -245,6 +254,8 @@ export class QuestionEditor
       parts: this.props.model.parts.set(part.guid, part),
     });
 
+    this.lastBody = body;
+
     this.props.onEdit(model, null);
   }
 
@@ -316,6 +327,11 @@ export class QuestionEditor
     if (item.contentType === 'Essay') {
       return (
         <Essay {...questionProps} itemModel={item} />
+      );
+    }
+    if (item.contentType === 'ImageHotspot') {
+      return (
+        <ImageHotspot {...questionProps} itemModel={item} />
       );
     }
   }

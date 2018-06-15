@@ -7,51 +7,36 @@ import './InputRef.scss';
 const InputRef = (props) => {
   const data = props.contentState.getEntity(props.entityKey).getData();
 
-  const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
+  // const selected = props.activeItemId === data['@input'] ? 'InputRefSelected' : '';
 
   if (data.$type === 'FillInTheBlank') {
-    const classes = 'form-control-sm custom-select mb-2 mr-sm-2 mb-sm-0 ' + selected;
     return (
-        <select data-offset-key={props.offsetKey} disabled
-          style={{ width:'120px', marginRight: '2px', display: 'inline' }}
-          value="sample1" className={classes}>
-          <option value="sample1">Dropdown</option>
-        </select>
+      <span className="dropdownSpan" data-offset-key={props.offsetKey}>
+        {props.children}
+      </span>
     );
   }
   if (data.$type === 'Numeric') {
-    const classes = 'form-control form-control-sm ' + selected;
     return (
-        <input
-          data-offset-key={props.offsetKey}
-          style={{ width:'75px', marginRight: '2px', display: 'inline' }}
-          disabled
-          className={classes}
-          value="Numeric"/>
+      <span className="numericSpan" data-offset-key={props.offsetKey}>
+        {props.children}
+      </span>
     );
 
   }
   if (data.$type === 'Text') {
-    const classes = 'form-control form-control-sm ' + selected;
     return (
-        <input
-          data-offset-key={props.offsetKey}
-          style={{ width:'65px', marginRight: '2px', display: 'inline' }}
-          disabled
-          className={classes}
-          value="Text"/>
+      <span className="textSpan" data-offset-key={props.offsetKey}>
+        {props.children}
+      </span>
     );
 
   }
 
-  const classes = 'form-control form-control-sm ' + selected;
   return (
-      <input
-        data-offset-key={props.offsetKey}
-        style={{ width:'65px', marginRight: '2px', display: 'inline' }}
-        disabled
-        className={classes}
-        value={data.$type}/>
+    <span className="textSpan" data-offset-key={props.offsetKey}>
+      {props.children}
+    </span>
   );
 };
 
