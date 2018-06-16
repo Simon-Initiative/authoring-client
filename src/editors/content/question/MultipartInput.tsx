@@ -131,7 +131,7 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Text().with({ id: result[1] });
-      const part = this.buildPartWithInitialResponse('');
+      const part = this.buildPartWithInitialResponse('answer');
 
       this.props.onAddItemPart(item, part, result[0]);
     }
