@@ -17,7 +17,6 @@ import {
 import { AppContext } from 'editors/common/AppContext';
 import { AppServices } from 'editors/common/AppServices';
 import { PageSelection } from 'editors/document/assessment/PageSelection.tsx';
-import guid from 'utils/guid';
 import { createMultipleChoiceQuestion } from 'editors/content/question/AddQuestion';
 import { TextInput } from 'editors/content/common/TextInput';
 import { LegacyTypes } from 'data/types';
@@ -176,14 +175,10 @@ export class ContextAwareSidebar
     let page = new contentTypes.Page()
       .with({ title: contentTypes.Title.fromText(text) });
 
-    let content = new contentTypes.Content();
-    content = content.with({ guid: guid() });
-
     const question = createMultipleChoiceQuestion('single');
 
     page = page.with({
-      nodes: page.nodes.set(content.guid, content)
-        .set(question.guid, question),
+      nodes: page.nodes.set(question.guid, question),
     });
 
     onEditModel(
