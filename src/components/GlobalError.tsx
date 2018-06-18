@@ -24,7 +24,7 @@ export const GlobalError = injectSheetSFC<GlobalErrorProps>(styles)(({
 
       <div className={classNames([classes.globalContent])}>
 
-        <div className={classNames([classes.icon])}>
+        <div>
           <span>
             <i className="fa fa-frown-o fa-4x"></i>
           </span>
