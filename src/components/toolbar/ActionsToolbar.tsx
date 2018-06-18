@@ -6,6 +6,20 @@ import { Resource } from 'data/content/resource';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
 
+const getReadableResourceType = (documentResource: Resource) => {
+  switch (documentResource && documentResource.type) {
+    case 'x-oli-workbook_page':
+      return 'Page';
+    case 'x-oli-inline-assessment"':
+    case 'x-oli-assessment2':
+      return 'Page';
+    case 'x-oli-assessment2-pool':
+      return 'Page';
+    default:
+      return 'Resource';
+  }
+};
+
 export interface ActionsToolbarProps {
   course: CourseModel;
   documentResource: Resource;
@@ -29,6 +43,8 @@ export const ActionsToolbar = (({
   canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
   onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
+  const ReadableResourceType = getReadableResourceType(documentResource);
+
   return (
     <React.Fragment>
       <ToolbarLayout.Column>
@@ -48,7 +64,7 @@ export const ActionsToolbar = (({
       <ToolbarLayout.Inline>
         <ToolbarButton
           onClick={() => onShowPageDetails()}
-          tooltip="View and Edit Page Details"
+          tooltip={`View and Edit ${ReadableResourceType} Details`}
           size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-info-circle" /></div>
           <div>Info</div>
@@ -60,13 +76,13 @@ export const ActionsToolbar = (({
               course={course}
               onDismissModal={onDismissModal} />)}
           size={ToolbarButtonSize.Large}
-          tooltip="Delete this Page">
+          tooltip={`Delete this ${ReadableResourceType}`}>
           <div><i className="fa fa-trash-o" /></div>
         <div>Delete</div>
       </ToolbarButton>
       <ToolbarButton
         onClick={() => onQuickPreview(course.guid, documentResource)}
-        tooltip="Preview this Page"
+        tooltip={`Preview this ${ReadableResourceType}`}
         disabled={!canPreview}
         size={ToolbarButtonSize.Large}>
         <div><i className="fa fa-eye" /></div>
