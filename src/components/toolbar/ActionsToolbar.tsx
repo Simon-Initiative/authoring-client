@@ -12,9 +12,9 @@ const getReadableResourceType = (documentResource: Resource) => {
       return 'Page';
     case 'x-oli-inline-assessment"':
     case 'x-oli-assessment2':
-      return 'Page';
+      return 'Assessment';
     case 'x-oli-assessment2-pool':
-      return 'Page';
+      return 'Pool';
     default:
       return 'Resource';
   }
