@@ -130,7 +130,8 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
     const iframeOrWait = needsRefresh
       && this.state.previewUrl.caseOf({ just: n => false, nothing: () => true })
       ? <div className="preview-waiting">
-          Please wait while the course content is being built.
+          <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> Please wait
+          while the course content is being built...
         </div>
       : iframe;
 
