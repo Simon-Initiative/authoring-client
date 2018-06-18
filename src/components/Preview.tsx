@@ -110,16 +110,30 @@ export default class Preview extends React.PureComponent<PreviewProps, PreviewSt
 
   render() {
 
-    const buildIFrame = url => <iframe className="preview-iframe" src={url} />;
+    const buildIFrame = (url) => {
+      return <iframe className="preview-iframe" src={url} />;
+    };
 
+    const needsRefresh = this.props.previewUrl.caseOf({
+      nothing: () => true,
+      just: url => this.props.shouldRefresh,
+    });
 
-    const iframeOrWait = this.props.previewUrl.caseOf({
+    const iframe = this.props.previewUrl.caseOf({
       just: url => buildIFrame(url),
       nothing: () => this.state.previewUrl.caseOf({
         just: url => buildIFrame(url),
         nothing: () => null,
       }),
     });
+
+    const iframeOrWait = needsRefresh
+      && this.state.previewUrl.caseOf({ just: n => false, nothing: () => true })
+      ? <div className="preview-waiting">
+          <i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw" /> Please wait
+          while the course content is being built...
+        </div>
+      : iframe;
 
     return (
       <div className="preview">
