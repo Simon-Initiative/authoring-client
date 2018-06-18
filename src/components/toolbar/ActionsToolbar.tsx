@@ -5,6 +5,21 @@ import { ToolbarButton, ToolbarButtonSize } from './ToolbarButton';
 import { Resource } from 'data/content/resource';
 import { DeleteResourceModal } from 'components/DeleteResourceModal.controller';
 import { CourseModel } from 'data/models';
+import { LegacyTypes } from 'data/types';
+
+const getReadableResourceType = (documentResource: Resource) => {
+  switch (documentResource && documentResource.type) {
+    case LegacyTypes.workbook_page:
+      return 'Page';
+    case LegacyTypes.inline:
+    case LegacyTypes.assessment2:
+      return 'Assessment';
+    case LegacyTypes.assessment2_pool:
+      return 'Pool';
+    default:
+      return 'Resource';
+  }
+};
 
 export interface ActionsToolbarProps {
   course: CourseModel;
@@ -29,6 +44,8 @@ export const ActionsToolbar = (({
   canPreview, onShowPageDetails, onQuickPreview, onUndo, onRedo,
   onDismissModal, onDisplayModal,
 }: ComponentProps<ActionsToolbarProps>) => {
+  const ReadableResourceType = getReadableResourceType(documentResource);
+
   return (
     <React.Fragment>
       <ToolbarLayout.Column>
@@ -48,7 +65,7 @@ export const ActionsToolbar = (({
       <ToolbarLayout.Inline>
         <ToolbarButton
           onClick={() => onShowPageDetails()}
-          tooltip="View and Edit Page Details"
+          tooltip={`View and Edit ${ReadableResourceType} Details`}
           size={ToolbarButtonSize.Large}>
           <div><i className="fa fa-info-circle" /></div>
           <div>Info</div>
@@ -60,13 +77,13 @@ export const ActionsToolbar = (({
               course={course}
               onDismissModal={onDismissModal} />)}
           size={ToolbarButtonSize.Large}
-          tooltip="Delete this Page">
+          tooltip={`Delete this ${ReadableResourceType}`}>
           <div><i className="fa fa-trash-o" /></div>
         <div>Delete</div>
       </ToolbarButton>
       <ToolbarButton
         onClick={() => onQuickPreview(course.guid, documentResource)}
-        tooltip="Preview this Page"
+        tooltip={`Preview this ${ReadableResourceType}`}
         disabled={!canPreview}
         size={ToolbarButtonSize.Large}>
         <div><i className="fa fa-eye" /></div>
