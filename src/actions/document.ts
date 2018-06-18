@@ -231,6 +231,13 @@ export function load(courseId: string, documentId: string) {
   };
 }
 
+export function releaseAll() {
+  return function (dispatch, getState) {
+    const documents : EditedDocument[] = getState().documents.toArray();
+    documents.forEach(d => dispatch(release(d.documentId)));
+  };
+}
+
 export function release(documentId: string) {
   return function (dispatch, getState) {
     const editedDocument: EditedDocument = getState().documents.get(documentId);
