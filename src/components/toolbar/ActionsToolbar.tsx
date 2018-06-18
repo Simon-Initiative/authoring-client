@@ -10,7 +10,7 @@ const getReadableResourceType = (documentResource: Resource) => {
   switch (documentResource && documentResource.type) {
     case 'x-oli-workbook_page':
       return 'Page';
-    case 'x-oli-inline-assessment"':
+    case 'x-oli-inline-assessment':
     case 'x-oli-assessment2':
       return 'Assessment';
     case 'x-oli-assessment2-pool':
