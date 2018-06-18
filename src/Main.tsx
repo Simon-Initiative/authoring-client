@@ -160,7 +160,7 @@ export default class Main extends React.Component<MainProps, MainState> {
 
   constructor(props) {
     super(props);
-    const { location, onDispatch } = this.props;
+    const { onDispatch } = this.props;
 
     this.modalActions = bindActionCreators((modalActions as any), onDispatch);
     this.viewActions = bindActionCreators((viewActions as any), onDispatch);
