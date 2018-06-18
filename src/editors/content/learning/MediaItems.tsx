@@ -175,10 +175,9 @@ export class MediaMetadataEditor
         </SidebarGroup>
         <SidebarGroup label="Popout">
           <ToggleSwitch
-            {...this.props}
             checked={popout.enable}
             onClick={this.onPopoutEnableToggle}
-            labelBefore="Enabled" />
+            label="Enabled" />
           <TextInput width="100%" label="Content"
             editMode={this.props.editMode}
             value={popout.content}

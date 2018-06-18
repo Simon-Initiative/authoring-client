@@ -99,7 +99,7 @@ export default class PulloutEditor
             editMode={this.props.editMode}
             checked={this.isOrientVertical()}
             onClick={() => this.onEditOrient(!this.isOrientVertical())}
-            labelBefore="Vertical" />
+            label="Vertical" />
 
         </ToolbarLayout.Column>
 

@@ -272,7 +272,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <Tab className="criteria-tab">
         <TabSection className="criteria">
           <TabSectionHeader title="Grading Criteria">
-            <TabOptionControl key="add-cirteria" name="Add Criteria" hideLabel>
+            <TabOptionControl name="add-cirteria">
               <Button
                 editMode={editMode}
                 type="link"
@@ -309,7 +309,7 @@ export abstract class Question<P extends QuestionProps<contentTypes.QuestionItem
       <Tab className="hints-tab">
         <TabSection className="hints">
           <TabSectionHeader title="Hints">
-            <TabOptionControl key="add-hint" name="Add Hint" hideLabel>
+            <TabOptionControl name="add-hint">
               <Button
                 editMode={this.props.editMode}
                 type="link"

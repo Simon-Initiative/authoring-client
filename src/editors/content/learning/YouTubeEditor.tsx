@@ -91,7 +91,7 @@ export default class YouTubeEditor
           <ToggleSwitch
             checked={this.props.model.controls}
             onClick={this.onControlEdit}
-            labelBefore="Display YouTube controls" />
+            label="Display YouTube controls" />
         </SidebarGroup>
         <MediaWidthHeightEditor
           width={this.props.model.width}

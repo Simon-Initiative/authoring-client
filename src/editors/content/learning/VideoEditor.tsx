@@ -111,7 +111,7 @@ export default class VideoEditor
           <ToggleSwitch
             checked={this.props.model.controls}
             onClick={this.onControlEdit}
-            labelBefore="Display video controls" />
+            label="Display video controls" />
         </SidebarGroup>
 
         <MediaWidthHeightEditor

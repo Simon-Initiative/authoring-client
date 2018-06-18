@@ -219,7 +219,7 @@ FillInTheBlank
     return (
       <TabSection className="choices">
         <TabSectionHeader title="Choices">
-          <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+          <TabOptionControl name="add-choice">
             <Button
               editMode={editMode}
               type="link"
@@ -227,8 +227,11 @@ FillInTheBlank
               Add Choice
             </Button>
           </TabOptionControl>
-          <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-            <ToggleSwitch checked={itemModel.shuffle} />
+          <TabOptionControl name="shuffle">
+            <ToggleSwitch
+              checked={itemModel.shuffle}
+              label="Shuffle"
+              onClick={this.onToggleShuffle} />
           </TabOptionControl>
         </TabSectionHeader>
         <TabSectionContent>

@@ -239,9 +239,9 @@ export class ImageHotspot
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Hotspots">
-            <TabOptionControl key="advancedscoring" name="" >
+            <TabOptionControl name="advancedscoring">
               <ToggleSwitch
-                labelBefore="Advanced"
+                label="Advanced"
                 checked={advancedScoring}
                 onClick={this.onToggleAdvanced}/>
             </TabOptionControl>

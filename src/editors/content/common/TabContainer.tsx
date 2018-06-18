@@ -145,17 +145,17 @@ export const TabSection: React.StatelessComponent<TabSectionProps> = ({ classNam
 type TabOptionControlProps = {
   className?: string;
   name: string,
-  hideLabel?: boolean,
+  label?: string,
   onClick?: (e, name: string) => void;
 };
 
 export const TabOptionControl: React.StatelessComponent<TabOptionControlProps>
-  = ({ name, hideLabel, onClick, children, className }) => (
+  = ({ name, label, onClick, children, className }) => (
   <div
     className={`control clickable ${convertStringToCSS(name)} ${className || ''}`}
     onClick={e => onClick && onClick(e, name)}>
-    {!hideLabel &&
-      <div className="control-label">{name}</div>
+    {label &&
+      <div className="control-label">{label}</div>
     }
     {children}
   </div>

@@ -183,7 +183,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
-            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+            <TabOptionControl name="add-choice">
               <Button
                 editMode={editMode}
                 type="link"
@@ -191,8 +191,11 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
                 Add Choice
               </Button>
             </TabOptionControl>
-            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-              <ToggleSwitch checked={itemModel.shuffle} />
+            <TabOptionControl name="shuffle">
+              <ToggleSwitch
+                checked={itemModel.shuffle}
+                label="Shuffle"
+                onClick={this.onToggleShuffle} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>
@@ -203,7 +206,7 @@ export class Ordering extends Question<OrderingProps, OrderingState> {
         </TabSection>
         <TabSection key="feedback" className="feedback">
           <TabSectionHeader title="Feedback">
-            <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
+            <TabOptionControl name="add-feedback">
               <Button
                 editMode={editMode}
                 type="link"
