@@ -91,10 +91,9 @@ export class CustomEditor
           </SidebarRow>
           <SidebarRow label="Logging">
             <ToggleSwitch
-              {...this.props}
               checked={model.logging}
               onClick={() => onEdit(model.with({ logging: !model.logging }))}
-              labelBefore="Enabled" />
+              label="Enabled" />
           </SidebarRow>
         </SidebarGroup>
       </SidebarContent>

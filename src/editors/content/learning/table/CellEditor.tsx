@@ -156,11 +156,10 @@ export default class CellEditor
         </SidebarGroup>
         <SidebarGroup label="Header">
           <ToggleSwitch
-            {...this.props}
             checked={this.props.model.contentType === 'CellHeader'}
             onClick={() =>
               this.onToggleCellHeader()}
-            labelBefore="Display cell as a header" />
+            label="Display cell as a header" />
         </SidebarGroup>
       </SidebarContent>
     );

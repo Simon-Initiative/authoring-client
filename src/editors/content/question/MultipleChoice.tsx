@@ -306,7 +306,7 @@ export class MultipleChoice
       <React.Fragment>
         <TabSection key="choices" className="choices">
           <TabSectionHeader title="Choices">
-            <TabOptionControl key="add-choice" name="Add Choice" hideLabel>
+            <TabOptionControl name="add-choice">
               <Button
                 editMode={editMode}
                 type="link"
@@ -314,11 +314,17 @@ export class MultipleChoice
                 Add Choice
               </Button>
             </TabOptionControl>
-            <TabOptionControl key="shuffle" name="Shuffle" onClick={this.onToggleShuffle}>
-              <ToggleSwitch checked={itemModel.shuffle} />
+            <TabOptionControl name="shuffle">
+              <ToggleSwitch
+                checked={itemModel.shuffle}
+                label="Shuffle"
+                onClick={this.onToggleShuffle} />
             </TabOptionControl>
-            <TabOptionControl key="advancedscoring" name="Advanced" onClick={this.onToggleAdvanced}>
-              <ToggleSwitch checked={advancedScoring} />
+            <TabOptionControl name="advancedscoring">
+              <ToggleSwitch
+                checked={advancedScoring}
+                label="Advanced"
+                onClick={this.onToggleAdvanced} />
             </TabOptionControl>
           </TabSectionHeader>
           <TabSectionContent>

@@ -99,7 +99,7 @@ export class Numeric
           </Select>
         </TabSectionContent>
         <TabSectionHeader title="Feedback">
-          <TabOptionControl key="add-feedback" name="Add Feedback" hideLabel>
+          <TabOptionControl name="add-feedback">
             <Button
               editMode={editMode}
               type="link"

@@ -103,10 +103,9 @@ export default class AppletEditor
 
         <SidebarGroup label="Logging">
           <ToggleSwitch
-            {...this.props}
             checked={model.logging}
             onClick={this.onLoggingToggle}
-            labelBefore="Enabled" />
+            label="Enabled" />
         </SidebarGroup>
 
         <MediaWidthHeightEditor

@@ -8,15 +8,14 @@ export interface ToggleSwitchProps {
   style?: any;
   checked?: boolean;
   onClick?: (e) => void;
-  labelBefore?: string;
-  labelAfter?: string;
+  label: string;
 }
 
 /**
  * React Stateless ToggleSwitch
  */
 export const ToggleSwitch: React.StatelessComponent<ToggleSwitchProps> = ({
-  className, style, checked, onClick, labelBefore, labelAfter, editMode,
+  className, style, checked, onClick, label, editMode,
 }) => {
   const disabled = (editMode !== undefined && !editMode);
 
@@ -24,7 +23,6 @@ export const ToggleSwitch: React.StatelessComponent<ToggleSwitchProps> = ({
     <div
       className={`toggle-switch ${className || ''} ${disabled && 'disabled'}`}
       style={style} onClick={e => !disabled && onClick(e)}>
-      {labelBefore && <span className="label before">{labelBefore}</span>}
       <input
         className="toggle toggle-light"
         type="checkbox"
@@ -32,7 +30,7 @@ export const ToggleSwitch: React.StatelessComponent<ToggleSwitchProps> = ({
         disabled={disabled}
         checked={checked || false} />
       <label className="toggle-btn"></label>
-      {labelAfter && <span className="label after">{labelAfter}</span>}
+      {label && <span className="label after">{label}</span>}
     </div>
   );
 };

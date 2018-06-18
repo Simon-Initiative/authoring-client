@@ -219,14 +219,13 @@ export class ImageSizeSidebar extends
           </SidebarRow>
           <SidebarRow label="">
             <ToggleSwitch
-              {...this.props}
               editMode={this.props.editMode &&
                 this.state.isSizeReceived &&
                 !this.state.isNativeSize}
               checked={this.state.isProportionConstrained}
               onClick={() =>
                 this.onToggleProportionContrained(!this.state.isProportionConstrained)}
-              labelBefore="Maintain Aspect Ratio" />
+              label="Maintain Aspect Ratio" />
           </SidebarRow>
         </SidebarGroup>
       </div>
