@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import * as contentTypes from 'data/contentTypes';
 import {
   Question, QuestionProps, QuestionState,
@@ -88,12 +89,39 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
     return result;
   }
 
+  buildPartWithInitialResponse(match: string) : contentTypes.Part {
+
+    const correctFeedback = contentTypes.Feedback.fromText('Correct!', guid());
+    const correctResponse = new contentTypes.Response().with({
+      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
+        .set(correctFeedback.guid, correctFeedback),
+      score: '1',
+      match,
+    });
+
+    const otherFeedback = contentTypes.Feedback.fromText('Incorrect.', guid());
+    const otherResponse = new contentTypes.Response().with({
+      feedback: Immutable.OrderedMap<string, contentTypes.Feedback>()
+        .set(otherFeedback.guid, otherFeedback),
+      score: '0',
+      match: '*',
+    });
+
+    return new contentTypes.Part().with({
+      responses: Immutable.OrderedMap<string, contentTypes.Response>()
+        .set(correctResponse.guid, correctResponse)
+        .set(otherResponse.guid, otherResponse),
+    });
+
+  }
+
   onInsertNumeric(canInsertAnotherPart: PartAddPredicate) {
     const result = this.onInsertInputRef(canInsertAnotherPart, 'Numeric');
 
     if (result !== null) {
       const item = new contentTypes.Numeric().with({ id: result[1] });
-      const part = new contentTypes.Part();
+      const part = this.buildPartWithInitialResponse('0');
+
       this.props.onAddItemPart(item, part, result[0]);
     }
   }
@@ -103,7 +131,8 @@ export class MultipartInput extends Question<MultipartInputProps, MultipartInput
 
     if (result !== null) {
       const item = new contentTypes.Text().with({ id: result[1] });
-      const part = new contentTypes.Part();
+      const part = this.buildPartWithInitialResponse('answer');
+
       this.props.onAddItemPart(item, part, result[0]);
     }
   }
